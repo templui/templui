@@ -31,26 +31,25 @@ const (
 
 // ButtonProps configures the Button component
 type ButtonProps struct {
-	Class        string           // Additional CSS classes
-	Text         string           // Button label text
-	Variant      ButtonVariant    // Visual style
-	Size         ButtonSize       // Button dimensions
-	FullWidth    bool             // Expand to fill container
-	Href         string           // URL for link buttons
-	Target       string           // Link target attribute
-	Disabled     bool             // Interactivity state
-	Type         string           // Button type attribute
-	IconLeft     templ.Component  // Icon component before text
-	IconRight    templ.Component  // Icon component after text
-	HxGet        string           // HTMX: URL for GET requests
-	HxPost       string           // HTMX: URL for POST requests
-	HxPut        string           // HTMX: URL for PUT requests
-	HxDelete     string           // HTMX: URL for DELETE requests
-	HxTrigger    string           // HTMX: Trigger event
-	HxTarget     string           // HTMX: Target for response
-	HxSwap       string           // HTMX: Method for inserting response
-	HxReplaceUrl string           // HTMX: Replace the URL to - (alternative to using Href, to void reloading the page)
-	Attributes   templ.Attributes // Additional HTML attributes
+	Class      string           // Additional CSS classes
+	Text       string           // Button label text
+	Variant    ButtonVariant    // Visual style
+	Size       ButtonSize       // Button dimensions
+	FullWidth  bool             // Expand to fill container
+	Href       string           // URL for link buttons
+	Target     string           // Link target attribute
+	Disabled   bool             // Interactivity state
+	Type       string           // Button type attribute
+	IconLeft   templ.Component  // Icon component before text
+	IconRight  templ.Component  // Icon component after text
+	HxGet      string           // HTMX: URL for GET requests
+	HxPost     string           // HTMX: URL for POST requests
+	HxPut      string           // HTMX: URL for PUT requests
+	HxDelete   string           // HTMX: URL for DELETE requests
+	HxTrigger  string           // HTMX: Trigger event
+	HxTarget   string           // HTMX: Target for response
+	HxSwap     string           // HTMX: Method for inserting response
+	Attributes templ.Attributes // Additional HTML attributes
 }
 
 // variantClasses returns CSS classes based on button variant
@@ -179,9 +178,6 @@ templ Button(props ButtonProps) {
 			}
 			if props.HxSwap != "" {
 				hx-swap={ props.HxSwap }
-			}
-			if props.HxReplaceUrl != "" {
-				hx-replace-url={ props.HxReplaceUrl }
 			}
 		>
 			{ children... }
