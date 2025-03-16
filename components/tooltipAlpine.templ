@@ -1,0 +1,90 @@
+package components
+
+import (
+	"fmt"
+	"github.com/axzilla/templui/utils"
+)
+
+type ATooltipProps struct {
+	Text      string          // Text which is displayed insided the tooltip
+	Trigger   templ.Component // The trigger of the tooltip
+	Side      TooltipSide     // Tooltip position relative to trigger
+	ShowArrow bool            // Whether to show the arrow pointer
+	Variant   TooltipVariant  // Visual style variant
+	Class     string          // Additional CSS classes
+
+}
+
+func getDataFromProps(props ATooltipProps) string {
+	// Set default side of tooltip
+	side := TooltipTop
+	if props.Side != "" {
+		side = props.Side
+	}
+
+	return fmt.Sprintf("{tooltipVisible: false,tooltipText: '%v',tooltipArrow: %t,tooltipPosition: '%v'}", props.Text, props.ShowArrow, side)
+}
+
+func getAlpineArrowClass(side TooltipSide) string {
+	switch side {
+	case TooltipRight:
+		return "left-0 -translate-y-1/2 top-1/2 h-2.5 -mt-px -translate-x-full"
+	case TooltipBottom:
+		return "top-0 -translate-x-1/2 left-1/2 w-2.5 -translate-y-full"
+	case TooltipLeft:
+		return "right-0 -translate-y-1/2 top-1/2 h-2.5 -mt-px translate-x-full"
+	default:
+		return "bottom-0 -translate-x-1/2 left-1/2 w-2.5 translate-y-full" // Top
+	}
+}
+
+func getAlpineTooltipSideClass(side TooltipSide) string {
+	switch side {
+	case TooltipRight:
+		return "top-1/2 -translate-y-1/2 -mr-1 right-0 translate-x-full"
+	case TooltipBottom:
+		return "bottom-0 left-1/2 -translate-x-1/2 -mb-1 translate-y-full"
+	case TooltipLeft:
+		return "top-1/2 -translate-y-1/2 -ml-1 left-0 -translate-x-full"
+	default:
+		return "top-0 left-1/2 -translate-x-1/2 -mt-1 -translate-y-full" //top
+	}
+}
+
+templ TTooltip(props ATooltipProps) {
+	<div
+		x-data={ getDataFromProps(props) }
+		x-init="$refs.content.addEventListener('mouseenter', () => { tooltipVisible = true; }); $refs.content.addEventListener('mouseleave', () => { tooltipVisible = false; });"
+		class="relative"
+	>
+		<div
+			x-ref="tooltip"
+			x-show="tooltipVisible"
+			class={ utils.TwMerge("absolute w-auto text-sm z-50", getTooltipSideClass(props.Side)) }
+			x-cloak
+		>
+			<div
+				x-show="tooltipVisible"
+				x-transition
+				class={ utils.TwMerge(
+			"relative px-2 py-1 rounded bg-opacity-90 ",
+			getTooltipVariantClass(props.Variant)) }
+			>
+				<p x-text="tooltipText" class="flex-shrink-0 block text-xs whitespace-nowrap"></p>
+				<div
+					x-ref="tooltipArrow"
+					x-show="tooltipArrow"
+					class={ utils.TwMerge("absolute inline-flex items-center justify-center overflow-hidden", getArrowClass(props.Side)) }
+				>
+					<div
+						:class="{ 'origin-top-left -rotate-45' : tooltipPosition == 'top', 'origin-top-left rotate-45' : tooltipPosition == 'left', 'origin-bottom-left rotate-45' : tooltipPosition == 'bottom', 'origin-top-right -rotate-45' : tooltipPosition == 'right' }"
+						class={ utils.TwMerge("w-1.5 h-1.5 transform bg-black bg-opacity-90", getArrowColor(props.Variant)) }
+					></div>
+				</div>
+			</div>
+		</div>
+		<div x-ref="content">
+			@props.Trigger
+		</div>
+	</div>
+}
