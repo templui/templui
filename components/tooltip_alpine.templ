@@ -51,7 +51,7 @@ func getAlpineTooltipSideClass(side TooltipSide) string {
 	}
 }
 
-templ TTooltip(props ATooltipProps) {
+templ ATooltip(props ATooltipProps) {
 	<div
 		x-data={ getDataFromProps(props) }
 		x-init="$refs.content.addEventListener('mouseenter', () => { tooltipVisible = true; }); $refs.content.addEventListener('mouseleave', () => { tooltipVisible = false; });"
