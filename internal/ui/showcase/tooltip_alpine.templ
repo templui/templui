@@ -1,0 +1,13 @@
+package showcase
+
+import "github.com/axzilla/templui/components"
+
+templ ATooltip() {
+	@components.ATooltip(components.ATooltipProps{
+		Trigger: components.Button(components.ButtonProps{
+			Text:    "Hover me",
+			Variant: components.ButtonVariantOutline,
+		}),
+		Text: "Default",
+	})
+}

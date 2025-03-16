@@ -1,0 +1,50 @@
+package pages
+
+import (
+	"github.com/axzilla/templui/internal/ui/layouts"
+	"github.com/axzilla/templui/internal/ui/modules"
+	"github.com/axzilla/templui/internal/ui/showcase"
+)
+
+templ ATooltip() {
+	@layouts.DocsLayout(
+		"Tooltip",
+		"A small pop-up box that appears when a user hovers over an element",
+	) {
+		@modules.PageWrapper(modules.PageWrapperProps{
+			Name:        "Tooltip",
+			Description: templ.Raw("A small pop-up box that appears when a user hovers over an element"),
+			Tailwind:    true,
+		}) {
+			@modules.ExampleWrapper(modules.ExampleWrapperProps{
+				ShowcaseFile:      showcase.ATooltip(),
+				PreviewCodeFile:   "tooltip_alpine.templ",
+				ComponentCodeFile: "tooltip_alpine.templ",
+			})
+			@modules.Usage(modules.UsageProps{
+				ComponentName: "Tooltip",
+				PropsExample:  "...",
+			})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:       "Variants",
+					ShowcaseFile:      showcase.ATooltipVariants(),
+					PreviewCodeFile:   "tooltip_alpine_variants.templ",
+					ComponentCodeFile: "tooltip_alpine.templ",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:       "Sides",
+					ShowcaseFile:      showcase.ATooltipSides(),
+					PreviewCodeFile:   "tooltip_alpine_sides.templ",
+					ComponentCodeFile: "tooltip_alpine.templ",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:       "With Arrow",
+					ShowcaseFile:      showcase.ATooltipWithArrow(),
+					PreviewCodeFile:   "tooltip_alpine_with_arrow.templ",
+					ComponentCodeFile: "tooltip_alpine.templ",
+				})
+			}
+		}
+	}
+}

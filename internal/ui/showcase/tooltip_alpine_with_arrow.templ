@@ -1,0 +1,45 @@
+
+package showcase
+
+import "github.com/axzilla/templui/components"
+
+templ ATooltipWithArrow() {
+	<div class="flex flex-wrap gap-2">
+		@components.ATooltip(components.ATooltipProps{
+			Trigger: components.Button(components.ButtonProps{
+				Text:    "Top",
+				Variant: components.ButtonVariantOutline,
+			}),
+			Text:      "Top tooltip",
+			Side:      components.TooltipTop, // Its the default value but we can set it explicitly
+			ShowArrow: true,
+		})
+		@components.ATooltip(components.ATooltipProps{
+			Trigger: components.Button(components.ButtonProps{
+				Text:    "Right",
+				Variant: components.ButtonVariantOutline,
+			}),
+			Text:      "Right tooltip",
+			Side:      components.TooltipRight,
+			ShowArrow: true,
+		})
+		@components.ATooltip(components.ATooltipProps{
+			Trigger: components.Button(components.ButtonProps{
+				Text:    "Bottom",
+				Variant: components.ButtonVariantOutline,
+			}),
+			Text:      "Bottom tooltip",
+			Side:      components.TooltipBottom,
+			ShowArrow: true,
+		})
+		@components.ATooltip(components.ATooltipProps{
+			Trigger: components.Button(components.ButtonProps{
+				Text:    "Left",
+				Variant: components.ButtonVariantOutline,
+			}),
+			Text:      "Left tooltip",
+			Side:      components.TooltipLeft,
+			ShowArrow: true,
+		})
+	</div>
+}

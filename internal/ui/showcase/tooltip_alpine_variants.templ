@@ -1,0 +1,32 @@
+
+package showcase
+
+import "github.com/axzilla/templui/components"
+
+templ ATooltipVariants() {
+	<div class="flex flex-wrap gap-2">
+		@components.ATooltip(components.ATooltipProps{
+			Trigger: components.Button(components.ButtonProps{
+				Text:    "Default",
+				Variant: components.ButtonVariantOutline,
+			}),
+			Text: "Default tooltip",
+		})
+		@components.ATooltip(components.ATooltipProps{
+			Trigger: components.Button(components.ButtonProps{
+				Text:    "Secondary",
+				Variant: components.ButtonVariantOutline,
+			}),
+			Text:    "Secondary tooltip",
+			Variant: components.TooltipSecondary,
+		})
+		@components.ATooltip(components.ATooltipProps{
+			Trigger: components.Button(components.ButtonProps{
+				Text:    "Destructive",
+				Variant: components.ButtonVariantOutline,
+			}),
+			Text:    "Destructive tooltip",
+			Variant: components.TooltipDestructive,
+		})
+	</div>
+}
