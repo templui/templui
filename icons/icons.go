@@ -25,6 +25,7 @@ var iconFS embed.FS
 
 // IconProps defines the properties that can be set for an icon.
 type IconProps struct {
+	Name        string
 	Size        string
 	Color       string
 	Fill        string
@@ -45,6 +46,24 @@ func Icon(name string) func(IconProps) templ.Component {
 			return
 		})
 	}
+}
+
+// UseNameProp generates a templ.Component using IconProps.Name, with fallback to "file-question" icon.
+func UseNameProp(props IconProps) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
+		var svg string
+
+		svg, err = generateSVG(props.Name, props)
+		if err != nil {
+			svg, err = generateSVG("file-question", props)
+			if err != nil {
+				return err
+			}
+		}
+		_, err = w.Write([]byte(svg))
+		return
+	})
+
 }
 
 // generateSVG creates an SVG string for the specified icon with the given properties.
