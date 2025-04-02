@@ -41,6 +41,13 @@ templ Select() {
 					ComponentCodeFile: "select.templ",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:       "Multiple Selection",
+					ShowcaseFile:      showcase.SelectMultiple(),
+					PreviewCodeFile:   "select_multiple.templ",
+					ComponentCodeFile: "select.templ",
+					ID:                "multiple",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:       "Form",
 					ShowcaseFile:      showcase.SelectForm(),
 					PreviewCodeFile:   "select_form.templ",

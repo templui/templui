@@ -23,10 +23,11 @@ type SelectTriggerProps struct {
 }
 
 type SelectValueProps struct {
-	ID          string
-	Class       string
-	Attributes  templ.Attributes
-	Placeholder string
+	ID           string
+	Class        string
+	Attributes   templ.Attributes
+	Placeholder  string
+	MultipleItems bool
 }
 
 type SelectContentProps struct {
@@ -83,7 +84,7 @@ templ SelectTrigger(props ...SelectTriggerProps) {
 		Type:    "button",
 		Variant: ButtonVariantOutline,
 		Class: utils.TwMerge(
-			"w-full select-trigger flex items-center justify-between focus:ring-2 focus:ring-offset-2",
+			"w-full select-trigger flex items-center justify-start focus:ring-2 focus:ring-offset-2 overflow-hidden",
 			utils.If(p.HasError, "border-destructive ring-destructive"),
 			p.Class,
 		),
@@ -107,7 +108,7 @@ templ SelectTrigger(props ...SelectTriggerProps) {
 			required?={ p.Required }
 		/>
 		{ children... }
-		<span class="pointer-events-none ml-1">
+		<span class="pointer-events-none ml-auto flex-shrink-0">
 			@icons.ChevronDown(icons.IconProps{
 				Size:  16,
 				Class: "text-muted-foreground",
@@ -125,7 +126,11 @@ templ SelectValue(props ...SelectValueProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("block truncate select-value text-muted-foreground", p.Class) }
+		class={ utils.TwMerge("flex-1 min-w-0 block truncate select-value text-muted-foreground text-left", p.Class) }
+		if p.Placeholder != "" {
+			data-placeholder={ p.Placeholder }
+		}
+		data-multiple={ strconv.FormatBool(p.MultipleItems) }
 		{ p.Attributes... }
 	>
 		if p.Placeholder != "" {
@@ -332,47 +337,95 @@ templ SelectScript() {
 					const hiddenInput = selectContainer.querySelector('input[type="hidden"]');
 					let isOpen = false;
 					
-					// Initialize selected value
-					let selectedItem = selectContainer.querySelector('.select-item[data-selected="true"]');
+					// Initialize selected values
+					let selectedItems = Array.from(selectContainer.querySelectorAll('.select-item[data-selected="true"]'));
 					let hoverApplied = false; // Track if hover effect is applied
 					
+					// Check if multiple items selection is allowed
+					const isMultipleAllowed = valueEl && valueEl.getAttribute('data-multiple') === 'true';
+					
 					// If no item is selected, mark the first one as pre-selected (just visually)
-					if (!selectedItem) {
+					if (selectedItems.length === 0) {
 						const firstItem = selectContainer.querySelector('.select-item');
 						if (firstItem) {
 							firstItem.classList.add('bg-muted'); // Add a subtle gray background
 						}
 					}
 					
-					// Update values if an item is actually selected
-					if (selectedItem && valueEl) {
-						const itemText = selectedItem.querySelector('.select-item-text');
-						if (itemText) {
-							valueEl.textContent = itemText.textContent;
-							valueEl.classList.remove('text-muted-foreground');
+					// Function to update the displayed value based on selected items
+					function updateDisplayedValue() {
+						if (selectedItems.length === 0) {
+							if (valueEl && valueEl.hasAttribute('data-placeholder')) {
+								valueEl.textContent = valueEl.getAttribute('data-placeholder');
+								valueEl.classList.add('text-muted-foreground');
+							} else {
+								valueEl.textContent = '';
+								valueEl.classList.add('text-muted-foreground');
+							}
+							if (hiddenInput) {
+								hiddenInput.value = '';
+							}
+							return;
 						}
+
+						if (valueEl) {
+							if (selectedItems.length === 1 || !isMultipleAllowed) {
+								// For single selection or when multiple not allowed, just show the first one
+								const itemText = selectedItems[0].querySelector('.select-item-text');
+								if (itemText) {
+									valueEl.textContent = itemText.textContent;
+									valueEl.classList.remove('text-muted-foreground');
+								}
+							} else {
+								// Multiple items selected - create CSV with truncation
+								const selectedTexts = selectedItems.map(item => 
+									item.querySelector('.select-item-text').textContent.trim()
+								);
+								
+								const displayText = selectedTexts.join(', ');
+								
+								// Calculate available width for text (trigger width minus some padding and icon width)
+								const triggerWidth = trigger.offsetWidth;
+								const availableWidth = triggerWidth - 40; // 40px for padding and icon
+								
+								// Approximate characters that can fit (assumes ~8px per character on average)
+								const approxCharsCanFit = Math.max(10, Math.floor(availableWidth / 8));
+								
+								// Truncate if too long
+								if (displayText.length > approxCharsCanFit) {
+									valueEl.textContent = displayText.substring(0, approxCharsCanFit - 3) + '...';
+								} else {
+									valueEl.textContent = displayText;
+								}
+								valueEl.classList.remove('text-muted-foreground');
+							}
+						}
+						
+						// Update hidden input with all values
 						if (hiddenInput) {
-							hiddenInput.value = selectedItem.getAttribute('data-value');
+							const values = selectedItems.map(item => item.getAttribute('data-value'));
+							hiddenInput.value = values.join(',');
+							hiddenInput.dispatchEvent(new Event('change', {bubbles: true}));
 						}
 					}
+					
+					// Update values initially
+					updateDisplayedValue();
 
 					// Handle hover effect on mouse movement
 					content.addEventListener('mouseover', function(e) {
 						const item = e.target.closest('.select-item');
 						if (!item) return;
 						
-						// Reset all items to normal state
+						// Reset hover states on all non-selected items
 						selectContainer.querySelectorAll('.select-item').forEach(el => {
-							if (el.getAttribute('data-selected') === 'true') {
-								// For selected item, keep check mark but remove background
-								el.classList.remove('bg-accent', 'text-accent-foreground', 'bg-muted');
-							} else {
+							if (el.getAttribute('data-selected') !== 'true') {
 								el.classList.remove('bg-accent', 'text-accent-foreground', 'bg-muted');
 							}
 						});
 						
-						// Apply hover effect to current item
-						if (item.getAttribute('data-disabled') !== 'true') {
+						// Apply hover effect to current item if not selected
+						if (item.getAttribute('data-disabled') !== 'true' && item.getAttribute('data-selected') !== 'true') {
 							item.classList.add('bg-accent', 'text-accent-foreground');
 							hoverApplied = true;
 						}
@@ -380,12 +433,9 @@ templ SelectScript() {
 					
 					// Reset hover effect when mouse leaves content area
 					content.addEventListener('mouseleave', function() {
-						// Remove hover effect
+						// Remove hover effect from non-selected items
 						selectContainer.querySelectorAll('.select-item').forEach(el => {
-							if (el.getAttribute('data-selected') === 'true') {
-								// Restore background to selected item
-								el.classList.add('bg-accent', 'text-accent-foreground');
-							} else {
+							if (el.getAttribute('data-selected') !== 'true') {
 								el.classList.remove('bg-accent', 'text-accent-foreground', 'bg-muted');
 							}
 						});
@@ -458,32 +508,53 @@ templ SelectScript() {
 							// Get data
 							const value = this.getAttribute('data-value');
 							const itemText = this.querySelector('.select-item-text');
+							const isSelected = this.getAttribute('data-selected') === 'true';
 							
-							// Reset selection state
-							selectContainer.querySelectorAll('.select-item').forEach(el => {
-								el.setAttribute('data-selected', 'false');
-								el.classList.remove('bg-accent', 'text-accent-foreground', 'bg-muted');
-								const check = el.querySelector('.select-check');
-								if (check) check.classList.replace('opacity-100', 'opacity-0');
-							});
-							
-							// Set new selection
-							this.setAttribute('data-selected', 'true');
-							this.classList.add('bg-accent', 'text-accent-foreground');
-							const check = this.querySelector('.select-check');
-							if (check) check.classList.replace('opacity-0', 'opacity-100');
-							
-							// Update UI
-							if (valueEl && itemText) {
-								valueEl.textContent = itemText.textContent;
-								valueEl.classList.remove('text-muted-foreground');
+							// Different behavior based on whether multiple selection is allowed
+							if (isMultipleAllowed) {
+								// Toggle selection state for this item
+								if (isSelected) {
+									// Deselect if already selected
+									this.setAttribute('data-selected', 'false');
+									this.classList.remove('bg-accent', 'text-accent-foreground');
+									const check = this.querySelector('.select-check');
+									if (check) check.classList.replace('opacity-100', 'opacity-0');
+									
+									// Remove from selectedItems array
+									selectedItems = selectedItems.filter(item => 
+										item.getAttribute('data-value') !== value
+									);
+								} else {
+									// Select it
+									this.setAttribute('data-selected', 'true');
+									this.classList.add('bg-accent', 'text-accent-foreground');
+									const check = this.querySelector('.select-check');
+									if (check) check.classList.replace('opacity-0', 'opacity-100');
+									
+									// Add to selectedItems array
+									selectedItems.push(this);
+								}
+							} else {
+								// Single selection mode - reset all first
+								selectContainer.querySelectorAll('.select-item').forEach(el => {
+									el.setAttribute('data-selected', 'false');
+									el.classList.remove('bg-accent', 'text-accent-foreground', 'bg-muted');
+									const check = el.querySelector('.select-check');
+									if (check) check.classList.replace('opacity-100', 'opacity-0');
+								});
+								
+								// Then select just this one
+								this.setAttribute('data-selected', 'true');
+								this.classList.add('bg-accent', 'text-accent-foreground');
+								const check = this.querySelector('.select-check');
+								if (check) check.classList.replace('opacity-0', 'opacity-100');
+								
+								// Update selectedItems array to only contain this item
+								selectedItems = [this];
 							}
 							
-							// Update hidden input
-							if (hiddenInput && value) {
-								hiddenInput.value = value;
-								hiddenInput.dispatchEvent(new Event('change', {bubbles: true}));
-							}
+							// Update display with new selection state
+							updateDisplayedValue();
 							
 							// Close dropdown elegantly
 							isOpen = false;

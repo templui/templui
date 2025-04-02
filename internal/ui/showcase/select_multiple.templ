@@ -1,0 +1,65 @@
+package showcase
+
+import "github.com/axzilla/templui/components"
+
+templ SelectMultiple() {
+	<div class="w-full max-w-sm">
+		@components.FormItem() {
+			@components.FormLabel(components.FormLabelProps{
+				For: "select-multiple",
+			}) {
+				Select Multiple Fruits
+			}
+			@components.Select() {
+				@components.SelectTrigger(components.SelectTriggerProps{
+					ID:   "select-multiple",
+					Name: "fruits",
+				}) {
+					@components.SelectValue(components.SelectValueProps{
+						Placeholder:  "Select fruits",
+						MultipleItems: true,
+					})
+				}
+				@components.SelectContent() {
+					@components.SelectGroup() {
+						@components.SelectLabel() {
+							Fruits
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value:    "apple",
+							Selected: true,
+						}) {
+							Apple
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value:    "banana",
+							Selected: true,
+						}) {
+							Banana
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "blueberry",
+						}) {
+							Blueberry
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value:    "grapes",
+							Selected: true,
+						}) {
+							Grapes
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value:    "pineapple",
+							Disabled: true,
+						}) {
+							Pineapple (out of stock)
+						}
+					}
+				}
+			}
+			@components.FormDescription() {
+				Multiple fruits can be selected.
+			}
+		}
+	</div>
+} 
