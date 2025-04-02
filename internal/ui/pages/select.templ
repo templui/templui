@@ -48,6 +48,20 @@ templ Select() {
 					ID:                "multiple",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:       "With Search",
+					ShowcaseFile:      showcase.SelectSearch(),
+					PreviewCodeFile:   "select_search.templ",
+					ComponentCodeFile: "select.templ",
+					ID:                "search",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:       "With Search (Multiple)",
+					ShowcaseFile:      showcase.SelectSearchMultiple(),
+					PreviewCodeFile:   "select_search_multiple.templ",
+					ComponentCodeFile: "select.templ",
+					ID:                "search-multiple",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:       "Form",
 					ShowcaseFile:      showcase.SelectForm(),
 					PreviewCodeFile:   "select_form.templ",

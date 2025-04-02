@@ -10,10 +10,13 @@ templ SelectMultiple() {
 			}) {
 				Select Multiple Fruits
 			}
-			@components.Select() {
+			@components.Select(components.SelectProps{
+				MultipleItems: true,
+			}) {
 				@components.SelectTrigger(components.SelectTriggerProps{
-					ID:   "select-multiple",
-					Name: "fruits",
+					ID:           "select-multiple",
+					Name:         "fruits",
+					MultipleItems: true,
 				}) {
 					@components.SelectValue(components.SelectValueProps{
 						Placeholder:  "Select fruits",
@@ -54,11 +57,26 @@ templ SelectMultiple() {
 						}) {
 							Pineapple (out of stock)
 						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "orange",
+						}) {
+							Orange
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "strawberry",
+						}) {
+							Strawberry
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "watermelon",
+						}) {
+							Watermelon
+						}
 					}
 				}
 			}
 			@components.FormDescription() {
-				Multiple fruits can be selected.
+				Multiple fruits can be selected. Click (x) to remove a selected fruit.
 			}
 		}
 	</div>

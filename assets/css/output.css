@@ -283,6 +283,9 @@
   .inset-y-0 {
     inset-block: calc(var(--spacing) * 0);
   }
+  .start-0 {
+    inset-inline-start: calc(var(--spacing) * 0);
+  }
   .top-0 {
     top: calc(var(--spacing) * 0);
   }
@@ -312,6 +315,9 @@
   }
   .right-2 {
     right: calc(var(--spacing) * 2);
+  }
+  .right-3 {
+    right: calc(var(--spacing) * 3);
   }
   .right-4 {
     right: calc(var(--spacing) * 4);
@@ -617,6 +623,12 @@
   }
   .max-h-full\! {
     max-height: 100% !important;
+  }
+  .min-h-\[2\.5rem\] {
+    min-height: 2.5rem;
+  }
+  .min-h-\[42px\] {
+    min-height: 42px;
   }
   .min-h-\[80px\] {
     min-height: 80px;
@@ -1120,6 +1132,10 @@
     border-style: var(--tw-border-style);
     border-width: 1px;
   }
+  .border-0 {
+    border-style: var(--tw-border-style);
+    border-width: 0px;
+  }
   .border-2 {
     border-style: var(--tw-border-style);
     border-width: 2px;
@@ -1302,6 +1318,12 @@
   .object-cover {
     object-fit: cover;
   }
+  .p-0 {
+    padding: calc(var(--spacing) * 0);
+  }
+  .p-0\.5 {
+    padding: calc(var(--spacing) * 0.5);
+  }
   .p-1 {
     padding: calc(var(--spacing) * 1);
   }
@@ -1362,6 +1384,18 @@
   .py-16 {
     padding-block: calc(var(--spacing) * 16);
   }
+  .ps-2 {
+    padding-inline-start: calc(var(--spacing) * 2);
+  }
+  .ps-3 {
+    padding-inline-start: calc(var(--spacing) * 3);
+  }
+  .ps-8 {
+    padding-inline-start: calc(var(--spacing) * 8);
+  }
+  .ps-9 {
+    padding-inline-start: calc(var(--spacing) * 9);
+  }
   .pt-0 {
     padding-top: calc(var(--spacing) * 0);
   }
@@ -1379,6 +1413,9 @@
   }
   .pr-4 {
     padding-right: calc(var(--spacing) * 4);
+  }
+  .pr-8 {
+    padding-right: calc(var(--spacing) * 8);
   }
   .pb-0 {
     padding-bottom: calc(var(--spacing) * 0);
@@ -2016,6 +2053,13 @@
       }
     }
   }
+  .hover\:bg-muted-foreground\/20 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in oklab, var(--muted-foreground) 20%, transparent);
+      }
+    }
+  }
   .hover\:bg-muted\/50 {
     &:hover {
       @media (hover: hover) {
@@ -2027,6 +2071,13 @@
     &:hover {
       @media (hover: hover) {
         background-color: color-mix(in oklab, var(--primary) 90%, transparent);
+      }
+    }
+  }
+  .hover\:bg-secondary-foreground\/20 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in oklab, var(--secondary-foreground) 20%, transparent);
       }
     }
   }
@@ -2108,6 +2159,12 @@
   .focus\:text-accent-foreground {
     &:focus {
       color: var(---accent-foreground);
+    }
+  }
+  .focus\:ring-1 {
+    &:focus {
+      --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentColor);
+      box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
     }
   }
   .focus\:ring-2 {

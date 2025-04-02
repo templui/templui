@@ -1,0 +1,101 @@
+package showcase
+
+import (
+	"github.com/axzilla/templui/components"
+	"github.com/axzilla/templui/icons"
+)
+
+templ SelectSearch() {
+	<div class="w-full max-w-sm">
+		@components.FormItem() {
+			@components.FormLabel(components.FormLabelProps{
+				For: "select-search",
+			}) {
+				Select with Search
+			}
+			@components.Select() {
+				@components.SelectTrigger(components.SelectTriggerProps{
+					ID:   "select-search",
+					Name: "country",
+				}) {
+					@components.SelectValue(components.SelectValueProps{
+						Placeholder: "Select a country",
+					})
+				}
+				@components.SelectContent() {
+					@components.SelectSearchItem(components.SelectSearchItemProps{
+						Placeholder: "Search countries...",
+						HxGet:       "/api/countries/search",
+						HxTarget:    "#countries-list",
+					})
+					<div id="countries-list">
+						@components.SelectItem(components.SelectItemProps{
+							Value: "tr",
+						}) {
+							Turkey
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "us",
+						}) {
+							United States
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "uk",
+						}) {
+							United Kingdom
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "de",
+						}) {
+							Germany
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "fr",
+						}) {
+							France
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "jp",
+						}) {
+							Japan
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "cn",
+						}) {
+							China
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "kr",
+						}) {
+							South Korea
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "ca",
+						}) {
+							Canada
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "au",
+						}) {
+							Australia
+						}
+					</div>
+				}
+			}
+			@components.FormDescription() {
+				Start typing to search for a country.
+				<div class="w-full max-w-xl">
+					@components.Alert() {
+						@icons.MessageCircleWarning(icons.IconProps{Size: 16})
+						@components.AlertTitle() {
+							Note
+						}
+						@components.AlertDescription() {
+							The server-side <code class="font-bold">search handler</code> is not defined, so hx-get request will be redirected to the homepage.
+						}
+					}
+				</div>
+			}
+		}
+	</div>
+}

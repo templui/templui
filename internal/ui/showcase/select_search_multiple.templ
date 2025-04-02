@@ -1,0 +1,120 @@
+package showcase
+
+import "github.com/axzilla/templui/components"
+import "github.com/axzilla/templui/icons"
+
+templ SelectSearchMultiple() {
+	<div class="w-full max-w-sm">
+		@components.FormItem() {
+			@components.FormLabel(components.FormLabelProps{
+				For: "select-search-multiple",
+			}) {
+				Select Multiple Countries
+			}
+			@components.Select(components.SelectProps{
+				MultipleItems: true,
+			}) {
+				@components.SelectTrigger(components.SelectTriggerProps{
+					ID:            "select-search-multiple",
+					Name:          "countries",
+					MultipleItems: true,
+				}) {
+					@components.SelectValue(components.SelectValueProps{
+						Placeholder:   "Select countries",
+						MultipleItems: true,
+					})
+				}
+				@components.SelectContent() {
+					@components.SelectSearchItem(components.SelectSearchItemProps{
+						Placeholder: "Search countries...",
+						HxGet:       "/api/countries/search",
+						HxTarget:    "#countries-list-multiple",
+					})
+					<div id="countries-list-multiple">
+						@components.SelectItem(components.SelectItemProps{
+							Value:    "tr",
+							Selected: true,
+						}) {
+							Turkey
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value:    "us",
+							Selected: true,
+						}) {
+							United States
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "uk",
+						}) {
+							United Kingdom
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "de",
+						}) {
+							Germany
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "fr",
+						}) {
+							France
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "jp",
+						}) {
+							Japan
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "cn",
+						}) {
+							China
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "kr",
+						}) {
+							South Korea
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "ca",
+						}) {
+							Canada
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "au",
+						}) {
+							Australia
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "it",
+						}) {
+							Italy
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "es",
+						}) {
+							Spain
+						}
+						@components.SelectItem(components.SelectItemProps{
+							Value: "br",
+						}) {
+							Brazil
+						}
+					</div>
+				}
+			}
+			@components.FormDescription() {
+				Start typing to search for countries. Multiple countries can be selected.
+				<div class="w-full max-w-xl">
+					@components.Alert() {
+						@icons.MessageCircleWarning(icons.IconProps{Size: 16})
+						@components.AlertTitle() {
+							Note
+						}
+						@components.AlertDescription() {
+							The server-side <code class="font-bold">search handler</code> is not defined, so hx-get request will be redirected to the homepage.
+						}
+					}
+				</div>
+			}
+		}
+	</div>
+}

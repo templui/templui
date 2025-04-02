@@ -7,19 +7,21 @@ import (
 )
 
 type SelectProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
+	ID           string
+	Class        string
+	Attributes   templ.Attributes
+	MultipleItems bool
 }
 
 type SelectTriggerProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-	Name       string
-	Required   bool
-	Disabled   bool
-	HasError   bool
+	ID           string
+	Class        string
+	Attributes   templ.Attributes
+	Name         string
+	Required     bool
+	Disabled     bool
+	HasError     bool
+	MultipleItems bool
 }
 
 type SelectValueProps struct {
@@ -57,6 +59,17 @@ type SelectItemProps struct {
 	Disabled   bool
 }
 
+type SelectSearchItemProps struct {
+	ID          string
+	Class       string
+	Attributes  templ.Attributes
+	Placeholder string
+	HxGet       string
+	HxTrigger   string
+	HxTarget    string
+	HxSwap      string
+}
+
 templ Select(props ...SelectProps) {
 	{{ var p SelectProps }}
 	if len(props) > 0 {
@@ -68,6 +81,7 @@ templ Select(props ...SelectProps) {
 		}
 		class={ utils.TwMerge("w-full select-container relative", p.Class) }
 		data-select-id={ p.ID }
+		data-multiple={ strconv.FormatBool(p.MultipleItems) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -84,7 +98,8 @@ templ SelectTrigger(props ...SelectTriggerProps) {
 		Type:    "button",
 		Variant: ButtonVariantOutline,
 		Class: utils.TwMerge(
-			"w-full select-trigger flex items-center justify-start focus:ring-2 focus:ring-offset-2 overflow-hidden",
+			"w-full select-trigger flex items-center justify-start focus:ring-2 focus:ring-offset-2 overflow-hidden min-h-[2.5rem]",
+			utils.If(p.MultipleItems, "h-auto py-1"),
 			utils.If(p.HasError, "border-destructive ring-destructive"),
 			p.Class,
 		),
@@ -122,11 +137,14 @@ templ SelectValue(props ...SelectValueProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<span
+	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("flex-1 min-w-0 block truncate select-value text-muted-foreground text-left", p.Class) }
+		class={ utils.TwMerge("flex-1 min-w-0 select-value text-muted-foreground text-left", 
+			utils.If(p.MultipleItems, "flex flex-wrap gap-1 items-center py-0.5"), 
+			p.Class) 
+		}
 		if p.Placeholder != "" {
 			data-placeholder={ p.Placeholder }
 		}
@@ -134,10 +152,13 @@ templ SelectValue(props ...SelectValueProps) {
 		{ p.Attributes... }
 	>
 		if p.Placeholder != "" {
-			{ p.Placeholder }
+			<span class="select-value-placeholder">{ p.Placeholder }</span>
 		}
-		{ children... }
-	</span>
+		if !p.MultipleItems {
+			<span class="select-value-text truncate">{ children... }</span>
+		}
+		<div class="select-value-tags flex flex-wrap items-center gap-1 flex-1"></div>
+	</div>
 }
 
 templ SelectContent(props ...SelectContentProps) {
@@ -241,6 +262,67 @@ templ SelectItem(props ...SelectItemProps) {
 	</div>
 }
 
+templ SelectSearchItem(props ...SelectSearchItemProps) {
+	{{ var p SelectSearchItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("px-2 py-1.5 select-search-item", p.Class) }
+		{ p.Attributes... }
+	>
+		<div class="relative w-full flex items-center">
+			<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-10">
+				@icons.Search(icons.IconProps{
+					Size:  16,
+					Class: "text-muted-foreground",
+				})
+			</div>
+			<input
+				type="search"
+				name="q"
+				class={
+					utils.TwMerge(
+						"peer flex h-10 w-full ps-9 pr-8 py-2",
+						"rounded-md border border-input bg-background text-sm ring-offset-background",
+						"placeholder:text-muted-foreground",
+						"focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+						"disabled:cursor-not-allowed disabled:opacity-50",
+					)
+				}
+				placeholder={ utils.IfElse(p.Placeholder != "", p.Placeholder, "Search...") }
+				if p.HxGet != "" {
+					hx-get={ p.HxGet }
+				}
+				if p.HxTrigger != "" {
+					hx-trigger={ p.HxTrigger }
+				} else {
+					hx-trigger="keyup changed delay:300ms"
+				}
+				if p.HxTarget != "" {
+					hx-target={ p.HxTarget }
+				}
+				if p.HxSwap != "" {
+					hx-swap={ p.HxSwap }
+				} else {
+					hx-swap="innerHTML"
+				}
+				hx-params="q"
+				hx-indicator="#search-spinner"
+			/>
+			<div id="search-spinner" class="htmx-indicator absolute right-3">
+				@Spinner(SpinnerProps{
+					Size:  SpinnerSizeSm,
+					Class: "text-muted-foreground",
+				})
+			</div>
+		</div>
+	</div>
+}
+
 templ SelectScript() {
 	{{ handle := templ.NewOnceHandle() }}
 	@handle.Once() {
@@ -337,12 +419,25 @@ templ SelectScript() {
 					const hiddenInput = selectContainer.querySelector('input[type="hidden"]');
 					let isOpen = false;
 					
-					// Initialize selected values
+					// Check if multiple items selection is allowed
+					const isMultipleAllowed = selectContainer.getAttribute('data-multiple') === 'true' || 
+						(valueEl && valueEl.getAttribute('data-multiple') === 'true');
+					
+					// Apply appropriate classes to trigger for multiple selection
+					if (isMultipleAllowed && trigger) {
+						trigger.classList.add('h-auto', 'py-1');
+					}
+					
+					// Initialize selected values and related display elements
 					let selectedItems = Array.from(selectContainer.querySelectorAll('.select-item[data-selected="true"]'));
 					let hoverApplied = false; // Track if hover effect is applied
 					
-					// Check if multiple items selection is allowed
-					const isMultipleAllowed = valueEl && valueEl.getAttribute('data-multiple') === 'true';
+					// Ensure all selected items have proper styling (sometimes the CSS class may not be applied)
+					selectedItems.forEach(item => {
+						item.classList.add('bg-accent', 'text-accent-foreground');
+						const check = item.querySelector('.select-check');
+						if (check) check.classList.replace('opacity-0', 'opacity-100');
+					});
 					
 					// If no item is selected, mark the first one as pre-selected (just visually)
 					if (selectedItems.length === 0) {
@@ -354,50 +449,127 @@ templ SelectScript() {
 					
 					// Function to update the displayed value based on selected items
 					function updateDisplayedValue() {
+						// Clear and reset all display elements first
+						const tagsContainer = valueEl.querySelector('.select-value-tags');
+						if (tagsContainer) {
+							tagsContainer.innerHTML = '';
+						}
+						
 						if (selectedItems.length === 0) {
 							if (valueEl && valueEl.hasAttribute('data-placeholder')) {
-								valueEl.textContent = valueEl.getAttribute('data-placeholder');
-								valueEl.classList.add('text-muted-foreground');
-							} else {
-								valueEl.textContent = '';
+								const placeholder = valueEl.getAttribute('data-placeholder');
+								const placeholderEl = valueEl.querySelector('.select-value-placeholder');
+								if (placeholderEl) {
+									placeholderEl.textContent = placeholder;
+									placeholderEl.style.display = 'block';
+								}
 								valueEl.classList.add('text-muted-foreground');
 							}
 							if (hiddenInput) {
 								hiddenInput.value = '';
 							}
+							
+							// Reset all items to non-selected state to ensure consistency
+							selectContainer.querySelectorAll('.select-item').forEach(el => {
+								el.setAttribute('data-selected', 'false');
+								el.classList.remove('bg-accent', 'text-accent-foreground');
+								const check = el.querySelector('.select-check');
+								if (check) check.classList.replace('opacity-100', 'opacity-0');
+							});
+							
 							return;
 						}
 
+						// Hide placeholder when items are selected
+						const placeholderEl = valueEl.querySelector('.select-value-placeholder');
+						if (placeholderEl) {
+							placeholderEl.style.display = 'none';
+						}
+						valueEl.classList.remove('text-muted-foreground');
+
 						if (valueEl) {
-							if (selectedItems.length === 1 || !isMultipleAllowed) {
-								// For single selection or when multiple not allowed, just show the first one
+							if (!isMultipleAllowed) { 
+								// For single selection mode, just show the text
 								const itemText = selectedItems[0].querySelector('.select-item-text');
 								if (itemText) {
-									valueEl.textContent = itemText.textContent;
-									valueEl.classList.remove('text-muted-foreground');
+									const valueTextEl = valueEl.querySelector('.select-value-text');
+									if (valueTextEl) {
+										valueTextEl.textContent = itemText.textContent;
+									}
 								}
 							} else {
-								// Multiple items selected - create CSV with truncation
-								const selectedTexts = selectedItems.map(item => 
-									item.querySelector('.select-item-text').textContent.trim()
-								);
-								
-								const displayText = selectedTexts.join(', ');
-								
-								// Calculate available width for text (trigger width minus some padding and icon width)
-								const triggerWidth = trigger.offsetWidth;
-								const availableWidth = triggerWidth - 40; // 40px for padding and icon
-								
-								// Approximate characters that can fit (assumes ~8px per character on average)
-								const approxCharsCanFit = Math.max(10, Math.floor(availableWidth / 8));
-								
-								// Truncate if too long
-								if (displayText.length > approxCharsCanFit) {
-									valueEl.textContent = displayText.substring(0, approxCharsCanFit - 3) + '...';
-								} else {
-									valueEl.textContent = displayText;
+								// For multiple selection mode, always create pills, even for a single item
+								if (tagsContainer) {
+									// Reset container styles to defaults first
+									tagsContainer.style.margin = '0';
+									
+									// If there are selected items, adjust display
+									if (selectedItems.length > 0) {
+										selectedItems.forEach(item => {
+											const itemValue = item.getAttribute('data-value');
+											const itemText = item.querySelector('.select-item-text').textContent.trim();
+											
+											// Create pill
+											const pill = document.createElement('div');
+											pill.className = 'flex items-center gap-1 rounded-md border border-transparent bg-secondary text-secondary-foreground px-2 py-0.5 text-xs font-semibold';
+											pill.setAttribute('data-value', itemValue);
+											
+											// Add text
+											const text = document.createElement('span');
+											text.textContent = itemText;
+											pill.appendChild(text);
+											
+											// Add remove button
+											const removeBtn = document.createElement('button');
+											removeBtn.type = 'button';
+											removeBtn.className = 'inline-flex items-center justify-center rounded-full focus:outline-none focus:ring-1 hover:bg-secondary-foreground/20 p-0.5 transition-colors';
+											removeBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+											
+											// Add event listener to remove item
+											removeBtn.addEventListener('click', function(e) {
+												e.stopPropagation(); // Prevent triggering the select dropdown
+												e.preventDefault(); // Prevent any default action
+												
+												// Find the item in the dropdown by value
+												const itemToRemove = selectContainer.querySelector(`.select-item[data-value="${itemValue}"]`);
+												if (itemToRemove) {
+													// Set the item as not selected
+													itemToRemove.setAttribute('data-selected', 'false');
+													itemToRemove.classList.remove('bg-accent', 'text-accent-foreground');
+													const check = itemToRemove.querySelector('.select-check');
+													if (check) check.classList.replace('opacity-100', 'opacity-0');
+													
+													// Remove from selectedItems array
+													selectedItems = selectedItems.filter(item => 
+														item.getAttribute('data-value') !== itemValue
+													);
+													
+													// Remove the pill itself immediately for visual feedback
+													pill.remove();
+													
+													// Update hidden input with all values
+													if (hiddenInput) {
+														const values = selectedItems.map(item => item.getAttribute('data-value'));
+														hiddenInput.value = values.join(',');
+														hiddenInput.dispatchEvent(new Event('change', {bubbles: true}));
+													}
+													
+													// Show placeholder if needed
+													if (selectedItems.length === 0) {
+														const placeholderEl = valueEl.querySelector('.select-value-placeholder');
+														if (placeholderEl) {
+															placeholderEl.style.display = 'block';
+															valueEl.classList.add('text-muted-foreground');
+														}
+													}
+												}
+											});
+											
+											pill.appendChild(removeBtn);
+											tagsContainer.appendChild(pill);
+										});
+									}
 								}
-								valueEl.classList.remove('text-muted-foreground');
 							}
 						}
 						
@@ -409,8 +581,10 @@ templ SelectScript() {
 						}
 					}
 					
-					// Update values initially
-					updateDisplayedValue();
+					// Update values initially - this will create pills for any pre-selected items
+					setTimeout(() => {
+						updateDisplayedValue();
+					}, 0);
 
 					// Handle hover effect on mouse movement
 					content.addEventListener('mouseover', function(e) {
@@ -534,6 +708,9 @@ templ SelectScript() {
 									// Add to selectedItems array
 									selectedItems.push(this);
 								}
+								
+								// For multiselect, always do a full update to refresh all pills
+								updateDisplayedValue();
 							} else {
 								// Single selection mode - reset all first
 								selectContainer.querySelectorAll('.select-item').forEach(el => {
@@ -551,10 +728,10 @@ templ SelectScript() {
 								
 								// Update selectedItems array to only contain this item
 								selectedItems = [this];
+								
+								// For single select, update display
+								updateDisplayedValue();
 							}
-							
-							// Update display with new selection state
-							updateDisplayedValue();
 							
 							// Close dropdown elegantly
 							isOpen = false;
