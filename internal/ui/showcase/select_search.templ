@@ -7,6 +7,43 @@ import (
 
 templ SelectSearch() {
 	<div class="w-full max-w-sm">
+        /*
+        // Example server-side search handler with pagination & no results found
+        func SearchCountries(c *fiber.Ctx) error {
+            query := c.Query("q")
+            page := c.QueryInt("page", 1)  // Page number, defaults to 1
+            
+            if len(query) < 2 {
+                return c.SendString("Enter at least 2 characters")
+            }
+            
+            // Get results with pagination
+            pageSize := 10
+            offset := (page - 1) * pageSize
+            
+            // Query from database utilizing indexes
+            // Returns both results and a flag indicating if more results exist
+            countries, hasMore := db.SearchCountriesPaginated(query, pageSize, offset)
+            
+            // Return HTMX compatible response
+            if len(countries) == 0 {
+                return c.SendString("<div class='text-gray-500 p-2'>No results found</div>")
+            }
+            
+            var html strings.Builder
+            for _, country := range countries {
+                // Build HTML for each country item
+                // Example: html.WriteString(fmt.Sprintf("<div>%s</div>", country.Name))
+            }
+            
+            if hasMore {
+                // Add "Load more" button if more results are available
+                html.WriteString(fmt.Sprintf(`<button hx-get="/api/countries/search?q=%s&page=%d" hx-target="#countries-list-multiple" hx-swap="beforeend" class="w-full text-sm py-2 hover:bg-gray-100">Show more results</button>`, url.QueryEscape(query), page+1))
+            }
+            
+            return c.SendString(html.String())
+        }
+        */
 		@components.FormItem() {
 			@components.FormLabel(components.FormLabelProps{
 				For: "select-search",
