@@ -47,7 +47,7 @@ build-html: templ-generate render-showcases
 
 # Step 4: Lint HTML output using ESLint
 lint-html:
-	npx eslint "out/**/*.html" --ext .html
+	npx eslint --fix "out/**/*.html" --ext .html
 
 # Step 6: Run full pipeline (build + lint)
 validate-html: build-html lint-html
