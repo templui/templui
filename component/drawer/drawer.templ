@@ -117,7 +117,9 @@ templ Content(props ...ContentProps) {
 		x-transition:leave-end="opacity-0"
 	></div>
 	<div
-		id={ p.ID + "-content" }
+		if p.ID != "" {
+			id={ p.ID + "-content" }
+		}
 		x-show="isOpen"
 		@click.away="close"
 		class={
