@@ -60,7 +60,7 @@ templ Popover(props ...Props) {
 		{ children... }
 	</div>
 	<div
-		id="popover-portal-container"
+		data-popover-portal-container
 		class="fixed inset-0 z-[9999] pointer-events-none"
 	></div>
 }
@@ -197,7 +197,7 @@ templ Script() {
             `;
             document.head.appendChild(style);
             
-            const portalContainer = document.getElementById('popover-portal-container');
+            const portalContainer = document.querySelector('[data-popover-portal-container]');
             const triggers = document.querySelectorAll('[data-popover-trigger]');
             const templates = document.querySelectorAll('[data-popover-content-template]');
             
