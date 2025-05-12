@@ -250,7 +250,9 @@ templ Script() {
 					const closeButtons = drawer.querySelectorAll('[data-drawer-close]');
 					const position = content?.getAttribute('data-drawer-position') || 'right';
 					
-					if (!content || !backdrop) return;
+					if (!content || !backdrop) {
+						return;
+					}
 					
 					// Set up animations based on position
 					const transitions = {
@@ -279,13 +281,13 @@ templ Script() {
 							leaveTo: 'opacity-0 translate-y-full'
 						}
 					};
-
+					
 					// Check if drawer is already initialized
 					if (drawer.dataset.drawerInitialized) {
-						return;
+						// Remove initialization flag to allow re-initialization
+						delete drawer.dataset.drawerInitialized;
 					}
-					drawer.dataset.drawerInitialized = 'true';
-
+					
 					// Initial styles
 					content.style.transform = position === 'left' ? 'translateX(-100%)' : 
 											position === 'right' ? 'translateX(100%)' :
@@ -381,15 +383,31 @@ templ Script() {
 					}
 					
 					// Set up trigger click listeners
-					triggers.forEach(trigger => {
-						trigger.removeEventListener('click', openDrawer); // Remove potential duplicates
-						trigger.addEventListener('click', openDrawer);
+					triggers.forEach((trigger, index) => {
+						// Remove all existing click listeners
+						const newTrigger = trigger.cloneNode(true);
+						trigger.parentNode.replaceChild(newTrigger, trigger);
+						
+						// Add new click listener
+						newTrigger.addEventListener('click', (e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							openDrawer();
+						});
 					});
 					
 					// Set up close button listeners
-					closeButtons.forEach(button => {
-						button.removeEventListener('click', closeDrawer); // Remove potential duplicates
-						button.addEventListener('click', closeDrawer);
+					closeButtons.forEach((button, index) => {
+						// Remove all existing click listeners
+						const newButton = button.cloneNode(true);
+						button.parentNode.replaceChild(newButton, button);
+						
+						// Add new click listener
+						newButton.addEventListener('click', (e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							closeDrawer();
+						});
 					});
 					
 					// Stop propagation on the inner content click to prevent backdrop click handler
@@ -398,6 +416,8 @@ templ Script() {
 						inner.removeEventListener('click', stopPropagationHandler); // Remove potential duplicates
 						inner.addEventListener('click', stopPropagationHandler);
 					}
+					
+					drawer.dataset.drawerInitialized = 'true';
 				}
 
 				function stopPropagationHandler(e) {
@@ -425,6 +445,12 @@ templ Script() {
 				document.addEventListener('DOMContentLoaded', () => initAllComponents());
 				document.body.addEventListener('htmx:afterSwap', handleHtmxSwap);
 				document.body.addEventListener('htmx:oobAfterSwap', handleHtmxSwap);
+				// Add popstate event listener for browser history navigation
+				window.addEventListener('popstate', () => {
+					requestAnimationFrame(() => {
+						initAllComponents(document);
+					});
+				});
 			})(); // End of IIFE
         </script>
 	}
