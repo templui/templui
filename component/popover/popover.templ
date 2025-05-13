@@ -274,7 +274,7 @@ templ Script() {
 					state.trigger = trigger; // Ensure trigger reference is current
 					state.content = content; // Ensure content reference is current
 
-					const portal = document.querySelector('[data-popover-portal-container]');
+					const portal = content.closest('[data-popover-portal-container]');
 					if (portal && content.parentNode !== portal) portal.appendChild(content);
 					
 					content.style.display = 'block';
