@@ -114,7 +114,7 @@ templ Content(props ...ContentProps) {
 			data-popover-match-width="true"
 		}
 		class={ utils.TwMerge(
-			"bg-background rounded-lg border text-sm shadow-lg pointer-events-auto absolute z-[9999] hidden top-0 left-0",
+			"bg-background rounded-lg border-[1.5px] border-[#e5e7eb] dark:border-[#27272a] text-sm shadow-lg pointer-events-auto fixed z-[9999] hidden top-0 left-0 p-2 min-w-[8rem] max-w-[20rem] relative",
 			p.Class,
 		) }
 		{ p.Attributes... }
@@ -123,357 +123,652 @@ templ Content(props ...ContentProps) {
 			{ children... }
 		</div>
 		if p.ShowArrow {
-			<div data-popover-arrow class="absolute h-2.5 w-2.5 rotate-45 bg-background border"></div>
+			<div data-popover-arrow class="absolute"></div>
 		}
 	</div>
+	<style>
+		@keyframes popover-in {
+			0% { opacity: 0; transform: scale(0.95); }
+			100% { opacity: 1; transform: scale(1); }
+		}
+		@keyframes popover-out {
+			0% { opacity: 1; transform: scale(1); }
+			100% { opacity: 0; transform: scale(0.95); }
+		}
+		[data-popover-id].popover-animate-in {
+			animation: popover-in 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+		}
+		[data-popover-id].popover-animate-out {
+			animation: popover-out 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		}
+	</style>
 }
 
 var handle = templ.NewOnceHandle()
 
 templ Script() {
 	@handle.Once() {
-		<script src="https://cdn.jsdelivr.net/npm/@floating-ui/core@1/dist/floating-ui.core.umd.min.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/dist/floating-ui.dom.umd.min.js"></script>
 		<script nonce={ templ.GetNonce(ctx) }>
-			if (typeof window.popoverState === 'undefined') {
-				window.popoverState = new Map();
-			}
+		(function() {
+		  if (window.popoverSystemInitialized) return;
+          function getPlacement(trigger, content, placement, offset) {
+            const rect = trigger.getBoundingClientRect();
+            const cRect = content.getBoundingClientRect();
+            let top = 0, left = 0;
+            switch (placement) {
+              case 'top':
+                top = rect.top - cRect.height - offset;
+                left = rect.left + (rect.width - cRect.width) / 2;
+                break;
+              case 'top-start':
+                top = rect.top - cRect.height - offset;
+                left = rect.left;
+                break;
+              case 'top-end':
+                top = rect.top - cRect.height - offset;
+                left = rect.left + rect.width - cRect.width;
+                break;
+              case 'right':
+                top = rect.top + (rect.height - cRect.height) / 2;
+                left = rect.right + offset;
+                break;
+              case 'right-start':
+                top = rect.top;
+                left = rect.right + offset;
+                break;
+              case 'right-end':
+                top = rect.bottom - cRect.height;
+                left = rect.right + offset;
+                break;
+              case 'bottom':
+                top = rect.bottom + offset;
+                left = rect.left + (rect.width - cRect.width) / 2;
+                break;
+              case 'bottom-start':
+                top = rect.bottom + offset;
+                left = rect.left;
+                break;
+              case 'bottom-end':
+                top = rect.bottom + offset;
+                left = rect.left + rect.width - cRect.width;
+                break;
+              case 'left':
+                top = rect.top + (rect.height - cRect.height) / 2;
+                left = rect.left - cRect.width - offset;
+                break;
+              case 'left-start':
+                top = rect.top;
+                left = rect.left - cRect.width - offset;
+                break;
+              case 'left-end':
+                top = rect.bottom - cRect.height;
+                left = rect.left - cRect.width - offset;
+                break;
+              default:
+                top = rect.bottom + offset;
+                left = rect.left + (rect.width - cRect.width) / 2;
+            }
+            return { top: Math.round(top), left: Math.round(left) };
+          }
 
-			(function() { // IIFE Start
-				if (window.popoverSystemInitialized) return;
+          function isInViewport(element) {
+            const rect = element.getBoundingClientRect();
+            return (
+              rect.top >= 0 &&
+              rect.left >= 0 &&
+              rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+              rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+            );
+          }
 
-				// --- Floating UI Check & Helper ---
-				let FloatingUIDOM = null;
+          function findBestPlacement(trigger, content, preferredPlacement, offset) {
+            // Determine the direction of the preferred placement
+            const direction = preferredPlacement.split('-')[0]; // 'left', 'right', 'top', 'bottom'
+            const alignment = preferredPlacement.split('-')[1] || ''; // 'start', 'end' or empty
 
-				function whenFloatingUiReady(callback, attempt = 1) {
-					if (window.FloatingUIDOM) {
-						FloatingUIDOM = window.FloatingUIDOM;
-						callback();
-					} else if (attempt < 40) {
-						setTimeout(() => whenFloatingUiReady(callback, attempt + 1), 50);
-					} else {
-						console.error("Floating UI DOM failed to load after several attempts.");
-					}
-				}
+            // Build alternatives in the same direction
+            const sameDirectionPlacements = [
+              preferredPlacement, // First try the preferred placement
+              direction, // Then just the direction (e.g. 'left')
+              direction + '-start', // Then start
+              direction + '-end' // Then end
+            ];
 
-				// --- Helper Functions ---
-				function findReferenceElement(triggerSpan) {
-					const children = triggerSpan.children;
-					if (children.length === 0) return triggerSpan;
-					let bestElement = triggerSpan;
-					let largestArea = 0;
-					for (const child of children) {
-						if (typeof child.getBoundingClientRect !== 'function') continue;
-						const rect = child.getBoundingClientRect();
-						const area = rect.width * rect.height;
-						if (area > largestArea) {
-							largestArea = area;
-							bestElement = child;
-						}
-					}
-					return bestElement;
-				}
+            // Build alternatives in the opposite direction
+            const oppositeDirection = {
+              'left': 'right',
+              'right': 'left',
+              'top': 'bottom',
+              'bottom': 'top'
+            }[direction];
 
-				function positionArrow(arrowElement, placement, arrowData, content) {
-					const { x: arrowX, y: arrowY } = arrowData;
-					const staticSide = { top: 'bottom', right: 'left', bottom: 'top', left: 'right' }[placement.split('-')[0]];
-					Object.assign(arrowElement.style, { left: arrowX != null ? `${arrowX}px` : '', top: arrowY != null ? `${arrowY}px` : '', right: '', bottom: '', [staticSide]: '-5px' });
-					const popoverStyle = window.getComputedStyle(content);
-					const popoverBorderColor = popoverStyle.borderColor;
-					arrowElement.style.backgroundColor = popoverStyle.backgroundColor;
-					arrowElement.style.borderTopColor = popoverBorderColor;
-					arrowElement.style.borderRightColor = popoverBorderColor;
-					arrowElement.style.borderBottomColor = popoverBorderColor;
-					arrowElement.style.borderLeftColor = popoverBorderColor;
-					switch (staticSide) {
-						case 'top': arrowElement.style.borderBottomColor = 'transparent'; arrowElement.style.borderRightColor = 'transparent'; break;
-						case 'bottom': arrowElement.style.borderTopColor = 'transparent'; arrowElement.style.borderLeftColor = 'transparent'; break;
-						case 'left': arrowElement.style.borderTopColor = 'transparent'; arrowElement.style.borderRightColor = 'transparent'; break;
-						case 'right': arrowElement.style.borderBottomColor = 'transparent'; arrowElement.style.borderLeftColor = 'transparent'; break;
-					}
-				}
+            const oppositePlacements = [
+              oppositeDirection,
+              oppositeDirection + '-start',
+              oppositeDirection + '-end'
+            ];
 
-				function addAnimationStyles() {
-					if (document.getElementById('popover-animations')) return;
-					const style = document.createElement('style');
-					style.id = 'popover-animations';
-					style.textContent = `
-						@keyframes popover-in { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
-						@keyframes popover-out { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0.95); } }
-						[data-popover-id].popover-animate-in { animation: popover-in 0.15s cubic-bezier(0.16, 1, 0.3, 1); }
-						[data-popover-id].popover-animate-out { animation: popover-out 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-					`;
-					document.head.appendChild(style);
-				}
-				
-				// --- Core Popover Logic ---				
-				function updatePosition(state) {
-					if (!FloatingUIDOM || !state || !state.trigger || !state.content) return;
-					const { computePosition, offset, flip, shift, arrow } = FloatingUIDOM;
-					const referenceElement = findReferenceElement(state.trigger);
-					const arrowElement = state.content.querySelector('[data-popover-arrow]');
-					const placement = state.content.dataset.popoverPlacement || 'bottom';
-					const offsetValue = parseInt(state.content.dataset.popoverOffset) || (arrowElement ? 8 : 4);
-					const shouldMatchWidth = state.content.dataset.popoverMatchWidth === 'true';
-					
-					const middleware = [offset(offsetValue), flip({ padding: 10 }), shift({ padding: 10 })];
-					if (arrowElement) middleware.push(arrow({ element: arrowElement, padding: 5 }));
+            // Build alternatives in the other directions
+            const otherDirections = ['top', 'right', 'bottom', 'left'].filter(d => d !== direction && d !== oppositeDirection);
+            const otherPlacements = otherDirections.flatMap(d => [d, d + '-start', d + '-end']);
 
-					computePosition(referenceElement, state.content, { placement, middleware }).then(({ x, y, placement, middlewareData }) => {
-						Object.assign(state.content.style, { left: `${x}px`, top: `${y}px` });
-						
-						if (shouldMatchWidth) {
-							const triggerWidth = referenceElement.offsetWidth;
-							state.content.style.setProperty('--popover-trigger-width', `${triggerWidth}px`);
-						}
+            // Combine all placements and remove duplicates
+            const allPlacements = [
+              ...sameDirectionPlacements,
+              ...oppositePlacements,
+              ...otherPlacements
+            ];
+            const uniquePlacements = [...new Set(allPlacements)];
 
-						if (arrowElement && middlewareData.arrow) {
-							positionArrow(arrowElement, placement, middlewareData.arrow, state.content);
-						}
-					});
-				}
+            // Try each placement
+            for (const placement of uniquePlacements) {
+              const pos = getPlacement(trigger, content, placement, offset);
+              content.style.top = pos.top + 'px';
+              content.style.left = pos.left + 'px';
 
-				function addGlobalListeners(popoverId, state) {
-					removeGlobalListeners(state); // Ensure no duplicates
-					if (state.content.dataset.popoverDisableClickaway !== 'true') {
-						const handler = (e) => {
-							// Close if click is outside trigger and content
-							if (!state.trigger.contains(e.target) && !state.content.contains(e.target)) {
-								closePopover(popoverId);
-							}
-						};
-						// Use setTimeout to avoid capturing the click that opened the popover
-						setTimeout(() => document.addEventListener('click', handler), 0);
-						state.eventListeners.clickAway = handler;
-					}
-					if (state.content.dataset.popoverDisableEsc !== 'true') {
-						const handler = (e) => { if (e.key === 'Escape') closePopover(popoverId); };
-						document.addEventListener('keydown', handler);
-						state.eventListeners.esc = handler;
-					}
-				}
+              if (isInViewport(content)) {
+                return placement;
+              }
+            }
 
-				function removeGlobalListeners(state) {
-					if (state.eventListeners.clickAway) document.removeEventListener('click', state.eventListeners.clickAway);
-					if (state.eventListeners.esc) document.removeEventListener('keydown', state.eventListeners.esc);
-					state.eventListeners = {}; // Clear stored handlers
-				}
+            // If no placement fits, at least keep the popover inside the viewport
+            const pos = getPlacement(trigger, content, preferredPlacement, offset);
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+            const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
 
-				function openPopover(popoverId, trigger) {
-					if (!FloatingUIDOM) return; 
-					const { autoUpdate } = FloatingUIDOM;
-					const content = document.getElementById(popoverId);
-					if (!content) return;
+            let top = pos.top;
+            let left = pos.left;
 
-					let state = window.popoverState.get(popoverId);
-					if (!state) { // Should be created by initTrigger, but as a fallback
-						state = { trigger, content, isOpen: false, cleanup: null, hoverState: {}, eventListeners: {} };
-						window.popoverState.set(popoverId, state);
-					} else if (state.isOpen) return;
+            // Check vertical boundaries
+            if (top < 0) top = 0;
+            if (top + content.offsetHeight > viewportHeight) {
+              top = viewportHeight - content.offsetHeight;
+            }
 
-					state.trigger = trigger; // Ensure trigger reference is current
-					state.content = content; // Ensure content reference is current
+            // Check horizontal boundaries
+            if (left < 0) left = 0;
+            if (left + content.offsetWidth > viewportWidth) {
+              left = viewportWidth - content.offsetWidth;
+            }
 
-					const portal = document.querySelector('[data-popover-portal-container]');
-					if (portal && content.parentNode !== portal) portal.appendChild(content);
-					
-					content.style.display = 'block';
-					content.classList.remove('popover-animate-out');
-					content.classList.add('popover-animate-in');
+            content.style.top = top + 'px';
+            content.style.left = left + 'px';
+            return preferredPlacement;
+          }
 
-					// Initial position update before autoUpdate starts
-					updatePosition(state); 
+          function openPopover(trigger, content, placement, offset, matchWidth) {
+            // Calculate extra offset: add space for arrow if present, otherwise none for matchWidth popovers
+            let extraOffset = 12;
+            const hasArrow = !!content.querySelector('[data-popover-arrow]');
+            if (matchWidth && !hasArrow) {
+              extraOffset = 0;
+            }
+            offset = (offset || 0) + extraOffset;
 
-					if (state.cleanup) state.cleanup();
-					state.cleanup = autoUpdate(findReferenceElement(trigger), content, () => updatePosition(state), { animationFrame: true }); // Use animationFrame for smoother updates
+            // Make popover visible but not shown, so it can be measured
+            content.style.visibility = 'hidden';
+            content.style.display = 'block';
+            content.style.position = 'fixed';
+            content.style.zIndex = '9999';
+            content.classList.remove('hidden');
+            content.classList.remove('popover-animate-out');
 
-					addGlobalListeners(popoverId, state);
-					state.isOpen = true;
-				}
+            // Make arrow measurable if present
+            const arrow = content.querySelector('[data-popover-arrow]');
+            if (arrow) {
+              arrow.style.visibility = 'hidden';
+              arrow.style.display = 'block';
+            }
 
-				function closePopover(popoverId, immediate = false) {
-					const state = window.popoverState.get(popoverId);
-					if (!state || !state.isOpen) return;
+            // Set width to match trigger if requested
+            if (matchWidth) {
+              const triggerRect = trigger.getBoundingClientRect();
+              content.style.width = `${triggerRect.width}px`;
+              content.style.minWidth = `${triggerRect.width}px`;
+              content.style.maxWidth = `${triggerRect.width}px`;
+            } else {
+              content.style.width = '';
+              content.style.minWidth = '';
+              content.style.maxWidth = '';
+            }
 
-					if (state.cleanup) { state.cleanup(); state.cleanup = null; }
-					removeGlobalListeners(state);
+            // Find the best placement that fits in the viewport
+            const bestPlacement = findBestPlacement(trigger, content, placement, offset);
+            let pos = getPlacement(trigger, content, bestPlacement, offset);
 
-					const content = state.content;
-					function hideContent() { content.style.display = 'none'; content.classList.remove('popover-animate-in', 'popover-animate-out'); }
-					
-					if (immediate) hideContent();
-					else {
-						content.classList.remove('popover-animate-in');
-						content.classList.add('popover-animate-out');
-						setTimeout(hideContent, 150); // Match animation duration
-					}
-					state.isOpen = false;
-				}
-				
-				// Expose closePopover globally
-				window.closePopover = closePopover;
+            // For matchWidth popovers, align left edge exactly with trigger
+            if (matchWidth && (
+              bestPlacement.startsWith('bottom') || bestPlacement.startsWith('top')
+            )) {
+              pos.left = trigger.getBoundingClientRect().left;
+            }
+            content.style.top = pos.top + 'px';
+            content.style.left = pos.left + 'px';
 
-				// --- Trigger Initialization & Handling ---
+            // Arrow positioning
+            if (arrow) {
+              const triggerRect = trigger.getBoundingClientRect();
+              const contentRect = content.getBoundingClientRect();
+              const popoverStyle = window.getComputedStyle(content);
+              const popoverBorderColor = popoverStyle.borderColor;
 
-				function attachClickTrigger(trigger, popoverId) {
-					const handler = (e) => {
-						e.stopPropagation();
-						const state = window.popoverState.get(popoverId);
-						if (state?.isOpen) closePopover(popoverId);
-						else openPopover(popoverId, trigger);
-					};
-					trigger.addEventListener('click', handler);
-					trigger._popoverListener = handler; 
-				}
+              arrow.style.width = '0';
+              arrow.style.height = '0';
+              arrow.style.position = 'absolute';
+              arrow.style.borderStyle = 'solid';
+              arrow.style.borderColor = 'transparent';
+              arrow.style.boxShadow = 'none';
 
-				function attachHoverTrigger(trigger, popoverId) {
-					const content = document.getElementById(popoverId);
-					if (!content) return;
-					let state = window.popoverState.get(popoverId);
-					if (!state) return; // State should exist from initTrigger
-					
-					const hoverDelay = parseInt(content.dataset.popoverHoverDelay) || 100;
-					const hoverOutDelay = parseInt(content.dataset.popoverHoverOutDelay) || 200;
+              let size = 10; // px
+              switch (bestPlacement) {
+                case 'top':
+                case 'top-start':
+                case 'top-end':
+                  arrow.style.borderLeft = `${size}px solid transparent`;
+                  arrow.style.borderRight = `${size}px solid transparent`;
+                  arrow.style.borderTop = `${size}px solid ${popoverBorderColor}`;
+                  arrow.style.borderBottom = '0';
+                  arrow.style.bottom = '-10px';
+                  if (bestPlacement === 'top') {
+                    arrow.style.left = (contentRect.width / 2 - size) + 'px';
+                  } else if (bestPlacement === 'top-start') {
+                    arrow.style.left = (triggerRect.left + triggerRect.width / 2 - contentRect.left - size) + 'px';
+                  } else if (bestPlacement === 'top-end') {
+                    arrow.style.left = (triggerRect.right - contentRect.left - triggerRect.width / 2 - size) + 'px';
+                  }
+                  break;
+                case 'bottom':
+                case 'bottom-start':
+                case 'bottom-end':
+                  arrow.style.borderLeft = `${size}px solid transparent`;
+                  arrow.style.borderRight = `${size}px solid transparent`;
+                  arrow.style.borderBottom = `${size}px solid ${popoverBorderColor}`;
+                  arrow.style.borderTop = '0';
+                  arrow.style.top = '-10px';
+                  if (bestPlacement === 'bottom') {
+                    arrow.style.left = (contentRect.width / 2 - size) + 'px';
+                  } else if (bestPlacement === 'bottom-start') {
+                    arrow.style.left = (triggerRect.left + triggerRect.width / 2 - contentRect.left - size) + 'px';
+                  } else if (bestPlacement === 'bottom-end') {
+                    arrow.style.left = (triggerRect.right - contentRect.left - triggerRect.width / 2 - size) + 'px';
+                  }
+                  break;
+                case 'left':
+                case 'left-start':
+                case 'left-end':
+                  arrow.style.borderTop = `${size}px solid transparent`;
+                  arrow.style.borderBottom = `${size}px solid transparent`;
+                  arrow.style.borderLeft = `${size}px solid ${popoverBorderColor}`;
+                  arrow.style.borderRight = '0';
+                  arrow.style.right = '-10px';
+                  if (bestPlacement === 'left') {
+                    arrow.style.top = (contentRect.height / 2 - size) + 'px';
+                  } else if (bestPlacement === 'left-start') {
+                    arrow.style.top = (triggerRect.top - contentRect.top + triggerRect.height / 2 - size) + 'px';
+                  } else if (bestPlacement === 'left-end') {
+                    arrow.style.top = (triggerRect.bottom - contentRect.top - triggerRect.height / 2 - size) + 'px';
+                  }
+                  break;
+                case 'right':
+                case 'right-start':
+                case 'right-end':
+                  arrow.style.borderTop = `${size}px solid transparent`;
+                  arrow.style.borderBottom = `${size}px solid transparent`;
+                  arrow.style.borderRight = `${size}px solid ${popoverBorderColor}`;
+                  arrow.style.borderLeft = '0';
+                  arrow.style.left = '-10px';
+                  if (bestPlacement === 'right') {
+                    arrow.style.top = (contentRect.height / 2 - size) + 'px';
+                  } else if (bestPlacement === 'right-start') {
+                    arrow.style.top = (triggerRect.top - contentRect.top + triggerRect.height / 2 - size) + 'px';
+                  } else if (bestPlacement === 'right-end') {
+                    arrow.style.top = (triggerRect.bottom - contentRect.top - triggerRect.height / 2 - size) + 'px';
+                  }
+                  break;
+              }
+              arrow.style.visibility = 'visible';
+              arrow.style.display = '';
+            }
 
-					const handleTriggerEnter = () => { clearTimeout(state.hoverState.leaveTimeout); state.hoverState.enterTimeout = setTimeout(() => openPopover(popoverId, trigger), hoverDelay); };
-					const handleTriggerLeave = (e) => { clearTimeout(state.hoverState.enterTimeout); state.hoverState.leaveTimeout = setTimeout(() => { if (!content.contains(e.relatedTarget)) closePopover(popoverId); }, hoverOutDelay); };
-					const handleContentEnter = () => clearTimeout(state.hoverState.leaveTimeout);
-					const handleContentLeave = (e) => { state.hoverState.leaveTimeout = setTimeout(() => { if (!trigger.contains(e.relatedTarget)) closePopover(popoverId); }, hoverOutDelay); };
+            // Finally make visible and start animation
+            content.style.visibility = 'visible';
+            content.setAttribute('aria-hidden', 'false');
 
-					trigger.addEventListener('mouseenter', handleTriggerEnter);
-					trigger.addEventListener('mouseleave', handleTriggerLeave);
-					content.addEventListener('mouseenter', handleContentEnter);
-					content.addEventListener('mouseleave', handleContentLeave);
+            // Start animation
+            requestAnimationFrame(() => {
+              content.classList.add('popover-animate-in');
+            });
+          }
 
-					// Store handlers for cleanup
-					trigger._popoverHoverListeners = { handleTriggerEnter, handleTriggerLeave };
-					content._popoverHoverListeners = { handleContentEnter, handleContentLeave };
-				}
-				
-				function initTrigger(trigger) {
-					const popoverId = trigger.dataset.popoverFor;
-					const content = document.getElementById(popoverId);
-					if (!popoverId || !content) return;
-					
-					// Prevent re-attaching listeners to the same DOM element instance
-					if (trigger._popoverListenerAttached) return;
+          function closePopover(popover) {
+            if (!popover) return;
 
-					// Ensure state object exists
-					if (!window.popoverState.has(popoverId)) {
-						window.popoverState.set(popoverId, {
-							trigger, content, isOpen: false, cleanup: null, 
-							hoverState: {}, eventListeners: {}
-						});
-					} else {
-						// Update refs in existing state if trigger persisted
-						const state = window.popoverState.get(popoverId);
-						state.trigger = trigger;
-						state.content = content;
-						// Ensure closed state after potential swap/cleanup
-						if (state.isOpen) closePopover(popoverId, true);
-					}
-					
-					// Cleanup any stray listeners before attaching new ones
-					if (trigger._popoverListener) trigger.removeEventListener('click', trigger._popoverListener);
-					if (trigger._popoverHoverListeners) { trigger.removeEventListener('mouseenter', trigger._popoverHoverListeners.handleTriggerEnter); trigger.removeEventListener('mouseleave', trigger._popoverHoverListeners.handleTriggerLeave); }
-					if (content._popoverHoverListeners) { content.removeEventListener('mouseenter', content._popoverHoverListeners.handleContentEnter); content.removeEventListener('mouseleave', content._popoverHoverListeners.handleContentLeave); }
-					delete trigger._popoverListener;
-					delete trigger._popoverHoverListeners;
-					if (content) delete content._popoverHoverListeners;
+            // If popover is already hidden, do nothing
+            if (popover.classList.contains('hidden')) return;
 
-					// Attach the correct listener type
-					const triggerType = trigger.dataset.popoverType || 'click';
-					if (triggerType === 'click') {
-						attachClickTrigger(trigger, popoverId);
-					} else if (triggerType === 'hover') {
-						attachHoverTrigger(trigger, popoverId);
-					}
-					trigger._popoverListenerAttached = true;
-				}
-				
-				// --- Cleanup ---
-				
-				function cleanupPopovers(element) {
-					const cleanupTrigger = (trigger) => {
-						const popoverId = trigger.dataset.popoverFor;
-						if (popoverId) {
-							closePopover(popoverId, true); // Close popover, remove global listeners, stop Floating UI
-						}
-						
-						// Remove listeners directly attached to the trigger
-						if (trigger._popoverListener) trigger.removeEventListener('click', trigger._popoverListener);
-						if (trigger._popoverHoverListeners) { 
-							trigger.removeEventListener('mouseenter', trigger._popoverHoverListeners.handleTriggerEnter);
-							trigger.removeEventListener('mouseleave', trigger._popoverHoverListeners.handleTriggerLeave);
-						}
-						
-						// Remove listeners attached to the content (for hover)
-						const content = document.getElementById(popoverId);
-						if (content && content._popoverHoverListeners) {
-							content.removeEventListener('mouseenter', content._popoverHoverListeners.handleContentEnter);
-							content.removeEventListener('mouseleave', content._popoverHoverListeners.handleContentLeave);
-							delete content._popoverHoverListeners;
-						}
-						
-						// Clean up stored references and flags on the trigger
-						delete trigger._popoverListener;
-						delete trigger._popoverHoverListeners;
-						delete trigger._popoverListenerAttached;
-						
-						// Optionally remove state - might be desired if the element is definitely gone
-						// window.popoverState.delete(popoverId);
-					};
+            // First start exit animation
+            popover.classList.remove('popover-animate-in');
+            popover.classList.add('popover-animate-out');
 
-					// Cleanup element itself if it's a trigger
-					if (element.matches && element.matches('[data-popover-trigger]')) {
-						cleanupTrigger(element);
-					}
-					// Cleanup descendants
-					if (element.querySelectorAll) {
-						element.querySelectorAll('[data-popover-trigger]').forEach(cleanupTrigger);
-					}
-				}
+            // Once animation ends, hide
+            const animationEndHandler = function handler() {
+              popover.removeEventListener('animationend', handler);
+              popover.style.display = 'none';
+              popover.style.visibility = 'hidden';
+              popover.classList.add('hidden');
+              popover.setAttribute('aria-hidden', 'true');
 
-				function initAllComponents(root = document) {
-					if (!FloatingUIDOM) return; // Don't init if library isn't ready
-					if (root instanceof Element && root.matches('[data-popover-trigger]')) {
-						initTrigger(root);
-					}
-					if (root && typeof root.querySelectorAll === 'function') {
-						for (const trigger of root.querySelectorAll('[data-popover-trigger]')) {
-							initTrigger(trigger);
-						}
-					}
-				}
+              // Hide arrow
+              const arrow = popover.querySelector('[data-popover-arrow]');
+              if (arrow) {
+                arrow.style.visibility = 'hidden';
+              }
+            };
 
-				const handleHtmxSwap = (event) => {
-					const target = event.detail.elt
-					if (target instanceof Element) {
-						whenFloatingUiReady(() => initAllComponents(target));
-					}
-				};
-				
-				initAllComponents();
-				
-				document.addEventListener('DOMContentLoaded', () => {
-					whenFloatingUiReady(() => {
-						addAnimationStyles();
-						initAllComponents(); 
-					});
-				});
+            popover.addEventListener('animationend', animationEndHandler, { once: true });
 
-				document.body.addEventListener('htmx:beforeSwap', (event) => {
-					const target = event.detail.elt;
-					if (target instanceof Element) {
-						cleanupPopovers(target);
-					}
-				});
+            // Fallback: if animation doesn't complete, force close after 300ms
+            setTimeout(() => {
+              if (!popover.classList.contains('hidden')) {
+                popover.removeEventListener('animationend', animationEndHandler);
+                popover.style.display = 'none';
+                popover.style.visibility = 'hidden';
+                popover.classList.add('hidden');
+                popover.setAttribute('aria-hidden', 'true');
 
-				document.body.addEventListener('htmx:afterSwap', handleHtmxSwap);
-				document.body.addEventListener('htmx:oobAfterSwap', handleHtmxSwap);
+                const arrow = popover.querySelector('[data-popover-arrow]');
+                if (arrow) {
+                  arrow.style.visibility = 'hidden';
+                }
+              }
+            }, 300);
+          }
 
-				window.popoverSystemInitialized = true;
-			})(); // IIFE End
+          function handleClickAway(e, content, trigger) {
+            if (!content || !trigger) return;
+            if (!content.contains(e.target) && !trigger.contains(e.target)) {
+              closePopover(content);
+            }
+          }
+
+          function handleESC(e, content) {
+            if (!content) return;
+            if (e.key === 'Escape') {
+              closePopover(content);
+            }
+          }
+
+          function initPopoverTrigger(trigger) {
+            if (!trigger) return;
+
+            const popoverId = trigger.getAttribute('data-popover-for');
+            if (!popoverId) return;
+
+            const content = document.getElementById(popoverId);
+            if (!content) return;
+
+            const type = trigger.getAttribute('data-popover-type') || 'click';
+            const placement = content.getAttribute('data-popover-placement') || 'bottom';
+            const offset = parseInt(content.getAttribute('data-popover-offset') || '4', 10);
+            const disableClickAway = content.getAttribute('data-popover-disable-clickaway') === 'true';
+            const disableESC = content.getAttribute('data-popover-disable-esc') === 'true';
+            const hoverDelay = parseInt(content.getAttribute('data-popover-hover-delay') || '0', 10);
+            const hoverOutDelay = parseInt(content.getAttribute('data-popover-hover-out-delay') || '0', 10);
+            const matchWidth = content.getAttribute('data-popover-match-width') === 'true';
+
+            // Clean up existing handlers if any
+            if (trigger._popoverHandlers) {
+              const handlers = trigger._popoverHandlers;
+              if (handlers.clickAwayHandler) {
+                document.removeEventListener('mousedown', handlers.clickAwayHandler);
+              }
+              if (handlers.escHandler) {
+                document.removeEventListener('keydown', handlers.escHandler);
+              }
+              if (handlers.scrollHandler) {
+                window.removeEventListener('scroll', handlers.scrollHandler, true);
+              }
+            }
+
+            // Initialize new handlers
+            trigger._popoverHandlers = {
+              clickAwayHandler: null,
+              escHandler: null,
+              scrollHandler: null,
+              resizeHandler: null
+            };
+            const handlers = trigger._popoverHandlers;
+
+            let hoverTimeout, outTimeout;
+
+            function updatePosition() {
+              if (content && !content.classList.contains('hidden')) {
+                openPopover(trigger, content, placement, offset, matchWidth);
+              }
+            }
+
+            function show() {
+              if (!content || !trigger) return;
+              openPopover(trigger, content, placement, offset, matchWidth);
+              if (!disableClickAway && !handlers.clickAwayHandler) {
+                handlers.clickAwayHandler = (e) => handleClickAway(e, content, trigger);
+                document.addEventListener('mousedown', handlers.clickAwayHandler);
+              }
+              if (!disableESC && !handlers.escHandler) {
+                handlers.escHandler = (e) => handleESC(e, content);
+                document.addEventListener('keydown', handlers.escHandler);
+              }
+              if (!handlers.scrollHandler) {
+                handlers.scrollHandler = () => {
+                  requestAnimationFrame(updatePosition);
+                };
+                window.addEventListener('scroll', handlers.scrollHandler, true);
+              }
+
+              // Add resize handler
+              if (!handlers.resizeHandler) {
+                handlers.resizeHandler = () => {
+                  requestAnimationFrame(updatePosition);
+                };
+                window.addEventListener('resize', handlers.resizeHandler);
+              }
+            }
+
+            function hide() {
+              if (!content) return;
+              closePopover(content);
+              if (handlers.clickAwayHandler) {
+                document.removeEventListener('mousedown', handlers.clickAwayHandler);
+                handlers.clickAwayHandler = null;
+              }
+              if (handlers.escHandler) {
+                document.removeEventListener('keydown', handlers.escHandler);
+                handlers.escHandler = null;
+              }
+              if (handlers.scrollHandler) {
+                window.removeEventListener('scroll', handlers.scrollHandler, true);
+                handlers.scrollHandler = null;
+              }
+              if (handlers.resizeHandler) {
+                window.removeEventListener('resize', handlers.resizeHandler);
+                handlers.resizeHandler = null;
+              }
+            }
+
+            // Remove any existing click handlers
+            const newTrigger = trigger.cloneNode(true);
+            trigger.parentNode.replaceChild(newTrigger, trigger);
+            trigger = newTrigger;
+
+            if (type === 'hover') {
+              trigger.addEventListener('mouseenter', () => {
+                clearTimeout(outTimeout);
+                hoverTimeout = setTimeout(show, hoverDelay);
+              });
+              trigger.addEventListener('mouseleave', () => {
+                clearTimeout(hoverTimeout);
+                outTimeout = setTimeout(hide, hoverOutDelay);
+              });
+              content.addEventListener('mouseenter', () => {
+                clearTimeout(outTimeout);
+              });
+              content.addEventListener('mouseleave', () => {
+                outTimeout = setTimeout(hide, hoverOutDelay);
+              });
+            } else {
+              trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (content.classList.contains('hidden')) {
+                  show();
+                } else {
+                  hide();
+                }
+              });
+            }
+          }
+
+          function initAllPopovers(root = document) {
+            const triggers = root.querySelectorAll('[data-popover-trigger]');
+            triggers.forEach(trigger => {
+              // Remove any existing handlers before reinitializing
+              if (trigger._popoverHandlers) {
+                const handlers = trigger._popoverHandlers;
+                if (handlers.clickAwayHandler) {
+                  document.removeEventListener('mousedown', handlers.clickAwayHandler);
+                }
+                if (handlers.escHandler) {
+                  document.removeEventListener('keydown', handlers.escHandler);
+                }
+                if (handlers.scrollHandler) {
+                  window.removeEventListener('scroll', handlers.scrollHandler, true);
+                }
+                if (handlers.resizeHandler) {
+                  window.removeEventListener('resize', handlers.resizeHandler);
+                }
+              }
+              initPopoverTrigger(trigger);
+            });
+          }
+
+          // Global closePopover function for external use
+          window.closePopover = function(popoverId, animate = true) {
+            const popover = document.getElementById(popoverId);
+            if (!popover) return;
+
+            // Find the trigger element that opened this popover
+            const trigger = document.querySelector(`[data-popover-trigger][data-popover-for="${popoverId}"]`);
+
+            // Disable all interactive elements inside popover
+            const interactiveElements = popover.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            interactiveElements.forEach(el => {
+              el.setAttribute('tabindex', '-1');
+              el.setAttribute('aria-hidden', 'true');
+            });
+
+            // Force blur any focused element inside popover
+            if (document.activeElement && popover.contains(document.activeElement)) {
+              document.activeElement.blur();
+            }
+
+            // Move focus to trigger or body
+            if (trigger) {
+              trigger.focus();
+            } else {
+              document.body.focus();
+            }
+
+            if (animate) {
+              // Start exit animation
+              popover.classList.remove('popover-animate-in');
+              popover.classList.add('popover-animate-out');
+
+              // Once animation ends, hide
+              const animationEndHandler = function handler() {
+                popover.removeEventListener('animationend', handler);
+                popover.style.display = 'none';
+                popover.style.visibility = 'hidden';
+                popover.classList.add('hidden');
+                popover.setAttribute('aria-hidden', 'true');
+
+                // Hide arrow
+                const arrow = popover.querySelector('[data-popover-arrow]');
+                if (arrow) {
+                  arrow.style.visibility = 'hidden';
+                }
+
+                // Re-enable interactive elements
+                interactiveElements.forEach(el => {
+                  el.removeAttribute('tabindex');
+                  el.removeAttribute('aria-hidden');
+                });
+              };
+
+              popover.addEventListener('animationend', animationEndHandler, { once: true });
+
+              // Fallback: if animation doesn't complete, force close after 300ms
+              setTimeout(() => {
+                if (!popover.classList.contains('hidden')) {
+                  popover.removeEventListener('animationend', animationEndHandler);
+                  popover.style.display = 'none';
+                  popover.style.visibility = 'hidden';
+                  popover.classList.add('hidden');
+                  popover.setAttribute('aria-hidden', 'true');
+
+                  const arrow = popover.querySelector('[data-popover-arrow]');
+                  if (arrow) {
+                    arrow.style.visibility = 'hidden';
+                  }
+
+                  // Re-enable interactive elements
+                  interactiveElements.forEach(el => {
+                    el.removeAttribute('tabindex');
+                    el.removeAttribute('aria-hidden');
+                  });
+                }
+              }, 300);
+            } else {
+              // Immediate close without animation
+              popover.style.display = 'none';
+              popover.style.visibility = 'hidden';
+              popover.classList.add('hidden');
+              popover.setAttribute('aria-hidden', 'true');
+
+              const arrow = popover.querySelector('[data-popover-arrow]');
+              if (arrow) {
+                arrow.style.visibility = 'hidden';
+              }
+
+              // Re-enable interactive elements
+              interactiveElements.forEach(el => {
+                el.removeAttribute('tabindex');
+                el.removeAttribute('aria-hidden');
+              });
+            }
+          };
+
+          document.addEventListener('DOMContentLoaded', () => initAllPopovers(document));
+
+          // HTMX event bindings
+          function htmxInitHandler(event) {
+            const target = event.detail && event.detail.elt;
+            if (target instanceof Element) {
+              initAllPopovers(target);
+            }
+          }
+          document.body.addEventListener('htmx:afterSwap', htmxInitHandler);
+          document.body.addEventListener('htmx:oobAfterSwap', htmxInitHandler);
+          document.body.addEventListener('htmx:beforeSwap', htmxInitHandler);
+
+          // Add popstate event listener for browser history navigation
+          window.addEventListener('popstate', () => {
+            requestAnimationFrame(() => {
+              initAllPopovers(document);
+            });
+          });
+
+          window.popoverSystemInitialized = true;
+		})();
 		</script>
 	}
 }
