@@ -6,7 +6,7 @@ import (
 	"github.com/axzilla/templui/internal/components/button"
 	"github.com/axzilla/templui/internal/components/icon"
 	"github.com/axzilla/templui/internal/components/popover"
-	"github.com/axzilla/templui/internal/util"
+	"github.com/axzilla/templui/internal/utils"
 	"strconv"
 )
 
@@ -81,14 +81,14 @@ templ SelectBox(props ...Props) {
 		}
 		wrapperID := p.ID
 		if wrapperID == "" {
-			wrapperID = util.RandomID()
+			wrapperID = utils.RandomID()
 		}
 		contentID := fmt.Sprintf("%s-content", wrapperID)
 		ctx = context.WithValue(ctx, contentIDKey, contentID)
 	}}
 	<div
 		id={ wrapperID }
-		class={ util.TwMerge("select-container w-full relative", p.Class) }
+		class={ utils.TwMerge("select-container w-full relative", p.Class) }
 		{ p.Attributes... }
 	>
 		@popover.Popover() {
@@ -116,13 +116,13 @@ templ Trigger(props ...TriggerProps) {
 			ID:      p.ID,
 			Type:    "button",
 			Variant: button.VariantOutline,
-			Class: util.TwMerge(
+			Class: utils.TwMerge(
 				"w-full select-trigger flex items-center justify-between focus:ring-2 focus:ring-offset-2",
-				util.If(p.HasError, "border-destructive ring-destructive"),
+				utils.If(p.HasError, "border-destructive ring-destructive"),
 				p.Class,
 			),
 			Disabled: p.Disabled,
-			Attributes: util.MergeAttributes(
+			Attributes: utils.MergeAttributes(
 				templ.Attributes{
 					"data-content-id": contentID,
 					"tabindex":        "0",
@@ -182,7 +182,7 @@ templ Value(props ...ValueProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ util.TwMerge("block truncate select-value text-muted-foreground", p.Class) }
+		class={ utils.TwMerge("block truncate select-value text-muted-foreground", p.Class) }
 		{ p.Attributes... }
 	>
 		if p.Placeholder != "" {
@@ -208,12 +208,12 @@ templ Content(props ...ContentProps) {
 		Placement:  popover.PlacementBottomStart,
 		Offset:     4,
 		MatchWidth: true,
-		Class: util.TwMerge(
+		Class: utils.TwMerge(
 			"p-1 select-content z-50 overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md",
 			"min-w-[var(--popover-trigger-width)] w-[var(--popover-trigger-width)]",
 			p.Class,
 		),
-		Attributes: util.MergeAttributes(
+		Attributes: utils.MergeAttributes(
 			templ.Attributes{
 				"role":     "listbox",
 				"tabindex": "-1",
@@ -234,7 +234,7 @@ templ Group(props ...GroupProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ util.TwMerge("p-1", p.Class) }
+		class={ utils.TwMerge("p-1", p.Class) }
 		role="group"
 		{ p.Attributes... }
 	>
@@ -251,7 +251,7 @@ templ Label(props ...LabelProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ util.TwMerge("px-2 py-1.5 text-sm font-medium", p.Class) }
+		class={ utils.TwMerge("px-2 py-1.5 text-sm font-medium", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -268,12 +268,12 @@ templ Item(props ...ItemProps) {
 			id={ p.ID }
 		}
 		class={
-			util.TwMerge(
+			utils.TwMerge(
 				"select-item relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 px-2 text-sm font-light outline-none",
 				"hover:bg-accent hover:text-accent-foreground",
 				"focus:bg-accent focus:text-accent-foreground",
-				util.If(p.Selected, "bg-accent text-accent-foreground"),
-				util.If(p.Disabled, "pointer-events-none opacity-50"),
+				utils.If(p.Selected, "bg-accent text-accent-foreground"),
+				utils.If(p.Disabled, "pointer-events-none opacity-50"),
 				p.Class,
 			),
 		}
@@ -289,9 +289,9 @@ templ Item(props ...ItemProps) {
 		</span>
 		<span
 			class={
-				util.TwMerge(
+				utils.TwMerge(
 					"select-check absolute right-2 flex h-3.5 w-3.5 items-center justify-center",
-					util.IfElse(p.Selected, "opacity-100", "opacity-0"),
+					utils.IfElse(p.Selected, "opacity-100", "opacity-0"),
 				),
 			}
 		>
