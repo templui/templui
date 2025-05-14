@@ -1,6 +1,6 @@
 package drawer
 
-import "github.com/axzilla/templui/util"
+import "github.com/axzilla/templui/internal/utils"
 
 type Position string
 
@@ -68,11 +68,11 @@ templ Drawer(props ...Props) {
 		{{ p = props[0] }}
 	}
 	if p.ID == "" {
-		{{ p.ID = util.RandomID() }}
+		{{ p.ID = utils.RandomID() }}
 	}
 	<div
 		id={ p.ID }
-		class={ util.TwMerge("relative", p.Class) }
+		class={ utils.TwMerge("relative", p.Class) }
 		data-component="drawer"
 		data-drawer-id={ p.ID }
 		{ p.Attributes... }
@@ -90,7 +90,7 @@ templ Trigger(props ...TriggerProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ util.TwMerge("cursor-pointer", p.Class) }
+		class={ utils.TwMerge("cursor-pointer", p.Class) }
 		data-drawer-trigger
 		{ p.Attributes... }
 	>
@@ -104,7 +104,7 @@ templ Content(props ...ContentProps) {
 		{{ p = props[0] }}
 	}
 	if p.ID == "" {
-		{{ p.ID = util.RandomID() }}
+		{{ p.ID = utils.RandomID() }}
 	}
 	<div
 		if p.ID != "" {
@@ -116,13 +116,13 @@ templ Content(props ...ContentProps) {
 	<div
 		id={ p.ID + "-content" }
 		class={
-			util.TwMerge(
+			utils.TwMerge(
 				"fixed z-50 templui-drawer-content hidden",
 				p.Class,
-				util.If(p.Position == PositionRight, "inset-y-0 right-0 w-3/4 md:w-1/2 lg:w-1/3"),
-				util.If(p.Position == PositionLeft, "inset-y-0 left-0 w-3/4 md:w-1/2 lg:w-1/3"),
-				util.If(p.Position == PositionTop, "inset-x-0 top-0 h-auto sm:h-1/2"),
-				util.If(p.Position == PositionBottom, "inset-x-0 bottom-0 h-auto sm:h-1/2"),
+				utils.If(p.Position == PositionRight, "inset-y-0 right-0 w-3/4 md:w-1/2 lg:w-1/3"),
+				utils.If(p.Position == PositionLeft, "inset-y-0 left-0 w-3/4 md:w-1/2 lg:w-1/3"),
+				utils.If(p.Position == PositionTop, "inset-x-0 top-0 h-auto sm:h-1/2"),
+				utils.If(p.Position == PositionBottom, "inset-x-0 bottom-0 h-auto sm:h-1/2"),
 			),
 		}
 		data-drawer-content
@@ -131,12 +131,12 @@ templ Content(props ...ContentProps) {
 	>
 		<div
 			class={
-				util.TwMerge(
+				utils.TwMerge(
 					"h-full overflow-y-auto bg-background p-6 shadow-lg",
-					util.If(p.Position == PositionRight, "border-l"),
-					util.If(p.Position == PositionLeft, "border-r"),
-					util.If(p.Position == PositionBottom, "border-t"),
-					util.If(p.Position == PositionTop, "border-b"),
+					utils.If(p.Position == PositionRight, "border-l"),
+					utils.If(p.Position == PositionLeft, "border-r"),
+					utils.If(p.Position == PositionBottom, "border-t"),
+					utils.If(p.Position == PositionTop, "border-b"),
 				),
 			}
 			data-drawer-inner
@@ -155,7 +155,7 @@ templ Header(props ...HeaderProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ util.TwMerge("flex flex-col space-y-1.5 pb-4", p.Class) }
+		class={ utils.TwMerge("flex flex-col space-y-1.5 pb-4", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -171,7 +171,7 @@ templ Title(props ...TitleProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ util.TwMerge("text-lg font-semibold leading-none tracking-tight", p.Class) }
+		class={ utils.TwMerge("text-lg font-semibold leading-none tracking-tight", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -187,7 +187,7 @@ templ Description(props ...DescriptionProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ util.TwMerge("text-sm text-muted-foreground", p.Class) }
+		class={ utils.TwMerge("text-sm text-muted-foreground", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -203,7 +203,7 @@ templ Footer(props ...FooterProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ util.TwMerge("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4", p.Class) }
+		class={ utils.TwMerge("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -220,7 +220,7 @@ templ Close(props ...CloseProps) {
 			id={ p.ID }
 		}
 		class={
-			util.TwMerge(
+			utils.TwMerge(
 				"inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background",
 				"transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 				"disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent",
