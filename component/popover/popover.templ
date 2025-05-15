@@ -274,9 +274,20 @@ templ Script() {
 					state.trigger = trigger; // Ensure trigger reference is current
 					state.content = content; // Ensure content reference is current
 
-					const portal = content.closest('[data-popover-portal-container]');
-					if (portal && content.parentNode !== portal) portal.appendChild(content);
-					
+					const popoverWrapper = content.parentElement;
+					let portal = null;
+
+					// Assuming the structure from Popover.templ: wrapper is parent, portal is parent.nextElementSibling
+					if (popoverWrapper && popoverWrapper.nextElementSibling && popoverWrapper.nextElementSibling.hasAttribute('data-popover-portal-container')) {
+						portal = popoverWrapper.nextElementSibling;
+					}
+
+					// If portal is found and content is not already in it, move the content.
+					// If portal is not found (remains null), content will not be moved and will display in its original DOM position.
+					if (portal && content.parentNode !== portal) {
+						portal.appendChild(content);
+					}
+
 					content.style.display = 'block';
 					content.classList.remove('popover-animate-out');
 					content.classList.add('popover-animate-in');
