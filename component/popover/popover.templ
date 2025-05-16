@@ -62,7 +62,6 @@ templ Popover(props ...Props) {
 	<div class={ p.Class }>
 		{ children... }
 	</div>
-	<div data-popover-portal-container class="fixed inset-0 z-[9999] pointer-events-none"></div>
 }
 
 templ Trigger(props ...TriggerProps) {
@@ -141,6 +140,16 @@ templ Script() {
 
 			(function() { // IIFE Start
 				if (window.popoverSystemInitialized) return;
+
+				// --- Ensure Global Portal Container ---
+				let portalContainer = document.querySelector('[data-popover-portal-container]');
+				if (!portalContainer) {
+					portalContainer = document.createElement('div');
+					portalContainer.setAttribute('data-popover-portal-container', '');
+					portalContainer.className = 'fixed inset-0 z-[9999] pointer-events-none';
+					document.body.appendChild(portalContainer);
+				}
+				// --- End Ensure Global Portal Container ---
 
 				// --- Floating UI Check & Helper ---
 				let FloatingUIDOM = null;
@@ -274,20 +283,9 @@ templ Script() {
 					state.trigger = trigger; // Ensure trigger reference is current
 					state.content = content; // Ensure content reference is current
 
-					const popoverWrapper = content.parentElement;
-					let portal = null;
-
-					// Assuming the structure from Popover.templ: wrapper is parent, portal is parent.nextElementSibling
-					if (popoverWrapper && popoverWrapper.nextElementSibling && popoverWrapper.nextElementSibling.hasAttribute('data-popover-portal-container')) {
-						portal = popoverWrapper.nextElementSibling;
-					}
-
-					// If portal is found and content is not already in it, move the content.
-					// If portal is not found (remains null), content will not be moved and will display in its original DOM position.
-					if (portal && content.parentNode !== portal) {
-						portal.appendChild(content);
-					}
-
+					const portal = document.querySelector('[data-popover-portal-container]');
+					if (portal && content.parentNode !== portal) portal.appendChild(content);
+					
 					content.style.display = 'block';
 					content.classList.remove('popover-animate-out');
 					content.classList.add('popover-animate-in');
