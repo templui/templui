@@ -1,3 +1,5 @@
+import "./chartjs.js";
+
 window.chartInstances = window.chartInstances || {};
 
 (function () {
