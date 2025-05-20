@@ -68,7 +68,7 @@ type Props struct {
 }
 
 templ Chart(props ...Props) {
-	@Script()
+	// @Script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}

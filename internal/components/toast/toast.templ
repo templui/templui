@@ -42,7 +42,7 @@ type Props struct {
 }
 
 templ Toast(props ...Props) {
-	@Script()
+	// @Script()
 	@ToastCSS()
 	{{ var p Props }}
 	if len(props) > 0 {

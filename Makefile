@@ -56,3 +56,6 @@ lint-html:
 
 # Step 6: Run full pipeline (build + lint)
 validate-html: build-html lint-html
+
+minify-js:
+	npx esbuild --bundle internal/components/main.js --minify --outfile=assets/js/main.min.js

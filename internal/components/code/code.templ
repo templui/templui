@@ -24,7 +24,9 @@ type Props struct {
 }
 
 templ Code(props ...Props) {
-	@Script()
+	// @Script()
+	// <script nonce={ templ.GetNonce(ctx) } src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/pojoaque.min.css"/>
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}

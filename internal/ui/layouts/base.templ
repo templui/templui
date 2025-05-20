@@ -55,6 +55,8 @@ templ BaseLayout(title, description string) {
 			@ThemeScript()
 			// Shiki Highlighter Script
 			@modules.CodeHighlightingScript()
+			// Main Script
+			<script defer nonce={ templ.GetNonce(ctx) } src="/assets/js/main.min.js"></script>
 			// Favicon
 			<link rel="icon" href="/assets/img/favicon.svg" type="image/x-icon"/>
 			// Tailwind CSS
