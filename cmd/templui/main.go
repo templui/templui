@@ -454,7 +454,7 @@ func initConfig(ref string, force bool) {
 	}
 
 	// Download and save the JS file
-	jsURL := fmt.Sprintf("https://raw.githubusercontent.com/templui/templui/%s/assets/js/main.min.js", ref)
+	jsURL := fmt.Sprintf("https://raw.githubusercontent.com/axzilla/templui/%s/assets/js/main.min.js", ref)
 	fmt.Printf("Downloading JS file from: %s\n", jsURL)
 
 	jsData, err := downloadFile(jsURL)
