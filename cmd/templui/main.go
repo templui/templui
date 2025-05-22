@@ -39,6 +39,7 @@ type Config struct {
 	ComponentsDir string `json:"componentsDir"`
 	UtilsDir      string `json:"utilsDir"`
 	ModuleName    string `json:"moduleName"`
+	MainJSPath    string `json:"mainJSPath,omitempty"` // Path for the main JS bundle
 }
 
 // Manifest defines the structure of the manifest.json file.
@@ -420,8 +421,82 @@ func initConfig(ref string, force bool) {
 		fmt.Printf("Using module name: %s\n", config.ModuleName)
 	}
 
-	// Load the config (either existing or newly created) to proceed.
+	// After config file creation is complete, handle the JS file
+	// This part should be after the config file has been created and config loaded
 	config, err := loadConfig()
+	if err != nil {
+		fmt.Printf("Error loading config for handling JavaScript file: %v\n", err)
+		return
+	}
+
+	// Get the path for main.min.js
+	fmt.Printf("Enter the path for main JavaScript file (default: assets/js/templui.min.js): ")
+	var mainJSPath string
+	fmt.Scanln(&mainJSPath)
+	if mainJSPath == "" {
+		mainJSPath = "assets/js/templui.min.js"
+	}
+
+	// Update config with JS path
+	config.MainJSPath = mainJSPath
+
+	// Save updated config
+	updatedData, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		fmt.Printf("Error updating config with JS path: %v\n", err)
+	} else {
+		err = os.WriteFile(configFileName, updatedData, 0644)
+		if err != nil {
+			fmt.Printf("Error saving updated config file: %v\n", err)
+		} else {
+			fmt.Printf("Config updated with main JS path: %s\n", mainJSPath)
+		}
+	}
+
+	// Download and save the JS file
+	jsURL := fmt.Sprintf("https://raw.githubusercontent.com/templui/templui/%s/assets/js/main.min.js", ref)
+	fmt.Printf("Downloading JS file from: %s\n", jsURL)
+
+	jsData, err := downloadFile(jsURL)
+	if err != nil {
+		fmt.Printf("Warning: Failed to download JS file: %v\n", err)
+		return
+	}
+
+	// Create directory for JS file if needed
+	jsDir := filepath.Dir(mainJSPath)
+	if err := os.MkdirAll(jsDir, 0755); err != nil {
+		fmt.Printf("Error creating directory for JS file: %v\n", err)
+		return
+	}
+
+	// Check if file exists and ask for overwrite
+	fileExists := false
+	if _, err := os.Stat(mainJSPath); err == nil {
+		fileExists = true
+	}
+
+	shouldWrite := true
+	if fileExists && !force {
+		fmt.Printf("File %s already exists. Overwrite? (y/N): ", mainJSPath)
+		var response string
+		fmt.Scanln(&response)
+		shouldWrite = strings.ToLower(response) == "y"
+	}
+
+	if shouldWrite {
+		if err := os.WriteFile(mainJSPath, jsData, 0644); err != nil {
+			fmt.Printf("Error writing JS file: %v\n", err)
+		} else {
+			fmt.Printf("Successfully saved JS file to %s\n", mainJSPath)
+		}
+	} else {
+		fmt.Println("Skipped writing JS file.")
+	}
+
+	// Continue with utils installation (original code)
+	// Load the config (either existing or newly created) to proceed.
+	config, err = loadConfig()
 	if err != nil {
 		fmt.Printf("Error loading config for initial utils installation: %v\n", err)
 		return
