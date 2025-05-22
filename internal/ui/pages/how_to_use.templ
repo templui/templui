@@ -359,13 +359,24 @@ templ HowToUse() {
 								ShowCopyButton: true,
 								CodeContent:    "templui init",
 							})
-							<p class="text-sm mt-2 mb-4 text-muted-foreground">You will be prompted to configure the destination directories for components and utils, and your projects Go module name.</p>
+							<p class="text-sm mt-2 mb-4 text-muted-foreground">You will be prompted to set directories for components and utils, your Go module name, and a path to save (templui.min.js), which will be downloaded automatically.</p>
 							<p class="mb-2 text-muted-foreground">You can specify a specific version (tag, branch, commit):</p>
 							@modules.Code(modules.CodeProps{
 								Language:       "shell",
 								ShowCopyButton: true,
 								CodeContent:    "templui init@v0.1.0 # Example: Initialize using version v0.1.0",
 							})
+							<div class="bg-muted p-4 rounded-lg mt-4 mb-4">
+								<h4 class="font-semibold mb-2">Important: Include the JavaScript File</h4>
+								<p class="text-muted-foreground mb-2">Once initialized, you need to include the JavaScript file in your HTML layout:</p>
+								@modules.Code(modules.CodeProps{
+									Language:       "html",
+									ShowCopyButton: true,
+									CodeContent: `<!-- Add this to your base layout file -->
+<script src="/assets/js/templui.min.js"></script>`,
+								})
+								<p class="text-sm mt-2 text-muted-foreground">Make sure the path matches where you saved the file during initialization. The JavaScript is required for interactive components like modals, popovers, tabs, etc.</p>
+							</div>
 						</div>
 						<div>
 							<h3 class="text-xl font-semibold mb-2">3. Add Components</h3>

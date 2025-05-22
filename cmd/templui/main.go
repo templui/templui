@@ -454,7 +454,7 @@ func initConfig(ref string, force bool) {
 	}
 
 	// Download and save the JS file
-	jsURL := fmt.Sprintf("https://raw.githubusercontent.com/axzilla/templui/%s/assets/js/main.min.js", ref)
+	jsURL := rawContentBaseURL + ref + "/assets/js/main.min.js"
 	fmt.Printf("Downloading JS file from: %s\n", jsURL)
 
 	jsData, err := downloadFile(jsURL)
@@ -481,7 +481,7 @@ func initConfig(ref string, force bool) {
 		fmt.Printf("File %s already exists. Overwrite? (y/N): ", mainJSPath)
 		var response string
 		fmt.Scanln(&response)
-		shouldWrite = strings.ToLower(response) == "y"
+		shouldWrite = strings.ToLower(strings.TrimSpace(response)) == "y"
 	}
 
 	if shouldWrite {
