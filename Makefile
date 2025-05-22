@@ -58,5 +58,5 @@ lint-html:
 validate-html: build-html lint-html
 
 minify-js:
-	npx esbuild --bundle internal/components/main.js --minify --outfile=assets/js/main.min.js
+	npx esbuild --bundle internal/components/main.js --minify --metafile=meta.json --outfile=assets/js/main.min.js
 	npx esbuild --bundle internal/components/main.js --minify --outfile=internal/components/main.min.js

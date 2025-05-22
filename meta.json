@@ -1,0 +1,327 @@
+{
+  "inputs": {
+    "internal/components/avatar/avatar.js": {
+      "bytes": 1864,
+      "imports": []
+    },
+    "internal/components/calendar/calendar.js": {
+      "bytes": 8153,
+      "imports": []
+    },
+    "internal/components/carousel/carousel.js": {
+      "bytes": 5423,
+      "imports": []
+    },
+    "internal/components/chart/chartjs.js": {
+      "bytes": 345565,
+      "imports": [],
+      "format": "cjs"
+    },
+    "internal/components/chart/chart.js": {
+      "bytes": 7102,
+      "imports": [
+        {
+          "path": "internal/components/chart/chartjs.js",
+          "kind": "import-statement",
+          "original": "./chartjs.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "internal/components/code/highlight.js": {
+      "bytes": 233804,
+      "imports": [],
+      "format": "cjs"
+    },
+    "internal/components/code/code.js": {
+      "bytes": 3786,
+      "imports": [
+        {
+          "path": "internal/components/code/highlight.js",
+          "kind": "import-statement",
+          "original": "./highlight.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "internal/components/datepicker/date_picker.js": {
+      "bytes": 7970,
+      "imports": []
+    },
+    "internal/components/drawer/drawer.js": {
+      "bytes": 6593,
+      "imports": []
+    },
+    "internal/components/dropdown/dropdown.js": {
+      "bytes": 1349,
+      "imports": []
+    },
+    "internal/components/input/input.js": {
+      "bytes": 1536,
+      "imports": []
+    },
+    "internal/components/inputotp/input_otp.js": {
+      "bytes": 8329,
+      "imports": []
+    },
+    "internal/components/label/label.js": {
+      "bytes": 1970,
+      "imports": []
+    },
+    "internal/components/modal/modal.js": {
+      "bytes": 5110,
+      "imports": []
+    },
+    "internal/components/popover/floating_ui_core.js": {
+      "bytes": 26709,
+      "imports": [],
+      "format": "cjs"
+    },
+    "internal/components/popover/floating_ui_dom.js": {
+      "bytes": 17269,
+      "imports": [
+        {
+          "path": "internal/components/popover/floating_ui_core.js",
+          "kind": "require-call",
+          "original": "./floating_ui_core"
+        }
+      ],
+      "format": "cjs"
+    },
+    "internal/components/popover/popover.js": {
+      "bytes": 16095,
+      "imports": [
+        {
+          "path": "internal/components/popover/floating_ui_dom.js",
+          "kind": "import-statement",
+          "original": "./floating_ui_dom.js"
+        },
+        {
+          "path": "internal/components/popover/floating_ui_core.js",
+          "kind": "import-statement",
+          "original": "./floating_ui_core.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "internal/components/progress/progress.js": {
+      "bytes": 1353,
+      "imports": []
+    },
+    "internal/components/rating/rating.js": {
+      "bytes": 7797,
+      "imports": []
+    },
+    "internal/components/selectbox/select_box.js": {
+      "bytes": 5692,
+      "imports": []
+    },
+    "internal/components/slider/slider.js": {
+      "bytes": 1385,
+      "imports": []
+    },
+    "internal/components/tabs/tabs.js": {
+      "bytes": 2717,
+      "imports": []
+    },
+    "internal/components/textarea/textarea.js": {
+      "bytes": 1351,
+      "imports": []
+    },
+    "internal/components/toast/toast.js": {
+      "bytes": 3480,
+      "imports": []
+    },
+    "internal/components/main.js": {
+      "bytes": 605,
+      "imports": [
+        {
+          "path": "internal/components/avatar/avatar.js",
+          "kind": "import-statement",
+          "original": "./avatar/avatar.js"
+        },
+        {
+          "path": "internal/components/calendar/calendar.js",
+          "kind": "import-statement",
+          "original": "./calendar/calendar.js"
+        },
+        {
+          "path": "internal/components/carousel/carousel.js",
+          "kind": "import-statement",
+          "original": "./carousel/carousel.js"
+        },
+        {
+          "path": "internal/components/chart/chart.js",
+          "kind": "import-statement",
+          "original": "./chart/chart.js"
+        },
+        {
+          "path": "internal/components/code/code.js",
+          "kind": "import-statement",
+          "original": "./code/code.js"
+        },
+        {
+          "path": "internal/components/datepicker/date_picker.js",
+          "kind": "import-statement",
+          "original": "./datepicker/date_picker.js"
+        },
+        {
+          "path": "internal/components/drawer/drawer.js",
+          "kind": "import-statement",
+          "original": "./drawer/drawer.js"
+        },
+        {
+          "path": "internal/components/dropdown/dropdown.js",
+          "kind": "import-statement",
+          "original": "./dropdown/dropdown.js"
+        },
+        {
+          "path": "internal/components/input/input.js",
+          "kind": "import-statement",
+          "original": "./input/input.js"
+        },
+        {
+          "path": "internal/components/inputotp/input_otp.js",
+          "kind": "import-statement",
+          "original": "./inputotp/input_otp.js"
+        },
+        {
+          "path": "internal/components/label/label.js",
+          "kind": "import-statement",
+          "original": "./label/label.js"
+        },
+        {
+          "path": "internal/components/modal/modal.js",
+          "kind": "import-statement",
+          "original": "./modal/modal.js"
+        },
+        {
+          "path": "internal/components/popover/popover.js",
+          "kind": "import-statement",
+          "original": "./popover/popover.js"
+        },
+        {
+          "path": "internal/components/progress/progress.js",
+          "kind": "import-statement",
+          "original": "./progress/progress.js"
+        },
+        {
+          "path": "internal/components/rating/rating.js",
+          "kind": "import-statement",
+          "original": "./rating/rating.js"
+        },
+        {
+          "path": "internal/components/selectbox/select_box.js",
+          "kind": "import-statement",
+          "original": "./selectbox/select_box.js"
+        },
+        {
+          "path": "internal/components/slider/slider.js",
+          "kind": "import-statement",
+          "original": "./slider/slider.js"
+        },
+        {
+          "path": "internal/components/tabs/tabs.js",
+          "kind": "import-statement",
+          "original": "./tabs/tabs.js"
+        },
+        {
+          "path": "internal/components/textarea/textarea.js",
+          "kind": "import-statement",
+          "original": "./textarea/textarea.js"
+        },
+        {
+          "path": "internal/components/toast/toast.js",
+          "kind": "import-statement",
+          "original": "./toast/toast.js"
+        }
+      ],
+      "format": "esm"
+    }
+  },
+  "outputs": {
+    "assets/js/main.min.js": {
+      "imports": [],
+      "exports": [],
+      "entryPoint": "internal/components/main.js",
+      "inputs": {
+        "internal/components/chart/chartjs.js": {
+          "bytesInOutput": 203773
+        },
+        "internal/components/code/highlight.js": {
+          "bytesInOutput": 127243
+        },
+        "internal/components/popover/floating_ui_core.js": {
+          "bytesInOutput": 13370
+        },
+        "internal/components/popover/floating_ui_dom.js": {
+          "bytesInOutput": 10359
+        },
+        "internal/components/avatar/avatar.js": {
+          "bytesInOutput": 923
+        },
+        "internal/components/calendar/calendar.js": {
+          "bytesInOutput": 3660
+        },
+        "internal/components/carousel/carousel.js": {
+          "bytesInOutput": 2626
+        },
+        "internal/components/chart/chart.js": {
+          "bytesInOutput": 3107
+        },
+        "internal/components/code/code.js": {
+          "bytesInOutput": 1704
+        },
+        "internal/components/datepicker/date_picker.js": {
+          "bytesInOutput": 3351
+        },
+        "internal/components/drawer/drawer.js": {
+          "bytesInOutput": 3263
+        },
+        "internal/components/dropdown/dropdown.js": {
+          "bytesInOutput": 680
+        },
+        "internal/components/input/input.js": {
+          "bytesInOutput": 856
+        },
+        "internal/components/inputotp/input_otp.js": {
+          "bytesInOutput": 3403
+        },
+        "internal/components/label/label.js": {
+          "bytesInOutput": 909
+        },
+        "internal/components/modal/modal.js": {
+          "bytesInOutput": 2727
+        },
+        "internal/components/popover/popover.js": {
+          "bytesInOutput": 7984
+        },
+        "internal/components/progress/progress.js": {
+          "bytesInOutput": 738
+        },
+        "internal/components/rating/rating.js": {
+          "bytesInOutput": 3582
+        },
+        "internal/components/selectbox/select_box.js": {
+          "bytesInOutput": 2945
+        },
+        "internal/components/slider/slider.js": {
+          "bytesInOutput": 767
+        },
+        "internal/components/tabs/tabs.js": {
+          "bytesInOutput": 1405
+        },
+        "internal/components/textarea/textarea.js": {
+          "bytesInOutput": 723
+        },
+        "internal/components/toast/toast.js": {
+          "bytesInOutput": 1829
+        },
+        "internal/components/main.js": {
+          "bytesInOutput": 0
+        }
+      },
+      "bytes": 402887
+    }
+  }
+}
