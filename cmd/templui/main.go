@@ -379,17 +379,25 @@ func initConfig(ref string, force bool) {
 
 		// Prompt user for configuration values.
 		fmt.Printf("Enter the directory for components [%s]: ", initialPromptComponentsDir)
-		var componentsDir string // This will be the actual components directory
+		var componentsDir string
 		fmt.Scanln(&componentsDir)
 		if componentsDir == "" {
 			componentsDir = initialPromptComponentsDir
+		} else if strings.HasPrefix(componentsDir, "/") {
+			originalPath := componentsDir
+			componentsDir = strings.TrimPrefix(componentsDir, "/")
+			fmt.Printf("Hint: Absolute path '%s' detected. Using relative path '%s' to avoid potential permission issues.\n", originalPath, componentsDir)
 		}
 
 		fmt.Printf("Enter the directory for utils [%s]: ", initialPromptUtilsDir)
-		var utilsDir string // This will be the actual utils directory
+		var utilsDir string
 		fmt.Scanln(&utilsDir)
 		if utilsDir == "" {
-			utilsDir = initialPromptUtilsDir // Use the fixed default if user enters nothing
+			utilsDir = initialPromptUtilsDir
+		} else if strings.HasPrefix(utilsDir, "/") {
+			originalPath := utilsDir
+			utilsDir = strings.TrimPrefix(utilsDir, "/")
+			fmt.Printf("Hint: Absolute path '%s' detected. Using relative path '%s' to avoid potential permission issues.\n", originalPath, utilsDir)
 		}
 
 		fmt.Printf("Enter your Go module name [%s]: ", defaultModuleName)
@@ -435,6 +443,10 @@ func initConfig(ref string, force bool) {
 	fmt.Scanln(&mainJSPath)
 	if mainJSPath == "" {
 		mainJSPath = "assets/js/templui.min.js"
+	} else if strings.HasPrefix(mainJSPath, "/") {
+		originalPath := mainJSPath
+		mainJSPath = strings.TrimPrefix(mainJSPath, "/")
+		fmt.Printf("Hint: Absolute path '%s' detected. Using relative path '%s' to avoid potential permission issues.\n", originalPath, mainJSPath)
 	}
 
 	// Update config with JS path
