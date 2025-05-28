@@ -899,17 +899,6 @@ func addScriptTemplateToFiles(config Config, comp ComponentDef, jsFileName strin
 		// Add Script() template at the end
 		newContent := strings.TrimSpace(contentStr) + "\n\n" + scriptTemplate + "\n"
 
-		// Ask for confirmation if not forcing
-		if !force {
-			fmt.Printf("   Add Script() template to '%s'? (y/N): ", destPath)
-			var response string
-			fmt.Scanln(&response)
-			if strings.ToLower(strings.TrimSpace(response)) != "y" {
-				fmt.Printf("   Skipped adding Script() template to %s\n", destPath)
-				continue
-			}
-		}
-
 		// Write the updated content
 		err = os.WriteFile(destPath, []byte(newContent), 0644)
 		if err != nil {
