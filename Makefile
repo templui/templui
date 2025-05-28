@@ -83,8 +83,7 @@ minify-js-components:
 		internal/components/textarea/textarea.js \
 		internal/components/toast/toast.js \
 		--minify \
-		--bundle \
 		--watch \
-		--outdir=internal/component_scripts \
-		--out-extension:.js=.min.js \
-		--entry-names=[name]
+		--bundle \
+		--outdir=internal/components \
+		--out-extension:.js=.min.js

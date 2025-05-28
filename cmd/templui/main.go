@@ -799,7 +799,8 @@ func installUtils(config Config, utilPaths []string, ref string, force bool) err
 // and automatically adds Script() template at the end of .templ files
 func installComponentJS(config Config, comp ComponentDef, ref string, force bool) error {
 	jsFileName := comp.Name + ".min.js"
-	jsSourceURL := rawContentBaseURL + ref + "/internal/component_scripts/" + jsFileName
+	// Load from component directory instead of component_scripts
+	jsSourceURL := rawContentBaseURL + ref + "/internal/components/" + comp.Name + "/" + jsFileName
 	jsDestPath := filepath.Join(config.JSDir, jsFileName)
 
 	// Ensure JS directory exists
