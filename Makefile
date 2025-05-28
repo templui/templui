@@ -64,17 +64,17 @@ minify-js:
 		internal/components/carousel/carousel.js \
 		internal/components/chart/chart.js \
 		internal/components/code/code.js \
-		internal/components/datepicker/date_picker.js \
+		internal/components/datepicker/datepicker.js \
 		internal/components/drawer/drawer.js \
 		internal/components/dropdown/dropdown.js \
 		internal/components/input/input.js \
-		internal/components/inputotp/input_otp.js \
+		internal/components/inputotp/inputotp.js \
 		internal/components/label/label.js \
 		internal/components/modal/modal.js \
 		internal/components/popover/popover.js \
 		internal/components/progress/progress.js \
 		internal/components/rating/rating.js \
-		internal/components/selectbox/select_box.js \
+		internal/components/selectbox/selectbox.js \
 		internal/components/slider/slider.js \
 		internal/components/tabs/tabs.js \
 		internal/components/textarea/textarea.js \

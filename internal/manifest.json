@@ -16,7 +16,7 @@
     {
       "name": "aspectratio",
       "description": "",
-      "files": ["internal/components/aspectratio/aspect_ratio.templ"],
+      "files": ["internal/components/aspectratio/aspectratio.templ"],
       "dependencies": []
     },
     {
@@ -80,7 +80,7 @@
     {
       "name": "checkboxcard",
       "description": "",
-      "files": ["internal/components/checkboxcard/checkbox_card.templ"],
+      "files": ["internal/components/checkboxcard/checkboxcard.templ"],
       "dependencies": []
     },
     {
@@ -93,7 +93,7 @@
     {
       "name": "datepicker",
       "description": "",
-      "files": ["internal/components/datepicker/date_picker.templ"],
+      "files": ["internal/components/datepicker/datepicker.templ"],
       "dependencies": ["button", "calendar", "icon", "popover"],
       "hasJS": true
     },
@@ -121,8 +121,8 @@
       "name": "icon",
       "description": "",
       "files": [
-        "internal/components/icon/icon_data.go",
-        "internal/components/icon/icon_defs.go",
+        "internal/components/icon/icondata.go",
+        "internal/components/icon/icondefs.go",
         "internal/components/icon/icon.go"
       ],
       "dependencies": []
@@ -137,7 +137,7 @@
     {
       "name": "inputotp",
       "description": "",
-      "files": ["internal/components/inputotp/input_otp.templ"],
+      "files": ["internal/components/inputotp/inputotp.templ"],
       "dependencies": ["input"],
       "hasJS": true
     },
@@ -184,7 +184,7 @@
     {
       "name": "radiocard",
       "description": "",
-      "files": ["internal/components/radiocard/radio_card.templ"],
+      "files": ["internal/components/radiocard/radiocard.templ"],
       "dependencies": []
     },
     {
@@ -197,7 +197,7 @@
     {
       "name": "selectbox",
       "description": "",
-      "files": ["internal/components/selectbox/select_box.templ"],
+      "files": ["internal/components/selectbox/selectbox.templ"],
       "dependencies": ["button", "icon", "popover"],
       "hasJS": true
     },
