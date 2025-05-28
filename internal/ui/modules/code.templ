@@ -161,7 +161,7 @@ func GetHighlightedHTML(ctx context.Context, codeContent string, language string
 	req.Header.Set("Accept", "text/html")
 
 	resp, err := httpClient.Do(req)
-	log.Printf("INFO: Shiki call finished for lang '%s'. Error: %v", language, err)
+	// log.Printf("INFO: Shiki call finished for lang '%s'. Error: %v", language, err)
 	if err != nil {
 		// Distinguish between timeout and other errors
 		if reqCtx.Err() == context.DeadlineExceeded { // Check reqCtx for timeout

@@ -71,7 +71,7 @@ app.post("/highlight", async (req, res) => {
       lang: effectiveLang,
       theme: THEME,
     });
-    logInfo(`Sending response for lang: ${lang}`);
+    // logInfo(`Sending response for lang: ${lang}`);
     res.status(200).type("text/html").send(html);
   } catch (error) {
     console.error(`Error highlighting code (lang: ${effectiveLang}): ${error}`);
