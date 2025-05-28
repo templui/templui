@@ -23,7 +23,7 @@ tailwind-watch:
 
 dev:
 	make tailwind-clean
-	make -j5 tailwind-watch templ docs shiki-highlighter watch-js
+	make -j6 tailwind-watch templ docs shiki-highlighter minify-js-dev minify-js-components
 
 debug:
 	make -j3 templ tailwind-app tailwind
@@ -57,10 +57,10 @@ lint-html:
 # Step 6: Run full pipeline (build + lint)
 validate-html: build-html lint-html
 
-watch-js:
+minify-js-dev:
 	npx esbuild internal/components/main.js --minify --bundle --watch --outfile=assets/js/templui.min.js
 
-minify-js:
+minify-js-components:
 	npx esbuild \
 		internal/components/avatar/avatar.js \
 		internal/components/calendar/calendar.js \
@@ -84,6 +84,7 @@ minify-js:
 		internal/components/toast/toast.js \
 		--minify \
 		--bundle \
+		--watch \
 		--outdir=internal/component_scripts \
 		--out-extension:.js=.min.js \
 		--entry-names=[name]
