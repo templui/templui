@@ -313,7 +313,7 @@ func main() {
 
 // showHelp displays the command usage instructions.
 func showHelp(manifest *Manifest, refUsedForHelp string) {
-	fmt.Println("templUI Component Installer (v" + version + ")")
+	fmt.Println("templUI Component Installer (" + version + ")")
 	fmt.Println("Usage:")
 	fmt.Println("  templui [flags] init[@<ref>]         - Initialize config and install utils from <ref>")
 	fmt.Println("  templui [flags] add[@<ref>] <comp>... - Add component(s) from specified <ref>")
