@@ -37,7 +37,6 @@ templ Modal() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.ModalDefault(),
 				PreviewCodeFile: "modal_default.templ",
-				// ComponentCodeFile: "modal/modal.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -45,7 +44,7 @@ templ Modal() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "modal",
-					ComponentPath: "modal/modal.templ",
+					HasJS:         true,
 				})
 			}
 		}

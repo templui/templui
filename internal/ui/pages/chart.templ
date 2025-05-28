@@ -125,7 +125,6 @@ templ Chart() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.ChartDefault(),
 				PreviewCodeFile: "chart_default.templ",
-				// ComponentCodeFile: "chart/chart.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -133,7 +132,7 @@ templ Chart() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "chart",
-					ComponentPath: "chart/chart.templ",
+					HasJS:         true,
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

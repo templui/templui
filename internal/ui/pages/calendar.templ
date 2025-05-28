@@ -37,7 +37,6 @@ templ Calendar() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.CalendarDefault(),
 				PreviewCodeFile: "calendar_default.templ",
-				// ComponentCodeFile: "calendar/calendar.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -45,7 +44,7 @@ templ Calendar() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "calendar",
-					ComponentPath: "calendar/calendar.templ",
+					HasJS:         true,
 				})
 			}
 		}

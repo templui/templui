@@ -46,7 +46,6 @@ templ Alert() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.AlertDefault(),
 				PreviewCodeFile: "alert_default.templ",
-				// ComponentCodeFile: "alert/alert.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -54,7 +53,6 @@ templ Alert() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "alert",
-					ComponentPath: "alert/alert.templ",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

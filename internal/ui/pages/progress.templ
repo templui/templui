@@ -69,7 +69,6 @@ templ Progress() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.ProgressDefault(),
 				PreviewCodeFile: "progress_default.templ",
-				// ComponentCodeFile: "progress/progress.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -77,7 +76,7 @@ templ Progress() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "progress",
-					ComponentPath: "progress/progress.templ",
+					HasJS:         true,
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

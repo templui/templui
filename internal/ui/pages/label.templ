@@ -39,7 +39,6 @@ templ Label() {
 				SectionName:     "",
 				ShowcaseFile:    showcase.CheckboxWithLabel(),
 				PreviewCodeFile: "checkbox_with_label.templ",
-				// ComponentCodeFile: "label/label.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -47,7 +46,7 @@ templ Label() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "label",
-					ComponentPath: "label/label.templ",
+					HasJS:         true,
 				})
 			}
 			<div>

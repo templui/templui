@@ -63,7 +63,6 @@ templ Rating() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.RatingDefault(),
 				PreviewCodeFile: "rating_default.templ",
-				// ComponentCodeFile: "rating/rating.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -71,7 +70,7 @@ templ Rating() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "rating",
-					ComponentPath: "rating/rating.templ",
+					HasJS:         true,
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

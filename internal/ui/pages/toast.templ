@@ -53,7 +53,6 @@ templ Toast() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.ToastDefault(),
 				PreviewCodeFile: "toast_default.templ",
-				// ComponentCodeFile: "toast/toast.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -61,7 +60,7 @@ templ Toast() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "toast",
-					ComponentPath: "toast/toast.templ",
+					HasJS:         true,
 				})
 			}
 			@UsageExamples()

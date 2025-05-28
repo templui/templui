@@ -37,7 +37,6 @@ templ Dropdown() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.DropdownDefault(),
 				PreviewCodeFile: "dropdown_default.templ",
-				// ComponentCodeFile: "dropdown/dropdown.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -45,7 +44,7 @@ templ Dropdown() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "dropdown",
-					ComponentPath: "dropdown/dropdown.templ",
+					HasJS:         true,
 				})
 			}
 		}

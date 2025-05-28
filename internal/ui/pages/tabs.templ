@@ -37,7 +37,6 @@ templ Tabs() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.TabsDefault(),
 				PreviewCodeFile: "tabs_default.templ",
-				// ComponentCodeFile: "tabs/tabs.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -45,7 +44,7 @@ templ Tabs() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "tabs",
-					ComponentPath: "tabs/tabs.templ",
+					HasJS:         true,
 				})
 			}
 		}

@@ -58,7 +58,6 @@ templ Card() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.CardDefault(),
 				PreviewCodeFile: "card_default.templ",
-				// ComponentCodeFile: "card/card.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -66,7 +65,6 @@ templ Card() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "card",
-					ComponentPath: "card/card.templ",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples"}) {

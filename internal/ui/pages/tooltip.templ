@@ -47,7 +47,6 @@ templ Tooltip() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.TooltipDefault(),
 				PreviewCodeFile: "tooltip_default.templ",
-				// ComponentCodeFile: "tooltip/tooltip.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -55,7 +54,6 @@ templ Tooltip() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "tooltip",
-					ComponentPath: "tooltip/tooltip.templ",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

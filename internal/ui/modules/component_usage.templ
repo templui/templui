@@ -1,59 +1,33 @@
 package modules
 
-import (
-	"github.com/axzilla/templui/internal/components"
-	"github.com/axzilla/templui/internal/components/tabs"
-)
-
 type ComponentUsageProps struct {
 	ComponentName string
-	ComponentPath string
+	HasJS         bool
 }
 
 templ ComponentUsage(props ComponentUsageProps) {
-	@tabs.Tabs(tabs.Props{
-		ID: "install-" + props.ComponentName,
-	}) {
-		@tabs.List(tabs.ListProps{
-			Class: "w-1/2",
-		}) {
-			@tabs.Trigger(tabs.TriggerProps{
-				Value:    "cli",
-				IsActive: true,
-			}) {
-				CLI
-			}
-			@tabs.Trigger(tabs.TriggerProps{
-				Value: "manual",
-			}) {
-				Manual
-			}
-		}
-		<div class="w-full mt-2">
-			@tabs.Content(tabs.ContentProps{
-				Value:    "cli",
-				IsActive: true,
-			}) {
+	if !props.HasJS {
+		@Code(CodeProps{
+			CodeContent:    "templui add " + props.ComponentName,
+			ShowCopyButton: true,
+		})
+	} else {
+		<ol class="list-decimal pl-5 space-y-8">
+			<li>
+				<p class="mb-4 font-semibold">Install the component</p>
 				@Code(CodeProps{
 					CodeContent:    "templui add " + props.ComponentName,
 					ShowCopyButton: true,
 				})
-			}
-			@tabs.Content(tabs.ContentProps{
-				Value: "manual",
-			}) {
-				<div class="border rounded-md p-4">
-					<ol class="list-decimal pl-5 space-y-8">
-						<li>
-							<p class="mb-4 font-semibold">Copy and paste the following code into your project:</p>
-							@CodeSnippetFromEmbedded(props.ComponentPath, "go", components.TemplFiles)
-						</li>
-						<li>
-							<p class="mb-4 font-semibold">Update the import paths to match your project setup.</p>
-						</li>
-					</ol>
-				</div>
-			}
-		</div>
+			</li>
+			<li>
+				<p class="mb-4 font-semibold">Add the JavaScript to your layout</p>
+				@Code(CodeProps{
+					CodeContent:    "@" + props.ComponentName + ".Script()",
+					ShowCopyButton: true,
+				})
+				<p class="text-sm text-muted-foreground mt-2">Call this template in your base layout file (e.g., in the &lt;head&gt; section).</p>
+			</li>
+		</ol>
 	}
 }

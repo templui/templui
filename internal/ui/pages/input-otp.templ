@@ -67,7 +67,6 @@ templ InputOtp() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.InputOTPDefault(),
 				PreviewCodeFile: "input_otp_default.templ",
-				// ComponentCodeFile: "inputotp/inputotp.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -75,7 +74,7 @@ templ InputOtp() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "inputotp",
-					ComponentPath: "inputotp/inputotp.templ",
+					HasJS:         true,
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

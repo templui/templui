@@ -19,8 +19,7 @@ type ExampleWrapperProps struct {
 	SectionName     string
 	ShowcaseFile    templ.Component
 	PreviewCodeFile string
-	// ComponentCodeFile string
-	ID string // For #id in URL Link
+	ID              string // For #id in URL Link
 }
 
 templ ExampleWrapper(p ExampleWrapperProps) {
@@ -47,13 +46,6 @@ templ ExampleWrapper(p ExampleWrapperProps) {
 				}) {
 					Code
 				}
-				// if p.ComponentCodeFile != "" {
-				// 	@tabs.Trigger(tabs.TriggerProps{
-				// 		Value: "component",
-				// 	}) {
-				// 		Component
-				// 	}
-				// }
 			}
 			<div class="w-full relative mt-2">
 				@tabs.Content(tabs.ContentProps{
@@ -69,13 +61,6 @@ templ ExampleWrapper(p ExampleWrapperProps) {
 				}) {
 					@CodeSnippetFromEmbedded(p.PreviewCodeFile, "go", showcase.TemplFiles)
 				}
-				// if p.ComponentCodeFile != "" {
-				// 	@tabs.Content(tabs.ContentProps{
-				// 		Value: "component",
-				// 	}) {
-				// 		@CodeSnippetFromEmbedded(p.ComponentCodeFile, "go", components.TemplFiles)
-				// 	}
-				// }
 			</div>
 		}
 	</div>

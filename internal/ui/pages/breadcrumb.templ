@@ -54,7 +54,6 @@ templ Breadcrumb() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.BreadcrumbDefault(),
 				PreviewCodeFile: "breadcrumb_default.templ",
-				// ComponentCodeFile: "breadcrumb/breadcrumb.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -62,7 +61,6 @@ templ Breadcrumb() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "breadcrumb",
-					ComponentPath: "breadcrumb/breadcrumb.templ",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

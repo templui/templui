@@ -51,7 +51,6 @@ templ Popover() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.PopoverDefault(),
 				PreviewCodeFile: "popover_default.templ",
-				// ComponentCodeFile: "popover/popover.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -59,7 +58,7 @@ templ Popover() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "popover",
-					ComponentPath: "popover/popover.templ",
+					HasJS:         true,
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

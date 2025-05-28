@@ -63,7 +63,6 @@ templ Input() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.InputDefault(),
 				PreviewCodeFile: "input_default.templ",
-				// ComponentCodeFile: "input/input.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -71,7 +70,7 @@ templ Input() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "input",
-					ComponentPath: "input/input.templ",
+					HasJS:         true,
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

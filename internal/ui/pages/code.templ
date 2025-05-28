@@ -51,7 +51,6 @@ templ Code() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.CodeDefault(),
 				PreviewCodeFile: "code_default.templ",
-				// ComponentCodeFile: "code/code.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -59,7 +58,7 @@ templ Code() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "code",
-					ComponentPath: "code/code.templ",
+					HasJS:         true,
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

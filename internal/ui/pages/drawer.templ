@@ -48,7 +48,6 @@ templ Drawer() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.DrawerDefault(),
 				PreviewCodeFile: "drawer_default.templ",
-				// ComponentCodeFile: "drawer/drawer.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -56,7 +55,7 @@ templ Drawer() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "drawer",
-					ComponentPath: "drawer/drawer.templ",
+					HasJS:         true,
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

@@ -38,7 +38,6 @@ templ Form() {
 				SectionName:     "",
 				ShowcaseFile:    showcase.InputForm(),
 				PreviewCodeFile: "input_form.templ",
-				// ComponentCodeFile: "form/form.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -46,7 +45,6 @@ templ Form() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "form",
-					ComponentPath: "form/form.templ",
 				})
 			}
 			<div>

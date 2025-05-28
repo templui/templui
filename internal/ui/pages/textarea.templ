@@ -63,7 +63,6 @@ templ Textarea() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.TextareaDefault(),
 				PreviewCodeFile: "textarea_default.templ",
-				// ComponentCodeFile: "textarea/textarea.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -71,7 +70,9 @@ templ Textarea() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "textarea",
-					ComponentPath: "textarea/textarea.templ",
+					HasJS:         true,
+				})
+			}
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

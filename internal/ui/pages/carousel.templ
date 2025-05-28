@@ -55,7 +55,6 @@ templ Carousel() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.CarouselDefault(),
 				PreviewCodeFile: "carousel_default.templ",
-				// ComponentCodeFile: "carousel/carousel.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -63,7 +62,7 @@ templ Carousel() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "carousel",
-					ComponentPath: "carousel/carousel.templ",
+					HasJS:         true,
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

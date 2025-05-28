@@ -59,7 +59,6 @@ templ Avatar() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.AvatarDefault(),
 				PreviewCodeFile: "avatar_default.templ",
-				// ComponentCodeFile: "avatar/avatar.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -67,7 +66,9 @@ templ Avatar() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "avatar",
-					ComponentPath: "avatar/avatar.templ",
+					HasJS:         true,
+				})
+			}
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

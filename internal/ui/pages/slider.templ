@@ -59,7 +59,6 @@ templ Slider() {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				ShowcaseFile:    showcase.SliderDefault(),
 				PreviewCodeFile: "slider_default.templ",
-				// ComponentCodeFile: "slider/slider.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -67,7 +66,7 @@ templ Slider() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "slider",
-					ComponentPath: "slider/slider.templ",
+					HasJS:         true,
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
