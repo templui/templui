@@ -1,3 +1,4 @@
+// https://cdn.jsdelivr.net/npm/@floating-ui/core@1.7.0
 !(function (t, e) {
   "object" == typeof exports && "undefined" != typeof module
     ? e(exports)

@@ -1,3 +1,4 @@
+// https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.0
 !(function (t, e) {
   "object" == typeof exports && "undefined" != typeof module
     ? e(exports, require("./floating_ui_core"))
