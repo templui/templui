@@ -39,7 +39,7 @@ type Config struct {
 	ComponentsDir string `json:"componentsDir"`
 	UtilsDir      string `json:"utilsDir"`
 	ModuleName    string `json:"moduleName"`
-	MainJSPath    string `json:"mainJSPath,omitempty"` // Path for the main JS bundle
+	JSDir         string `json:"jsDir,omitempty"` // Directory for component JavaScript files
 }
 
 // Manifest defines the structure of the manifest.json file.
@@ -53,9 +53,10 @@ type Manifest struct {
 type ComponentDef struct {
 	Name          string   `json:"name"`
 	Description   string   `json:"description"`
-	Files         []string `json:"files"`         // Paths relative to the repository root
-	Dependencies  []string `json:"dependencies"`  // Names of other required components
-	RequiredUtils []string `json:"requiredUtils"` // Paths to required utils relative to the repository root
+	Files         []string `json:"files"`           // Paths relative to the repository root
+	Dependencies  []string `json:"dependencies"`    // Names of other required components
+	RequiredUtils []string `json:"requiredUtils"`   // Paths to required utils relative to the repository root
+	HasJS         bool     `json:"hasJS,omitempty"` // Whether this component requires JavaScript
 }
 
 // UtilDef describes a single utility file within the manifest.
@@ -407,10 +408,22 @@ func initConfig(ref string, force bool) {
 			moduleName = defaultModuleName
 		}
 
+		fmt.Printf("Enter the directory for JavaScript files [assets/js]: ")
+		var jsDir string
+		fmt.Scanln(&jsDir)
+		if jsDir == "" {
+			jsDir = "assets/js"
+		} else if strings.HasPrefix(jsDir, "/") {
+			originalPath := jsDir
+			jsDir = strings.TrimPrefix(jsDir, "/")
+			fmt.Printf("Hint: Absolute path '%s' detected. Using relative path '%s' to avoid potential permission issues.\n", originalPath, jsDir)
+		}
+
 		config := Config{
 			ComponentsDir: componentsDir,
 			UtilsDir:      utilsDir,
 			ModuleName:    moduleName,
+			JSDir:         jsDir,
 		}
 
 		data, err := json.MarshalIndent(config, "", "  ")
@@ -427,90 +440,13 @@ func initConfig(ref string, force bool) {
 		fmt.Printf("Components will be installed to: %s\n", config.ComponentsDir)
 		fmt.Printf("Utils will be installed to: %s\n", config.UtilsDir)
 		fmt.Printf("Using module name: %s\n", config.ModuleName)
+		fmt.Printf("JavaScript files will be saved to: %s\n", config.JSDir)
 	}
 
-	// After config file creation is complete, handle the JS file
-	// This part should be after the config file has been created and config loaded
+	// Install the default utilities.
 	config, err := loadConfig()
 	if err != nil {
-		fmt.Printf("Error loading config for handling JavaScript file: %v\n", err)
-		return
-	}
-
-	// Get the path for main.min.js
-	fmt.Printf("Enter the path for main JavaScript file (default: assets/js/templui.min.js): ")
-	var mainJSPath string
-	fmt.Scanln(&mainJSPath)
-	if mainJSPath == "" {
-		mainJSPath = "assets/js/templui.min.js"
-	} else if strings.HasPrefix(mainJSPath, "/") {
-		originalPath := mainJSPath
-		mainJSPath = strings.TrimPrefix(mainJSPath, "/")
-		fmt.Printf("Hint: Absolute path '%s' detected. Using relative path '%s' to avoid potential permission issues.\n", originalPath, mainJSPath)
-	}
-
-	// Update config with JS path
-	config.MainJSPath = mainJSPath
-
-	// Save updated config
-	updatedData, err := json.MarshalIndent(config, "", "  ")
-	if err != nil {
-		fmt.Printf("Error updating config with JS path: %v\n", err)
-	} else {
-		err = os.WriteFile(configFileName, updatedData, 0644)
-		if err != nil {
-			fmt.Printf("Error saving updated config file: %v\n", err)
-		} else {
-			fmt.Printf("Config updated with main JS path: %s\n", mainJSPath)
-		}
-	}
-
-	// Download and save the JS file
-	jsURL := rawContentBaseURL + ref + "/assets/js/main.min.js"
-	fmt.Printf("Downloading JS file from: %s\n", jsURL)
-
-	jsData, err := downloadFile(jsURL)
-	if err != nil {
-		fmt.Printf("Warning: Failed to download JS file: %v\n", err)
-		return
-	}
-
-	// Create directory for JS file if needed
-	jsDir := filepath.Dir(mainJSPath)
-	if err := os.MkdirAll(jsDir, 0755); err != nil {
-		fmt.Printf("Error creating directory for JS file: %v\n", err)
-		return
-	}
-
-	// Check if file exists and ask for overwrite
-	fileExists := false
-	if _, err := os.Stat(mainJSPath); err == nil {
-		fileExists = true
-	}
-
-	shouldWrite := true
-	if fileExists && !force {
-		fmt.Printf("File %s already exists. Overwrite? (y/N): ", mainJSPath)
-		var response string
-		fmt.Scanln(&response)
-		shouldWrite = strings.ToLower(strings.TrimSpace(response)) == "y"
-	}
-
-	if shouldWrite {
-		if err := os.WriteFile(mainJSPath, jsData, 0644); err != nil {
-			fmt.Printf("Error writing JS file: %v\n", err)
-		} else {
-			fmt.Printf("Successfully saved JS file to %s\n", mainJSPath)
-		}
-	} else {
-		fmt.Println("Skipped writing JS file.")
-	}
-
-	// Continue with utils installation (original code)
-	// Load the config (either existing or newly created) to proceed.
-	config, err = loadConfig()
-	if err != nil {
-		fmt.Printf("Error loading config for initial utils installation: %v\n", err)
+		fmt.Printf("Error loading config: %v\n", err)
 		return
 	}
 
@@ -754,6 +690,14 @@ func installComponent(
 		requiredUtils[repoUtilPath] = true
 	}
 
+	// Handle JavaScript files if component requires them
+	if comp.HasJS && config.JSDir != "" {
+		err := installComponentJS(config, comp, ref, force)
+		if err != nil {
+			return fmt.Errorf("failed to install JavaScript for component '%s': %w", comp.Name, err)
+		}
+	}
+
 	return nil
 }
 
@@ -851,6 +795,137 @@ func installUtils(config Config, utilPaths []string, ref string, force bool) err
 	return nil
 }
 
+// installComponentJS handles the installation of JavaScript files for a component
+// and automatically adds Script() template at the end of .templ files
+func installComponentJS(config Config, comp ComponentDef, ref string, force bool) error {
+	jsFileName := comp.Name + ".min.js"
+	jsSourceURL := rawContentBaseURL + ref + "/internal/component_scripts/" + jsFileName
+	jsDestPath := filepath.Join(config.JSDir, jsFileName)
+
+	// Ensure JS directory exists
+	err := os.MkdirAll(config.JSDir, 0755)
+	if err != nil {
+		return fmt.Errorf("failed to create JS directory '%s': %w", config.JSDir, err)
+	}
+
+	// Check if JS file exists and handle overwrite logic
+	fileExists := false
+	if _, err := os.Stat(jsDestPath); err == nil {
+		fileExists = true
+	}
+
+	shouldWriteJS := true
+	if fileExists && !force {
+		fmt.Printf("   JavaScript file '%s' already exists. Overwrite? (y/N): ", jsDestPath)
+		var response string
+		fmt.Scanln(&response)
+		shouldWriteJS = strings.ToLower(strings.TrimSpace(response)) == "y"
+	}
+
+	if shouldWriteJS {
+		fmt.Printf("   Downloading JavaScript: %s\n", jsSourceURL)
+		jsData, err := downloadFile(jsSourceURL)
+		if err != nil {
+			return fmt.Errorf("failed to download JS file from %s: %w", jsSourceURL, err)
+		}
+
+		err = os.WriteFile(jsDestPath, jsData, 0644)
+		if err != nil {
+			return fmt.Errorf("failed to write JS file '%s': %w", jsDestPath, err)
+		}
+
+		if fileExists {
+			fmt.Printf("   Overwritten %s\n", jsDestPath)
+		} else {
+			fmt.Printf("   Installed %s\n", jsDestPath)
+		}
+	}
+
+	// Add Script() template to .templ files
+	err = addScriptTemplateToFiles(config, comp, jsFileName, force)
+	if err != nil {
+		return fmt.Errorf("failed to add Script() template: %w", err)
+	}
+
+	return nil
+}
+
+// addScriptTemplateToFiles adds Script() template at the end of .templ files
+func addScriptTemplateToFiles(config Config, comp ComponentDef, jsFileName string, force bool) error {
+	repoComponentBasePath := "internal/components/"
+
+	for _, repoFilePath := range comp.Files {
+		if !strings.HasSuffix(repoFilePath, ".templ") {
+			continue // Only process .templ files
+		}
+
+		// Determine the destination path
+		var destPath string
+		if strings.HasPrefix(repoFilePath, repoComponentBasePath) {
+			relativePath := repoFilePath[len(repoComponentBasePath):]
+			destPath = filepath.Join(config.ComponentsDir, relativePath)
+		} else {
+			fileName := filepath.Base(repoFilePath)
+			destPath = filepath.Join(config.ComponentsDir, fileName)
+		}
+
+		// Check if file exists
+		if _, err := os.Stat(destPath); os.IsNotExist(err) {
+			continue // Skip if .templ file doesn't exist
+		}
+
+		// Read the current file content
+		content, err := os.ReadFile(destPath)
+		if err != nil {
+			return fmt.Errorf("failed to read .templ file '%s': %w", destPath, err)
+		}
+
+		contentStr := string(content)
+
+		// Calculate the relative path from the .templ file to the JS file
+		templDir := filepath.Dir(destPath)
+		relPath, err := filepath.Rel(templDir, filepath.Join(config.JSDir, jsFileName))
+		if err != nil {
+			// Fallback to absolute path
+			relPath = filepath.Join(config.JSDir, jsFileName)
+		}
+
+		// Convert to forward slashes for web paths
+		relPath = filepath.ToSlash(relPath)
+
+		// Check if Script() template already exists
+		scriptTemplate := fmt.Sprintf(`script(src="/%s")`, relPath)
+		if strings.Contains(contentStr, scriptTemplate) {
+			fmt.Printf("   Script() template already exists in %s\n", destPath)
+			continue
+		}
+
+		// Add Script() template at the end
+		newContent := strings.TrimSpace(contentStr) + "\n\n" + scriptTemplate + "\n"
+
+		// Ask for confirmation if not forcing
+		if !force {
+			fmt.Printf("   Add Script() template to '%s'? (y/N): ", destPath)
+			var response string
+			fmt.Scanln(&response)
+			if strings.ToLower(strings.TrimSpace(response)) != "y" {
+				fmt.Printf("   Skipped adding Script() template to %s\n", destPath)
+				continue
+			}
+		}
+
+		// Write the updated content
+		err = os.WriteFile(destPath, []byte(newContent), 0644)
+		if err != nil {
+			return fmt.Errorf("failed to write updated .templ file '%s': %w", destPath, err)
+		}
+
+		fmt.Printf("   Added Script() template to %s\n", destPath)
+	}
+
+	return nil
+}
+
 // listComponents fetches the manifest and lists available components and utils.
 func listComponents(ref string) error {
 	fmt.Printf("Fetching component manifest from ref '%s'...\n", ref)
@@ -869,10 +944,16 @@ func listComponents(ref string) error {
 		// Print components.
 		for _, comp := range manifest.Components {
 			desc := comp.Description
-			if len(desc) > 60 {
-				desc = desc[:57] + "..."
+			if len(desc) > 45 {
+				desc = desc[:42] + "..."
 			}
-			fmt.Printf("  - %-20s : %s\n", comp.Name, desc)
+
+			jsStatus := ""
+			if comp.HasJS {
+				jsStatus = " [JS]"
+			}
+
+			fmt.Printf("  - %-20s : %s%s\n", comp.Name, desc, jsStatus)
 		}
 	}
 

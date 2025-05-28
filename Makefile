@@ -58,5 +58,29 @@ lint-html:
 validate-html: build-html lint-html
 
 minify-js:
-	npx esbuild --bundle internal/components/main.js --minify --metafile=meta.json --outfile=assets/js/main.min.js
-	npx esbuild --bundle internal/components/main.js --minify --outfile=internal/components/main.min.js
+	npx esbuild \
+		internal/components/avatar/avatar.js \
+		internal/components/calendar/calendar.js \
+		internal/components/carousel/carousel.js \
+		internal/components/chart/chart.js \
+		internal/components/code/code.js \
+		internal/components/datepicker/date_picker.js \
+		internal/components/drawer/drawer.js \
+		internal/components/dropdown/dropdown.js \
+		internal/components/input/input.js \
+		internal/components/inputotp/input_otp.js \
+		internal/components/label/label.js \
+		internal/components/modal/modal.js \
+		internal/components/popover/popover.js \
+		internal/components/progress/progress.js \
+		internal/components/rating/rating.js \
+		internal/components/selectbox/select_box.js \
+		internal/components/slider/slider.js \
+		internal/components/tabs/tabs.js \
+		internal/components/textarea/textarea.js \
+		internal/components/toast/toast.js \
+		--minify \
+		--bundle \
+		--outdir=internal/component_scripts \
+		--out-extension:.js=.min.js \
+		--entry-names=[name]

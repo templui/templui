@@ -23,7 +23,8 @@
       "name": "avatar",
       "description": "",
       "files": ["internal/components/avatar/avatar.templ"],
-      "dependencies": []
+      "dependencies": [],
+      "hasJS": true
     },
     {
       "name": "badge",
@@ -47,7 +48,8 @@
       "name": "calendar",
       "description": "",
       "files": ["internal/components/calendar/calendar.templ"],
-      "dependencies": ["icon"]
+      "dependencies": ["icon"],
+      "hasJS": true
     },
     {
       "name": "card",
@@ -59,13 +61,15 @@
       "name": "carousel",
       "description": "",
       "files": ["internal/components/carousel/carousel.templ"],
-      "dependencies": ["icon"]
+      "dependencies": ["icon"],
+      "hasJS": true
     },
     {
       "name": "chart",
       "description": "",
       "files": ["internal/components/chart/chart.templ"],
-      "dependencies": []
+      "dependencies": [],
+      "hasJS": true
     },
     {
       "name": "checkbox",
@@ -83,25 +87,29 @@
       "name": "code",
       "description": "",
       "files": ["internal/components/code/code.templ"],
-      "dependencies": ["icon"]
+      "dependencies": ["icon"],
+      "hasJS": true
     },
     {
       "name": "datepicker",
       "description": "",
       "files": ["internal/components/datepicker/date_picker.templ"],
-      "dependencies": ["button", "calendar", "icon", "popover"]
+      "dependencies": ["button", "calendar", "icon", "popover"],
+      "hasJS": true
     },
     {
       "name": "drawer",
       "description": "",
       "files": ["internal/components/drawer/drawer.templ"],
-      "dependencies": []
+      "dependencies": [],
+      "hasJS": true
     },
     {
       "name": "dropdown",
       "description": "",
       "files": ["internal/components/dropdown/dropdown.templ"],
-      "dependencies": ["popover"]
+      "dependencies": ["popover"],
+      "hasJS": true
     },
     {
       "name": "form",
@@ -123,25 +131,29 @@
       "name": "input",
       "description": "",
       "files": ["internal/components/input/input.templ"],
-      "dependencies": ["button", "icon"]
+      "dependencies": ["button", "icon"],
+      "hasJS": true
     },
     {
       "name": "inputotp",
       "description": "",
       "files": ["internal/components/inputotp/input_otp.templ"],
-      "dependencies": ["input"]
+      "dependencies": ["input"],
+      "hasJS": true
     },
     {
       "name": "label",
       "description": "",
       "files": ["internal/components/label/label.templ"],
-      "dependencies": []
+      "dependencies": [],
+      "hasJS": true
     },
     {
       "name": "modal",
       "description": "",
       "files": ["internal/components/modal/modal.templ"],
-      "dependencies": []
+      "dependencies": [],
+      "hasJS": true
     },
     {
       "name": "pagination",
@@ -157,13 +169,15 @@
         "internal/components/popover/floating_ui_dom.templ",
         "internal/components/popover/popover.templ"
       ],
-      "dependencies": []
+      "dependencies": [],
+      "hasJS": true
     },
     {
       "name": "progress",
       "description": "",
       "files": ["internal/components/progress/progress.templ"],
-      "dependencies": []
+      "dependencies": [],
+      "hasJS": true
     },
     {
       "name": "radio",
@@ -181,13 +195,15 @@
       "name": "rating",
       "description": "",
       "files": ["internal/components/rating/rating.templ"],
-      "dependencies": ["icon"]
+      "dependencies": ["icon"],
+      "hasJS": true
     },
     {
       "name": "selectbox",
       "description": "",
       "files": ["internal/components/selectbox/select_box.templ"],
-      "dependencies": ["button", "icon", "popover"]
+      "dependencies": ["button", "icon", "popover"],
+      "hasJS": true
     },
     {
       "name": "separator",
@@ -205,7 +221,8 @@
       "name": "slider",
       "description": "",
       "files": ["internal/components/slider/slider.templ"],
-      "dependencies": []
+      "dependencies": [],
+      "hasJS": true
     },
     {
       "name": "spinner",
@@ -223,19 +240,22 @@
       "name": "tabs",
       "description": "",
       "files": ["internal/components/tabs/tabs.templ"],
-      "dependencies": []
+      "dependencies": [],
+      "hasJS": true
     },
     {
       "name": "textarea",
       "description": "",
       "files": ["internal/components/textarea/textarea.templ"],
-      "dependencies": []
+      "dependencies": [],
+      "hasJS": true
     },
     {
       "name": "toast",
       "description": "",
       "files": ["internal/components/toast/toast.templ"],
-      "dependencies": ["icon"]
+      "dependencies": ["icon"],
+      "hasJS": true
     },
     {
       "name": "toggle",
