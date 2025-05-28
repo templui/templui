@@ -164,11 +164,7 @@
     {
       "name": "popover",
       "description": "",
-      "files": [
-        "internal/components/popover/floating_ui_core.templ",
-        "internal/components/popover/floating_ui_dom.templ",
-        "internal/components/popover/popover.templ"
-      ],
+      "files": ["internal/components/popover/popover.templ"],
       "dependencies": [],
       "hasJS": true
     },
