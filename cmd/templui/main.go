@@ -882,23 +882,19 @@ func addScriptTemplateToFiles(config Config, comp ComponentDef, jsFileName strin
 
 		contentStr := string(content)
 
-		// Calculate the relative path from the .templ file to the JS file
-		templDir := filepath.Dir(destPath)
-		relPath, err := filepath.Rel(templDir, filepath.Join(config.JSDir, jsFileName))
-		if err != nil {
-			// Fallback to absolute path
-			relPath = filepath.Join(config.JSDir, jsFileName)
-		}
-
-		// Convert to forward slashes for web paths
-		relPath = filepath.ToSlash(relPath)
+		// Create the web path for the JavaScript file (always use forward slashes and start with /)
+		webPath := "/" + filepath.ToSlash(filepath.Join(config.JSDir, jsFileName))
 
 		// Check if Script() template already exists
-		scriptTemplate := fmt.Sprintf(`script(src="/%s")`, relPath)
-		if strings.Contains(contentStr, scriptTemplate) {
+		if strings.Contains(contentStr, "templ Script()") {
 			fmt.Printf("   Script() template already exists in %s\n", destPath)
 			continue
 		}
+
+		// Create the Script() template with correct templ syntax
+		scriptTemplate := fmt.Sprintf(`templ Script() {
+	<script defer src="%s"></script>
+}`, webPath)
 
 		// Add Script() template at the end
 		newContent := strings.TrimSpace(contentStr) + "\n\n" + scriptTemplate + "\n"
