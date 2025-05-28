@@ -23,7 +23,7 @@ tailwind-watch:
 
 dev:
 	make tailwind-clean
-	make -j4 tailwind-watch templ docs shiki-highlighter
+	make -j5 tailwind-watch templ docs shiki-highlighter watch-js
 
 debug:
 	make -j3 templ tailwind-app tailwind
@@ -56,6 +56,9 @@ lint-html:
 
 # Step 6: Run full pipeline (build + lint)
 validate-html: build-html lint-html
+
+watch-js:
+	npx esbuild internal/components/main.js --minify --bundle --watch --outfile=assets/js/templui.min.js
 
 minify-js:
 	npx esbuild \

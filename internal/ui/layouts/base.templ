@@ -47,6 +47,8 @@ templ BaseLayout(title, description string) {
 			<style>
                 [x-cloak] { display: none !important; }
             </style>
+			// templui.min.js
+			<script defer nonce={ templ.GetNonce(ctx) } src="/assets/js/templui.min.js"></script>
 			// Plausible Analytics
 			if config.AppConfig.GoEnv == "production" {
 				<script defer data-domain="templui.io" src="https://plausible.axeladrian.com/js/script.js" nonce={ templ.GetNonce(ctx) }></script>
@@ -55,8 +57,6 @@ templ BaseLayout(title, description string) {
 			@ThemeScript()
 			// Shiki Highlighter Script
 			@modules.CodeHighlightingScript()
-			// Main Script
-			<script defer nonce={ templ.GetNonce(ctx) } src="/assets/js/main.min.js"></script>
 			// Favicon
 			<link rel="icon" href="/assets/img/favicon.svg" type="image/x-icon"/>
 			// Tailwind CSS
