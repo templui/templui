@@ -842,7 +842,7 @@ func installComponentJS(config Config, comp ComponentDef, ref string, force bool
 	}
 
 	// Add Script() template to .templ files
-	err = addScriptTemplateToFiles(config, comp, jsFileName, force)
+	err = addScriptTemplateToFiles(config, comp, jsFileName)
 	if err != nil {
 		return fmt.Errorf("failed to add Script() template: %w", err)
 	}
@@ -851,7 +851,7 @@ func installComponentJS(config Config, comp ComponentDef, ref string, force bool
 }
 
 // addScriptTemplateToFiles adds Script() template at the end of .templ files
-func addScriptTemplateToFiles(config Config, comp ComponentDef, jsFileName string, force bool) error {
+func addScriptTemplateToFiles(config Config, comp ComponentDef, jsFileName string) error {
 	repoComponentBasePath := "internal/components/"
 
 	for _, repoFilePath := range comp.Files {
