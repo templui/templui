@@ -271,6 +271,19 @@ func main() {
 		}
 
 		fmt.Println("\nInstallation finished.")
+
+		// Check if any installed components have JavaScript
+		hasJSComponents := false
+		for compName := range installedComponents {
+			if comp, exists := componentMap[compName]; exists && comp.HasJS {
+				hasJSComponents = true
+				break
+			}
+		}
+
+		if hasJSComponents {
+			fmt.Println("\n💡 Tip: Some components require JavaScript. Make sure to include @component.Script() in your layout!")
+		}
 		return
 	}
 
