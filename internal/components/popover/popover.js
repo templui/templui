@@ -451,8 +451,6 @@ if (typeof window.popoverState === "undefined") {
     }
   };
 
-  initAllComponents();
-
   document.addEventListener("DOMContentLoaded", () => {
     whenFloatingUiReady(() => {
       addAnimationStyles();

@@ -226,8 +226,6 @@ if (typeof window.ratingState === "undefined") {
     }
   };
 
-  initAllComponents();
-
   document.addEventListener("DOMContentLoaded", () => initAllComponents());
 
   document.body.addEventListener("htmx:beforeCleanup", (event) => {

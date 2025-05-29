@@ -246,7 +246,6 @@ if (typeof window.inputOTPState === "undefined") {
     }
   });
 
-  initAllComponents();
   document.body.addEventListener("htmx:afterSwap", handleHtmxSwap);
   document.body.addEventListener("htmx:oobAfterSwap", handleHtmxSwap);
 

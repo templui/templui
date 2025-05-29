@@ -59,7 +59,6 @@
     }
   };
 
-  initAllComponents();
   document.addEventListener("DOMContentLoaded", () => initAllComponents());
   document.body.addEventListener("htmx:afterSwap", handleHtmxSwap);
   document.body.addEventListener("htmx:oobAfterSwap", handleHtmxSwap);

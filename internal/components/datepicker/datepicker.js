@@ -203,7 +203,6 @@
     }
   };
 
-  initAllComponents();
   document.addEventListener("DOMContentLoaded", () => initAllComponents());
 
   document.body.addEventListener("htmx:beforeSwap", (event) => {

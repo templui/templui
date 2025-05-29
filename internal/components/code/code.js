@@ -110,7 +110,6 @@ import "./highlight.js";
     }
   };
 
-  initAllComponents();
   document.addEventListener("DOMContentLoaded", () => {
     whenHljsReady(() => initAllComponents());
   });
