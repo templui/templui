@@ -202,20 +202,20 @@ func main() {
 		}
 
 		// Fetch the manifest for the target ref.
-		fmt.Printf("Using ref: %s\n", targetRef)
-		fmt.Printf("Fetching component manifest from ref '%s'...\n", targetRef)
+		fmt.Printf("\n📦 Using ref: %s\n", targetRef)
+		fmt.Printf("🔍 Fetching component manifest from ref '%s'...\n", targetRef)
 		manifest, err := fetchManifest(targetRef)
 		if err != nil {
 			if strings.Contains(err.Error(), "status code 404") {
-				fmt.Printf("Error fetching manifest: %v\n", err)
-				fmt.Printf("  Check if the ref '%s' exists and contains the file '%s'.\n", targetRef, manifestPath)
-				fmt.Printf("  Manifest URL attempted: %s%s/%s\n", rawContentBaseURL, targetRef, manifestPath)
+				fmt.Printf("❌ Error fetching manifest: %v\n", err)
+				fmt.Printf("   Check if the ref '%s' exists and contains the file '%s'.\n", targetRef, manifestPath)
+				fmt.Printf("   Manifest URL attempted: %s%s/%s\n", rawContentBaseURL, targetRef, manifestPath)
 			} else {
-				fmt.Printf("Error fetching manifest: %v\n", err)
+				fmt.Printf("❌ Error fetching manifest: %v\n", err)
 			}
 			return
 		}
-		fmt.Printf("Using components from templui manifest version %s (fetched from ref %s)\n", manifest.Version, targetRef)
+		fmt.Printf("✅ Using components from templui manifest version %s (fetched from ref %s)\n", manifest.Version, targetRef)
 
 		// Build a map for quick component lookup.
 		componentMap := make(map[string]ComponentDef)
@@ -225,12 +225,16 @@ func main() {
 
 		// If '*' was requested, get all component names from the manifest.
 		if isInstallAll {
-			fmt.Println("Preparing to install all components...")
+			fmt.Printf("\n🚀 Preparing to install all %d components...\n", len(manifest.Components))
 			componentsToInstallNames = []string{}
 			for _, comp := range manifest.Components {
 				componentsToInstallNames = append(componentsToInstallNames, comp.Name)
 			}
 		}
+
+		fmt.Printf("\n" + strings.Repeat("─", 50) + "\n")
+		fmt.Printf("🔧 INSTALLING COMPONENTS\n")
+		fmt.Printf(strings.Repeat("─", 50) + "\n")
 
 		// Track installed state and required utils for this run.
 		installedComponents := make(map[string]bool)
@@ -240,10 +244,10 @@ func main() {
 		for _, componentName := range componentsToInstallNames {
 			compDef, exists := componentMap[componentName]
 			if !exists {
-				fmt.Printf("Error: Component '%s' not found in manifest for ref '%s'.\n", componentName, targetRef)
+				fmt.Printf("❌ Component '%s' not found in manifest for ref '%s'.\n", componentName, targetRef)
 				fmt.Println("Available components in this manifest:")
 				for _, availableComp := range manifest.Components {
-					fmt.Printf(" - %s\n", availableComp.Name)
+					fmt.Printf("   • %s\n", availableComp.Name)
 				}
 				continue // Skip to next requested component
 			}
@@ -251,14 +255,14 @@ func main() {
 			// Pass the force flag down to the installation function.
 			err = installComponent(config, compDef, componentMap, targetRef, installedComponents, requiredUtils, *forceOverwrite)
 			if err != nil {
-				fmt.Printf("Error installing component %s: %v\n", componentName, err)
+				fmt.Printf("❌ Error installing component %s: %v\n", componentName, err)
 				// Decide whether to continue or stop on error
 			}
 		}
 
 		// Install all collected required utils.
 		if len(requiredUtils) > 0 {
-			fmt.Println("Installing required utils...")
+			fmt.Printf("\n🛠️  Installing required utils...\n")
 			utilsToInstallPaths := []string{}
 			for utilPath := range requiredUtils {
 				utilsToInstallPaths = append(utilsToInstallPaths, utilPath)
@@ -266,11 +270,13 @@ func main() {
 			// Pass the force flag down.
 			err = installUtils(config, utilsToInstallPaths, targetRef, *forceOverwrite)
 			if err != nil {
-				fmt.Printf("Error installing utils: %v\n", err)
+				fmt.Printf("❌ Error installing utils: %v\n", err)
 			}
 		}
 
-		fmt.Println("\nInstallation finished.")
+		fmt.Printf("\n" + strings.Repeat("─", 50) + "\n")
+		fmt.Printf("✅ INSTALLATION COMPLETED\n")
+		fmt.Printf(strings.Repeat("─", 50) + "\n")
 
 		// Check if any installed components have JavaScript
 		hasJSComponents := false
@@ -597,7 +603,7 @@ func installComponent(
 	}
 	installed[comp.Name] = true
 
-	fmt.Printf("Processing component: %s (from ref: %s)\n", comp.Name, ref)
+	fmt.Printf("\n📦 Processing component: %s (from ref: %s)\n", comp.Name, ref)
 
 	// Install dependencies first recursively.
 	for _, depName := range comp.Dependencies {
@@ -614,11 +620,11 @@ func installComponent(
 		if err != nil {
 			return fmt.Errorf("failed to install dependency '%s' for '%s': %w", depName, comp.Name, err)
 		}
-		fmt.Printf(" -> Installed dependency: %s\n", depName)
+		fmt.Printf("   ✅ Installed dependency: %s\n", depName)
 	}
 
 	// Download and write component files.
-	fmt.Printf(" Installing files for: %s\n", comp.Name)
+	fmt.Printf("   📁 Installing files for: %s\n", comp.Name)
 	repoComponentBasePath := "internal/components/"
 
 	for _, repoFilePath := range comp.Files {
@@ -652,16 +658,16 @@ func installComponent(
 		if fileExists {
 			existingRef, _ := readFileVersion(destPath)
 			if existingRef == ref {
-				fmt.Printf("  Info: File '%s' already up-to-date (ref: %s). Skipping.\n", destPath, ref)
+				fmt.Printf("      ℹ️  File '%s' already up-to-date (ref: %s). Skipping.\n", destPath, ref)
 				shouldWriteFile = false
 			} else {
 				// Versions differ or existing version couldn't be read.
 				if force {
-					fmt.Printf("  Info: File '%s' exists (Version: '%s'). Forcing overwrite with ref '%s'.\n", destPath, existingRef, ref)
+					fmt.Printf("      ⚠️  File '%s' exists (Version: '%s'). Forcing overwrite with ref '%s'.\n", destPath, existingRef, ref)
 				} else {
 					shouldOverwrite := askForOverwrite(destPath, existingRef, ref)
 					if !shouldOverwrite {
-						fmt.Printf("  Info: Skipping overwrite for '%s'.\n", destPath)
+						fmt.Printf("      ⏭️  Skipping overwrite for '%s'.\n", destPath)
 						shouldWriteFile = false
 					}
 				}
@@ -671,7 +677,7 @@ func installComponent(
 		// Proceed with download and write only if necessary.
 		if shouldWriteFile {
 			fileURL := rawContentBaseURL + ref + "/" + repoFilePath
-			fmt.Printf("   Downloading %s...\n", fileURL)
+			fmt.Printf("      ⬇️  Downloading %s...\n", fileURL)
 			data, err := downloadFile(fileURL)
 			if err != nil {
 				fileNameForError := filepath.Base(repoFilePath)
@@ -691,9 +697,9 @@ func installComponent(
 				return fmt.Errorf("failed to write file '%s': %w", destPath, err)
 			}
 			if fileExists {
-				fmt.Printf("   Overwritten %s\n", destPath)
+				fmt.Printf("      ✅ Overwritten %s\n", destPath)
 			} else {
-				fmt.Printf("   Installed %s\n", destPath)
+				fmt.Printf("      ✅ Installed %s\n", destPath)
 			}
 		}
 	}
