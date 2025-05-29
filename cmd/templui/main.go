@@ -232,9 +232,9 @@ func main() {
 			}
 		}
 
-		fmt.Printf("\n" + strings.Repeat("─", 50) + "\n")
+		fmt.Print("\n" + strings.Repeat("─", 50) + "\n")
 		fmt.Printf("🔧 INSTALLING COMPONENTS\n")
-		fmt.Printf(strings.Repeat("─", 50) + "\n")
+		fmt.Printf("%s\n", strings.Repeat("─", 50))
 
 		// Track installed state and required utils for this run.
 		installedComponents := make(map[string]bool)
@@ -274,9 +274,9 @@ func main() {
 			}
 		}
 
-		fmt.Printf("\n" + strings.Repeat("─", 50) + "\n")
+		fmt.Print("\n" + strings.Repeat("─", 50) + "\n")
 		fmt.Printf("✅ INSTALLATION COMPLETED\n")
-		fmt.Printf(strings.Repeat("─", 50) + "\n")
+		fmt.Printf("%s\n", strings.Repeat("─", 50))
 
 		// Check if any installed components have JavaScript
 		hasJSComponents := false
