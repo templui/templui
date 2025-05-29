@@ -3,123 +3,123 @@
   "components": [
     {
       "name": "accordion",
-      "description": "",
+      "description": "Collapsible content sections",
       "files": ["internal/components/accordion/accordion.templ"],
       "dependencies": ["icon"]
     },
     {
       "name": "alert",
-      "description": "",
+      "description": "Status messages and notifications",
       "files": ["internal/components/alert/alert.templ"],
       "dependencies": []
     },
     {
       "name": "aspectratio",
-      "description": "",
+      "description": "Maintains width-to-height ratios",
       "files": ["internal/components/aspectratio/aspectratio.templ"],
       "dependencies": []
     },
     {
       "name": "avatar",
-      "description": "",
+      "description": "User profile images and initials",
       "files": ["internal/components/avatar/avatar.templ"],
       "dependencies": [],
       "hasJS": true
     },
     {
       "name": "badge",
-      "description": "",
+      "description": "Small status indicators",
       "files": ["internal/components/badge/badge.templ"],
       "dependencies": []
     },
     {
       "name": "breadcrumb",
-      "description": "",
+      "description": "Navigation trail",
       "files": ["internal/components/breadcrumb/breadcrumb.templ"],
       "dependencies": ["icon"]
     },
     {
       "name": "button",
-      "description": "",
+      "description": "Interactive action elements",
       "files": ["internal/components/button/button.templ"],
       "dependencies": []
     },
     {
       "name": "calendar",
-      "description": "",
+      "description": "Date selection interface",
       "files": ["internal/components/calendar/calendar.templ"],
       "dependencies": ["icon"],
       "hasJS": true
     },
     {
       "name": "card",
-      "description": "",
+      "description": "Content containers",
       "files": ["internal/components/card/card.templ"],
       "dependencies": ["aspectratio"]
     },
     {
       "name": "carousel",
-      "description": "",
+      "description": "Image and content slider",
       "files": ["internal/components/carousel/carousel.templ"],
       "dependencies": ["icon"],
       "hasJS": true
     },
     {
       "name": "chart",
-      "description": "",
+      "description": "Data visualization charts",
       "files": ["internal/components/chart/chart.templ"],
       "dependencies": [],
       "hasJS": true
     },
     {
       "name": "checkbox",
-      "description": "",
+      "description": "Boolean input selection",
       "files": ["internal/components/checkbox/checkbox.templ"],
       "dependencies": ["icon"]
     },
     {
       "name": "checkboxcard",
-      "description": "",
+      "description": "Card-style checkbox selection",
       "files": ["internal/components/checkboxcard/checkboxcard.templ"],
       "dependencies": []
     },
     {
       "name": "code",
-      "description": "",
+      "description": "Syntax-highlighted code blocks",
       "files": ["internal/components/code/code.templ"],
       "dependencies": ["icon"],
       "hasJS": true
     },
     {
       "name": "datepicker",
-      "description": "",
+      "description": "Calendar-based date selection",
       "files": ["internal/components/datepicker/datepicker.templ"],
       "dependencies": ["button", "calendar", "icon", "popover"],
       "hasJS": true
     },
     {
       "name": "drawer",
-      "description": "",
+      "description": "Sliding side panel",
       "files": ["internal/components/drawer/drawer.templ"],
       "dependencies": [],
       "hasJS": true
     },
     {
       "name": "dropdown",
-      "description": "",
+      "description": "Contextual menu options",
       "files": ["internal/components/dropdown/dropdown.templ"],
       "dependencies": ["popover"],
       "hasJS": true
     },
     {
       "name": "form",
-      "description": "",
+      "description": "Form layout and validation",
       "files": ["internal/components/form/form.templ"],
       "dependencies": ["label"]
     },
     {
       "name": "icon",
-      "description": "",
+      "description": "SVG icon library",
       "files": [
         "internal/components/icon/icondata.go",
         "internal/components/icon/icondefs.go",
@@ -129,139 +129,139 @@
     },
     {
       "name": "input",
-      "description": "",
+      "description": "Text input fields",
       "files": ["internal/components/input/input.templ"],
       "dependencies": ["button", "icon"],
       "hasJS": true
     },
     {
       "name": "inputotp",
-      "description": "",
+      "description": "One-time password input",
       "files": ["internal/components/inputotp/inputotp.templ"],
       "dependencies": ["input"],
       "hasJS": true
     },
     {
       "name": "label",
-      "description": "",
+      "description": "Form field labels",
       "files": ["internal/components/label/label.templ"],
       "dependencies": [],
       "hasJS": true
     },
     {
       "name": "modal",
-      "description": "",
+      "description": "Overlay dialog windows",
       "files": ["internal/components/modal/modal.templ"],
       "dependencies": [],
       "hasJS": true
     },
     {
       "name": "pagination",
-      "description": "",
+      "description": "Page navigation controls",
       "files": ["internal/components/pagination/pagination.templ"],
       "dependencies": ["button", "icon"]
     },
     {
       "name": "popover",
-      "description": "",
+      "description": "Floating content overlay",
       "files": ["internal/components/popover/popover.templ"],
       "dependencies": [],
       "hasJS": true
     },
     {
       "name": "progress",
-      "description": "",
+      "description": "Loading progress indicators",
       "files": ["internal/components/progress/progress.templ"],
       "dependencies": [],
       "hasJS": true
     },
     {
       "name": "radio",
-      "description": "",
+      "description": "Single-choice selection",
       "files": ["internal/components/radio/radio.templ"],
       "dependencies": []
     },
     {
       "name": "radiocard",
-      "description": "",
+      "description": "Card-style radio selection",
       "files": ["internal/components/radiocard/radiocard.templ"],
       "dependencies": []
     },
     {
       "name": "rating",
-      "description": "",
+      "description": "Star rating input",
       "files": ["internal/components/rating/rating.templ"],
       "dependencies": ["icon"],
       "hasJS": true
     },
     {
       "name": "selectbox",
-      "description": "",
+      "description": "Dropdown selection menu",
       "files": ["internal/components/selectbox/selectbox.templ"],
       "dependencies": ["button", "icon", "popover"],
       "hasJS": true
     },
     {
       "name": "separator",
-      "description": "",
+      "description": "Visual content divider",
       "files": ["internal/components/separator/separator.templ"],
       "dependencies": []
     },
     {
       "name": "skeleton",
-      "description": "",
+      "description": "Loading placeholder animation",
       "files": ["internal/components/skeleton/skeleton.templ"],
       "dependencies": []
     },
     {
       "name": "slider",
-      "description": "",
+      "description": "Range input control",
       "files": ["internal/components/slider/slider.templ"],
       "dependencies": [],
       "hasJS": true
     },
     {
       "name": "spinner",
-      "description": "",
+      "description": "Loading indicator animation",
       "files": ["internal/components/spinner/spinner.templ"],
       "dependencies": []
     },
     {
       "name": "table",
-      "description": "",
+      "description": "Data table display",
       "files": ["internal/components/table/table.templ"],
       "dependencies": []
     },
     {
       "name": "tabs",
-      "description": "",
+      "description": "Tabbed content navigation",
       "files": ["internal/components/tabs/tabs.templ"],
       "dependencies": [],
       "hasJS": true
     },
     {
       "name": "textarea",
-      "description": "",
+      "description": "Multi-line text input",
       "files": ["internal/components/textarea/textarea.templ"],
       "dependencies": [],
       "hasJS": true
     },
     {
       "name": "toast",
-      "description": "",
+      "description": "Temporary notification messages",
       "files": ["internal/components/toast/toast.templ"],
       "dependencies": ["icon"],
       "hasJS": true
     },
     {
       "name": "toggle",
-      "description": "",
+      "description": "On/off switch control",
       "files": ["internal/components/toggle/toggle.templ"],
       "dependencies": []
     },
     {
       "name": "tooltip",
-      "description": "",
+      "description": "Hover information overlay",
       "files": ["internal/components/tooltip/tooltip.templ"],
       "dependencies": ["popover"]
     }
@@ -269,7 +269,7 @@
   "utils": [
     {
       "path": "internal/utils/templui.go",
-      "description": ""
+      "description": "Core utility functions"
     }
   ]
 }
