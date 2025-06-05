@@ -29,6 +29,7 @@ type LabelProps struct {
 type DescriptionProps struct {
 	ID         string
 	Class      string
+	Value	   any
 	Attributes templ.Attributes
 }
 
@@ -98,6 +99,9 @@ templ Description(props ...DescriptionProps) {
 		class={ utils.TwMerge("text-sm text-muted-foreground", p.Class) }
 		{ p.Attributes... }
 	>
+		if p.Value != nil {
+			{ p.Value }
+		}
 		{ children... }
 	</p>
 }
