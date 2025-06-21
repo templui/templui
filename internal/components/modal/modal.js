@@ -1,166 +1,124 @@
-if (typeof window.modalState === "undefined") {
-  window.modalState = {
-    openModalId: null,
-  };
-}
-
 (function () {
   // IIFE
-  function closeModal(modal, immediate = false) {
-    if (!modal || modal.style.display === "none") return;
 
-    const content = modal.querySelector("[data-modal-content]");
-    const modalId = modal.id;
-
-    // Apply leaving transitions
-    modal.classList.remove("opacity-100");
-    modal.classList.add("opacity-0");
-
-    if (content) {
-      content.classList.remove("scale-100", "opacity-100");
-      content.classList.add("scale-95", "opacity-0");
-    }
-
-    function hideModal() {
-      modal.style.display = "none";
-
-      if (window.modalState.openModalId === modalId) {
-        window.modalState.openModalId = null;
-        document.body.style.overflow = "";
-      }
-    }
-
-    if (immediate) {
-      hideModal();
-    } else {
-      setTimeout(hideModal, 300);
+  // Opens a modal dialog with animation
+  function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal && modal.tagName === "DIALOG") {
+      modal.showModal();
+      // Remove any closing class and force reflow
+      modal.classList.remove("modal-closing");
+      modal.offsetHeight; // Force reflow
+      // Add opening class for animation
+      modal.classList.add("modal-opening");
     }
   }
 
-  function openModal(modal) {
-    if (!modal) return;
+  // Closes a modal dialog with animation
+  function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal && modal.tagName === "DIALOG" && modal.open) {
+      // Remove opening class and add closing class
+      modal.classList.remove("modal-opening");
+      modal.classList.add("modal-closing");
 
-    // Close any open modal first
-    if (window.modalState.openModalId) {
-      const openModal = document.getElementById(window.modalState.openModalId);
-      if (openModal && openModal !== modal) {
-        closeModal(openModal, true);
-      }
-    }
-
-    const content = modal.querySelector("[data-modal-content]");
-
-    // Display and prepare for animation
-    modal.style.display = "flex";
-
-    // Store as currently open modal
-    window.modalState.openModalId = modal.id;
-    document.body.style.overflow = "hidden";
-
-    // Force reflow before adding transition classes
-    void modal.offsetHeight;
-
-    // Start animations
-    modal.classList.remove("opacity-0");
-    modal.classList.add("opacity-100");
-
-    if (content) {
-      content.classList.remove("scale-95", "opacity-0");
-      content.classList.add("scale-100", "opacity-100");
-
-      // Focus first focusable element
+      // Close dialog after animation completes
       setTimeout(() => {
-        const focusable = content.querySelector(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusable) focusable.focus();
-      }, 50);
+        modal.close();
+        // Clean up classes
+        modal.classList.remove("modal-closing");
+      }, 300); // Match CSS transition duration
     }
   }
 
-  function closeModalById(modalId, immediate = false) {
-    const modal = document.getElementById(modalId);
-    if (modal) closeModal(modal, immediate);
-  }
+  // Handles clicks on modal trigger elements
+  function handleTriggerClick(event) {
+    const trigger = event.currentTarget;
+    const modalId = trigger.dataset.modalTargetId;
 
-  function openModalById(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) openModal(modal);
-  }
-
-  function handleClickAway(e) {
-    const openModalId = window.modalState.openModalId;
-    if (!openModalId) return;
-
-    const modal = document.getElementById(openModalId);
-    if (!modal || modal.getAttribute("data-disable-click-away") === "true")
-      return;
-
-    const content = modal.querySelector("[data-modal-content]");
-    const trigger = e.target.closest("[data-modal-trigger]");
-
-    if (
-      content &&
-      !content.contains(e.target) &&
-      (!trigger || trigger.getAttribute("data-modal-target-id") !== openModalId)
-    ) {
-      closeModal(modal);
+    if (modalId) {
+      openModal(modalId);
+    } else {
+      console.warn("Modal trigger is missing data-modal-target-id attribute");
     }
   }
 
-  function handleEscKey(e) {
-    if (e.key !== "Escape" || !window.modalState.openModalId) return;
+  // Handles clicks on modal close buttons
+  function handleCloseClick(event) {
+    const closeButton = event.currentTarget;
+    const modalId = closeButton.dataset.modalTargetId;
 
-    const modal = document.getElementById(window.modalState.openModalId);
-    if (modal && modal.getAttribute("data-disable-esc") !== "true") {
-      closeModal(modal);
-    }
-  }
-
-  function initTrigger(trigger) {
-    const targetId = trigger.getAttribute("data-modal-target-id");
-    if (!targetId) return;
-
-    trigger.addEventListener("click", () => {
-      if (
-        !trigger.hasAttribute("disabled") &&
-        !trigger.classList.contains("opacity-50")
-      ) {
-        openModalById(targetId);
+    if (modalId) {
+      closeModal(modalId);
+    } else {
+      // If no specific modal ID, find the closest modal
+      const modal = closeButton.closest("dialog[data-modal]");
+      if (modal) {
+        closeModal(modal.id);
       }
-    });
+    }
   }
 
-  function initCloseButton(closeBtn) {
-    closeBtn.addEventListener("click", () => {
-      const targetId = closeBtn.getAttribute("data-modal-target-id");
-      if (targetId) {
-        closeModalById(targetId);
-      } else {
-        const modal = closeBtn.closest("[data-modal]");
-        if (modal && modal.id) {
-          closeModal(modal);
+  // Handles clicks on dialog element for backdrop closing
+  function handleDialogClick(event) {
+    const dialog = event.currentTarget;
+    const rect = dialog.getBoundingClientRect();
+    const isInDialog =
+      rect.top <= event.clientY &&
+      event.clientY <= rect.top + rect.height &&
+      rect.left <= event.clientX &&
+      event.clientX <= rect.left + rect.width;
+
+    // Check if click is outside dialog content (on backdrop)
+    if (!isInDialog) {
+      const disableClickAway = dialog.dataset.disableClickAway === "true";
+      if (!disableClickAway) {
+        closeModal(dialog.id);
+      }
+    }
+  }
+
+  // Handles keyboard events for modal interactions
+  function handleKeyDown(event) {
+    if (event.key === "Escape") {
+      const openModals = document.querySelectorAll("dialog[data-modal][open]");
+      if (openModals.length > 0) {
+        const lastModal = openModals[openModals.length - 1];
+        const disableESC = lastModal.dataset.disableEsc === "true";
+
+        if (!disableESC) {
+          event.preventDefault();
+          closeModal(lastModal.id);
         }
       }
+    }
+  }
+
+  // Initializes modal components within a given root element
+  function initAllComponents(root = document) {
+    // Initialize modal triggers
+    const triggers = root.querySelectorAll("[data-modal-trigger]");
+    triggers.forEach((trigger) => {
+      trigger.removeEventListener("click", handleTriggerClick);
+      trigger.addEventListener("click", handleTriggerClick);
+    });
+
+    // Initialize modal close buttons
+    const closeButtons = root.querySelectorAll("[data-modal-close]");
+    closeButtons.forEach((closeButton) => {
+      closeButton.removeEventListener("click", handleCloseClick);
+      closeButton.addEventListener("click", handleCloseClick);
+    });
+
+    // Initialize modals
+    const modals = root.querySelectorAll("dialog[data-modal]");
+    modals.forEach((modal) => {
+      modal.removeEventListener("click", handleDialogClick);
+      modal.addEventListener("click", handleDialogClick);
     });
   }
 
-  function initAllComponents(root = document) {
-    if (root instanceof Element && root.matches("[data-modal-trigger]")) {
-      initTrigger(root);
-    }
-    for (const trigger of root.querySelectorAll("[data-modal-trigger]")) {
-      initTrigger(trigger);
-    }
-
-    if (root instanceof Element && root.matches("[data-modal-close]")) {
-      initCloseButton(root);
-    }
-    for (const closeBtn of root.querySelectorAll("[data-modal-close]")) {
-      initCloseButton(closeBtn);
-    }
-  }
-
+  // Handles HTMX content swapping to reinitialize components
   const handleHtmxSwap = (event) => {
     let target;
     if (event.type === "htmx:afterSwap") {
@@ -174,13 +132,13 @@ if (typeof window.modalState === "undefined") {
     }
   };
 
-  if (typeof window.modalEventsInitialized === "undefined") {
-    document.addEventListener("click", handleClickAway);
-    document.addEventListener("keydown", handleEscKey);
-    window.modalEventsInitialized = true;
-  }
+  // Export functions for external use
+  window.openModal = openModal;
+  window.closeModal = closeModal;
 
+  // Event listeners for component lifecycle
   document.addEventListener("DOMContentLoaded", () => initAllComponents());
+  document.addEventListener("keydown", handleKeyDown);
   document.body.addEventListener("htmx:afterSwap", handleHtmxSwap);
   document.body.addEventListener("htmx:oobAfterSwap", handleHtmxSwap);
 })(); // End of IIFE

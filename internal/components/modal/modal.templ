@@ -54,32 +54,40 @@ templ Modal(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = "modal-" + utils.RandomID() }}
 	}
-	<div
+	<dialog
 		id={ p.ID }
 		data-modal
 		data-disable-click-away={ strconv.FormatBool(p.DisableClickAway) }
 		data-disable-esc={ strconv.FormatBool(p.DisableESC) }
-		class="modal-container fixed inset-0 z-50 flex items-center justify-center overflow-y-auto opacity-0 transition-opacity duration-300 ease-out hidden"
+		class={
+			utils.TwMerge(
+				"backdrop:bg-background/70 backdrop:opacity-50",
+				"bg-background text-foreground rounded-lg border border-border text-left overflow-hidden shadow-xl w-full max-w-md",
+				"fixed top-1/2 left-1/2",
+				"opacity-0 duration-300 ease-out",
+				"m-0 p-0", // Reset dialog default margins/padding
+				p.Class,
+			),
+		}
+		style="transition: opacity 300ms ease-out, transform 300ms ease-out;"
 		aria-labelledby={ p.ID + "-title" }
-		role="dialog"
-		aria-modal="true"
 		{ p.Attributes... }
 	>
-		<div data-modal-backdrop class="fixed inset-0 bg-background/70 bg-opacity-50" aria-hidden="true"></div>
-		<div
-			id={ p.ID + "-content" }
-			data-modal-content
-			class={
-				utils.TwMerge(
-					"modal-content relative bg-background rounded-lg border text-left overflow-hidden shadow-xl transform transition-all sm:my-8 w-full scale-95 opacity-0", // Base classes + transition start
-					"duration-300 ease-out", // Enter duration
-					p.Class,
-				),
+		<style>
+			dialog[data-modal] {
+				transform: translate(-50%, -50%) scale(0.95);
 			}
-		>
-			{ children... }
-		</div>
-	</div>
+			dialog[data-modal].modal-opening {
+				opacity: 1 !important;
+				transform: translate(-50%, -50%) scale(1) !important;
+			}
+			dialog[data-modal].modal-closing {
+				opacity: 0 !important;
+				transform: translate(-50%, -50%) scale(0.95) !important;
+			}
+		</style>
+		{ children... }
+	</dialog>
 }
 
 templ Trigger(props ...TriggerProps) {
@@ -136,11 +144,10 @@ templ Header(props ...HeaderProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("px-4 pt-5 pb-4 sm:p-6 sm:pb-4 text-lg leading-6 font-medium text-foreground", p.Class) }
+		class={ utils.TwMerge("px-4 pt-5 pb-4 sm:p-6 sm:pb-4", p.Class) }
 		{ p.Attributes... }
 	>
 		<h3 class="text-lg leading-6 font-medium text-foreground" id={ p.ID + "-title" }>
-			// Ensure title ID matches aria-labelledby
 			{ children... }
 		</h3>
 	</div>
