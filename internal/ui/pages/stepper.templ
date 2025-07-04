@@ -1,0 +1,381 @@
+package pages
+
+import (
+	"github.com/axzilla/templui/internal/ui/layouts"
+	"github.com/axzilla/templui/internal/ui/modules"
+	"github.com/axzilla/templui/internal/ui/showcase"
+)
+
+templ Stepper() {
+	@layouts.DocsLayout(
+		"Stepper",
+		"Step-by-step navigation for breaking complex tasks into manageable steps.",
+		[]modules.TableOfContentsItem{
+			{
+				ID:   "installation",
+				Text: "Installation",
+			},
+			{
+				ID:   "api",
+				Text: "API Reference",
+				Children: []modules.TableOfContentsItem{
+					{
+						ID:   "stepper",
+						Text: "Stepper",
+					},
+					{
+						ID:   "step",
+						Text: "Step",
+					},
+					{
+						ID:   "stepcontent",
+						Text: "StepContent",
+					},
+					{
+						ID:   "next",
+						Text: "Next",
+					},
+					{
+						ID:   "prev",
+						Text: "Prev",
+					},
+					{
+						ID:   "goto",
+						Text: "GoTo",
+					},
+				},
+			},
+		},
+	) {
+		@modules.PageWrapper(modules.PageWrapperProps{
+			Name:        "Stepper",
+			Description: templ.Raw("Step-by-step navigation for breaking complex tasks into manageable steps."),
+			Tailwind:    true,
+			VanillaJS:   true,
+			Breadcrumbs: modules.Breadcrumbs{
+				Items: []modules.BreadcrumbItem{
+					{
+						Text: "Docs",
+						Path: "/docs",
+					},
+					{
+						Text: "Stepper",
+					},
+				},
+			},
+		}) {
+			@modules.ExampleWrapper(modules.ExampleWrapperProps{
+				ShowcaseFile:    showcase.StepperDefault(),
+				PreviewCodeFile: "stepper_default.templ",
+			})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{
+				Title: "Examples",
+				ID:    "examples",
+			}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Vertical",
+					ShowcaseFile:    showcase.StepperVertical(),
+					PreviewCodeFile: "stepper_vertical.templ",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Sizes",
+					ShowcaseFile:    showcase.StepperSizes(),
+					PreviewCodeFile: "stepper_sizes.templ",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Error State",
+					ShowcaseFile:    showcase.StepperError(),
+					PreviewCodeFile: "stepper_error.templ",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{
+				Title: "Installation",
+				ID:    "installation",
+			}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{
+					ComponentName: "stepper",
+					JSFiles:       []string{"stepper"},
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{
+				Title: "API Reference",
+				ID:    "api",
+			}) {
+				@modules.APILegend()
+				<div id="stepper" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Stepper",
+						Description: "Root container for the stepper component.",
+						Items: []modules.APITableItem{
+							{
+								Name:        "ID",
+								Type:        "string",
+								Default:     "",
+								Description: "Unique identifier for the stepper container. Auto-generated if not provided.",
+								Required:    false,
+							},
+							{
+								Name:        "Class",
+								Type:        "string",
+								Default:     "",
+								Description: "Additional CSS classes to apply to the stepper container.",
+								Required:    false,
+							},
+							{
+								Name:        "Attributes",
+								Type:        "templ.Attributes",
+								Default:     "",
+								Description: "Additional HTML attributes to apply to the stepper container.",
+								Required:    false,
+							},
+							{
+								Name:        "Orientation",
+								Type:        "Orientation",
+								Default:     "horizontal",
+								Description: "Layout orientation of the stepper. Options: 'horizontal', 'vertical'.",
+								Required:    false,
+							},
+							{
+								Name:        "Size",
+								Type:        "Size",
+								Default:     "md",
+								Description: "Size of the stepper components. Options: 'sm', 'md', 'lg'.",
+								Required:    false,
+							},
+							{
+								Name:        "CurrentStep",
+								Type:        "int",
+								Default:     "1",
+								Description: "The currently active step number (1-based index).",
+								Required:    false,
+							},
+						},
+					})
+				</div>
+				<div id="step" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Step",
+						Description: "Individual step item with number, status, and optional content.",
+						Items: []modules.APITableItem{
+							{
+								Name:        "ID",
+								Type:        "string",
+								Default:     "",
+								Description: "Unique identifier for the step element.",
+								Required:    false,
+							},
+							{
+								Name:        "Class",
+								Type:        "string",
+								Default:     "",
+								Description: "Additional CSS classes to apply to the step.",
+								Required:    false,
+							},
+							{
+								Name:        "Attributes",
+								Type:        "templ.Attributes",
+								Default:     "",
+								Description: "Additional HTML attributes to apply to the step element.",
+								Required:    false,
+							},
+							{
+								Name:        "Number",
+								Type:        "int",
+								Default:     "",
+								Description: "The step number (1-based index).",
+								Required:    true,
+							},
+							{
+								Name:        "Status",
+								Type:        "Status",
+								Default:     "incomplete",
+								Description: "Current status of the step. Options: 'active', 'completed', 'incomplete', 'error'.",
+								Required:    false,
+							},
+							{
+								Name:        "Title",
+								Type:        "string",
+								Default:     "",
+								Description: "Title text for the step.",
+								Required:    false,
+							},
+							{
+								Name:        "Description",
+								Type:        "string",
+								Default:     "",
+								Description: "Description text for the step.",
+								Required:    false,
+							},
+							{
+								Name:        "StepperID",
+								Type:        "string",
+								Default:     "",
+								Description: "ID of the parent stepper container. Auto-detected if not provided.",
+								Required:    false,
+							},
+						},
+					})
+				</div>
+				<div id="stepcontent" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "StepContent",
+						Description: "Container for step-specific content that appears when the step is active.",
+						Items: []modules.APITableItem{
+							{
+								Name:        "ID",
+								Type:        "string",
+								Default:     "",
+								Description: "Unique identifier for the step content element.",
+								Required:    false,
+							},
+							{
+								Name:        "Class",
+								Type:        "string",
+								Default:     "",
+								Description: "Additional CSS classes to apply to the step content.",
+								Required:    false,
+							},
+							{
+								Name:        "Attributes",
+								Type:        "templ.Attributes",
+								Default:     "",
+								Description: "Additional HTML attributes to apply to the step content element.",
+								Required:    false,
+							},
+							{
+								Name:        "Number",
+								Type:        "int",
+								Default:     "",
+								Description: "The step number this content belongs to.",
+								Required:    true,
+							},
+							{
+								Name:        "StepperID",
+								Type:        "string",
+								Default:     "",
+								Description: "ID of the parent stepper container. Auto-detected if not provided.",
+								Required:    false,
+							},
+						},
+					})
+				</div>
+				<div id="next" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Next",
+						Description: "Navigation trigger to advance to the next step.",
+						Items: []modules.APITableItem{
+							{
+								Name:        "ID",
+								Type:        "string",
+								Default:     "",
+								Description: "Unique identifier for the next button element.",
+								Required:    false,
+							},
+							{
+								Name:        "Class",
+								Type:        "string",
+								Default:     "",
+								Description: "Additional CSS classes to apply to the next button.",
+								Required:    false,
+							},
+							{
+								Name:        "Attributes",
+								Type:        "templ.Attributes",
+								Default:     "",
+								Description: "Additional HTML attributes to apply to the next button element.",
+								Required:    false,
+							},
+							{
+								Name:        "For",
+								Type:        "string",
+								Default:     "",
+								Description: "ID of the stepper to control. If not provided, controls the nearest parent stepper.",
+								Required:    false,
+							},
+						},
+					})
+				</div>
+				<div id="prev" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Prev",
+						Description: "Navigation trigger to go back to the previous step.",
+						Items: []modules.APITableItem{
+							{
+								Name:        "ID",
+								Type:        "string",
+								Default:     "",
+								Description: "Unique identifier for the previous button element.",
+								Required:    false,
+							},
+							{
+								Name:        "Class",
+								Type:        "string",
+								Default:     "",
+								Description: "Additional CSS classes to apply to the previous button.",
+								Required:    false,
+							},
+							{
+								Name:        "Attributes",
+								Type:        "templ.Attributes",
+								Default:     "",
+								Description: "Additional HTML attributes to apply to the previous button element.",
+								Required:    false,
+							},
+							{
+								Name:        "For",
+								Type:        "string",
+								Default:     "",
+								Description: "ID of the stepper to control. If not provided, controls the nearest parent stepper.",
+								Required:    false,
+							},
+						},
+					})
+				</div>
+				<div id="goto" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "GoTo",
+						Description: "Navigation trigger to jump directly to a specific step.",
+						Items: []modules.APITableItem{
+							{
+								Name:        "ID",
+								Type:        "string",
+								Default:     "",
+								Description: "Unique identifier for the goto button element.",
+								Required:    false,
+							},
+							{
+								Name:        "Class",
+								Type:        "string",
+								Default:     "",
+								Description: "Additional CSS classes to apply to the goto button.",
+								Required:    false,
+							},
+							{
+								Name:        "Attributes",
+								Type:        "templ.Attributes",
+								Default:     "",
+								Description: "Additional HTML attributes to apply to the goto button element.",
+								Required:    false,
+							},
+							{
+								Name:        "For",
+								Type:        "string",
+								Default:     "",
+								Description: "ID of the stepper to control. If not provided, controls the nearest parent stepper.",
+								Required:    false,
+							},
+							{
+								Name:        "Step",
+								Type:        "int",
+								Default:     "",
+								Description: "The step number to navigate to (1-based index).",
+								Required:    true,
+							},
+						},
+					})
+				</div>
+			}
+		}
+	}
+}
+

@@ -2,296 +2,314 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://templui.io/</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://templui.io/docs</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/getting-started</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/introduction</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/how-to-use</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/themes</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/accordion</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/alert</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/aspect-ratio</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/avatar</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/badge</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/breadcrumb</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/button</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/calendar</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/card</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/carousel</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/charts</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/checkbox</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/checkbox-card</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/code</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/date-picker</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/drawer</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/dropdown</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/form</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/icon</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/input</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/input-otp</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/label</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/modal</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/pagination</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/progress</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/radio</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/radio-card</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/rating</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/select-box</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/separator</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/skeleton</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/slider</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/spinner</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://templui.io/docs/components/stepper</loc>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/table</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/tabs</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/tags-input</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/textarea</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/time-picker</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/toast</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/toggle</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/tooltip</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://templui.io/docs/components/popover</loc>
-    <lastmod>2025-06-27</lastmod>
+    <lastmod>2025-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://templui.io/docs/datastar-example</loc>
+    <lastmod>2025-07-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://templui.io/api/load-datepicker</loc>
+    <lastmod>2025-07-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.5</priority>
   </url>
 </urlset>

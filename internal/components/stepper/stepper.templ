@@ -1,0 +1,400 @@
+package stepper
+
+import (
+	"context"
+	"fmt"
+	"github.com/axzilla/templui/internal/utils"
+)
+
+type Orientation string
+type Size string
+type Status string
+
+const (
+	OrientationHorizontal Orientation = "horizontal"
+	OrientationVertical   Orientation = "vertical"
+)
+
+const (
+	SizeSm Size = "sm"
+	SizeMd Size = "md"
+	SizeLg Size = "lg"
+)
+
+const (
+	StatusActive     Status = "active"
+	StatusCompleted  Status = "completed"
+	StatusIncomplete Status = "incomplete"
+	StatusError      Status = "error"
+)
+
+type Props struct {
+	ID          string
+	Class       string
+	Attributes  templ.Attributes
+	Orientation Orientation
+	Size        Size
+	CurrentStep int
+}
+
+type StepProps struct {
+	ID          string
+	Class       string
+	Attributes  templ.Attributes
+	Number      int
+	Status      Status
+	Title       string
+	Description string
+	StepperID   string
+}
+
+type StepContentProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Number     int
+	StepperID  string
+}
+
+type NextProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	For        string // ID of the stepper to control
+}
+
+type PrevProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	For        string // ID of the stepper to control
+}
+
+type GoToProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	For        string // ID of the stepper to control
+	Step       int    // Step number to go to
+}
+
+templ Stepper(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ stepperID := p.ID }}
+	if stepperID == "" {
+		{{ stepperID = utils.RandomID() }}
+	}
+	if p.Orientation == "" {
+		{{ p.Orientation = OrientationHorizontal }}
+	}
+	if p.Size == "" {
+		{{ p.Size = SizeMd }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge(orientationClasses(p.Orientation), p.Class) }
+		data-stepper
+		data-stepper-id={ stepperID }
+		data-orientation={ string(p.Orientation) }
+		data-current-step={ fmt.Sprintf("%d", p.CurrentStep) }
+		{ p.Attributes... }
+	>
+		{{ ctx = context.WithValue(ctx, "stepperID", stepperID) }}
+		{{ ctx = context.WithValue(ctx, "stepperOrientation", p.Orientation) }}
+		{{ ctx = context.WithValue(ctx, "stepperSize", p.Size) }}
+		{ children... }
+	</div>
+}
+
+templ Step(props ...StepProps) {
+	{{ var p StepProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ stepperID := p.StepperID }}
+	if stepperID == "" {
+		{{ stepperID = IDFromContext(ctx) }}
+	}
+	{{ orientation := OrientationFromContext(ctx) }}
+	{{ size := SizeFromContext(ctx) }}
+	if p.Status == "" {
+		{{ p.Status = StatusIncomplete }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"relative flex items-center",
+				stepClasses(orientation),
+				p.Class,
+			),
+		}
+		data-step
+		data-step-number={ fmt.Sprintf("%d", p.Number) }
+		data-stepper-id={ stepperID }
+		data-status={ string(p.Status) }
+		{ p.Attributes... }
+	>
+		<button
+			type="button"
+			class={
+				utils.TwMerge(
+					"relative z-10 flex items-center justify-center rounded-full transition-all",
+					"focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
+					stepButtonClasses(p.Status),
+					stepSizeClasses(size),
+				),
+			}
+			data-step-trigger
+			aria-current={ utils.If(p.Status == StatusActive, "step") }
+		>
+			if p.Status == StatusCompleted {
+				<svg class={ iconSizeClasses(size) } fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+				</svg>
+			} else {
+				<span class={ textSizeClasses(size) }>{ fmt.Sprintf("%d", p.Number) }</span>
+			}
+		</button>
+		<div class={ utils.TwMerge("ml-4", utils.If(orientation == OrientationVertical, "flex-1")) }>
+			if p.Title != "" {
+				<h3 class={ utils.TwMerge("font-medium", titleSizeClasses(size)) }>{ p.Title }</h3>
+			}
+			if p.Description != "" {
+				<p class={ utils.TwMerge("text-muted-foreground", descriptionSizeClasses(size)) }>{ p.Description }</p>
+			}
+		</div>
+		if orientation == OrientationHorizontal {
+			<div 
+				class="flex-1 h-[2px] ml-4"
+				data-step-connector
+			>
+				<div class={ utils.TwMerge("h-full transition-all", connectorClasses(p.Status)) }></div>
+			</div>
+		} else if orientation == OrientationVertical {
+			<div 
+				class="absolute left-[20px] top-[44px] w-[2px] h-[calc(100%-44px)]"
+				data-step-connector
+			>
+				<div class={ utils.TwMerge("w-full h-full transition-all", connectorClasses(p.Status)) }></div>
+			</div>
+		}
+	</div>
+}
+
+templ StepContent(props ...StepContentProps) {
+	{{ var p StepContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ stepperID := p.StepperID }}
+	if stepperID == "" {
+		{{ stepperID = IDFromContext(ctx) }}
+	}
+	{{ orientation := OrientationFromContext(ctx) }}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"transition-all",
+				utils.If(orientation == OrientationVertical, "ml-12 mb-8"),
+				p.Class,
+			),
+		}
+		data-step-content
+		data-step-number={ fmt.Sprintf("%d", p.Number) }
+		data-stepper-id={ stepperID }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+func IDFromContext(ctx context.Context) string {
+	if stepperID, ok := ctx.Value("stepperID").(string); ok {
+		return stepperID
+	}
+	return ""
+}
+
+func OrientationFromContext(ctx context.Context) Orientation {
+	if orientation, ok := ctx.Value("stepperOrientation").(Orientation); ok {
+		return orientation
+	}
+	return OrientationHorizontal
+}
+
+func SizeFromContext(ctx context.Context) Size {
+	if size, ok := ctx.Value("stepperSize").(Size); ok {
+		return size
+	}
+	return SizeMd
+}
+
+func orientationClasses(orientation Orientation) string {
+	switch orientation {
+	case OrientationVertical:
+		return "flex flex-col space-y-4"
+	default:
+		return "flex flex-col space-y-8"
+	}
+}
+
+func stepClasses(orientation Orientation) string {
+	switch orientation {
+	case OrientationVertical:
+		return "flex-col items-start"
+	default:
+		return "flex-row"
+	}
+}
+
+func stepButtonClasses(status Status) string {
+	switch status {
+	case StatusActive:
+		return "bg-primary text-primary-foreground"
+	case StatusCompleted:
+		return "bg-primary text-primary-foreground"
+	case StatusError:
+		return "bg-destructive text-destructive-foreground"
+	default:
+		return "bg-muted text-muted-foreground"
+	}
+}
+
+func stepSizeClasses(size Size) string {
+	switch size {
+	case SizeSm:
+		return "w-8 h-8"
+	case SizeLg:
+		return "w-12 h-12"
+	default:
+		return "w-10 h-10"
+	}
+}
+
+func iconSizeClasses(size Size) string {
+	switch size {
+	case SizeSm:
+		return "w-4 h-4"
+	case SizeLg:
+		return "w-6 h-6"
+	default:
+		return "w-5 h-5"
+	}
+}
+
+func textSizeClasses(size Size) string {
+	switch size {
+	case SizeSm:
+		return "text-xs"
+	case SizeLg:
+		return "text-lg"
+	default:
+		return "text-sm"
+	}
+}
+
+func titleSizeClasses(size Size) string {
+	switch size {
+	case SizeSm:
+		return "text-sm"
+	case SizeLg:
+		return "text-lg"
+	default:
+		return "text-base"
+	}
+}
+
+func descriptionSizeClasses(size Size) string {
+	switch size {
+	case SizeSm:
+		return "text-xs"
+	case SizeLg:
+		return "text-base"
+	default:
+		return "text-sm"
+	}
+}
+
+func connectorClasses(status Status) string {
+	switch status {
+	case StatusCompleted:
+		return "bg-primary"
+	default:
+		return "bg-muted"
+	}
+}
+
+templ Next(props ...NextProps) {
+	{{ var p NextProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		if p.For != "" {
+			data-stepper-next={ p.For }
+		} else {
+			data-stepper-next
+		}
+		class={ utils.TwMerge("inline-flex cursor-pointer", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}
+
+templ Prev(props ...PrevProps) {
+	{{ var p PrevProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		if p.For != "" {
+			data-stepper-prev={ p.For }
+		} else {
+			data-stepper-prev
+		}
+		class={ utils.TwMerge("inline-flex cursor-pointer", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}
+
+templ GoTo(props ...GoToProps) {
+	{{ var p GoToProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		if p.For != "" {
+			data-stepper-goto={ p.For }
+		} else {
+			data-stepper-goto
+		}
+		data-stepper-goto-step={ fmt.Sprintf("%d", p.Step) }
+		class={ utils.TwMerge("inline-flex cursor-pointer", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}

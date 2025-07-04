@@ -15,6 +15,7 @@ import "./progress/progress.js";
 import "./rating/rating.js";
 import "./selectbox/selectbox.js";
 import "./slider/slider.js";
+import "./stepper/stepper.js";
 import "./tabs/tabs.js";
 import "./tagsinput/tagsinput.js";
 import "./textarea/textarea.js";

@@ -1,0 +1,69 @@
+package showcase
+
+import (
+	"github.com/axzilla/templui/internal/components/button"
+	"github.com/axzilla/templui/internal/components/stepper"
+)
+
+templ StepperVertical() {
+	@stepper.Stepper(stepper.Props{
+		ID:          "vertical-stepper",
+		Orientation: stepper.OrientationVertical,
+		CurrentStep: 2,
+	}) {
+		@stepper.Step(stepper.StepProps{
+			Number:      1,
+			Title:       "Create Account",
+			Description: "Set up your new account",
+			Status:      stepper.StatusCompleted,
+		})
+		@stepper.StepContent(stepper.StepContentProps{
+			Number: 1,
+		}) {
+			<div class="p-4 rounded-lg bg-muted">
+				<p class="text-sm">Account created successfully!</p>
+			</div>
+		}
+		@stepper.Step(stepper.StepProps{
+			Number:      2,
+			Title:       "Verify Email",
+			Description: "Confirm your email address",
+			Status:      stepper.StatusActive,
+		})
+		@stepper.StepContent(stepper.StepContentProps{
+			Number: 2,
+		}) {
+			<div class="p-4 rounded-lg border">
+				<p class="text-sm mb-4">We've sent a verification email to your address.</p>
+				@button.Button(button.Props{}) {
+					Resend Email
+				}
+			</div>
+		}
+		@stepper.Step(stepper.StepProps{
+			Number:      3,
+			Title:       "Complete Profile",
+			Description: "Add your personal details",
+		})
+		@stepper.StepContent(stepper.StepContentProps{
+			Number: 3,
+		}) {
+			<div class="p-4 rounded-lg bg-muted">
+				<p class="text-sm">Complete your profile to get started.</p>
+			</div>
+		}
+		@stepper.Step(stepper.StepProps{
+			Number:      4,
+			Title:       "Welcome!",
+			Description: "You're all set",
+		})
+		@stepper.StepContent(stepper.StepContentProps{
+			Number: 4,
+		}) {
+			<div class="p-4 rounded-lg bg-muted">
+				<p class="text-sm">Welcome to our platform!</p>
+			</div>
+		}
+	}
+}
+

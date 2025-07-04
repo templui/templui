@@ -144,6 +144,7 @@ func main() {
 	mux.Handle("GET /docs/components/skeleton", templ.Handler(pages.Skeleton()))
 	mux.Handle("GET /docs/components/slider", templ.Handler(pages.Slider()))
 	mux.Handle("GET /docs/components/spinner", templ.Handler(pages.Spinner()))
+	mux.Handle("GET /docs/components/stepper", templ.Handler(pages.Stepper()))
 	mux.Handle("GET /docs/components/table", templ.Handler(pages.Table()))
 	mux.Handle("GET /docs/components/tabs", templ.Handler(pages.Tabs()))
 	mux.Handle("GET /docs/components/tags-input", templ.Handler(pages.TagsInput()))

@@ -227,6 +227,13 @@
       "dependencies": []
     },
     {
+      "name": "stepper",
+      "description": "Step-by-step navigation",
+      "files": ["internal/components/stepper/stepper.templ"],
+      "dependencies": ["icon"],
+      "hasJS": true
+    },
+    {
       "name": "table",
       "description": "Data table display",
       "files": ["internal/components/table/table.templ"],

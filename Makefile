@@ -79,6 +79,7 @@ minify-js-components:
 		internal/components/rating/rating.js \
 		internal/components/selectbox/selectbox.js \
 		internal/components/slider/slider.js \
+		internal/components/slider/stepper.js \
 		internal/components/tabs/tabs.js \
 		internal/components/tagsinput/tagsinput.js \
 		internal/components/textarea/textarea.js \

@@ -1,0 +1,30 @@
+package showcase
+
+import (
+	"github.com/axzilla/templui/internal/components/stepper"
+)
+
+templ StepperError() {
+	@stepper.Stepper(stepper.Props{
+		ID:          "error-stepper",
+		CurrentStep: 2,
+	}) {
+		@stepper.Step(stepper.StepProps{
+			Number:      1,
+			Title:       "Account Setup",
+			Description: "Basic information",
+			Status:      stepper.StatusCompleted,
+		})
+		@stepper.Step(stepper.StepProps{
+			Number:      2,
+			Title:       "Verification Failed",
+			Description: "Unable to verify",
+			Status:      stepper.StatusError,
+		})
+		@stepper.Step(stepper.StepProps{
+			Number:      3,
+			Title:       "Complete Setup",
+			Description: "Final steps",
+		})
+	}
+}

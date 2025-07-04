@@ -1,0 +1,267 @@
+package showcase
+
+import (
+	"github.com/axzilla/templui/internal/components/button"
+	"github.com/axzilla/templui/internal/components/card"
+	"github.com/axzilla/templui/internal/components/input"
+	"github.com/axzilla/templui/internal/components/stepper"
+	"github.com/axzilla/templui/internal/components/textarea"
+)
+
+templ StepperDefault() {
+	@stepper.Stepper(stepper.Props{
+		ID:          "checkout-stepper",
+		CurrentStep: 2,
+	}) {
+		@stepper.Step(stepper.StepProps{
+			Number:      1,
+			Title:       "Personal Info",
+			Description: "Enter your details",
+			Status:      stepper.StatusCompleted,
+		})
+		@stepper.Step(stepper.StepProps{
+			Number:      2,
+			Title:       "Shipping",
+			Description: "Choose delivery method",
+			Status:      stepper.StatusActive,
+		})
+		@stepper.Step(stepper.StepProps{
+			Number:      3,
+			Title:       "Payment",
+			Description: "Add payment details",
+		})
+		@stepper.Step(stepper.StepProps{
+			Number:      4,
+			Title:       "Review",
+			Description: "Confirm your order",
+		})
+		<div class="mt-8">
+			@stepper.StepContent(stepper.StepContentProps{
+				Number: 1,
+			}) {
+				@PersonalInfoStep()
+			}
+			@stepper.StepContent(stepper.StepContentProps{
+				Number: 2,
+			}) {
+				@ShippingStep()
+			}
+			@stepper.StepContent(stepper.StepContentProps{
+				Number: 3,
+			}) {
+				@PaymentStep()
+			}
+			@stepper.StepContent(stepper.StepContentProps{
+				Number: 4,
+			}) {
+				@ReviewStep()
+			}
+		</div>
+	}
+}
+
+templ PersonalInfoStep() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Personal Information
+			}
+			@card.Description() {
+				Please provide your personal details for order processing.
+			}
+		}
+		@card.Content() {
+			<div class="flex flex-col gap-4">
+				@input.Input(input.Props{
+					Type:        input.TypeText,
+					Placeholder: "First Name",
+					ID:          "first_name",
+				})
+				@input.Input(input.Props{
+					Type:        input.TypeText,
+					Placeholder: "Last Name",
+					ID:          "last_name",
+				})
+				@input.Input(input.Props{
+					Type:        input.TypeEmail,
+					Placeholder: "Email",
+					ID:          "email",
+				})
+			</div>
+		}
+		@card.Footer() {
+			<div class="flex justify-end">
+				@stepper.Next(stepper.NextProps{
+					For: "checkout-stepper",
+				}) {
+					@button.Button() {
+						Next
+					}
+				}
+			</div>
+		}
+	}
+}
+
+templ ShippingStep() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Shipping Information
+			}
+			@card.Description() {
+				Enter your shipping address and select delivery method.
+			}
+		}
+		@card.Content() {
+			<div class="flex flex-col gap-4">
+				@input.Input(input.Props{
+					Type:        input.TypeText,
+					Placeholder: "Street Address",
+					ID:          "address",
+				})
+				@input.Input(input.Props{
+					Type:        input.TypeText,
+					Placeholder: "City",
+					ID:          "city",
+				})
+				<div class="grid grid-cols-2 gap-4">
+					@input.Input(input.Props{
+						Type:        input.TypeText,
+						Placeholder: "State",
+						ID:          "state",
+					})
+					@input.Input(input.Props{
+						Type:        input.TypeText,
+						Placeholder: "Zip Code",
+						ID:          "zip",
+					})
+				</div>
+			</div>
+		}
+		@card.Footer() {
+			<div class="flex justify-between">
+				@stepper.Prev(stepper.PrevProps{
+					For: "checkout-stepper",
+				}) {
+					@button.Button(button.Props{
+						Variant: button.VariantOutline,
+					}) {
+						Previous
+					}
+				}
+				@stepper.Next(stepper.NextProps{
+					For: "checkout-stepper",
+				}) {
+					@button.Button() {
+						Next
+					}
+				}
+			</div>
+		}
+	}
+}
+
+templ PaymentStep() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Payment Method
+			}
+			@card.Description() {
+				Add your payment details securely.
+			}
+		}
+		@card.Content() {
+			<div class="flex flex-col gap-4">
+				@input.Input(input.Props{
+					Type:        input.TypeText,
+					Placeholder: "Card Number",
+					ID:          "card_number",
+				})
+				@input.Input(input.Props{
+					Type:        input.TypeText,
+					Placeholder: "Cardholder Name",
+					ID:          "card_name",
+				})
+				<div class="grid grid-cols-2 gap-4">
+					@input.Input(input.Props{
+						Type:        input.TypeText,
+						Placeholder: "MM/YY",
+						ID:          "expiry",
+					})
+					@input.Input(input.Props{
+						Type:        input.TypeText,
+						Placeholder: "CVV",
+						ID:          "cvv",
+					})
+				</div>
+			</div>
+		}
+		@card.Footer() {
+			<div class="flex justify-between">
+				@stepper.Prev(stepper.PrevProps{
+					For: "checkout-stepper",
+				}) {
+					@button.Button(button.Props{
+						Variant: button.VariantOutline,
+					}) {
+						Previous
+					}
+				}
+				@stepper.Next(stepper.NextProps{
+					For: "checkout-stepper",
+				}) {
+					@button.Button() {
+						Next
+					}
+				}
+			</div>
+		}
+	}
+}
+
+templ ReviewStep() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Order Review
+			}
+			@card.Description() {
+				Review your order details before confirmation.
+			}
+		}
+		@card.Content() {
+			<div class="space-y-4">
+				<div class="p-4 rounded-lg bg-muted">
+					<h4 class="font-medium mb-2">Order Summary</h4>
+					<p class="text-sm text-muted-foreground">Please review all the information you have provided.</p>
+				</div>
+				@textarea.Textarea(textarea.Props{
+					Placeholder: "Special instructions (optional)",
+					ID:          "instructions",
+					Rows:        3,
+				})
+			</div>
+		}
+		@card.Footer() {
+			<div class="flex justify-between">
+				@stepper.Prev(stepper.PrevProps{
+					For: "checkout-stepper",
+				}) {
+					@button.Button(button.Props{
+						Variant: button.VariantOutline,
+					}) {
+						Previous
+					}
+				}
+				@button.Button(button.Props{
+					Variant: button.VariantDefault,
+				}) {
+					Place Order
+				}
+			</div>
+		}
+	}
+}
+

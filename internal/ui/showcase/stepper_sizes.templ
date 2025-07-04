@@ -1,0 +1,78 @@
+package showcase
+
+import (
+	"github.com/axzilla/templui/internal/components/stepper"
+)
+
+templ StepperSizes() {
+	<div class="space-y-12">
+		<div>
+			<h3 class="text-sm font-medium mb-4">Small</h3>
+			@stepper.Stepper(stepper.Props{
+				Size:        stepper.SizeSm,
+				CurrentStep: 2,
+			}) {
+				@stepper.Step(stepper.StepProps{
+					Number: 1,
+					Title:  "Step 1",
+					Status: stepper.StatusCompleted,
+				})
+				@stepper.Step(stepper.StepProps{
+					Number: 2,
+					Title:  "Step 2",
+					Status: stepper.StatusActive,
+				})
+				@stepper.Step(stepper.StepProps{
+					Number: 3,
+					Title:  "Step 3",
+				})
+			}
+		</div>
+		
+		<div>
+			<h3 class="text-sm font-medium mb-4">Medium (Default)</h3>
+			@stepper.Stepper(stepper.Props{
+				Size:        stepper.SizeMd,
+				CurrentStep: 2,
+			}) {
+				@stepper.Step(stepper.StepProps{
+					Number: 1,
+					Title:  "Step 1",
+					Status: stepper.StatusCompleted,
+				})
+				@stepper.Step(stepper.StepProps{
+					Number: 2,
+					Title:  "Step 2",
+					Status: stepper.StatusActive,
+				})
+				@stepper.Step(stepper.StepProps{
+					Number: 3,
+					Title:  "Step 3",
+				})
+			}
+		</div>
+		
+		<div>
+			<h3 class="text-sm font-medium mb-4">Large</h3>
+			@stepper.Stepper(stepper.Props{
+				Size:        stepper.SizeLg,
+				CurrentStep: 2,
+			}) {
+				@stepper.Step(stepper.StepProps{
+					Number: 1,
+					Title:  "Step 1",
+					Status: stepper.StatusCompleted,
+				})
+				@stepper.Step(stepper.StepProps{
+					Number: 2,
+					Title:  "Step 2",
+					Status: stepper.StatusActive,
+				})
+				@stepper.Step(stepper.StepProps{
+					Number: 3,
+					Title:  "Step 3",
+				})
+			}
+		</div>
+	</div>
+}
