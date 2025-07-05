@@ -8,6 +8,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/axzilla/templui/internal/ui/showcase"
+	"github.com/axzilla/templui/internal/ui/showcase/selectbox"
 )
 
 func writeHTML(filename string, c templ.Component) error {
@@ -192,10 +193,10 @@ func main() {
 		"out/showcase/rating_with_label.html": showcase.RatingWithLabel(),
 
 		// Select Box
-		"out/showcase/select_box_default.html":    showcase.SelectBoxDefault(),
-		"out/showcase/select_box_disabled.html":   showcase.SelectBoxDisabled(),
-		"out/showcase/select_box_form.html":       showcase.SelectBoxForm(),
-		"out/showcase/select_box_with_label.html": showcase.SelectBoxWithLabel(),
+		"out/showcase/select_box_default.html":    selectbox.SelectBoxDefault(),
+		"out/showcase/select_box_disabled.html":   selectbox.SelectBoxDisabled(),
+		"out/showcase/select_box_form.html":       selectbox.SelectBoxForm(),
+		"out/showcase/select_box_with_label.html": selectbox.SelectBoxWithLabel(),
 
 		// Separator
 		"out/showcase/separator_decorated.html": showcase.SeparatorDecorated(),
