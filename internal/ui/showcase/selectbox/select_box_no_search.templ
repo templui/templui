@@ -1,16 +1,16 @@
-package showcase
+package selectbox
 
 import "github.com/axzilla/templui/internal/components/selectbox"
 
-templ SelectBoxMultipleSelect() {
+templ SelectBoxNoSearch() {
 	<div class="w-full max-w-sm">
 		@selectbox.SelectBox() {
-			@selectbox.Trigger(selectbox.TriggerProps{Multiple: true}) {
+			@selectbox.Trigger() {
 				@selectbox.Value(selectbox.ValueProps{
 					Placeholder: "Select a fruit",
 				})
 			}
-			@selectbox.Content() {
+			@selectbox.Content(selectbox.ContentProps{NoSearch: true}) {
 				@selectbox.Group() {
 					@selectbox.Label() {
 						Fruits

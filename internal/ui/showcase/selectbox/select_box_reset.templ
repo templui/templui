@@ -1,0 +1,231 @@
+package selectbox
+
+import (
+	"github.com/axzilla/templui/internal/components/selectbox"
+	"github.com/axzilla/templui/internal/components/button"
+	"github.com/axzilla/templui/internal/components/icon"
+)
+
+templ SelectBoxReset() {
+	// Example 1: SelectBox with internal reset button
+	<div class="space-y-8">
+		<div>
+			<h3 class="text-lg font-semibold mb-4">With Internal Reset Button</h3>
+			<div class="max-w-sm">
+				@selectbox.SelectBox(selectbox.Props{
+					ID: "select-with-reset",
+					Attributes: templ.Attributes{
+						"data-show-reset": "true",
+					},
+				}) {
+					@selectbox.Trigger(selectbox.TriggerProps{
+						Name: "country",
+					}) {
+						@selectbox.Value(selectbox.ValueProps{
+							Placeholder: "Select a country",
+						})
+					}
+					@selectbox.Content(selectbox.ContentProps{
+						SearchPlaceholder: "Search countries...",
+					}) {
+						@selectbox.Item(selectbox.ItemProps{Value: "us"}) {
+							United States 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "ca"}) {
+							Canada 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "mx"}) {
+							Mexico 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "uk"}) {
+							United Kingdom 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "de"}) {
+							Germany 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "fr"}) {
+							France 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "jp"}) {
+							Japan 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "cn"}) {
+							China 
+						}
+					}
+				}
+			</div>
+		</div>
+		// Example 2: SelectBox with external reset button
+		<div>
+			<h3 class="text-lg font-semibold mb-4">With External Reset Button</h3>
+			<div class="max-w-sm space-y-4">
+				@selectbox.SelectBox(selectbox.Props{
+					ID: "select-external-reset",
+				}) {
+					@selectbox.Trigger(selectbox.TriggerProps{
+						Name: "language",
+					}) {
+						@selectbox.Value(selectbox.ValueProps{
+							Placeholder: "Select a language",
+						})
+					}
+					@selectbox.Content(selectbox.ContentProps{
+						SearchPlaceholder: "Search languages...",
+					}) {
+						@selectbox.Item(selectbox.ItemProps{Value: "en", Selected: true}) {
+							English 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "es"}) {
+							Spanish 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "fr"}) {
+							French 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "de"}) {
+							German 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "it"}) {
+							Italian 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "pt"}) {
+							Portuguese 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "ru"}) {
+							Russian 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "zh"}) {
+							Chinese 
+						}
+					}
+				}
+				@button.Button(button.Props{
+					Variant: button.VariantOutline,
+					Attributes: templ.Attributes{
+						"data-selectbox-reset": "#select-external-reset",
+					},
+				}) {
+					@icon.X(icon.Props{Size: 16, Class: "mr-2"})
+					Clear Selection
+				}
+			</div>
+		</div>
+		// Example 3: Multiple SelectBox with reset
+		<div>
+			<h3 class="text-lg font-semibold mb-4">Multiple Selection with Reset</h3>
+			<div class="max-w-sm space-y-4">
+				@selectbox.SelectBox(selectbox.Props{
+					ID: "select-multiple-reset",
+					Attributes: templ.Attributes{
+						"data-show-reset": "true",
+					},
+				}) {
+					@selectbox.Trigger(selectbox.TriggerProps{
+						Name:      "skills",
+						Multiple:  true,
+						ShowPills: true,
+					}) {
+						@selectbox.Value(selectbox.ValueProps{
+							Placeholder: "Select skills",
+						})
+					}
+					@selectbox.Content(selectbox.ContentProps{
+						SearchPlaceholder: "Search skills...",
+					}) {
+						@selectbox.Item(selectbox.ItemProps{Value: "javascript", Selected: true}) {
+							JavaScript 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "typescript", Selected: true}) {
+							TypeScript 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "go"}) {
+							Go 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "python"}) {
+							Python 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "rust"}) {
+							Rust 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "java"}) {
+							Java 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "csharp"}) {
+							C# 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "php"}) {
+							PHP 
+						}
+					}
+				}
+			</div>
+		</div>
+		// Example 4: Programmatic reset via API
+		<div>
+			<h3 class="text-lg font-semibold mb-4">Programmatic Reset via API</h3>
+			<div class="max-w-sm space-y-4">
+				@selectbox.SelectBox(selectbox.Props{
+					ID: "select-api-reset",
+				}) {
+					@selectbox.Trigger(selectbox.TriggerProps{
+						Name: "framework",
+					}) {
+						@selectbox.Value(selectbox.ValueProps{
+							Placeholder: "Select a framework",
+						})
+					}
+					@selectbox.Content(selectbox.ContentProps{
+						SearchPlaceholder: "Search frameworks...",
+					}) {
+						@selectbox.Item(selectbox.ItemProps{Value: "react"}) {
+							React 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "vue"}) {
+							Vue 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "angular"}) {
+							Angular 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "svelte"}) {
+							Svelte 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "solid"}) {
+							Solid 
+						}
+						@selectbox.Item(selectbox.ItemProps{Value: "templ"}) {
+							Templ 
+						}
+					}
+				}
+				<div class="flex gap-2">
+					@button.Button(button.Props{
+						Variant: button.VariantOutline,
+						Attributes: templ.Attributes{
+							"onclick": "window.templUI.selectbox.setValue('#select-api-reset', 'react')",
+						},
+					}) {
+						Set React
+					}
+					@button.Button(button.Props{
+						Variant: button.VariantOutline,
+						Attributes: templ.Attributes{
+							"onclick": "window.templUI.selectbox.reset('#select-api-reset')",
+						},
+					}) {
+						Reset via API
+					}
+					@button.Button(button.Props{
+						Variant: button.VariantOutline,
+						Attributes: templ.Attributes{
+							"onclick": "console.log('Current value:', window.templUI.selectbox.getValue('#select-api-reset'))",
+						},
+					}) {
+						Log Value
+					}
+				</div>
+			</div>
+		</div>
+		// Code example removed from showcase to avoid circular imports
+		// See select_box.templ page for full API documentation
+	</div>
+}

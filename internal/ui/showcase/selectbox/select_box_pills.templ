@@ -1,11 +1,11 @@
-package showcase
+package selectbox
 
 import "github.com/axzilla/templui/internal/components/selectbox"
 
 templ SelectBoxMultipleSelectPills() {
 	<div class="w-full max-w-sm">
 		@selectbox.SelectBox() {
-			@selectbox.Trigger(selectbox.TriggerProps{ShowPills: true,}) {
+			@selectbox.Trigger(selectbox.TriggerProps{ShowPills: true}) {
 				@selectbox.Value(selectbox.ValueProps{
 					Placeholder: "Select a fruit",
 				})

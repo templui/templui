@@ -1,446 +1,655 @@
 (function () {
-  let isSelecting = false;
-
-  function initSelect(wrapper) {
-    if (!wrapper || wrapper.hasAttribute("data-initialized")) return;
-    wrapper.setAttribute("data-initialized", "true");
-
-    const triggerButton = wrapper.querySelector("button.select-trigger");
-    if (!triggerButton) {
-      console.error(
-        "Select box: Trigger button (.select-trigger) not found in wrapper",
-        wrapper
-      );
-      return;
-    }
-
-    const contentID = triggerButton.dataset.contentId;
-    const isMultiple = triggerButton.dataset.multiple === "true";
-    const showPills = triggerButton.dataset.showPills === "true";
-    const content = contentID ? document.getElementById(contentID) : null;
-    const valueEl = triggerButton.querySelector(".select-value");
-    const hiddenInput = triggerButton.querySelector('input[type="hidden"]');
-
-    if (!content || !valueEl || !hiddenInput) {
-      console.error(
-        "Select box: Missing required elements for initialization.",
-        {
-          wrapper,
-          contentID,
-          contentExists: !!content,
-          valueElExists: !!valueEl,
-          hiddenInputExists: !!hiddenInput,
-        }
-      );
-      return;
-    }
-
-    // Add keyboard event handler for trigger button
-    triggerButton.addEventListener("keydown", (event) => {
-      if (
-        event.key.length === 1 ||
-        event.key === "Backspace" ||
-        event.key === "Delete"
-      ) {
-        event.preventDefault();
-        document.getElementById(contentID).click();
-        setTimeout(() => {
-          const searchInput = document.querySelector("[data-select-search]");
-          if (searchInput) {
-            searchInput.focus();
-            if (event.key !== "Backspace" && event.key !== "Delete") {
-              searchInput.value = event.key;
-            }
-          }
-        }, 0);
-      }
-    });
-
-    // Remove existing event listeners
-    const newContent = content.cloneNode(true);
-    content.parentNode.replaceChild(newContent, content);
-
-    // Search functionality
-    const searchInput = newContent.querySelector("[data-select-search]");
-    if (searchInput) {
-      // Focus search input when popover opens
-      const checkVisibility = () => {
-        const style = window.getComputedStyle(newContent);
-        if (
-          style.display !== "none" &&
-          style.visibility !== "hidden" &&
-          style.opacity !== "0"
-        ) {
-          searchInput.focus();
-        }
+  'use strict';
+  
+  // Instance storage using WeakMap for automatic garbage collection
+  const instances = new WeakMap();
+  
+  // SelectBox class for encapsulation
+  class SelectBox {
+    constructor(element, options = {}) {
+      this.element = element;
+      this.options = { ...SelectBox.defaults, ...options };
+      this.state = {
+        isSelecting: false,
+        selectedValues: new Set()
       };
-
-      // Focus when opened by click
-      document.addEventListener("click", (e) => {
-        if (triggerButton.contains(e.target)) {
-          setTimeout(checkVisibility, 50);
-        }
-      });
-
-      // Focus when opened by Enter key
-      triggerButton.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          setTimeout(checkVisibility, 50);
-        }
-      });
-
-      searchInput.addEventListener("input", (e) => {
-        const searchTerm = e.target.value.toLowerCase().trim();
-        const items = newContent.querySelectorAll(".select-item");
-
-        items.forEach((item) => {
-          const itemText =
-            item
-              .querySelector(".select-item-text")
-              ?.textContent.toLowerCase() || "";
-          const itemValue =
-            item.getAttribute("data-value")?.toLowerCase() || "";
-          const isVisible =
-            searchTerm === "" ||
-            itemText.includes(searchTerm) ||
-            itemValue.includes(searchTerm);
-
-          item.style.display = isVisible ? "" : "none";
-        });
-      });
+      this.listeners = new Map();
+      
+      this.init();
     }
-
-    // Keyboard navigation event listener
-    newContent.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-        e.preventDefault();
-        const visibleItems = Array.from(
-          newContent.querySelectorAll(".select-item")
-        ).filter((item) => item.style.display !== "none");
-
-        if (visibleItems.length === 0) return;
-
-        const currentFocused = newContent.querySelector(".select-item:focus");
-        let nextIndex = 0;
-
-        if (currentFocused) {
-          const currentIndex = visibleItems.indexOf(currentFocused);
-          if (e.key === "ArrowDown") {
-            nextIndex = (currentIndex + 1) % visibleItems.length;
-          } else {
-            nextIndex =
-              (currentIndex - 1 + visibleItems.length) % visibleItems.length;
-          }
-        }
-
-        visibleItems[nextIndex].focus();
-      } else if (e.key === "Enter") {
-        e.preventDefault();
-        const focusedItem = newContent.querySelector(".select-item:focus");
-        if (focusedItem) {
-          selectItem(focusedItem);
-        }
-      } else if (e.key === "Escape") {
-        e.preventDefault();
-        const focusedItem = newContent.querySelector(".select-item:focus");
-        if (focusedItem) {
-          // If focus is on an item, move to search input
-          searchInput.focus();
-        } else if (document.activeElement === searchInput) {
-          // If focus is on search input, close popover and return to trigger
-          if (window.closePopover) {
-            window.closePopover(contentID, true);
-            setTimeout(() => {
-              triggerButton.focus();
-            }, 50);
-          }
-        }
+    
+    static defaults = {
+      multiple: false,
+      showPills: false,
+      searchable: true,
+      closeOnSelect: true,
+      selectedCountText: '{n} items selected'
+    };
+    
+    init() {
+      // Mark as initialized
+      this.element.setAttribute('data-initialized', 'true');
+      
+      // Find elements
+      this.triggerButton = this.element.querySelector('button.select-trigger');
+      if (!this.triggerButton) {
+        console.error('SelectBox: Trigger button not found', this.element);
+        return;
       }
-    });
-
-    // Initialize display value if an item is pre-selected
-    const selectedItems = newContent.querySelectorAll(
-      '.select-item[data-selected="true"]'
-    );
-    if (selectedItems.length > 0) {
-      if (isMultiple) {
-        if (showPills) {
-          valueEl.innerHTML = "";
-          const pillsContainer = document.createElement("div");
-          pillsContainer.className =
-            "flex flex-nowrap overflow-hidden max-w-full whitespace-nowrap gap-1";
-          Array.from(selectedItems).forEach((selectedItem) => {
-            const pill = document.createElement("div");
-            pill.className =
-              "flex items-center gap-1 px-2 py-1 text-xs rounded-md bg-primary text-primary-foreground";
-            const pillText = document.createElement("span");
-            pillText.textContent =
-              selectedItem.querySelector(".select-item-text").textContent;
-            const closeButton = document.createElement("button");
-            closeButton.className = "hover:text-destructive focus:outline-none";
-            closeButton.innerHTML = "x";
-            closeButton.onclick = (e) => {
-              e.stopPropagation();
-              selectItem(selectedItem);
-            };
-            pill.appendChild(pillText);
-            pill.appendChild(closeButton);
-            pillsContainer.appendChild(pill);
-          });
-          valueEl.appendChild(pillsContainer);
-          valueEl.classList.remove("text-muted-foreground");
-
-          // Pills overflow control
+      
+      const contentID = this.triggerButton.dataset.contentId;
+      this.content = contentID ? document.getElementById(contentID) : null;
+      this.valueEl = this.triggerButton.querySelector('.select-value');
+      this.hiddenInput = this.triggerButton.querySelector('input[type="hidden"]');
+      
+      if (!this.content || !this.valueEl || !this.hiddenInput) {
+        console.error('SelectBox: Missing required elements', {
+          contentExists: !!this.content,
+          valueElExists: !!this.valueEl,
+          hiddenInputExists: !!this.hiddenInput
+        });
+        return;
+      }
+      
+      // Store placeholder
+      this.placeholder = this.valueEl.getAttribute('data-placeholder') || this.valueEl.textContent || '';
+      this.valueEl.setAttribute('data-placeholder', this.placeholder);
+      
+      // Parse options from data attributes
+      this.options.multiple = this.triggerButton.dataset.multiple === 'true';
+      this.options.showPills = this.triggerButton.dataset.showPills === 'true';
+      if (this.triggerButton.dataset.selectedCountText) {
+        this.options.selectedCountText = this.triggerButton.dataset.selectedCountText;
+      }
+      
+      // Initialize state from pre-selected items
+      this.initializeSelection();
+      
+      // Setup event handlers
+      this.setupEventHandlers();
+      
+      // Setup reset functionality
+      this.setupResetFunctionality();
+      
+      // Dispatch init event
+      this.element.dispatchEvent(new CustomEvent('selectbox:init', {
+        detail: { instance: this },
+        bubbles: true
+      }));
+    }
+    
+    initializeSelection() {
+      const selectedItems = this.content.querySelectorAll('.select-item[data-selected="true"]');
+      selectedItems.forEach(item => {
+        const value = item.getAttribute('data-value');
+        if (value) {
+          this.state.selectedValues.add(value);
+        }
+      });
+      
+      if (selectedItems.length > 0) {
+        this.updateDisplay();
+        this.updateHiddenInput();
+      }
+    }
+    
+    setupEventHandlers() {
+      // Keyboard navigation on trigger
+      this.addEventListener(this.triggerButton, 'keydown', (e) => {
+        if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete') {
+          e.preventDefault();
+          this.content.click();
           setTimeout(() => {
-            const pillsWidth = pillsContainer.scrollWidth;
-            const valueWidth = valueEl.clientWidth;
-            if (pillsWidth > valueWidth) {
-              const selectedCountText =
-                triggerButton.dataset.selectedCountText ||
-                `${selectedItems.length} items selected`;
-              const msg = selectedCountText.replace(
-                "{n}",
-                selectedItems.length
-              );
-              valueEl.innerHTML = msg;
-              valueEl.classList.remove("text-muted-foreground");
+            const searchInput = this.content.querySelector('[data-select-search]');
+            if (searchInput) {
+              searchInput.focus();
+              if (e.key !== 'Backspace' && e.key !== 'Delete') {
+                searchInput.value = e.key;
+              }
             }
           }, 0);
-        } else {
-          valueEl.textContent = `${selectedItems.length} items selected`;
-          valueEl.classList.remove("text-muted-foreground");
-        }
-        // Store selected values as CSV
-        const selectedValues = Array.from(selectedItems).map((item) =>
-          item.getAttribute("data-value")
-        );
-        hiddenInput.value = selectedValues.join(",");
-      } else {
-        // For single selection, show the selected item's text
-        const selectedItem = selectedItems[0];
-        const itemText = selectedItem.querySelector(".select-item-text");
-        if (itemText) {
-          valueEl.textContent = itemText.textContent;
-          valueEl.classList.remove("text-muted-foreground");
-        }
-        if (hiddenInput) {
-          const value = selectedItem.getAttribute("data-value") || "";
-          // Only set initial value if not already set
-          if (!hiddenInput.hasAttribute("data-initialized")) {
-            hiddenInput.value = value;
-            hiddenInput.setAttribute("data-initialized", "true");
-            hiddenInput.dispatchEvent(new Event("change", { bubbles: true }));
-          }
-        }
-      }
-    }
-
-    // Reset visual state of items
-    function resetItemStyles() {
-      newContent.querySelectorAll(".select-item").forEach((item) => {
-        if (item.getAttribute("data-selected") === "true") {
-          item.classList.add("bg-accent", "text-accent-foreground");
-          item.classList.remove("bg-muted");
-        } else {
-          item.classList.remove(
-            "bg-accent",
-            "text-accent-foreground",
-            "bg-muted"
-          );
         }
       });
+      
+      // Search functionality
+      const searchInput = this.content.querySelector('[data-select-search]');
+      if (searchInput) {
+        this.setupSearch(searchInput);
+      }
+      
+      // Keyboard navigation in content
+      this.addEventListener(this.content, 'keydown', (e) => this.handleContentKeydown(e));
+      
+      // Item selection - use event delegation to handle clicks after DOM moves
+      const handleItemClick = (e) => {
+        // Check if the click is within our content element
+        if (!this.content.contains(e.target)) return;
+        
+        const item = e.target.closest('.select-item');
+        if (item && item.getAttribute('data-disabled') !== 'true') {
+          this.selectItem(item);
+        }
+      };
+      
+      // Use document-level event delegation
+      document.addEventListener('click', handleItemClick);
+      // Store handler for cleanup
+      this.itemClickHandler = handleItemClick;
+      
+      // Hover effects
+      this.addEventListener(this.content, 'mouseover', (e) => {
+        const item = e.target.closest('.select-item');
+        if (item && item.getAttribute('data-disabled') !== 'true') {
+          this.highlightItem(item);
+        }
+      });
+      
+      this.addEventListener(this.content, 'mouseleave', () => {
+        this.resetItemStyles();
+      });
     }
-
-    // Select an item
-    function selectItem(item) {
-      if (!item || item.getAttribute("data-disabled") === "true" || isSelecting)
-        return;
-
-      isSelecting = true;
-
-      const value = item.getAttribute("data-value");
-      const itemText = item.querySelector(".select-item-text");
-
-      if (isMultiple) {
-        // Toggle selection for multiple mode
-        const isSelected = item.getAttribute("data-selected") === "true";
-        item.setAttribute("data-selected", (!isSelected).toString());
-
-        if (!isSelected) {
-          item.classList.add("bg-accent", "text-accent-foreground");
-          const check = item.querySelector(".select-check");
-          if (check) check.classList.replace("opacity-0", "opacity-100");
-        } else {
-          item.classList.remove("bg-accent", "text-accent-foreground");
-          const check = item.querySelector(".select-check");
-          if (check) check.classList.replace("opacity-100", "opacity-0");
+    
+    setupSearch(searchInput) {
+      // Focus when popover opens
+      const observer = new MutationObserver(() => {
+        const style = window.getComputedStyle(this.content);
+        if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
+          searchInput.focus();
         }
-
-        // Update display value
-        const selectedItems = newContent.querySelectorAll(
-          '.select-item[data-selected="true"]'
-        );
-        if (selectedItems.length > 0) {
-          if (showPills) {
-            // Clear existing content
-            valueEl.innerHTML = "";
-
-            // Create pills container
-            const pillsContainer = document.createElement("div");
-            pillsContainer.className =
-              "flex flex-nowrap overflow-hidden max-w-full whitespace-nowrap gap-1";
-
-            // Add pills for each selected item
-            Array.from(selectedItems).forEach((selectedItem) => {
-              const pill = document.createElement("div");
-              pill.className =
-                "flex items-center gap-1 px-2 py-0.5 text-xs rounded-full bg-accent text-accent-foreground";
-
-              const pillText = document.createElement("span");
-              pillText.textContent =
-                selectedItem.querySelector(".select-item-text").textContent;
-
-              const closeButton = document.createElement("button");
-              closeButton.className =
-                "hover:text-destructive focus:outline-none";
-              closeButton.innerHTML = "×";
-              closeButton.onclick = (e) => {
-                e.stopPropagation();
-                selectItem(selectedItem);
-              };
-
-              pill.appendChild(pillText);
-              pill.appendChild(closeButton);
-              pillsContainer.appendChild(pill);
-            });
-
-            valueEl.appendChild(pillsContainer);
-            valueEl.classList.remove("text-muted-foreground");
-
-            // Pills overflow kontrolü
-            setTimeout(() => {
-              const pillsWidth = pillsContainer.scrollWidth;
-              const valueWidth = valueEl.clientWidth;
-              if (pillsWidth > valueWidth) {
-                const selectedCountText =
-                  triggerButton.dataset.selectedCountText ||
-                  `${selectedItems.length} items selected`;
-                const msg = selectedCountText.replace(
-                  "{n}",
-                  selectedItems.length
-                );
-                valueEl.innerHTML = msg;
-                valueEl.classList.remove("text-muted-foreground");
-              }
-            }, 0);
-          } else {
-            valueEl.textContent = `${selectedItems.length} items selected`;
-            valueEl.classList.remove("text-muted-foreground");
-          }
-        } else {
-          valueEl.textContent = valueEl.getAttribute("data-placeholder") || "";
-          valueEl.classList.add("text-muted-foreground");
-        }
-
-        // Update hidden input with CSV of selected values
-        const selectedValues = Array.from(selectedItems).map((item) =>
-          item.getAttribute("data-value")
-        );
-        hiddenInput.value = selectedValues.join(",");
-        hiddenInput.dispatchEvent(new Event("change", { bubbles: true }));
-      } else {
-        // Single selection mode
-        // Reset all items in this content
-        newContent.querySelectorAll(".select-item").forEach((el) => {
-          el.setAttribute("data-selected", "false");
-          el.classList.remove(
-            "bg-accent",
-            "text-accent-foreground",
-            "bg-muted"
-          );
-          const check = el.querySelector(".select-check");
-          if (check) check.classList.replace("opacity-100", "opacity-0");
+      });
+      
+      observer.observe(this.content, {
+        attributes: true,
+        attributeFilter: ['style', 'class']
+      });
+      
+      // Search functionality
+      this.addEventListener(searchInput, 'input', (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        const items = this.content.querySelectorAll('.select-item');
+        
+        items.forEach(item => {
+          const itemText = item.querySelector('.select-item-text')?.textContent.toLowerCase() || '';
+          const itemValue = item.getAttribute('data-value')?.toLowerCase() || '';
+          const isVisible = searchTerm === '' || itemText.includes(searchTerm) || itemValue.includes(searchTerm);
+          
+          item.style.display = isVisible ? '' : 'none';
         });
-
-        // Mark new selection
-        item.setAttribute("data-selected", "true");
-        item.classList.add("bg-accent", "text-accent-foreground");
-        const check = item.querySelector(".select-check");
-        if (check) check.classList.replace("opacity-0", "opacity-100");
-
-        // Update display value
-        if (valueEl && itemText) {
-          valueEl.textContent = itemText.textContent;
-          valueEl.classList.remove("text-muted-foreground");
-        }
-
-        // Update hidden input & trigger change event
-        if (hiddenInput && value !== null) {
-          const oldValue = hiddenInput.value;
-          hiddenInput.value = value;
-
-          // Only trigger change if value actually changed
-          if (oldValue !== value) {
-            hiddenInput.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+    }
+    
+    setupResetFunctionality() {
+      // Check if internal reset button should be shown
+      const showReset = this.element.hasAttribute('data-show-reset') || 
+                       this.triggerButton.hasAttribute('data-show-reset');
+      
+      if (showReset) {
+        this.addInternalResetButton();
+      }
+      
+      // Setup external reset triggers with event delegation
+      // Store the handler so we can remove it later
+      this.externalResetHandler = (e) => {
+        const resetTrigger = e.target.closest('[data-selectbox-reset]');
+        if (resetTrigger) {
+          const selector = resetTrigger.getAttribute('data-selectbox-reset');
+          if (selector && (this.element.matches(selector) || this.element.id === selector.replace('#', ''))) {
+            e.preventDefault();
+            this.reset();
           }
         }
-
-        // Close the popover using the correct contentID
-        if (window.closePopover) {
-          window.closePopover(contentID, true);
-          // Return focus to trigger
-          setTimeout(() => {
-            triggerButton.focus();
-          }, 50);
-        } else {
-          console.warn("closePopover function not found");
+      };
+      
+      // Only add the listener once per instance
+      document.addEventListener('click', this.externalResetHandler);
+    }
+    
+    addInternalResetButton() {
+      // Create reset button container
+      const resetContainer = document.createElement('span');
+      resetContainer.className = 'select-reset-container ml-1';
+      resetContainer.style.display = 'none';
+      
+      // Create reset button
+      const resetButton = document.createElement('button');
+      resetButton.type = 'button';
+      resetButton.className = 'select-reset-button p-1 hover:text-destructive transition-colors';
+      resetButton.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+      resetButton.setAttribute('aria-label', 'Clear selection');
+      
+      resetContainer.appendChild(resetButton);
+      
+      // Insert before chevron
+      const chevron = this.triggerButton.querySelector('.pointer-events-none');
+      if (chevron) {
+        chevron.parentNode.insertBefore(resetContainer, chevron);
+      }
+      
+      // Handle reset click
+      this.addEventListener(resetButton, 'click', (e) => {
+        e.stopPropagation();
+        this.reset();
+      });
+      
+      this.resetContainer = resetContainer;
+      this.updateResetButtonVisibility();
+    }
+    
+    updateResetButtonVisibility() {
+      if (this.resetContainer) {
+        const hasSelection = this.state.selectedValues.size > 0;
+        this.resetContainer.style.display = hasSelection ? '' : 'none';
+      }
+    }
+    
+    handleContentKeydown(e) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const visibleItems = Array.from(this.content.querySelectorAll('.select-item'))
+          .filter(item => item.style.display !== 'none');
+        
+        if (visibleItems.length === 0) return;
+        
+        const currentFocused = this.content.querySelector('.select-item:focus');
+        let nextIndex = 0;
+        
+        if (currentFocused) {
+          const currentIndex = visibleItems.indexOf(currentFocused);
+          if (e.key === 'ArrowDown') {
+            nextIndex = (currentIndex + 1) % visibleItems.length;
+          } else {
+            nextIndex = (currentIndex - 1 + visibleItems.length) % visibleItems.length;
+          }
+        }
+        
+        visibleItems[nextIndex].focus();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const focusedItem = this.content.querySelector('.select-item:focus');
+        if (focusedItem) {
+          this.selectItem(focusedItem);
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        const searchInput = this.content.querySelector('[data-select-search]');
+        const focusedItem = this.content.querySelector('.select-item:focus');
+        
+        if (focusedItem && searchInput) {
+          searchInput.focus();
+        } else if (document.activeElement === searchInput) {
+          if (window.closePopover) {
+            window.closePopover(this.content.id, true);
+            setTimeout(() => this.triggerButton.focus(), 50);
+          }
         }
       }
-
+    }
+    
+    selectItem(item) {
+      if (this.state.isSelecting) return;
+      
+      this.state.isSelecting = true;
+      
+      const value = item.getAttribute('data-value');
+      const previousValues = new Set(this.state.selectedValues);
+      
+      if (this.options.multiple) {
+        // Toggle selection
+        if (this.state.selectedValues.has(value)) {
+          this.state.selectedValues.delete(value);
+          item.setAttribute('data-selected', 'false');
+          this.updateItemVisual(item, false);
+        } else {
+          this.state.selectedValues.add(value);
+          item.setAttribute('data-selected', 'true');
+          this.updateItemVisual(item, true);
+        }
+      } else {
+        // Single selection - clear others first
+        this.content.querySelectorAll('.select-item').forEach(el => {
+          el.setAttribute('data-selected', 'false');
+          this.updateItemVisual(el, false);
+        });
+        
+        this.state.selectedValues.clear();
+        this.state.selectedValues.add(value);
+        item.setAttribute('data-selected', 'true');
+        this.updateItemVisual(item, true);
+        
+        // Close popover for single selection
+        if (this.options.closeOnSelect && window.closePopover) {
+          window.closePopover(this.content.id, true);
+          setTimeout(() => this.triggerButton.focus(), 50);
+        }
+      }
+      
+      this.updateDisplay();
+      this.updateHiddenInput();
+      this.updateResetButtonVisibility();
+      
+      // Dispatch change event
+      this.element.dispatchEvent(new CustomEvent('selectbox:change', {
+        detail: { 
+          value: this.getValue(),
+          previousValue: Array.from(previousValues),
+          item: item
+        },
+        bubbles: true
+      }));
+      
       setTimeout(() => {
-        isSelecting = false;
+        this.state.isSelecting = false;
       }, 100);
     }
-
-    // Event Listeners for Items (delegated from content for robustness)
-    newContent.addEventListener("click", (e) => {
-      const item = e.target.closest(".select-item");
-      if (item) selectItem(item);
-    });
-
-    newContent.addEventListener("keydown", (e) => {
-      const item = e.target.closest(".select-item");
-      if (item && (e.key === "Enter" || e.key === " ")) {
-        e.preventDefault();
-        selectItem(item);
+    
+    updateItemVisual(item, selected) {
+      const check = item.querySelector('.select-check');
+      
+      if (selected) {
+        item.classList.add('bg-accent', 'text-accent-foreground');
+        if (check) check.classList.replace('opacity-0', 'opacity-100');
+      } else {
+        item.classList.remove('bg-accent', 'text-accent-foreground');
+        if (check) check.classList.replace('opacity-100', 'opacity-0');
       }
-    });
-
-    // Event: Mouse hover on items (delegated)
-    newContent.addEventListener("mouseover", (e) => {
-      const item = e.target.closest(".select-item");
-      if (!item || item.getAttribute("data-disabled") === "true") return;
-      // Reset all others first
-      newContent.querySelectorAll(".select-item").forEach((el) => {
-        el.classList.remove("bg-accent", "text-accent-foreground", "bg-muted");
+    }
+    
+    highlightItem(item) {
+      this.content.querySelectorAll('.select-item').forEach(el => {
+        if (el !== item) {
+          el.classList.remove('bg-accent', 'text-accent-foreground', 'bg-muted');
+        }
       });
-      // Apply hover style only if not selected
-      if (item.getAttribute("data-selected") !== "true") {
-        item.classList.add("bg-accent", "text-accent-foreground");
+      
+      if (item.getAttribute('data-selected') !== 'true') {
+        item.classList.add('bg-accent', 'text-accent-foreground');
       }
-    });
-
-    // Reset hover styles when mouse leaves the content area
-    newContent.addEventListener("mouseleave", resetItemStyles);
+    }
+    
+    resetItemStyles() {
+      this.content.querySelectorAll('.select-item').forEach(item => {
+        if (item.getAttribute('data-selected') === 'true') {
+          item.classList.add('bg-accent', 'text-accent-foreground');
+          item.classList.remove('bg-muted');
+        } else {
+          item.classList.remove('bg-accent', 'text-accent-foreground', 'bg-muted');
+        }
+      });
+    }
+    
+    updateDisplay() {
+      const selectedItems = Array.from(this.content.querySelectorAll('.select-item[data-selected="true"]'));
+      
+      if (selectedItems.length === 0) {
+        this.valueEl.textContent = this.placeholder;
+        this.valueEl.classList.add('text-muted-foreground');
+        return;
+      }
+      
+      this.valueEl.classList.remove('text-muted-foreground');
+      
+      if (this.options.multiple) {
+        if (this.options.showPills) {
+          this.renderPills(selectedItems);
+        } else {
+          const text = this.options.selectedCountText.replace('{n}', selectedItems.length);
+          this.valueEl.textContent = text;
+        }
+      } else {
+        const selectedItem = selectedItems[0];
+        const itemText = selectedItem.querySelector('.select-item-text');
+        if (itemText) {
+          this.valueEl.textContent = itemText.textContent;
+        }
+      }
+    }
+    
+    renderPills(selectedItems) {
+      this.valueEl.innerHTML = '';
+      
+      const pillsContainer = document.createElement('div');
+      pillsContainer.className = 'flex flex-nowrap overflow-hidden max-w-full whitespace-nowrap gap-1';
+      
+      selectedItems.forEach(item => {
+        const pill = document.createElement('div');
+        pill.className = 'flex items-center gap-1 px-2 py-0.5 text-xs rounded-full bg-accent text-accent-foreground';
+        
+        const pillText = document.createElement('span');
+        pillText.textContent = item.querySelector('.select-item-text').textContent;
+        
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'hover:text-destructive focus:outline-none';
+        closeButton.innerHTML = '×';
+        closeButton.onclick = (e) => {
+          e.stopPropagation();
+          this.selectItem(item);
+        };
+        
+        pill.appendChild(pillText);
+        pill.appendChild(closeButton);
+        pillsContainer.appendChild(pill);
+      });
+      
+      this.valueEl.appendChild(pillsContainer);
+      
+      // Check for overflow
+      setTimeout(() => {
+        const pillsWidth = pillsContainer.scrollWidth;
+        const valueWidth = this.valueEl.clientWidth;
+        if (pillsWidth > valueWidth) {
+          const text = this.options.selectedCountText.replace('{n}', selectedItems.length);
+          this.valueEl.textContent = text;
+        }
+      }, 0);
+    }
+    
+    updateHiddenInput() {
+      const values = Array.from(this.state.selectedValues);
+      const oldValue = this.hiddenInput.value;
+      const newValue = values.join(',');
+      
+      this.hiddenInput.value = newValue;
+      
+      if (oldValue !== newValue) {
+        this.hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+    
+    // Public API methods
+    getValue() {
+      if (this.options.multiple) {
+        return Array.from(this.state.selectedValues);
+      }
+      return this.state.selectedValues.size > 0 ? 
+        Array.from(this.state.selectedValues)[0] : null;
+    }
+    
+    setValue(value) {
+      const previousValues = new Set(this.state.selectedValues);
+      
+      // Clear current selection
+      this.state.selectedValues.clear();
+      this.content.querySelectorAll('.select-item').forEach(item => {
+        item.setAttribute('data-selected', 'false');
+        this.updateItemVisual(item, false);
+      });
+      
+      // Set new value(s)
+      const values = Array.isArray(value) ? value : [value];
+      values.forEach(val => {
+        if (val !== null && val !== undefined) {
+          const item = this.content.querySelector(`.select-item[data-value="${val}"]`);
+          if (item) {
+            this.state.selectedValues.add(val);
+            item.setAttribute('data-selected', 'true');
+            this.updateItemVisual(item, true);
+          }
+        }
+      });
+      
+      this.updateDisplay();
+      this.updateHiddenInput();
+      this.updateResetButtonVisibility();
+      
+      // Dispatch change event
+      this.element.dispatchEvent(new CustomEvent('selectbox:change', {
+        detail: { 
+          value: this.getValue(),
+          previousValue: Array.from(previousValues)
+        },
+        bubbles: true
+      }));
+    }
+    
+    reset() {
+      const previousValues = new Set(this.state.selectedValues);
+      
+      // Clear selection
+      this.state.selectedValues.clear();
+      this.content.querySelectorAll('.select-item').forEach(item => {
+        item.setAttribute('data-selected', 'false');
+        this.updateItemVisual(item, false);
+      });
+      
+      // Reset display
+      this.valueEl.textContent = this.placeholder;
+      this.valueEl.classList.add('text-muted-foreground');
+      
+      // Clear hidden input
+      this.hiddenInput.value = '';
+      this.hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+      
+      // Update reset button visibility
+      this.updateResetButtonVisibility();
+      
+      // Clear search if exists
+      const searchInput = this.content.querySelector('[data-select-search]');
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      
+      // Dispatch reset event
+      this.element.dispatchEvent(new CustomEvent('selectbox:reset', {
+        detail: { previousValue: Array.from(previousValues) },
+        bubbles: true
+      }));
+    }
+    
+    enable() {
+      this.triggerButton.disabled = false;
+      this.element.classList.remove('opacity-50');
+    }
+    
+    disable() {
+      this.triggerButton.disabled = true;
+      this.element.classList.add('opacity-50');
+    }
+    
+    destroy() {
+      // Remove event listeners
+      this.listeners.forEach((handler, key) => {
+        key.element.removeEventListener(key.event, handler);
+      });
+      this.listeners.clear();
+      
+      // Remove document-level item click handler
+      if (this.itemClickHandler) {
+        document.removeEventListener('click', this.itemClickHandler);
+      }
+      
+      // Remove external reset handler if it exists
+      if (this.externalResetHandler) {
+        document.removeEventListener('click', this.externalResetHandler);
+      }
+      
+      // Clean up state
+      this.element.removeAttribute('data-initialized');
+      
+      // Remove instance
+      instances.delete(this.element);
+      
+      // Dispatch destroy event
+      this.element.dispatchEvent(new CustomEvent('selectbox:destroy', {
+        detail: { instance: this },
+        bubbles: true
+      }));
+    }
+    
+    // Helper for managed event listeners
+    addEventListener(element, event, handler) {
+      element.addEventListener(event, handler);
+      // Store both element and event for proper cleanup
+      const key = { element, event };
+      this.listeners.set(key, handler);
+    }
   }
-
-  function init(root = document) {
-    const containers = root.querySelectorAll(".select-container");
-    containers.forEach(initSelect);
-  }
-
+  
+  // Public API
   window.templUI = window.templUI || {};
-  window.templUI.selectbox = { init: init };
-
-  document.addEventListener("DOMContentLoaded", () => init());
+  window.templUI.selectbox = {
+    // Get instance by element or selector
+    getInstance(selector) {
+      const element = typeof selector === 'string' 
+        ? document.querySelector(selector) 
+        : selector;
+      return element ? instances.get(element) : null;
+    },
+    
+    // Initialize components
+    init(selector = '.select-container') {
+      const elements = typeof selector === 'string'
+        ? document.querySelectorAll(selector)
+        : [selector];
+        
+      elements.forEach(element => {
+        if (!instances.has(element)) {
+          instances.set(element, new SelectBox(element));
+        }
+      });
+    },
+    
+    // Destroy instances
+    destroy(selector) {
+      if (selector) {
+        const instance = this.getInstance(selector);
+        instance?.destroy();
+      } else {
+        // Destroy all instances
+        instances.forEach(instance => instance.destroy());
+      }
+    },
+    
+    // Convenience methods
+    getValue(selector) {
+      const instance = this.getInstance(selector);
+      return instance?.getValue();
+    },
+    
+    setValue(selector, value) {
+      const instance = this.getInstance(selector);
+      return instance?.setValue(value);
+    },
+    
+    reset(selector) {
+      const instance = this.getInstance(selector);
+      return instance?.reset();
+    },
+    
+    enable(selector) {
+      const instance = this.getInstance(selector);
+      return instance?.enable();
+    },
+    
+    disable(selector) {
+      const instance = this.getInstance(selector);
+      return instance?.disable();
+    }
+  };
+  
+  // Auto-initialization
+  document.addEventListener('DOMContentLoaded', () => {
+    window.templUI.selectbox.init();
+  });
 })();

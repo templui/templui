@@ -7,7 +7,7 @@ templ CodeSnippetFromEmbedded(filename, language string, embed embed.FS) {
 		<div class="error">Error reading file: { filename }: { err.Error() }</div>
 	} else {
 		@Code(CodeProps{
-			Language:       "templ",
+			Language:       language,
 			ShowCopyButton: true,
 			CodeContent:    string(content),
 		})

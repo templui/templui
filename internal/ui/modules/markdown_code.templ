@@ -1,0 +1,40 @@
+package modules
+
+import (
+	"embed"
+	"strings"
+)
+
+// ExtractCodeFromMarkdown extracts code content from a markdown file
+// It looks for code blocks wrapped in triple backticks
+func ExtractCodeFromMarkdown(content string) string {
+	lines := strings.Split(content, "\n")
+	var codeLines []string
+	inCodeBlock := false
+
+	for _, line := range lines {
+		if strings.HasPrefix(line, "```") {
+			inCodeBlock = !inCodeBlock
+			continue
+		}
+		if inCodeBlock {
+			codeLines = append(codeLines, line)
+		}
+	}
+
+	return strings.Join(codeLines, "\n")
+}
+
+templ MarkdownCodeSnippet(filename string, language string, embedFS embed.FS) {
+	if content, err := embedFS.ReadFile(filename); err != nil {
+		<div class="error">Error reading file: { filename }: { err.Error() }</div>
+	} else {
+		{{ codeContent := ExtractCodeFromMarkdown(string(content)) }}
+		@Code(CodeProps{
+			Language:       language,
+			ShowCopyButton: true,
+			CodeContent:    codeContent,
+		})
+	}
+}
+

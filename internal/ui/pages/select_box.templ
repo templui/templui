@@ -4,6 +4,7 @@ import (
 	"github.com/axzilla/templui/internal/ui/layouts"
 	"github.com/axzilla/templui/internal/ui/modules"
 	"github.com/axzilla/templui/internal/ui/showcase"
+	"github.com/axzilla/templui/internal/ui/showcase/selectbox"
 )
 
 templ SelectBox() {
@@ -38,6 +39,10 @@ templ SelectBox() {
 					{
 						Text: "Disabled",
 						ID:   "disabled",
+					},
+					{
+						Text: "Reset",
+						ID:   "reset",
 					},
 					{
 						Text: "Form",
@@ -79,6 +84,36 @@ templ SelectBox() {
 					},
 				},
 			},
+			{
+				ID:   "javascript-api",
+				Text: "JavaScript API",
+				Children: []modules.TableOfContentsItem{
+					{
+						ID:   "initialization",
+						Text: "Initialization",
+					},
+					{
+						ID:   "instance-methods",
+						Text: "Instance Methods",
+					},
+					{
+						ID:   "convenience-methods",
+						Text: "Convenience Methods",
+					},
+					{
+						ID:   "events",
+						Text: "Events",
+					},
+					{
+						ID:   "reset-functionality",
+						Text: "Reset Functionality",
+					},
+					{
+						ID:   "configuration",
+						Text: "Configuration Options",
+					},
+				},
+			},
 		},
 	) {
 		@modules.PageWrapper(modules.PageWrapperProps{
@@ -99,8 +134,8 @@ templ SelectBox() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.SelectBoxDefault(),
-				PreviewCodeFile: "select_box_default.templ",
+				ShowcaseFile:    selectbox.SelectBoxDefault(),
+				PreviewCodeFile: "selectbox/select_box_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -117,38 +152,44 @@ templ SelectBox() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "With Label",
-					ShowcaseFile:    showcase.SelectBoxWithLabel(),
-					PreviewCodeFile: "select_box_with_label.templ",
+					ShowcaseFile:    selectbox.SelectBoxWithLabel(),
+					PreviewCodeFile: "selectbox/select_box_with_label.templ",
 					ID:              "with-label",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Multiple",
-					ShowcaseFile:    showcase.SelectBoxMultipleSelect(),
-					PreviewCodeFile: "select_box_multiple.templ",
+					ShowcaseFile:    selectbox.SelectBoxMultipleSelect(),
+					PreviewCodeFile: "selectbox/select_box_multiple.templ",
 					ID:              "multiple-select",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Multiple Pills",
-					ShowcaseFile:    showcase.SelectBoxMultipleSelectPills(),
+					ShowcaseFile:    selectbox.SelectBoxMultipleSelectPills(),
 					PreviewCodeFile: "select_box_pills.templ",
 					ID:              "pills-select",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "No Search",
-					ShowcaseFile:    showcase.SelectBoxNoSearch(),
-					PreviewCodeFile: "select_box_no_search.templ",
+					ShowcaseFile:    selectbox.SelectBoxNoSearch(),
+					PreviewCodeFile: "selectbox/select_box_no_search.templ",
 					ID:              "no-search",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Disabled",
-					ShowcaseFile:    showcase.SelectBoxDisabled(),
-					PreviewCodeFile: "select_box_disabled.templ",
+					ShowcaseFile:    selectbox.SelectBoxDisabled(),
+					PreviewCodeFile: "selectbox/select_box_disabled.templ",
 					ID:              "disabled",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Reset",
+					ShowcaseFile:    selectbox.SelectBoxReset(),
+					PreviewCodeFile: "selectbox/select_box_reset.templ",
+					ID:              "reset",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Form",
-					ShowcaseFile:    showcase.SelectBoxForm(),
-					PreviewCodeFile: "select_box_form.templ",
+					ShowcaseFile:    selectbox.SelectBoxForm(),
+					PreviewCodeFile: "selectbox/select_box_form.templ",
 					ID:              "form",
 				})
 			}
@@ -464,6 +505,28 @@ templ SelectBox() {
 							},
 						},
 					})
+				</div>
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{
+				Title: "JavaScript API",
+				ID:    "javascript-api",
+			}) {
+				<div class="prose max-w-none">
+					<p class="text-muted-foreground mb-6">
+						The SelectBox component provides a comprehensive JavaScript API for programmatic control and event handling.
+					</p>
+					<h3 id="initialization" class="text-lg font-semibold mt-8 mb-4">Initialization</h3>
+					@modules.MarkdownCodeSnippet("selectbox/markdown/initialization.md", "javascript", showcase.TemplFiles)
+					<h3 id="instance-methods" class="text-lg font-semibold mt-8 mb-4">Instance Methods</h3>
+					@modules.MarkdownCodeSnippet("selectbox/markdown/instance-methods.md", "javascript", showcase.TemplFiles)
+					<h3 id="convenience-methods" class="text-lg font-semibold mt-8 mb-4">Convenience Methods</h3>
+					@modules.MarkdownCodeSnippet("selectbox/markdown/convenience-methods.md", "javascript", showcase.TemplFiles)
+					<h3 id="events" class="text-lg font-semibold mt-8 mb-4">Events</h3>
+					@modules.MarkdownCodeSnippet("selectbox/markdown/events.md", "javascript", showcase.TemplFiles)
+					<h3 id="reset-functionality" class="text-lg font-semibold mt-8 mb-4">Reset Functionality</h3>
+					@modules.MarkdownCodeSnippet("selectbox/markdown/reset-functionality.md", "javascript", showcase.TemplFiles)
+					<h3 id="configuration" class="text-lg font-semibold mt-8 mb-4">Configuration Options</h3>
+					@modules.MarkdownCodeSnippet("selectbox/markdown/configuration.md", "javascript", showcase.TemplFiles)
 				</div>
 			}
 		}
