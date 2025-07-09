@@ -17,29 +17,11 @@
         `[data-tabs-content][data-tabs-id="${tabsId}"]`
       )
     );
-    const marker = container.querySelector(
-      `[data-tabs-marker][data-tabs-id="${tabsId}"]`
-    );
-
-    function updateMarker(activeTrigger) {
-      if (!marker || !activeTrigger) return;
-
-      marker.style.width = activeTrigger.offsetWidth + "px";
-      marker.style.height = activeTrigger.offsetHeight + "px";
-      marker.style.left = activeTrigger.offsetLeft + "px";
-    }
 
     function setActiveTab(value) {
-      let activeTrigger = null;
-
       for (const trigger of triggers) {
         const isActive = trigger.dataset.tabsValue === value;
         trigger.dataset.state = isActive ? "active" : "inactive";
-        trigger.classList.toggle("text-foreground", isActive);
-        trigger.classList.toggle("bg-background", isActive);
-        trigger.classList.toggle("shadow-xs", isActive);
-
-        if (isActive) activeTrigger = trigger;
       }
 
       for (const content of contents) {
@@ -47,8 +29,6 @@
         content.dataset.state = isActive ? "active" : "inactive";
         content.classList.toggle("hidden", !isActive);
       }
-
-      updateMarker(activeTrigger);
     }
 
     const defaultTrigger =
