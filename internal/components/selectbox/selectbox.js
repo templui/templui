@@ -16,7 +16,7 @@
 
     const contentID = triggerButton.dataset.contentId;
     const isMultiple = triggerButton.dataset.multiple === "true";
-    const showPills = triggerButton.dataset.showPills === "true";
+    const showPills = triggerButton.dataset.pills === "true";
     const content = contentID ? document.getElementById(contentID) : null;
     const valueEl = triggerButton.querySelector(".select-value");
     const hiddenInput = triggerButton.querySelector('input[type="hidden"]');
