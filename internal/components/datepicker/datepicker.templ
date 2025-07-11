@@ -30,6 +30,7 @@ var (
 	LocaleTagJapanese   = LocaleTag("ja-JP")
 	LocaleTagPortuguese = LocaleTag("pt-PT")
 	LocaleTagSpanish    = LocaleTag("es-ES")
+	LocaleTagTurkish    = LocaleTag("tr-TR")
 )
 
 type Props struct {
@@ -44,6 +45,9 @@ type Props struct {
 	Required    bool
 	HasError    bool
 	Name        string
+	WithTime    bool // Show time input row if true
+	WithSeconds bool // Show seconds field if true
+	With24Hours bool // Use 24-hour format if true, otherwise 12-hour
 }
 
 templ DatePicker(props ...Props) {
@@ -125,10 +129,13 @@ templ DatePicker(props ...Props) {
 				Class: "p-3",
 			}) {
 				@calendar.Calendar(calendar.Props{
-					ID:        p.ID + "-calendar-instance",     // Pass ID for calendar instance
-					Name:      p.Name,                          // Pass Name for hidden input
-					LocaleTag: calendar.LocaleTag(p.LocaleTag), // Pass locale tag to calendar
-					Value:     valuePtr,                        // Pass pointer to value
+					ID:        p.ID + "-calendar-instance",
+					Name:      p.Name,
+					LocaleTag: calendar.LocaleTag(p.LocaleTag),
+					Value:     valuePtr,
+					WithTime:      p.WithTime,      // Pass time support to calendar
+					WithSeconds:   p.WithSeconds,   // Pass seconds support to calendar
+					With24Hours:   p.With24Hours,   // Pass 24h/12h support to calendar
 				})
 			}
 		}

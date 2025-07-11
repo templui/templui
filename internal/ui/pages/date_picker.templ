@@ -43,6 +43,22 @@ templ DatePicker() {
 						Text: "Form",
 						ID:   "form",
 					},
+					{
+						Text: "With Time",
+						ID:   "with-time",
+					},
+					{
+						Text: "With Time Seconds",
+						ID:   "with-time-seconds",
+					},
+					{
+						Text: "With Time (24 Hours)",
+						ID:   "with-time-24",
+					},
+					{
+						Text: "With Time Seconds",
+						ID:   "with-time-seconds-24",
+					},
 				},
 			},
 			{
@@ -131,6 +147,30 @@ templ DatePicker() {
 					PreviewCodeFile: "date_picker_form.templ",
 					ID:              "form",
 				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "With Time",
+					ShowcaseFile:    showcase.DatePickerWithTime(),
+					PreviewCodeFile: "date_picker_with_time.templ",
+					ID:              "with-time",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "With Time Seconds",
+					ShowcaseFile:    showcase.DatePickerWithTimeSeconds(),
+					PreviewCodeFile: "date_picker_with_time_seconds.templ",
+					ID:              "with-time-seconds",
+				})
+					@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "With Time (24 Hours)",
+					ShowcaseFile:    showcase.DatePickerWithTime24Hours(),
+					PreviewCodeFile: "date_picker_with_time_24.templ",
+					ID:              "with-time-24",
+				})
+					@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "With Time Seconds",
+					ShowcaseFile:    showcase.DatePickerWithTimeSeconds24Hours(),
+					PreviewCodeFile: "date_picker_with_time_seconds_24.templ",
+					ID:              "with-time-seconds-24",
+				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "API Reference",
@@ -207,6 +247,24 @@ templ DatePicker() {
 								Type:        "string",
 								Default:     "ID value",
 								Description: "Name attribute for the hidden input field",
+							},
+							{
+								Name:        "WithTime",
+								Type:        "bool",
+								Default:     "false",
+								Description: "Show time input row (hour/minute/second/AMPM) if true.",
+							},
+							{
+								Name:        "WithSeconds",
+								Type:        "bool",
+								Default:     "false",
+								Description: "Show seconds input if true.",
+							},
+							{
+								Name:        "With24Hours",
+								Type:        "bool",
+								Default:     "false",
+								Description: "Use 24-hour format if true, otherwise 12-hour (AM/PM).",
 							},
 						},
 					})

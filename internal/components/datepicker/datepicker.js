@@ -17,6 +17,30 @@
     return null;
   }
 
+  function parseISODateTime(isoString) {
+    // Parse ISO string with optional time (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss)
+    if (!isoString || typeof isoString !== "string") return null;
+    const parts = isoString.match(
+      /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?/
+    );
+    if (!parts) return null;
+    const year = parseInt(parts[1], 10);
+    const month = parseInt(parts[2], 10) - 1;
+    const day = parseInt(parts[3], 10);
+    const hour = parts[4] ? parseInt(parts[4], 10) : 0;
+    const minute = parts[5] ? parseInt(parts[5], 10) : 0;
+    const second = parts[6] ? parseInt(parts[6], 10) : 0;
+    const date = new Date(Date.UTC(year, month, day, hour, minute, second));
+    if (
+      date.getUTCFullYear() === year &&
+      date.getUTCMonth() === month &&
+      date.getUTCDate() === day
+    ) {
+      return date;
+    }
+    return null;
+  }
+
   function formatDateWithIntl(date, format, localeTag) {
     if (!date || isNaN(date.getTime())) return "";
 
@@ -62,6 +86,38 @@
         const day = date.getUTCDate().toString().padStart(2, "0");
         return `${year}-${month}-${day}`; // Simple ISO format as absolute fallback
       }
+    }
+  }
+
+  function formatDateTimeWithIntl(date, format, localeTag, withTime, withSeconds, with24Hours) {
+    if (!date || isNaN(date.getTime())) return "";
+    let options = { timeZone: "UTC" };
+    switch (format) {
+      case "locale-short":
+        options.dateStyle = "short";
+        break;
+      case "locale-long":
+        options.dateStyle = "long";
+        break;
+      case "locale-full":
+        options.dateStyle = "full";
+        break;
+      case "locale-medium":
+      default:
+        options.dateStyle = "medium";
+        break;
+    }
+    if (withTime) {
+      options.hour = "2-digit";
+      options.minute = "2-digit";
+      if (withSeconds) options.second = "2-digit";
+      options.hour12 = !with24Hours;
+    }
+    try {
+      return new Intl.DateTimeFormat(localeTag, options).format(date);
+    } catch (e) {
+      // fallback logic
+      return date.toISOString();
     }
   }
 
@@ -116,18 +172,35 @@
     const localeTag = triggerButton.dataset.localeTag || "en-US";
     const placeholder = triggerButton.dataset.placeholder || "Select a date";
 
+    const withTime = triggerButton.dataset.withTime === "true";
+    const withSeconds = triggerButton.dataset.withSeconds === "true";
+    const with24Hours = triggerButton.dataset.with24Hours !== "false";
+
     const onCalendarSelect = (event) => {
-      if (
-        !event.detail ||
-        !event.detail.date ||
-        !(event.detail.date instanceof Date)
-      )
-        return;
-      const selectedDate = event.detail.date;
-      const displayFormattedValue = formatDateWithIntl(
+      if (!event.detail || !event.detail.date || !(event.detail.date instanceof Date)) return;
+      let selectedDate = event.detail.date;
+      // Read time fields if present
+      if (withTime) {
+        const hourInput = document.getElementById(triggerButton.id + "-hour");
+        const minInput = document.getElementById(triggerButton.id + "-minute");
+        const secInput = document.getElementById(triggerButton.id + "-second");
+        const ampmSel = document.getElementById(triggerButton.id + "-ampm");
+        let hour = hourInput ? parseInt(hourInput.value, 10) : (with24Hours ? 0 : 12);
+        let minute = minInput ? parseInt(minInput.value, 10) : 0;
+        let second = secInput ? parseInt(secInput.value, 10) : 0;
+        if (!with24Hours && ampmSel) {
+          if (ampmSel.value === "PM" && hour < 12) hour += 12;
+          if (ampmSel.value === "AM" && hour === 12) hour = 0;
+        }
+        selectedDate.setUTCHours(hour, minute, second);
+      }
+      const displayFormattedValue = formatDateTimeWithIntl(
         selectedDate,
         displayFormat,
-        localeTag
+        localeTag,
+        withTime,
+        withSeconds,
+        with24Hours
       );
       displaySpan.textContent = displayFormattedValue;
       displaySpan.classList.remove("text-muted-foreground");
@@ -145,24 +218,25 @@
 
     const updateDisplay = () => {
       if (hiddenInput && hiddenInput.value) {
-        const initialDate = parseISODate(hiddenInput.value);
+        const initialDate = parseISODateTime(hiddenInput.value);
         if (initialDate) {
-          const correctlyFormatted = formatDateWithIntl(
+          const correctlyFormatted = formatDateTimeWithIntl(
             initialDate,
             displayFormat,
-            localeTag
+            localeTag,
+            withTime,
+            withSeconds,
+            with24Hours
           );
           if (displaySpan.textContent.trim() !== correctlyFormatted) {
             displaySpan.textContent = correctlyFormatted;
             displaySpan.classList.remove("text-muted-foreground");
           }
         } else {
-          // Handle case where hidden input has invalid value
           displaySpan.textContent = placeholder;
           displaySpan.classList.add("text-muted-foreground");
         }
       } else {
-        // Ensure placeholder is shown if no value
         displaySpan.textContent = placeholder;
         displaySpan.classList.add("text-muted-foreground");
       }
@@ -184,6 +258,13 @@
         );
       }
     };
+
+    // Add data-with-time attribute for config
+    if (withTime) {
+      triggerButton.setAttribute("data-with-time", "true");
+    } else {
+      triggerButton.removeAttribute("data-with-time");
+    }
   }
 
   function init(root = document) {

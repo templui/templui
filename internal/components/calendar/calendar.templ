@@ -18,6 +18,7 @@ var (
 	LocaleTagJapanese   = LocaleTag("ja-JP")
 	LocaleTagPortuguese = LocaleTag("pt-PT")
 	LocaleTagSpanish    = LocaleTag("es-ES")
+	LocaleTagTurkish    = LocaleTag("tr-TR")
 )
 
 type Props struct {
@@ -28,6 +29,9 @@ type Props struct {
 	Name         string
 	InitialMonth int // Optional: 0-11 (Default: current or from Value). Controls the initially displayed month view.
 	InitialYear  int // Optional: (Default: current or from Value). Controls the initially displayed year view.
+	WithTime     bool // Show time input row if true
+	WithSeconds  bool // Show seconds field if true
+	With24Hours  bool // Use 24-hour format if true, otherwise 12-hour
 }
 
 templ Calendar(props ...Props) {
@@ -111,6 +115,28 @@ templ Calendar(props ...Props) {
 			<div data-calendar-weekdays class="grid grid-cols-7 gap-1 mb-1 place-items-center"></div>
 			<!-- Calendar Day Grid -->
 			<div data-calendar-days class="grid grid-cols-7 gap-1 place-items-center"></div>
+			<!-- Time input row (only if WithTime) -->
+			if p.WithTime {
+				<div class="flex gap-2 mt-2 items-center justify-center">
+					<!-- Hour input -->
+					<input id={p.ID + "-hour"} type="number" min={ utils.IfElse(p.With24Hours, 0, 1) } max={ utils.IfElse(p.With24Hours, 23, 12) } class={ utils.TwMerge("flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm dark:bg-input/30 selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40", "w-14 text-center", "bg-background", "border", "px-2", "py-1") } if p.Value != nil { value={ strconv.Itoa(p.Value.Hour()) } } if p.Value == nil { value="12" } />
+					<span class="font-bold">:</span>
+					<!-- Minute input -->
+					<input id={p.ID + "-minute"} type="number" min="0" max="59" class={ utils.TwMerge("flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm dark:bg-input/30 selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40", "w-14 text-center", "bg-background", "border", "px-2", "py-1") } if p.Value != nil { value={ strconv.Itoa(p.Value.Minute()) } } if p.Value == nil { value="0" } />
+					<!-- Second input if enabled -->
+					if p.WithSeconds {
+						<span class="font-bold">:</span>
+						<input id={p.ID + "-second"} type="number" min="0" max="59" class={ utils.TwMerge("flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm dark:bg-input/30 selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40", "w-14 text-center", "bg-background", "border", "px-2", "py-1") } if p.Value != nil { value={ strconv.Itoa(p.Value.Second()) } } if p.Value == nil { value="0" } />
+					}
+					<!-- AM/PM select if 12-hour -->
+					if !p.With24Hours {
+						<select id={p.ID + "-ampm"} class={ utils.TwMerge("flex h-9 w-full min-w-fit rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm dark:bg-input/30 selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40", "w-14 text-center", "bg-background", "border", "px-2", "py-1") }>
+							<option value="AM">AM</option>
+							<option value="PM">PM</option>
+						</select>
+					}
+				</div>
+			}
 		</div>
 	</div>
 }
