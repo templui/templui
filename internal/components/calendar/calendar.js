@@ -173,8 +173,15 @@
         button.dataset.day = day;
         const currentDate = new Date(Date.UTC(currentYear, currentMonth, day));
         const isSelected =
-          selectedDate && currentDate.getTime() === selectedDate.getTime();
-        const isToday = currentDate.getTime() === today.getTime();
+          selectedDate &&
+          currentDate.getUTCFullYear() === selectedDate.getUTCFullYear() &&
+          currentDate.getUTCMonth() === selectedDate.getUTCMonth() &&
+          currentDate.getUTCDate() === selectedDate.getUTCDate();
+
+        const isToday =
+          currentDate.getUTCFullYear() === today.getUTCFullYear() &&
+          currentDate.getUTCMonth() === today.getUTCMonth() &&
+          currentDate.getUTCDate() === today.getUTCDate();
 
         if (isSelected)
           button.classList.add(
