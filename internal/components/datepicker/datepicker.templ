@@ -71,13 +71,18 @@ templ DatePicker(props ...Props) {
 		if p.Format == "" {
 			p.Format = FormatLOCALE_MEDIUM
 		}
-
 		var contentID = p.ID + "-content"
-		var valuePtr *time.Time
-		if !p.Value.IsZero() {
-			valuePtr = &p.Value
-		}
+		valuePtr := &p.Value
 	}}
+	// Always render a single hidden input for form submission, outside the popover.
+	// This input is the only one with the 'name' attribute, so only one value is posted.
+	<input
+		type="hidden"
+		name={ p.Name }
+		id={ p.ID + "-form-hidden" }
+		value={ utils.IfElse(p.Value.IsZero(), "", p.Value.Format("2006-01-02T15:04:05Z07:00")) }
+		data-datepicker-form-hidden
+	/>
 	@popover.Trigger(popover.TriggerProps{For: contentID}) {
 		@button.Button(button.Props{
 			ID:      p.ID,
@@ -105,6 +110,9 @@ templ DatePicker(props ...Props) {
 				"data-locale-tag":     string(p.LocaleTag),
 				"data-placeholder":    p.Placeholder,
 				"aria-invalid":        utils.If(p.HasError, "true"),
+				"data-with-time":      utils.If(p.WithTime, "true"),
+				"data-with-seconds":   utils.If(p.WithSeconds, "true"),
+				"data-with-24-hours":  utils.If(p.With24Hours, "true"),
 			}),
 		}) {
 			if p.Placeholder != "" {
@@ -129,13 +137,13 @@ templ DatePicker(props ...Props) {
 				Class: "p-3",
 			}) {
 				@calendar.Calendar(calendar.Props{
-					ID:        p.ID + "-calendar-instance",
-					Name:      p.Name,
-					LocaleTag: calendar.LocaleTag(p.LocaleTag),
-					Value:     valuePtr,
-					WithTime:      p.WithTime,      // Pass time support to calendar
-					WithSeconds:   p.WithSeconds,   // Pass seconds support to calendar
-					With24Hours:   p.With24Hours,   // Pass 24h/12h support to calendar
+					ID:          p.ID + "-calendar-instance",
+					Name:        "", // Do not set name here, so calendar's hidden input is not posted
+					LocaleTag:   calendar.LocaleTag(p.LocaleTag),
+					Value:       valuePtr,
+					WithTime:    p.WithTime,    // Pass time support to calendar
+					WithSeconds: p.WithSeconds, // Pass seconds support to calendar
+					With24Hours: p.With24Hours, // Pass 24h/12h support to calendar
 				})
 			}
 		}

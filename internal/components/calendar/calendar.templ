@@ -27,8 +27,8 @@ type Props struct {
 	LocaleTag    LocaleTag
 	Value        *time.Time
 	Name         string
-	InitialMonth int // Optional: 0-11 (Default: current or from Value). Controls the initially displayed month view.
-	InitialYear  int // Optional: (Default: current or from Value). Controls the initially displayed year view.
+	InitialMonth int  // Optional: 0-11 (Default: current or from Value). Controls the initially displayed month view.
+	InitialYear  int  // Optional: (Default: current or from Value). Controls the initially displayed year view.
 	WithTime     bool // Show time input row if true
 	WithSeconds  bool // Show seconds field if true
 	With24Hours  bool // Use 24-hour format if true, otherwise 12-hour
@@ -52,7 +52,7 @@ templ Calendar(props ...Props) {
 	}
 
 	initialView := time.Now()
-	if p.Value != nil {
+	if p.Value != nil && !p.Value.IsZero() {
 		initialView = *p.Value
 	}
 
@@ -71,8 +71,12 @@ templ Calendar(props ...Props) {
 	}
 
 	initialSelectedISO := ""
-	if p.Value != nil {
-		initialSelectedISO = p.Value.Format("2006-01-02")
+	if p.Value != nil && !p.Value.IsZero() {
+		if p.WithTime {
+			initialSelectedISO = p.Value.Format("2006-01-02T15:04:05Z")
+		} else {
+			initialSelectedISO = p.Value.Format("2006-01-02")
+		}
 	}
 	}}
 	<div class={ p.Class } id={ p.ID + "-wrapper" } data-calendar-wrapper="true">
@@ -90,6 +94,9 @@ templ Calendar(props ...Props) {
 			data-initial-month={ strconv.Itoa(initialMonth) }
 			data-initial-year={ strconv.Itoa(initialYear) }
 			data-selected-date={ initialSelectedISO }
+			data-with-time={ utils.If(p.WithTime, "true") }
+			data-with-seconds={ utils.If(p.WithSeconds, "true") }
+			data-with-24hours={ utils.If(p.With24Hours, "true") }
 		>
 			<!-- Calendar Header -->
 			<div class="flex items-center justify-between mb-4">
@@ -119,20 +126,44 @@ templ Calendar(props ...Props) {
 			if p.WithTime {
 				<div class="flex gap-2 mt-2 items-center justify-center">
 					<!-- Hour input -->
-					<input id={p.ID + "-hour"} type="number" min={ utils.IfElse(p.With24Hours, 0, 1) } max={ utils.IfElse(p.With24Hours, 23, 12) } class={ utils.TwMerge("flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm dark:bg-input/30 selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40", "w-14 text-center", "bg-background", "border", "px-2", "py-1") } if p.Value != nil { value={ strconv.Itoa(p.Value.Hour()) } } if p.Value == nil { value="12" } />
+					<input
+						id={ p.ID + "-hour" }
+						type="number"
+						min={ utils.IfElse(p.With24Hours, 0, 1) }
+						max={ utils.IfElse(p.With24Hours, 23, 12) }
+						class={ utils.TwMerge("flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm dark:bg-input/30 selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40", "w-14 text-center", "bg-background", "border", "px-2", "py-1") }
+						value={ utils.IfElse(p.Value != nil && !p.Value.IsZero(), strconv.Itoa(p.Value.Hour()), "12") }
+					/>
 					<span class="font-bold">:</span>
 					<!-- Minute input -->
-					<input id={p.ID + "-minute"} type="number" min="0" max="59" class={ utils.TwMerge("flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm dark:bg-input/30 selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40", "w-14 text-center", "bg-background", "border", "px-2", "py-1") } if p.Value != nil { value={ strconv.Itoa(p.Value.Minute()) } } if p.Value == nil { value="0" } />
+					<input
+						id={ p.ID + "-minute" }
+						type="number"
+						min="0"
+						max="59"
+						class={ utils.TwMerge("flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm dark:bg-input/30 selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40", "w-14 text-center", "bg-background", "border", "px-2", "py-1") }
+						value={ utils.IfElse(p.Value != nil && !p.Value.IsZero(), strconv.Itoa(p.Value.Minute()), "0") }
+					/>
 					<!-- Second input if enabled -->
 					if p.WithSeconds {
 						<span class="font-bold">:</span>
-						<input id={p.ID + "-second"} type="number" min="0" max="59" class={ utils.TwMerge("flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm dark:bg-input/30 selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40", "w-14 text-center", "bg-background", "border", "px-2", "py-1") } if p.Value != nil { value={ strconv.Itoa(p.Value.Second()) } } if p.Value == nil { value="0" } />
+						<input
+							id={ p.ID + "-second" }
+							type="number"
+							min="0"
+							max="59"
+							class={ utils.TwMerge("flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm dark:bg-input/30 selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40", "w-14 text-center", "bg-background", "border", "px-2", "py-1") }
+							value={ utils.IfElse(p.Value != nil && !p.Value.IsZero(), strconv.Itoa(p.Value.Second()), "0") }
+						/>
 					}
 					<!-- AM/PM select if 12-hour -->
 					if !p.With24Hours {
-						<select id={p.ID + "-ampm"} class={ utils.TwMerge("flex h-9 w-full min-w-fit rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm dark:bg-input/30 selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40", "w-14 text-center", "bg-background", "border", "px-2", "py-1") }>
-							<option value="AM">AM</option>
-							<option value="PM">PM</option>
+						<select
+							id={ p.ID + "-ampm" }
+							class={ utils.TwMerge("flex h-9 w-full min-w-fit rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm dark:bg-input/30 selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40", "w-14 text-center", "bg-background", "border", "px-2", "py-1") }
+						>
+							<option value="AM" selected={ utils.IfElse(p.Value != nil && !p.Value.IsZero(), p.Value.Hour() < 12, true) }>AM</option>
+							<option value="PM" selected={ utils.IfElse(p.Value != nil && !p.Value.IsZero(), p.Value.Hour() >= 12, false) }>PM</option>
 						</select>
 					}
 				</div>

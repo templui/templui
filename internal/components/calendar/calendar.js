@@ -1,5 +1,10 @@
 (function () {
   function initCalendar(container) {
+    // Read time config from data attributes (must be before any use)
+    const withTime = container.hasAttribute('data-with-time');
+    const withSeconds = container.hasAttribute('data-with-seconds');
+    const with24Hours = container.hasAttribute('data-with-24hours') ? container.getAttribute('data-with-24hours') !== 'false' : true;
+
     if (!container || container.hasAttribute("data-initialized")) return;
     container.setAttribute("data-initialized", "true");
 
@@ -82,10 +87,23 @@
 
     if (container.dataset.selectedDate) {
       selectedDate = parseISODate(container.dataset.selectedDate);
+      // Always set time inputs from initial value if withTime is true
+      if (withTime && selectedDate) setTimeout(() => setTimeInputsFromDate(selectedDate), 0);
+      // If initial value exists, set currentMonth and currentYear from it so the calendar grid is correct
+      if (selectedDate) {
+        currentMonth = selectedDate.getMonth();
+        currentYear = selectedDate.getFullYear();
+      }
     }
 
     function parseISODate(isoStr) {
       if (!isoStr) return null;
+      // If the string contains a timezone offset, let the browser parse it so the offset is handled correctly
+      if (/([zZ]|[+-]\d{2}:?\d{2})$/.test(isoStr)) {
+        const date = new Date(isoStr);
+        if (!isNaN(date.getTime())) return date;
+      }
+      // Otherwise, parse as YYYY-MM-DD (no time, no offset)
       try {
         const parts = isoStr.split("-");
         const year = parseInt(parts[0], 10);
@@ -197,11 +215,6 @@
       renderCalendar();
     }
 
-    // Read time config from data attributes
-    const withTime = container.hasAttribute('data-with-time');
-    const withSeconds = container.hasAttribute('data-with-seconds');
-    const with24Hours = container.hasAttribute('data-with-24hours') ? container.getAttribute('data-with-24hours') !== 'false' : true;
-
     // Helper: set time inputs from a Date
     function setTimeInputsFromDate(date) {
       if (!withTime || !date) return;
@@ -209,9 +222,9 @@
       const minInput = document.getElementById(container.id + '-minute');
       const secInput = document.getElementById(container.id + '-second');
       const ampmSel = document.getElementById(container.id + '-ampm');
-      let hour = date.getUTCHours();
-      let minute = date.getUTCMinutes();
-      let second = date.getUTCSeconds();
+      let hour = date.getHours();
+      let minute = date.getMinutes();
+      let second = date.getSeconds();
       if (!with24Hours && ampmSel) {
         if (hour === 0) {
           hour = 12;
@@ -225,9 +238,10 @@
           ampmSel.value = 'AM';
         }
       }
-      if (hourInput) hourInput.value = hour;
-      if (minInput) minInput.value = minute;
-      if (secInput && withSeconds) secInput.value = second;
+      // Always pad hour, minute, and second to two digits for better UX
+      if (hourInput) hourInput.value = hour.toString().padStart(2, '0');
+      if (minInput) minInput.value = minute.toString().padStart(2, '0');
+      if (secInput && withSeconds) secInput.value = second.toString().padStart(2, '0');
     }
 
     // Helper: get time from inputs
@@ -247,18 +261,15 @@
       return { hour, minute, second };
     }
 
-    // Gün seçildiğinde zamanı da ekle
     function handleDayClick(event) {
       const day = parseInt(event.target.dataset.day);
       if (!day) return;
-      const newlySelectedDate = new Date(
-        Date.UTC(currentYear, currentMonth, day)
-      );
-      // Zaman inputlarından oku
+      // Create date in local time so the selected time matches the user's local selection
+      const newlySelectedDate = new Date(currentYear, currentMonth, day);
       const { hour, minute, second } = getTimeFromInputs();
-      newlySelectedDate.setUTCHours(hour, minute, second);
+      newlySelectedDate.setHours(hour, minute, second);
       selectedDate = newlySelectedDate;
-      // ISO string (tarih+saat)
+      // ISO string
       let isoFormattedValue = newlySelectedDate.toISOString();
       if (!withTime) isoFormattedValue = isoFormattedValue.split('T')[0];
       hiddenInput.value = isoFormattedValue;
@@ -266,13 +277,12 @@
       container.dispatchEvent(
         new CustomEvent('calendar-date-selected', {
           bubbles: true,
-          detail: { date: newlySelectedDate },
+          detail: { date: newlySelectedDate, closePopover: true },
         })
       );
       renderCalendar();
     }
 
-    // İlk açılışta varsa zamanı inputlara yaz
     if (withTime && selectedDate) {
       setTimeout(() => setTimeInputsFromDate(selectedDate), 0);
     }
@@ -285,7 +295,6 @@
     renderWeekdays();
     renderCalendar();
 
-    // inputlarda değişiklik olursa selectedDate'i güncelle
     if (withTime) {
       const hourInput = document.getElementById(container.id + '-hour');
       const minInput = document.getElementById(container.id + '-minute');
@@ -296,7 +305,8 @@
           el.addEventListener('change', function () {
             if (!selectedDate) return;
             const { hour, minute, second } = getTimeFromInputs();
-            selectedDate.setUTCHours(hour, minute, second);
+            // Set time in local hours/minutes/seconds
+            selectedDate.setHours(hour, minute, second);
             let isoFormattedValue = selectedDate.toISOString();
             if (!withTime) isoFormattedValue = isoFormattedValue.split('T')[0];
             hiddenInput.value = isoFormattedValue;
