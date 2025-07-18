@@ -48,6 +48,20 @@ templ DatePickerFormats() {
 		</div>
 		<div class="space-y-2">
 			@label.Label(label.Props{
+				For: "dp-tr-long",
+			}) {
+				Long Format (Turkish)
+			}
+			@datepicker.DatePicker(datepicker.Props{
+				ID:          "dp-tr-long",
+				LocaleTag:   datepicker.LocaleTagTurkish,
+				Format:      datepicker.FormatLOCALE_LONG,
+				Value:       time.Now().AddDate(0, 0, -30), // 30 days ago
+				Placeholder: "Tarih seçiniz", 
+			})
+		</div>
+		<div class="space-y-2">
+			@label.Label(label.Props{
 				For: "dp-fr-full",
 			}) {
 				Full Format (French)

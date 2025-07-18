@@ -1,5 +1,10 @@
 (function () {
   function initCalendar(container) {
+    // Read time config from data attributes (must be before any use)
+    const withTime = container.hasAttribute('data-with-time');
+    const withSeconds = container.hasAttribute('data-with-seconds');
+    const with24Hours = container.hasAttribute('data-with-24hours') ? container.getAttribute('data-with-24hours') !== 'false' : true;
+
     if (!container || container.hasAttribute("data-initialized")) return;
     container.setAttribute("data-initialized", "true");
 
@@ -82,10 +87,23 @@
 
     if (container.dataset.selectedDate) {
       selectedDate = parseISODate(container.dataset.selectedDate);
+      // Always set time inputs from initial value if withTime is true
+      if (withTime && selectedDate) setTimeout(() => setTimeInputsFromDate(selectedDate), 0);
+      // If initial value exists, set currentMonth and currentYear from it so the calendar grid is correct
+      if (selectedDate) {
+        currentMonth = selectedDate.getMonth();
+        currentYear = selectedDate.getFullYear();
+      }
     }
 
     function parseISODate(isoStr) {
       if (!isoStr) return null;
+      // If the string contains a timezone offset, let the browser parse it so the offset is handled correctly
+      if (/([zZ]|[+-]\d{2}:?\d{2})$/.test(isoStr)) {
+        const date = new Date(isoStr);
+        if (!isNaN(date.getTime())) return date;
+      }
+      // Otherwise, parse as YYYY-MM-DD (no time, no offset)
       try {
         const parts = isoStr.split("-");
         const year = parseInt(parts[0], 10);
@@ -100,7 +118,7 @@
         ) {
           return date;
         }
-      } catch {}
+      } catch { }
       return null;
     }
 
@@ -155,8 +173,15 @@
         button.dataset.day = day;
         const currentDate = new Date(Date.UTC(currentYear, currentMonth, day));
         const isSelected =
-          selectedDate && currentDate.getTime() === selectedDate.getTime();
-        const isToday = currentDate.getTime() === today.getTime();
+          selectedDate &&
+          currentDate.getUTCFullYear() === selectedDate.getUTCFullYear() &&
+          currentDate.getUTCMonth() === selectedDate.getUTCMonth() &&
+          currentDate.getUTCDate() === selectedDate.getUTCDate();
+
+        const isToday =
+          currentDate.getUTCFullYear() === today.getUTCFullYear() &&
+          currentDate.getUTCMonth() === today.getUTCMonth() &&
+          currentDate.getUTCDate() === today.getUTCDate();
 
         if (isSelected)
           button.classList.add(
@@ -197,27 +222,76 @@
       renderCalendar();
     }
 
+    // Helper: set time inputs from a Date
+    function setTimeInputsFromDate(date) {
+      if (!withTime || !date) return;
+      const hourInput = document.getElementById(container.id + '-hour');
+      const minInput = document.getElementById(container.id + '-minute');
+      const secInput = document.getElementById(container.id + '-second');
+      const ampmSel = document.getElementById(container.id + '-ampm');
+      let hour = date.getHours();
+      let minute = date.getMinutes();
+      let second = date.getSeconds();
+      if (!with24Hours && ampmSel) {
+        if (hour === 0) {
+          hour = 12;
+          ampmSel.value = 'AM';
+        } else if (hour > 12) {
+          ampmSel.value = 'PM';
+          hour = hour - 12;
+        } else if (hour === 12) {
+          ampmSel.value = 'PM';
+        } else {
+          ampmSel.value = 'AM';
+        }
+      }
+      // Always pad hour, minute, and second to two digits for better UX
+      if (hourInput) hourInput.value = hour.toString().padStart(2, '0');
+      if (minInput) minInput.value = minute.toString().padStart(2, '0');
+      if (secInput && withSeconds) secInput.value = second.toString().padStart(2, '0');
+    }
+
+    // Helper: get time from inputs
+    function getTimeFromInputs() {
+      if (!withTime) return { hour: 0, minute: 0, second: 0 };
+      const hourInput = document.getElementById(container.id + '-hour');
+      const minInput = document.getElementById(container.id + '-minute');
+      const secInput = document.getElementById(container.id + '-second');
+      const ampmSel = document.getElementById(container.id + '-ampm');
+      let hour = hourInput ? parseInt(hourInput.value, 10) : (with24Hours ? 0 : 12);
+      let minute = minInput ? parseInt(minInput.value, 10) : 0;
+      let second = secInput && withSeconds ? parseInt(secInput.value, 10) : 0;
+      if (!with24Hours && ampmSel) {
+        if (ampmSel.value === 'PM' && hour < 12) hour += 12;
+        if (ampmSel.value === 'AM' && hour === 12) hour = 0;
+      }
+      return { hour, minute, second };
+    }
+
     function handleDayClick(event) {
       const day = parseInt(event.target.dataset.day);
       if (!day) return;
-      const newlySelectedDate = new Date(
-        Date.UTC(currentYear, currentMonth, day)
-      );
-
+      // Create date in local time so the selected time matches the user's local selection
+      const newlySelectedDate = new Date(currentYear, currentMonth, day);
+      const { hour, minute, second } = getTimeFromInputs();
+      newlySelectedDate.setHours(hour, minute, second);
       selectedDate = newlySelectedDate;
-
-      const isoFormattedValue = newlySelectedDate.toISOString().split("T")[0];
+      // ISO string
+      let isoFormattedValue = newlySelectedDate.toISOString();
+      if (!withTime) isoFormattedValue = isoFormattedValue.split('T')[0];
       hiddenInput.value = isoFormattedValue;
-      hiddenInput.dispatchEvent(new Event("change", { bubbles: true }));
-
+      hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
       container.dispatchEvent(
-        new CustomEvent("calendar-date-selected", {
+        new CustomEvent('calendar-date-selected', {
           bubbles: true,
-          detail: { date: newlySelectedDate },
+          detail: { date: newlySelectedDate, closePopover: true },
         })
       );
-
       renderCalendar();
+    }
+
+    if (withTime && selectedDate) {
+      setTimeout(() => setTimeInputsFromDate(selectedDate), 0);
     }
 
     // Initialization
@@ -227,6 +301,33 @@
     updateMonthDisplay();
     renderWeekdays();
     renderCalendar();
+
+    if (withTime) {
+      const hourInput = document.getElementById(container.id + '-hour');
+      const minInput = document.getElementById(container.id + '-minute');
+      const secInput = document.getElementById(container.id + '-second');
+      const ampmSel = document.getElementById(container.id + '-ampm');
+      [hourInput, minInput, secInput, ampmSel].forEach(function (el) {
+        if (el) {
+          el.addEventListener('change', function () {
+            if (!selectedDate) return;
+            const { hour, minute, second } = getTimeFromInputs();
+            // Set time in local hours/minutes/seconds
+            selectedDate.setHours(hour, minute, second);
+            let isoFormattedValue = selectedDate.toISOString();
+            if (!withTime) isoFormattedValue = isoFormattedValue.split('T')[0];
+            hiddenInput.value = isoFormattedValue;
+            hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+            container.dispatchEvent(
+              new CustomEvent('calendar-date-selected', {
+                bubbles: true,
+                detail: { date: selectedDate },
+              })
+            );
+          });
+        }
+      });
+    }
 
     container._calendarInitialized = true;
   }

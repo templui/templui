@@ -1,0 +1,12 @@
+package showcase
+
+import "github.com/axzilla/templui/internal/components/datepicker"
+
+templ DatePickerWithTimeSeconds() {
+	<div class="w-full max-w-sm space-y-4">
+		@datepicker.DatePicker(datepicker.Props{
+			WithTime: true,
+			WithSeconds: true,
+		})
+	</div>
+} 
