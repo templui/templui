@@ -427,10 +427,10 @@ func initConfig(ref string, force bool) {
 			// Check if existing config has missing fields
 			_, err := loadConfig()
 			if err != nil {
-				fmt.Println("Config file exists but has issues. Use 'templui init --force' to repair missing fields and reinstall utils.")
+				fmt.Println("Config file exists but has issues. Use 'templui -f init' to repair missing fields and reinstall utils.")
 				return
 			}
-			fmt.Println("Config file already exists and is complete. Use 'templui init --force' to reinstall utils if needed.")
+			fmt.Println("Config file already exists and is complete. Use 'templui -f init' to reinstall utils if needed.")
 			// Don't reinstall utils unless forced
 			return
 		} else {
