@@ -137,10 +137,10 @@ templ Trigger(props ...TriggerProps) {
 			Disabled: p.Disabled,
 			Attributes: utils.MergeAttributes(
 				templ.Attributes{
-					"data-content-id":          contentID,
-					"data-multiple":            strconv.FormatBool(p.Multiple),
-					"data-show-pills":          strconv.FormatBool(p.ShowPills),
-					"data-selected-count-text": p.SelectedCountText,
+					"data-tui-selectbox-content-id":          contentID,
+					"data-tui-selectbox-multiple":            strconv.FormatBool(p.Multiple),
+					"data-tui-selectbox-show-pills":          strconv.FormatBool(p.ShowPills),
+					"data-tui-selectbox-selected-count-text": p.SelectedCountText,
 					"tabindex":                 "0",
 					"required":                 strconv.FormatBool(p.Required),
 					"aria-invalid":             utils.If(p.HasError, "true"),
@@ -226,7 +226,7 @@ templ Content(props ...ContentProps) {
 						Class:       "pl-8",
 						Placeholder: utils.IfElse(p.SearchPlaceholder != "", p.SearchPlaceholder, "Search..."),
 						Attributes: templ.Attributes{
-							"data-select-search": "",
+							"data-tui-selectbox-search": "",
 						},
 					})
 				</div>
@@ -291,9 +291,9 @@ templ Item(props ...ItemProps) {
 			),
 		}
 		role="option"
-		data-value={ p.Value }
-		data-selected={ strconv.FormatBool(p.Selected) }
-		data-disabled={ strconv.FormatBool(p.Disabled) }
+		data-tui-selectbox-value={ p.Value }
+		data-tui-selectbox-selected={ strconv.FormatBool(p.Selected) }
+		data-tui-selectbox-disabled={ strconv.FormatBool(p.Disabled) }
 		tabindex="0"
 		{ p.Attributes... }
 	>
