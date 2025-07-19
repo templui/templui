@@ -128,6 +128,19 @@
     textInput.addEventListener("keydown", handleKeyDown);
     container.removeEventListener("click", handleClick);
     container.addEventListener("click", handleClick);
+
+    // Form reset support
+    const form = container.closest('form');
+    if (form) {
+      form.addEventListener('reset', () => {
+        // Remove all tag chips
+        tagsContainer.querySelectorAll('[data-tag-chip]').forEach(chip => chip.remove());
+        // Remove all hidden inputs
+        hiddenInputsContainer.querySelectorAll('input[type="hidden"]').forEach(input => input.remove());
+        // Clear text input
+        textInput.value = '';
+      });
+    }
   }
 
   function init(root = document) {
