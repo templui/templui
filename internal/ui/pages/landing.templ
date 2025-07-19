@@ -10,7 +10,7 @@ import (
 
 templ Landing() {
 	@layouts.BaseLayout(
-		"templUI - Beautiful UI components for Go templ",
+		"The UI Kit for templ",
 		"Beautifully designed components that you can copy and paste into your apps. Built with templ, Tailwind CSS, and Vanilla JS.",
 	) {
 		<div class="flex flex-col h-screen">
@@ -18,132 +18,132 @@ templ Landing() {
 			@modules.Navbar()
 			<div class="flex-1 overflow-y-auto">
 				<header class="relative">
-			<div class="container mx-auto px-4 sm:px-6 lg:px-8">
-				<div class="flex flex-col items-center justify-center py-16 md:py-20">
-					<div class="text-center space-y-4 max-w-3xl mx-auto">
-						<!-- Main Heading -->
-						<h1 class="text-4xl md:text-5xl font-semibold tracking-tight">
-							Build modern Go applications
-						</h1>
-						<!-- Subheading -->
-						<p class="text-lg text-muted-foreground max-w-[700px] mx-auto">
-							A growing collection of beautifully designed components built with templ and Tailwind CSS. 
-							Install via CLI. Customize everything. Own your code.
-						</p>
-						<!-- CTA Buttons -->
-						<div class="flex flex-col sm:flex-row gap-2 justify-center pt-2">
-							@button.Button(button.Props{
-								Href: "/docs/how-to-use",
-							}) {
-								Get Started
+					<div class="container mx-auto px-4 sm:px-6 lg:px-8">
+						<div class="flex flex-col items-center justify-center py-16 md:py-20">
+							<div class="text-center space-y-4 max-w-3xl mx-auto">
+								<!-- Main Heading -->
+								<h1 class="text-4xl md:text-5xl font-semibold tracking-tight">
+									Build modern Go applications
+								</h1>
+								<!-- Subheading -->
+								<p class="text-lg text-muted-foreground max-w-[700px] mx-auto">
+									A growing collection of beautifully designed components built with templ and Tailwind CSS. 
+									Install via CLI. Customize everything. Own your code.
+								</p>
+								<!-- CTA Buttons -->
+								<div class="flex flex-col sm:flex-row gap-2 justify-center pt-2">
+									@button.Button(button.Props{
+										Href: "/docs/how-to-use",
+									}) {
+										Get Started
+									}
+									@button.Button(button.Props{
+										Href:    "/docs/components",
+										Variant: button.VariantGhost,
+										Class:   "gap-2",
+									}) {
+										Browse Components
+									}
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- <div class="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80" aria-hidden="true"> -->
+					<!-- 	<div class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-primary to-secondary opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"></div> -->
+					<!-- </div> -->
+				</header>
+				<!-- Features Section -->
+				<section class="py-3 px-4 md:px-6 lg:px-8">
+					<div class="mx-auto max-w-5xl">
+						<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+							<!-- Type-Safe -->
+							@card.Card(card.Props{Class: "h-full"}) {
+								@card.Header(card.HeaderProps{Class: "pb-3"}) {
+									<div class="flex items-center gap-2">
+										@icon.FileCode(icon.Props{Size: 16, Class: "text-muted-foreground"})
+										@card.Title(card.TitleProps{Class: "text-base"}) {
+											Type-safe
+										}
+									</div>
+									@card.Description(card.DescriptionProps{}) {
+										Go's compiler has your back.
+									}
+								}
 							}
-							@button.Button(button.Props{
-								Href:    "/docs/components",
-								Variant: button.VariantGhost,
-								Class:   "gap-2",
-							}) {
-								Browse Components
+							<!-- CLI-first -->
+							@card.Card(card.Props{Class: "h-full"}) {
+								@card.Header(card.HeaderProps{Class: "pb-3"}) {
+									<div class="flex items-center gap-2">
+										@icon.Terminal(icon.Props{Size: 16, Class: "text-muted-foreground"})
+										@card.Title(card.TitleProps{Class: "text-base"}) {
+											CLI-first
+										}
+									</div>
+									@card.Description(card.DescriptionProps{}) {
+										Install with one command. Own your code.
+									}
+								}
+							}
+							<!-- No JS Framework -->
+							@card.Card(card.Props{Class: "h-full"}) {
+								@card.Header(card.HeaderProps{Class: "pb-3"}) {
+									<div class="flex items-center gap-2">
+										@icon.Zap(icon.Props{Size: 16, Class: "text-muted-foreground"})
+										@card.Title(card.TitleProps{Class: "text-base"}) {
+											Zero JS frameworks
+										}
+									</div>
+									@card.Description(card.DescriptionProps{}) {
+										Just vanilla. Just fast.
+									}
+								}
+							}
+							<!-- Enterprise Ready -->
+							@card.Card(card.Props{Class: "h-full"}) {
+								@card.Header(card.HeaderProps{Class: "pb-3"}) {
+									<div class="flex items-center gap-2">
+										@icon.Building(icon.Props{Size: 16, Class: "text-muted-foreground"})
+										@card.Title(card.TitleProps{Class: "text-base"}) {
+											Enterprise ready
+										}
+									</div>
+									@card.Description(card.DescriptionProps{}) {
+										Production-grade. Battle-tested.
+									}
+								}
+							}
+							<!-- CSP Compliant -->
+							@card.Card(card.Props{Class: "h-full"}) {
+								@card.Header(card.HeaderProps{Class: "pb-3"}) {
+									<div class="flex items-center gap-2">
+										@icon.ShieldCheck(icon.Props{Size: 16, Class: "text-muted-foreground"})
+										@card.Title(card.TitleProps{Class: "text-base"}) {
+											CSP compliant
+										}
+									</div>
+									@card.Description(card.DescriptionProps{}) {
+										No inline scripts. Secure by default.
+									}
+								}
+							}
+							<!-- Dark Mode -->
+							@card.Card(card.Props{Class: "h-full"}) {
+								@card.Header(card.HeaderProps{Class: "pb-3"}) {
+									<div class="flex items-center gap-2">
+										@icon.Moon(icon.Props{Size: 16, Class: "text-muted-foreground"})
+										@card.Title(card.TitleProps{Class: "text-base"}) {
+											Dark mode
+										}
+									</div>
+									@card.Description(card.DescriptionProps{}) {
+										Looks great, always.
+									}
+								}
 							}
 						</div>
 					</div>
-				</div>
-			</div>
-			<!-- <div class="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80" aria-hidden="true"> -->
-			<!-- 	<div class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-primary to-secondary opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"></div> -->
-			<!-- </div> -->
-		</header>
-		<!-- Features Section -->
-		<section class="py-3 px-4 md:px-6 lg:px-8">
-			<div class="mx-auto max-w-5xl">
-				<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-					<!-- Type-Safe -->
-					@card.Card(card.Props{Class: "h-full"}) {
-						@card.Header(card.HeaderProps{Class: "pb-3"}) {
-							<div class="flex items-center gap-2">
-								@icon.FileCode(icon.Props{Size: 16, Class: "text-muted-foreground"})
-								@card.Title(card.TitleProps{Class: "text-base"}) {
-									Type-safe
-								}
-							</div>
-							@card.Description(card.DescriptionProps{}) {
-								Go's compiler has your back.
-							}
-						}
-					}
-					<!-- CLI-first -->
-					@card.Card(card.Props{Class: "h-full"}) {
-						@card.Header(card.HeaderProps{Class: "pb-3"}) {
-							<div class="flex items-center gap-2">
-								@icon.Terminal(icon.Props{Size: 16, Class: "text-muted-foreground"})
-								@card.Title(card.TitleProps{Class: "text-base"}) {
-									CLI-first
-								}
-							</div>
-							@card.Description(card.DescriptionProps{}) {
-								Install with one command. Own your code.
-							}
-						}
-					}
-					<!-- No JS Framework -->
-					@card.Card(card.Props{Class: "h-full"}) {
-						@card.Header(card.HeaderProps{Class: "pb-3"}) {
-							<div class="flex items-center gap-2">
-								@icon.Zap(icon.Props{Size: 16, Class: "text-muted-foreground"})
-								@card.Title(card.TitleProps{Class: "text-base"}) {
-									Zero JS frameworks
-								}
-							</div>
-							@card.Description(card.DescriptionProps{}) {
-								Just vanilla. Just fast.
-							}
-						}
-					}
-					<!-- Enterprise Ready -->
-					@card.Card(card.Props{Class: "h-full"}) {
-						@card.Header(card.HeaderProps{Class: "pb-3"}) {
-							<div class="flex items-center gap-2">
-								@icon.Building(icon.Props{Size: 16, Class: "text-muted-foreground"})
-								@card.Title(card.TitleProps{Class: "text-base"}) {
-									Enterprise ready
-								}
-							</div>
-							@card.Description(card.DescriptionProps{}) {
-								Production-grade. Battle-tested.
-							}
-						}
-					}
-					<!-- CSP Compliant -->
-					@card.Card(card.Props{Class: "h-full"}) {
-						@card.Header(card.HeaderProps{Class: "pb-3"}) {
-							<div class="flex items-center gap-2">
-								@icon.ShieldCheck(icon.Props{Size: 16, Class: "text-muted-foreground"})
-								@card.Title(card.TitleProps{Class: "text-base"}) {
-									CSP compliant
-								}
-							</div>
-							@card.Description(card.DescriptionProps{}) {
-								No inline scripts. Secure by default.
-							}
-						}
-					}
-					<!-- Dark Mode -->
-					@card.Card(card.Props{Class: "h-full"}) {
-						@card.Header(card.HeaderProps{Class: "pb-3"}) {
-							<div class="flex items-center gap-2">
-								@icon.Moon(icon.Props{Size: 16, Class: "text-muted-foreground"})
-								@card.Title(card.TitleProps{Class: "text-base"}) {
-									Dark mode
-								}
-							</div>
-							@card.Description(card.DescriptionProps{}) {
-								Looks great, always.
-							}
-						}
-					}
-				</div>
-			</div>
-		</section>
-		@modules.Footer()
+				</section>
+				@modules.Footer()
 			</div>
 		</div>
 	}

@@ -2,14 +2,19 @@ package modules
 
 // SEO is a simple module for all important SEO tags
 templ SEO(title, description, path string) {
-	{{ title = title + " | templUI" }}
+	{{ title = title + " - templUI" }}
 	<title>{ title }</title>
 	<meta name="description" content={ description }/>
-	<!-- Robots Tags -->
+	// Charset & Viewport
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	// Author
+	<meta name="author" content="templUI"/>
+	// Robots Tags
 	<meta name="robots" content="index, follow"/>
-	<!-- Canonical URL -->
+	// Canonical URL
 	<link rel="canonical" href={ "https://templui.io" + path }/>
-	<!-- OpenGraph-Tags -->
+	// OpenGraph Tags
 	<meta property="og:title" content={ title }/>
 	<meta property="og:description" content={ description }/>
 	<meta property="og:type" content="website"/>
@@ -17,10 +22,26 @@ templ SEO(title, description, path string) {
 	<meta property="og:image" content="https://templui.io/assets/img/social-preview.png"/>
 	<meta property="og:image:width" content="1200"/>
 	<meta property="og:image:height" content="630"/>
-	<meta property="og:image:alt" content="templUI component library preview"/>
-	<!-- Twitter Card -->
+	<meta property="og:image:alt" content="templUI - Modern UI components for Go"/>
+	<meta property="og:site_name" content="templUI"/>
+	// Twitter Card
 	<meta name="twitter:card" content="summary_large_image"/>
 	<meta name="twitter:title" content={ title }/>
 	<meta name="twitter:description" content={ description }/>
 	<meta name="twitter:image" content="https://templui.io/assets/img/social-preview.png"/>
+	<meta name="twitter:image:alt" content="templUI - Modern UI components for Go"/>
+	// Favicon - Minimal but comprehensive support
+	// Note: Some files are served from root URLs (e.g., /favicon.ico) for Safari compatibility.
+	// Safari often ignores HTML favicon tags and looks directly in the root directory.
+	// The SVG favicon remains in the assets folder as it's not commonly requested by Safari.
+	<link rel="icon" type="image/svg+xml" href="/assets/img/favicon/favicon.svg"/>
+	<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"/>
+	// Theme Color
+	<meta name="theme-color" content="#000000"/>
+	// Additional iOS/Safari support
+	<meta name="apple-mobile-web-app-capable" content="yes"/>
+	<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
 }

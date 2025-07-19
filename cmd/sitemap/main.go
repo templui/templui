@@ -60,12 +60,10 @@ func main() {
 	baseURL := flag.String("baseurl", "https://templui.io", "Base URL for the sitemap")
 	outputFile := flag.String("output", "static/sitemap.xml", "Path to output file")
 	routesFile := flag.String("routes", "cmd/docs/main.go", "Path to routes file")
-	robotsFile := flag.String("robots", "static/robots.txt", "Path to robots.txt file")
 	flag.Parse()
 
 	// Create directory for output file
 	os.MkdirAll(filepath.Dir(*outputFile), 0755)
-	os.MkdirAll(filepath.Dir(*robotsFile), 0755)
 
 	// Find routes
 	routes, err := findRoutes(*routesFile)
@@ -143,18 +141,4 @@ func main() {
 
 	fmt.Printf("Sitemap with %d URLs successfully written to %s.\n", len(sitemap.URLs), *outputFile)
 
-	// Create robots.txt
-	robotsContent := fmt.Sprintf(`User-agent: *
-Allow: /assets/img/social-preview.png
-Allow: /
-Disallow: /assets/
-
-Sitemap: %s/sitemap.xml
-`, *baseURL)
-
-	if err := os.WriteFile(*robotsFile, []byte(robotsContent), 0644); err != nil {
-		log.Fatalf("Error creating robots.txt: %v", err)
-	}
-
-	fmt.Printf("robots.txt successfully written to %s.\n", *robotsFile)
 }

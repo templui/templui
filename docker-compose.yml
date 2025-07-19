@@ -1,5 +1,4 @@
 version: "3.8"
-
 services:
   go-app:
     build:
@@ -19,12 +18,31 @@ services:
     restart: unless-stopped
     networks:
       - templui-net
+      - dokploy-network
     # Resource limits
     deploy:
       resources:
         limits:
           cpus: "1.0" # Limit Go app to 1 CPU core
           memory: 512M # Limit Go app to 512 MB RAM
+    labels:
+      # Enable Traefik
+      - traefik.enable=true
+
+      # Router configuration - WICHTIG: Beide Domains in einer Rule!
+      - traefik.http.routers.templui.rule=Host(`templui.io`) || Host(`www.templui.io`)
+      - traefik.http.routers.templui.entrypoints=websecure
+      - traefik.http.routers.templui.tls=true
+      - traefik.http.routers.templui.tls.certResolver=letsencrypt
+      - traefik.http.services.templui.loadbalancer.server.port=8090
+
+      # WWW Redirect Middleware
+      - traefik.http.middlewares.templui-www-redirect.redirectregex.regex=^https://www\.(.*)
+      - traefik.http.middlewares.templui-www-redirect.redirectregex.replacement=https://$${1}
+      - traefik.http.middlewares.templui-www-redirect.redirectregex.permanent=true
+
+      # Apply middleware to router
+      - traefik.http.routers.templui.middlewares=templui-www-redirect
     # volumes:
     # Optional: Local directory for persistent data if needed
     # - ./data:/app/data
@@ -50,3 +68,5 @@ services:
 networks:
   templui-net:
     driver: bridge
+  dokploy-network:
+    external: true
