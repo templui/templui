@@ -9,14 +9,18 @@
     if (!triggerButton) {
       console.error(
         "Select box: Trigger button (.select-trigger) not found in wrapper",
-        wrapper
+        wrapper,
       );
       return;
     }
 
-    const contentID = triggerButton.getAttribute("data-tui-selectbox-content-id");
-    const isMultiple = triggerButton.getAttribute("data-tui-selectbox-multiple") === "true";
-    const showPills = triggerButton.getAttribute("data-tui-selectbox-show-pills") === "true";
+    const contentID = triggerButton.getAttribute(
+      "data-tui-selectbox-content-id",
+    );
+    const isMultiple =
+      triggerButton.getAttribute("data-tui-selectbox-multiple") === "true";
+    const showPills =
+      triggerButton.getAttribute("data-tui-selectbox-show-pills") === "true";
     const content = contentID ? document.getElementById(contentID) : null;
     const valueEl = triggerButton.querySelector(".select-value");
     const hiddenInput = triggerButton.querySelector('input[type="hidden"]');
@@ -30,7 +34,7 @@
           contentExists: !!content,
           valueElExists: !!valueEl,
           hiddenInputExists: !!hiddenInput,
-        }
+        },
       );
       return;
     }
@@ -45,7 +49,9 @@
         event.preventDefault();
         document.getElementById(contentID).click();
         setTimeout(() => {
-          const searchInput = document.querySelector("[data-tui-selectbox-search]");
+          const searchInput = document.querySelector(
+            "[data-tui-selectbox-search]",
+          );
           if (searchInput) {
             searchInput.focus();
             if (event.key !== "Backspace" && event.key !== "Delete") {
@@ -115,7 +121,7 @@
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
         const visibleItems = Array.from(
-          newContent.querySelectorAll(".select-item")
+          newContent.querySelectorAll(".select-item"),
         ).filter((item) => item.style.display !== "none");
 
         if (visibleItems.length === 0) return;
@@ -160,7 +166,7 @@
 
     // Initialize display value if an item is pre-selected
     const selectedItems = newContent.querySelectorAll(
-      '.select-item[data-tui-selectbox-selected="true"]'
+      '.select-item[data-tui-selectbox-selected="true"]',
     );
     if (selectedItems.length > 0) {
       if (isMultiple) {
@@ -196,11 +202,12 @@
             const valueWidth = valueEl.clientWidth;
             if (pillsWidth > valueWidth) {
               const selectedCountText =
-                triggerButton.getAttribute("data-tui-selectbox-selected-count-text") ||
-                `${selectedItems.length} items selected`;
+                triggerButton.getAttribute(
+                  "data-tui-selectbox-selected-count-text",
+                ) || `${selectedItems.length} items selected`;
               const msg = selectedCountText.replace(
                 "{n}",
-                selectedItems.length
+                selectedItems.length,
               );
               valueEl.innerHTML = msg;
               valueEl.classList.remove("text-muted-foreground");
@@ -212,7 +219,7 @@
         }
         // Store selected values as CSV
         const selectedValues = Array.from(selectedItems).map((item) =>
-          item.getAttribute("data-tui-selectbox-value")
+          item.getAttribute("data-tui-selectbox-value"),
         );
         hiddenInput.value = selectedValues.join(",");
       } else {
@@ -245,7 +252,7 @@
           item.classList.remove(
             "bg-accent",
             "text-accent-foreground",
-            "bg-muted"
+            "bg-muted",
           );
         }
       });
@@ -253,7 +260,11 @@
 
     // Select an item
     function selectItem(item) {
-      if (!item || item.getAttribute("data-tui-selectbox-disabled") === "true" || isSelecting)
+      if (
+        !item ||
+        item.getAttribute("data-tui-selectbox-disabled") === "true" ||
+        isSelecting
+      )
         return;
 
       isSelecting = true;
@@ -263,8 +274,12 @@
 
       if (isMultiple) {
         // Toggle selection for multiple mode
-        const isSelected = item.getAttribute("data-tui-selectbox-selected") === "true";
-        item.setAttribute("data-tui-selectbox-selected", (!isSelected).toString());
+        const isSelected =
+          item.getAttribute("data-tui-selectbox-selected") === "true";
+        item.setAttribute(
+          "data-tui-selectbox-selected",
+          (!isSelected).toString(),
+        );
 
         if (!isSelected) {
           item.classList.add("bg-accent", "text-accent-foreground");
@@ -278,7 +293,7 @@
 
         // Update display value
         const selectedItems = newContent.querySelectorAll(
-          '.select-item[data-tui-selectbox-selected="true"]'
+          '.select-item[data-tui-selectbox-selected="true"]',
         );
         if (selectedItems.length > 0) {
           if (showPills) {
@@ -323,11 +338,12 @@
               const valueWidth = valueEl.clientWidth;
               if (pillsWidth > valueWidth) {
                 const selectedCountText =
-                  triggerButton.getAttribute("data-tui-selectbox-selected-count-text") ||
-                  `${selectedItems.length} items selected`;
+                  triggerButton.getAttribute(
+                    "data-tui-selectbox-selected-count-text",
+                  ) || `${selectedItems.length} items selected`;
                 const msg = selectedCountText.replace(
                   "{n}",
-                  selectedItems.length
+                  selectedItems.length,
                 );
                 valueEl.innerHTML = msg;
                 valueEl.classList.remove("text-muted-foreground");
@@ -338,13 +354,14 @@
             valueEl.classList.remove("text-muted-foreground");
           }
         } else {
-          valueEl.textContent = valueEl.getAttribute("data-tui-selectbox-placeholder") || "";
+          valueEl.textContent =
+            valueEl.getAttribute("data-tui-selectbox-placeholder") || "";
           valueEl.classList.add("text-muted-foreground");
         }
 
         // Update hidden input with CSV of selected values
         const selectedValues = Array.from(selectedItems).map((item) =>
-          item.getAttribute("data-tui-selectbox-value")
+          item.getAttribute("data-tui-selectbox-value"),
         );
         hiddenInput.value = selectedValues.join(",");
         hiddenInput.dispatchEvent(new Event("change", { bubbles: true }));
@@ -356,7 +373,7 @@
           el.classList.remove(
             "bg-accent",
             "text-accent-foreground",
-            "bg-muted"
+            "bg-muted",
           );
           const check = el.querySelector(".select-check");
           if (check) check.classList.replace("opacity-100", "opacity-0");
@@ -419,7 +436,8 @@
     // Event: Mouse hover on items (delegated)
     newContent.addEventListener("mouseover", (e) => {
       const item = e.target.closest(".select-item");
-      if (!item || item.getAttribute("data-tui-selectbox-disabled") === "true") return;
+      if (!item || item.getAttribute("data-tui-selectbox-disabled") === "true")
+        return;
       // Reset all others first
       newContent.querySelectorAll(".select-item").forEach((el) => {
         el.classList.remove("bg-accent", "text-accent-foreground", "bg-muted");
@@ -432,6 +450,42 @@
 
     // Reset hover styles when mouse leaves the content area
     newContent.addEventListener("mouseleave", resetItemStyles);
+
+    // Form reset support
+    const form = wrapper.closest("form");
+    if (form) {
+      form.addEventListener("reset", () => {
+        // Clear all selections
+        newContent.querySelectorAll(".select-item").forEach((item) => {
+          item.setAttribute("data-tui-selectbox-selected", "false");
+          const check = item.querySelector(".select-check");
+          if (check) check.classList.replace("opacity-100", "opacity-0");
+          item.classList.remove("bg-accent", "text-accent-foreground");
+        });
+
+        // Reset display value to placeholder
+        const placeholder =
+          valueEl.getAttribute("data-placeholder") ||
+          triggerButton
+            .querySelector(".select-value")
+            ?.getAttribute("data-placeholder") ||
+          "Select...";
+        valueEl.textContent = placeholder;
+        valueEl.classList.add("text-muted-foreground");
+
+        // Clear hidden input
+        hiddenInput.value = "";
+
+        // Clear search input if exists
+        if (searchInput) {
+          searchInput.value = "";
+          // Show all items again
+          newContent.querySelectorAll(".select-item").forEach((item) => {
+            item.style.display = "";
+          });
+        }
+      });
+    }
   }
 
   function init(root = document) {
