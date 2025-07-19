@@ -145,7 +145,6 @@ templ Trigger(props ...TriggerProps) {
 					"required":                 strconv.FormatBool(p.Required),
 					"aria-invalid":             utils.If(p.HasError, "true"),
 				},
-				p.Attributes,
 			),
 		}) {
 			<input
@@ -154,6 +153,7 @@ templ Trigger(props ...TriggerProps) {
 					name={ p.Name }
 				}
 				required?={ p.Required }
+				{ p.Attributes... }
 			/>
 			{ children... }
 			<span class="pointer-events-none ml-1">
