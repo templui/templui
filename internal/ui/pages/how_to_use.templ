@@ -318,6 +318,7 @@ templ HowToUse() {
 					{ID: "initialize-project", Text: "Initialize Project"},
 					{ID: "add-components", Text: "Add Components"},
 					{ID: "list-components", Text: "List Components"},
+					{ID: "upgrade-cli", Text: "Upgrade CLI"},
 					{ID: "copy-paste", Text: "Copy & Paste"},
 					{ID: "quickstart-template", Text: "Quickstart Template"},
 				},
@@ -636,14 +637,24 @@ templ HowToUse() {
 								CodeContent:    "templui list\ntemplui list@v0.1.0", // Keep newline for display
 							})
 						</div>
+						<div id="upgrade-cli">
+							<h3 class="text-xl font-semibold mb-2">5. Upgrade CLI</h3>
+							<p class="mb-2 text-muted-foreground">Keep your templUI CLI up to date with the latest features and improvements:</p>
+							@modules.Code(modules.CodeProps{
+								Language:       "shell",
+								ShowCopyButton: true,
+								CodeContent:    "templui upgrade                  # Upgrade to latest version\ntemplui upgrade@v0.84.0          # Upgrade to specific version",
+							})
+							<p class="text-sm mt-2 text-muted-foreground">The upgrade command uses `go install` to update the CLI tool to the specified version.</p>
+						</div>
 						<div id="copy-paste">
-							<h3 class="text-xl font-semibold mb-2">Copy & Paste</h3>
+							<h3 class="text-xl font-semibold mb-2">6. Copy & Paste</h3>
 							<p class="mb-4 text-muted-foreground">
 								Alternatively, instead of using our CLI, you can copy any component directly from the docs or the GitHub repository and paste it into your project. Just make sure to manually include any required dependencies and adjust import paths accordingly.
 							</p>
 						</div>
 						<div id="quickstart-template">
-							<h3 class="text-xl font-semibold mb-2">Quickstart Template</h3>
+							<h3 class="text-xl font-semibold mb-2">7. Quickstart Template</h3>
 							<p class="mb-4 text-muted-foreground">
 								For a completely new project with everything pre-configured, use our <a href="https://github.com/axzilla/templui-quickstart" class="text-primary underline" target="_blank">templUI Quickstart</a> template.
 							</p>

@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -335,6 +336,27 @@ func main() {
 		return
 	}
 
+	// Handle the 'upgrade' command.
+	if strings.HasPrefix(commandArg, "upgrade") {
+		var ref string
+
+		if strings.Contains(commandArg, "@") {
+			parts := strings.SplitN(commandArg, "@", 2)
+			if len(parts) == 2 && parts[0] == "upgrade" && parts[1] != "" {
+				ref = parts[1]
+				fmt.Printf("Updating templUI cli using specified ref: %s\n", ref)
+			} else {
+				fmt.Printf("Error: Invalid format '%s'. Use 'upgrade' or 'upgrade@<ref>'.\n", commandArg)
+				return
+			}
+		}
+
+		if err := updateCLI(ref); err != nil {
+			fmt.Printf("Error upgrading templUI cli: %v\n", err)
+		}
+		return
+	}
+
 	// Fallback for unknown commands.
 	fmt.Printf("Error: Unknown command '%s'\n", commandArg)
 	showHelp(nil, getDefaultRef())
@@ -347,8 +369,9 @@ func showHelp(manifest *Manifest, refUsedForHelp string) {
 	fmt.Println("  templui init[@<ref>]                - Initialize config and install utils from <ref>")
 	fmt.Println("  templui -f init[@<ref>]             - Force reinitialize and repair incomplete config")
 	fmt.Println("  templui add[@<ref>] <comp>...       - Add component(s) from specified <ref>")
-	fmt.Println("  templui add[@<ref>] \"*\"             - Add all components from specified <ref>")
-	fmt.Println("  templui list[@<ref>]               - List available components and utils from <ref>")
+	fmt.Println("  templui add[@<ref>] \"*\"           - Add all components from specified <ref>")
+	fmt.Println("  templui list[@<ref>]                - List available components and utils from <ref>")
+  fmt.Println("  templui upgrade[@<ref>]             - Upgrades the cli to <ref> or latest if no <ref> was given")
 	fmt.Println("  templui -v, --version               - Show installer version")
 	fmt.Println("  templui -h, --help                  - Show this help message")
 	fmt.Println("\n<ref> can be a branch name, tag name, or commit hash.")
@@ -1144,6 +1167,22 @@ func listComponents(ref string) error {
 		}
 	}
 
+	return nil
+}
+
+// updateCLI attempts to install a new version of the templUI cli based on the passed in ref.
+func updateCLI(ref string) error {
+	if ref == "" {
+		ref = "latest"
+	}
+	cmd := exec.Command("go", "install", fmt.Sprintf("github.com/axzilla/templui/cmd/templui@%s", ref))
+	output, err := cmd.Output()
+	if err != nil {
+		return err
+	}
+
+	fmt.Print(string(output))
+	fmt.Printf("Updated templUI to ref '%s'\n", ref)
 	return nil
 }
 
