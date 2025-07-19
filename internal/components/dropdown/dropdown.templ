@@ -219,7 +219,7 @@ templ Item(props ...ItemProps) {
 			}
 			class={
 				utils.TwMerge(
-					"flex text-left items-center px-2 py-1.5 text-sm rounded-sm",
+					"flex text-left items-center justify-between px-2 py-1.5 text-sm rounded-sm",
 					utils.If(!p.Disabled, "focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground cursor-default"),
 					utils.If(p.Disabled, "opacity-50 pointer-events-none"),
 					p.Class,
