@@ -14,9 +14,9 @@
       return;
     }
 
-    const contentID = triggerButton.dataset.contentId;
-    const isMultiple = triggerButton.dataset.multiple === "true";
-    const showPills = triggerButton.dataset.pills === "true";
+    const contentID = triggerButton.getAttribute("data-tui-selectbox-content-id");
+    const isMultiple = triggerButton.getAttribute("data-tui-selectbox-multiple") === "true";
+    const showPills = triggerButton.getAttribute("data-tui-selectbox-show-pills") === "true";
     const content = contentID ? document.getElementById(contentID) : null;
     const valueEl = triggerButton.querySelector(".select-value");
     const hiddenInput = triggerButton.querySelector('input[type="hidden"]');
@@ -45,7 +45,7 @@
         event.preventDefault();
         document.getElementById(contentID).click();
         setTimeout(() => {
-          const searchInput = document.querySelector("[data-select-search]");
+          const searchInput = document.querySelector("[data-tui-selectbox-search]");
           if (searchInput) {
             searchInput.focus();
             if (event.key !== "Backspace" && event.key !== "Delete") {
@@ -61,7 +61,7 @@
     content.parentNode.replaceChild(newContent, content);
 
     // Search functionality
-    const searchInput = newContent.querySelector("[data-select-search]");
+    const searchInput = newContent.querySelector("[data-tui-selectbox-search]");
     if (searchInput) {
       // Focus search input when popover opens
       const checkVisibility = () => {
@@ -99,7 +99,7 @@
               .querySelector(".select-item-text")
               ?.textContent.toLowerCase() || "";
           const itemValue =
-            item.getAttribute("data-value")?.toLowerCase() || "";
+            item.getAttribute("data-tui-selectbox-value")?.toLowerCase() || "";
           const isVisible =
             searchTerm === "" ||
             itemText.includes(searchTerm) ||
@@ -160,7 +160,7 @@
 
     // Initialize display value if an item is pre-selected
     const selectedItems = newContent.querySelectorAll(
-      '.select-item[data-selected="true"]'
+      '.select-item[data-tui-selectbox-selected="true"]'
     );
     if (selectedItems.length > 0) {
       if (isMultiple) {
@@ -196,7 +196,7 @@
             const valueWidth = valueEl.clientWidth;
             if (pillsWidth > valueWidth) {
               const selectedCountText =
-                triggerButton.dataset.selectedCountText ||
+                triggerButton.getAttribute("data-tui-selectbox-selected-count-text") ||
                 `${selectedItems.length} items selected`;
               const msg = selectedCountText.replace(
                 "{n}",
@@ -212,7 +212,7 @@
         }
         // Store selected values as CSV
         const selectedValues = Array.from(selectedItems).map((item) =>
-          item.getAttribute("data-value")
+          item.getAttribute("data-tui-selectbox-value")
         );
         hiddenInput.value = selectedValues.join(",");
       } else {
@@ -238,7 +238,7 @@
     // Reset visual state of items
     function resetItemStyles() {
       newContent.querySelectorAll(".select-item").forEach((item) => {
-        if (item.getAttribute("data-selected") === "true") {
+        if (item.getAttribute("data-tui-selectbox-selected") === "true") {
           item.classList.add("bg-accent", "text-accent-foreground");
           item.classList.remove("bg-muted");
         } else {
@@ -253,18 +253,18 @@
 
     // Select an item
     function selectItem(item) {
-      if (!item || item.getAttribute("data-disabled") === "true" || isSelecting)
+      if (!item || item.getAttribute("data-tui-selectbox-disabled") === "true" || isSelecting)
         return;
 
       isSelecting = true;
 
-      const value = item.getAttribute("data-value");
+      const value = item.getAttribute("data-tui-selectbox-value");
       const itemText = item.querySelector(".select-item-text");
 
       if (isMultiple) {
         // Toggle selection for multiple mode
-        const isSelected = item.getAttribute("data-selected") === "true";
-        item.setAttribute("data-selected", (!isSelected).toString());
+        const isSelected = item.getAttribute("data-tui-selectbox-selected") === "true";
+        item.setAttribute("data-tui-selectbox-selected", (!isSelected).toString());
 
         if (!isSelected) {
           item.classList.add("bg-accent", "text-accent-foreground");
@@ -278,7 +278,7 @@
 
         // Update display value
         const selectedItems = newContent.querySelectorAll(
-          '.select-item[data-selected="true"]'
+          '.select-item[data-tui-selectbox-selected="true"]'
         );
         if (selectedItems.length > 0) {
           if (showPills) {
@@ -323,7 +323,7 @@
               const valueWidth = valueEl.clientWidth;
               if (pillsWidth > valueWidth) {
                 const selectedCountText =
-                  triggerButton.dataset.selectedCountText ||
+                  triggerButton.getAttribute("data-tui-selectbox-selected-count-text") ||
                   `${selectedItems.length} items selected`;
                 const msg = selectedCountText.replace(
                   "{n}",
@@ -338,13 +338,13 @@
             valueEl.classList.remove("text-muted-foreground");
           }
         } else {
-          valueEl.textContent = valueEl.getAttribute("data-placeholder") || "";
+          valueEl.textContent = valueEl.getAttribute("data-tui-selectbox-placeholder") || "";
           valueEl.classList.add("text-muted-foreground");
         }
 
         // Update hidden input with CSV of selected values
         const selectedValues = Array.from(selectedItems).map((item) =>
-          item.getAttribute("data-value")
+          item.getAttribute("data-tui-selectbox-value")
         );
         hiddenInput.value = selectedValues.join(",");
         hiddenInput.dispatchEvent(new Event("change", { bubbles: true }));
@@ -352,7 +352,7 @@
         // Single selection mode
         // Reset all items in this content
         newContent.querySelectorAll(".select-item").forEach((el) => {
-          el.setAttribute("data-selected", "false");
+          el.setAttribute("data-tui-selectbox-selected", "false");
           el.classList.remove(
             "bg-accent",
             "text-accent-foreground",
@@ -363,7 +363,7 @@
         });
 
         // Mark new selection
-        item.setAttribute("data-selected", "true");
+        item.setAttribute("data-tui-selectbox-selected", "true");
         item.classList.add("bg-accent", "text-accent-foreground");
         const check = item.querySelector(".select-check");
         if (check) check.classList.replace("opacity-0", "opacity-100");
@@ -419,13 +419,13 @@
     // Event: Mouse hover on items (delegated)
     newContent.addEventListener("mouseover", (e) => {
       const item = e.target.closest(".select-item");
-      if (!item || item.getAttribute("data-disabled") === "true") return;
+      if (!item || item.getAttribute("data-tui-selectbox-disabled") === "true") return;
       // Reset all others first
       newContent.querySelectorAll(".select-item").forEach((el) => {
         el.classList.remove("bg-accent", "text-accent-foreground", "bg-muted");
       });
       // Apply hover style only if not selected
-      if (item.getAttribute("data-selected") !== "true") {
+      if (item.getAttribute("data-tui-selectbox-selected") !== "true") {
         item.classList.add("bg-accent", "text-accent-foreground");
       }
     });
