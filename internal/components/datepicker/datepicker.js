@@ -184,6 +184,20 @@
         );
       }
     };
+
+    // Form reset support
+    const form = triggerButton.closest('form');
+    if (form) {
+      form.addEventListener('reset', () => {
+        // Clear hidden input
+        if (hiddenInput) {
+          hiddenInput.value = '';
+        }
+        // Reset display to placeholder
+        displaySpan.textContent = placeholder;
+        displaySpan.classList.add('text-muted-foreground');
+      });
+    }
   }
 
   function init(root = document) {

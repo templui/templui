@@ -163,6 +163,17 @@ if (typeof window.ratingState === "undefined") {
       ratingElement.addEventListener("mouseleave", handlers.mouseleave);
     }
 
+    // Form reset support
+    const form = ratingElement.closest('form');
+    if (form) {
+      form.addEventListener('reset', () => {
+        currentValue = config.value; // Reset to initial value
+        previewValue = 0;
+        updateHiddenInput();
+        updateItemStyles(0);
+      });
+    }
+
     const observer = new MutationObserver(() => {
       try {
         const currentItemCount =

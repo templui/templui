@@ -228,6 +228,21 @@
     renderWeekdays();
     renderCalendar();
 
+    // Form reset support
+    const form = container.closest('form');
+    if (form) {
+      form.addEventListener('reset', () => {
+        // Clear selected date
+        selectedDate = null;
+        hiddenInput.value = '';
+        // Re-render calendar to show current month without selection
+        currentMonth = new Date().getMonth();
+        currentYear = new Date().getFullYear();
+        updateMonthDisplay();
+        renderCalendar();
+      });
+    }
+
     container._calendarInitialized = true;
   }
 
