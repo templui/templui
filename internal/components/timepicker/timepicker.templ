@@ -84,6 +84,14 @@ templ TimePicker(props ...Props) {
 				"aria-invalid":                    utils.If(p.HasError, "true"),
 			}),
 		}) {
+			// Hidden input for form submission
+			<input
+				type="hidden"
+				name={ p.Name }
+				value={ valueString }
+				required?={ p.Required }
+				data-tui-timepicker-hidden-input="true"
+			/>
 			<span data-tui-timepicker-display class="text-left grow text-muted-foreground">
 				{ p.Placeholder }
 			</span>
@@ -110,14 +118,6 @@ templ TimePicker(props ...Props) {
 						data-tui-timepicker-value={ valueString }
 					}
 				>
-					// Hidden input for form submission
-					<input
-						type="hidden"
-						name={ p.Name }
-						value={ valueString }
-						required?={ p.Required }
-						data-tui-timepicker-hidden-input="true"
-					/>
 					// Time selection grid
 					<div class="grid grid-cols-2 gap-3 mb-4">
 						// Hour selection
