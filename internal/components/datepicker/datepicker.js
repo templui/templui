@@ -69,20 +69,19 @@
     if (!triggerButton || triggerButton.hasAttribute("data-tui-datepicker-initialized")) return;
     triggerButton.setAttribute("data-tui-datepicker-initialized", "true");
 
+    let hiddenInput = triggerButton.querySelector("[data-tui-datepicker-hidden-input]");
+
     const datePickerID = triggerButton.id;
     const displaySpan = triggerButton.querySelector(
       "[data-tui-datepicker-display]"
     );
     const calendarInstanceId = datePickerID + "-calendar-instance";
     const calendarInstance = document.getElementById(calendarInstanceId);
-    const calendarHiddenInputId = calendarInstanceId + "-hidden";
-    const calendarHiddenInput = document.getElementById(calendarHiddenInputId);
 
     // Fallback to find calendar relatively
     let calendar = calendarInstance;
-    let hiddenInput = calendarHiddenInput;
 
-    if (!calendarInstance || !calendarHiddenInput) {
+    if (!calendarInstance) {
       const popoverContentId = triggerButton.getAttribute("aria-controls");
       const popoverContent = popoverContentId
         ? document.getElementById(popoverContentId)
@@ -90,14 +89,6 @@
       if (popoverContent) {
         if (!calendar)
           calendar = popoverContent.querySelector("[data-tui-calendar-container]");
-        if (!hiddenInput) {
-          const wrapper = popoverContent.querySelector(
-            "[data-tui-calendar-wrapper]"
-          );
-          hiddenInput = wrapper
-            ? wrapper.querySelector("[data-tui-calendar-hidden-input]")
-            : null;
-        }
       }
     }
 
@@ -131,6 +122,11 @@
       );
       displaySpan.textContent = displayFormattedValue;
       displaySpan.classList.remove("text-muted-foreground");
+
+      // Update hidden input
+      const isoFormattedValue = selectedDate.toISOString().split("T")[0];
+      hiddenInput.value = isoFormattedValue;
+      hiddenInput.disabled = false; // add the input to the form
 
       // Find and click the popover trigger to close it
       const popoverTrigger = triggerButton

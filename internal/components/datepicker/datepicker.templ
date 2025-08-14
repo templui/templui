@@ -96,11 +96,11 @@ templ DatePicker(props ...Props) {
 			),
 			Disabled: p.Disabled,
 			Attributes: utils.MergeAttributes(p.Attributes, templ.Attributes{
-				"data-tui-datepicker":     "true",
+				"data-tui-datepicker":                "true",
 				"data-tui-datepicker-display-format": string(p.Format),
 				"data-tui-datepicker-locale-tag":     string(p.LocaleTag),
 				"data-tui-datepicker-placeholder":    p.Placeholder,
-				"aria-invalid":        utils.If(p.HasError, "true"),
+				"aria-invalid":                       utils.If(p.HasError, "true"),
 			}),
 		}) {
 			if p.Placeholder != "" {
@@ -111,6 +111,17 @@ templ DatePicker(props ...Props) {
 			<span class="text-muted-foreground flex items-center ml-2">
 				@icon.Calendar(icon.Props{Size: 16})
 			</span>
+			// hidden input for form
+			// initially marked as disabled to prevent double sending of value
+			// because the calendar hidden input is visible before the user clicks on the popover
+			<input
+				type="hidden"
+				name={ p.Name }
+				value={ p.Value.Format("2006-01-02") }
+				id={ p.ID + "-hidden" }
+				disabled
+				data-tui-datepicker-hidden-input
+			/>
 		}
 	}
 	@popover.Content(popover.ContentProps{
