@@ -108,7 +108,7 @@ templ Input(props ...Props) {
 				Size:       button.SizeIcon,
 				Variant:    button.VariantGhost,
 				Class:      "absolute right-0 top-1/2 -translate-y-1/2 opacity-50 cursor-pointer",
-				Attributes: templ.Attributes{"data-tui-input-toggle-password": p.ID},
+				Attributes: templ.Attributes{"data-tui-input-toggle-password": p.ID, "tabindex": "-1"},
 			}) {
 				<span class="icon-open block">
 					@icon.Eye(icon.Props{
