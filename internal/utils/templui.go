@@ -2,6 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"os/exec"
+	"time"
 
 	"crypto/rand"
 
@@ -51,4 +53,16 @@ func MergeAttributes(attrs ...templ.Attributes) templ.Attributes {
 // Example: RandomID() → "id-1a2b3c"
 func RandomID() string {
 	return fmt.Sprintf("id-%s", rand.Text())
+}
+
+// FileVersion returns the last commit hash of a file change using Git.
+// Example: FileVersion("internal/web/static/js/carousel.min.js") -> "5632101539fef5aaad8cc01690698c1c3a0f496c"
+func FileVersion(projectPath string) string {
+	cmd := exec.Command("git", "log", "-1", "--format=%H", "--", projectPath)
+	output, err := cmd.Output()
+	if err != nil {
+		return fmt.Sprintf("%d", time.Now().Unix())
+	} else {
+		return string(output)
+	}
 }

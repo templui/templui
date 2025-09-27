@@ -1093,6 +1093,11 @@ func addScriptTemplateToFiles(config Config, comp ComponentDef, jsFileName strin
 			webPath = "/" + filepath.ToSlash(filepath.Join(config.JSDir, jsFileName))
 		}
 
+		// Create the project path for the JavaScript file
+		// Always use the relative project path for the JavaScript file
+		var projectPath string
+		projectPath = filepath.ToSlash(filepath.Join(config.JSDir, jsFileName))
+
 		// Check if Script() template already exists
 		if strings.Contains(contentStr, "templ Script()") {
 			fmt.Printf("   Script() template already exists in %s\n", destPath)
@@ -1100,9 +1105,9 @@ func addScriptTemplateToFiles(config Config, comp ComponentDef, jsFileName strin
 		}
 
 		// Create the Script() template with correct templ syntax and nonce support
-		scriptTemplate := fmt.Sprintf(`templ Script() {
-	<script defer nonce={ templ.GetNonce(ctx) } src="%s"></script>
-}`, webPath)
+		scriptTemplate := `templ Script() {
+			<script defer nonce={ templ.GetNonce(ctx) } src={ fmt.Sprintf("` + webPath + `?v=%s", utils.FileVersion("` + projectPath + `")) }></script>
+		}`
 
 		// Add Script() template at the end
 		newContent := strings.TrimSpace(contentStr) + "\n\n" + scriptTemplate + "\n"
