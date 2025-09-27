@@ -200,7 +200,7 @@ var devCommand = `make dev`
 
 var configurationFile = `{
   "componentsDir": "components",
-  "utilsDir": "utils", 
+  "utilsDir": "utils",
   "moduleName": "your-app/module",
   "jsDir": "assets/js",
   "jsPublicPath": "/assets/js"
@@ -215,7 +215,7 @@ mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./
   "jsPublicPath": "/assets/js"  // or omit for automatic fallback
 }`
 
-var urlPrefixSetup = `// Go server setup  
+var urlPrefixSetup = `// Go server setup
 appGroup := mux.PathPrefix("/app").Subrouter()
 appGroup.Handle("/static/", http.StripPrefix("/app/static/", http.FileServer(http.Dir("./assets"))))
 
@@ -228,7 +228,7 @@ appGroup.Handle("/static/", http.StripPrefix("/app/static/", http.FileServer(htt
 var customAssetSetup = `// Go server setup
 mux.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("./build"))))
 
-// .templui.json  
+// .templui.json
 {
   "jsDir": "build/js",
   "jsPublicPath": "/public/js"
@@ -318,7 +318,7 @@ templ HowToUse() {
 								CodeContent:    installGo,
 							})
 							<p class="text-sm mt-2 text-muted-foreground">
-								For installation instructions, visit 
+								For installation instructions, visit
 								<a href="https://golang.org/dl" class="inline-flex items-center gap-1 text-primary/90 hover:text-primary underline underline-offset-4" target="_blank">
 									golang.org/dl
 									@icon.ArrowUpRight(icon.Props{Size: 12})
@@ -559,6 +559,7 @@ templ HowToUse() {
 									CodeContent:    "@dialog.Script()  // Include in your base layout",
 								})
 								<p class="text-sm mt-2 text-muted-foreground">Each component manages its own JavaScript - no global bundle needed!</p>
+								<p class="text-sm mt-2 text-muted-foreground">JavaScript files have their cache busted based on their git commit hash or current timestamp if git hash is not available.</p>
 							</div>
 						</div>
 						<div id="update-components">
