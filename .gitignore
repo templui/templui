@@ -1,12 +1,22 @@
-**/*_templ.go
+# Ignore internal generated files
+internal/**/*_templ.go
 **/*_templ.txt
 meta.json
 
+# Allow public library–mode generated files
+!components/**/*_templ.go
+!utils/**/*_templ.go
+
+# System / build / cache
 .DS_Store
 bin
 node_modules
 tmp
+out
+
+# Env
 .env
 
-out
+# Build outputs
 assets/css/output.css
+
