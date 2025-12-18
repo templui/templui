@@ -399,7 +399,24 @@
   }
   
   // Initialize selectboxes on DOM ready and handle dynamic content
-  function initializeSelectBoxes() {
+  function initializeSelectBoxes(mutations) {
+    // Ensures display is updated when only selectbox content is Changed in the DOM
+    if (mutations) {
+      mutations.forEach(mutation => {
+        const targetClassList = mutation.target.classList
+        const targetId = mutation.target.id
+
+        if (targetClassList.contains('select-content')) {
+          const trigger = document.querySelector(`button.select-trigger[data-tui-selectbox-content-id="${targetId}"]`)
+
+          if (trigger) {
+            updateDisplayValue(trigger);
+          }
+        }
+      })
+    }
+
+
     document.querySelectorAll('.select-container').forEach(container => {
       const trigger = container.querySelector('button.select-trigger');
       if (trigger && !trigger.hasAttribute('data-initialized')) {
