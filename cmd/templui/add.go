@@ -226,20 +226,14 @@ func installComponent(
 
 	// Download and write component files.
 	fmt.Printf("   📁 Installing files for: %s\n", comp.Name)
-	repoComponentBasePath := "internal/components/"
 
 	for _, repoFilePath := range comp.Files {
 		// Determine the destination path, preserving subdirectory structure.
-		var destPath string
-		if strings.HasPrefix(repoFilePath, repoComponentBasePath) {
-			relativePath := repoFilePath[len(repoComponentBasePath):]
-			destPath = filepath.Join(config.ComponentsDir, relativePath)
-		} else {
-			// Fallback for unexpected paths (shouldn't happen with proper manifest).
-			fmt.Printf("  Warning: File path '%s' does not start with '%s'. Placing it directly in '%s'.\n", repoFilePath, repoComponentBasePath, config.ComponentsDir)
-			fileName := filepath.Base(repoFilePath)
-			destPath = filepath.Join(config.ComponentsDir, fileName)
+		relativePath, ok := componentRelativePath(repoFilePath)
+		if !ok {
+			return fmt.Errorf("invalid component file path '%s': expected prefix 'components/'", repoFilePath)
 		}
+		destPath := filepath.Join(config.ComponentsDir, relativePath)
 
 		// Ensure the destination directory exists.
 		compDestDir := filepath.Dir(destPath)
@@ -335,7 +329,6 @@ func installUtils(config Config, utilPaths []string, ref string, force bool) err
 
 	utilsBaseDestDir := config.UtilsDir
 	fmt.Printf("Ensuring utils are installed in: %s (from ref: %s)\n", utilsBaseDestDir, ref)
-	repoUtilBasePath := "internal/utils/"
 
 	// Ensure base utils directory exists.
 	err := os.MkdirAll(utilsBaseDestDir, 0755)
@@ -345,15 +338,11 @@ func installUtils(config Config, utilPaths []string, ref string, force bool) err
 
 	for _, repoUtilPath := range utilPaths {
 		// Determine destination path, preserving subdirectory structure.
-		var destPath string
-		if strings.HasPrefix(repoUtilPath, repoUtilBasePath) {
-			relativePath := repoUtilPath[len(repoUtilBasePath):]
-			destPath = filepath.Join(utilsBaseDestDir, relativePath)
-		} else {
-			fmt.Printf("  Warning: Util path '%s' does not start with '%s'. Placing it directly in '%s'.\n", repoUtilPath, repoUtilBasePath, utilsBaseDestDir)
-			fileName := filepath.Base(repoUtilPath)
-			destPath = filepath.Join(utilsBaseDestDir, fileName)
+		relativePath, ok := utilRelativePath(repoUtilPath)
+		if !ok {
+			return fmt.Errorf("invalid util file path '%s': expected prefix 'utils/'", repoUtilPath)
 		}
+		destPath := filepath.Join(utilsBaseDestDir, relativePath)
 
 		// Ensure the specific util directory exists.
 		utilDestDir := filepath.Dir(destPath)
@@ -428,8 +417,6 @@ func installUtils(config Config, utilPaths []string, ref string, force bool) err
 // and automatically adds Script() template at the end of .templ files
 func installComponentJS(config Config, comp ComponentDef, ref string, force bool) error {
 	jsFileName := comp.Name + ".min.js"
-	// Load from component directory instead of component_scripts
-	jsSourceURL := rawContentBaseURL + ref + "/internal/components/" + comp.Name + "/" + jsFileName
 	jsDestPath := filepath.Join(config.JSDir, jsFileName)
 
 	// Ensure JS directory exists
@@ -453,10 +440,11 @@ func installComponentJS(config Config, comp ComponentDef, ref string, force bool
 	}
 
 	if shouldWriteJS {
+		jsSourceURL := rawContentBaseURL + ref + "/components/" + comp.Name + "/" + jsFileName
 		fmt.Printf("   Downloading JavaScript: %s\n", jsSourceURL)
 		jsData, err := downloadFile(jsSourceURL)
 		if err != nil {
-			return fmt.Errorf("failed to download JS file from %s: %w", jsSourceURL, err)
+			return fmt.Errorf("failed to download JS file for component '%s' from %s: %w", comp.Name, jsSourceURL, err)
 		}
 
 		err = os.WriteFile(jsDestPath, jsData, 0644)
@@ -482,22 +470,17 @@ func installComponentJS(config Config, comp ComponentDef, ref string, force bool
 
 // addScriptTemplateToFiles adds Script() template at the end of .templ files
 func addScriptTemplateToFiles(config Config, comp ComponentDef, jsFileName string) error {
-	repoComponentBasePath := "internal/components/"
-
 	for _, repoFilePath := range comp.Files {
 		if !strings.HasSuffix(repoFilePath, ".templ") {
 			continue // Only process .templ files
 		}
 
 		// Determine the destination path
-		var destPath string
-		if strings.HasPrefix(repoFilePath, repoComponentBasePath) {
-			relativePath := repoFilePath[len(repoComponentBasePath):]
-			destPath = filepath.Join(config.ComponentsDir, relativePath)
-		} else {
-			fileName := filepath.Base(repoFilePath)
-			destPath = filepath.Join(config.ComponentsDir, fileName)
+		relativePath, ok := componentRelativePath(repoFilePath)
+		if !ok {
+			return fmt.Errorf("invalid templ file path '%s': expected prefix 'components/'", repoFilePath)
 		}
+		destPath := filepath.Join(config.ComponentsDir, relativePath)
 
 		// Check if file exists
 		if _, err := os.Stat(destPath); os.IsNotExist(err) {
@@ -519,7 +502,7 @@ func addScriptTemplateToFiles(config Config, comp ComponentDef, jsFileName strin
 			// Use configured public path
 			webPath = strings.TrimSuffix(config.JSPublicPath, "/") + "/" + jsFileName
 		} else {
-			// Fallback to jsDir (backward compatible)
+			// Derive public path from configured JS directory.
 			webPath = "/" + filepath.ToSlash(filepath.Join(config.JSDir, jsFileName))
 		}
 
@@ -539,6 +522,22 @@ func addScriptTemplateToFiles(config Config, comp ComponentDef, jsFileName strin
 	}
 
 	return nil
+}
+
+func componentRelativePath(repoPath string) (string, bool) {
+	const newBase = "components/"
+	if strings.HasPrefix(repoPath, newBase) {
+		return strings.TrimPrefix(repoPath, newBase), true
+	}
+	return "", false
+}
+
+func utilRelativePath(repoPath string) (string, bool) {
+	const newBase = "utils/"
+	if strings.HasPrefix(repoPath, newBase) {
+		return strings.TrimPrefix(repoPath, newBase), true
+	}
+	return "", false
 }
 
 func upsertScriptTemplate(content, scriptTemplate string) (string, string) {

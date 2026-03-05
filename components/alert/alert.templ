@@ -1,0 +1,108 @@
+package alert
+
+import "github.com/templui/templui/utils"
+
+type Variant string
+
+const (
+	VariantDefault     Variant = "default"
+	VariantDestructive Variant = "destructive"
+)
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Variant    Variant
+}
+
+type TitleProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type DescriptionProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+templ Alert(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="alert"
+		class={
+			utils.TwMerge(
+				"relative w-full rounded-lg border px-4 py-3 text-sm",
+				"grid has-[>svg]:grid-cols-[1rem_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-3 gap-y-0.5 items-start",
+				"[&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current",
+				variantClasses(p.Variant),
+				p.Class,
+			),
+		}
+		role="alert"
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Title(props ...TitleProps) {
+	{{ var p TitleProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<h5
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="alert-title"
+		class={
+			utils.TwMerge(
+				"col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</h5>
+}
+
+templ Description(props ...DescriptionProps) {
+	{{ var p DescriptionProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="alert-description"
+		class={
+			utils.TwMerge(
+				"text-muted-foreground col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+func variantClasses(variant Variant) string {
+	switch variant {
+	case VariantDestructive:
+		return "text-destructive bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90"
+	default:
+		return "bg-card text-card-foreground"
+	}
+}

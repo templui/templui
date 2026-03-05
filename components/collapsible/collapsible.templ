@@ -67,7 +67,7 @@ templ Content(props ...ContentProps) {
 			id={ p.ID }
 		}
 		class={ utils.TwMerge(
-			"grid grid-rows-[0fr] transition-[grid-template-rows] duration-200 ease-out [[data-tui-collapsible-state=open]_&]:grid-rows-[1fr]",
+			"grid grid-rows-[0fr] transition-[grid-template-rows] duration-200 ease-out [&.tui-collapsible-open]:grid-rows-[1fr]",
 			p.Class,
 		) }
 		data-tui-collapsible="content"

@@ -1,0 +1,209 @@
+package carousel
+
+import (
+	"fmt"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/utils"
+	"strconv"
+)
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Autoplay   bool
+	Interval   int
+	Loop       bool
+}
+
+type ContentProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ItemProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type PreviousProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type NextProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type IndicatorsProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Count      int
+}
+
+templ Carousel(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"relative overflow-hidden w-full",
+				p.Class,
+			),
+		}
+		data-tui-carousel
+		data-tui-carousel-current="0"
+		data-tui-carousel-autoplay={ strconv.FormatBool(p.Autoplay) }
+		data-tui-carousel-interval={ fmt.Sprintf("%d", func() int {
+            if p.Interval == 0 {
+                return 5000
+            }
+            return p.Interval
+        }()) }
+		data-tui-carousel-loop={ strconv.FormatBool(p.Loop) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"flex h-full w-full transition-transform duration-500 ease-in-out cursor-grab",
+				p.Class,
+			),
+		}
+		data-tui-carousel-track
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Item(props ...ItemProps) {
+	{{ var p ItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"flex-shrink-0 w-full h-full relative",
+				p.Class,
+			),
+		}
+		data-tui-carousel-item
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Previous(props ...PreviousProps) {
+	{{ var p PreviousProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<button
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"absolute left-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 focus:outline-none",
+				p.Class,
+			),
+		}
+		data-tui-carousel-prev
+		aria-label="Previous slide"
+		type="button"
+		{ p.Attributes... }
+	>
+		@icon.ChevronLeft()
+	</button>
+}
+
+templ Next(props ...NextProps) {
+	{{ var p NextProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<button
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 focus:outline-none",
+				p.Class,
+			),
+		}
+		data-tui-carousel-next
+		aria-label="Next slide"
+		type="button"
+		{ p.Attributes... }
+	>
+		@icon.ChevronRight()
+	</button>
+}
+
+templ Indicators(props ...IndicatorsProps) {
+	{{ var p IndicatorsProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		for i := 0; i < p.Count; i++ {
+			<button
+				class={
+					utils.TwMerge(
+						"w-3 h-3 rounded-full bg-foreground/30 hover:bg-foreground/50 focus:outline-none transition-colors",
+						utils.If(i == 0, "bg-primary"),
+					),
+				}
+				data-tui-carousel-indicator={ strconv.Itoa(i) }
+				data-tui-carousel-active={ utils.IfElse(i == 0, "true", "false") }
+				aria-label={ fmt.Sprintf("Go to slide %d", i+1) }
+				type="button"
+			></button>
+		}
+	</div>
+}
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("carousel") }></script>
+}

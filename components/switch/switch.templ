@@ -1,0 +1,84 @@
+package switchcomp
+
+import "github.com/templui/templui/utils"
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Name       string
+	Value      string
+	Disabled   bool
+	Checked    bool
+	Form       string
+}
+
+templ Switch(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	<label
+		for={ p.ID }
+		class={ utils.TwMerge(
+			"inline-flex cursor-pointer items-center gap-2",
+			utils.If(p.Disabled, "cursor-not-allowed"),
+		) }
+	>
+		<!-- Actual checkbox switch -->
+		<input
+			id={ p.ID }
+			if p.Name != "" {
+				name={ p.Name }
+			}
+			type="checkbox"
+			if p.Value != "" {
+				value={ p.Value }
+			} else {
+				value="on"
+			}
+			if p.Form != "" {
+				form={ p.Form }
+			}
+			checked?={ p.Checked }
+			disabled?={ p.Disabled }
+			class="peer hidden"
+			role="switch"
+			{ p.Attributes... }
+		/>
+		<!-- Visual switch UI -->
+		<div
+			class={
+				utils.TwMerge(
+					// Container
+					"relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center",
+					"rounded-full border-2 border-transparent",
+					"transition-colors",
+					// Background colors
+					"bg-input",
+					"peer-checked:bg-primary",
+					// Focus styles
+					"peer-focus-visible:outline-none peer-focus-visible:ring-2",
+					"peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2",
+					"peer-focus-visible:ring-offset-background",
+					// Disabled state
+					"peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+					// Thumb
+					"after:pointer-events-none after:block",
+					"after:h-4 after:w-4",
+					"after:rounded-full after:bg-background",
+					"after:shadow-lg after:ring-0",
+					"after:transition-transform",
+					"after:content-['']",
+					// Thumb position
+					"peer-checked:after:translate-x-4",
+					p.Class,
+				),
+			}
+			aria-hidden="true"
+		></div>
+	</label>
+}

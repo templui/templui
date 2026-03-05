@@ -1,0 +1,83 @@
+package textarea
+
+import (
+	"github.com/templui/templui/utils"
+	"strconv"
+)
+
+type Props struct {
+	ID          string
+	Class       string
+	Attributes  templ.Attributes
+	Name        string
+	Value       string
+	Form        string
+	Placeholder string
+	Rows        int
+	AutoResize  bool
+	Disabled    bool
+	Readonly    bool
+	HasError    bool
+}
+
+templ Textarea(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	<textarea
+		id={ p.ID }
+		data-tui-textarea
+		if p.Name != "" {
+			name={ p.Name }
+		}
+		if p.Form != "" {
+			form={ p.Form }
+		}
+		if p.Placeholder != "" {
+			placeholder={ p.Placeholder }
+		}
+		if p.Rows > 0 {
+			rows={ strconv.Itoa(p.Rows) }
+		}
+		disabled?={ p.Disabled }
+		readonly?={ p.Readonly }
+		if p.HasError {
+			aria-invalid="true"
+		}
+		if p.AutoResize {
+			data-tui-textarea-auto-resize="true"
+		}
+		class={
+			utils.TwMerge(
+				// Base styles
+				"flex w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm",
+				"min-h-[80px]", // Default min-height
+				// Dark mode background
+				"dark:bg-input/30",
+				// Selection styles
+				"selection:bg-primary selection:text-primary-foreground",
+				// Placeholder
+				"placeholder:text-muted-foreground",
+				// Focus styles
+				"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+				// Disabled styles
+				"disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+				// Error/Invalid styles
+				"aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40",
+				utils.If(p.HasError, "border-destructive ring-destructive/20 dark:ring-destructive/40"),
+				// Add overflow-hidden only if auto-resizing to prevent scrollbar flicker
+				utils.If(p.AutoResize, "overflow-hidden resize-none"),
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>{ p.Value }</textarea>
+}
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("textarea") }></script>
+}
