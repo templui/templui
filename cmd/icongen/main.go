@@ -7,15 +7,16 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
 )
 
 const (
-	outputDir      = "./internal/components/icon/"
-	iconContentDir = "./icon/content" // Directory for individual icon contents
-	lucideVersion  = "0.544.0"        // Current Lucide version - update as needed
+	outputDir       = "./internal/components/icon/"
+	lucideRepoOwner = "lucide-icons"
+	lucideRepoName  = "lucide"
 )
 
 type GitHubContent struct {
@@ -24,9 +25,23 @@ type GitHubContent struct {
 	DownloadUrl string `json:"download_url"`
 }
 
+type GitHubRelease struct {
+	TagName string `json:"tag_name"`
+}
+
+type LucideRelease struct {
+	Ref     string
+	Version string
+}
+
 func main() {
+	lucideRelease, err := fetchLatestLucideRelease()
+	if err != nil {
+		panic(fmt.Errorf("failed to fetch latest Lucide release: %w", err))
+	}
+
 	// Fetch the list of files from GitHub
-	files, err := fetchGitHubContents("")
+	files, err := fetchGitHubContents(lucideRelease.Ref)
 	if err != nil {
 		panic(fmt.Errorf("failed to fetch GitHub contents: %w", err))
 	}
@@ -35,7 +50,7 @@ func main() {
 	var iconDefs []string
 	iconDefs = append(iconDefs, "package icon\n")
 	iconDefs = append(iconDefs, "// This file is auto generated\n")
-	iconDefs = append(iconDefs, fmt.Sprintf("// Using Lucide icons version %s\n", lucideVersion))
+	iconDefs = append(iconDefs, fmt.Sprintf("// Using Lucide icons version %s\n", lucideRelease.Version))
 
 	// Create the output directory if it doesn't exist
 	err = os.MkdirAll(outputDir, os.ModePerm)
@@ -130,6 +145,7 @@ func main() {
 	doneChan <- true
 
 	// Write icon_defs.go
+	sort.Strings(iconDefs[3:])
 	outputFileDefs := filepath.Join(outputDir, "icon_defs.go")
 	err = os.WriteFile(outputFileDefs, []byte(strings.Join(iconDefs, "")), 0644)
 	if err != nil {
@@ -142,10 +158,16 @@ func main() {
 	var iconDataContent strings.Builder
 	iconDataContent.WriteString("package icon\n\n")
 	iconDataContent.WriteString("// This file is auto generated\n")
-	iconDataContent.WriteString(fmt.Sprintf("// Using Lucide icons version %s\n\n", lucideVersion))
-	iconDataContent.WriteString(fmt.Sprintf("const LucideVersion = %q\n\n", lucideVersion))
+	iconDataContent.WriteString(fmt.Sprintf("// Using Lucide icons version %s\n\n", lucideRelease.Version))
+	iconDataContent.WriteString(fmt.Sprintf("const LucideVersion = %q\n\n", lucideRelease.Version))
 	iconDataContent.WriteString("var internalSvgData = map[string]string{\n")
-	for name, data := range iconDataEntries {
+	iconNames := make([]string, 0, len(iconDataEntries))
+	for name := range iconDataEntries {
+		iconNames = append(iconNames, name)
+	}
+	sort.Strings(iconNames)
+	for _, name := range iconNames {
+		data := iconDataEntries[name]
 		// Escape backticks in SVG data for multi-line string literals
 		escapedData := strings.ReplaceAll(data, "`", "`+\"`\"+`")
 		iconDataContent.WriteString(fmt.Sprintf("\t%q: `%s`,\n", name, escapedData))
@@ -295,13 +317,68 @@ func toPascalCase(s string) string {
 	return strings.Join(words, "")
 }
 
+// fetchLatestLucideRelease resolves the latest Lucide GitHub release and uses it as the single source of truth.
+func fetchLatestLucideRelease() (LucideRelease, error) {
+	fmt.Println("Fetching latest Lucide release from GitHub repository...")
+
+	releaseURL := fmt.Sprintf(
+		"https://api.github.com/repos/%s/%s/releases/latest",
+		lucideRepoOwner,
+		lucideRepoName,
+	)
+
+	req, err := http.NewRequest("GET", releaseURL, nil)
+	if err != nil {
+		return LucideRelease{}, err
+	}
+
+	req.Header.Add("Accept", "application/vnd.github.v3+json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return LucideRelease{}, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return LucideRelease{}, fmt.Errorf("latest release lookup returned status code %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return LucideRelease{}, err
+	}
+
+	var release GitHubRelease
+	if err := json.Unmarshal(body, &release); err != nil {
+		return LucideRelease{}, err
+	}
+
+	if release.TagName == "" {
+		return LucideRelease{}, fmt.Errorf("latest release response did not contain a tag_name")
+	}
+
+	version := strings.TrimPrefix(release.TagName, "v")
+	fmt.Printf("Using Lucide version %s from release tag %s\n", version, release.TagName)
+	return LucideRelease{
+		Ref:     release.TagName,
+		Version: version,
+	}, nil
+}
+
 // fetchGitHubContents fetches the list of files from a GitHub repository directory
-func fetchGitHubContents(url string) ([]GitHubContent, error) {
+func fetchGitHubContents(ref string) ([]GitHubContent, error) {
 	fmt.Println("Fetching icons from GitHub repository...")
 
 	// Instead of using the API, let's use a direct approach to get all icons
 	// The API has pagination limits, but we can get file listings from the tree endpoint
-	treeUrl := "https://api.github.com/repos/lucide-icons/lucide/git/trees/main?recursive=1"
+	treeUrl := fmt.Sprintf(
+		"https://api.github.com/repos/%s/%s/git/trees/%s?recursive=1",
+		lucideRepoOwner,
+		lucideRepoName,
+		ref,
+	)
 
 	req, err := http.NewRequest("GET", treeUrl, nil)
 	if err != nil {
@@ -352,9 +429,15 @@ func fetchGitHubContents(url string) ([]GitHubContent, error) {
 
 			// Create a GitHubContent entry
 			content := GitHubContent{
-				Name:        filename,
-				Path:        item.Path,
-				DownloadUrl: fmt.Sprintf("https://raw.githubusercontent.com/lucide-icons/lucide/main/%s", item.Path),
+				Name: filename,
+				Path: item.Path,
+				DownloadUrl: fmt.Sprintf(
+					"https://raw.githubusercontent.com/%s/%s/%s/%s",
+					lucideRepoOwner,
+					lucideRepoName,
+					ref,
+					item.Path,
+				),
 			}
 			contents = append(contents, content)
 		}

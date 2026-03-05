@@ -16,12 +16,27 @@ templ TableOfContents(props TableOfContentsProps) {
 		data-toc="container"
 	>
 		<div class="px-4 mb-6">
-			<a href="mailto:hello@axeladrian.com?subject=templUI%20Sponsorship" class="block border rounded-md p-3 hover:border-muted-foreground/50 transition-colors group">
-				<p class="text-[0.65rem] font-medium uppercase tracking-wider text-muted-foreground mb-2">Sponsored</p>
-				<div class="flex items-center justify-center h-8 opacity-60 group-hover:opacity-80 transition-opacity">
-					<span class="text-[0.7rem] text-muted-foreground">Your Brand Here</span>
+			<div class="border border-primary/30 bg-primary/5 rounded-md p-3 space-y-3">
+				<p class="text-[0.65rem] font-medium uppercase tracking-wider text-muted-foreground">From the creator</p>
+				<div class="space-y-1.5">
+					<a href="https://pro.templui.io" target="_blank" rel="noopener" class="block font-medium text-foreground hover:text-foreground/80 transition-colors">
+						templUI Pro
+					</a>
+					<p class="text-[0.75rem] leading-relaxed text-muted-foreground">Premium UI blocks for Go + templ</p>
+					<a href="https://pro.templui.io" target="_blank" rel="noopener" class="inline-flex text-[0.75rem] font-medium text-foreground hover:text-foreground/80 transition-colors">
+						Explore Pro
+					</a>
 				</div>
-			</a>
+				<div class="border-t pt-3 space-y-1.5">
+					<a href="https://goilerplate.com" target="_blank" rel="noopener" class="block font-medium text-foreground hover:text-foreground/80 transition-colors">
+						goilerplate
+					</a>
+					<p class="text-[0.75rem] leading-relaxed text-muted-foreground">Go boilerplate with auth, payments, email, and blog/docs</p>
+					<a href="https://goilerplate.com" target="_blank" rel="noopener" class="inline-flex text-[0.75rem] font-medium text-foreground hover:text-foreground/80 transition-colors">
+						See goilerplate
+					</a>
+				</div>
+			</div>
 		</div>
 		if len(props.Items) > 0 {
 			<div class="flex flex-col gap-2 p-4 pt-0">

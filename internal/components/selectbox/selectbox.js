@@ -182,16 +182,39 @@
     updateTriggerClearState(trigger);
   }
   
+  function normalizeSearchValue(value) {
+    return (value || '').toLowerCase().trim().replace(/\s+/g, ' ');
+  }
+
+  function fuzzyMatch(searchTerm, candidate) {
+    const needle = normalizeSearchValue(searchTerm).replace(/\s+/g, '');
+    const haystack = normalizeSearchValue(candidate).replace(/\s+/g, '');
+
+    if (!needle) return true;
+    if (!haystack) return false;
+    if (haystack.includes(needle)) return true;
+
+    let needleIndex = 0;
+
+    for (let i = 0; i < haystack.length && needleIndex < needle.length; i += 1) {
+      if (haystack[i] === needle[needleIndex]) {
+        needleIndex += 1;
+      }
+    }
+
+    return needleIndex === needle.length;
+  }
+
   // Helper to filter items based on search
   function filterItems(searchInput) {
-    const searchTerm = searchInput.value.toLowerCase().trim();
+    const searchTerm = normalizeSearchValue(searchInput.value);
     const content = searchInput.closest('[data-tui-popover-id]');
     if (!content) return;
     
     content.querySelectorAll('.select-item').forEach(item => {
-      const text = item.querySelector('.select-item-text')?.textContent.toLowerCase() || '';
-      const value = item.getAttribute('data-tui-selectbox-value')?.toLowerCase() || '';
-      const visible = !searchTerm || text.includes(searchTerm) || value.includes(searchTerm);
+      const text = normalizeSearchValue(item.querySelector('.select-item-text')?.textContent);
+      const value = normalizeSearchValue(item.getAttribute('data-tui-selectbox-value'));
+      const visible = !searchTerm || fuzzyMatch(searchTerm, text) || fuzzyMatch(searchTerm, value);
       item.style.display = visible ? '' : 'none';
     });
   }

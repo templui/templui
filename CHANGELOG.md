@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.6.0] - 2026-03-02
+
+### Added
+- icons: Synced generated icons with the latest Lucide release
+- input: Added `Required` to `Props` (thanks @tacheraSasi)
+- selectbox: Added fuzzy search matching for improved item filtering
+
+### Fixed
+- toast: Restored progress pause/resume behavior for initial and swapped toasts
+
 ## [v1.5.0] - 2026-02-08
 
 ### Added

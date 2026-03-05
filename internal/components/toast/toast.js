@@ -5,6 +5,8 @@
 
   // Setup toast when it appears
   function setupToast(toast) {
+    if (!toast || toastTimers.has(toast)) return;
+
     const duration = parseInt(toast.dataset.tuiToastDuration || "3000");
     const progress = toast.querySelector(".toast-progress");
 
@@ -13,18 +15,17 @@
       timer: null,
       startTime: Date.now(),
       remaining: duration,
-      paused: false
+      paused: false,
+      progressWidth: null,
     };
     toastTimers.set(toast, state);
 
     // Animate progress bar if present
     if (progress && duration > 0) {
-      progress.style.transitionDuration = duration + "ms";
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          progress.style.transform = "scaleX(0)";
-        });
-      });
+      progress.style.width = "100%";
+      void progress.offsetWidth;
+      progress.style.transition = `width ${duration}ms linear`;
+      progress.style.width = "0px";
     }
 
     // Auto-dismiss after duration
@@ -39,16 +40,16 @@
 
       // Clear the dismiss timer
       clearTimeout(state.timer);
-      
+
       // Calculate remaining time
       state.remaining = state.remaining - (Date.now() - state.startTime);
       state.paused = true;
 
       // Pause progress animation
       if (progress) {
-        const computed = getComputedStyle(progress);
-        progress.style.transitionDuration = "0ms";
-        progress.style.transform = computed.transform;
+        state.progressWidth = getComputedStyle(progress).width;
+        progress.style.transition = "none";
+        progress.style.width = state.progressWidth;
       }
     });
 
@@ -64,12 +65,10 @@
 
       // Resume progress animation
       if (progress) {
-        progress.style.transitionDuration = state.remaining + "ms";
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            progress.style.transform = "scaleX(0)";
-          });
-        });
+        progress.style.width = state.progressWidth;
+        void progress.offsetWidth;
+        progress.style.transition = `width ${state.remaining}ms linear`;
+        progress.style.width = "0px";
       }
     });
   }
@@ -78,12 +77,12 @@
   function dismissToast(toast) {
     // Clean up timer state
     toastTimers.delete(toast);
-    
+
     // Add transition for smooth fade out
     toast.style.transition = "opacity 300ms, transform 300ms";
     toast.style.opacity = "0";
     toast.style.transform = "translateY(1rem)";
-    
+
     // Remove after animation
     setTimeout(() => toast.remove(), 300);
   }
@@ -97,21 +96,31 @@
     }
   });
 
+  function initializeToasts(root) {
+    if (!root) return;
+
+    if (root.matches?.("[data-tui-toast]")) {
+      setupToast(root);
+    }
+
+    root.querySelectorAll?.("[data-tui-toast]").forEach(setupToast);
+  }
+
   // Initialize pre-rendered toasts
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll("[data-tui-toast]").forEach(setupToast);
-    });
+    document.addEventListener("DOMContentLoaded", () =>
+      initializeToasts(document),
+    );
   } else {
-    document.querySelectorAll("[data-tui-toast]").forEach(setupToast);
+    initializeToasts(document);
   }
 
   // Watch for new toasts
   new MutationObserver((mutations) => {
     mutations.forEach((m) => {
       m.addedNodes.forEach((node) => {
-        if (node.nodeType === 1 && node.matches?.("[data-tui-toast]")) {
-          setupToast(node);
+        if (node.nodeType === 1) {
+          initializeToasts(node);
         }
       });
     });
