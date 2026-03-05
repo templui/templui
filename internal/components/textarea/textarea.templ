@@ -77,3 +77,7 @@ templ Textarea(props ...Props) {
 		{ p.Attributes... }
 	>{ p.Value }</textarea>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("textarea") }></script>
+}

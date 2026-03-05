@@ -113,3 +113,7 @@ templ Value(props ...ValueProps) {
 		<!-- Initial value will be set by JS -->
 	</span>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("slider") }></script>
+}

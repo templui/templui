@@ -48,3 +48,7 @@ templ Code(props ...Props) {
 		</pre>
 	</div>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("code") }></script>
+}

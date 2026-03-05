@@ -2,6 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"os"
+	"strings"
 	"time"
 
 	"crypto/rand"
@@ -70,4 +72,20 @@ var ScriptVersion = fmt.Sprintf("%d", time.Now().Unix())
 //	}
 var ScriptURL = func(path string) string {
 	return path + "?v=" + ScriptVersion
+}
+
+var (
+	RemoteScriptCDNBase = "https://cdn.jsdelivr.net/gh/templui/templui"
+)
+
+func remoteScriptRef() string {
+	if ref := strings.TrimSpace(os.Getenv("TEMPLUI_SCRIPT_REF")); ref != "" {
+		return ref
+	}
+	return "main"
+}
+
+func RemoteComponentScriptURL(component string) string {
+	ref := remoteScriptRef()
+	return fmt.Sprintf("%s@%s/internal/components/%s/%s.min.js", RemoteScriptCDNBase, ref, component, component)
 }

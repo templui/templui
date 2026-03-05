@@ -383,3 +383,7 @@ templ SubContent(props ...SubContentProps) {
 		{ children... }
 	}
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("dropdown") }></script>
+}

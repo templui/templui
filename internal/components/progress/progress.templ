@@ -119,3 +119,7 @@ func variantClasses(variant Variant) string {
 		return "bg-primary"
 	}
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("progress") }></script>
+}

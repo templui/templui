@@ -189,3 +189,7 @@ templ Calendar(props ...Props) {
 		</div>
 	</div>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("calendar") }></script>
+}

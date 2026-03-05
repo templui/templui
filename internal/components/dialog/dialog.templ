@@ -324,3 +324,7 @@ templ Description(props ...DescriptionProps) {
 		{ children... }
 	</p>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("dialog") }></script>
+}

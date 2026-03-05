@@ -173,3 +173,7 @@ templ Separator(props ...SeparatorProps) {
 		<span>-</span>
 	</div>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("inputotp") }></script>
+}

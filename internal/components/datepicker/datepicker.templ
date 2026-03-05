@@ -150,3 +150,7 @@ templ DatePicker(props ...Props) {
 		}
 	</div>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("datepicker") }></script>
+}

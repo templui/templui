@@ -35,3 +35,7 @@ templ Label(props ...Props) {
 		{ children... }
 	</label>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("label") }></script>
+}

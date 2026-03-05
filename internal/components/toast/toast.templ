@@ -145,3 +145,7 @@ templ Toast(props ...Props) {
 		</div>
 	</div>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("toast") }></script>
+}

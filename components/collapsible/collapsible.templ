@@ -38,7 +38,6 @@ templ Collapsible(props ...Props) {
 	>
 		{ children... }
 	</div>
-	@CollapsibleScript()
 }
 
 templ Trigger(props ...TriggerProps) {
@@ -80,45 +79,6 @@ templ Content(props ...ContentProps) {
 	</div>
 }
 
-templ CollapsibleScript() {
-	<script type="module">
-	(function () {
-		"use strict";
-
-		// Skip if already initialized
-		if (window.templUICollapsibleInit) return;
-		window.templUICollapsibleInit = true;
-
-		function toggle(trigger) {
-			const root = trigger.closest('[data-tui-collapsible="root"]');
-			if (!root) return;
-
-			const isOpen = root.getAttribute("data-tui-collapsible-state") === "open";
-			const newState = isOpen ? "closed" : "open";
-
-			// Update states
-			root.setAttribute("data-tui-collapsible-state", newState);
-			trigger.setAttribute("aria-expanded", !isOpen);
-		}
-
-		// Click handler
-		document.addEventListener("click", (e) => {
-			const trigger = e.target.closest('[data-tui-collapsible="trigger"]');
-			if (trigger) {
-				e.preventDefault();
-				toggle(trigger);
-			}
-		});
-
-		// Keyboard handler
-		document.addEventListener("keydown", (e) => {
-			if (e.key !== " " && e.key !== "Enter") return;
-			const trigger = e.target.closest('[data-tui-collapsible="trigger"]');
-			if (trigger) {
-				e.preventDefault();
-				toggle(trigger);
-			}
-		});
-	})();
-	</script>
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("collapsible") }></script>
 }

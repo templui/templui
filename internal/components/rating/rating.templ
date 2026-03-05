@@ -185,3 +185,7 @@ func (p *Props) setDefaults() {
 		p.Precision = 1.0
 	}
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("rating") }></script>
+}

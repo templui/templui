@@ -155,3 +155,7 @@ func IDFromContext(ctx context.Context) string {
 	}
 	return ""
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("tabs") }></script>
+}

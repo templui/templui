@@ -122,3 +122,7 @@ templ Input(props ...Props) {
 		}
 	</div>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("input") }></script>
+}

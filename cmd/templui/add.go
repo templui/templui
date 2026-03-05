@@ -523,30 +523,65 @@ func addScriptTemplateToFiles(config Config, comp ComponentDef, jsFileName strin
 			webPath = "/" + filepath.ToSlash(filepath.Join(config.JSDir, jsFileName))
 		}
 
-		// Check if Script() template already exists
-		if strings.Contains(contentStr, "templ Script()") {
-			fmt.Printf("   Script() template already exists in %s\n", destPath)
-			continue
-		}
-
 		// Create the Script() template with correct templ syntax, nonce support, and cache busting
 		scriptTemplate := fmt.Sprintf(`templ Script() {
 	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("%s") }></script>
 }`, webPath)
 
-		// Add Script() template at the end
-		newContent := strings.TrimSpace(contentStr) + "\n\n" + scriptTemplate + "\n"
+		newContent, action := upsertScriptTemplate(contentStr, scriptTemplate)
 
 		// Write the updated content
 		err = os.WriteFile(destPath, []byte(newContent), 0644)
 		if err != nil {
 			return fmt.Errorf("failed to write updated .templ file '%s': %w", destPath, err)
 		}
-
-		fmt.Printf("   Added Script() template to %s\n", destPath)
+		fmt.Printf("   %s Script() template in %s\n", action, destPath)
 	}
 
 	return nil
+}
+
+func upsertScriptTemplate(content, scriptTemplate string) (string, string) {
+	scriptDecl := "templ Script()"
+	idx := strings.Index(content, scriptDecl)
+	if idx == -1 {
+		return strings.TrimSpace(content) + "\n\n" + scriptTemplate + "\n", "Added"
+	}
+
+	openRel := strings.Index(content[idx:], "{")
+	if openRel == -1 {
+		return strings.TrimSpace(content) + "\n\n" + scriptTemplate + "\n", "Added"
+	}
+
+	open := idx + openRel
+	depth := 0
+	end := -1
+	for i := open; i < len(content); i++ {
+		switch content[i] {
+		case '{':
+			depth++
+		case '}':
+			depth--
+			if depth == 0 {
+				end = i + 1
+				i = len(content)
+			}
+		}
+	}
+
+	if end == -1 {
+		return strings.TrimSpace(content) + "\n\n" + scriptTemplate + "\n", "Added"
+	}
+
+	head := strings.TrimRight(content[:idx], " \t\r\n")
+	tail := strings.TrimLeft(content[end:], " \t\r\n")
+
+	updated := head + "\n\n" + scriptTemplate + "\n"
+	if tail != "" {
+		updated += "\n" + tail + "\n"
+	}
+
+	return updated, "Updated"
 }
 
 // getInstalledComponentNames returns the names of all installed components

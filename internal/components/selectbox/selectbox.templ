@@ -326,3 +326,7 @@ templ Item(props ...ItemProps) {
 		</span>
 	</div>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("selectbox") }></script>
+}

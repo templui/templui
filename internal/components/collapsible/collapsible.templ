@@ -78,3 +78,7 @@ templ Content(props ...ContentProps) {
 		</div>
 	</div>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("collapsible") }></script>
+}

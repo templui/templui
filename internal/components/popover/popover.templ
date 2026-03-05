@@ -128,3 +128,7 @@ templ Content(props ...ContentProps) {
 		}
 	</div>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("popover") }></script>
+}

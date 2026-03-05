@@ -745,3 +745,7 @@ templ Separator(props ...SeparatorProps) {
 		{ p.Attributes... }
 	/>
 }
+
+templ Script() {
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("sidebar") }></script>
+}
