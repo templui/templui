@@ -82,7 +82,7 @@ func remoteScriptRef() string {
 	if ref := strings.TrimSpace(os.Getenv("TEMPLUI_SCRIPT_REF")); ref != "" {
 		return ref
 	}
-	return "main"
+	return "latest"
 }
 
 func RemoteComponentScriptURL(component string) string {
