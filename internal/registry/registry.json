@@ -400,7 +400,7 @@
       "displayName": "Tags Input",
       "description": "Tags input component.",
       "files": ["components/tagsinput/tagsinput.templ"],
-      "dependencies": ["badge", "input"],
+      "dependencies": ["badge", "input", "popover"],
       "hasJS": true,
       "categories": ["form-input"],
       "tags": ["tags", "input", "form", "multi-value", "chips"]

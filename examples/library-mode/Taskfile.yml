@@ -11,17 +11,22 @@ vars:
 
 tasks:
   templ:
+    desc: Run templ with integrated server and hot reload
     cmds:
-      - templ generate --watch --proxy="http://localhost:8090" --cmd="go run ." --open-browser=false
+      - go tool templ generate --watch --proxy="http://localhost:8090" --cmd="go run ." --open-browser=false
 
-  tailwind:
+  tailwind-watch:
+    desc: Watch tailwind css
     cmds:
       - |
-        {{.TAILWIND_CMD}} -i ./assets/css/input.css -o ./assets/css/output.css \
-          --content "./**/*.templ" \
-          --content "{{.TEMPLUI_PATH}}/components/**/*.templ" \
-          --watch
+        TEMPLUI_PATH="$(go list -m -f {{`'{{.Dir}}'`}} github.com/templui/templui)" && \
+        printf '%s\n' \
+          '@source "./**/*.templ";' \
+          "@source \"$TEMPLUI_PATH/components/**/*.templ\";" \
+          > ./assets/css/sources.generated.css && \
+        {{.TAILWIND_CMD}} -i ./assets/css/input.css -o ./assets/css/output.css --watch
 
   dev:
+    desc: Start development server with hot reload
     cmds:
-      - task --parallel tailwind templ
+      - task --parallel tailwind-watch templ

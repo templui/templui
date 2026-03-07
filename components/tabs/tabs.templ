@@ -36,6 +36,7 @@ type ContentProps struct {
 }
 
 templ Tabs(props ...Props) {
+	@Script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -156,6 +157,10 @@ func IDFromContext(ctx context.Context) string {
 	return ""
 }
 
+var onceHandle = templ.NewOnceHandle()
+
 templ Script() {
-	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("tabs") }></script>
+	@onceHandle.Once() {
+		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("tabs") }></script>
+	}
 }

@@ -11,6 +11,7 @@ type Props struct {
 }
 
 templ Label(props ...Props) {
+	@Script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -36,6 +37,10 @@ templ Label(props ...Props) {
 	</label>
 }
 
+var onceHandle = templ.NewOnceHandle()
+
 templ Script() {
-	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("label") }></script>
+	@onceHandle.Once() {
+		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("label") }></script>
+	}
 }

@@ -79,6 +79,7 @@ type CloseProps struct {
 }
 
 templ Sheet(props ...Props) {
+	@Script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -312,5 +313,13 @@ func getSideClasses(side Side) string {
 			"!translate-y-0 " +
 			"data-[tui-dialog-open=false]:!translate-x-full " +
 			"data-[tui-dialog-open=true]:!translate-x-0"
+	}
+}
+
+var onceHandle = templ.NewOnceHandle()
+
+templ Script() {
+	@onceHandle.Once() {
+		@dialog.Script()
 	}
 }

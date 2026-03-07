@@ -7,28 +7,31 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/joho/godotenv"
-	"{{.ModuleName}}/assets"
-	"{{.ModuleName}}/ui/pages"
+	"myapp/assets"
+	"myapp/ui/pages"
 )
 
 func main() {
-	InitDotEnv()
+	initDotEnv()
+
 	mux := http.NewServeMux()
-	SetupAssetsRoutes(mux)
+	setupAssetsRoutes(mux)
 	mux.Handle("GET /", templ.Handler(pages.Landing()))
+
 	fmt.Println("Server is running on http://localhost:8090")
-	http.ListenAndServe(":8090", mux)
+	if err := http.ListenAndServe(":8090", mux); err != nil {
+		panic(err)
+	}
 }
 
-func InitDotEnv() {
-	err := godotenv.Load()
-	if err != nil {
+func initDotEnv() {
+	if err := godotenv.Load(); err != nil {
 		fmt.Println("Error loading .env file")
 	}
 }
 
-func SetupAssetsRoutes(mux *http.ServeMux) {
-	var isDevelopment = os.Getenv("GO_ENV") != "production"
+func setupAssetsRoutes(mux *http.ServeMux) {
+	isDevelopment := os.Getenv("GO_ENV") != "production"
 
 	assetHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if isDevelopment {

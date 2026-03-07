@@ -5,11 +5,8 @@ WORKDIR /app
 # Copy the source code
 COPY . .
 
-# Install templ
-RUN go install github.com/a-h/templ/cmd/templ@latest
-
 # Generate templ files
-RUN templ generate
+RUN go tool templ generate
 
 # Install build dependencies
 RUN apk add --no-cache gcc musl-dev

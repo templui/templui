@@ -42,6 +42,7 @@ type Props struct {
 }
 
 templ Toast(props ...Props) {
+	@Script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -146,6 +147,10 @@ templ Toast(props ...Props) {
 	</div>
 }
 
+var onceHandle = templ.NewOnceHandle()
+
 templ Script() {
-	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("toast") }></script>
+	@onceHandle.Once() {
+		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("toast") }></script>
+	}
 }

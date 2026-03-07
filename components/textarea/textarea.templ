@@ -21,6 +21,7 @@ type Props struct {
 }
 
 templ Textarea(props ...Props) {
+	@Script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -78,6 +79,10 @@ templ Textarea(props ...Props) {
 	>{ p.Value }</textarea>
 }
 
+var onceHandle = templ.NewOnceHandle()
+
 templ Script() {
-	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("textarea") }></script>
+	@onceHandle.Once() {
+		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("textarea") }></script>
+	}
 }

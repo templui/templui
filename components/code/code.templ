@@ -11,6 +11,7 @@ type Props struct {
 }
 
 templ Code(props ...Props) {
+	@Script()
 	// Highlight.js with theme switching
 	<link
 		id="highlight-theme"
@@ -49,6 +50,10 @@ templ Code(props ...Props) {
 	</div>
 }
 
+var onceHandle = templ.NewOnceHandle()
+
 templ Script() {
-	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("code") }></script>
+	@onceHandle.Once() {
+		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("code") }></script>
+	}
 }
