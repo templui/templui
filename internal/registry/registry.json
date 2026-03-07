@@ -152,7 +152,7 @@
       "displayName": "Date Picker",
       "description": "Date picker component combining input and calendar.",
       "files": ["components/datepicker/datepicker.templ"],
-      "dependencies": ["button", "calendar", "icon", "popover"],
+      "dependencies": ["button", "calendar", "card", "icon", "popover"],
       "hasJS": true,
       "categories": ["form-input"],
       "tags": ["datepicker", "date", "calendar", "input", "form"]
