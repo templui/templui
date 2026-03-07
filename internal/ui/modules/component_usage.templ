@@ -18,13 +18,7 @@ templ ComponentUsage(props ComponentUsageProps) {
 			componentImportLine = componentAlias + " " + componentImportLine
 		}
 
-		importLines := []string{componentImportLine}
-
-		importCode := "import (\n"
-		for _, line := range importLines {
-			importCode += "\t" + line + "\n"
-		}
-		importCode += ")"
+		importCode := "import " + componentImportLine
 	}}
 	@tabs.Tabs(tabs.Props{
 		ID: "installation-" + props.ComponentName,
@@ -57,7 +51,6 @@ templ ComponentUsage(props ComponentUsageProps) {
 			@tabs.Content(tabs.ContentProps{
 				Value: "import",
 			}) {
-				<p class="mb-4 font-semibold">Import the package</p>
 				@Code(CodeProps{
 					CodeContent:    importCode,
 					ShowCopyButton: true,

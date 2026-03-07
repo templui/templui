@@ -312,15 +312,6 @@ templui upgrade@v0.84.0      # Specific version
 
 This updates both the CLI tool and the utils package (`utils/templui.go`) to ensure you have the latest helper functions.
 
-### Copy & Paste
-
-Copy components directly from docs or GitHub.
-
-**You'll need to manually:**
-- Handle dependencies
-- Update import paths
-- Include required JavaScript files
-
 ## Advanced
 
 ### Config File
