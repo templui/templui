@@ -1,6 +1,6 @@
-# templUI Import Quickstart
+# templUI Quickstart
 
-This is a full import-based starter project for templUI.
+This is a ready-to-run quickstart project for templUI.
 
 ## Run
 

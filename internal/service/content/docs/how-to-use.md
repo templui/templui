@@ -204,15 +204,15 @@ task dev
 
 ## Installation
 
-### Import Quickstart (Recommended for fast start)
+### Quickstart (Recommended for fast start)
 
 Clone the repo with sparse checkout and use the ready-to-run quickstart folder:
 
 ```shell
 git clone --depth 1 --filter=blob:none --sparse https://github.com/templui/templui.git myapp
 cd myapp
-git sparse-checkout set examples/library-mode
-cd examples/library-mode
+git sparse-checkout set examples/quickstart
+cd examples/quickstart
 cp .env.example .env
 go mod tidy
 task dev
