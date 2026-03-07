@@ -112,14 +112,9 @@ func main() {
 		// Collapsible
 		"out/showcase/collapsible_default.html": showcase.CollapsibleDefault(),
 
-		// Code
-		"out/showcase/code_copy_button.html": showcase.CodeCopyButton(),
-		"out/showcase/code_default.html":     showcase.CodeDefault(),
-
 		// CopyButton
 		"out/showcase/copybutton_default.html":    showcase.CopyButtonDefault(),
 		"out/showcase/copybutton_with_input.html": showcase.CopyButtonWithInput(),
-		"out/showcase/copybutton_with_code.html":  showcase.CopyButtonWithCode(),
 
 		// Date Picker
 		"out/showcase/date_picker_custom_placeholder.html": showcase.DatePickerCustomPlaceholder(),
@@ -147,14 +142,14 @@ func main() {
 		"out/showcase/icon_sizes.html":   showcase.IconSizes(),
 
 		// Input
-		"out/showcase/input_default.html":     showcase.InputDefault(),
-		"out/showcase/input_disabled.html":    showcase.InputDisabled(),
-		"out/showcase/input_file.html":        showcase.InputFile(),
-		"out/showcase/input_form.html":        showcase.InputForm(),
-		"out/showcase/input_password.html":    showcase.InputPassword(),
+		"out/showcase/input_default.html":      showcase.InputDefault(),
+		"out/showcase/input_disabled.html":     showcase.InputDisabled(),
+		"out/showcase/input_file.html":         showcase.InputFile(),
+		"out/showcase/input_form.html":         showcase.InputForm(),
+		"out/showcase/input_password.html":     showcase.InputPassword(),
 		"out/showcase/input_time_default.html": showcase.InputTimeDefault(),
 		"out/showcase/input_time_styled.html":  showcase.InputTimeStyled(),
-		"out/showcase/input_with_label.html":  showcase.InputWithLabel(),
+		"out/showcase/input_with_label.html":   showcase.InputWithLabel(),
 
 		// Input OTP
 		"out/showcase/input_otp_custom_length.html":  showcase.InputOTPCustomLength(),

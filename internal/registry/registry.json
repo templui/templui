@@ -136,17 +136,6 @@
       "tags": ["collapsible", "toggle", "expand", "collapse"]
     },
     {
-      "name": "code",
-      "slug": "code",
-      "displayName": "Code",
-      "description": "Syntax-highlighted code block component.",
-      "files": ["components/code/code.templ"],
-      "dependencies": [],
-      "hasJS": true,
-      "categories": ["misc"],
-      "tags": ["code", "syntax", "highlight", "snippet"]
-    },
-    {
       "name": "copybutton",
       "slug": "copy-button",
       "displayName": "Copy Button",

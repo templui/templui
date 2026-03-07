@@ -37,7 +37,6 @@ tasks:
         components/carousel/carousel.js \
         components/checkbox/checkbox.js \
         components/chart/chart.js \
-        components/code/code.js \
         components/collapsible/collapsible.js \
         components/copybutton/copybutton.js \
         components/datepicker/datepicker.js \
