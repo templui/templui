@@ -10,8 +10,8 @@ import (
 	"github.com/a-h/templ"
 
 	"github.com/templui/templui/assets"
-	"github.com/templui/templui/internal/components"
-	"github.com/templui/templui/internal/components/toast"
+	"github.com/templui/templui/components"
+	"github.com/templui/templui/components/toast"
 	"github.com/templui/templui/internal/config"
 	"github.com/templui/templui/internal/middleware"
 	"github.com/templui/templui/internal/service"
@@ -237,7 +237,7 @@ func SetupAssetsRoutes(mux *http.ServeMux) {
 		if isDevelopment {
 			w.Header().Set("Cache-Control", "no-store")
 			// In dev, serve from filesystem
-			http.ServeFile(w, r, "./internal/components/"+path)
+			http.ServeFile(w, r, "./components/"+path)
 		} else {
 			// In production, serve from embedded FS
 			w.Header().Set("Cache-Control", "public, max-age=31536000")

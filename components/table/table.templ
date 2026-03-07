@@ -1,0 +1,201 @@
+package table
+
+import "github.com/templui/templui/utils"
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type HeaderProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type BodyProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type FooterProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type RowProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Selected   bool
+}
+
+type HeadProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type CellProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type CaptionProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+templ Table(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<table
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("w-full caption-bottom text-sm", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</table>
+}
+
+templ Header(props ...HeaderProps) {
+	{{ var p HeaderProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<thead
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("[&_tr]:border-b", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</thead>
+}
+
+templ Body(props ...BodyProps) {
+	{{ var p BodyProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<tbody
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("[&_tr:last-child]:border-0", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</tbody>
+}
+
+templ Footer(props ...FooterProps) {
+	{{ var p FooterProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<tfoot
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</tfoot>
+}
+
+templ Row(props ...RowProps) {
+	{{ var p RowProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<tr
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"border-b transition-colors hover:bg-muted/50",
+				utils.If(p.Selected, "data-[tui-table-state-selected]:bg-muted"),
+				p.Class,
+			),
+		}
+		if p.Selected {
+			data-tui-table-state-selected
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</tr>
+}
+
+templ Head(props ...HeadProps) {
+	{{ var p HeadProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<th
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"h-10 px-2 text-left align-middle font-medium text-muted-foreground",
+				"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</th>
+}
+
+templ Cell(props ...CellProps) {
+	{{ var p CellProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<td
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"p-2 align-middle",
+				"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</td>
+}
+
+templ Caption(props ...CaptionProps) {
+	{{ var p CaptionProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<caption
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("mt-4 text-sm text-muted-foreground", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</caption>
+}

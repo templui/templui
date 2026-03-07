@@ -204,6 +204,20 @@ task dev
 
 ## Installation
 
+### Import Quickstart (Recommended for fast start)
+
+Clone the repo with sparse checkout and use the ready-to-run quickstart folder:
+
+```shell
+git clone --depth 1 --filter=blob:none --sparse https://github.com/templui/templui.git myapp
+cd myapp
+git sparse-checkout set examples/library-mode
+cd examples/library-mode
+cp .env.example .env
+go mod tidy
+task dev
+```
+
 ### Install CLI
 
 Install the templUI CLI:
@@ -257,7 +271,7 @@ templui add@main button
 templui add@v0.84.0 dialog
 ```
 
-> **💡 Tip:** Components with JavaScript include a `Script()` template function. Add it to your base layout to include required JavaScript.
+> **💡 Tip:** JavaScript is included automatically by interactive components. No extra script wiring is needed.
 
 ### Update Components
 
@@ -297,45 +311,6 @@ templui upgrade@v0.84.0      # Specific version
 ```
 
 This updates both the CLI tool and the utils package (`utils/templui.go`) to ensure you have the latest helper functions.
-
-### Copy & Paste
-
-Copy components directly from docs or GitHub.
-
-**You'll need to manually:**
-- Handle dependencies
-- Update import paths
-- Include required JavaScript files
-
-### Create New Project
-
-Create a new project with everything pre-configured:
-
-```shell
-templui new myapp
-cd myapp
-task dev
-```
-
-**With full module path (like go mod init):**
-
-```shell
-templui new github.com/user/myapp
-cd myapp
-task dev
-```
-
-**Options:**
-
-```shell
-templui new@v1.0.0 myapp  # Specific version
-```
-
-This creates a ready-to-run project with:
-- Base layout with dark mode support
-- Example landing page
-- Pre-configured Taskfile for development
-- Required components auto-installed
 
 ## Advanced
 

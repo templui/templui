@@ -1,0 +1,28 @@
+package skeleton
+
+import "github.com/templui/templui/utils"
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+templ Skeleton(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"animate-pulse rounded bg-muted",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	></div>
+}

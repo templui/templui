@@ -61,7 +61,6 @@ var (
 	forceOverwrite = flag.Bool("force", false, "Force overwrite existing files without asking")
 	versionFlag    = flag.Bool("version", false, "Show installer version")
 	helpFlag       = flag.Bool("help", false, "Show this help message")
-	moduleFlag     = flag.String("module", "", "Go module name (for 'new' command)")
 	installedFlag  = flag.Bool("installed", false, "Update all currently installed components")
 )
 
@@ -102,8 +101,6 @@ func main() {
 
 	// Route to appropriate command handler
 	switch {
-	case strings.HasPrefix(commandArg, "new"):
-		runNew(args, commandArg, *forceOverwrite, *moduleFlag)
 	case strings.HasPrefix(commandArg, "init"):
 		runInit(args, commandArg, *forceOverwrite)
 	case strings.HasPrefix(commandArg, "add"):
@@ -122,8 +119,6 @@ func main() {
 func showHelp(registry *Registry, refUsedForHelp string) {
 	fmt.Println("templUI " + version + " - The UI Kit for templ" + "\n")
 	fmt.Println("Usage:")
-	fmt.Println("  templui new <project-name>              - Create a new templUI project")
-	fmt.Println("  templui --module <mod> new <name>       - Create project with custom module name")
 	fmt.Println("  templui init[@<ref>]                    - Initialize config and install utils from <ref>")
 	fmt.Println("  templui --force init[@<ref>]            - Force reinitialize and repair incomplete config")
 	fmt.Println("  templui add[@<ref>] <comp>...           - Add or update component(s) from specified <ref>")

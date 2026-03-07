@@ -1,0 +1,32 @@
+version: "3"
+
+vars:
+  # Auto-detect templUI Go module path
+  TEMPLUI_PATH:
+    sh: go list -m -f {{`'{{.Dir}}'`}} github.com/templui/templui 2>/dev/null || echo ""
+
+  # Auto-detect Tailwind CLI (standalone or npx)
+  TAILWIND_CMD:
+    sh: command -v tailwindcss >/dev/null 2>&1 && echo "tailwindcss" || echo "npx tailwindcss@latest"
+
+tasks:
+  templ:
+    desc: Run templ with integrated server and hot reload
+    cmds:
+      - go tool templ generate --watch --proxy="http://localhost:8090" --cmd="go run ." --open-browser=false
+
+  tailwind-watch:
+    desc: Watch tailwind css
+    cmds:
+      - |
+        TEMPLUI_PATH="$(go list -m -f {{`'{{.Dir}}'`}} github.com/templui/templui)" && \
+        printf '%s\n' \
+          '@source "./**/*.templ";' \
+          "@source \"$TEMPLUI_PATH/components/**/*.templ\";" \
+          > ./assets/css/sources.generated.css && \
+        {{.TAILWIND_CMD}} -i ./assets/css/input.css -o ./assets/css/output.css --watch
+
+  dev:
+    desc: Start development server with hot reload
+    cmds:
+      - task --parallel tailwind-watch templ

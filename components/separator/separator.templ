@@ -1,0 +1,96 @@
+package separator
+
+import "github.com/templui/templui/utils"
+
+type Orientation string
+type Decoration string
+
+const (
+	OrientationHorizontal Orientation = "horizontal"
+	OrientationVertical   Orientation = "vertical"
+)
+
+const (
+	DecorationDashed Decoration = "dashed"
+	DecorationDotted Decoration = "dotted"
+)
+
+type Props struct {
+	ID          string
+	Class       string
+	Attributes  templ.Attributes
+	Orientation Orientation
+	Decoration  Decoration
+}
+
+templ Separator(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Orientation == "" {
+		{{ p.Orientation = OrientationHorizontal }}
+	}
+	if p.Orientation == OrientationHorizontal {
+		<div
+			if p.ID != "" {
+				id={ p.ID }
+			}
+			role="separator"
+			aria-orientation="horizontal"
+			class={ utils.TwMerge("shrink-0 w-full", p.Class) }
+			{ p.Attributes... }
+		>
+			<div class="relative flex items-center w-full">
+				<span
+					class={
+						utils.TwMerge(
+							"absolute w-full border-t h-[1px]",
+							decorationClasses(p.Decoration),
+						),
+					}
+					aria-hidden="true"
+				></span>
+				<span class="relative mx-auto bg-background px-2 text-xs text-muted-foreground">
+					{ children... }
+				</span>
+			</div>
+		</div>
+	} else {
+		<div
+			if p.ID != "" {
+				id={ p.ID }
+			}
+			role="separator"
+			aria-orientation="vertical"
+			class={ utils.TwMerge("shrink-0 h-full", p.Class) }
+			{ p.Attributes... }
+		>
+			<div class="relative flex flex-col items-center h-full">
+				<span
+					class={
+						utils.TwMerge(
+							"absolute h-full border-l w-[1px]",
+							decorationClasses(p.Decoration),
+						),
+					}
+					aria-hidden="true"
+				></span>
+				<span class="relative my-auto bg-background py-2 text-xs text-muted-foreground">
+					{ children... }
+				</span>
+			</div>
+		</div>
+	}
+}
+
+func decorationClasses(decoration Decoration) string {
+	switch decoration {
+	case DecorationDashed:
+		return "border-dashed"
+	case DecorationDotted:
+		return "border-dotted"
+	default:
+		return ""
+	}
+}

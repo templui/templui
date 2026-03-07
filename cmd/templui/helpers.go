@@ -61,25 +61,27 @@ func askForOverwrite(filePath, oldRef, newRef string) bool {
 	return input == "y"
 }
 
-// replaceImports replaces internal templUI import paths with the user's configured module name and paths.
+// replaceImports rewrites templui component/util imports to the user's configured module paths.
+// Expected repository paths are under "github.com/templui/templui/components/..." and
+// "github.com/templui/templui/utils...".
 func replaceImports(data []byte, config Config, context string) []byte {
 	content := string(data)
-	// Pattern to find "github.com/templui/templui/internal/..." imports.
-	// It captures the part after "internal/", e.g., "components/icon" or "utils".
-	internalImportPattern := `"github.com/templui/templui/internal/([^"]+)"`
+	// Pattern to find "github.com/templui/templui/..." imports and capture the
+	// path part so we can map components/utils imports to user-defined folders.
+	internalImportPattern := `"github.com/templui/templui/([^"]+)"`
 	re := regexp.MustCompile(internalImportPattern)
 
 	modified := false // Flag to track if any replacement occurred
 
 	newContent := re.ReplaceAllStringFunc(content, func(originalFullImport string) string {
-		// originalFullImport is like: "github.com/templui/templui/internal/components/icon" (with quotes)
+		// originalFullImport is like: "github.com/templui/templui/components/icon" (with quotes)
 		// submatches[0] is originalFullImport
 		// submatches[1] is the captured group, e.g., "components/icon" or "utils"
 		submatches := re.FindStringSubmatch(originalFullImport)
 		if len(submatches) < 2 {
 			return originalFullImport // Should not happen if regex matches
 		}
-		repoRelativePath := submatches[1] // This is "components/icon" or "utils"
+		repoRelativePath := submatches[1]
 
 		var newImportPath string
 		if strings.HasPrefix(repoRelativePath, "components/") {

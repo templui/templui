@@ -1,0 +1,101 @@
+package tooltip
+
+import (
+	"github.com/templui/templui/components/popover"
+	"github.com/templui/templui/utils"
+)
+
+type Position string
+
+const (
+	PositionTop    Position = "top"
+	PositionRight  Position = "right"
+	PositionBottom Position = "bottom"
+	PositionLeft   Position = "left"
+)
+
+// Map tooltip positions to popover positions
+func mapTooltipPositionToPopover(position Position) popover.Placement {
+	switch position {
+	case PositionTop:
+		return popover.PlacementTop
+	case PositionRight:
+		return popover.PlacementRight
+	case PositionBottom:
+		return popover.PlacementBottom
+	case PositionLeft:
+		return popover.PlacementLeft
+	default:
+		return popover.PlacementTop
+	}
+}
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type TriggerProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	For        string
+}
+
+type ContentProps struct {
+	ID            string
+	Class         string
+	Attributes    templ.Attributes
+	ShowArrow     bool
+	Position      Position
+	HoverDelay    int
+	HoverOutDelay int
+}
+
+templ Tooltip(props ...Props) {
+	@Script()
+	{ children... }
+}
+
+templ Trigger(props ...TriggerProps) {
+	{{ var p TriggerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@popover.Trigger(popover.TriggerProps{
+		ID:          p.ID,
+		Class:       p.Class,
+		Attributes:  p.Attributes,
+		TriggerType: popover.TriggerTypeHover,
+		For:         p.For,
+	}) {
+		{ children... }
+	}
+}
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@popover.Content(popover.ContentProps{
+		ID:            p.ID,
+		Class:         utils.TwMerge("px-4 py-1 bg-foreground text-background [&_[data-tui-popover-arrow]]:!bg-foreground [&_[data-tui-popover-arrow]]:!border-0", p.Class),
+		Attributes:    p.Attributes,
+		Placement:     mapTooltipPositionToPopover(p.Position),
+		ShowArrow:     p.ShowArrow,
+		HoverDelay:    p.HoverDelay,
+		HoverOutDelay: p.HoverOutDelay,
+	}) {
+		{ children... }
+	}
+}
+
+var onceHandle = templ.NewOnceHandle()
+
+templ Script() {
+	@onceHandle.Once() {
+		@popover.Script()
+	}
+}

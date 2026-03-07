@@ -1,40 +1,61 @@
 package modules
 
+import "github.com/templui/templui/components/tabs"
+
 type ComponentUsageProps struct {
 	ComponentName string
-	// HasJS         bool
-	JSFiles []string
 }
 
 templ ComponentUsage(props ComponentUsageProps) {
-	if len(props.JSFiles) == 0 {
-		@Code(CodeProps{
-			CodeContent:    "templui add " + props.ComponentName,
-			ShowCopyButton: true,
-		})
-	} else {
-		<ol class="list-decimal pl-5 space-y-8">
-			<li>
-				<p class="mb-4 font-semibold">Install the component</p>
+	{{
+		componentAlias := props.ComponentName
+		if props.ComponentName == "switch" {
+			componentAlias = "switchcomp"
+		}
+
+		componentImportLine := `"` + "github.com/templui/templui/components/" + props.ComponentName + `"`
+		if componentAlias != props.ComponentName {
+			componentImportLine = componentAlias + " " + componentImportLine
+		}
+
+		importCode := "import " + componentImportLine
+	}}
+	@tabs.Tabs(tabs.Props{
+		ID: "installation-" + props.ComponentName,
+	}) {
+		@tabs.List(tabs.ListProps{
+			Class: "w-fit",
+		}) {
+			@tabs.Trigger(tabs.TriggerProps{
+				Value:    "cli",
+				IsActive: true,
+			}) {
+				CLI
+			}
+			@tabs.Trigger(tabs.TriggerProps{
+				Value: "import",
+			}) {
+				Import
+			}
+		}
+		<div class="mt-4">
+			@tabs.Content(tabs.ContentProps{
+				Value:    "cli",
+				IsActive: true,
+			}) {
 				@Code(CodeProps{
 					CodeContent:    "templui add " + props.ComponentName,
 					ShowCopyButton: true,
 				})
-			</li>
-			<li>
-				<p class="mb-4 font-semibold">Add the JavaScript to your layout</p>
-				{{
-					var files string
-					for _, jsFile := range props.JSFiles {
-						files += "@" + jsFile + ".Script()\n"
-					}
-				}}
+			}
+			@tabs.Content(tabs.ContentProps{
+				Value: "import",
+			}) {
 				@Code(CodeProps{
-					CodeContent:    files,
+					CodeContent:    importCode,
 					ShowCopyButton: true,
 				})
-				<p class="text-sm text-muted-foreground mt-2">Call this template in your base layout file (e.g., in the &lt;head&gt; section).</p>
-			</li>
-		</ol>
+			}
+		</div>
 	}
 }
