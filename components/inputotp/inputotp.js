@@ -1,5 +1,9 @@
 (function () {
   'use strict';
+
+  function getEventTargetElement(event) {
+    return event.target instanceof Element ? event.target : null;
+  }
   
   // Utility functions
   function getSlots(container) {
@@ -44,9 +48,10 @@
   
   // Event handlers
   document.addEventListener('input', (e) => {
-    if (!e.target.matches('[data-tui-inputotp-slot]')) return;
+    const target = getEventTargetElement(e);
+    if (!target?.matches('[data-tui-inputotp-slot]')) return;
     
-    const slot = e.target;
+    const slot = target;
     const container = slot.closest('[data-tui-inputotp]');
     if (!container) return;
     
@@ -71,9 +76,10 @@
   });
   
   document.addEventListener('keydown', (e) => {
-    if (!e.target.matches('[data-tui-inputotp-slot]')) return;
+    const target = getEventTargetElement(e);
+    if (!target?.matches('[data-tui-inputotp-slot]')) return;
     
-    const slot = e.target;
+    const slot = target;
     const container = slot.closest('[data-tui-inputotp]');
     if (!container) return;
     
@@ -103,9 +109,10 @@
   });
   
   document.addEventListener('focus', (e) => {
-    if (!e.target.matches('[data-tui-inputotp-slot]')) return;
+    const target = getEventTargetElement(e);
+    if (!target?.matches('[data-tui-inputotp-slot]')) return;
     
-    const slot = e.target;
+    const slot = target;
     const container = slot.closest('[data-tui-inputotp]');
     if (!container) return;
     
@@ -120,7 +127,8 @@
   }, true);
   
   document.addEventListener('paste', (e) => {
-    const slot = e.target.closest('[data-tui-inputotp-slot]');
+    const target = getEventTargetElement(e);
+    const slot = target?.closest('[data-tui-inputotp-slot]');
     if (!slot) return;
     
     e.preventDefault();
@@ -145,9 +153,10 @@
   
   // Label click handling
   document.addEventListener('click', (e) => {
-    if (!e.target.matches('label[for]')) return;
+    const target = getEventTargetElement(e);
+    if (!target?.matches('label[for]')) return;
     
-    const targetId = e.target.getAttribute('for');
+    const targetId = target.getAttribute('for');
     const hiddenInput = document.getElementById(targetId);
     if (!hiddenInput?.matches('[data-tui-inputotp-value-target]')) return;
     
@@ -159,9 +168,10 @@
   
   // Form reset
   document.addEventListener('reset', (e) => {
-    if (!e.target.matches('form')) return;
+    const target = getEventTargetElement(e);
+    if (!target?.matches('form')) return;
     
-    e.target.querySelectorAll('[data-tui-inputotp]').forEach(container => {
+    target.querySelectorAll('[data-tui-inputotp]').forEach(container => {
       getSlots(container).forEach(slot => {
         slot.value = '';
       });
