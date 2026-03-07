@@ -20,3 +20,5 @@ out
 # Build outputs
 assets/css/output.css
 
+.gocache
+
