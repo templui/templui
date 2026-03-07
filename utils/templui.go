@@ -75,7 +75,11 @@ var ScriptURL = func(path string) string {
 }
 
 var (
-	RemoteScriptCDNBase = "https://cdn.jsdelivr.net/gh/templui/templui"
+	SuppressComponentScripts bool
+	RemoteScriptCDNBase      = "https://cdn.jsdelivr.net/gh/templui/templui"
+	ComponentScriptURL       = func(component string) string {
+		return RemoteComponentScriptURL(component)
+	}
 )
 
 func remoteScriptRef() string {
@@ -88,4 +92,8 @@ func remoteScriptRef() string {
 func RemoteComponentScriptURL(component string) string {
 	ref := remoteScriptRef()
 	return fmt.Sprintf("%s@%s/components/%s/%s.min.js", RemoteScriptCDNBase, ref, component, component)
+}
+
+func LocalComponentScriptURL(component string) string {
+	return ScriptURL(fmt.Sprintf("/components/js/%s/%s.min.js", component, component))
 }

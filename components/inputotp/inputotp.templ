@@ -180,7 +180,9 @@ var onceHandle = templ.NewOnceHandle()
 
 templ Script() {
 	@onceHandle.Once() {
-		@input.Script()
-		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("inputotp") }></script>
+		if !utils.SuppressComponentScripts {
+			@input.Script()
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("inputotp") }></script>
+		}
 	}
 }

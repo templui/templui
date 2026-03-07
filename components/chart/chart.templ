@@ -120,6 +120,8 @@ var onceHandle = templ.NewOnceHandle()
 
 templ Script() {
 	@onceHandle.Once() {
-		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("chart") }></script>
+		if !utils.SuppressComponentScripts {
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("chart") }></script>
+		}
 	}
 }

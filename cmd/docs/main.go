@@ -17,6 +17,7 @@ import (
 	"github.com/templui/templui/internal/service"
 	"github.com/templui/templui/internal/ui/pages"
 	"github.com/templui/templui/static"
+	"github.com/templui/templui/utils"
 )
 
 func toastDemoHandler(w http.ResponseWriter, r *http.Request) {
@@ -56,6 +57,8 @@ func htmxHandler(component templ.Component) http.Handler {
 func main() {
 	mux := http.NewServeMux()
 	config.LoadConfig()
+	utils.SuppressComponentScripts = true
+
 	SetupAssetsRoutes(mux)
 
 	// Initialize markdown docs service

@@ -751,8 +751,10 @@ var onceHandle = templ.NewOnceHandle()
 
 templ Script() {
 	@onceHandle.Once() {
-		@sheet.Script()
-		@tooltip.Script()
-		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("sidebar") }></script>
+		if !utils.SuppressComponentScripts {
+			@sheet.Script()
+			@tooltip.Script()
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("sidebar") }></script>
+		}
 	}
 }

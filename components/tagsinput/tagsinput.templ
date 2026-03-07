@@ -129,8 +129,10 @@ var onceHandle = templ.NewOnceHandle()
 
 templ Script() {
 	@onceHandle.Once() {
-		@popover.Script()
-		@input.Script()
-		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("tagsinput") }></script>
+		if !utils.SuppressComponentScripts {
+			@popover.Script()
+			@input.Script()
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("tagsinput") }></script>
+		}
 	}
 }

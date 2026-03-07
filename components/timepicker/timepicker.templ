@@ -248,7 +248,9 @@ var onceHandle = templ.NewOnceHandle()
 
 templ Script() {
 	@onceHandle.Once() {
-		@popover.Script()
-		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.RemoteComponentScriptURL("timepicker") }></script>
+		if !utils.SuppressComponentScripts {
+			@popover.Script()
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("timepicker") }></script>
+		}
 	}
 }
