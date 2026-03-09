@@ -73,7 +73,7 @@ type ItemProps struct {
 }
 
 templ SelectBox(props ...Props) {
-	@Script()
+	@script()
 	{{
 		var p Props
 		if len(props) > 0 {
@@ -327,11 +327,9 @@ templ Item(props ...ItemProps) {
 
 var onceHandle = templ.NewOnceHandle()
 
-templ Script() {
+templ script() {
 	@onceHandle.Once() {
 		if !utils.SuppressComponentScripts {
-			@popover.Script()
-			@input.Script()
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("selectbox") }></script>
 		}
 	}

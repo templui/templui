@@ -54,7 +54,6 @@ type ContentProps struct {
 }
 
 templ Tooltip(props ...Props) {
-	@Script()
 	{ children... }
 }
 
@@ -89,13 +88,5 @@ templ Content(props ...ContentProps) {
 		HoverOutDelay: p.HoverOutDelay,
 	}) {
 		{ children... }
-	}
-}
-
-var onceHandle = templ.NewOnceHandle()
-
-templ Script() {
-	@onceHandle.Once() {
-		@popover.Script()
 	}
 }

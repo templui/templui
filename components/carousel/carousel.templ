@@ -48,7 +48,7 @@ type IndicatorsProps struct {
 }
 
 templ Carousel(props ...Props) {
-	@Script()
+	@script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -207,7 +207,7 @@ templ Indicators(props ...IndicatorsProps) {
 
 var onceHandle = templ.NewOnceHandle()
 
-templ Script() {
+templ script() {
 	@onceHandle.Once() {
 		if !utils.SuppressComponentScripts {
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("carousel") }></script>
