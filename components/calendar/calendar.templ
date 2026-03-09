@@ -151,7 +151,7 @@ templ Calendar(props ...Props) {
 						</select>
 						<span class="select-none font-medium rounded-md px-2 flex items-center justify-center gap-1 text-sm h-7 pointer-events-none" aria-hidden="true">
 							<span id={ p.ID + "-month-value" }>{ monthNames[currentMonth] }</span>
-							@icon.ChevronDown(icon.Props{Size: 14, Class: "text-muted-foreground"})
+							@icon.ChevronDown(icon.Props{Class: "size-3.5 text-muted-foreground"})
 						</span>
 					</div>
 					<!-- Year Select -->
@@ -171,7 +171,7 @@ templ Calendar(props ...Props) {
 						</select>
 						<span class="select-none font-medium rounded-md px-2 flex items-center justify-center gap-1 text-sm h-7 pointer-events-none" aria-hidden="true">
 							<span id={ p.ID + "-year-value" }>{ strconv.Itoa(currentYear) }</span>
-							@icon.ChevronDown(icon.Props{Size: 14, Class: "text-muted-foreground"})
+							@icon.ChevronDown(icon.Props{Class: "size-3.5 text-muted-foreground"})
 						</span>
 					</div>
 				</div>

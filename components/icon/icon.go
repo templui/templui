@@ -18,12 +18,7 @@ var (
 
 // Props defines the properties that can be set for an icon.
 type Props struct {
-	Size        int
-	Color       string
-	Fill        string
-	Stroke      string
-	StrokeWidth string // Stroke Width of Icon, Usage: "2.5"
-	Class       string
+	Class string
 }
 
 // Icon returns a function that generates a templ.Component for the specified icon name.
@@ -34,10 +29,8 @@ func Icon(name string) func(...Props) templ.Component {
 			p = props[0]
 		}
 
-		// Create a unique key for the cache based on icon name and all relevant props.
-		// This ensures different stylings of the same icon are cached separately.
-		cacheKey := fmt.Sprintf("%s|s:%d|c:%s|f:%s|sk:%s|sw:%s|cl:%s",
-			name, p.Size, p.Color, p.Fill, p.Stroke, p.StrokeWidth, p.Class)
+		// Cache by icon name and class so repeated renders reuse the generated SVG.
+		cacheKey := fmt.Sprintf("%s|cl:%s", name, p.Class)
 
 		return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 			iconMutex.RLock()
@@ -76,33 +69,10 @@ func generateSVG(name string, props Props) (string, error) {
 		return "", err // Error from getIconContent already includes icon name
 	}
 
-	size := props.Size
-	if size <= 0 {
-		size = 24 // Default size
-	}
-
-	fill := props.Fill
-	if fill == "" {
-		fill = "none" // Default fill
-	}
-
-	stroke := props.Stroke
-	if stroke == "" {
-		stroke = props.Color // Fallback to Color if Stroke is not set
-	}
-	if stroke == "" {
-		stroke = "currentColor" // Default stroke color
-	}
-
-	strokeWidth := props.StrokeWidth
-	if strokeWidth == "" {
-		strokeWidth = "2" // Default stroke width
-	}
-
 	// Construct the final SVG string.
 	// The data-lucide attribute helps identify these as Lucide icons if needed.
-	return fmt.Sprintf("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%d\" height=\"%d\" viewBox=\"0 0 24 24\" fill=\"%s\" stroke=\"%s\" stroke-width=\"%s\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"%s\" data-lucide=\"icon\">%s</svg>",
-		size, size, fill, stroke, strokeWidth, props.Class, content), nil
+	return fmt.Sprintf("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"%s\" data-lucide=\"icon\">%s</svg>",
+		props.Class, content), nil
 }
 
 // getIconContent retrieves the raw inner SVG content for a given icon name.

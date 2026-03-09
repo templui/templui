@@ -12,7 +12,7 @@ templ BreadcrumbWithIcons() {
 				@breadcrumb.Link(breadcrumb.LinkProps{
 					Href: "/",
 				}) {
-					@icon.House(icon.Props{Size: 16})
+					@icon.House(icon.Props{Class: "size-4"})
 					<span class="ml-1">Home</span>
 				}
 			}
@@ -21,14 +21,14 @@ templ BreadcrumbWithIcons() {
 				@breadcrumb.Link(breadcrumb.LinkProps{
 					Href: "/docs",
 				}) {
-					@icon.FileText(icon.Props{Size: 16})
+					@icon.FileText(icon.Props{Class: "size-4"})
 					<span class="ml-1">Documentation</span>
 				}
 			}
 			@breadcrumb.Item() {
 				@breadcrumb.Separator()
 				@breadcrumb.Page(breadcrumb.ItemProps{Current: true}) {
-					@icon.Component(icon.Props{Size: 16})
+					@icon.Component(icon.Props{Class: "size-4"})
 					<span class="ml-1">Components</span>
 				}
 			}

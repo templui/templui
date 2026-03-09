@@ -29,20 +29,20 @@ templ DropdownDefault() {
 				@dropdown.Sub() {
 					@dropdown.SubTrigger() {
 						<span class="flex items-center">
-							@icon.Users(icon.Props{Size: 16, Class: "mr-2"})
+							@icon.Users(icon.Props{Class: "size-4 mr-2"})
 							Invite users
 						</span>
 					}
 					@dropdown.SubContent() {
 						@dropdown.Item() {
 							<span class="flex items-center">
-								@icon.Mail(icon.Props{Size: 16, Class: "mr-2"})
+								@icon.Mail(icon.Props{Class: "size-4 mr-2"})
 								Email
 							</span>
 						}
 						@dropdown.Item() {
 							<span class="flex items-center">
-								@icon.MessageSquare(icon.Props{Size: 16, Class: "mr-2"})
+								@icon.MessageSquare(icon.Props{Class: "size-4 mr-2"})
 								Message
 							</span>
 						}
@@ -65,13 +65,13 @@ templ DropdownDefault() {
 				Target: "_blank",
 			}) {
 				<span class="flex items-center">
-					@icon.Github(icon.Props{Size: 16, Class: "mr-2"})
+					@icon.Github(icon.Props{Class: "size-4 mr-2"})
 					GitHub
 				</span>
 			}
 			@dropdown.Item() {
 				<span class="flex items-center">
-					@icon.LifeBuoy(icon.Props{Size: 16, Class: "mr-2"})
+					@icon.LifeBuoy(icon.Props{Class: "size-4 mr-2"})
 					Support
 				</span>
 			}
@@ -79,14 +79,14 @@ templ DropdownDefault() {
 				Disabled: true,
 			}) {
 				<span class="flex items-center">
-					@icon.Code(icon.Props{Size: 16, Class: "mr-2"})
+					@icon.Code(icon.Props{Class: "size-4 mr-2"})
 					API
 				</span>
 			}
 			@dropdown.Separator()
 			@dropdown.Item() {
 				<span class="flex items-center">
-					@icon.LogOut(icon.Props{Size: 16, Class: "mr-2"})
+					@icon.LogOut(icon.Props{Class: "size-4 mr-2"})
 					Log out
 				</span>
 				@dropdown.Shortcut() {

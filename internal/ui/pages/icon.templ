@@ -9,7 +9,7 @@ import (
 templ Icon() {
 	@layouts.DocsLayout(
 		"Icon",
-		"A wrapper for Lucide Icons with optional settings for size, color, fill, stroke, and custom classes.",
+		"Lucide icons styled directly with Tailwind utility classes.",
 		[]modules.TableOfContentsItem{
 			{
 				ID:   "installation",
@@ -47,7 +47,7 @@ templ Icon() {
 	) {
 		@modules.PageWrapper(modules.PageWrapperProps{
 			Name:        "Icon",
-			Description: templ.Raw(`A wrapper for <a href="https://lucide.dev" target="_blank" rel="noopener" class="text-primary underline underline-offset-2 hover:opacity-80 transition-opacity">Lucide Icons</a> with optional settings for size, color, fill, stroke, and custom classes. Browse available icons in the Lucide library to see what you can use.`),
+			Description: templ.Raw(`A wrapper for <a href="https://lucide.dev" target="_blank" rel="noopener" class="text-primary underline underline-offset-2 hover:opacity-80 transition-opacity">Lucide Icons</a> that is primarily styled with Tailwind utility classes. Browse the Lucide library to see what you can use.`),
 			Tailwind:    true,
 			Breadcrumbs: modules.Breadcrumbs{
 				Items: []modules.BreadcrumbItem{
@@ -108,7 +108,7 @@ templ Icon() {
 				<div id="icon" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Icon",
-						Description: "Wrapper component for Lucide Icons with customizable size, color, fill, and stroke properties.",
+						Description: "Wrapper component for Lucide Icons. Style icons with `icon.Props{Class: \"...\"}`.",
 						Items: []modules.APITableItem{
 							{
 								Name:        "Name",
@@ -118,52 +118,10 @@ templ Icon() {
 								Required:    true,
 							},
 							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "",
-								Description: "Unique identifier for the icon element.",
-								Required:    false,
-							},
-							{
 								Name:        "Class",
 								Type:        "string",
-								Default:     "",
-								Description: "Additional CSS classes to apply to the icon.",
-								Required:    false,
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "",
-								Description: "Additional HTML attributes to apply to the icon element.",
-								Required:    false,
-							},
-							{
-								Name:        "Size",
-								Type:        "int",
-								Default:     "24",
-								Description: "Size of the icon in pixels.",
-								Required:    false,
-							},
-							{
-								Name:        "Color",
-								Type:        "string",
-								Default:     "currentColor",
-								Description: "Color of the icon (CSS color value).",
-								Required:    false,
-							},
-							{
-								Name:        "Fill",
-								Type:        "string",
-								Default:     "none",
-								Description: "Fill color of the icon (CSS color value or 'none').",
-								Required:    false,
-							},
-							{
-								Name:        "StrokeWidth",
-								Type:        "float64",
-								Default:     "2",
-								Description: "Width of the icon's stroke.",
+								Default:     "\"\"",
+								Description: "Tailwind utility classes passed via `icon.Props{Class: \"...\"}`, for example `size-6 text-red-500 fill-current`.",
 								Required:    false,
 							},
 						},

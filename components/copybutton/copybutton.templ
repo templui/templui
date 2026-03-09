@@ -33,10 +33,10 @@ templ CopyButton(props Props) {
 			Type:       button.TypeButton,
 		}) {
 			<span data-copy-icon-clipboard>
-				@icon.Clipboard(icon.Props{Size: 16})
+				@icon.Clipboard(icon.Props{Class: "size-4"})
 			</span>
 			<span data-copy-icon-check class="hidden">
-				@icon.Check(icon.Props{Size: 16})
+				@icon.Check(icon.Props{Class: "size-4"})
 			</span>
 		}
 	</div>

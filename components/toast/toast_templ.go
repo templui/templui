@@ -253,22 +253,22 @@ func Toast(props ...Props) templ.Component {
 		if p.Icon {
 			switch p.Variant {
 			case VariantSuccess:
-				templ_7745c5c3_Err = icon.CircleCheck(icon.Props{Size: 22, Class: "text-green-500 mr-3 flex-shrink-0"}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = icon.CircleCheck(icon.Props{Class: "size-[22px] text-green-500 mr-3 flex-shrink-0"}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			case VariantError:
-				templ_7745c5c3_Err = icon.CircleX(icon.Props{Size: 22, Class: "text-red-500 mr-3 flex-shrink-0"}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = icon.CircleX(icon.Props{Class: "size-[22px] text-red-500 mr-3 flex-shrink-0"}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			case VariantWarning:
-				templ_7745c5c3_Err = icon.TriangleAlert(icon.Props{Size: 22, Class: "text-yellow-500 mr-3 flex-shrink-0"}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = icon.TriangleAlert(icon.Props{Class: "size-[22px] text-yellow-500 mr-3 flex-shrink-0"}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			case VariantInfo:
-				templ_7745c5c3_Err = icon.Info(icon.Props{Size: 22, Class: "text-blue-500 mr-3 flex-shrink-0"}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = icon.Info(icon.Props{Class: "size-[22px] text-blue-500 mr-3 flex-shrink-0"}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -333,10 +333,7 @@ func Toast(props ...Props) templ.Component {
 					}()
 				}
 				ctx = templ.InitializeContext(ctx)
-				templ_7745c5c3_Err = icon.X(icon.Props{
-					Size:  18,
-					Class: "opacity-75 hover:opacity-100",
-				}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = icon.X(icon.Props{Class: "size-[18px] opacity-75 hover:opacity-100"}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -406,7 +403,7 @@ func Script() templ.Component {
 				var templ_7745c5c3_Var17 string
 				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toast/toast.templ`, Line: 155, Col: 44}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toast/toast.templ`, Line: 152, Col: 44}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
@@ -419,7 +416,7 @@ func Script() templ.Component {
 				var templ_7745c5c3_Var18 string
 				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(utils.ComponentScriptURL("toast"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toast/toast.templ`, Line: 155, Col: 86}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toast/toast.templ`, Line: 152, Col: 86}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {

@@ -95,10 +95,7 @@ templ Trigger(props ...TriggerProps) {
 		{ p.Attributes... }
 	>
 		{ children... }
-		@icon.ChevronDown(icon.Props{
-			Size:  16,
-			Class: "size-4 shrink-0 translate-y-0.5 transition-transform duration-200 text-muted-foreground pointer-events-none",
-		})
+		@icon.ChevronDown(icon.Props{Class: "size-4 shrink-0 translate-y-0.5 transition-transform duration-200 text-muted-foreground pointer-events-none"})
 	</summary>
 }
 

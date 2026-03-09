@@ -112,14 +112,10 @@ templ Input(props ...Props) {
 				Attributes: templ.Attributes{"data-tui-input-toggle-password": p.ID},
 			}) {
 				<span class="icon-open block">
-					@icon.Eye(icon.Props{
-						Size: 18,
-					})
+					@icon.Eye(icon.Props{Class: "size-[18px]"})
 				</span>
 				<span class="icon-closed hidden">
-					@icon.EyeOff(icon.Props{
-						Size: 18,
-					})
+					@icon.EyeOff(icon.Props{Class: "size-[18px]"})
 				</span>
 			}
 		}

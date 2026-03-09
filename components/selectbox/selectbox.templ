@@ -165,13 +165,10 @@ templ Trigger(props ...TriggerProps) {
 				aria-label="Clear selection"
 				role="button"
 			>
-				@icon.CircleX(icon.Props{Size: 14})
+				@icon.CircleX(icon.Props{Class: "size-3.5"})
 			</span>
 			<span class="pointer-events-none ml-1" data-tui-selectbox-chevron>
-				@icon.ChevronDown(icon.Props{
-					Size:  16,
-					Class: "text-muted-foreground",
-				})
+				@icon.ChevronDown(icon.Props{Class: "size-4 text-muted-foreground"})
 			</span>
 		}
 	}
@@ -234,7 +231,7 @@ templ Content(props ...ContentProps) {
 			<div class="sticky top-0 bg-popover p-1">
 				<div class="relative">
 					<span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10 pointer-events-none">
-						@icon.Search(icon.Props{Size: 16})
+						@icon.Search(icon.Props{Class: "size-4"})
 					</span>
 					@input.Input(input.Props{
 						Type:        input.TypeSearch,
@@ -323,7 +320,7 @@ templ Item(props ...ItemProps) {
 				),
 			}
 		>
-			@icon.Check(icon.Props{Size: 16})
+			@icon.Check(icon.Props{Class: "size-4"})
 		</span>
 	</div>
 }

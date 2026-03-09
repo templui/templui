@@ -205,7 +205,7 @@ func TimePicker(props ...Props) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = icon.Clock(icon.Props{Size: 16}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = icon.Clock(icon.Props{Class: "size-4"}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

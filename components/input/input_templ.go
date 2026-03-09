@@ -306,9 +306,7 @@ func Input(props ...Props) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = icon.Eye(icon.Props{
-					Size: 18,
-				}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = icon.Eye(icon.Props{Class: "size-[18px]"}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -316,9 +314,7 @@ func Input(props ...Props) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = icon.EyeOff(icon.Props{
-					Size: 18,
-				}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = icon.EyeOff(icon.Props{Class: "size-[18px]"}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -389,7 +385,7 @@ func Script() templ.Component {
 				var templ_7745c5c3_Var14 string
 				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/input/input.templ`, Line: 134, Col: 44}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/input/input.templ`, Line: 130, Col: 44}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
@@ -402,7 +398,7 @@ func Script() templ.Component {
 				var templ_7745c5c3_Var15 string
 				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(utils.ComponentScriptURL("input"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/input/input.templ`, Line: 134, Col: 86}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/input/input.templ`, Line: 130, Col: 86}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 				if templ_7745c5c3_Err != nil {

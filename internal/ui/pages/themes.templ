@@ -48,7 +48,7 @@ templ Themes() {
 									"data-action": "reset-theme",
 								},
 							}) {
-								@icon.RotateCcw(icon.Props{Size: 14})
+								@icon.RotateCcw(icon.Props{Class: "size-3.5"})
 								<span class="ml-2">Reset to Default</span>
 							}
 							@dialog.Trigger(dialog.TriggerProps{
@@ -185,7 +185,7 @@ templ ThemeShowcase() {
 						Variant: button.VariantDestructive,
 						Class:   "w-full",
 					}) {
-						@icon.Trash(icon.Props{Size: 16})
+						@icon.Trash(icon.Props{Class: "size-4"})
 						<span class="ml-2">Delete Account</span>
 					}
 				}
@@ -203,21 +203,21 @@ templ ThemeShowcase() {
 							Variant: button.VariantSecondary,
 							Class:   "w-full",
 						}) {
-							@icon.Icon("twitter")(icon.Props{Size: 16})
+							@icon.Icon("twitter")(icon.Props{Class: "size-4"})
 							<span class="ml-2">Twitter</span>
 						}
 						@button.Button(button.Props{
 							Variant: button.VariantSecondary,
 							Class:   "w-full",
 						}) {
-							@icon.Icon("github")(icon.Props{Size: 16})
+							@icon.Icon("github")(icon.Props{Class: "size-4"})
 							<span class="ml-2">GitHub</span>
 						}
 						@button.Button(button.Props{
 							Variant: button.VariantGhost,
 							Class:   "w-full col-span-2",
 						}) {
-							@icon.Icon("link")(icon.Props{Size: 16})
+							@icon.Icon("link")(icon.Props{Class: "size-4"})
 							<span class="ml-2">Copy Link</span>
 						}
 					</div>
@@ -299,7 +299,7 @@ templ ThemeShowcase() {
 						<div class="flex items-center justify-between">
 							<span class="text-sm">Build Status</span>
 							@badge.Badge(badge.Props{Variant: badge.VariantDefault}) {
-								@icon.Icon("circle-check")(icon.Props{Size: 12})
+								@icon.Icon("circle-check")(icon.Props{Class: "size-3"})
 								<span class="ml-1">Passing</span>
 							}
 						</div>

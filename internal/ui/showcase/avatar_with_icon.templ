@@ -8,10 +8,7 @@ import (
 templ AvatarWithIcon() {
 	@avatar.Avatar() {
 		@avatar.Fallback() {
-			@icon.Camera(icon.Props{
-				Size:  22,
-				Class: "text-muted-foreground",
-			})
+			@icon.Camera(icon.Props{Class: "size-[22px] text-muted-foreground"})
 		}
 	}
 }

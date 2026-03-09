@@ -518,7 +518,7 @@ func ratingIcon(style Style, filled bool, value float64) templ.Component {
 	}
 	iconProps := icon.Props{}
 	if filled {
-		iconProps.Fill = "currentColor"
+		iconProps.Class = "fill-current"
 	}
 	switch style {
 	case StyleHeart:
