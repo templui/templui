@@ -1,0 +1,42 @@
+package pages
+
+import (
+	"github.com/templui/templui/components/button"
+	"myapp/ui/layouts"
+)
+
+templ Landing() {
+	@layouts.BaseLayout() {
+		<div class="flex h-full items-center justify-center">
+			<div class="flex w-full max-w-2xl flex-col items-center justify-center gap-4 px-4">
+				<div class="space-y-4 text-center">
+					<h1 class="text-5xl font-bold tracking-tight">templUI Quickstart</h1>
+					<p class="text-muted-foreground mx-auto max-w-md text-lg">
+						Build modern web applications with
+						<br/>
+						Go, templ, and Tailwind CSS.
+					</p>
+				</div>
+				<div class="flex gap-3">
+					@button.Button(button.Props{
+						Variant: "default",
+						Href:    "https://templui.io/docs/how-to-use",
+						Target:  "_blank",
+					}) {
+						Documentation
+					}
+					@button.Button(button.Props{
+						Variant: "outline",
+						Href:    "https://github.com/templui/templui",
+						Target:  "_blank",
+					}) {
+						GitHub
+					}
+				</div>
+				<p class="text-muted-foreground text-sm">
+					<a href="https://github.com/templui/templui/discussions" target="_blank" class="text-primary underline underline-offset-4 hover:opacity-80">Join the community</a>
+				</p>
+			</div>
+		</div>
+	}
+}

@@ -1,0 +1,132 @@
+package progress
+
+import (
+	"fmt"
+	"github.com/templui/templui/utils"
+)
+
+type Size string
+type Variant string
+
+const (
+	SizeSm Size = "sm"
+	SizeLg Size = "lg"
+)
+
+const (
+	VariantDefault Variant = "default"
+	VariantSuccess Variant = "success"
+	VariantDanger  Variant = "danger"
+	VariantWarning Variant = "warning"
+)
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Max        int
+	Value      int
+	Label      string
+	ShowValue  bool
+	Size       Size
+	Variant    Variant
+	BarClass   string
+}
+
+templ Progress(props ...Props) {
+	@Script()
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	<div
+		id={ p.ID }
+		class={ utils.TwMerge("w-full", p.Class) }
+		aria-valuemin="0"
+		aria-valuemax={ fmt.Sprintf("%d", maxValue(p.Max)) }
+		aria-valuenow={ fmt.Sprintf("%d", p.Value) }
+		role="progressbar"
+		{ p.Attributes... }
+	>
+		if p.Label != "" || p.ShowValue {
+			<div class="flex justify-between items-center mb-1">
+				if p.Label != "" {
+					<span class="text-sm font-medium">{ p.Label }</span>
+				}
+				if p.ShowValue {
+					<span class="text-sm font-medium">
+						{ fmt.Sprintf("%d%%", percentage(p.Value, p)) }
+					</span>
+				}
+			</div>
+		}
+		<div class="w-full overflow-hidden rounded-full bg-secondary">
+			<div
+				data-tui-progress-indicator
+				class={
+					utils.TwMerge(
+						"h-full rounded-full transition-all",
+						sizeClasses(p.Size),
+						variantClasses(p.Variant),
+						p.BarClass,
+					),
+				}
+			></div>
+		</div>
+	</div>
+}
+
+func maxValue(max int) int {
+	if max <= 0 {
+		return 100
+	}
+	return max
+}
+
+func percentage(value int, props Props) int {
+	max := maxValue(props.Max)
+	if value < 0 {
+		value = 0
+	}
+	if value > max {
+		value = max
+	}
+	return (value * 100) / max
+}
+
+func sizeClasses(size Size) string {
+	switch size {
+	case SizeSm:
+		return "h-1"
+	case SizeLg:
+		return "h-4"
+	default:
+		return "h-2.5"
+	}
+}
+
+func variantClasses(variant Variant) string {
+	switch variant {
+	case VariantSuccess:
+		return "bg-green-500"
+	case VariantDanger:
+		return "bg-destructive"
+	case VariantWarning:
+		return "bg-yellow-500"
+	default:
+		return "bg-primary"
+	}
+}
+
+var onceHandle = templ.NewOnceHandle()
+
+templ Script() {
+	@onceHandle.Once() {
+		if !utils.SuppressComponentScripts {
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("progress") }></script>
+		}
+	}
+}

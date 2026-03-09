@@ -5,7 +5,7 @@ import (
 	"github.com/templui/templui/internal/config"
 	"github.com/templui/templui/internal/ctxkeys"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/utils"
+	"github.com/templui/templui/utils"
 )
 
 templ BaseLayout(title, description string) {
@@ -20,31 +20,30 @@ templ BaseLayout(title, description string) {
 			<link rel="preload" href="/assets/fonts/geist/geist-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous"/>
 			<link rel="preload" href="/assets/fonts/geist/geist-mono-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous"/>
 			// Component JS files
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/avatar/avatar.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/calendar/calendar.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/carousel/carousel.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/checkbox/checkbox.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/chart/chart.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/code/code.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/collapsible/collapsible.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/copybutton/copybutton.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/datepicker/datepicker.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/dropdown/dropdown.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/input/input.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/inputotp/inputotp.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/label/label.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/dialog/dialog.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/popover/popover.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/progress/progress.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/rating/rating.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/selectbox/selectbox.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/sidebar/sidebar.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/slider/slider.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/tabs/tabs.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/tagsinput/tagsinput.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/textarea/textarea.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/timepicker/timepicker.min.js?v=" + utils.ScriptVersion }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ "/components/js/toast/toast.min.js?v=" + utils.ScriptVersion }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("avatar") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("calendar") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("carousel") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("checkbox") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("chart") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("collapsible") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("copybutton") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("datepicker") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("dropdown") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("input") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("inputotp") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("label") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("dialog") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("popover") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("progress") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("rating") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("selectbox") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("sidebar") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("slider") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("tabs") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("tagsinput") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("textarea") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("timepicker") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.LocalComponentScriptURL("toast") }></script>
 			// Plausible Analytics
 			if config.AppConfig.GoEnv == "production" {
 				<script defer data-domain="templui.io" src="https://plausible.axeladrian.com/js/script.js" nonce={ templ.GetNonce(ctx) }></script>

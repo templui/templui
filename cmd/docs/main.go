@@ -10,13 +10,14 @@ import (
 	"github.com/a-h/templ"
 
 	"github.com/templui/templui/assets"
-	"github.com/templui/templui/internal/components"
-	"github.com/templui/templui/internal/components/toast"
+	"github.com/templui/templui/components"
+	"github.com/templui/templui/components/toast"
 	"github.com/templui/templui/internal/config"
 	"github.com/templui/templui/internal/middleware"
 	"github.com/templui/templui/internal/service"
 	"github.com/templui/templui/internal/ui/pages"
 	"github.com/templui/templui/static"
+	"github.com/templui/templui/utils"
 )
 
 func toastDemoHandler(w http.ResponseWriter, r *http.Request) {
@@ -56,6 +57,8 @@ func htmxHandler(component templ.Component) http.Handler {
 func main() {
 	mux := http.NewServeMux()
 	config.LoadConfig()
+	utils.SuppressComponentScripts = true
+
 	SetupAssetsRoutes(mux)
 
 	// Initialize markdown docs service
@@ -139,7 +142,6 @@ func main() {
 	mux.Handle("GET /docs/components/charts", htmxHandler(pages.Chart()))
 	mux.Handle("GET /docs/components/checkbox", htmxHandler(pages.Checkbox()))
 	mux.Handle("GET /docs/components/collapsible", htmxHandler(pages.Collapsible()))
-	mux.Handle("GET /docs/components/code", htmxHandler(pages.Code()))
 	mux.Handle("GET /docs/components/copy-button", htmxHandler(pages.CopyButton()))
 	mux.Handle("GET /docs/components/date-picker", htmxHandler(pages.DatePicker()))
 	mux.Handle("GET /docs/components/sheet", htmxHandler(pages.Sheet()))
@@ -237,7 +239,7 @@ func SetupAssetsRoutes(mux *http.ServeMux) {
 		if isDevelopment {
 			w.Header().Set("Cache-Control", "no-store")
 			// In dev, serve from filesystem
-			http.ServeFile(w, r, "./internal/components/"+path)
+			http.ServeFile(w, r, "./components/"+path)
 		} else {
 			// In production, serve from embedded FS
 			w.Header().Set("Cache-Control", "public, max-age=31536000")

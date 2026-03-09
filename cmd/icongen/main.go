@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	outputDir       = "./internal/components/icon/"
+	outputDir       = "./components/icon/"
 	lucideRepoOwner = "lucide-icons"
 	lucideRepoName  = "lucide"
 )

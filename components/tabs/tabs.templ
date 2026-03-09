@@ -1,0 +1,168 @@
+package tabs
+
+import (
+	"context"
+	"github.com/templui/templui/utils"
+)
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ListProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type TriggerProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Value      string
+	IsActive   bool
+	TabsID     string
+}
+
+type ContentProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Value      string
+	IsActive   bool
+	TabsID     string
+}
+
+templ Tabs(props ...Props) {
+	@Script()
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ tabsID := p.ID }}
+	if tabsID == "" {
+		{{ tabsID = utils.RandomID() }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("flex flex-col gap-2", p.Class) }
+		data-tui-tabs
+		data-tui-tabs-id={ tabsID }
+		{ p.Attributes... }
+	>
+		{{ ctx = context.WithValue(ctx, "tabsId", tabsID) }}
+		{ children... }
+	</div>
+}
+
+templ List(props ...ListProps) {
+	{{ var p ListProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ tabsID := IDFromContext(ctx) }}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
+				p.Class,
+			),
+		}
+		data-tui-tabs-list
+		data-tui-tabs-id={ tabsID }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Trigger(props ...TriggerProps) {
+	{{ var p TriggerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ tabsID := p.TabsID }}
+	if tabsID == "" {
+		{{ tabsID = IDFromContext(ctx) }}
+	}
+	if p.Value == "" {
+		<span class="text-xs text-destructive">Error: Tab Trigger missing required 'Value' attribute.</span>
+	}
+	<button
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		type="button"
+		class={
+			utils.TwMerge(
+				"data-[tui-tabs-state=active]:bg-background dark:data-[tui-tabs-state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[tui-tabs-state=active]:border-input dark:data-[tui-tabs-state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[tui-tabs-state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+				p.Class,
+			),
+		}
+		data-tui-tabs-trigger
+		data-tui-tabs-id={ tabsID }
+		data-tui-tabs-value={ p.Value }
+		data-tui-tabs-state={ utils.IfElse(p.IsActive, "active", "inactive") }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</button>
+}
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ tabsID := p.TabsID }}
+	if tabsID == "" {
+		{{ tabsID = IDFromContext(ctx) }}
+	}
+	if p.Value == "" {
+		<span class="text-xs text-destructive">Error: Tab Content missing required 'Value' attribute.</span>
+		return templ.NopComponent
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"flex-1 outline-none",
+				utils.If(!p.IsActive, "hidden"),
+				p.Class,
+			),
+		}
+		data-tui-tabs-content
+		data-tui-tabs-id={ tabsID }
+		data-tui-tabs-value={ p.Value }
+		data-tui-tabs-state={ utils.IfElse(p.IsActive, "active", "inactive") }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+func IDFromContext(ctx context.Context) string {
+	if tabsID, ok := ctx.Value("tabsId").(string); ok {
+		return tabsID
+	}
+	return ""
+}
+
+var onceHandle = templ.NewOnceHandle()
+
+templ Script() {
+	@onceHandle.Once() {
+		if !utils.SuppressComponentScripts {
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("tabs") }></script>
+		}
+	}
+}

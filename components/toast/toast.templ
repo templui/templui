@@ -1,0 +1,155 @@
+package toast
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/utils"
+	"strconv"
+)
+
+type Variant string
+type Position string
+
+const (
+	VariantDefault Variant = "default"
+	VariantSuccess Variant = "success"
+	VariantError   Variant = "error"
+	VariantWarning Variant = "warning"
+	VariantInfo    Variant = "info"
+)
+
+const (
+	PositionTopRight     Position = "top-right"
+	PositionTopLeft      Position = "top-left"
+	PositionTopCenter    Position = "top-center"
+	PositionBottomRight  Position = "bottom-right"
+	PositionBottomLeft   Position = "bottom-left"
+	PositionBottomCenter Position = "bottom-center"
+)
+
+type Props struct {
+	ID            string
+	Class         string
+	Attributes    templ.Attributes
+	Title         string
+	Description   string
+	Variant       Variant
+	Position      Position
+	Duration      int
+	Dismissible   bool
+	ShowIndicator bool
+	Icon          bool
+}
+
+templ Toast(props ...Props) {
+	@Script()
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	// Set defaults
+	if p.Variant == "" {
+		{{ p.Variant = VariantDefault }}
+	}
+	if p.Position == "" {
+		{{ p.Position = PositionBottomRight }}
+	}
+	if p.Duration == 0 {
+		{{ p.Duration = 3000 }}
+	}
+	<div
+		id={ p.ID }
+		data-tui-toast
+		data-tui-toast-duration={ strconv.Itoa(p.Duration) }
+		data-position={ string(p.Position) }
+		data-variant={ string(p.Variant) }
+		class={ utils.TwMerge(
+			// Base styles
+			"z-50 fixed pointer-events-auto p-4 w-full md:max-w-[420px]",
+			// Animation
+			"animate-in fade-in slide-in-from-bottom-4 duration-300",
+			// Position-based styles using data attributes
+			"data-[position=top-right]:top-0 data-[position=top-right]:right-0",
+			"data-[position=top-left]:top-0 data-[position=top-left]:left-0",
+			"data-[position=top-center]:top-0 data-[position=top-center]:left-1/2 data-[position=top-center]:-translate-x-1/2",
+			"data-[position=bottom-right]:bottom-0 data-[position=bottom-right]:right-0",
+			"data-[position=bottom-left]:bottom-0 data-[position=bottom-left]:left-0",
+			"data-[position=bottom-center]:bottom-0 data-[position=bottom-center]:left-1/2 data-[position=bottom-center]:-translate-x-1/2",
+			// Slide direction based on position
+			"data-[position*=top]:slide-in-from-top-4",
+			"data-[position*=bottom]:slide-in-from-bottom-4",
+			p.Class,
+		) }
+		{ p.Attributes... }
+	>
+		<div class="w-full bg-popover text-popover-foreground rounded-lg shadow-xs border pt-5 pb-4 px-4 flex items-center justify-center relative overflow-hidden group">
+			// Progress indicator
+			if p.ShowIndicator && p.Duration > 0 {
+				<div class="absolute top-0 left-0 right-0 h-1 overflow-hidden">
+					<div
+						class={ utils.TwMerge(
+							"toast-progress h-full origin-left transition-transform ease-linear",
+							// Variant colors
+							"data-[variant=default]:bg-gray-500",
+							"data-[variant=success]:bg-green-500",
+							"data-[variant=error]:bg-red-500",
+							"data-[variant=warning]:bg-yellow-500",
+							"data-[variant=info]:bg-blue-500",
+						) }
+						data-variant={ string(p.Variant) }
+						data-duration={ strconv.Itoa(p.Duration) }
+					></div>
+				</div>
+			}
+			// Icon
+			if p.Icon {
+				switch p.Variant {
+					case VariantSuccess:
+						@icon.CircleCheck(icon.Props{Class: "size-[22px] text-green-500 mr-3 flex-shrink-0"})
+					case VariantError:
+						@icon.CircleX(icon.Props{Class: "size-[22px] text-red-500 mr-3 flex-shrink-0"})
+					case VariantWarning:
+						@icon.TriangleAlert(icon.Props{Class: "size-[22px] text-yellow-500 mr-3 flex-shrink-0"})
+					case VariantInfo:
+						@icon.Info(icon.Props{Class: "size-[22px] text-blue-500 mr-3 flex-shrink-0"})
+				}
+			}
+			// Content
+			<span class="flex-1 min-w-0">
+				if p.Title != "" {
+					<p class="text-sm font-semibold truncate">{ p.Title }</p>
+				}
+				if p.Description != "" {
+					<p class="text-sm opacity-90 mt-1">{ p.Description }</p>
+				}
+			</span>
+			// Dismiss button
+			if p.Dismissible {
+				@button.Button(button.Props{
+					Size:    button.SizeIcon,
+					Variant: button.VariantGhost,
+					Attributes: templ.Attributes{
+						"aria-label":             "Close",
+						"data-tui-toast-dismiss": "",
+						"type":                   "button",
+					},
+				}) {
+					@icon.X(icon.Props{Class: "size-[18px] opacity-75 hover:opacity-100"})
+				}
+			}
+		</div>
+	</div>
+}
+
+var onceHandle = templ.NewOnceHandle()
+
+templ Script() {
+	@onceHandle.Once() {
+		if !utils.SuppressComponentScripts {
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("toast") }></script>
+		}
+	}
+}

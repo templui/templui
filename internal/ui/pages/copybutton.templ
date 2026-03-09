@@ -23,10 +23,6 @@ templ CopyButton() {
 						ID:   "with_input",
 						Text: "With Input",
 					},
-					{
-						ID:   "with_code",
-						Text: "With Code Block",
-					},
 				},
 			},
 			{
@@ -72,7 +68,6 @@ templ CopyButton() {
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
 					ComponentName: "copybutton",
-					JSFiles:       []string{"copybutton"},
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -84,12 +79,6 @@ templ CopyButton() {
 					ShowcaseFile:    showcase.CopyButtonWithInput(),
 					PreviewCodeFile: "copybutton_with_input.templ",
 					ID:              "with_input",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "With Code Block",
-					ShowcaseFile:    showcase.CopyButtonWithCode(),
-					PreviewCodeFile: "copybutton_with_code.templ",
-					ID:              "with_code",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

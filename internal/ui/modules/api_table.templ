@@ -1,10 +1,10 @@
 package modules
 
 import (
-	"github.com/templui/templui/internal/components/card"
-	"github.com/templui/templui/internal/components/icon"
-	"github.com/templui/templui/internal/components/popover"
-	"github.com/templui/templui/internal/components/table"
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/popover"
+	"github.com/templui/templui/components/table"
 )
 
 type APITableProps struct {
@@ -67,10 +67,7 @@ templ APITable(p APITableProps) {
 												For:         "desc-" + p.Title + "-" + item.Name,
 												TriggerType: popover.TriggerTypeHover,
 											}) {
-												@icon.Icon("info")(icon.Props{
-													Size:  14,
-													Class: "text-muted-foreground hover:text-foreground cursor-help",
-												})
+												@icon.Icon("info")(icon.Props{Class: "size-3.5 text-muted-foreground hover:text-foreground cursor-help"})
 											}
 											@popover.Content(popover.ContentProps{
 												ID:        "desc-" + p.Title + "-" + item.Name,

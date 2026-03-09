@@ -1,0 +1,325 @@
+package sheet
+
+import (
+	"context"
+	"github.com/templui/templui/components/dialog"
+	"github.com/templui/templui/utils"
+)
+
+type contextKey string
+
+const (
+	sideKey contextKey = "sheetSide"
+)
+
+type Side string
+
+const (
+	SideTop    Side = "top"
+	SideRight  Side = "right"
+	SideBottom Side = "bottom"
+	SideLeft   Side = "left"
+)
+
+type Props struct {
+	ID               string
+	Class            string
+	Attributes       templ.Attributes
+	Side             Side
+	Open             bool
+	DisableClickAway bool
+	DisableESC       bool
+}
+
+type TriggerProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	For        string // Reference to a specific sheet ID (for external triggers)
+}
+
+type ContentProps struct {
+	ID              string
+	Class           string
+	Attributes      templ.Attributes
+	HideCloseButton bool
+	Side            Side //
+	Open            bool // Initial open state for standalone usage
+}
+
+type HeaderProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type FooterProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type TitleProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type DescriptionProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type CloseProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	For        string
+}
+
+templ Sheet(props ...Props) {
+	@Script()
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Side == "" {
+		{{ p.Side = SideRight }}
+	}
+	// Pass the Side through context to child components
+	{{ ctx = context.WithValue(ctx, sideKey, p.Side) }}
+	// Sheet uses Dialog internally with sheet-specific attributes
+	@dialog.Dialog(dialog.Props{
+		ID:               p.ID,
+		Open:             p.Open,
+		DisableClickAway: p.DisableClickAway,
+		DisableESC:       p.DisableESC,
+		Class:            p.Class,
+		Attributes: utils.MergeAttributes(
+			templ.Attributes{
+				"data-tui-sheet":      "true",
+				"data-tui-sheet-side": string(p.Side),
+			},
+			p.Attributes,
+		),
+	}) {
+		{ children... }
+	}
+}
+
+templ Trigger(props ...TriggerProps) {
+	{{ var p TriggerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	// Sheet trigger is just a Dialog trigger
+	@dialog.Trigger(dialog.TriggerProps{
+		ID:         p.ID,
+		For:        p.For,
+		Class:      p.Class,
+		Attributes: p.Attributes,
+	}) {
+		{ children... }
+	}
+}
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	// Get Side from context if not explicitly provided
+	if p.Side == "" {
+		if val := ctx.Value(sideKey); val != nil {
+			{{ p.Side = val.(Side) }}
+		} else {
+			{{ p.Side = SideRight }}
+		}
+	}
+	// Sheet content uses Dialog content with sheet-specific styles
+	@dialog.Content(dialog.ContentProps{
+		ID:              p.ID,
+		Open:            p.Open,
+		HideCloseButton: p.HideCloseButton,
+		Class: utils.TwMerge(
+			// First apply side-specific positioning and animations
+			getSideClasses(p.Side),
+			// Default gap matching shadcn (no padding in content)
+			"gap-4 !p-0", // Remove Dialog's p-6 padding
+			// Override Dialog styles
+			"!scale-100",    // Reset Dialog's scale animation
+			"!rounded-none", // Remove dialog rounded corners
+			"!opacity-100",  // Keep fully opaque - no fade, only slide
+			// Remove pointer-events control during animation
+			"!pointer-events-auto data-[tui-dialog-hidden=true]:!pointer-events-none",
+			// User-provided classes last
+			p.Class,
+		),
+		Attributes: utils.MergeAttributes(
+			templ.Attributes{
+				"data-tui-sheet-content": "true",
+				"data-tui-sheet-side":    string(p.Side),
+			},
+			p.Attributes,
+		),
+	}) {
+		{ children... }
+	}
+}
+
+templ Header(props ...HeaderProps) {
+	{{ var p HeaderProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	// Sheet header uses Dialog header but overrides styles
+	@dialog.Header(dialog.HeaderProps{
+		ID:         p.ID,
+		Class:      utils.TwMerge("gap-1.5 p-4 text-left", p.Class),
+		Attributes: p.Attributes,
+	}) {
+		{ children... }
+	}
+}
+
+templ Title(props ...TitleProps) {
+	{{ var p TitleProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	// Sheet title uses Dialog title but overrides styles
+	@dialog.Title(dialog.TitleProps{
+		ID:         p.ID,
+		Class:      utils.TwMerge("text-base leading-normal", p.Class),
+		Attributes: p.Attributes,
+	}) {
+		{ children... }
+	}
+}
+
+templ Description(props ...DescriptionProps) {
+	{{ var p DescriptionProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	// Sheet description uses Dialog description
+	@dialog.Description(dialog.DescriptionProps{
+		ID:         p.ID,
+		Class:      p.Class,
+		Attributes: p.Attributes,
+	}) {
+		{ children... }
+	}
+}
+
+templ Footer(props ...FooterProps) {
+	{{ var p FooterProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	// Sheet footer uses Dialog footer but overrides styles
+	@dialog.Footer(dialog.FooterProps{
+		ID:         p.ID,
+		Class:      utils.TwMerge("mt-auto flex flex-col gap-2 p-4", p.Class),
+		Attributes: p.Attributes,
+	}) {
+		{ children... }
+	}
+}
+
+templ Close(props ...CloseProps) {
+	{{ var p CloseProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	// Sheet close uses Dialog close
+	@dialog.Close(dialog.CloseProps{
+		ID:         p.ID,
+		For:        p.For,
+		Class:      p.Class,
+		Attributes: p.Attributes,
+	}) {
+		{ children... }
+	}
+}
+
+func getSideClasses(side Side) string {
+	// Base classes for all sheets - matching shadcn
+	// Duration varies: 300ms when closing, 500ms when opening
+	// Use !transition-transform to override Dialog's transition-all
+	baseClasses := "fixed z-50 flex flex-col bg-background shadow-lg !transition-transform ease-in-out " +
+		"data-[tui-dialog-open=false]:duration-300 data-[tui-dialog-open=true]:duration-500 "
+
+	switch side {
+	case SideRight:
+		return baseClasses +
+			// Positioning
+			"!inset-y-0 !right-0 !left-auto !top-auto " +
+			// Size
+			"h-full w-3/4 sm:max-w-sm " +
+			// Border
+			"border-l border-t-0 border-r-0 border-b-0 " +
+			// Reset Dialog transforms
+			"!translate-y-0 " +
+			// Slide animation
+			"data-[tui-dialog-open=false]:!translate-x-full " +
+			"data-[tui-dialog-open=true]:!translate-x-0"
+	case SideLeft:
+		return baseClasses +
+			// Positioning
+			"!inset-y-0 !left-0 !right-auto !top-auto " +
+			// Size
+			"h-full w-3/4 sm:max-w-sm " +
+			// Border
+			"border-r border-t-0 border-l-0 border-b-0 " +
+			// Reset Dialog transforms
+			"!translate-y-0 " +
+			// Slide animation
+			"data-[tui-dialog-open=false]:!-translate-x-full " +
+			"data-[tui-dialog-open=true]:!translate-x-0"
+	case SideTop:
+		return baseClasses +
+			// Positioning - full width at top
+			"!inset-x-0 !top-0 !bottom-auto !left-0 !right-0 " +
+			// Size - full width, auto height
+			"!w-full !max-w-full h-auto " +
+			// Border
+			"border-b border-t-0 border-l-0 border-r-0 " +
+			// Reset Dialog transforms - IMPORTANT: reset the centering from Dialog
+			"!translate-x-0 !translate-y-0 " +
+			// Slide animation - top slides up when closing
+			"data-[tui-dialog-open=false]:!-translate-y-full " +
+			"data-[tui-dialog-open=true]:!translate-y-0"
+	case SideBottom:
+		return baseClasses +
+			// Positioning - full width at bottom
+			"!inset-x-0 !bottom-0 !top-auto !left-0 !right-0 " +
+			// Size - full width, auto height
+			"!w-full !max-w-full h-auto " +
+			// Border
+			"border-t border-b-0 border-l-0 border-r-0 " +
+			// Reset Dialog transforms - IMPORTANT: reset the centering from Dialog
+			"!translate-x-0 !translate-y-0 " +
+			// Slide animation
+			"data-[tui-dialog-open=false]:!translate-y-full " +
+			"data-[tui-dialog-open=true]:!translate-y-0"
+	default:
+		return baseClasses +
+			// Default to right side
+			"!inset-y-0 !right-0 !left-auto !top-auto " +
+			"h-full w-3/4 " +
+			"border-l border-t-0 border-r-0 border-b-0 " +
+			"!translate-y-0 " +
+			"data-[tui-dialog-open=false]:!translate-x-full " +
+			"data-[tui-dialog-open=true]:!translate-x-0"
+	}
+}
+
+var onceHandle = templ.NewOnceHandle()
+
+templ Script() {
+	@onceHandle.Once() {
+		@dialog.Script()
+	}
+}

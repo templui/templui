@@ -1,8 +1,8 @@
 package showcase
 
 import (
-	"github.com/templui/templui/internal/components/breadcrumb"
-	"github.com/templui/templui/internal/components/icon"
+	"github.com/templui/templui/components/breadcrumb"
+	"github.com/templui/templui/components/icon"
 )
 
 templ BreadcrumbCustomSeparator() {
@@ -17,7 +17,7 @@ templ BreadcrumbCustomSeparator() {
 			}
 			@breadcrumb.Item() {
 				@breadcrumb.Separator(breadcrumb.SeparatorProps{UseCustom: true}) {
-					@icon.Slash(icon.Props{Size: 14})
+					@icon.Slash(icon.Props{Class: "size-3.5"})
 				}
 				@breadcrumb.Link(breadcrumb.LinkProps{
 					Href: "/products",
@@ -27,7 +27,7 @@ templ BreadcrumbCustomSeparator() {
 			}
 			@breadcrumb.Item() {
 				@breadcrumb.Separator(breadcrumb.SeparatorProps{UseCustom: true}) {
-					@icon.Slash(icon.Props{Size: 14})
+					@icon.Slash(icon.Props{Class: "size-3.5"})
 				}
 				@breadcrumb.Page(breadcrumb.ItemProps{Current: true}) {
 					Category

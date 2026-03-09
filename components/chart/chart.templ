@@ -1,0 +1,127 @@
+package chart
+
+import "github.com/templui/templui/utils"
+
+type Variant string
+
+const (
+	VariantBar      Variant = "bar"
+	VariantLine     Variant = "line"
+	VariantPie      Variant = "pie"
+	VariantDoughnut Variant = "doughnut"
+	VariantRadar    Variant = "radar"
+)
+
+type Dataset struct {
+	Label           string      `json:"label"`
+	Data            []float64   `json:"data"`
+	BorderWidth     int         `json:"borderWidth,omitempty"`
+	BorderColor     interface{} `json:"borderColor,omitempty"`
+	BackgroundColor interface{} `json:"backgroundColor,omitempty"`
+	Tension         float64     `json:"tension,omitempty"`
+	Fill            bool        `json:"fill,omitempty"`
+	Stepped         bool        `json:"stepped,omitempty"`
+}
+
+type Options struct {
+	Responsive bool `json:"responsive,omitempty"`
+	Legend     bool `json:"legend,omitempty"`
+}
+
+type Data struct {
+	Labels   []string  `json:"labels"`
+	Datasets []Dataset `json:"datasets"`
+}
+
+type Config struct {
+	Type        Variant  `json:"type"`
+	Data        Data     `json:"data"`
+	Options     Options  `json:"options,omitempty"`
+	ShowLegend  bool     `json:"showLegend,omitempty"`
+	ShowXAxis   bool     `json:"showXAxis"`
+	ShowYAxis   bool     `json:"showYAxis"`
+	ShowXLabels bool     `json:"showXLabels"`
+	ShowYLabels bool     `json:"showYLabels"`
+	ShowXGrid   bool     `json:"showXGrid"`
+	ShowYGrid   bool     `json:"showYGrid"`
+	Horizontal  bool     `json:"horizontal"`
+	Stacked     bool     `json:"stacked"`
+	YMin        *float64 `json:"yMin,omitempty"`
+	YMax        *float64 `json:"yMax,omitempty"`
+	BeginAtZero *bool    `json:"beginAtZero,omitempty"`
+}
+
+type Props struct {
+	ID          string
+	Variant     Variant
+	Data        Data
+	Options     Options
+	ShowLegend  bool
+	ShowXAxis   bool
+	ShowYAxis   bool
+	ShowXLabels bool
+	ShowYLabels bool
+	ShowXGrid   bool
+	ShowYGrid   bool
+	Horizontal  bool
+	Stacked     bool
+	YMin        *float64
+	YMax        *float64
+	BeginAtZero *bool
+	Class       string
+	Attributes  templ.Attributes
+}
+
+templ Chart(props ...Props) {
+	@Script()
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = "chart-" + utils.RandomID() }}
+	}
+	{{ canvasId := p.ID + "-canvas" }}
+	{{ dataId := p.ID + "-data" }}
+	<div
+		id={ p.ID }
+		class={
+			utils.TwMerge(
+				"chart-container relative",
+				p.Class),
+		}
+		{ p.Attributes... }
+	>
+		<canvas id={ canvasId } data-tui-chart-id={ dataId }></canvas>
+	</div>
+	{{
+		chartConfig := Config{
+			Type:        p.Variant,
+			Data:        p.Data,
+			Options:     p.Options,
+			ShowLegend:  p.ShowLegend,
+			ShowXAxis:   p.ShowXAxis,
+			ShowYAxis:   p.ShowYAxis,
+			ShowXLabels: p.ShowXLabels,
+			ShowYLabels: p.ShowYLabels,
+			ShowXGrid:   p.ShowXGrid,
+			ShowYGrid:   p.ShowYGrid,
+			Horizontal:  p.Horizontal,
+			Stacked:     p.Stacked,
+			YMin:        p.YMin,
+			YMax:        p.YMax,
+			BeginAtZero: p.BeginAtZero,
+		}
+	}}
+	@templ.JSONScript(dataId, chartConfig)
+}
+
+var onceHandle = templ.NewOnceHandle()
+
+templ Script() {
+	@onceHandle.Once() {
+		if !utils.SuppressComponentScripts {
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("chart") }></script>
+		}
+	}
+}

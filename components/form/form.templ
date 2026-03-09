@@ -1,0 +1,136 @@
+package form
+
+import (
+	"github.com/templui/templui/components/label"
+	"github.com/templui/templui/utils"
+)
+
+type MessageVariant string
+
+const (
+	MessageVariantError MessageVariant = "error"
+	MessageVariantInfo  MessageVariant = "info"
+)
+
+type ItemProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type LabelProps struct {
+	ID            string
+	Class         string
+	Attributes    templ.Attributes
+	For           string
+	DisabledClass string
+}
+
+type DescriptionProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type MessageProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Variant    MessageVariant
+}
+
+templ Item(props ...ItemProps) {
+	{{ var p ItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("space-y-2", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ ItemFlex(props ...ItemProps) {
+	{{ var p ItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("items-center flex space-x-2", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Label(props ...LabelProps) {
+	{{ var p LabelProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@label.Label(label.Props{
+		ID:         p.ID,
+		Class:      p.Class,
+		Attributes: p.Attributes,
+		For:        p.For,
+	}) {
+		{ children... }
+	}
+}
+
+templ Description(props ...DescriptionProps) {
+	{{ var p DescriptionProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<p
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("text-sm text-muted-foreground", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</p>
+}
+
+templ Message(props ...MessageProps) {
+	{{ var p MessageProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<p
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"text-[0.8rem] font-medium",
+				messageVariantClass(p.Variant),
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</p>
+}
+
+func messageVariantClass(variant MessageVariant) string {
+	switch variant {
+	case MessageVariantError:
+		return "text-red-500"
+	case MessageVariantInfo:
+		return "text-blue-500"
+	default:
+		return ""
+	}
+}

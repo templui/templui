@@ -1,0 +1,248 @@
+package pagination
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/utils"
+)
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ContentProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ItemProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type LinkProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Href       string
+	IsActive   bool
+	Disabled   bool
+}
+
+type PreviousProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Href       string
+	Disabled   bool
+	Label      string
+}
+
+type NextProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Href       string
+	Disabled   bool
+	Label      string
+}
+
+templ Pagination(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<nav
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="navigation"
+		aria-label="pagination"
+		class={ utils.TwMerge("flex flex-wrap justify-center", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</nav>
+}
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<ul
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class="flex flex-row items-center gap-1"
+		{ p.Attributes... }
+	>
+		{ children... }
+	</ul>
+}
+
+templ Item(props ...ItemProps) {
+	{{ var p ItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<li
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</li>
+}
+
+templ Link(props ...LinkProps) {
+	{{ var p LinkProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Disabled {
+		@button.Button(button.Props{
+			ID:         p.ID,
+			Disabled:   true,
+			Size:       button.SizeIcon,
+			Variant:    button.VariantGhost,
+			Class:      p.Class,
+			Attributes: p.Attributes,
+		}) {
+			{ children... }
+		}
+	} else {
+		@button.Button(button.Props{
+			ID:         p.ID,
+			Href:       p.Href,
+			Size:       button.SizeIcon,
+			Variant:    button.Variant(buttonVariant(p.IsActive)),
+			Class:      p.Class,
+			Attributes: p.Attributes,
+		}) {
+			{ children... }
+		}
+	}
+}
+
+templ Previous(props ...PreviousProps) {
+	{{ var p PreviousProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@button.Button(button.Props{
+		ID:         p.ID,
+		Href:       p.Href,
+		Disabled:   p.Disabled,
+		Variant:    button.VariantGhost,
+		Class:      utils.TwMerge("gap-1", p.Class),
+		Attributes: p.Attributes,
+	}) {
+		@icon.ChevronLeft(icon.Props{Class: "size-4"})
+		if p.Label != "" {
+			<span>{ p.Label }</span>
+		}
+	}
+}
+
+templ Next(props ...NextProps) {
+	{{ var p NextProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@button.Button(button.Props{
+		ID:         p.ID,
+		Href:       p.Href,
+		Disabled:   p.Disabled,
+		Variant:    button.VariantGhost,
+		Class:      utils.TwMerge("gap-1", p.Class),
+		Attributes: p.Attributes,
+	}) {
+		if p.Label != "" {
+			<span>{ p.Label }</span>
+		}
+		@icon.ChevronRight(icon.Props{Class: "size-4"})
+	}
+}
+
+templ Ellipsis() {
+	@icon.Ellipsis(icon.Props{Class: "size-4"})
+}
+
+func CreatePagination(currentPage, totalPages, maxVisible int) struct {
+	CurrentPage int
+	TotalPages  int
+	Pages       []int
+	HasPrevious bool
+	HasNext     bool
+} {
+	if currentPage < 1 {
+		currentPage = 1
+	}
+	if totalPages < 1 {
+		totalPages = 1
+	}
+	if currentPage > totalPages {
+		currentPage = totalPages
+	}
+	if maxVisible < 1 {
+		maxVisible = 5
+	}
+
+	start, end := calculateVisibleRange(currentPage, totalPages, maxVisible)
+	pages := make([]int, 0, end-start+1)
+	for i := start; i <= end; i++ {
+		pages = append(pages, i)
+	}
+
+	return struct {
+		CurrentPage int
+		TotalPages  int
+		Pages       []int
+		HasPrevious bool
+		HasNext     bool
+	}{
+		CurrentPage: currentPage,
+		TotalPages:  totalPages,
+		Pages:       pages,
+		HasPrevious: currentPage > 1,
+		HasNext:     currentPage < totalPages,
+	}
+}
+
+func calculateVisibleRange(currentPage, totalPages, maxVisible int) (int, int) {
+	if totalPages <= maxVisible {
+		return 1, totalPages
+	}
+
+	half := maxVisible / 2
+	start := currentPage - half
+	end := currentPage + half
+
+	if start < 1 {
+		end += (1 - start)
+		start = 1
+	}
+
+	if end > totalPages {
+		start -= (end - totalPages)
+		if start < 1 {
+			start = 1
+		}
+		end = totalPages
+	}
+
+	return start, end
+}
+
+func buttonVariant(isActive bool) button.Variant {
+	if isActive {
+		return button.VariantOutline
+	}
+	return button.VariantGhost
+}

@@ -1,0 +1,174 @@
+package breadcrumb
+
+import (
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/utils"
+)
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ListProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ItemProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Current    bool
+}
+
+type LinkProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Href       string
+}
+
+type SeparatorProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	UseCustom  bool
+}
+
+templ Breadcrumb(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<nav
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"flex",
+				p.Class,
+			),
+		}
+		aria-label="Breadcrumb"
+		{ p.Attributes... }
+	>
+		{ children... }
+	</nav>
+}
+
+templ List(props ...ListProps) {
+	{{ var p ListProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<ol
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"flex items-center flex-wrap gap-1 text-sm",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</ol>
+}
+
+templ Item(props ...ItemProps) {
+	{{ var p ItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<li
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"flex items-center",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</li>
+}
+
+templ Link(props ...LinkProps) {
+	{{ var p LinkProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<a
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		if p.Href != "" {
+			href={ templ.SafeURL(p.Href) }
+		}
+		class={
+			utils.TwMerge(
+				"text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1.5 transition-colors",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</a>
+}
+
+templ Separator(props ...SeparatorProps) {
+	{{ var p SeparatorProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"mx-2 text-muted-foreground",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		if p.UseCustom {
+			{ children... }
+		} else {
+			@icon.ChevronRight(icon.Props{Class: "size-3.5 text-muted-foreground"})
+		}
+	</span>
+}
+
+templ Page(props ...ItemProps) {
+	{{ var p ItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"font-medium text-foreground flex items-center gap-1.5",
+				p.Class,
+			),
+		}
+		aria-current="page"
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}

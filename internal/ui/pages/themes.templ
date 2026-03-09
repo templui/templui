@@ -1,24 +1,24 @@
 package pages
 
 import (
-	"github.com/templui/templui/internal/components/badge"
-	"github.com/templui/templui/internal/components/button"
-	"github.com/templui/templui/internal/components/calendar"
-	"github.com/templui/templui/internal/components/card"
-	"github.com/templui/templui/internal/components/checkbox"
-	"github.com/templui/templui/internal/components/dialog"
-	"github.com/templui/templui/internal/components/form"
-	"github.com/templui/templui/internal/components/icon"
-	"github.com/templui/templui/internal/components/input"
-	"github.com/templui/templui/internal/components/inputotp"
-	"github.com/templui/templui/internal/components/progress"
-	"github.com/templui/templui/internal/components/radio"
-	"github.com/templui/templui/internal/components/selectbox"
-	"github.com/templui/templui/internal/components/slider"
-	switchcomp "github.com/templui/templui/internal/components/switch"
-	"github.com/templui/templui/internal/components/tabs"
-	"github.com/templui/templui/internal/components/tagsinput"
-	"github.com/templui/templui/internal/components/textarea"
+	"github.com/templui/templui/components/badge"
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/calendar"
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/checkbox"
+	"github.com/templui/templui/components/dialog"
+	"github.com/templui/templui/components/form"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/input"
+	"github.com/templui/templui/components/inputotp"
+	"github.com/templui/templui/components/progress"
+	"github.com/templui/templui/components/radio"
+	"github.com/templui/templui/components/selectbox"
+	"github.com/templui/templui/components/slider"
+	switchcomp "github.com/templui/templui/components/switch"
+	"github.com/templui/templui/components/tabs"
+	"github.com/templui/templui/components/tagsinput"
+	"github.com/templui/templui/components/textarea"
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
 	"time"
@@ -48,7 +48,7 @@ templ Themes() {
 									"data-action": "reset-theme",
 								},
 							}) {
-								@icon.RotateCcw(icon.Props{Size: 14})
+								@icon.RotateCcw(icon.Props{Class: "size-3.5"})
 								<span class="ml-2">Reset to Default</span>
 							}
 							@dialog.Trigger(dialog.TriggerProps{
@@ -185,7 +185,7 @@ templ ThemeShowcase() {
 						Variant: button.VariantDestructive,
 						Class:   "w-full",
 					}) {
-						@icon.Trash(icon.Props{Size: 16})
+						@icon.Trash(icon.Props{Class: "size-4"})
 						<span class="ml-2">Delete Account</span>
 					}
 				}
@@ -203,21 +203,21 @@ templ ThemeShowcase() {
 							Variant: button.VariantSecondary,
 							Class:   "w-full",
 						}) {
-							@icon.Icon("twitter")(icon.Props{Size: 16})
+							@icon.Icon("twitter")(icon.Props{Class: "size-4"})
 							<span class="ml-2">Twitter</span>
 						}
 						@button.Button(button.Props{
 							Variant: button.VariantSecondary,
 							Class:   "w-full",
 						}) {
-							@icon.Icon("github")(icon.Props{Size: 16})
+							@icon.Icon("github")(icon.Props{Class: "size-4"})
 							<span class="ml-2">GitHub</span>
 						}
 						@button.Button(button.Props{
 							Variant: button.VariantGhost,
 							Class:   "w-full col-span-2",
 						}) {
-							@icon.Icon("link")(icon.Props{Size: 16})
+							@icon.Icon("link")(icon.Props{Class: "size-4"})
 							<span class="ml-2">Copy Link</span>
 						}
 					</div>
@@ -299,7 +299,7 @@ templ ThemeShowcase() {
 						<div class="flex items-center justify-between">
 							<span class="text-sm">Build Status</span>
 							@badge.Badge(badge.Props{Variant: badge.VariantDefault}) {
-								@icon.Icon("circle-check")(icon.Props{Size: 12})
+								@icon.Icon("circle-check")(icon.Props{Class: "size-3"})
 								<span class="ml-1">Passing</span>
 							}
 						</div>
