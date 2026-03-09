@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.7.0] - 2026-03-09
+
+### Added
+- Import workflow beta: templUI can now be used directly as a Go dependency via `github.com/templui/templui`
+- Restored the dedicated [`templui-quickstart`](https://github.com/templui/templui-quickstart) repository as the fastest way to start a new app
+- Simplified the documentation around two clear workflows: `Quickstart` / `Import Workflow` / `CLI Workflow`
+
+### Changed
+- Interactive components now render and deduplicate their own `Script()` templates automatically, so manual component script wiring in layouts is no longer required
+- Icon API simplified to class-only props for more consistent styling across the library (breaking change)
+- Import usage now targets only the public `components` and `utils` packages
+- Updated `templ` to `v0.3.1001`
+- The import workflow and quickstart are currently beta and may still evolve
+
+### Removed
+- CLI: removed `templui new` in favor of the dedicated quickstart flow
+- Removed the monorepo quickstart example and related template assets
+- Removed the `Code` component and related docs/showcases
+
+### Fixed
+- datepicker: Updated component dependencies
+- inputotp: Improved event target handling
+- scripts: Updated the default remote script reference from `main` to `latest`
+
 ## [v1.6.0] - 2026-03-02
 
 ### Added
