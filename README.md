@@ -8,6 +8,8 @@ Beautifully designed components built with templ and Tailwind CSS. Use the CLI t
 
 Visit https://templui.io/docs/introduction to view the documentation.
 
+Quickstart repo: https://github.com/templui/templui-quickstart
+
 ## Contributing
 
 Please read the [contributing guide](CONTRIBUTING.md).
