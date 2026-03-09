@@ -278,6 +278,9 @@ func installComponent(
 			modifiedData := append([]byte(versionComment), data...)
 			if strings.HasSuffix(repoFilePath, ".templ") || strings.HasSuffix(repoFilePath, ".go") {
 				modifiedData = replaceImports(modifiedData, config, comp.Name)
+				if comp.HasJS {
+					modifiedData = rewriteComponentScriptURL(modifiedData, config, comp.Name)
+				}
 			}
 
 			// Write the file.
@@ -463,6 +466,20 @@ func utilRelativePath(repoPath string) (string, bool) {
 		return strings.TrimPrefix(repoPath, newBase), true
 	}
 	return "", false
+}
+
+func rewriteComponentScriptURL(content []byte, config Config, componentName string) []byte {
+	jsFileName := componentName + ".min.js"
+	var webPath string
+	if config.JSPublicPath != "" {
+		webPath = strings.TrimSuffix(config.JSPublicPath, "/") + "/" + jsFileName
+	} else {
+		webPath = "/" + filepath.ToSlash(filepath.Join(config.JSDir, jsFileName))
+	}
+
+	old := []byte(fmt.Sprintf(`utils.ComponentScriptURL("%s")`, componentName))
+	new := []byte(fmt.Sprintf(`utils.ScriptURL("%s")`, webPath))
+	return bytes.ReplaceAll(content, old, new)
 }
 
 // getInstalledComponentNames returns the names of all installed components
