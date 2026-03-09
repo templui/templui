@@ -1,8 +1,17 @@
 ---
 title: "How To Use"
-description: "Learn how to integrate templUI into your projects using the CLI."
+description: "Learn how to use templUI via the CLI or direct imports."
 order: 2
 ---
+
+## Choose A Workflow
+
+templUI supports two workflows:
+
+- **CLI workflow**: run `templui init` and `templui add` to copy component source into your own project. Best when you want to own and edit the code locally.
+- **Import workflow**: add `github.com/templui/templui` and import component packages directly. Best when you want the fastest setup.
+
+Use the same Tailwind setup in both workflows. The main difference is where the component code lives.
 
 ## Requirements
 
@@ -138,6 +147,48 @@ Create `assets/css/input.css` with templUI's base styles:
 
 > **💡 Tip:** For custom themes and color palettes, visit [/docs/themes](/docs/themes).
 
+## Import Workflow
+
+Use this when you want the simplest setup.
+
+### 1. Add templUI to your module
+
+```shell
+go get github.com/templui/templui@latest
+```
+
+You can also just import a component package and run `go mod tidy`.
+
+### 2. Import and use a component
+
+```go
+import "github.com/templui/templui/components/button"
+```
+
+```templ
+@button.Button() {
+  Click me
+}
+```
+
+### 3. No CLI setup is required
+
+For the import workflow you do **not** need:
+
+- `templui init`
+- `.templui.json`
+- `templui add`
+
+You only need:
+
+- the Tailwind base styles from this page
+- normal Go imports
+- `go get` or `go mod tidy`
+
+## CLI Workflow
+
+Use this when you want templUI to copy component source into your own project for you.
+
 ## Development
 
 Recommended setup with hot reloading using [Task](https://taskfile.dev).
@@ -272,6 +323,8 @@ templui add@v0.84.0 dialog
 ```
 
 > **💡 Tip:** JavaScript is included automatically by interactive components. No extra script wiring is needed.
+>
+> In the CLI workflow, templUI copies the component files into your configured directories and rewrites imports to your local module paths.
 
 ### Update Components
 

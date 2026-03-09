@@ -6,13 +6,13 @@ order: 1
 
 ## Introduction
 
-templUI is a growing collection of beautifully designed components built with templ and Tailwind CSS. Install components via CLI or copy the source directly. Everything is customizable, type-safe, and yours to own.
+templUI is a growing collection of beautifully designed components built with templ and Tailwind CSS. You can use it in two ways: install components into your own repo with the CLI, or import component packages directly from `github.com/templui/templui`. Everything is customizable, type-safe, and yours to own.
 
-**CLI-first workflow.** Install with one command. Full control over your code. Follow our [releases](https://github.com/templui/templui/releases) to see what's new.
+**Two supported workflows.** Use the CLI if you want the source copied into your app. Use direct imports if you want the simplest setup. Follow our [releases](https://github.com/templui/templui/releases) to see what's new.
 
 ## Why templUI
 
-Heavily inspired by [shadcn/ui](https://ui.shadcn.com/), templUI brings the same philosophy to Go developers. Install via CLI, customize everything, own your code – no hidden dependencies.
+Heavily inspired by [shadcn/ui](https://ui.shadcn.com/), templUI brings the same philosophy to Go developers. Use the CLI for full ownership of copied source, or direct imports for a simpler dependency-based workflow.
 
 Every component is designed to be beautiful by default, fully accessible, and CSP compliant. No magic, no hidden complexity – just clean, customizable code that works.
 

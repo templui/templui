@@ -1,6 +1,6 @@
 # templUI
 
-Beautifully designed components built with templ and Tailwind CSS. Install via CLI. Customize everything. Own your code. **Use this to build modern Go applications**.
+Beautifully designed components built with templ and Tailwind CSS. Use the CLI to copy components into your app, or import them directly. Customize everything. Own your code. **Use this to build modern Go applications**.
 
 ![hero](./assets/img/readme.png)
 
