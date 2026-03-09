@@ -4,16 +4,22 @@ description: "Learn how to use templUI via the CLI or direct imports."
 order: 2
 ---
 
-## Choose A Workflow
+## Quickstart
 
-templUI supports two workflows:
+Start fast with [`templui/templui-quickstart`](https://github.com/templui/templui-quickstart):
 
-- **CLI workflow**: run `templui init` and `templui add` to copy component source into your own project. Best when you want to own and edit the code locally.
-- **Import workflow**: add `github.com/templui/templui` and import component packages directly. Best when you want the fastest setup.
+```shell
+git clone https://github.com/templui/templui-quickstart.git myapp
+rm -rf myapp/.git
+cd myapp
+cp .env.example .env
+go mod tidy
+task dev
+```
 
-Use the same Tailwind setup in both workflows. The main difference is where the component code lives.
+## Tools
 
-## Requirements
+The documented setup uses these tools in every workflow.
 
 ### Go
 
@@ -43,9 +49,261 @@ go install github.com/a-h/templ/cmd/templ@latest
 npx tailwindcss@latest
 ```
 
-## Configuration
+### Task
 
-Create `assets/css/input.css` with templUI's base styles:
+```shell
+go install github.com/go-task/task/v3/cmd/task@latest
+```
+
+> **📝 Note:** Learn more at [taskfile.dev](https://taskfile.dev)
+
+## Import Workflow
+
+Use this when you want the simplest setup and prefer importing component packages directly.
+
+### 1. Add templUI
+
+```shell
+go get github.com/templui/templui@latest
+```
+
+You can also just import a component package and run `go mod tidy`.
+
+### 2. Base Styles
+
+Create `assets/css/input.css`:
+
+```css
+@import "tailwindcss";
+@import "./sources.generated.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --breakpoint-3xl: 1600px;
+  --breakpoint-4xl: 2000px;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  --radius: 0.65rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-muted-foreground) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--color-muted-foreground);
+    border-radius: 4px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--color-foreground);
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+```
+
+> **💡 Tip:** For custom themes and color palettes, visit [/docs/themes](/docs/themes).
+
+### 3. Taskfile
+
+```yaml
+version: "3"
+
+vars:
+  TAILWIND_CMD:
+    sh: command -v tailwindcss >/dev/null 2>&1 && echo "tailwindcss" || echo "npx tailwindcss@latest"
+
+tasks:
+  templ:
+    desc: Run templ with integrated server and hot reload
+    cmds:
+      - templ generate --watch --proxy="http://localhost:8090" --cmd="go run ./main.go" --open-browser=false
+
+  tailwind:
+    desc: Watch Tailwind CSS changes
+    cmds:
+      - |
+        TEMPLUI_PATH="$(go list -m -f {{`'{{.Dir}}'`}} github.com/templui/templui)" && \
+        printf '%s\n' \
+          '@source "./**/*.templ";' \
+          "@source \"$TEMPLUI_PATH/components/**/*.templ\";" \
+          > ./assets/css/sources.generated.css && \
+        {{.TAILWIND_CMD}} -i ./assets/css/input.css -o ./assets/css/output.css --watch
+
+  dev:
+    desc: Start development server with hot reload
+    cmds:
+      - task --parallel tailwind templ
+```
+
+### 4. Import and use a component
+
+```go
+import "github.com/templui/templui/components/button"
+```
+
+```templ
+@button.Button() {
+  Click me
+}
+```
+
+For a complete import-based app setup, see [`templui/templui-quickstart`](https://github.com/templui/templui-quickstart).
+
+## CLI Workflow
+
+Use this when you want templUI to copy component source into your own project for you.
+
+### 1. Install CLI
+
+```shell
+go install github.com/templui/templui/cmd/templui@latest
+templui --version
+```
+
+### 2. Initialize Project
+
+```shell
+templui init
+```
+
+This creates `.templui.json` in your project root.
+
+### 3. Config File
+
+After running `templui init`, `.templui.json` is created:
+
+```json
+{
+  "componentsDir": "components",
+  "utilsDir": "utils",
+  "moduleName": "your-app/module",
+  "jsDir": "assets/js",
+  "jsPublicPath": "/assets/js"
+}
+```
+
+**Configuration:**
+
+- `componentsDir` - templ components location (relative to project root)
+- `utilsDir` - Utility Go files location
+- `moduleName` - Your Go module name (for import paths)
+- `jsDir` - JavaScript files disk location
+- `jsPublicPath` _(optional)_ - Public URL path for serving JS files
+
+**jsPublicPath examples:**
+- `"/assets/js"` → yoursite.com/assets/js/
+- `"/app/static/js"` → yoursite.com/app/static/js/
+- `"/static"` → yoursite.com/static/
+
+> **📝 Note:** If not set, defaults to `"/" + jsDir`
+
+### 4. JS Asset Routing
+
+Use `jsPublicPath` when your server config doesn't map filesystem paths to URLs directly.
+
+**Standard Setup (Default)**
+
+Files in `assets/js/` served at `/assets/js/`:
+
+```go
+mux.Handle("/assets/js/", http.StripPrefix("/assets/js/",
+    http.FileServer(http.Dir("./assets/js"))))
+```
+
+**App with URL Prefix**
+
+App running under `/app/`:
+
+```go
+// Config: "jsPublicPath": "/app/assets/js"
+mux.Handle("/app/assets/js/", http.StripPrefix("/app/assets/js/",
+    http.FileServer(http.Dir("./assets/js"))))
+```
+
+**Custom Asset Directory**
+
+Assets served from different path than filesystem:
+
+```go
+// Config: "jsDir": "internal/assets", "jsPublicPath": "/static"
+mux.Handle("/static/", http.StripPrefix("/static/",
+    http.FileServer(http.Dir("./internal/assets"))))
+```
+
+### 5. Base Styles
+
+Create `assets/css/input.css`:
 
 ```css
 @import "tailwindcss";
@@ -147,63 +405,7 @@ Create `assets/css/input.css` with templUI's base styles:
 
 > **💡 Tip:** For custom themes and color palettes, visit [/docs/themes](/docs/themes).
 
-## Import Workflow
-
-Use this when you want the simplest setup.
-
-### 1. Add templUI to your module
-
-```shell
-go get github.com/templui/templui@latest
-```
-
-You can also just import a component package and run `go mod tidy`.
-
-### 2. Import and use a component
-
-```go
-import "github.com/templui/templui/components/button"
-```
-
-```templ
-@button.Button() {
-  Click me
-}
-```
-
-### 3. No CLI setup is required
-
-For the import workflow you do **not** need:
-
-- `templui init`
-- `.templui.json`
-- `templui add`
-
-You only need:
-
-- the Tailwind base styles from this page
-- normal Go imports
-- `go get` or `go mod tidy`
-
-## CLI Workflow
-
-Use this when you want templUI to copy component source into your own project for you.
-
-## Development
-
-Recommended setup with hot reloading using [Task](https://taskfile.dev).
-
-### Install Task
-
-**Task** is a modern alternative to Make that works on all platforms.
-
-```shell
-go install github.com/go-task/task/v3/cmd/task@latest
-```
-
-> **📝 Note:** Learn more at [taskfile.dev](https://taskfile.dev)
-
-### Create Taskfile
+### 6. Taskfile
 
 Create `Taskfile.yml` in your project root:
 
@@ -235,78 +437,7 @@ tasks:
 
 > **📝 Note:** Adjust the `--proxy` port (default: 8090) if your app uses a different port. templ's dev server runs at http://localhost:7331
 
-### Start Dev Server
-
-Start all development tools:
-
-```shell
-task dev
-```
-
-**This command:**
-- Watches and compiles templ files
-- Starts the Go server with hot reload
-- Watches and compiles Tailwind CSS changes
-
-**Run individually:**
-- `task templ` - templ files + server
-- `task tailwind` - Tailwind CSS only
-- `task --list` - Show all tasks
-
-## Installation
-
-### Quickstart (Recommended for fast start)
-
-Clone the repo with sparse checkout and use the ready-to-run quickstart folder:
-
-```shell
-git clone --depth 1 --filter=blob:none --sparse https://github.com/templui/templui.git myapp
-cd myapp
-git sparse-checkout set examples/quickstart
-cd examples/quickstart
-cp .env.example .env
-go mod tidy
-task dev
-```
-
-### Install CLI
-
-Install the templUI CLI:
-
-```shell
-go install github.com/templui/templui/cmd/templui@latest
-```
-
-Verify installation:
-
-```shell
-templui --version
-```
-
-### Initialize Project
-
-Initialize templUI in your project:
-
-```shell
-templui init
-```
-
-**You will be prompted for:**
-- Components directory (default: `components`)
-- Utils directory (default: `utils`)
-- Go module name
-- JavaScript directory
-- JS public path (optional)
-
-**Use specific version:**
-
-```shell
-templui init@v0.1.0  # Tag, branch, or commit
-```
-
-> **📝 Note:** This creates `.templui.json` in your project root.
-
-### Add Components
+### 7. Add Components
 
 Install components and their dependencies:
 
@@ -326,7 +457,7 @@ templui add@v0.84.0 dialog
 >
 > In the CLI workflow, templUI copies the component files into your configured directories and rewrites imports to your local module paths.
 
-### Update Components
+### 8. Update Components
 
 Update all installed components at once:
 
@@ -345,7 +476,7 @@ templui --force add carousel    # Force without prompts
 
 > **⚠️ Warning:** Updates overwrite custom modifications. Always backup your changes first.
 
-### List Components
+### 9. List Components
 
 View all available components:
 
@@ -354,7 +485,7 @@ templui list              # Latest version
 templui list@v0.1.0       # Specific version
 ```
 
-### Upgrade
+### 10. Upgrade
 
 Update the CLI and utils:
 
@@ -364,74 +495,3 @@ templui upgrade@v0.84.0      # Specific version
 ```
 
 This updates both the CLI tool and the utils package (`utils/templui.go`) to ensure you have the latest helper functions.
-
-## Advanced
-
-### Config File
-
-After running `templui init`, `.templui.json` is created:
-
-```json
-{
-  "componentsDir": "components",
-  "utilsDir": "utils",
-  "moduleName": "your-app/module",
-  "jsDir": "assets/js",
-  "jsPublicPath": "/assets/js"
-}
-```
-
-**Configuration:**
-
-- `componentsDir` - templ components location (relative to project root)
-- `utilsDir` - Utility Go files location
-- `moduleName` - Your Go module name (for import paths)
-- `jsDir` - JavaScript files disk location
-- `jsPublicPath` _(optional)_ - Public URL path for serving JS files
-
-**jsPublicPath examples:**
-- `"/assets/js"` → yoursite.com/assets/js/
-- `"/app/static/js"` → yoursite.com/app/static/js/
-- `"/static"` → yoursite.com/static/
-
-> **📝 Note:** If not set, defaults to `"/" + jsDir`
-
-### JS Asset Routing
-
-Use `jsPublicPath` when your server config doesn't map filesystem paths to URLs directly.
-
-**Standard Setup (Default)**
-
-Files in `assets/js/` served at `/assets/js/`:
-
-```go
-mux.Handle("/assets/js/", http.StripPrefix("/assets/js/",
-    http.FileServer(http.Dir("./assets/js"))))
-```
-
-**App with URL Prefix**
-
-App running under `/app/`:
-
-```go
-// Config: "jsPublicPath": "/app/assets/js"
-mux.Handle("/app/assets/js/", http.StripPrefix("/app/assets/js/",
-    http.FileServer(http.Dir("./assets/js"))))
-```
-
-**Custom Asset Directory**
-
-Assets served from different path than filesystem:
-
-```go
-// Config: "jsDir": "internal/assets", "jsPublicPath": "/static"
-mux.Handle("/static/", http.StripPrefix("/static/",
-    http.FileServer(http.Dir("./internal/assets"))))
-```
-
-### External Docs
-
-**Additional resources:**
-
-- [templ](https://templ.guide) - Cache configuration, component patterns
-- [Tailwind CSS](https://tailwindcss.com/docs) - Theming, plugins, optimization
