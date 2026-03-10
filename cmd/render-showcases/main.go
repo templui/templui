@@ -123,6 +123,7 @@ func main() {
 		"out/showcase/date_picker_disabled.html":           showcase.DatePickerDisabled(),
 		"out/showcase/date_picker_form.html":               showcase.DatePickerForm(),
 		"out/showcase/date_picker_formats.html":            showcase.DatePickerFormats(),
+		"out/showcase/date_picker_range.html":              showcase.DatePickerRange(),
 		"out/showcase/date_picker_selected_date.html":      showcase.DatePickerSelectedDate(),
 		"out/showcase/date_picker_with_label.html":         showcase.DatePickerWithLabel(),
 		"out/showcase/date_picker_with_time.html":          showcase.DatePickerWithTime(),

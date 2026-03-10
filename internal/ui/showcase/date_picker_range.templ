@@ -1,0 +1,13 @@
+package showcase
+
+import "github.com/templui/templui/components/datepicker"
+
+templ DatePickerRange() {
+	<div class="w-full max-w-sm">
+		@datepicker.DatePicker(datepicker.Props{
+			RangeMode:      true,
+			Placeholder:    "Start date",
+			EndPlaceholder: "End date",
+		})
+	</div>
+}

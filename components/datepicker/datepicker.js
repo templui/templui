@@ -104,6 +104,10 @@
     }
   }
 
+  function findRangeEndInput(root) {
+    return root?.querySelector("[data-tui-calendar-hidden-end-input]");
+  }
+
   // Update display
   function updateDisplay(root) {
     const elements = findElements(root);
@@ -115,6 +119,42 @@
     const locale =
       elements.trigger.getAttribute("data-tui-datepicker-locale-tag") ||
       "en-US";
+
+    if (
+      elements.trigger.getAttribute("data-tui-datepicker-range-mode") ===
+      "true"
+    ) {
+      const startPlaceholder =
+        elements.trigger.getAttribute("data-tui-datepicker-placeholder") ||
+        "Select a date";
+      const endPlaceholder =
+        elements.trigger.getAttribute(
+          "data-tui-datepicker-end-placeholder",
+        ) || "End date";
+      const rangeEndInput = findRangeEndInput(root);
+      const startDate = parseISODate(elements.hiddenInput.value);
+      const endDate = rangeEndInput
+        ? parseISODate(rangeEndInput.value)
+        : null;
+
+      if (startDate && endDate) {
+        elements.display.textContent =
+          formatDate(startDate, format, locale) +
+          " \u2013 " +
+          formatDate(endDate, format, locale);
+        elements.display.classList.remove("text-muted-foreground");
+      } else if (startDate) {
+        elements.display.textContent =
+          formatDate(startDate, format, locale) + " \u2013 " + endPlaceholder;
+        elements.display.classList.remove("text-muted-foreground");
+      } else {
+        elements.display.textContent =
+          startPlaceholder + " - " + endPlaceholder;
+        elements.display.classList.add("text-muted-foreground");
+      }
+      return;
+    }
+
     const placeholder =
       elements.trigger.getAttribute("data-tui-datepicker-placeholder") ||
       "Select a date";
@@ -143,10 +183,44 @@
     const root = findRoot(calendar);
     const elements = findElements(root);
     if (!elements.hiddenInput || !e.detail?.date) return;
+    if (
+      elements.trigger?.getAttribute("data-tui-datepicker-range-mode") ===
+      "true"
+    )
+      return;
 
     elements.hiddenInput.value = toISODate(e.detail.date);
     updateDisplay(root);
     closePopover(root);
+  });
+
+  // Handle calendar range selection
+  document.addEventListener("calendar-range-selected", (e) => {
+    const calendar = e.target;
+    const root = findRoot(calendar);
+    if (!root) return;
+
+    // Sync the calendar's range state into the datepicker's own hidden inputs
+    // (the calendar can't find them directly when HideHiddenInput is true)
+    const elements = findElements(root);
+    if (elements.hiddenInput) {
+      elements.hiddenInput.value = e.detail?.startDate
+        ? toISODate(e.detail.startDate)
+        : "";
+    }
+    const rangeEndInput = findRangeEndInput(root);
+    if (rangeEndInput) {
+      rangeEndInput.value = e.detail?.endDate
+        ? toISODate(e.detail.endDate)
+        : "";
+    }
+
+    updateDisplay(root);
+
+    // Only close the popover once the range is complete (end date selected)
+    if (e.detail?.endDate) {
+      closePopover(root);
+    }
   });
 
   // Handle hidden input value changes (for reactive frameworks)
@@ -167,6 +241,10 @@
       const elements = findElements(root);
       if (elements.hiddenInput) {
         elements.hiddenInput.value = "";
+      }
+      const rangeEndInput = findRangeEndInput(root);
+      if (rangeEndInput) {
+        rangeEndInput.value = "";
       }
       updateDisplay(root);
     });

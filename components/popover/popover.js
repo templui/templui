@@ -328,6 +328,12 @@ import "./floating_ui_dom.js";
         return;
       }
 
+      // If the click target was removed from the DOM (e.g. by a re-render),
+      // don't treat it as an outside click.
+      if (!event.target.isConnected) {
+        return;
+      }
+
       const clickedInsideContent = content.contains(event.target);
       const clickedTrigger = getTriggers(currentRoot).some((item) =>
         item.contains(event.target),

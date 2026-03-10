@@ -33,18 +33,22 @@ var (
 )
 
 type Props struct {
-	ID          string
-	Class       string
-	Attributes  templ.Attributes
-	Name        string
-	Value       time.Time
-	Form        string
-	Format      Format        // Controls the display format using Intl dateStyle options.
-	LocaleTag   LocaleTag     // BCP 47 Locale Tag (e.g., "en-US", "es-ES"). Determines language and regional format defaults.
-	StartOfWeek *calendar.Day // Optional: 0-6 [Sun-Sat] (Default: 1).
-	Placeholder string
-	Disabled    bool
-	HasError    bool
+	ID               string
+	Class            string
+	Attributes       templ.Attributes
+	Name             string
+	Value            time.Time
+	Form             string
+	Format           Format        // Controls the display format using Intl dateStyle options.
+	LocaleTag        LocaleTag     // BCP 47 Locale Tag (e.g., "en-US", "es-ES"). Determines language and regional format defaults.
+	StartOfWeek      *calendar.Day // Optional: 0-6 [Sun-Sat] (Default: 1).
+	Placeholder      string
+	Disabled         bool
+	HasError         bool
+	RangeMode        bool      // Activates range selection mode.
+	RangeEnd         time.Time // End date for range selection (range mode only).
+	RangeEndName     string    // Hidden input name for range end date. Defaults to Name + "-end".
+	EndPlaceholder   string    // Display placeholder for the end date (range mode only).
 }
 
 templ DatePicker(props ...Props) {
@@ -69,11 +73,27 @@ templ DatePicker(props ...Props) {
 			p.Format = FormatLOCALE_MEDIUM
 		}
 
+		rangeMode := p.RangeMode
+		if rangeMode {
+			if p.RangeEndName == "" {
+				p.RangeEndName = p.Name + "-end"
+			}
+			if p.EndPlaceholder == "" {
+				p.EndPlaceholder = "End date"
+			}
+		}
+
 		var valuePtr *time.Time
 		var initialSelectedISO string
 		if !p.Value.IsZero() {
 			valuePtr = &p.Value
 			initialSelectedISO = p.Value.Format("2006-01-02")
+		}
+		var rangeEndValuePtr *time.Time
+		var rangeEndISO string
+		if rangeMode && !p.RangeEnd.IsZero() {
+			rangeEndValuePtr = &p.RangeEnd
+			rangeEndISO = p.RangeEnd.Format("2006-01-02")
 		}
 	}}
 	<div class="relative inline-block w-full" data-tui-datepicker-root>
@@ -85,8 +105,21 @@ templ DatePicker(props ...Props) {
 				if p.Form != "" {
 					form={ p.Form }
 				}
+				id={ p.ID + "-hidden" }
 				data-tui-datepicker-hidden-input
 			/>
+			if rangeMode {
+				<input
+					type="hidden"
+					name={ p.RangeEndName }
+					value={ rangeEndISO }
+					if p.Form != "" {
+						form={ p.Form }
+					}
+					id={ p.ID + "-range-end-hidden" }
+					data-tui-calendar-hidden-end-input
+				/>
+			}
 			@popover.Trigger() {
 				@button.Button(button.Props{
 					ID:      p.ID,
@@ -113,14 +146,18 @@ templ DatePicker(props ...Props) {
 						"data-tui-datepicker-display-format": string(p.Format),
 						"data-tui-datepicker-locale-tag":     string(p.LocaleTag),
 						"data-tui-datepicker-placeholder":    p.Placeholder,
+						"data-tui-datepicker-range-mode":     utils.If(rangeMode, "true"),
+						"data-tui-datepicker-end-placeholder":   p.EndPlaceholder,
 						"aria-invalid":                       utils.If(p.HasError, "true"),
 					}),
 				}) {
-					if p.Placeholder != "" {
-						<span data-tui-datepicker-display class={ "text-left grow text-muted-foreground" }>
+					<span data-tui-datepicker-display class={ "text-left grow text-muted-foreground" }>
+						if rangeMode {
+							{ p.Placeholder } - { p.EndPlaceholder }
+						} else {
 							{ p.Placeholder }
-						</span>
-					}
+						}
+					</span>
 					<span class="text-muted-foreground flex items-center ml-2">
 						@icon.Calendar(icon.Props{Class: "size-4"})
 					</span>
@@ -137,10 +174,14 @@ templ DatePicker(props ...Props) {
 						Class: "p-3",
 					}) {
 						@calendar.Calendar(calendar.Props{
+							ID:              p.ID + "-calendar-instance",
 							LocaleTag:       calendar.LocaleTag(p.LocaleTag),
 							StartOfWeek:     p.StartOfWeek,
 							Value:           valuePtr,
 							HideHiddenInput: true,
+							RangeMode:       rangeMode,
+							RangeEnd:        rangeEndValuePtr,
+							RangeEndName:    p.RangeEndName,
 						})
 					}
 				}

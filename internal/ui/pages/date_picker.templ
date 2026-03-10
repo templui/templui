@@ -40,6 +40,10 @@ templ DatePicker() {
 						ID:   "formats",
 					},
 					{
+						Text: "Range",
+						ID:   "range",
+					},
+					{
 						Text: "With Time",
 						ID:   "with-time",
 					},
@@ -129,6 +133,12 @@ templ DatePicker() {
 					ID:              "formats",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Range",
+					ShowcaseFile:    showcase.DatePickerRange(),
+					PreviewCodeFile: "date_picker_range.templ",
+					ID:              "range",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "With Time",
 					ShowcaseFile:    showcase.DatePickerWithTime(),
 					PreviewCodeFile: "date_picker_with_time.templ",
@@ -216,6 +226,30 @@ templ DatePicker() {
 								Type:        "string",
 								Default:     "ID value",
 								Description: "Name attribute for the hidden input field",
+							},
+							{
+								Name:        "RangeMode",
+								Type:        "bool",
+								Default:     "false",
+								Description: "Activates range selection mode for selecting a date range",
+							},
+							{
+								Name:        "RangeEnd",
+								Type:        "time.Time",
+								Default:     "time.Time{}",
+								Description: "End date for range selection (range mode only)",
+							},
+							{
+								Name:        "RangeEndName",
+								Type:        "string",
+								Default:     "Name + \"-end\"",
+								Description: "Hidden input name for the range end date",
+							},
+							{
+								Name:        "EndPlaceholder",
+								Type:        "string",
+								Default:     "End date",
+								Description: "Display placeholder for the end date (range mode only)",
 							},
 						},
 					})
