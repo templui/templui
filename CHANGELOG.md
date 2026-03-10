@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v1.7.1] - 2026-03-10
 
+### Important
+
+- `v1.7.1` is currently still experimental and buggy. The new import workflow does not work reliably right now, so please use the CLI workflow instead. If you need a stable version, please use `v1.6.0` for now.
+
 ### Changed
 
 - Removed the public `Script()` component API
@@ -20,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed local component JS paths during CLI installs
 
 ## [v1.7.0] - 2026-03-09
+
+### Important
+
+- `v1.7.0` is currently still experimental and buggy. The new import workflow does not work reliably right now, so please use the CLI workflow instead. If you need a stable version, please use `v1.6.0` for now.
 
 ### Added
 
