@@ -61,6 +61,8 @@ go install github.com/go-task/task/v3/cmd/task@latest
 
 Use this when you want the simplest setup and prefer importing component packages directly.
 
+> **Important:** In `v1.7.0` and `v1.7.1`, the new import workflow is currently still buggy and does not work reliably. Please use the CLI workflow instead. If you need the last stable release before these changes, use `v1.6.0`.
+
 ### 1. Add templUI
 
 ```shell
