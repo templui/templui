@@ -34,7 +34,7 @@ type Props struct {
 }
 
 templ Progress(props ...Props) {
-	@Script()
+	@script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -123,7 +123,7 @@ func variantClasses(variant Variant) string {
 
 var onceHandle = templ.NewOnceHandle()
 
-templ Script() {
+templ script() {
 	@onceHandle.Once() {
 		if !utils.SuppressComponentScripts {
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("progress") }></script>

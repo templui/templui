@@ -106,7 +106,7 @@ type PortalProps struct {
 }
 
 templ Dropdown(props ...Props) {
-	@Script()
+	@script()
 	{{
 		var p Props
 		if len(props) > 0 {
@@ -387,10 +387,9 @@ templ SubContent(props ...SubContentProps) {
 
 var onceHandle = templ.NewOnceHandle()
 
-templ Script() {
+templ script() {
 	@onceHandle.Once() {
 		if !utils.SuppressComponentScripts {
-			@popover.Script()
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("dropdown") }></script>
 		}
 	}

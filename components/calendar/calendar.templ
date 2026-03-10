@@ -45,7 +45,7 @@ type Props struct {
 }
 
 templ Calendar(props ...Props) {
-	@Script()
+	@script()
 	{{
 		var p Props
 		if len(props) > 0 {
@@ -193,7 +193,7 @@ templ Calendar(props ...Props) {
 
 var onceHandle = templ.NewOnceHandle()
 
-templ Script() {
+templ script() {
 	@onceHandle.Once() {
 		if !utils.SuppressComponentScripts {
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("calendar") }></script>

@@ -1,7 +1,6 @@
 package inputotp
 
 import (
-	"github.com/templui/templui/components/input"
 	"github.com/templui/templui/utils"
 	"strconv"
 )
@@ -40,7 +39,7 @@ type SeparatorProps struct {
 }
 
 templ InputOTP(props ...Props) {
-	@Script()
+	@script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -178,10 +177,9 @@ templ Separator(props ...SeparatorProps) {
 
 var onceHandle = templ.NewOnceHandle()
 
-templ Script() {
+templ script() {
 	@onceHandle.Once() {
 		if !utils.SuppressComponentScripts {
-			@input.Script()
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("inputotp") }></script>
 		}
 	}

@@ -5,11 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 )
-
-var onceHandleDeclRE = regexp.MustCompile(`(?m)^var onceHandle = templ\.NewOnceHandle\(\)\n\n?`)
 
 // runAdd handles the 'add' command logic.
 func runAdd(args []string, commandArg string, force bool, installed bool) {
@@ -178,22 +175,6 @@ func runAdd(args []string, commandArg string, force bool, installed bool) {
 	fmt.Printf("✅ INSTALLATION COMPLETED\n")
 	fmt.Printf("%s\n", strings.Repeat("─", 50))
 
-	// Check if any installed components require Script() (own JS or JS dependencies)
-	hasJSComponents := false
-	for compName := range installedComponents {
-		comp, exists := componentMap[compName]
-		if !exists {
-			continue
-		}
-		if len(resolveScriptComponentOrder(comp, componentMap)) > 0 {
-			hasJSComponents = true
-			break
-		}
-	}
-
-	if hasJSComponents {
-		fmt.Println("\n💡 Tip: Some components require JavaScript. Make sure to include @component.Script() in your layout!")
-	}
 }
 
 // installComponent handles the installation of a single component and its dependencies.
@@ -297,6 +278,9 @@ func installComponent(
 			modifiedData := append([]byte(versionComment), data...)
 			if strings.HasSuffix(repoFilePath, ".templ") || strings.HasSuffix(repoFilePath, ".go") {
 				modifiedData = replaceImports(modifiedData, config, comp.Name)
+				if comp.HasJS {
+					modifiedData = rewriteComponentScriptURL(modifiedData, config, comp.Name)
+				}
 			}
 
 			// Write the file.
@@ -317,14 +301,11 @@ func installComponent(
 		requiredUtils[repoUtilPath] = true
 	}
 
-	// Handle Script() generation for own/transitive JS dependencies.
-	if config.JSDir != "" {
-		scriptComponents := resolveScriptComponentOrder(comp, componentMap)
-		if len(scriptComponents) > 0 {
-			err := installComponentJS(config, comp, scriptComponents, ref, force)
-			if err != nil {
-				return fmt.Errorf("failed to install JavaScript for component '%s': %w", comp.Name, err)
-			}
+	// Download the component's JavaScript asset when it has one.
+	if config.JSDir != "" && comp.HasJS {
+		err := installComponentJS(config, comp, ref, force)
+		if err != nil {
+			return fmt.Errorf("failed to install JavaScript for component '%s': %w", comp.Name, err)
 		}
 	}
 
@@ -423,157 +404,52 @@ func installUtils(config Config, utilPaths []string, ref string, force bool) err
 	return nil
 }
 
-// installComponentJS installs the component's own JS (if present) and updates Script() templates.
-func installComponentJS(config Config, comp ComponentDef, scriptComponents []string, ref string, force bool) error {
-	if comp.HasJS {
-		jsFileName := comp.Name + ".min.js"
-		jsDestPath := filepath.Join(config.JSDir, jsFileName)
+// installComponentJS downloads the component's own JS asset when present.
+func installComponentJS(config Config, comp ComponentDef, ref string, force bool) error {
+	jsFileName := comp.Name + ".min.js"
+	jsDestPath := filepath.Join(config.JSDir, jsFileName)
 
-		// Ensure JS directory exists
-		err := os.MkdirAll(config.JSDir, 0755)
-		if err != nil {
-			return fmt.Errorf("failed to create JS directory '%s': %w", config.JSDir, err)
-		}
-
-		// Check if JS file exists and handle overwrite logic
-		fileExists := false
-		if _, err := os.Stat(jsDestPath); err == nil {
-			fileExists = true
-		}
-
-		shouldWriteJS := true
-		if fileExists && !force {
-			fmt.Printf("   JavaScript file '%s' already exists. Overwrite? (y/N): ", jsDestPath)
-			var response string
-			fmt.Scanln(&response)
-			shouldWriteJS = strings.ToLower(strings.TrimSpace(response)) == "y"
-		}
-
-		if shouldWriteJS {
-			jsSourceURL := rawContentBaseURL + ref + "/components/" + comp.Name + "/" + jsFileName
-			fmt.Printf("   Downloading JavaScript: %s\n", jsSourceURL)
-			jsData, err := downloadFile(jsSourceURL)
-			if err != nil {
-				return fmt.Errorf("failed to download JS file for component '%s' from %s: %w", comp.Name, jsSourceURL, err)
-			}
-
-			err = os.WriteFile(jsDestPath, jsData, 0644)
-			if err != nil {
-				return fmt.Errorf("failed to write JS file '%s': %w", jsDestPath, err)
-			}
-
-			if fileExists {
-				fmt.Printf("   Overwritten %s\n", jsDestPath)
-			} else {
-				fmt.Printf("   Installed %s\n", jsDestPath)
-			}
-		}
+	err := os.MkdirAll(config.JSDir, 0755)
+	if err != nil {
+		return fmt.Errorf("failed to create JS directory '%s': %w", config.JSDir, err)
 	}
 
-	// Add Script() template to .templ files
-	if err := addScriptTemplateToFiles(config, comp, scriptComponents); err != nil {
-		return fmt.Errorf("failed to add Script() template: %w", err)
+	fileExists := false
+	if _, err := os.Stat(jsDestPath); err == nil {
+		fileExists = true
+	}
+
+	shouldWriteJS := true
+	if fileExists && !force {
+		fmt.Printf("   JavaScript file '%s' already exists. Overwrite? (y/N): ", jsDestPath)
+		var response string
+		fmt.Scanln(&response)
+		shouldWriteJS = strings.ToLower(strings.TrimSpace(response)) == "y"
+	}
+
+	if !shouldWriteJS {
+		return nil
+	}
+
+	jsSourceURL := rawContentBaseURL + ref + "/components/" + comp.Name + "/" + jsFileName
+	fmt.Printf("   Downloading JavaScript: %s\n", jsSourceURL)
+	jsData, err := downloadFile(jsSourceURL)
+	if err != nil {
+		return fmt.Errorf("failed to download JS file for component '%s' from %s: %w", comp.Name, jsSourceURL, err)
+	}
+
+	err = os.WriteFile(jsDestPath, jsData, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write JS file '%s': %w", jsDestPath, err)
+	}
+
+	if fileExists {
+		fmt.Printf("   Overwritten %s\n", jsDestPath)
+	} else {
+		fmt.Printf("   Installed %s\n", jsDestPath)
 	}
 
 	return nil
-}
-
-// addScriptTemplateToFiles adds Script() template at the end of .templ files
-func addScriptTemplateToFiles(config Config, comp ComponentDef, scriptComponents []string) error {
-	for _, repoFilePath := range comp.Files {
-		if !strings.HasSuffix(repoFilePath, ".templ") {
-			continue // Only process .templ files
-		}
-
-		// Determine the destination path
-		relativePath, ok := componentRelativePath(repoFilePath)
-		if !ok {
-			return fmt.Errorf("invalid templ file path '%s': expected prefix 'components/'", repoFilePath)
-		}
-		destPath := filepath.Join(config.ComponentsDir, relativePath)
-
-		// Check if file exists
-		if _, err := os.Stat(destPath); os.IsNotExist(err) {
-			continue // Skip if .templ file doesn't exist
-		}
-
-		// Read the current file content
-		content, err := os.ReadFile(destPath)
-		if err != nil {
-			return fmt.Errorf("failed to read .templ file '%s': %w", destPath, err)
-		}
-
-		contentStr := onceHandleDeclRE.ReplaceAllString(string(content), "")
-
-		// Build script lines for own/transitive JS dependencies in load order.
-		scriptLines := make([]string, 0, len(scriptComponents))
-		for _, scriptCompName := range scriptComponents {
-			jsFileName := scriptCompName + ".min.js"
-			var webPath string
-			if config.JSPublicPath != "" {
-				webPath = strings.TrimSuffix(config.JSPublicPath, "/") + "/" + jsFileName
-			} else {
-				webPath = "/" + filepath.ToSlash(filepath.Join(config.JSDir, jsFileName))
-			}
-
-			// Prefer dependency Script() calls (deduped with onceHandle in each component).
-			// Fallback to direct local script tag when dependency package isn't imported.
-			if scriptCompName != comp.Name && strings.Contains(contentStr, `components/`+scriptCompName+`"`) {
-				scriptLines = append(scriptLines, fmt.Sprintf("\t\t@%s.Script()", scriptCompName))
-				continue
-			}
-			scriptLines = append(scriptLines, fmt.Sprintf("\t\t<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL(\"%s\") }></script>", webPath))
-		}
-
-		// Create the Script() template with once-handle dedupe and local ScriptURL usage.
-		scriptTemplate := "var onceHandle = templ.NewOnceHandle()\n\n" +
-			"templ Script() {\n" +
-			"\t@onceHandle.Once() {\n" +
-			strings.Join(scriptLines, "\n") + "\n" +
-			"\t}\n" +
-			"}"
-
-		newContent, action := upsertScriptTemplate(contentStr, scriptTemplate)
-
-		// Write the updated content
-		err = os.WriteFile(destPath, []byte(newContent), 0644)
-		if err != nil {
-			return fmt.Errorf("failed to write updated .templ file '%s': %w", destPath, err)
-		}
-		fmt.Printf("   %s Script() template in %s\n", action, destPath)
-	}
-
-	return nil
-}
-
-// resolveScriptComponentOrder returns JS components in dependency-first order.
-func resolveScriptComponentOrder(comp ComponentDef, componentMap map[string]ComponentDef) []string {
-	var ordered []string
-	visited := make(map[string]bool)
-
-	var visit func(name string)
-	visit = func(name string) {
-		if visited[name] {
-			return
-		}
-		visited[name] = true
-
-		current, ok := componentMap[name]
-		if !ok {
-			return
-		}
-
-		for _, depName := range current.Dependencies {
-			visit(depName)
-		}
-
-		if current.HasJS {
-			ordered = append(ordered, current.Name)
-		}
-	}
-
-	visit(comp.Name)
-	return ordered
 }
 
 func componentRelativePath(repoPath string) (string, bool) {
@@ -592,47 +468,18 @@ func utilRelativePath(repoPath string) (string, bool) {
 	return "", false
 }
 
-func upsertScriptTemplate(content, scriptTemplate string) (string, string) {
-	scriptDecl := "templ Script()"
-	idx := strings.Index(content, scriptDecl)
-	if idx == -1 {
-		return strings.TrimSpace(content) + "\n\n" + scriptTemplate + "\n", "Added"
+func rewriteComponentScriptURL(content []byte, config Config, componentName string) []byte {
+	jsFileName := componentName + ".min.js"
+	var webPath string
+	if config.JSPublicPath != "" {
+		webPath = strings.TrimSuffix(config.JSPublicPath, "/") + "/" + jsFileName
+	} else {
+		webPath = "/" + filepath.ToSlash(filepath.Join(config.JSDir, jsFileName))
 	}
 
-	openRel := strings.Index(content[idx:], "{")
-	if openRel == -1 {
-		return strings.TrimSpace(content) + "\n\n" + scriptTemplate + "\n", "Added"
-	}
-
-	open := idx + openRel
-	depth := 0
-	end := -1
-	for i := open; i < len(content); i++ {
-		switch content[i] {
-		case '{':
-			depth++
-		case '}':
-			depth--
-			if depth == 0 {
-				end = i + 1
-				i = len(content)
-			}
-		}
-	}
-
-	if end == -1 {
-		return strings.TrimSpace(content) + "\n\n" + scriptTemplate + "\n", "Added"
-	}
-
-	head := strings.TrimRight(content[:idx], " \t\r\n")
-	tail := strings.TrimLeft(content[end:], " \t\r\n")
-
-	updated := head + "\n\n" + scriptTemplate + "\n"
-	if tail != "" {
-		updated += "\n" + tail + "\n"
-	}
-
-	return updated, "Updated"
+	old := []byte(fmt.Sprintf(`utils.ComponentScriptURL("%s")`, componentName))
+	new := []byte(fmt.Sprintf(`utils.ScriptURL("%s")`, webPath))
+	return bytes.ReplaceAll(content, old, new)
 }
 
 // getInstalledComponentNames returns the names of all installed components
