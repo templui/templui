@@ -73,25 +73,38 @@
     }
   }
   
-  // Find elements
-  function findElements(trigger) {
-    const calendarId = trigger.id + "-calendar-instance";
-    const calendar = document.getElementById(calendarId);
-    const hiddenInput = document.getElementById(trigger.id + "-hidden") || 
-                       trigger.parentElement?.querySelector("[data-tui-datepicker-hidden-input]");
-    const display = trigger.querySelector("[data-tui-datepicker-display]");
-    
-    return { calendar, hiddenInput, display };
+  function findRoot(element) {
+    return element?.closest("[data-tui-datepicker-root]") || null;
+  }
+
+  function findElements(root) {
+    const trigger = root?.querySelector("[data-tui-datepicker='true']");
+    const calendar = root?.querySelector("[data-tui-calendar-container]");
+    const hiddenInput = root?.querySelector("[data-tui-datepicker-hidden-input]");
+    const display = trigger?.querySelector("[data-tui-datepicker-display]");
+
+    return { trigger, calendar, hiddenInput, display };
+  }
+
+  function closePopover(root) {
+    const popoverContent = root?.querySelector("[data-tui-popovernative-content]");
+    if (!popoverContent?.matches(":popover-open")) return;
+
+    try {
+      popoverContent.hidePopover();
+    } catch {
+      // ignore
+    }
   }
   
   // Update display
-  function updateDisplay(trigger) {
-    const elements = findElements(trigger);
-    if (!elements.display || !elements.hiddenInput) return;
+  function updateDisplay(root) {
+    const elements = findElements(root);
+    if (!elements.trigger || !elements.display || !elements.hiddenInput) return;
     
-    const format = trigger.getAttribute("data-tui-datepicker-display-format") || "locale-medium";
-    const locale = trigger.getAttribute("data-tui-datepicker-locale-tag") || "en-US";
-    const placeholder = trigger.getAttribute("data-tui-datepicker-placeholder") || "Select a date";
+    const format = elements.trigger.getAttribute("data-tui-datepicker-display-format") || "locale-medium";
+    const locale = elements.trigger.getAttribute("data-tui-datepicker-locale-tag") || "en-US";
+    const placeholder = elements.trigger.getAttribute("data-tui-datepicker-placeholder") || "Select a date";
     
     if (elements.hiddenInput.value) {
       const date = parseISODate(elements.hiddenInput.value);
@@ -108,37 +121,26 @@
   
   // Handle calendar date selection
   document.addEventListener("calendar-date-selected", (e) => {
-    // Find the datepicker trigger associated with this calendar
     const calendar = e.target;
-    if (!calendar || !calendar.id.endsWith("-calendar-instance")) return;
-    
-    const triggerId = calendar.id.replace("-calendar-instance", "");
-    const trigger = document.getElementById(triggerId);
-    if (!trigger || !trigger.hasAttribute("data-tui-datepicker")) return;
-    
-    const elements = findElements(trigger);
+    const root = findRoot(calendar);
+    const elements = findElements(root);
     if (!elements.display || !e.detail?.date) return;
     
-    const format = trigger.getAttribute("data-tui-datepicker-display-format") || "locale-medium";
-    const locale = trigger.getAttribute("data-tui-datepicker-locale-tag") || "en-US";
+    const format = elements.trigger?.getAttribute("data-tui-datepicker-display-format") || "locale-medium";
+    const locale = elements.trigger?.getAttribute("data-tui-datepicker-locale-tag") || "en-US";
     
     elements.display.textContent = formatDate(e.detail.date, format, locale);
     elements.display.classList.remove("text-muted-foreground");
-    
-    // Close the popover
-    if (window.closePopover) {
-      const popoverId = trigger.getAttribute("aria-controls") || (trigger.id + "-content");
-      window.closePopover(popoverId);
-    }
+    closePopover(root);
   });
   
   // Handle hidden input value changes (for reactive frameworks)
   document.addEventListener('input', (e) => {
     if (!e.target.matches('[data-tui-datepicker-hidden-input]')) return;
 
-    const trigger = document.getElementById(e.target.id.replace('-hidden', ''));
-    if (trigger) {
-      updateDisplay(trigger);
+    const root = findRoot(e.target);
+    if (root) {
+      updateDisplay(root);
     }
   });
 
@@ -146,24 +148,24 @@
   document.addEventListener("reset", (e) => {
     if (!e.target.matches("form")) return;
 
-    e.target.querySelectorAll('[data-tui-datepicker="true"]').forEach(trigger => {
-      const elements = findElements(trigger);
+    e.target.querySelectorAll('[data-tui-datepicker-root]').forEach(root => {
+      const elements = findElements(root);
       if (elements.hiddenInput) {
         elements.hiddenInput.value = "";
       }
-      updateDisplay(trigger);
+      updateDisplay(root);
     });
   });
 
   // Initialize datepickers
   function initializeDatePickers() {
-    document.querySelectorAll('[data-tui-datepicker="true"]').forEach(trigger => {
-      const elements = findElements(trigger);
+    document.querySelectorAll('[data-tui-datepicker-root]').forEach(root => {
+      const elements = findElements(root);
       if (!elements.hiddenInput || elements.hiddenInput._tui) return;
 
       // Enable reactive binding for hidden input
       enableReactiveBinding(elements.hiddenInput);
-      updateDisplay(trigger);
+      updateDisplay(root);
     });
   }
 

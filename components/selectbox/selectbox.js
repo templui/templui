@@ -51,11 +51,46 @@
     hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
+  function getContainer(element) {
+    return element?.closest('.select-container') || null;
+  }
+
+  function getTriggerFromContainer(container) {
+    return container?.querySelector('button.select-trigger') || null;
+  }
+
+  function getContentFromContainer(container) {
+    return container?.querySelector('[data-tui-selectbox-content]') || null;
+  }
+
+  function getContentFromTrigger(trigger) {
+    return getContentFromContainer(getContainer(trigger));
+  }
+
+  function syncContentWidth(trigger) {
+    const content = getContentFromTrigger(trigger);
+    if (!content) return;
+
+    const width = trigger.getBoundingClientRect().width;
+    content.style.width = `${width}px`;
+    content.style.minWidth = `${width}px`;
+  }
+
+  function closePopover(trigger) {
+    const content = getContentFromTrigger(trigger);
+    if (!content?.matches(':popover-open')) return;
+
+    try {
+      content.hidePopover();
+    } catch {
+      // ignore
+    }
+  }
+
   // Helper to sync selections from hidden input value
   function syncSelectionsFromValue(trigger) {
     const hiddenInput = trigger.querySelector('input[type="hidden"]');
-    const contentId = trigger.getAttribute('data-tui-selectbox-content-id');
-    const content = document.getElementById(contentId);
+    const content = getContentFromTrigger(trigger);
     
     if (!hiddenInput || !content) return;
     
@@ -77,8 +112,7 @@
   function updateDisplayValue(trigger) {
     const valueEl = trigger.querySelector('.select-value');
     const hiddenInput = trigger.querySelector('input[type="hidden"]');
-    const contentId = trigger.getAttribute('data-tui-selectbox-content-id');
-    const content = document.getElementById(contentId);
+    const content = getContentFromTrigger(trigger);
 
     if (!valueEl) {
       updateTriggerClearState(trigger);
@@ -208,7 +242,7 @@
   // Helper to filter items based on search
   function filterItems(searchInput) {
     const searchTerm = normalizeSearchValue(searchInput.value);
-    const content = searchInput.closest('[data-tui-popover-id]');
+    const content = searchInput.closest('[data-tui-selectbox-content]');
     if (!content) return;
     
     content.querySelectorAll('.select-item').forEach(item => {
@@ -223,9 +257,8 @@
   function toggleItem(item) {
     if (item.getAttribute('data-tui-selectbox-disabled') === 'true') return;
     
-    const content = item.closest('[data-tui-popover-id]');
-    const contentId = content?.id;
-    const trigger = document.querySelector(`[data-tui-selectbox-content-id="${contentId}"]`);
+    const content = item.closest('[data-tui-selectbox-content]');
+    const trigger = getTriggerFromContainer(getContainer(item));
     if (!trigger) return;
     
     const isMultiple = trigger.getAttribute('data-tui-selectbox-multiple') === 'true';
@@ -251,8 +284,8 @@
     }
     
     // Close on single selection
-    if (!isMultiple && window.closePopover) {
-      window.closePopover(contentId);
+    if (!isMultiple) {
+      closePopover(trigger);
       setTimeout(() => trigger.focus(), 50);
     }
   }
@@ -306,8 +339,7 @@
       e.stopPropagation();
       const value = e.target.getAttribute('data-tui-selectbox-value');
       const trigger = e.target.closest('button.select-trigger');
-      const contentId = trigger?.getAttribute('data-tui-selectbox-content-id');
-      const content = document.getElementById(contentId);
+      const content = trigger ? getContentFromTrigger(trigger) : null;
       const item = content?.querySelector(`.select-item[data-tui-selectbox-value="${value}"]`);
       if (item) toggleItem(item);
       return;
@@ -324,16 +356,16 @@
     // Focus search when trigger clicked
     const trigger = e.target.closest('button.select-trigger');
     if (trigger) {
-      const contentId = trigger.getAttribute('data-tui-selectbox-content-id');
-      const content = document.getElementById(contentId);
+      const content = getContentFromTrigger(trigger);
+      syncContentWidth(trigger);
       const searchInput = content?.querySelector('[data-tui-selectbox-search]');
       if (searchInput) {
         requestAnimationFrame(() => {
-          if (content.style.display !== 'none') searchInput.focus();
+          if (content?.matches(':popover-open')) searchInput.focus();
         });
       } else {
         requestAnimationFrame(() => {
-          const firstItem = content.querySelector('.select-item');
+          const firstItem = content?.querySelector('.select-item');
           if (firstItem) firstItem.focus();
         });
       }
@@ -366,11 +398,11 @@
     if (activeElement?.matches('button.select-trigger')) {
       if (e.key.length === 1 || e.key === 'Backspace') {
         e.preventDefault();
-        const contentId = activeElement.getAttribute('data-tui-selectbox-content-id');
+        const content = getContentFromTrigger(activeElement);
         activeElement.click(); // Open popover
         
         setTimeout(() => {
-          const searchInput = document.getElementById(contentId)?.querySelector('[data-tui-selectbox-search]');
+          const searchInput = content?.querySelector('[data-tui-selectbox-search]');
           if (searchInput) {
             searchInput.focus();
             if (e.key !== 'Backspace') searchInput.value = e.key;
@@ -380,7 +412,7 @@
     }
     
     // Handle arrow navigation in content
-    const content = activeElement?.closest('[data-tui-popover-id]');
+    const content = activeElement?.closest('[data-tui-selectbox-content]');
     if (content?.querySelector('.select-item')) {
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault();
@@ -408,9 +440,11 @@
         const searchInput = content.querySelector('[data-tui-selectbox-search]');
         if (activeElement?.matches('.select-item')) {
           searchInput?.focus();
-        } else if (activeElement === searchInput && window.closePopover) {
-          window.closePopover(content.id);
-          const trigger = document.querySelector(`[data-tui-selectbox-content-id="${content.id}"]`);
+        } else if (activeElement === searchInput) {
+          const trigger = getTriggerFromContainer(getContainer(content));
+          if (trigger) {
+            closePopover(trigger);
+          }
           setTimeout(() => trigger?.focus(), 50);
         }
       }
@@ -423,8 +457,7 @@
     
     e.target.querySelectorAll('.select-container').forEach(wrapper => {
       const trigger = wrapper.querySelector('button.select-trigger');
-      const contentId = trigger?.getAttribute('data-tui-selectbox-content-id');
-      const content = document.getElementById(contentId);
+      const content = trigger ? getContentFromTrigger(trigger) : null;
       
       if (content) {
         // Clear selections

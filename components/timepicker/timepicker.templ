@@ -5,7 +5,7 @@ import (
 	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/card"
 	"github.com/templui/templui/components/icon"
-	"github.com/templui/templui/components/popover"
+	"github.com/templui/templui/components/popovernative"
 	"github.com/templui/templui/utils"
 	"strconv"
 	"time"
@@ -55,7 +55,6 @@ templ TimePicker(props ...Props) {
 			p.Step = 1
 		}
 
-		var contentID = p.ID + "-content"
 		var valueString string
 		if p.Value != (time.Time{}) {
 			valueString = p.Value.Format("15:04")
@@ -69,77 +68,75 @@ templ TimePicker(props ...Props) {
 			maxTimeString = p.MaxTime.Format("15:04")
 		}
 	}}
-	<div class="relative inline-block w-full">
-		<input
-			type="hidden"
-			name={ p.Name }
-			value={ valueString }
-			if p.Form != "" {
-				form={ p.Form }
-			}
-			id={ p.ID + "-hidden" }
-			data-tui-timepicker-hidden-input="true"
-		/>
-		@popover.Trigger(popover.TriggerProps{For: contentID}) {
-			@button.Button(button.Props{
-				ID:      p.ID,
-				Variant: button.VariantOutline,
-				Class: utils.TwMerge(
-					// Base styles matching input
-					"w-full h-9 px-3 py-1 text-base md:text-sm",
-					"flex items-center justify-between",
-					"rounded-md border border-input bg-transparent shadow-xs transition-[color,box-shadow] outline-none",
-					// Dark mode background
-					"dark:bg-input/30",
-					// Selection styles
-					"selection:bg-primary selection:text-primary-foreground",
-					// Focus styles
-					"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-					// Error/Invalid styles
-					"aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40",
-					utils.If(p.HasError, "border-destructive ring-destructive/20 dark:ring-destructive/40"),
-					p.Class,
-				),
-				Disabled: p.Disabled,
-				Attributes: utils.MergeAttributes(p.Attributes, templ.Attributes{
-					"data-tui-timepicker":             "true",
-					"data-tui-timepicker-use12hours":  fmt.Sprintf("%t", p.Use12Hours),
-					"data-tui-timepicker-am-label":    p.AMLabel,
-					"data-tui-timepicker-pm-label":    p.PMLabel,
-					"data-tui-timepicker-placeholder": p.Placeholder,
-					"data-tui-timepicker-step":        fmt.Sprintf("%d", p.Step),
-					"data-tui-timepicker-min-time":    minTimeString,
-					"data-tui-timepicker-max-time":    maxTimeString,
-					"aria-invalid":                    utils.If(p.HasError, "true"),
-				}),
-			}) {
-				<span data-tui-timepicker-display class="text-left grow text-muted-foreground">
-					{ p.Placeholder }
-				</span>
-				<span class="text-muted-foreground flex items-center ml-2">
-					@icon.Clock(icon.Props{Class: "size-4"})
-				</span>
-			}
-		}
-		@popover.Content(popover.ContentProps{
-			ID:        contentID,
-			Placement: popover.PlacementBottomStart,
-			Class:     "p-0 w-80",
-		}) {
-			@card.Card(card.Props{
-				Class: "border-0 shadow-none",
-			}) {
-				@card.Content(card.ContentProps{
-					Class: "p-4",
+	<div class="relative inline-block w-full" data-tui-timepicker-root>
+		@popovernative.Root() {
+			<input
+				type="hidden"
+				name={ p.Name }
+				value={ valueString }
+				if p.Form != "" {
+					form={ p.Form }
+				}
+				data-tui-timepicker-hidden-input="true"
+			/>
+			@popovernative.Trigger() {
+				@button.Button(button.Props{
+					ID:      p.ID,
+					Variant: button.VariantOutline,
+					Class: utils.TwMerge(
+						// Base styles matching input
+						"w-full h-9 px-3 py-1 text-base md:text-sm",
+						"flex items-center justify-between",
+						"rounded-md border border-input bg-transparent shadow-xs transition-[color,box-shadow] outline-none",
+						// Dark mode background
+						"dark:bg-input/30",
+						// Selection styles
+						"selection:bg-primary selection:text-primary-foreground",
+						// Focus styles
+						"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+						// Error/Invalid styles
+						"aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40",
+						utils.If(p.HasError, "border-destructive ring-destructive/20 dark:ring-destructive/40"),
+						p.Class,
+					),
+					Disabled: p.Disabled,
+					Attributes: utils.MergeAttributes(p.Attributes, templ.Attributes{
+						"data-tui-timepicker":             "true",
+						"data-tui-timepicker-use12hours":  fmt.Sprintf("%t", p.Use12Hours),
+						"data-tui-timepicker-am-label":    p.AMLabel,
+						"data-tui-timepicker-pm-label":    p.PMLabel,
+						"data-tui-timepicker-placeholder": p.Placeholder,
+						"data-tui-timepicker-step":        fmt.Sprintf("%d", p.Step),
+						"data-tui-timepicker-min-time":    minTimeString,
+						"data-tui-timepicker-max-time":    maxTimeString,
+						"aria-invalid":                    utils.If(p.HasError, "true"),
+					}),
 				}) {
-					<div
-						data-tui-timepicker-popup="true"
-						data-tui-timepicker-input-name={ p.Name }
-						data-tui-timepicker-parent-id={ p.ID }
-						if valueString != "" {
-							data-tui-timepicker-value={ valueString }
-						}
-					>
+					<span data-tui-timepicker-display class="text-left grow text-muted-foreground">
+						{ p.Placeholder }
+					</span>
+					<span class="text-muted-foreground flex items-center ml-2">
+						@icon.Clock(icon.Props{Class: "size-4"})
+					</span>
+				}
+			}
+			@popovernative.Content(popovernative.ContentProps{
+				Placement: popovernative.PlacementBottomStart,
+				Class:     "p-0 w-80",
+			}) {
+				@card.Card(card.Props{
+					Class: "border-0 shadow-none",
+				}) {
+					@card.Content(card.ContentProps{
+						Class: "p-4",
+					}) {
+						<div
+							data-tui-timepicker-popup="true"
+							data-tui-timepicker-input-name={ p.Name }
+							if valueString != "" {
+								data-tui-timepicker-value={ valueString }
+							}
+						>
 						// Time selection grid
 						<div class="grid grid-cols-2 gap-3 mb-4">
 							// Hour selection
@@ -237,7 +234,8 @@ templ TimePicker(props ...Props) {
 								Done
 							}
 						</div>
-					</div>
+						</div>
+					}
 				}
 			}
 		}

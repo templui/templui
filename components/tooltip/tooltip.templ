@@ -1,7 +1,7 @@
 package tooltip
 
 import (
-	"github.com/templui/templui/components/popover"
+	"github.com/templui/templui/components/popovernative"
 	"github.com/templui/templui/utils"
 )
 
@@ -14,19 +14,18 @@ const (
 	PositionLeft   Position = "left"
 )
 
-// Map tooltip positions to popover positions
-func mapTooltipPositionToPopover(position Position) popover.Placement {
+func mapTooltipPositionToPopover(position Position) popovernative.Placement {
 	switch position {
 	case PositionTop:
-		return popover.PlacementTop
+		return popovernative.PlacementTop
 	case PositionRight:
-		return popover.PlacementRight
+		return popovernative.PlacementRight
 	case PositionBottom:
-		return popover.PlacementBottom
+		return popovernative.PlacementBottom
 	case PositionLeft:
-		return popover.PlacementLeft
+		return popovernative.PlacementLeft
 	default:
-		return popover.PlacementTop
+		return popovernative.PlacementTop
 	}
 }
 
@@ -54,7 +53,17 @@ type ContentProps struct {
 }
 
 templ Tooltip(props ...Props) {
-	{ children... }
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@popovernative.Root(popovernative.RootProps{
+		ID:         p.ID,
+		Class:      p.Class,
+		Attributes: p.Attributes,
+	}) {
+		{ children... }
+	}
 }
 
 templ Trigger(props ...TriggerProps) {
@@ -62,12 +71,11 @@ templ Trigger(props ...TriggerProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	@popover.Trigger(popover.TriggerProps{
+	@popovernative.Trigger(popovernative.TriggerProps{
 		ID:          p.ID,
 		Class:       p.Class,
 		Attributes:  p.Attributes,
-		TriggerType: popover.TriggerTypeHover,
-		For:         p.For,
+		TriggerType: popovernative.TriggerTypeHover,
 	}) {
 		{ children... }
 	}
@@ -78,9 +86,9 @@ templ Content(props ...ContentProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	@popover.Content(popover.ContentProps{
+	@popovernative.Content(popovernative.ContentProps{
 		ID:            p.ID,
-		Class:         utils.TwMerge("px-4 py-1 bg-foreground text-background [&_[data-tui-popover-arrow]]:!bg-foreground [&_[data-tui-popover-arrow]]:!border-0", p.Class),
+		Class:         utils.TwMerge("px-4 py-1 bg-foreground text-background [&_[data-tui-popovernative-arrow]]:!bg-foreground [&_[data-tui-popovernative-arrow]]:!border-0", p.Class),
 		Attributes:    p.Attributes,
 		Placement:     mapTooltipPositionToPopover(p.Position),
 		ShowArrow:     p.ShowArrow,

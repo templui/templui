@@ -1,19 +1,13 @@
 package selectbox
 
 import (
-	"context"
-	"fmt"
 	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/components/input"
-	"github.com/templui/templui/components/popover"
+	"github.com/templui/templui/components/popovernative"
 	"github.com/templui/templui/utils"
 	"strconv"
 )
-
-type contextKey string
-
-var contentIDKey contextKey = "contentID"
 
 type Props struct {
 	ID         string
@@ -79,19 +73,17 @@ templ SelectBox(props ...Props) {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		wrapperID := p.ID
-		if wrapperID == "" {
-			wrapperID = utils.RandomID()
-		}
-		contentID := fmt.Sprintf("%s-content", wrapperID)
-		ctx = context.WithValue(ctx, contentIDKey, contentID)
 	}}
 	<div
-		id={ wrapperID }
+		if p.ID != "" {
+			id={ p.ID }
+		}
 		class={ utils.TwMerge("select-container w-full relative", p.Class) }
 		{ p.Attributes... }
 	>
-		{ children... }
+		@popovernative.Root() {
+			{ children... }
+		}
 	</div>
 }
 
@@ -101,17 +93,12 @@ templ Trigger(props ...TriggerProps) {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		contentID, ok := ctx.Value(contentIDKey).(string)
-		if !ok {
-			contentID = "fallback-select-content-id"
-		}
 		if p.ShowPills {
 			p.Multiple = true
 		}
 	}}
-	@popover.Trigger(popover.TriggerProps{
-		For:         contentID,
-		TriggerType: popover.TriggerTypeClick,
+	@popovernative.Trigger(popovernative.TriggerProps{
+		TriggerType: popovernative.TriggerTypeClick,
 	}) {
 		@button.Button(button.Props{
 			ID:      p.ID,
@@ -138,7 +125,6 @@ templ Trigger(props ...TriggerProps) {
 			Disabled: p.Disabled,
 			Attributes: utils.MergeAttributes(
 				templ.Attributes{
-					"data-tui-selectbox-content-id":          contentID,
 					"data-tui-selectbox-multiple":            strconv.FormatBool(p.Multiple),
 					"data-tui-selectbox-show-pills":          strconv.FormatBool(p.ShowPills),
 					"data-tui-selectbox-selected-count-text": p.SelectedCountText,
@@ -197,31 +183,23 @@ templ Value(props ...ValueProps) {
 }
 
 templ Content(props ...ContentProps) {
-	{{
-		var p ContentProps
-		if len(props) > 0 {
-			p = props[0]
-		}
-		contentID, ok := ctx.Value(contentIDKey).(string)
-		if !ok {
-			contentID = "fallback-select-content-id"
-		}
-	}}
-	@popover.Content(popover.ContentProps{
-		ID:         contentID,
-		Placement:  popover.PlacementBottomStart,
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@popovernative.Content(popovernative.ContentProps{
+		Placement:  popovernative.PlacementBottomStart,
 		Offset:     4,
-		MatchWidth: true,
 		DisableESC: !p.NoSearch,
 		Class: utils.TwMerge(
 			"p-1 select-content z-50 overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md",
-			"min-w-[var(--popover-trigger-width)] w-[var(--popover-trigger-width)]",
 			p.Class,
 		),
 		Attributes: utils.MergeAttributes(
 			templ.Attributes{
-				"role":     "listbox",
-				"tabindex": "-1",
+				"role":                       "listbox",
+				"tabindex":                   "-1",
+				"data-tui-selectbox-content": "true",
 			},
 			p.Attributes,
 		),
