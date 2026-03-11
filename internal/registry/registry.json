@@ -260,23 +260,12 @@
       "name": "popover",
       "slug": "popover",
       "displayName": "Popover",
-      "description": "Floating popover component.",
+      "description": "Floating popover component using the browser popover API and Floating UI positioning.",
       "files": ["components/popover/popover.templ"],
       "dependencies": [],
       "hasJS": true,
       "categories": ["overlays-dialogs"],
       "tags": ["popover", "tooltip", "overlay", "floating"]
-    },
-    {
-      "name": "popovernative",
-      "slug": "popover-native",
-      "displayName": "Popover Native",
-      "description": "Native browser popover component.",
-      "files": ["components/popovernative/popovernative.templ"],
-      "dependencies": [],
-      "hasJS": true,
-      "categories": ["overlays-dialogs"],
-      "tags": ["popover", "native", "anchor-positioning", "overlay", "browser"]
     },
     {
       "name": "progress",

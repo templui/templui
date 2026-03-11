@@ -5,7 +5,7 @@ import (
 	"github.com/templui/templui/components/calendar"
 	"github.com/templui/templui/components/card"
 	"github.com/templui/templui/components/icon"
-	"github.com/templui/templui/components/popovernative"
+	"github.com/templui/templui/components/popover"
 	"github.com/templui/templui/utils"
 	"time"
 )
@@ -78,7 +78,7 @@ templ DatePicker(props ...Props) {
 		}
 	}}
 	<div class="relative inline-block w-full" data-tui-datepicker-root>
-		@popovernative.Root() {
+		@popover.Root() {
 			<input
 				type="hidden"
 				name={ p.Name }
@@ -88,7 +88,7 @@ templ DatePicker(props ...Props) {
 				}
 				data-tui-datepicker-hidden-input
 			/>
-			@popovernative.Trigger() {
+			@popover.Trigger() {
 				@button.Button(button.Props{
 					ID:      p.ID,
 					Variant: button.VariantOutline,
@@ -127,8 +127,8 @@ templ DatePicker(props ...Props) {
 					</span>
 				}
 			}
-			@popovernative.Content(popovernative.ContentProps{
-				Placement: popovernative.PlacementBottomStart,
+			@popover.Content(popover.ContentProps{
+				Placement: popover.PlacementBottomStart,
 				Class:     "p-0",
 			}) {
 				@card.Card(card.Props{

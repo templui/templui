@@ -11,7 +11,7 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"github.com/templui/templui/components/badge"
 	"github.com/templui/templui/components/input"
-	"github.com/templui/templui/components/popovernative"
+	"github.com/templui/templui/components/popover"
 	"github.com/templui/templui/utils"
 )
 
@@ -268,8 +268,8 @@ func TagsInput(props ...Props) templ.Component {
 					}
 					return nil
 				})
-				templ_7745c5c3_Err = popovernative.Trigger(popovernative.TriggerProps{
-					TriggerType: popovernative.TriggerTypeManual,
+				templ_7745c5c3_Err = popover.Trigger(popover.TriggerProps{
+					TriggerType: popover.TriggerTypeManual,
 				}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var11), templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -324,8 +324,8 @@ func TagsInput(props ...Props) templ.Component {
 					}
 					return nil
 				})
-				templ_7745c5c3_Err = popovernative.Content(popovernative.ContentProps{
-					Placement:        popovernative.PlacementBottomStart,
+				templ_7745c5c3_Err = popover.Content(popover.ContentProps{
+					Placement:        popover.PlacementBottomStart,
 					DisableClickAway: true,
 					Class:            "p-1 max-h-[200px] overflow-y-auto min-w-[var(--trigger-width,12rem)] w-[var(--trigger-width,12rem)]",
 					Attributes: templ.Attributes{
@@ -337,7 +337,7 @@ func TagsInput(props ...Props) templ.Component {
 				}
 				return nil
 			})
-			templ_7745c5c3_Err = popovernative.Root(popovernative.RootProps{
+			templ_7745c5c3_Err = popover.Root(popover.RootProps{
 				ID: suggestionsID,
 			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var10), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {

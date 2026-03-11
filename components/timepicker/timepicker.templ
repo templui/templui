@@ -5,7 +5,7 @@ import (
 	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/card"
 	"github.com/templui/templui/components/icon"
-	"github.com/templui/templui/components/popovernative"
+	"github.com/templui/templui/components/popover"
 	"github.com/templui/templui/utils"
 	"strconv"
 	"time"
@@ -69,7 +69,7 @@ templ TimePicker(props ...Props) {
 		}
 	}}
 	<div class="relative inline-block w-full" data-tui-timepicker-root>
-		@popovernative.Root() {
+		@popover.Root() {
 			<input
 				type="hidden"
 				name={ p.Name }
@@ -79,7 +79,7 @@ templ TimePicker(props ...Props) {
 				}
 				data-tui-timepicker-hidden-input="true"
 			/>
-			@popovernative.Trigger() {
+			@popover.Trigger() {
 				@button.Button(button.Props{
 					ID:      p.ID,
 					Variant: button.VariantOutline,
@@ -120,8 +120,8 @@ templ TimePicker(props ...Props) {
 					</span>
 				}
 			}
-			@popovernative.Content(popovernative.ContentProps{
-				Placement: popovernative.PlacementBottomStart,
+			@popover.Content(popover.ContentProps{
+				Placement: popover.PlacementBottomStart,
 				Class:     "p-0 w-80",
 			}) {
 				@card.Card(card.Props{

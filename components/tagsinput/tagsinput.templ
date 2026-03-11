@@ -3,7 +3,7 @@ package tagsinput
 import (
 	"github.com/templui/templui/components/badge"
 	"github.com/templui/templui/components/input"
-	"github.com/templui/templui/components/popovernative"
+	"github.com/templui/templui/components/popover"
 	"github.com/templui/templui/utils"
 )
 
@@ -82,11 +82,11 @@ templ TagsInput(props ...Props) {
 		</div>
 		<!-- Input row -->
 		if len(p.Suggestions) > 0 {
-			@popovernative.Root(popovernative.RootProps{
+			@popover.Root(popover.RootProps{
 				ID: suggestionsID,
 			}) {
-				@popovernative.Trigger(popovernative.TriggerProps{
-					TriggerType: popovernative.TriggerTypeManual,
+				@popover.Trigger(popover.TriggerProps{
+					TriggerType: popover.TriggerTypeManual,
 				}) {
 					<div class="relative w-full">
 						@input.Input(input.Props{
@@ -103,8 +103,8 @@ templ TagsInput(props ...Props) {
 						})
 					</div>
 				}
-				@popovernative.Content(popovernative.ContentProps{
-					Placement:        popovernative.PlacementBottomStart,
+				@popover.Content(popover.ContentProps{
+					Placement:        popover.PlacementBottomStart,
 					DisableClickAway: true,
 					Class:            "p-1 max-h-[200px] overflow-y-auto min-w-[var(--trigger-width,12rem)] w-[var(--trigger-width,12rem)]",
 					Attributes: templ.Attributes{

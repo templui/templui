@@ -92,7 +92,7 @@
 
   function closePopover(trigger) {
     const root = findRoot(trigger);
-    const popoverContent = root?.querySelector('[data-tui-popovernative-content]');
+    const popoverContent = root?.querySelector('[data-tui-popover-content]');
     if (!popoverContent?.matches(':popover-open')) return;
 
     try {
@@ -366,7 +366,7 @@
   // Scroll to selected values when timepicker popover opens
   new MutationObserver((mutations) => {
     for (const m of mutations) {
-      if (m.target.getAttribute('data-tui-popovernative-open') !== 'true') continue;
+      if (m.target.getAttribute('data-tui-popover-open') !== 'true') continue;
       const popup = m.target.querySelector('[data-tui-timepicker-popup]');
       if (!popup) continue;
 
@@ -375,5 +375,5 @@
         popup.querySelector('[data-tui-timepicker-minute-list] [data-tui-timepicker-selected="true"]')?.scrollIntoView({ block: 'center' });
       });
     }
-  }).observe(document.body, { attributes: true, attributeFilter: ['data-tui-popovernative-open'], subtree: true });
+  }).observe(document.body, { attributes: true, attributeFilter: ['data-tui-popover-open'], subtree: true });
 })();

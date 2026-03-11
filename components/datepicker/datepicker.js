@@ -87,7 +87,7 @@
   }
 
   function closePopover(root) {
-    const popoverContent = root?.querySelector("[data-tui-popovernative-content]");
+    const popoverContent = root?.querySelector("[data-tui-popover-content]");
     if (!popoverContent?.matches(":popover-open")) return;
 
     try {

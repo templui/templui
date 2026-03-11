@@ -4,7 +4,7 @@ import (
 	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/components/input"
-	"github.com/templui/templui/components/popovernative"
+	"github.com/templui/templui/components/popover"
 	"github.com/templui/templui/utils"
 	"strconv"
 )
@@ -81,7 +81,7 @@ templ SelectBox(props ...Props) {
 		class={ utils.TwMerge("select-container w-full relative", p.Class) }
 		{ p.Attributes... }
 	>
-		@popovernative.Root() {
+		@popover.Root() {
 			{ children... }
 		}
 	</div>
@@ -97,8 +97,8 @@ templ Trigger(props ...TriggerProps) {
 			p.Multiple = true
 		}
 	}}
-	@popovernative.Trigger(popovernative.TriggerProps{
-		TriggerType: popovernative.TriggerTypeClick,
+	@popover.Trigger(popover.TriggerProps{
+		TriggerType: popover.TriggerTypeClick,
 	}) {
 		@button.Button(button.Props{
 			ID:      p.ID,
@@ -187,8 +187,8 @@ templ Content(props ...ContentProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	@popovernative.Content(popovernative.ContentProps{
-		Placement:  popovernative.PlacementBottomStart,
+	@popover.Content(popover.ContentProps{
+		Placement:  popover.PlacementBottomStart,
 		Offset:     4,
 		DisableESC: !p.NoSearch,
 		Class: utils.TwMerge(

@@ -7,8 +7,8 @@
         item.hasAttribute('data-tui-dropdown-submenu-trigger') ||
         item.getAttribute('data-tui-dropdown-prevent-close') === 'true') return;
 
-    const popoverRoot = item.closest('[data-tui-popovernative-root]');
-    const popoverContent = popoverRoot?.querySelector(':scope > [data-tui-popovernative-content]');
+    const popoverRoot = item.closest('[data-tui-popover-root]');
+    const popoverContent = popoverRoot?.querySelector(':scope > [data-tui-popover-content]');
     if (!popoverContent?.matches(':popover-open')) return;
 
     try {

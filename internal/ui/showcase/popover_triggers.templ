@@ -7,59 +7,55 @@ import (
 
 templ PopoverTriggers() {
 	<div class="flex gap-2 flex-wrap">
-		@popover.Trigger(popover.TriggerProps{
-			For:         "hover-popover",
-			TriggerType: popover.TriggerTypeHover,
-		}) {
-			@button.Button(button.Props{Variant: button.VariantOutline}) {
-				Hover
+		@popover.Root() {
+			@popover.Trigger(popover.TriggerProps{
+				TriggerType: popover.TriggerTypeHover,
+			}) {
+				@button.Button(button.Props{Variant: button.VariantOutline}) {
+					Hover
+				}
+			}
+			@popover.Content(popover.ContentProps{
+				HoverDelay:    300,
+				HoverOutDelay: 500,
+			}) {
+				@PopoverContent()
 			}
 		}
-		@popover.Content(popover.ContentProps{
-			ID:            "hover-popover",
-			HoverDelay:    300,
-			HoverOutDelay: 500,
-		}) {
-			@PopoverContent()
-		}
-		@popover.Trigger(popover.TriggerProps{
-			For: "click-popover",
-		}) {
-			@button.Button(button.Props{Variant: button.VariantOutline}) {
-				Click
+		@popover.Root() {
+			@popover.Trigger() {
+				@button.Button(button.Props{Variant: button.VariantOutline}) {
+					Click
+				}
+			}
+			@popover.Content() {
+				@PopoverContent()
 			}
 		}
-		@popover.Content(popover.ContentProps{
-			ID: "click-popover",
-		}) {
-			@PopoverContent()
-		}
-		@popover.Trigger(popover.TriggerProps{
-			For: "no-clickaway-popover",
-		}) {
-			@button.Button(button.Props{Variant: button.VariantOutline}) {
-				No ClickAway
+		@popover.Root() {
+			@popover.Trigger() {
+				@button.Button(button.Props{Variant: button.VariantOutline}) {
+					No ClickAway
+				}
+			}
+			@popover.Content(popover.ContentProps{
+				DisableClickAway: true,
+			}) {
+				@PopoverContent()
 			}
 		}
-		@popover.Content(popover.ContentProps{
-			ID:               "no-clickaway-popover",
-			DisableClickAway: true,
-		}) {
-			@PopoverContent()
-		}
-		@popover.Trigger(popover.TriggerProps{
-			For: "no-clickaway-esc",
-		}) {
-			@button.Button(button.Props{Variant: button.VariantOutline}) {
-				No ClickAway-ESC
+		@popover.Root() {
+			@popover.Trigger() {
+				@button.Button(button.Props{Variant: button.VariantOutline}) {
+					No ClickAway-ESC
+				}
 			}
-		}
-		@popover.Content(popover.ContentProps{
-			ID:               "no-clickaway-esc",
-			DisableClickAway: true,
-			DisableESC:       true,
-		}) {
-			@PopoverContent()
+			@popover.Content(popover.ContentProps{
+				DisableClickAway: true,
+				DisableESC:       true,
+			}) {
+				@PopoverContent()
+			}
 		}
 	</div>
 }

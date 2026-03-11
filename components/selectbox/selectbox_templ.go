@@ -12,7 +12,7 @@ import (
 	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/components/input"
-	"github.com/templui/templui/components/popovernative"
+	"github.com/templui/templui/components/popover"
 	"github.com/templui/templui/utils"
 	"strconv"
 )
@@ -174,7 +174,7 @@ func SelectBox(props ...Props) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = popovernative.Root().Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = popover.Root().Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -356,8 +356,8 @@ func Trigger(props ...TriggerProps) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = popovernative.Trigger(popovernative.TriggerProps{
-			TriggerType: popovernative.TriggerTypeClick,
+		templ_7745c5c3_Err = popover.Trigger(popover.TriggerProps{
+			TriggerType: popover.TriggerTypeClick,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var7), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -566,8 +566,8 @@ func Content(props ...ContentProps) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = popovernative.Content(popovernative.ContentProps{
-			Placement:  popovernative.PlacementBottomStart,
+		templ_7745c5c3_Err = popover.Content(popover.ContentProps{
+			Placement:  popover.PlacementBottomStart,
 			Offset:     4,
 			DisableESC: !p.NoSearch,
 			Class: utils.TwMerge(

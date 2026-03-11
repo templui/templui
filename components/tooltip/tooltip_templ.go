@@ -9,7 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/templui/templui/components/popovernative"
+	"github.com/templui/templui/components/popover"
 	"github.com/templui/templui/utils"
 )
 
@@ -22,18 +22,18 @@ const (
 	PositionLeft   Position = "left"
 )
 
-func mapTooltipPositionToPopover(position Position) popovernative.Placement {
+func mapTooltipPositionToPopover(position Position) popover.Placement {
 	switch position {
 	case PositionTop:
-		return popovernative.PlacementTop
+		return popover.PlacementTop
 	case PositionRight:
-		return popovernative.PlacementRight
+		return popover.PlacementRight
 	case PositionBottom:
-		return popovernative.PlacementBottom
+		return popover.PlacementBottom
 	case PositionLeft:
-		return popovernative.PlacementLeft
+		return popover.PlacementLeft
 	default:
-		return popovernative.PlacementTop
+		return popover.PlacementTop
 	}
 }
 
@@ -47,7 +47,6 @@ type TriggerProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	For        string
 }
 
 type ContentProps struct {
@@ -103,7 +102,7 @@ func Tooltip(props ...Props) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = popovernative.Root(popovernative.RootProps{
+		templ_7745c5c3_Err = popover.Root(popover.RootProps{
 			ID:         p.ID,
 			Class:      p.Class,
 			Attributes: p.Attributes,
@@ -158,11 +157,11 @@ func Trigger(props ...TriggerProps) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = popovernative.Trigger(popovernative.TriggerProps{
+		templ_7745c5c3_Err = popover.Trigger(popover.TriggerProps{
 			ID:          p.ID,
 			Class:       p.Class,
 			Attributes:  p.Attributes,
-			TriggerType: popovernative.TriggerTypeHover,
+			TriggerType: popover.TriggerTypeHover,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -214,9 +213,9 @@ func Content(props ...ContentProps) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = popovernative.Content(popovernative.ContentProps{
+		templ_7745c5c3_Err = popover.Content(popover.ContentProps{
 			ID:            p.ID,
-			Class:         utils.TwMerge("px-4 py-1 bg-foreground text-background [&_[data-tui-popovernative-arrow]]:!bg-foreground [&_[data-tui-popovernative-arrow]]:!border-0", p.Class),
+			Class:         utils.TwMerge("px-4 py-1 bg-foreground text-background [&_[data-tui-popover-arrow]]:!bg-foreground [&_[data-tui-popover-arrow]]:!border-0", p.Class),
 			Attributes:    p.Attributes,
 			Placement:     mapTooltipPositionToPopover(p.Position),
 			ShowArrow:     p.ShowArrow,

@@ -1,25 +1,25 @@
 package dropdown
 
 import (
-	"github.com/templui/templui/components/popovernative"
+	"github.com/templui/templui/components/popover"
 	"github.com/templui/templui/utils"
 )
 
-type Placement = popovernative.Placement
+type Placement = popover.Placement
 
 const (
-	PlacementTop         = popovernative.PlacementTop
-	PlacementTopStart    = popovernative.PlacementTopStart
-	PlacementTopEnd      = popovernative.PlacementTopEnd
-	PlacementRight       = popovernative.PlacementRight
-	PlacementRightStart  = popovernative.PlacementRightStart
-	PlacementRightEnd    = popovernative.PlacementRightEnd
-	PlacementBottom      = popovernative.PlacementBottom
-	PlacementBottomStart = popovernative.PlacementBottomStart
-	PlacementBottomEnd   = popovernative.PlacementBottomEnd
-	PlacementLeft        = popovernative.PlacementLeft
-	PlacementLeftStart   = popovernative.PlacementLeftStart
-	PlacementLeftEnd     = popovernative.PlacementLeftEnd
+	PlacementTop         = popover.PlacementTop
+	PlacementTopStart    = popover.PlacementTopStart
+	PlacementTopEnd      = popover.PlacementTopEnd
+	PlacementRight       = popover.PlacementRight
+	PlacementRightStart  = popover.PlacementRightStart
+	PlacementRightEnd    = popover.PlacementRightEnd
+	PlacementBottom      = popover.PlacementBottom
+	PlacementBottomStart = popover.PlacementBottomStart
+	PlacementBottomEnd   = popover.PlacementBottomEnd
+	PlacementLeft        = popover.PlacementLeft
+	PlacementLeftStart   = popover.PlacementLeftStart
+	PlacementLeftEnd     = popover.PlacementLeftEnd
 )
 
 type Props struct {
@@ -99,7 +99,7 @@ templ Dropdown(props ...Props) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	@popovernative.Root(popovernative.RootProps{
+	@popover.Root(popover.RootProps{
 		ID: p.ID,
 	}) {
 		{ children... }
@@ -111,10 +111,10 @@ templ Trigger(props ...TriggerProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	@popovernative.Trigger(popovernative.TriggerProps{
+	@popover.Trigger(popover.TriggerProps{
 		Class:       p.Class,
 		Attributes:  p.Attributes,
-		TriggerType: popovernative.TriggerTypeClick,
+		TriggerType: popover.TriggerTypeClick,
 	}) {
 		{ children... }
 	}
@@ -131,7 +131,7 @@ templ Content(props ...ContentProps) {
 			placement = PlacementBottomStart
 		}
 	}}
-	@popovernative.Content(popovernative.ContentProps{
+	@popover.Content(popover.ContentProps{
 		Placement: placement,
 		Class: utils.TwMerge(
 			"z-50 rounded-md bg-popover p-1 shadow-md focus:outline-none overflow-auto",
@@ -273,7 +273,7 @@ templ Sub(props ...SubProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	@popovernative.Root(popovernative.RootProps{
+	@popover.Root(popover.RootProps{
 		ID:         p.ID,
 		Class:      p.Class,
 		Attributes: p.Attributes,
@@ -287,8 +287,8 @@ templ SubTrigger(props ...SubTriggerProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	@popovernative.Trigger(popovernative.TriggerProps{
-		TriggerType: popovernative.TriggerTypeHover,
+	@popover.Trigger(popover.TriggerProps{
+		TriggerType: popover.TriggerTypeHover,
 	}) {
 		<button
 			type="button"
@@ -317,8 +317,8 @@ templ SubContent(props ...SubContentProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	@popovernative.Content(popovernative.ContentProps{
-		Placement:     popovernative.PlacementRightStart,
+	@popover.Content(popover.ContentProps{
+		Placement:     popover.PlacementRightStart,
 		Offset:        -4,  // Adjust as needed
 		HoverDelay:    100, // ms
 		HoverOutDelay: 200, // ms

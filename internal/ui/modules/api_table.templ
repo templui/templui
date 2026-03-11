@@ -63,19 +63,21 @@ templ APITable(p APITableProps) {
 											<div class="w-1.5 h-1.5 bg-red-500 rounded-full"></div>
 										}
 										if item.Description != "" {
-											@popover.Trigger(popover.TriggerProps{
-												For:         "desc-" + p.Title + "-" + item.Name,
-												TriggerType: popover.TriggerTypeHover,
+											@popover.Root(popover.RootProps{
+												ID: "desc-" + p.Title + "-" + item.Name,
 											}) {
-												@icon.Icon("info")(icon.Props{Class: "size-3.5 text-muted-foreground hover:text-foreground cursor-help"})
-											}
-											@popover.Content(popover.ContentProps{
-												ID:        "desc-" + p.Title + "-" + item.Name,
-												Placement: popover.PlacementTop,
-												ShowArrow: true,
-												Class:     "max-w-xs p-2",
-											}) {
-												<p class="text-sm">{ item.Description }</p>
+												@popover.Trigger(popover.TriggerProps{
+													TriggerType: popover.TriggerTypeHover,
+												}) {
+													@icon.Icon("info")(icon.Props{Class: "size-3.5 text-muted-foreground hover:text-foreground cursor-help"})
+												}
+												@popover.Content(popover.ContentProps{
+													Placement: popover.PlacementTop,
+													ShowArrow: true,
+													Class:     "max-w-xs p-2",
+												}) {
+													<p class="text-sm">{ item.Description }</p>
+												}
 											}
 										}
 									</div>

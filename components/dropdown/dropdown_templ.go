@@ -9,25 +9,25 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/templui/templui/components/popovernative"
+	"github.com/templui/templui/components/popover"
 	"github.com/templui/templui/utils"
 )
 
-type Placement = popovernative.Placement
+type Placement = popover.Placement
 
 const (
-	PlacementTop         = popovernative.PlacementTop
-	PlacementTopStart    = popovernative.PlacementTopStart
-	PlacementTopEnd      = popovernative.PlacementTopEnd
-	PlacementRight       = popovernative.PlacementRight
-	PlacementRightStart  = popovernative.PlacementRightStart
-	PlacementRightEnd    = popovernative.PlacementRightEnd
-	PlacementBottom      = popovernative.PlacementBottom
-	PlacementBottomStart = popovernative.PlacementBottomStart
-	PlacementBottomEnd   = popovernative.PlacementBottomEnd
-	PlacementLeft        = popovernative.PlacementLeft
-	PlacementLeftStart   = popovernative.PlacementLeftStart
-	PlacementLeftEnd     = popovernative.PlacementLeftEnd
+	PlacementTop         = popover.PlacementTop
+	PlacementTopStart    = popover.PlacementTopStart
+	PlacementTopEnd      = popover.PlacementTopEnd
+	PlacementRight       = popover.PlacementRight
+	PlacementRightStart  = popover.PlacementRightStart
+	PlacementRightEnd    = popover.PlacementRightEnd
+	PlacementBottom      = popover.PlacementBottom
+	PlacementBottomStart = popover.PlacementBottomStart
+	PlacementBottomEnd   = popover.PlacementBottomEnd
+	PlacementLeft        = popover.PlacementLeft
+	PlacementLeftStart   = popover.PlacementLeftStart
+	PlacementLeftEnd     = popover.PlacementLeftEnd
 )
 
 type Props struct {
@@ -148,7 +148,7 @@ func Dropdown(props ...Props) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = popovernative.Root(popovernative.RootProps{
+		templ_7745c5c3_Err = popover.Root(popover.RootProps{
 			ID: p.ID,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -201,10 +201,10 @@ func Trigger(props ...TriggerProps) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = popovernative.Trigger(popovernative.TriggerProps{
+		templ_7745c5c3_Err = popover.Trigger(popover.TriggerProps{
 			Class:       p.Class,
 			Attributes:  p.Attributes,
-			TriggerType: popovernative.TriggerTypeClick,
+			TriggerType: popover.TriggerTypeClick,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -260,7 +260,7 @@ func Content(props ...ContentProps) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = popovernative.Content(popovernative.ContentProps{
+		templ_7745c5c3_Err = popover.Content(popover.ContentProps{
 			Placement: placement,
 			Class: utils.TwMerge(
 				"z-50 rounded-md bg-popover p-1 shadow-md focus:outline-none overflow-auto",
@@ -882,7 +882,7 @@ func Sub(props ...SubProps) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = popovernative.Root(popovernative.RootProps{
+		templ_7745c5c3_Err = popover.Root(popover.RootProps{
 			ID:         p.ID,
 			Class:      p.Class,
 			Attributes: p.Attributes,
@@ -976,8 +976,8 @@ func SubTrigger(props ...SubTriggerProps) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = popovernative.Trigger(popovernative.TriggerProps{
-			TriggerType: popovernative.TriggerTypeHover,
+		templ_7745c5c3_Err = popover.Trigger(popover.TriggerProps{
+			TriggerType: popover.TriggerTypeHover,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var35), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1029,8 +1029,8 @@ func SubContent(props ...SubContentProps) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = popovernative.Content(popovernative.ContentProps{
-			Placement:     popovernative.PlacementRightStart,
+		templ_7745c5c3_Err = popover.Content(popover.ContentProps{
+			Placement:     popover.PlacementRightStart,
 			Offset:        -4,  // Adjust as needed
 			HoverDelay:    100, // ms
 			HoverOutDelay: 200, // ms

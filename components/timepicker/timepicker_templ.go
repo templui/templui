@@ -13,7 +13,7 @@ import (
 	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/card"
 	"github.com/templui/templui/components/icon"
-	"github.com/templui/templui/components/popovernative"
+	"github.com/templui/templui/components/popover"
 	"github.com/templui/templui/utils"
 	"strconv"
 	"time"
@@ -254,7 +254,7 @@ func TimePicker(props ...Props) templ.Component {
 				}
 				return nil
 			})
-			templ_7745c5c3_Err = popovernative.Trigger().Render(templ.WithChildren(ctx, templ_7745c5c3_Var6), templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = popover.Trigger().Render(templ.WithChildren(ctx, templ_7745c5c3_Var6), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -537,8 +537,8 @@ func TimePicker(props ...Props) templ.Component {
 				}
 				return nil
 			})
-			templ_7745c5c3_Err = popovernative.Content(popovernative.ContentProps{
-				Placement: popovernative.PlacementBottomStart,
+			templ_7745c5c3_Err = popover.Content(popover.ContentProps{
+				Placement: popover.PlacementBottomStart,
 				Class:     "p-0 w-80",
 			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var9), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
@@ -546,7 +546,7 @@ func TimePicker(props ...Props) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = popovernative.Root().Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = popover.Root().Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

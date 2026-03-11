@@ -10,11 +10,11 @@
     const id = container.getAttribute('data-tui-tagsinput-suggestions-id');
     if (!id) return null;
     const root = document.getElementById(id);
-    return root?.matches('[data-tui-popovernative-root]') ? root : null;
+    return root?.matches('[data-tui-popover-root]') ? root : null;
   }
 
   function getSuggestionsContent(container) {
-    return getSuggestionsRoot(container)?.querySelector('[data-tui-popovernative-content]') || null;
+    return getSuggestionsRoot(container)?.querySelector('[data-tui-popover-content]') || null;
   }
 
   function showSuggestions(container, query) {
@@ -41,9 +41,9 @@
 
     if (first) {
       first.classList.add('bg-accent');
-      window.tui?.popovernative?.open(id);
+      window.tui?.popover?.open(id);
     } else {
-      window.tui?.popovernative?.close(id);
+      window.tui?.popover?.close(id);
     }
   }
 
@@ -114,7 +114,7 @@
     const id = container?.getAttribute('data-tui-tagsinput-suggestions-id');
     const nextTarget = e.relatedTarget;
     if (container?.contains(nextTarget) || getSuggestionsContent(container)?.contains(nextTarget)) return;
-    if (id) window.tui?.popovernative?.close(id);
+    if (id) window.tui?.popover?.close(id);
   });
 
   // Input → filter suggestions
@@ -130,7 +130,7 @@
     const suggestion = e.target.closest('[data-tui-tagsinput-suggestion]');
     if (!suggestion) return;
     e.preventDefault(); // Prevent focus change
-    const popupRoot = suggestion.closest('[data-tui-popovernative-root]');
+    const popupRoot = suggestion.closest('[data-tui-popover-root]');
     const container = document.querySelector(`[data-tui-tagsinput-suggestions-id="${popupRoot?.id}"]`);
     if (container) {
       addTag(container, suggestion.getAttribute('data-tui-tagsinput-suggestion-value'));
@@ -174,7 +174,7 @@
     if (!container) return;
 
     const id = container.getAttribute('data-tui-tagsinput-suggestions-id');
-    const isOpen = id && window.tui?.popovernative?.isOpen(id);
+    const isOpen = id && window.tui?.popover?.isOpen(id);
 
     if (e.key === 'ArrowDown' && isOpen) {
       e.preventDefault();
@@ -199,7 +199,7 @@
       showSuggestions(container, '');
     } else if (e.key === 'Escape' && isOpen) {
       e.preventDefault();
-      window.tui?.popovernative?.close(id);
+      window.tui?.popover?.close(id);
     } else if (e.key === 'Backspace' && input.value === '') {
       const chipsContainer = container.querySelector('[data-tui-tagsinput-chips]');
       const lastChip = chipsContainer?.lastElementChild;

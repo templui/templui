@@ -453,7 +453,6 @@ templ MenuButton(props ...MenuButtonProps) {
 		<div class="group-data-[tui-sidebar-state=collapsed]:group-data-[tui-sidebar-collapsible=icon]:block hidden">
 			@tooltip.Tooltip() {
 				@tooltip.Trigger(tooltip.TriggerProps{
-					For: tooltipID,
 				}) {
 					@menuButtonContent(p, "") {
 						{ children... }
