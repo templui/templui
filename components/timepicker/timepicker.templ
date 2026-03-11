@@ -137,103 +137,103 @@ templ TimePicker(props ...Props) {
 								data-tui-timepicker-value={ valueString }
 							}
 						>
-						// Time selection grid
-						<div class="grid grid-cols-2 gap-3 mb-4">
-							// Hour selection
-							<div class="space-y-2">
-								<label class="text-sm font-medium">Hour</label>
-								<div class="max-h-32 overflow-y-auto border rounded-md bg-background">
-									<div data-tui-timepicker-hour-list="true" class="p-1 space-y-0.5">
-										if p.Use12Hours {
-											// 12-hour format: 12, 01-11
-											<button
-												type="button"
-												data-tui-timepicker-hour="0"
-												data-tui-timepicker-selected="false"
-												class="w-full px-2 py-1 text-sm rounded transition-colors text-left hover:bg-accent hover:text-accent-foreground data-[tui-timepicker-selected=true]:bg-primary data-[tui-timepicker-selected=true]:text-primary-foreground data-[tui-timepicker-selected=true]:hover:bg-primary/90"
-											>
-												12
-											</button>
-											for hour := 1; hour <= 11; hour++ {
+							// Time selection grid
+							<div class="grid grid-cols-2 gap-3 mb-4">
+								// Hour selection
+								<div class="space-y-2">
+									<label class="text-sm font-medium">Hour</label>
+									<div class="max-h-32 overflow-y-auto border rounded-md bg-background">
+										<div data-tui-timepicker-hour-list="true" class="p-1 space-y-0.5">
+											if p.Use12Hours {
+												// 12-hour format: 12, 01-11
 												<button
 													type="button"
-													data-tui-timepicker-hour={ strconv.Itoa(hour) }
+													data-tui-timepicker-hour="0"
 													data-tui-timepicker-selected="false"
 													class="w-full px-2 py-1 text-sm rounded transition-colors text-left hover:bg-accent hover:text-accent-foreground data-[tui-timepicker-selected=true]:bg-primary data-[tui-timepicker-selected=true]:text-primary-foreground data-[tui-timepicker-selected=true]:hover:bg-primary/90"
 												>
-													{ fmt.Sprintf("%02d", hour) }
+													12
 												</button>
+												for hour := 1; hour <= 11; hour++ {
+													<button
+														type="button"
+														data-tui-timepicker-hour={ strconv.Itoa(hour) }
+														data-tui-timepicker-selected="false"
+														class="w-full px-2 py-1 text-sm rounded transition-colors text-left hover:bg-accent hover:text-accent-foreground data-[tui-timepicker-selected=true]:bg-primary data-[tui-timepicker-selected=true]:text-primary-foreground data-[tui-timepicker-selected=true]:hover:bg-primary/90"
+													>
+														{ fmt.Sprintf("%02d", hour) }
+													</button>
+												}
+											} else {
+												// 24-hour format: 00-23
+												for hour := 0; hour < 24; hour++ {
+													<button
+														type="button"
+														data-tui-timepicker-hour={ strconv.Itoa(hour) }
+														data-tui-timepicker-selected="false"
+														class="w-full px-2 py-1 text-sm rounded transition-colors text-left hover:bg-accent hover:text-accent-foreground data-[tui-timepicker-selected=true]:bg-primary data-[tui-timepicker-selected=true]:text-primary-foreground data-[tui-timepicker-selected=true]:hover:bg-primary/90"
+													>
+														{ fmt.Sprintf("%02d", hour) }
+													</button>
+												}
 											}
-										} else {
-											// 24-hour format: 00-23
-											for hour := 0; hour < 24; hour++ {
+										</div>
+									</div>
+								</div>
+								// Minute selection
+								<div class="space-y-2">
+									<label class="text-sm font-medium">Minute</label>
+									<div class="max-h-32 overflow-y-auto border rounded-md bg-background">
+										<div data-tui-timepicker-minute-list="true" class="p-1 space-y-0.5">
+											for minute := 0; minute < 60; minute += p.Step {
 												<button
 													type="button"
-													data-tui-timepicker-hour={ strconv.Itoa(hour) }
+													data-tui-timepicker-minute={ strconv.Itoa(minute) }
 													data-tui-timepicker-selected="false"
 													class="w-full px-2 py-1 text-sm rounded transition-colors text-left hover:bg-accent hover:text-accent-foreground data-[tui-timepicker-selected=true]:bg-primary data-[tui-timepicker-selected=true]:text-primary-foreground data-[tui-timepicker-selected=true]:hover:bg-primary/90"
 												>
-													{ fmt.Sprintf("%02d", hour) }
+													{ fmt.Sprintf("%02d", minute) }
 												</button>
 											}
-										}
+										</div>
 									</div>
 								</div>
 							</div>
-							// Minute selection
-							<div class="space-y-2">
-								<label class="text-sm font-medium">Minute</label>
-								<div class="max-h-32 overflow-y-auto border rounded-md bg-background">
-									<div data-tui-timepicker-minute-list="true" class="p-1 space-y-0.5">
-										for minute := 0; minute < 60; minute += p.Step {
-											<button
-												type="button"
-												data-tui-timepicker-minute={ strconv.Itoa(minute) }
-												data-tui-timepicker-selected="false"
-												class="w-full px-2 py-1 text-sm rounded transition-colors text-left hover:bg-accent hover:text-accent-foreground data-[tui-timepicker-selected=true]:bg-primary data-[tui-timepicker-selected=true]:text-primary-foreground data-[tui-timepicker-selected=true]:hover:bg-primary/90"
-											>
-												{ fmt.Sprintf("%02d", minute) }
-											</button>
-										}
+							// AM/PM selector and action buttons
+							<div class="flex justify-between items-center">
+								if p.Use12Hours {
+									<div class="flex gap-1">
+										<button
+											type="button"
+											data-tui-timepicker-period="AM"
+											data-tui-timepicker-active="false"
+											class="px-3 py-1 text-sm rounded-md border transition-colors hover:bg-accent hover:text-accent-foreground data-[tui-timepicker-active=true]:bg-primary data-[tui-timepicker-active=true]:text-primary-foreground data-[tui-timepicker-active=true]:hover:bg-primary/90"
+										>
+											{ p.AMLabel }
+										</button>
+										<button
+											type="button"
+											data-tui-timepicker-period="PM"
+											data-tui-timepicker-active="false"
+											class="px-3 py-1 text-sm rounded-md border transition-colors hover:bg-accent hover:text-accent-foreground data-[tui-timepicker-active=true]:bg-primary data-[tui-timepicker-active=true]:text-primary-foreground data-[tui-timepicker-active=true]:hover:bg-primary/90"
+										>
+											{ p.PMLabel }
+										</button>
 									</div>
-								</div>
+								} else {
+									<div></div>
+								}
+								@button.Button(button.Props{
+									Type:    "button",
+									Variant: button.VariantSecondary,
+									Size:    button.SizeSm,
+									Attributes: templ.Attributes{
+										"data-tui-timepicker-done": "true",
+									},
+								}) {
+									Done
+								}
 							</div>
-						</div>
-						// AM/PM selector and action buttons
-						<div class="flex justify-between items-center">
-							if p.Use12Hours {
-								<div class="flex gap-1">
-									<button
-										type="button"
-										data-tui-timepicker-period="AM"
-										data-tui-timepicker-active="false"
-										class="px-3 py-1 text-sm rounded-md border transition-colors hover:bg-accent hover:text-accent-foreground data-[tui-timepicker-active=true]:bg-primary data-[tui-timepicker-active=true]:text-primary-foreground data-[tui-timepicker-active=true]:hover:bg-primary/90"
-									>
-										{ p.AMLabel }
-									</button>
-									<button
-										type="button"
-										data-tui-timepicker-period="PM"
-										data-tui-timepicker-active="false"
-										class="px-3 py-1 text-sm rounded-md border transition-colors hover:bg-accent hover:text-accent-foreground data-[tui-timepicker-active=true]:bg-primary data-[tui-timepicker-active=true]:text-primary-foreground data-[tui-timepicker-active=true]:hover:bg-primary/90"
-									>
-										{ p.PMLabel }
-									</button>
-								</div>
-							} else {
-								<div></div>
-							}
-							@button.Button(button.Props{
-								Type:    "button",
-								Variant: button.VariantSecondary,
-								Size:    button.SizeSm,
-								Attributes: templ.Attributes{
-									"data-tui-timepicker-done": "true",
-								},
-							}) {
-								Done
-							}
-						</div>
 						</div>
 					}
 				}

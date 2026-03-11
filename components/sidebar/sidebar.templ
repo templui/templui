@@ -452,8 +452,7 @@ templ MenuButton(props ...MenuButtonProps) {
 		// When collapsed to icon mode - show with tooltip
 		<div class="group-data-[tui-sidebar-state=collapsed]:group-data-[tui-sidebar-collapsible=icon]:block hidden">
 			@tooltip.Tooltip() {
-				@tooltip.Trigger(tooltip.TriggerProps{
-				}) {
+				@tooltip.Trigger(tooltip.TriggerProps{}) {
 					@menuButtonContent(p, "") {
 						{ children... }
 					}

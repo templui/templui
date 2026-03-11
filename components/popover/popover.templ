@@ -107,7 +107,7 @@ templ Content(props ...ContentProps) {
 		{{ p.Placement = PlacementBottom }}
 	}
 	if p.Offset == 0 {
-	if p.ShowArrow {
+		if p.ShowArrow {
 			{{ p.Offset = 8 }}
 		} else {
 			{{ p.Offset = 4 }}
