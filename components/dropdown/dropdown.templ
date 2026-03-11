@@ -1,33 +1,25 @@
 package dropdown
 
 import (
-	"context"
-	"github.com/templui/templui/components/popover"
+	"github.com/templui/templui/components/popovernative"
 	"github.com/templui/templui/utils"
 )
 
-type Placement = popover.Placement
+type Placement = popovernative.Placement
 
 const (
-	PlacementTop         = popover.PlacementTop
-	PlacementTopStart    = popover.PlacementTopStart
-	PlacementTopEnd      = popover.PlacementTopEnd
-	PlacementRight       = popover.PlacementRight
-	PlacementRightStart  = popover.PlacementRightStart
-	PlacementRightEnd    = popover.PlacementRightEnd
-	PlacementBottom      = popover.PlacementBottom
-	PlacementBottomStart = popover.PlacementBottomStart
-	PlacementBottomEnd   = popover.PlacementBottomEnd
-	PlacementLeft        = popover.PlacementLeft
-	PlacementLeftStart   = popover.PlacementLeftStart
-	PlacementLeftEnd     = popover.PlacementLeftEnd
-)
-
-type contextKey string
-
-var (
-	contentIDKey    contextKey = "contentID"
-	subContentIDKey contextKey = "subContentID"
+	PlacementTop         = popovernative.PlacementTop
+	PlacementTopStart    = popovernative.PlacementTopStart
+	PlacementTopEnd      = popovernative.PlacementTopEnd
+	PlacementRight       = popovernative.PlacementRight
+	PlacementRightStart  = popovernative.PlacementRightStart
+	PlacementRightEnd    = popovernative.PlacementRightEnd
+	PlacementBottom      = popovernative.PlacementBottom
+	PlacementBottomStart = popovernative.PlacementBottomStart
+	PlacementBottomEnd   = popovernative.PlacementBottomEnd
+	PlacementLeft        = popovernative.PlacementLeft
+	PlacementLeftStart   = popovernative.PlacementLeftStart
+	PlacementLeftEnd     = popovernative.PlacementLeftEnd
 )
 
 type Props struct {
@@ -35,13 +27,11 @@ type Props struct {
 }
 
 type TriggerProps struct {
-	ID         string
 	Class      string
 	Attributes templ.Attributes
 }
 
 type ContentProps struct {
-	ID         string
 	Class      string
 	Attributes templ.Attributes
 	Placement  Placement
@@ -88,13 +78,11 @@ type SubProps struct {
 }
 
 type SubTriggerProps struct {
-	ID         string
 	Class      string
 	Attributes templ.Attributes
 }
 
 type SubContentProps struct {
-	ID         string
 	Class      string
 	Attributes templ.Attributes
 }
@@ -107,37 +95,26 @@ type PortalProps struct {
 
 templ Dropdown(props ...Props) {
 	@script()
-	{{
-		var p Props
-		if len(props) > 0 {
-			p = props[0]
-		}
-		contentID := p.ID
-		if contentID == "" {
-			contentID = utils.RandomID()
-		}
-		ctx = context.WithValue(ctx, contentIDKey, contentID)
-	}}
-	{ children... }
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@popovernative.Root(popovernative.RootProps{
+		ID: p.ID,
+	}) {
+		{ children... }
+	}
 }
 
 templ Trigger(props ...TriggerProps) {
-	{{
-		var p TriggerProps
-		if len(props) > 0 {
-			p = props[0]
-		}
-		contentID, ok := ctx.Value(contentIDKey).(string)
-		if !ok {
-			contentID = "fallback-content-id"
-		}
-	}}
-	@popover.Trigger(popover.TriggerProps{
-		ID:          p.ID,
+	{{ var p TriggerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@popovernative.Trigger(popovernative.TriggerProps{
 		Class:       p.Class,
 		Attributes:  p.Attributes,
-		For:         contentID,
-		TriggerType: popover.TriggerTypeClick,
+		TriggerType: popovernative.TriggerTypeClick,
 	}) {
 		{ children... }
 	}
@@ -148,18 +125,13 @@ templ Content(props ...ContentProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	{{ contentID, ok := ctx.Value(contentIDKey).(string) }}
-	if !ok {
-		{{ contentID = "fallback-content-id" }} // Must match fallback in Trigger
-	}
 	{{
 		placement := p.Placement
 		if placement == "" {
 			placement = PlacementBottomStart
 		}
 	}}
-	@popover.Content(popover.ContentProps{
-		ID:        contentID,
+	@popovernative.Content(popovernative.ContentProps{
 		Placement: placement,
 		Class: utils.TwMerge(
 			"z-50 rounded-md bg-popover p-1 shadow-md focus:outline-none overflow-auto",
@@ -297,44 +269,26 @@ templ Shortcut(props ...ShortcutProps) {
 }
 
 templ Sub(props ...SubProps) {
-	{{
-		var p SubProps
-		if len(props) > 0 {
-			p = props[0]
-		}
-		subContentID := p.ID
-		if subContentID == "" {
-			subContentID = utils.RandomID()
-		}
-		ctx = context.WithValue(ctx, subContentIDKey, subContentID)
-	}}
-	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		data-tui-dropdown-submenu
-		class={ utils.TwMerge("relative", p.Class) }
-		{ p.Attributes... }
-	>
+	{{ var p SubProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@popovernative.Root(popovernative.RootProps{
+		ID:         p.ID,
+		Class:      p.Class,
+		Attributes: p.Attributes,
+	}) {
 		{ children... }
-	</div>
+	}
 }
 
 templ SubTrigger(props ...SubTriggerProps) {
-	{{
-		var p SubTriggerProps
-		if len(props) > 0 {
-			p = props[0]
-		}
-		subContentID, ok := ctx.Value(subContentIDKey).(string)
-		if !ok {
-			subContentID = "fallback-subcontent-id"
-		}
-	}}
-	@popover.Trigger(popover.TriggerProps{
-		ID:          p.ID,
-		For:         subContentID,
-		TriggerType: popover.TriggerTypeHover,
+	{{ var p SubTriggerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@popovernative.Trigger(popovernative.TriggerProps{
+		TriggerType: popovernative.TriggerTypeHover,
 	}) {
 		<button
 			type="button"
@@ -359,19 +313,12 @@ templ SubTrigger(props ...SubTriggerProps) {
 }
 
 templ SubContent(props ...SubContentProps) {
-	{{
-		var p SubContentProps
-		if len(props) > 0 {
-			p = props[0]
-		}
-		subContentID, ok := ctx.Value(subContentIDKey).(string)
-		if !ok {
-			subContentID = "fallback-subcontent-id"
-		}
-	}}
-	@popover.Content(popover.ContentProps{
-		ID:            subContentID,
-		Placement:     popover.PlacementRightStart,
+	{{ var p SubContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@popovernative.Content(popovernative.ContentProps{
+		Placement:     popovernative.PlacementRightStart,
 		Offset:        -4,  // Adjust as needed
 		HoverDelay:    100, // ms
 		HoverOutDelay: 200, // ms
