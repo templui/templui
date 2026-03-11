@@ -6,10 +6,10 @@ import (
 	"github.com/templui/templui/internal/ui/showcase"
 )
 
-templ Popover() {
+templ PopoverNative() {
 	@layouts.DocsLayout(
-		"Popover",
-		"Displays rich content in a floating layer. Powered by Floating UI.",
+		"Popover Native",
+		"Displays rich content in a floating layer using the native browser popover API.",
 		[]modules.TableOfContentsItem{
 			{
 				ID:   "installation",
@@ -19,6 +19,10 @@ templ Popover() {
 				Text: "Examples",
 				ID:   "examples",
 				Children: []modules.TableOfContentsItem{
+					{
+						Text: "Default",
+						ID:   "default",
+					},
 					{
 						Text: "Trigger & Closing",
 						ID:   "trigger-closing",
@@ -50,8 +54,8 @@ templ Popover() {
 		},
 	) {
 		@modules.PageWrapper(modules.PageWrapperProps{
-			Name:        "Popover",
-			Description: templ.Raw(`Displays rich content in a floating layer. Powered by <a href="https://floating-ui.com/" target="_blank" rel="noopener" class="text-primary underline underline-offset-2 hover:opacity-80 transition-opacity">Floating UI</a>.`),
+			Name:        "Popover Native",
+			Description: templ.Raw(`Displays rich content in a floating layer using the native browser <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/popover" target="_blank" rel="noopener" class="text-primary underline underline-offset-2 hover:opacity-80 transition-opacity">popover API</a> and CSS anchor positioning.`),
 			Tailwind:    true,
 			VanillaJS:   true,
 			Breadcrumbs: modules.Breadcrumbs{
@@ -65,21 +69,21 @@ templ Popover() {
 						Path: "/docs/components",
 					},
 					{
-						Text: "Popover",
+						Text: "Popover Native",
 					},
 				},
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.PopoverDefault(),
-				PreviewCodeFile: "popover_default.templ",
+				ShowcaseFile:    showcase.PopoverNative(),
+				PreviewCodeFile: "popover_native.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
 				ID:    "installation",
 			}) {
 				@modules.ComponentUsage(modules.ComponentUsageProps{
-					ComponentName: "popover",
+					ComponentName: "popovernative",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -87,15 +91,21 @@ templ Popover() {
 				ID:    "examples",
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Default",
+					ShowcaseFile:    showcase.PopoverNative(),
+					PreviewCodeFile: "popover_native.templ",
+					ID:              "default",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Trigger & Closing",
-					ShowcaseFile:    showcase.PopoverTriggers(),
-					PreviewCodeFile: "popover_triggers.templ",
+					ShowcaseFile:    showcase.PopoverNativeTriggers(),
+					PreviewCodeFile: "popover_native_triggers.templ",
 					ID:              "trigger-closing",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Positions",
-					ShowcaseFile:    showcase.PopoverPositions(),
-					PreviewCodeFile: "popover_positions.templ",
+					ShowcaseFile:    showcase.PopoverNativePositions(),
+					PreviewCodeFile: "popover_native_positions.templ",
 					ID:              "positions",
 				})
 			}
@@ -107,7 +117,7 @@ templ Popover() {
 				<div id="trigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Trigger",
-						Description: "Element that triggers the popover when interacted with.",
+						Description: "Element that triggers the native popover when interacted with.",
 						Items: []modules.APITableItem{
 							{
 								Name:        "ID",
@@ -141,7 +151,7 @@ templ Popover() {
 								Name:        "TriggerType",
 								Type:        "TriggerType",
 								Default:     "click",
-								Description: "How the popover is triggered. Options: 'click', 'hover'.",
+								Description: "How the popover is triggered. Options: 'click', 'hover', 'manual'.",
 								Required:    false,
 							},
 						},
@@ -150,7 +160,7 @@ templ Popover() {
 				<div id="content" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Content",
-						Description: "Container for the popover content with positioning and behavior options.",
+						Description: "Container for the native popover content with placement and behavior options.",
 						Items: []modules.APITableItem{
 							{
 								Name:        "ID",
@@ -183,7 +193,7 @@ templ Popover() {
 							{
 								Name:        "Offset",
 								Type:        "int",
-								Default:     "4 (or 8 with arrow)",
+								Default:     "4",
 								Description: "Distance in pixels between the trigger and popover content.",
 								Required:    false,
 							},
@@ -212,21 +222,14 @@ templ Popover() {
 								Name:        "HoverDelay",
 								Type:        "int",
 								Default:     "0",
-								Description: "Delay in milliseconds before showing on hover (for hover triggers).",
+								Description: "Delay in milliseconds before showing the popover on hover.",
 								Required:    false,
 							},
 							{
 								Name:        "HoverOutDelay",
 								Type:        "int",
 								Default:     "0",
-								Description: "Delay in milliseconds before hiding on hover out (for hover triggers).",
-								Required:    false,
-							},
-							{
-								Name:        "MatchWidth",
-								Type:        "bool",
-								Default:     "false",
-								Description: "Whether the popover should match the width of the trigger element.",
+								Description: "Delay in milliseconds before hiding the popover on hover out.",
 								Required:    false,
 							},
 							{
@@ -245,22 +248,12 @@ templ Popover() {
 				ID:    "javascript-api",
 			}) {
 				@modules.Code(modules.CodeProps{
-					Language: "javascript",
-					CodeContent: `// Open a popover programmatically
-window.tui.popover.open("popover-id");
-
-// Close a popover
-window.tui.popover.close("popover-id");
-
-// Close all popovers (optionally except one)
-window.tui.popover.closeAll(); // Closes all
-window.tui.popover.closeAll("popover-id"); // Closes all except "popover-id"
-
-// Toggle popover state
-window.tui.popover.toggle("popover-id");
-
-// Check if popover is open (returns true/false)
-const isOpen = window.tui.popover.isOpen("popover-id");`,
+					CodeContent: `window.tui.popovernative.open("popover-id");
+window.tui.popovernative.close("popover-id");
+window.tui.popovernative.closeAll();
+window.tui.popovernative.toggle("popover-id");
+const isOpen = window.tui.popovernative.isOpen("popover-id");`,
+					ShowCopyButton: true,
 				})
 			}
 		}

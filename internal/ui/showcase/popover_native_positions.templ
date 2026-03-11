@@ -1,0 +1,193 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/button"
+	popovernative "github.com/templui/templui/components/popovernative"
+)
+
+templ PopoverNativePositions() {
+	<div class="flex flex-col w-full max-w-md">
+		<div class="grid grid-cols-3 gap-2">
+			@popovernative.Trigger(popovernative.TriggerProps{
+				For:         "top-start-native-popover",
+				TriggerType: popovernative.TriggerTypeHover,
+			}) {
+				@button.Button(button.Props{Class: "w-full", Variant: button.VariantOutline}) {
+					Top Start
+				}
+			}
+			@popovernative.Content(popovernative.ContentProps{
+				ID:        "top-start-native-popover",
+				Placement: popovernative.PlacementTopStart,
+				ShowArrow: true,
+			}) {
+				@PopoverContent()
+			}
+			@popovernative.Trigger(popovernative.TriggerProps{
+				For:         "top-native-popover",
+				TriggerType: popovernative.TriggerTypeHover,
+			}) {
+				@button.Button(button.Props{Class: "w-full", Variant: button.VariantOutline}) {
+					Top
+				}
+			}
+			@popovernative.Content(popovernative.ContentProps{
+				ID:        "top-native-popover",
+				Placement: popovernative.PlacementTop,
+				ShowArrow: true,
+			}) {
+				@PopoverContent()
+			}
+			@popovernative.Trigger(popovernative.TriggerProps{
+				For:         "top-end-native-popover",
+				TriggerType: popovernative.TriggerTypeHover,
+			}) {
+				@button.Button(button.Props{Class: "w-full", Variant: button.VariantOutline}) {
+					Top End
+				}
+			}
+			@popovernative.Content(popovernative.ContentProps{
+				ID:        "top-end-native-popover",
+				Placement: popovernative.PlacementTopEnd,
+				ShowArrow: true,
+			}) {
+				@PopoverContent()
+			}
+			@popovernative.Trigger(popovernative.TriggerProps{
+				For:         "right-start-native-popover",
+				TriggerType: popovernative.TriggerTypeHover,
+			}) {
+				@button.Button(button.Props{Class: "w-full", Variant: button.VariantOutline}) {
+					Right Start
+				}
+			}
+			@popovernative.Content(popovernative.ContentProps{
+				ID:        "right-start-native-popover",
+				Placement: popovernative.PlacementRightStart,
+				ShowArrow: true,
+			}) {
+				@PopoverContent()
+			}
+			@popovernative.Trigger(popovernative.TriggerProps{
+				For:         "right-native-popover",
+				TriggerType: popovernative.TriggerTypeHover,
+			}) {
+				@button.Button(button.Props{Class: "w-full", Variant: button.VariantOutline}) {
+					Right
+				}
+			}
+			@popovernative.Content(popovernative.ContentProps{
+				ID:        "right-native-popover",
+				Placement: popovernative.PlacementRight,
+				ShowArrow: true,
+			}) {
+				@PopoverContent()
+			}
+			@popovernative.Trigger(popovernative.TriggerProps{
+				For:         "right-end-native-popover",
+				TriggerType: popovernative.TriggerTypeHover,
+			}) {
+				@button.Button(button.Props{Class: "w-full", Variant: button.VariantOutline}) {
+					Right End
+				}
+			}
+			@popovernative.Content(popovernative.ContentProps{
+				ID:        "right-end-native-popover",
+				Placement: popovernative.PlacementRightEnd,
+				ShowArrow: true,
+			}) {
+				@PopoverContent()
+			}
+			@popovernative.Trigger(popovernative.TriggerProps{
+				For:         "bottom-start-native-popover",
+				TriggerType: popovernative.TriggerTypeHover,
+			}) {
+				@button.Button(button.Props{Class: "w-full", Variant: button.VariantOutline}) {
+					Bottom Start
+				}
+			}
+			@popovernative.Content(popovernative.ContentProps{
+				ID:        "bottom-start-native-popover",
+				Placement: popovernative.PlacementBottomStart,
+				ShowArrow: true,
+			}) {
+				@PopoverContent()
+			}
+			@popovernative.Trigger(popovernative.TriggerProps{
+				For:         "bottom-native-popover",
+				TriggerType: popovernative.TriggerTypeHover,
+			}) {
+				@button.Button(button.Props{Class: "w-full", Variant: button.VariantOutline}) {
+					Bottom
+				}
+			}
+			@popovernative.Content(popovernative.ContentProps{
+				ID:        "bottom-native-popover",
+				Placement: popovernative.PlacementBottom,
+				ShowArrow: true,
+			}) {
+				@PopoverContent()
+			}
+			@popovernative.Trigger(popovernative.TriggerProps{
+				For:         "bottom-end-native-popover",
+				TriggerType: popovernative.TriggerTypeHover,
+			}) {
+				@button.Button(button.Props{Class: "w-full", Variant: button.VariantOutline}) {
+					Bottom End
+				}
+			}
+			@popovernative.Content(popovernative.ContentProps{
+				ID:        "bottom-end-native-popover",
+				Placement: popovernative.PlacementBottomEnd,
+				ShowArrow: true,
+			}) {
+				@PopoverContent()
+			}
+			@popovernative.Trigger(popovernative.TriggerProps{
+				For:         "left-start-native-popover",
+				TriggerType: popovernative.TriggerTypeHover,
+			}) {
+				@button.Button(button.Props{Class: "w-full", Variant: button.VariantOutline}) {
+					Left Start
+				}
+			}
+			@popovernative.Content(popovernative.ContentProps{
+				ID:        "left-start-native-popover",
+				Placement: popovernative.PlacementLeftStart,
+				ShowArrow: true,
+			}) {
+				@PopoverContent()
+			}
+			@popovernative.Trigger(popovernative.TriggerProps{
+				For:         "left-native-popover",
+				TriggerType: popovernative.TriggerTypeHover,
+			}) {
+				@button.Button(button.Props{Class: "w-full", Variant: button.VariantOutline}) {
+					Left
+				}
+			}
+			@popovernative.Content(popovernative.ContentProps{
+				ID:        "left-native-popover",
+				Placement: popovernative.PlacementLeft,
+				ShowArrow: true,
+			}) {
+				@PopoverContent()
+			}
+			@popovernative.Trigger(popovernative.TriggerProps{
+				For:         "left-end-native-popover",
+				TriggerType: popovernative.TriggerTypeHover,
+			}) {
+				@button.Button(button.Props{Class: "w-full", Variant: button.VariantOutline}) {
+					Left End
+				}
+			}
+			@popovernative.Content(popovernative.ContentProps{
+				ID:        "left-end-native-popover",
+				Placement: popovernative.PlacementLeftEnd,
+				ShowArrow: true,
+			}) {
+				@PopoverContent()
+			}
+		</div>
+	</div>
+}

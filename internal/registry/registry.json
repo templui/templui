@@ -268,6 +268,17 @@
       "tags": ["popover", "tooltip", "overlay", "floating"]
     },
     {
+      "name": "popovernative",
+      "slug": "popover-native",
+      "displayName": "Popover Native",
+      "description": "Native browser popover component.",
+      "files": ["components/popovernative/popovernative.templ"],
+      "dependencies": [],
+      "hasJS": true,
+      "categories": ["overlays-dialogs"],
+      "tags": ["popover", "native", "anchor-positioning", "overlay", "browser"]
+    },
+    {
       "name": "progress",
       "slug": "progress",
       "displayName": "Progress",
