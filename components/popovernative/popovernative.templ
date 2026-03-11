@@ -129,7 +129,7 @@ templ Content(props ...ContentProps) {
 		data-tui-popovernative-hover-out-delay={ strconv.Itoa(p.HoverOutDelay) }
 		data-tui-popovernative-exclusive={ strconv.FormatBool(p.Exclusive) }
 		class={ utils.TwMerge(
-			"bg-popover rounded-lg border text-popover-foreground text-sm shadow-lg pointer-events-auto fixed top-0 left-0 max-w-[min(24rem,calc(100vw-2rem))] outline-none",
+			"bg-popover rounded-lg border text-popover-foreground text-sm shadow-lg pointer-events-auto fixed top-0 left-0 max-w-[min(24rem,calc(100vw-2rem))] overflow-visible outline-none",
 			p.Class,
 		) }
 		{ p.Attributes... }
@@ -140,11 +140,7 @@ templ Content(props ...ContentProps) {
 		if p.ShowArrow {
 			<div
 				data-tui-popovernative-arrow
-				class="absolute h-2.5 w-2.5 rotate-45 bg-popover border border-border
-					data-[tui-popovernative-placement^=top]:-bottom-[5px] data-[tui-popovernative-placement^=top]:border-t-transparent data-[tui-popovernative-placement^=top]:border-l-transparent
-					data-[tui-popovernative-placement^=bottom]:-top-[5px] data-[tui-popovernative-placement^=bottom]:border-b-transparent data-[tui-popovernative-placement^=bottom]:border-r-transparent
-					data-[tui-popovernative-placement^=left]:-right-[5px] data-[tui-popovernative-placement^=left]:border-l-transparent data-[tui-popovernative-placement^=left]:border-b-transparent
-					data-[tui-popovernative-placement^=right]:-left-[5px] data-[tui-popovernative-placement^=right]:border-r-transparent data-[tui-popovernative-placement^=right]:border-t-transparent"
+				class="absolute h-2.5 w-2.5 rotate-45 bg-popover border border-border"
 			></div>
 		}
 	</div>

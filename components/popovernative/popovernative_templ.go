@@ -309,7 +309,7 @@ func Content(props ...ContentProps) templ.Component {
 			}
 		}
 		var templ_7745c5c3_Var11 = []any{utils.TwMerge(
-			"bg-popover rounded-lg border text-popover-foreground text-sm shadow-lg pointer-events-auto fixed top-0 left-0 max-w-[min(24rem,calc(100vw-2rem))] outline-none",
+			"bg-popover rounded-lg border text-popover-foreground text-sm shadow-lg pointer-events-auto fixed top-0 left-0 max-w-[min(24rem,calc(100vw-2rem))] overflow-visible outline-none",
 			p.Class,
 		)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
@@ -477,7 +477,7 @@ func Content(props ...ContentProps) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if p.ShowArrow {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div data-tui-popovernative-arrow class=\"absolute h-2.5 w-2.5 rotate-45 bg-popover border border-border data-[tui-popovernative-placement^=top]:-bottom-[5px] data-[tui-popovernative-placement^=top]:border-t-transparent data-[tui-popovernative-placement^=top]:border-l-transparent data-[tui-popovernative-placement^=bottom]:-top-[5px] data-[tui-popovernative-placement^=bottom]:border-b-transparent data-[tui-popovernative-placement^=bottom]:border-r-transparent data-[tui-popovernative-placement^=left]:-right-[5px] data-[tui-popovernative-placement^=left]:border-l-transparent data-[tui-popovernative-placement^=left]:border-b-transparent data-[tui-popovernative-placement^=right]:-left-[5px] data-[tui-popovernative-placement^=right]:border-r-transparent data-[tui-popovernative-placement^=right]:border-t-transparent\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div data-tui-popovernative-arrow class=\"absolute h-2.5 w-2.5 rotate-45 bg-popover border border-border\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -533,7 +533,7 @@ func script() templ.Component {
 				var templ_7745c5c3_Var24 string
 				templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 158, Col: 44}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 154, Col: 44}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 				if templ_7745c5c3_Err != nil {
@@ -546,7 +546,7 @@ func script() templ.Component {
 				var templ_7745c5c3_Var25 string
 				templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(utils.ComponentScriptURL("popovernative"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 158, Col: 94}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 154, Col: 94}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 				if templ_7745c5c3_Err != nil {
