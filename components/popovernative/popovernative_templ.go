@@ -191,7 +191,7 @@ func Trigger(props ...TriggerProps) templ.Component {
 		if p.TriggerType == "" {
 			p.TriggerType = TriggerTypeClick
 		}
-		var templ_7745c5c3_Var6 = []any{utils.TwMerge("group inline-flex cursor-pointer", p.Class)}
+		var templ_7745c5c3_Var6 = []any{utils.TwMerge("contents", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

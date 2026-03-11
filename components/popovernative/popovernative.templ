@@ -88,7 +88,7 @@ templ Trigger(props ...TriggerProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("group inline-flex cursor-pointer", p.Class) }
+		class={ utils.TwMerge("contents", p.Class) }
 		data-tui-popovernative-trigger
 		data-tui-popovernative-type={ string(p.TriggerType) }
 		{ p.Attributes... }
