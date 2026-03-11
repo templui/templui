@@ -65,35 +65,40 @@ func triggerStyle(id string) string {
 	return "anchor-name: --tui-popovernative-" + id + ";"
 }
 
+func tryStrategyStyle() string {
+	return "position-try-fallbacks: flip-block, flip-inline;"
+}
+
 func contentStyle(id string, placement Placement, offset int) string {
 	anchorName := "--tui-popovernative-" + id
 	gap := strconv.Itoa(offset) + "px"
+	fallbacks := tryStrategyStyle()
 
 	switch placement {
 	case PlacementTopStart:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(left); translate: 0 -100%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(left); translate: 0 -100%%; %s", anchorName, gap, fallbacks)
 	case PlacementTop:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(center); translate: -50%% -100%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(center); translate: -50%% -100%%; %s", anchorName, gap, fallbacks)
 	case PlacementTopEnd:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(right); translate: -100%% -100%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(right); translate: -100%% -100%%; %s", anchorName, gap, fallbacks)
 	case PlacementRightStart:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(top); left: calc(anchor(right) + %s);", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(top); left: calc(anchor(right) + %s); %s", anchorName, gap, fallbacks)
 	case PlacementRight:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(center); left: calc(anchor(right) + %s); translate: 0 -50%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(center); left: calc(anchor(right) + %s); translate: 0 -50%%; %s", anchorName, gap, fallbacks)
 	case PlacementRightEnd:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(bottom); left: calc(anchor(right) + %s); translate: 0 -100%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(bottom); left: calc(anchor(right) + %s); translate: 0 -100%%; %s", anchorName, gap, fallbacks)
 	case PlacementBottomStart:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(left);", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(left); %s", anchorName, gap, fallbacks)
 	case PlacementBottomEnd:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(right); translate: -100%% 0;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(right); translate: -100%% 0; %s", anchorName, gap, fallbacks)
 	case PlacementLeftStart:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(top); left: calc(anchor(left) - %s); translate: -100%% 0;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(top); left: calc(anchor(left) - %s); translate: -100%% 0; %s", anchorName, gap, fallbacks)
 	case PlacementLeft:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(center); left: calc(anchor(left) - %s); translate: -100%% -50%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(center); left: calc(anchor(left) - %s); translate: -100%% -50%%; %s", anchorName, gap, fallbacks)
 	case PlacementLeftEnd:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(bottom); left: calc(anchor(left) - %s); translate: -100%% -100%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(bottom); left: calc(anchor(left) - %s); translate: -100%% -100%%; %s", anchorName, gap, fallbacks)
 	default:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(center); translate: -50%% 0;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(center); translate: -50%% 0; %s", anchorName, gap, fallbacks)
 	}
 }
 
@@ -177,7 +182,7 @@ func Trigger(props ...TriggerProps) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 134, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 139, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -213,7 +218,7 @@ func Trigger(props ...TriggerProps) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(p.For)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 138, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 143, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -226,7 +231,7 @@ func Trigger(props ...TriggerProps) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(triggerStyle(p.For))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 139, Col: 30}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 144, Col: 30}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -244,7 +249,7 @@ func Trigger(props ...TriggerProps) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.TriggerType))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 142, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 147, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -328,7 +333,7 @@ func Content(props ...ContentProps) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 166, Col: 11}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 171, Col: 11}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -341,7 +346,7 @@ func Content(props ...ContentProps) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 169, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 174, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -354,7 +359,7 @@ func Content(props ...ContentProps) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Placement))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 171, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 176, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -367,7 +372,7 @@ func Content(props ...ContentProps) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(p.Offset))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 172, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 177, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -380,7 +385,7 @@ func Content(props ...ContentProps) templ.Component {
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatBool(p.DisableClickAway))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 173, Col: 83}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 178, Col: 83}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -393,7 +398,7 @@ func Content(props ...ContentProps) templ.Component {
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatBool(p.DisableESC))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 174, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 179, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
@@ -406,7 +411,7 @@ func Content(props ...ContentProps) templ.Component {
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatBool(p.ShowArrow))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 175, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 180, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -419,7 +424,7 @@ func Content(props ...ContentProps) templ.Component {
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(p.HoverDelay))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 176, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 181, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
@@ -432,7 +437,7 @@ func Content(props ...ContentProps) templ.Component {
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(p.HoverOutDelay))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 177, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 182, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -445,7 +450,7 @@ func Content(props ...ContentProps) templ.Component {
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatBool(p.Exclusive))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 178, Col: 68}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 183, Col: 68}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -458,7 +463,7 @@ func Content(props ...ContentProps) templ.Component {
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(contentStyle(p.ID, p.Placement, p.Offset))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 179, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 184, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -572,7 +577,7 @@ func script() templ.Component {
 				var templ_7745c5c3_Var26 string
 				templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 200, Col: 44}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 205, Col: 44}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 				if templ_7745c5c3_Err != nil {
@@ -585,7 +590,7 @@ func script() templ.Component {
 				var templ_7745c5c3_Var27 string
 				templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(utils.ComponentScriptURL("popovernative"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 200, Col: 94}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popovernative/popovernative.templ`, Line: 205, Col: 94}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 				if templ_7745c5c3_Err != nil {

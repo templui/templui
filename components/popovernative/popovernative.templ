@@ -57,35 +57,40 @@ func triggerStyle(id string) string {
 	return "anchor-name: --tui-popovernative-" + id + ";"
 }
 
+func tryStrategyStyle() string {
+	return "position-try-fallbacks: flip-block, flip-inline;"
+}
+
 func contentStyle(id string, placement Placement, offset int) string {
 	anchorName := "--tui-popovernative-" + id
 	gap := strconv.Itoa(offset) + "px"
+	fallbacks := tryStrategyStyle()
 
 	switch placement {
 	case PlacementTopStart:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(left); translate: 0 -100%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(left); translate: 0 -100%%; %s", anchorName, gap, fallbacks)
 	case PlacementTop:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(center); translate: -50%% -100%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(center); translate: -50%% -100%%; %s", anchorName, gap, fallbacks)
 	case PlacementTopEnd:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(right); translate: -100%% -100%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(right); translate: -100%% -100%%; %s", anchorName, gap, fallbacks)
 	case PlacementRightStart:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(top); left: calc(anchor(right) + %s);", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(top); left: calc(anchor(right) + %s); %s", anchorName, gap, fallbacks)
 	case PlacementRight:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(center); left: calc(anchor(right) + %s); translate: 0 -50%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(center); left: calc(anchor(right) + %s); translate: 0 -50%%; %s", anchorName, gap, fallbacks)
 	case PlacementRightEnd:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(bottom); left: calc(anchor(right) + %s); translate: 0 -100%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(bottom); left: calc(anchor(right) + %s); translate: 0 -100%%; %s", anchorName, gap, fallbacks)
 	case PlacementBottomStart:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(left);", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(left); %s", anchorName, gap, fallbacks)
 	case PlacementBottomEnd:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(right); translate: -100%% 0;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(right); translate: -100%% 0; %s", anchorName, gap, fallbacks)
 	case PlacementLeftStart:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(top); left: calc(anchor(left) - %s); translate: -100%% 0;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(top); left: calc(anchor(left) - %s); translate: -100%% 0; %s", anchorName, gap, fallbacks)
 	case PlacementLeft:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(center); left: calc(anchor(left) - %s); translate: -100%% -50%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(center); left: calc(anchor(left) - %s); translate: -100%% -50%%; %s", anchorName, gap, fallbacks)
 	case PlacementLeftEnd:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(bottom); left: calc(anchor(left) - %s); translate: -100%% -100%%;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(bottom); left: calc(anchor(left) - %s); translate: -100%% -100%%; %s", anchorName, gap, fallbacks)
 	default:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(center); translate: -50%% 0;", anchorName, gap)
+		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(center); translate: -50%% 0; %s", anchorName, gap, fallbacks)
 	}
 }
 
