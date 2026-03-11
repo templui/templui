@@ -46,6 +46,7 @@ tasks:
         components/inputotp/inputotp.js \
         components/label/label.js \
         components/popover/popover.js \
+        components/popovernative/popovernative.js \
         components/progress/progress.js \
         components/rating/rating.js \
         components/selectbox/selectbox.js \
