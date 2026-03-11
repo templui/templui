@@ -45,7 +45,6 @@ type Props struct {
 }
 
 templ Calendar(props ...Props) {
-	@script()
 	{{
 		var p Props
 		if len(props) > 0 {
@@ -189,14 +188,4 @@ templ Calendar(props ...Props) {
 			<div data-tui-calendar-days class="grid grid-cols-7 gap-1 place-items-center"></div>
 		</div>
 	</div>
-}
-
-var onceHandle = templ.NewOnceHandle()
-
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("calendar") }></script>
-		}
-	}
 }

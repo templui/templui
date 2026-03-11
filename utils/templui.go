@@ -75,6 +75,7 @@ var ScriptURL = func(path string) string {
 }
 
 var (
+	// Deprecated: component scripts are loaded explicitly via Scripts(...).
 	SuppressComponentScripts bool
 	RemoteScriptCDNBase      = "https://cdn.jsdelivr.net/gh/templui/templui"
 	ComponentScriptURL       = func(component string) string {

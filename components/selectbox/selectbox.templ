@@ -67,7 +67,6 @@ type ItemProps struct {
 }
 
 templ SelectBox(props ...Props) {
-	@script()
 	{{
 		var p Props
 		if len(props) > 0 {
@@ -301,14 +300,4 @@ templ Item(props ...ItemProps) {
 			@icon.Check(icon.Props{Class: "size-4"})
 		</span>
 	</div>
-}
-
-var onceHandle = templ.NewOnceHandle()
-
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("selectbox") }></script>
-		}
-	}
 }

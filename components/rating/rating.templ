@@ -42,7 +42,6 @@ type ItemProps struct {
 }
 
 templ Rating(props ...Props) {
-	@script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -184,15 +183,5 @@ func (p *ItemProps) setDefaults() {
 func (p *Props) setDefaults() {
 	if p.Precision <= 0 {
 		p.Precision = 1.0
-	}
-}
-
-var onceHandle = templ.NewOnceHandle()
-
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("rating") }></script>
-		}
 	}
 }

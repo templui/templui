@@ -30,7 +30,6 @@ type Props struct {
 }
 
 templ TimePicker(props ...Props) {
-	@script()
 	{{
 		var p Props
 		if len(props) > 0 {
@@ -240,14 +239,4 @@ templ TimePicker(props ...Props) {
 			}
 		}
 	</div>
-}
-
-var onceHandle = templ.NewOnceHandle()
-
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("timepicker") }></script>
-		}
-	}
 }

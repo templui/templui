@@ -34,7 +34,6 @@ type Props struct {
 }
 
 templ Progress(props ...Props) {
-	@script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -118,15 +117,5 @@ func variantClasses(variant Variant) string {
 		return "bg-yellow-500"
 	default:
 		return "bg-primary"
-	}
-}
-
-var onceHandle = templ.NewOnceHandle()
-
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("progress") }></script>
-		}
 	}
 }

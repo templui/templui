@@ -57,7 +57,6 @@ func htmxHandler(component templ.Component) http.Handler {
 func main() {
 	mux := http.NewServeMux()
 	config.LoadConfig()
-	utils.SuppressComponentScripts = true
 
 	SetupAssetsRoutes(mux)
 

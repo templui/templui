@@ -58,7 +58,6 @@ type ContentProps struct {
 }
 
 templ Root(props ...RootProps) {
-	@script()
 	{{ var p RootProps }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -76,7 +75,6 @@ templ Root(props ...RootProps) {
 }
 
 templ Trigger(props ...TriggerProps) {
-	@script()
 	{{ var p TriggerProps }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -98,7 +96,6 @@ templ Trigger(props ...TriggerProps) {
 }
 
 templ Content(props ...ContentProps) {
-	@script()
 	{{ var p ContentProps }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -144,14 +141,4 @@ templ Content(props ...ContentProps) {
 			></div>
 		}
 	</div>
-}
-
-var onceHandle = templ.NewOnceHandle()
-
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("popover") }></script>
-		}
-	}
 }

@@ -442,6 +442,10 @@
     {
       "path": "utils/templui.go",
       "description": "Core utility functions"
+    },
+    {
+      "path": "utils/scripts.go",
+      "description": "Typed JavaScript loader with recursive component dependencies"
     }
   ]
 }

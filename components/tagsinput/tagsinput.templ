@@ -22,7 +22,6 @@ type Props struct {
 }
 
 templ TagsInput(props ...Props) {
-	@script()
 	{{
 		var p Props
 		if len(props) > 0 {
@@ -144,14 +143,4 @@ templ TagsInput(props ...Props) {
 			}
 		</div>
 	</div>
-}
-
-var onceHandle = templ.NewOnceHandle()
-
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("tagsinput") }></script>
-		}
-	}
 }

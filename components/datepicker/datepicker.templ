@@ -48,7 +48,6 @@ type Props struct {
 }
 
 templ DatePicker(props ...Props) {
-	@script()
 	{{
 		var p Props
 		if len(props) > 0 {
@@ -148,14 +147,4 @@ templ DatePicker(props ...Props) {
 			}
 		}
 	</div>
-}
-
-var onceHandle = templ.NewOnceHandle()
-
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("datepicker") }></script>
-		}
-	}
 }

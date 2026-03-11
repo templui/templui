@@ -70,7 +70,6 @@ type DescriptionProps struct {
 }
 
 templ Dialog(props ...Props) {
-	@script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -324,14 +323,4 @@ templ Description(props ...DescriptionProps) {
 	>
 		{ children... }
 	</p>
-}
-
-var onceHandle = templ.NewOnceHandle()
-
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("dialog") }></script>
-		}
-	}
 }
