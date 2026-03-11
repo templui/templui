@@ -20,6 +20,10 @@ templ Popover() {
 				ID:   "examples",
 				Children: []modules.TableOfContentsItem{
 					{
+						Text: "Native Browser API",
+						ID:   "native-browser-api",
+					},
+					{
 						Text: "Trigger & Closing",
 						ID:   "trigger-closing",
 					},
@@ -86,6 +90,12 @@ templ Popover() {
 				Title: "Examples",
 				ID:    "examples",
 			}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Native Browser API",
+					ShowcaseFile:    showcase.PopoverNative(),
+					PreviewCodeFile: "popover_native.templ",
+					ID:              "native-browser-api",
+				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Trigger & Closing",
 					ShowcaseFile:    showcase.PopoverTriggers(),

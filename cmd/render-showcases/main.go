@@ -171,6 +171,7 @@ func main() {
 
 		// Popover
 		"out/showcase/popover_default.html":   showcase.PopoverDefault(),
+		"out/showcase/popover_native.html":    showcase.PopoverNative(),
 		"out/showcase/popover_positions.html": showcase.PopoverPositions(),
 		"out/showcase/popover_triggers.html":  showcase.PopoverTriggers(),
 

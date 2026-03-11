@@ -1,0 +1,113 @@
+package showcase
+
+templ PopoverNative() {
+	<div class="flex flex-col items-start gap-3">
+		<div class="space-y-1">
+			<h3 class="text-base font-semibold">Native browser popover API</h3>
+			<p class="max-w-[36rem] text-sm text-muted-foreground">
+				This example uses the built-in HTML popover API. Placement is controlled with CSS Anchor Positioning, so each popover can decide for itself whether it opens above, below, left, or right of its trigger.
+			</p>
+		</div>
+		<button
+			type="button"
+			popovertarget="menu"
+			style="anchor-name: --native-menu-anchor;"
+			class="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground"
+		>
+			Toggle menu
+		</button>
+		<div
+			id="menu"
+			popover="auto"
+			style="position: fixed; position-anchor: --native-menu-anchor; inset: auto; margin: 0; top: calc(anchor(bottom) + 0.5rem); left: anchor(left);"
+			class="w-72 rounded-lg border bg-popover p-2 text-popover-foreground shadow-lg"
+		>
+			<div class="px-2 pb-2 pt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">Actions</div>
+			<ul class="space-y-1">
+				<li class="flex items-center justify-between gap-3 rounded-md px-3 py-2 transition-colors hover:bg-accent/50">
+					<span class="text-sm font-medium text-foreground">New thing</span>
+					<button
+						type="button"
+						popovertarget="new-info"
+						aria-label="About New thing"
+						style="anchor-name: --new-info-anchor;"
+						class="inline-flex size-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+					>
+						i
+					</button>
+					<div
+						id="new-info"
+						popover="auto"
+						style="position: fixed; position-anchor: --new-info-anchor; inset: auto; margin: 0; top: anchor(center); left: calc(anchor(right) + 0.5rem); translate: 0 -50%;"
+						class="max-w-56 rounded-md border bg-popover px-3 py-2 text-sm leading-5 text-popover-foreground shadow-lg"
+					>
+						Create a fresh item from scratch. This one is anchored to the right of its trigger.
+					</div>
+				</li>
+				<li class="flex items-center justify-between gap-3 rounded-md px-3 py-2 transition-colors hover:bg-accent/50">
+					<span class="text-sm font-medium text-foreground">Open thing</span>
+					<button
+						type="button"
+						popovertarget="open-info"
+						aria-label="About Open thing"
+						style="anchor-name: --open-info-anchor;"
+						class="inline-flex size-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+					>
+						i
+					</button>
+					<div
+						id="open-info"
+						popover="auto"
+						style="position: fixed; position-anchor: --open-info-anchor; inset: auto; margin: 0; top: calc(anchor(bottom) + 0.5rem); left: anchor(center); translate: -50% 0;"
+						class="max-w-56 rounded-md border bg-popover px-3 py-2 text-sm leading-5 text-popover-foreground shadow-lg"
+					>
+						Open an existing item from your workspace. This one is anchored below its trigger.
+					</div>
+				</li>
+				<li class="flex items-center justify-between gap-3 rounded-md px-3 py-2 transition-colors hover:bg-accent/50">
+					<span class="text-sm font-medium text-foreground">Save thing</span>
+					<button
+						type="button"
+						popovertarget="save-info"
+						aria-label="About Save thing"
+						style="anchor-name: --save-info-anchor;"
+						class="inline-flex size-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+					>
+						i
+					</button>
+					<div
+						id="save-info"
+						popover="auto"
+						style="position: fixed; position-anchor: --save-info-anchor; inset: auto; margin: 0; top: anchor(center); left: calc(anchor(left) - 0.5rem); translate: -100% -50%;"
+						class="max-w-56 rounded-md border bg-popover px-3 py-2 text-sm leading-5 text-popover-foreground shadow-lg"
+					>
+						Save the current item and keep editing. This one is anchored to the left of its trigger.
+					</div>
+				</li>
+				<li class="flex items-center justify-between gap-3 rounded-md px-3 py-2 transition-colors hover:bg-accent/50">
+					<span class="text-sm font-medium text-foreground">Close thing</span>
+					<button
+						type="button"
+						popovertarget="close-info"
+						aria-label="About Close thing"
+						style="anchor-name: --close-info-anchor;"
+						class="inline-flex size-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+					>
+						i
+					</button>
+					<div
+						id="close-info"
+						popover="auto"
+						style="position: fixed; position-anchor: --close-info-anchor; inset: auto; margin: 0; top: calc(anchor(top) - 0.5rem); left: anchor(center); translate: -50% -100%;"
+						class="max-w-56 rounded-md border bg-popover px-3 py-2 text-sm leading-5 text-popover-foreground shadow-lg"
+					>
+						Close the current item without saving. This one is anchored above its trigger.
+					</div>
+				</li>
+			</ul>
+		</div>
+		<p class="max-w-[36rem] text-xs text-muted-foreground">
+			With the native popover API, top/right/bottom/left placement comes from CSS Anchor Positioning. Here the trigger defines <code>anchor-name</code>, and the popover opts into that anchor via <code>position-anchor</code>.
+		</p>
+	</div>
+}
