@@ -34,6 +34,10 @@ templ PopoverNative() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
+						ID:   "root",
+						Text: "Root",
+					},
+					{
 						ID:   "trigger",
 						Text: "Trigger",
 					},
@@ -104,10 +108,39 @@ templ PopoverNative() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
+				<div id="root" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Root",
+						Description: "Local popover instance that groups one trigger with one content element.",
+						Items: []modules.APITableItem{
+							{
+								Name:        "ID",
+								Type:        "string",
+								Default:     "",
+								Description: "Optional root ID for the JavaScript API. Internal trigger-content wiring does not use it.",
+								Required:    false,
+							},
+							{
+								Name:        "Class",
+								Type:        "string",
+								Default:     "",
+								Description: "Additional CSS classes to apply to the root wrapper.",
+								Required:    false,
+							},
+							{
+								Name:        "Attributes",
+								Type:        "templ.Attributes",
+								Default:     "",
+								Description: "Additional HTML attributes to apply to the root wrapper.",
+								Required:    false,
+							},
+						},
+					})
+				</div>
 				<div id="trigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Trigger",
-						Description: "Element that triggers the native popover when interacted with.",
+						Description: "Element inside a Root that opens the matching native popover content.",
 						Items: []modules.APITableItem{
 							{
 								Name:        "ID",
@@ -131,13 +164,6 @@ templ PopoverNative() {
 								Required:    false,
 							},
 							{
-								Name:        "For",
-								Type:        "string",
-								Default:     "",
-								Description: "ID of the popover content this trigger controls.",
-								Required:    true,
-							},
-							{
 								Name:        "TriggerType",
 								Type:        "TriggerType",
 								Default:     "click",
@@ -150,14 +176,14 @@ templ PopoverNative() {
 				<div id="content" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Content",
-						Description: "Container for the native popover content with placement and behavior options.",
+						Description: "Popover content inside the same Root. Placement and closing behavior are configured here.",
 						Items: []modules.APITableItem{
 							{
 								Name:        "ID",
 								Type:        "string",
 								Default:     "",
-								Description: "Unique identifier for the content element.",
-								Required:    true,
+								Description: "Optional HTML id for the content element.",
+								Required:    false,
 							},
 							{
 								Name:        "Class",
@@ -238,11 +264,11 @@ templ PopoverNative() {
 				ID:    "javascript-api",
 			}) {
 				@modules.Code(modules.CodeProps{
-					CodeContent: `window.tui.popovernative.open("popover-id");
-window.tui.popovernative.close("popover-id");
+					CodeContent: `window.tui.popovernative.open("root-id");
+window.tui.popovernative.close("root-id");
 window.tui.popovernative.closeAll();
-window.tui.popovernative.toggle("popover-id");
-const isOpen = window.tui.popovernative.isOpen("popover-id");`,
+window.tui.popovernative.toggle("root-id");
+const isOpen = window.tui.popovernative.isOpen("root-id");`,
 					ShowCopyButton: true,
 				})
 			}

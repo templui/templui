@@ -1,34 +1,142 @@
 (function () {
   "use strict";
 
-  const hoverTimeouts = new Map();
+  const floatingCleanups = new WeakMap();
+  const hoverTimeouts = new WeakMap();
 
-  function getContent(id) {
-    return document.querySelector(
-      `[data-tui-popovernative-content][data-tui-popovernative-id="${id}"]`,
+  function getRootById(id) {
+    const root = document.getElementById(id);
+    return root?.matches("[data-tui-popovernative-root]") ? root : null;
+  }
+
+  function getRoots() {
+    return Array.from(
+      document.querySelectorAll("[data-tui-popovernative-root]"),
     );
   }
 
-  function getTriggers(id) {
-    return Array.from(
-      document.querySelectorAll(`[data-tui-popovernative-trigger="${id}"]`),
+  function getContent(root) {
+    return Array.from(root?.children || []).find((child) =>
+      child.matches("[data-tui-popovernative-content]"),
     );
+  }
+
+  function getTriggers(root) {
+    return Array.from(root?.children || []).filter((child) =>
+      child.matches("[data-tui-popovernative-trigger]"),
+    );
+  }
+
+  function getReferenceElement(trigger) {
+    let ref = trigger;
+    let maxArea = 0;
+
+    for (const child of trigger.children) {
+      const rect = child.getBoundingClientRect?.();
+      if (!rect) continue;
+
+      const area = rect.width * rect.height;
+      if (area > maxArea) {
+        maxArea = area;
+        ref = child;
+      }
+    }
+
+    return ref;
+  }
+
+  function isHoverRoot(root) {
+    return getTriggers(root).some(
+      (trigger) =>
+        trigger.getAttribute("data-tui-popovernative-type") === "hover",
+    );
+  }
+
+  function isOpenRoot(root) {
+    return !!getContent(root)?.matches(":popover-open");
   }
 
   function isOpen(id) {
-    return !!getContent(id)?.matches(":popover-open");
+    const root = getRootById(id);
+    return root ? isOpenRoot(root) : false;
   }
 
-  function closePopover(id) {
-    const content = getContent(id);
+  function clearHoverTimeouts(root) {
+    const timeouts = hoverTimeouts.get(root);
+    if (!timeouts) return;
+    clearTimeout(timeouts.enter);
+    clearTimeout(timeouts.leave);
+    hoverTimeouts.delete(root);
+  }
+
+  function stopAutoUpdate(root) {
+    const cleanup = floatingCleanups.get(root);
+    if (!cleanup) return;
+    cleanup();
+    floatingCleanups.delete(root);
+  }
+
+  function updatePosition(root, triggerOverride = null) {
+    if (!window.FloatingUIDOM) return;
+
+    const trigger = triggerOverride || getTriggers(root)[0];
+    const content = getContent(root);
+    if (!trigger || !content) return;
+
+    const { computePosition, offset, flip, shift, arrow } =
+      window.FloatingUIDOM;
+    const reference = getReferenceElement(trigger);
+    const arrowEl = content.querySelector("[data-tui-popovernative-arrow]");
+    const placement =
+      content.getAttribute("data-tui-popovernative-placement") || "bottom";
+    const offsetValue =
+      parseInt(content.getAttribute("data-tui-popovernative-offset"), 10) ||
+      (arrowEl ? 8 : 4);
+
+    const middleware = [
+      offset(offsetValue),
+      flip({ padding: 10 }),
+      shift({ padding: 10 }),
+    ];
+
+    if (arrowEl) {
+      middleware.push(arrow({ element: arrowEl, padding: 5 }));
+    }
+
+    computePosition(reference, content, { placement, middleware }).then(
+      ({ x, y, placement: finalPlacement, middlewareData }) => {
+        Object.assign(content.style, {
+          left: `${x}px`,
+          top: `${y}px`,
+        });
+
+        if (arrowEl && middlewareData.arrow) {
+          const { x: arrowX, y: arrowY } = middlewareData.arrow;
+
+          arrowEl.setAttribute(
+            "data-tui-popovernative-placement",
+            finalPlacement,
+          );
+          Object.assign(arrowEl.style, {
+            left: arrowX != null ? `${arrowX}px` : "",
+            top: arrowY != null ? `${arrowY}px` : "",
+          });
+        }
+      },
+    );
+  }
+
+  function closeRoot(root) {
+    const content = getContent(root);
     if (!content) return;
 
-    const timeouts = hoverTimeouts.get(id);
-    if (timeouts) {
-      clearTimeout(timeouts.enter);
-      clearTimeout(timeouts.leave);
-      hoverTimeouts.delete(id);
-    }
+    stopAutoUpdate(root);
+    clearHoverTimeouts(root);
+    content.setAttribute("data-tui-popovernative-open", "false");
+
+    getTriggers(root).forEach((trigger) => {
+      trigger.setAttribute("data-tui-popovernative-open", "false");
+    });
 
     if (content.matches(":popover-open")) {
       try {
@@ -39,26 +147,32 @@
     }
   }
 
-  function closeAll(exceptId = null) {
-    document
-      .querySelectorAll("[data-tui-popovernative-content]")
-      .forEach((content) => {
-        const id = content.getAttribute("data-tui-popovernative-id");
-        if (id && id !== exceptId && content.matches(":popover-open")) {
-          closePopover(id);
-        }
-      });
+  function close(rootId) {
+    const root = getRootById(rootId);
+    if (root) {
+      closeRoot(root);
+    }
   }
 
-  function openPopoverWithTrigger(trigger) {
-    const id = trigger?.getAttribute("data-tui-popovernative-trigger");
-    if (!id) return;
+  function closeAllRoots(exceptRoot = null) {
+    getRoots().forEach((root) => {
+      if (root !== exceptRoot && isOpenRoot(root)) {
+        closeRoot(root);
+      }
+    });
+  }
 
-    const content = getContent(id);
-    if (!content) return;
+  function closeAll(exceptId = null) {
+    closeAllRoots(exceptId ? getRootById(exceptId) : null);
+  }
+
+  function openRoot(root, triggerOverride = null) {
+    const content = getContent(root);
+    const trigger = triggerOverride || getTriggers(root)[0];
+    if (!content || !trigger) return;
 
     if (content.getAttribute("data-tui-popovernative-exclusive") === "true") {
-      closeAll(id);
+      closeAllRoots(root);
     }
 
     if (!content.matches(":popover-open")) {
@@ -68,175 +182,219 @@
         return;
       }
     }
-  }
 
-  function openPopover(id) {
-    const trigger = getTriggers(id)[0];
-    if (trigger) {
-      openPopoverWithTrigger(trigger);
+    content.setAttribute("data-tui-popovernative-open", "true");
+    getTriggers(root).forEach((item) => {
+      item.setAttribute("data-tui-popovernative-open", "true");
+    });
+
+    stopAutoUpdate(root);
+    updatePosition(root, trigger);
+
+    if (window.FloatingUIDOM) {
+      const cleanup = window.FloatingUIDOM.autoUpdate(
+        trigger,
+        content,
+        () => updatePosition(root, trigger),
+        { animationFrame: true },
+      );
+      floatingCleanups.set(root, cleanup);
     }
   }
 
-  function togglePopover(id, trigger = null) {
-    if (isOpen(id)) {
-      closePopover(id);
+  function open(rootId) {
+    const root = getRootById(rootId);
+    if (root) {
+      openRoot(root);
+    }
+  }
+
+  function toggleRoot(root, triggerOverride = null) {
+    if (isOpenRoot(root)) {
+      closeRoot(root);
       return;
     }
-    if (trigger) {
-      openPopoverWithTrigger(trigger);
-      return;
-    }
-    openPopover(id);
+
+    openRoot(root, triggerOverride);
   }
 
-  function handleHoverEnter(trigger, id) {
-    const content = getContent(id);
-    if (!content) return;
+  function toggle(rootId) {
+    const root = getRootById(rootId);
+    if (root) {
+      toggleRoot(root);
+    }
+  }
+
+  function clearOtherHoverRoots(activeRoot) {
+    getRoots().forEach((root) => {
+      if (root === activeRoot || !isHoverRoot(root)) {
+        return;
+      }
+
+      clearHoverTimeouts(root);
+      closeRoot(root);
+    });
+  }
+
+  function handleHoverEnter(root, trigger) {
+    const content = getContent(root);
+    if (!content || !isHoverRoot(root)) return;
 
     const delay =
       parseInt(
         content.getAttribute("data-tui-popovernative-hover-delay"),
         10,
       ) || 100;
-    const timeouts = hoverTimeouts.get(id) || {};
+    const timeouts = hoverTimeouts.get(root) || {};
+
+    clearOtherHoverRoots(root);
     clearTimeout(timeouts.leave);
     clearTimeout(timeouts.enter);
-    timeouts.enter = setTimeout(() => openPopoverWithTrigger(trigger), delay);
-    hoverTimeouts.set(id, timeouts);
+    timeouts.enter = setTimeout(() => openRoot(root, trigger), delay);
+    hoverTimeouts.set(root, timeouts);
   }
 
-  function handleHoverLeave(id, movingWithinPair) {
-    const content = getContent(id);
-    if (!content) return;
+  function handleHoverLeave(root, movingWithinPair) {
+    const content = getContent(root);
+    if (!content || !isHoverRoot(root)) return;
 
     const delay =
       parseInt(
         content.getAttribute("data-tui-popovernative-hover-out-delay"),
         10,
       ) || 200;
-    const timeouts = hoverTimeouts.get(id) || {};
+    const timeouts = hoverTimeouts.get(root) || {};
+
     clearTimeout(timeouts.enter);
     if (!movingWithinPair) {
-      timeouts.leave = setTimeout(() => closePopover(id), delay);
-      hoverTimeouts.set(id, timeouts);
+      timeouts.leave = setTimeout(() => closeRoot(root), delay);
+      hoverTimeouts.set(root, timeouts);
     }
   }
 
   document.addEventListener("click", (event) => {
     const trigger = event.target.closest("[data-tui-popovernative-trigger]");
+    const root = trigger?.closest("[data-tui-popovernative-root]");
     const triggerType = trigger?.getAttribute("data-tui-popovernative-type");
 
-    if (trigger && triggerType !== "hover" && triggerType !== "manual") {
+    if (
+      trigger &&
+      root &&
+      triggerType !== "hover" &&
+      triggerType !== "manual"
+    ) {
+      const disabledChild = trigger.querySelector(
+        ':disabled, [disabled], [aria-disabled="true"]',
+      );
+      if (disabledChild) {
+        return;
+      }
+
       event.preventDefault();
       event.stopPropagation();
-      const id = trigger.getAttribute("data-tui-popovernative-trigger");
-      if (id) {
-        togglePopover(id, trigger);
-      }
+      toggleRoot(root, trigger);
       return;
     }
 
-    document
-      .querySelectorAll("[data-tui-popovernative-content]")
-      .forEach((content) => {
-        if (
-          !content.matches(":popover-open") ||
-          content.getAttribute("data-tui-popovernative-disable-clickaway") ===
-            "true"
-        ) {
-          return;
-        }
+    getRoots().forEach((currentRoot) => {
+      const content = getContent(currentRoot);
+      if (
+        !content ||
+        !content.matches(":popover-open") ||
+        content.getAttribute("data-tui-popovernative-disable-clickaway") ===
+          "true"
+      ) {
+        return;
+      }
 
-        const id = content.getAttribute("data-tui-popovernative-id");
-        if (!id) return;
+      const clickedInsideContent = content.contains(event.target);
+      const clickedTrigger = getTriggers(currentRoot).some((item) =>
+        item.contains(event.target),
+      );
 
-        const clickedInsideContent = content.contains(event.target);
-        const clickedTrigger = getTriggers(id).some((item) =>
-          item.contains(event.target),
-        );
-
-        if (!clickedInsideContent && !clickedTrigger) {
-          closePopover(id);
-        }
-      });
+      if (!clickedInsideContent && !clickedTrigger) {
+        closeRoot(currentRoot);
+      }
+    });
   });
 
   document.addEventListener("mouseover", (event) => {
     const trigger = event.target.closest("[data-tui-popovernative-trigger]");
+    const root = trigger?.closest("[data-tui-popovernative-root]");
     if (
       trigger &&
+      root &&
       !trigger.contains(event.relatedTarget) &&
       trigger.getAttribute("data-tui-popovernative-type") === "hover"
     ) {
-      const id = trigger.getAttribute("data-tui-popovernative-trigger");
-      if (id) {
-        handleHoverEnter(trigger, id);
-      }
+      handleHoverEnter(root, trigger);
     }
 
     const content = event.target.closest("[data-tui-popovernative-content]");
+    const contentRoot = content?.closest("[data-tui-popovernative-root]");
     if (
       content &&
+      contentRoot &&
+      isHoverRoot(contentRoot) &&
       !content.contains(event.relatedTarget) &&
       content.matches(":popover-open")
     ) {
-      const id = content.getAttribute("data-tui-popovernative-id");
-      const timeouts = hoverTimeouts.get(id) || {};
+      const timeouts = hoverTimeouts.get(contentRoot) || {};
       clearTimeout(timeouts.leave);
-      hoverTimeouts.set(id, timeouts);
+      hoverTimeouts.set(contentRoot, timeouts);
     }
   });
 
   document.addEventListener("mouseout", (event) => {
     const trigger = event.target.closest("[data-tui-popovernative-trigger]");
+    const root = trigger?.closest("[data-tui-popovernative-root]");
     if (
       trigger &&
+      root &&
       !trigger.contains(event.relatedTarget) &&
       trigger.getAttribute("data-tui-popovernative-type") === "hover"
     ) {
-      const id = trigger.getAttribute("data-tui-popovernative-trigger");
-      const content = getContent(id);
-      handleHoverLeave(id, !!content?.contains(event.relatedTarget));
+      const content = getContent(root);
+      handleHoverLeave(root, !!content?.contains(event.relatedTarget));
     }
 
     const content = event.target.closest("[data-tui-popovernative-content]");
+    const contentRoot = content?.closest("[data-tui-popovernative-root]");
     if (
       content &&
+      contentRoot &&
+      isHoverRoot(contentRoot) &&
       !content.contains(event.relatedTarget) &&
       content.matches(":popover-open")
     ) {
-      const id = content.getAttribute("data-tui-popovernative-id");
-      const movingToTrigger = getTriggers(id).some((t) =>
-        t.contains(event.relatedTarget),
+      const movingToTrigger = getTriggers(contentRoot).some((item) =>
+        item.contains(event.relatedTarget),
       );
-      handleHoverLeave(id, movingToTrigger);
+      handleHoverLeave(contentRoot, movingToTrigger);
     }
   });
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
 
-    document
-      .querySelectorAll("[data-tui-popovernative-content]")
-      .forEach((content) => {
-        if (
-          content.matches(":popover-open") &&
-          content.getAttribute("data-tui-popovernative-disable-esc") !== "true"
-        ) {
-          const id = content.getAttribute("data-tui-popovernative-id");
-          if (id) {
-            closePopover(id);
-          }
-        }
-      });
+    getRoots().forEach((root) => {
+      const content = getContent(root);
+      if (
+        content &&
+        content.matches(":popover-open") &&
+        content.getAttribute("data-tui-popovernative-disable-esc") !== "true"
+      ) {
+        closeRoot(root);
+      }
+    });
   });
 
   window.tui = window.tui || {};
   window.tui.popovernative = {
-    open: openPopover,
-    close: closePopover,
+    open,
+    close,
     closeAll,
-    toggle: togglePopover,
+    toggle,
     isOpen,
   };
 })();

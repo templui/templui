@@ -6,18 +6,16 @@ import (
 )
 
 templ PopoverNative() {
-	@popovernative.Trigger(popovernative.TriggerProps{
-		For: "default-native-popover",
-	}) {
-		@button.Button(button.Props{
-			Variant: button.VariantOutline,
-		}) {
-			Open Native Popover
+	@popovernative.Root() {
+		@popovernative.Trigger() {
+			@button.Button(button.Props{
+				Variant: button.VariantOutline,
+			}) {
+				Open Native Popover
+			}
 		}
-	}
-	@popovernative.Content(popovernative.ContentProps{
-		ID: "default-native-popover",
-	}) {
-		@PopoverContent()
+		@popovernative.Content() {
+			@PopoverContent()
+		}
 	}
 }

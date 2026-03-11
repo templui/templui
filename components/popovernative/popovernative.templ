@@ -1,7 +1,6 @@
 package popovernative
 
 import (
-	"fmt"
 	"github.com/templui/templui/utils"
 	"strconv"
 )
@@ -31,11 +30,16 @@ const (
 	TriggerTypeManual TriggerType = "manual"
 )
 
+type RootProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
 type TriggerProps struct {
 	ID          string
 	Class       string
 	Attributes  templ.Attributes
-	For         string
 	TriggerType TriggerType
 }
 
@@ -53,76 +57,22 @@ type ContentProps struct {
 	Exclusive        bool
 }
 
-func triggerStyle(id string) string {
-	return "anchor-name: --tui-popovernative-" + id + ";"
-}
-
-func tryStrategyStyle() string {
-	return "position-try-fallbacks: flip-block, flip-inline;"
-}
-
-func contentStyle(id string, placement Placement, offset int) string {
-	anchorName := "--tui-popovernative-" + id
-	gap := strconv.Itoa(offset) + "px"
-	fallbacks := tryStrategyStyle()
-
-	switch placement {
-	case PlacementTopStart:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(left); translate: 0 -100%%; %s", anchorName, gap, fallbacks)
-	case PlacementTop:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(center); translate: -50%% -100%%; %s", anchorName, gap, fallbacks)
-	case PlacementTopEnd:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(top) - %s); left: anchor(right); translate: -100%% -100%%; %s", anchorName, gap, fallbacks)
-	case PlacementRightStart:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(top); left: calc(anchor(right) + %s); %s", anchorName, gap, fallbacks)
-	case PlacementRight:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(center); left: calc(anchor(right) + %s); translate: 0 -50%%; %s", anchorName, gap, fallbacks)
-	case PlacementRightEnd:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(bottom); left: calc(anchor(right) + %s); translate: 0 -100%%; %s", anchorName, gap, fallbacks)
-	case PlacementBottomStart:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(left); %s", anchorName, gap, fallbacks)
-	case PlacementBottomEnd:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(right); translate: -100%% 0; %s", anchorName, gap, fallbacks)
-	case PlacementLeftStart:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(top); left: calc(anchor(left) - %s); translate: -100%% 0; %s", anchorName, gap, fallbacks)
-	case PlacementLeft:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(center); left: calc(anchor(left) - %s); translate: -100%% -50%%; %s", anchorName, gap, fallbacks)
-	case PlacementLeftEnd:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: anchor(bottom); left: calc(anchor(left) - %s); translate: -100%% -100%%; %s", anchorName, gap, fallbacks)
-	default:
-		return fmt.Sprintf("position: fixed; position-anchor: %s; inset: auto; margin: 0; top: calc(anchor(bottom) + %s); left: anchor(center); translate: -50%% 0; %s", anchorName, gap, fallbacks)
+templ Root(props ...RootProps) {
+	@script()
+	{{ var p RootProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
 	}
-}
-
-func arrowClass(placement Placement) string {
-	base := "absolute h-2.5 w-2.5 rotate-45 bg-popover border border-border"
-
-	switch placement {
-	case PlacementTopStart:
-		return base + " -bottom-[5px] left-4 border-t-transparent border-l-transparent"
-	case PlacementTop:
-		return base + " -bottom-[5px] left-1/2 -translate-x-1/2 border-t-transparent border-l-transparent"
-	case PlacementTopEnd:
-		return base + " -bottom-[5px] right-4 border-t-transparent border-l-transparent"
-	case PlacementRightStart:
-		return base + " -left-[5px] top-4 border-r-transparent border-t-transparent"
-	case PlacementRight:
-		return base + " -left-[5px] top-1/2 -translate-y-1/2 border-r-transparent border-t-transparent"
-	case PlacementRightEnd:
-		return base + " -left-[5px] bottom-4 border-r-transparent border-t-transparent"
-	case PlacementBottomStart:
-		return base + " -top-[5px] left-4 border-b-transparent border-r-transparent"
-	case PlacementBottomEnd:
-		return base + " -top-[5px] right-4 border-b-transparent border-r-transparent"
-	case PlacementLeftStart:
-		return base + " -right-[5px] top-4 border-l-transparent border-b-transparent"
-	case PlacementLeft:
-		return base + " -right-[5px] top-1/2 -translate-y-1/2 border-l-transparent border-b-transparent"
-	case PlacementLeftEnd:
-		return base + " -right-[5px] bottom-4 border-l-transparent border-b-transparent"
-	default:
-		return base + " -top-[5px] left-1/2 -translate-x-1/2 border-b-transparent border-r-transparent"
-	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-tui-popovernative-root
+		class={ utils.TwMerge("contents", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
 }
 
 templ Trigger(props ...TriggerProps) {
@@ -139,11 +89,7 @@ templ Trigger(props ...TriggerProps) {
 			id={ p.ID }
 		}
 		class={ utils.TwMerge("group inline-flex cursor-pointer", p.Class) }
-		if p.For != "" {
-			data-tui-popovernative-trigger={ p.For }
-			style={ triggerStyle(p.For) }
-		}
-		data-tui-popovernative-open="false"
+		data-tui-popovernative-trigger
 		data-tui-popovernative-type={ string(p.TriggerType) }
 		{ p.Attributes... }
 	>
@@ -168,10 +114,11 @@ templ Content(props ...ContentProps) {
 		}
 	}
 	<div
-		id={ p.ID }
+		if p.ID != "" {
+			id={ p.ID }
+		}
 		popover="manual"
 		data-tui-popovernative-content
-		data-tui-popovernative-id={ p.ID }
 		data-tui-popovernative-open="false"
 		data-tui-popovernative-placement={ string(p.Placement) }
 		data-tui-popovernative-offset={ strconv.Itoa(p.Offset) }
@@ -181,9 +128,8 @@ templ Content(props ...ContentProps) {
 		data-tui-popovernative-hover-delay={ strconv.Itoa(p.HoverDelay) }
 		data-tui-popovernative-hover-out-delay={ strconv.Itoa(p.HoverOutDelay) }
 		data-tui-popovernative-exclusive={ strconv.FormatBool(p.Exclusive) }
-		style={ contentStyle(p.ID, p.Placement, p.Offset) }
 		class={ utils.TwMerge(
-			"bg-popover rounded-lg border text-popover-foreground text-sm shadow-lg pointer-events-auto fixed max-w-[min(24rem,calc(100vw-2rem))] outline-none",
+			"bg-popover rounded-lg border text-popover-foreground text-sm shadow-lg pointer-events-auto fixed top-0 left-0 max-w-[min(24rem,calc(100vw-2rem))] outline-none",
 			p.Class,
 		) }
 		{ p.Attributes... }
@@ -192,7 +138,14 @@ templ Content(props ...ContentProps) {
 			{ children... }
 		</div>
 		if p.ShowArrow {
-			<div data-tui-popovernative-arrow class={ arrowClass(p.Placement) }></div>
+			<div
+				data-tui-popovernative-arrow
+				class="absolute h-2.5 w-2.5 rotate-45 bg-popover border border-border
+					data-[tui-popovernative-placement^=top]:-bottom-[5px] data-[tui-popovernative-placement^=top]:border-t-transparent data-[tui-popovernative-placement^=top]:border-l-transparent
+					data-[tui-popovernative-placement^=bottom]:-top-[5px] data-[tui-popovernative-placement^=bottom]:border-b-transparent data-[tui-popovernative-placement^=bottom]:border-r-transparent
+					data-[tui-popovernative-placement^=left]:-right-[5px] data-[tui-popovernative-placement^=left]:border-l-transparent data-[tui-popovernative-placement^=left]:border-b-transparent
+					data-[tui-popovernative-placement^=right]:-left-[5px] data-[tui-popovernative-placement^=right]:border-r-transparent data-[tui-popovernative-placement^=right]:border-t-transparent"
+			></div>
 		}
 	</div>
 }
