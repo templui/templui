@@ -20,10 +20,6 @@ templ PopoverNative() {
 				ID:   "examples",
 				Children: []modules.TableOfContentsItem{
 					{
-						Text: "Default",
-						ID:   "default",
-					},
-					{
 						Text: "Trigger & Closing",
 						ID:   "trigger-closing",
 					},
@@ -90,12 +86,6 @@ templ PopoverNative() {
 				Title: "Examples",
 				ID:    "examples",
 			}) {
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Default",
-					ShowcaseFile:    showcase.PopoverNative(),
-					PreviewCodeFile: "popover_native.templ",
-					ID:              "default",
-				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Trigger & Closing",
 					ShowcaseFile:    showcase.PopoverNativeTriggers(),
