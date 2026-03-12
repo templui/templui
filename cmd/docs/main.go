@@ -17,7 +17,6 @@ import (
 	"github.com/templui/templui/internal/service"
 	"github.com/templui/templui/internal/ui/pages"
 	"github.com/templui/templui/static"
-	"github.com/templui/templui/utils"
 )
 
 func toastDemoHandler(w http.ResponseWriter, r *http.Request) {
