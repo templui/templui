@@ -6,11 +6,24 @@
       .map(i => i.value.toLowerCase());
   }
 
+  function getSuggestionsRoot(container) {
+    const id = container.getAttribute('data-tui-tagsinput-suggestions-id');
+    if (!id) return null;
+    const root = document.getElementById(id);
+    return root?.matches('[data-tui-popover-root]') ? root : null;
+  }
+
+  function getSuggestionsContent(container) {
+    return getSuggestionsRoot(container)?.querySelector('[data-tui-popover-content]') || null;
+  }
+
   function showSuggestions(container, query) {
     const id = container.getAttribute('data-tui-tagsinput-suggestions-id');
-    if (!id) return;
-    const popup = document.getElementById(id);
-    if (!popup) return;
+    const popup = getSuggestionsContent(container);
+    const input = container.querySelector('[data-tui-tagsinput-text-input]');
+    if (!id || !popup || !input) return;
+
+    popup.style.setProperty('--trigger-width', `${input.getBoundingClientRect().width}px`);
 
     const selected = getSelectedTags(container);
     const q = query.toLowerCase().trim();
@@ -35,9 +48,7 @@
   }
 
   function getVisibleSuggestions(container) {
-    const id = container.getAttribute('data-tui-tagsinput-suggestions-id');
-    if (!id) return [];
-    const popup = document.getElementById(id);
+    const popup = getSuggestionsContent(container);
     if (!popup) return [];
     return Array.from(popup.querySelectorAll('[data-tui-tagsinput-suggestion]'))
       .filter(el => el.style.display !== 'none');
@@ -101,6 +112,8 @@
     if (!input) return;
     const container = input.closest('[data-tui-tagsinput]');
     const id = container?.getAttribute('data-tui-tagsinput-suggestions-id');
+    const nextTarget = e.relatedTarget;
+    if (container?.contains(nextTarget) || getSuggestionsContent(container)?.contains(nextTarget)) return;
     if (id) window.tui?.popover?.close(id);
   });
 
@@ -117,8 +130,8 @@
     const suggestion = e.target.closest('[data-tui-tagsinput-suggestion]');
     if (!suggestion) return;
     e.preventDefault(); // Prevent focus change
-    const popup = suggestion.closest('[data-tui-popover-id]');
-    const container = document.querySelector(`[data-tui-tagsinput-suggestions-id="${popup?.id}"]`);
+    const popupRoot = suggestion.closest('[data-tui-popover-root]');
+    const container = document.querySelector(`[data-tui-tagsinput-suggestions-id="${popupRoot?.id}"]`);
     if (container) {
       addTag(container, suggestion.getAttribute('data-tui-tagsinput-suggestion-value'));
       showSuggestions(container, '');

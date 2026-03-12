@@ -260,7 +260,7 @@
       "name": "popover",
       "slug": "popover",
       "displayName": "Popover",
-      "description": "Floating popover component.",
+      "description": "Floating popover component using the browser popover API and Floating UI positioning.",
       "files": ["components/popover/popover.templ"],
       "dependencies": [],
       "hasJS": true,
@@ -441,7 +441,7 @@
   "utils": [
     {
       "path": "utils/templui.go",
-      "description": "Core utility functions"
+      "description": "Core utility functions, asset URLs, and component script helpers"
     }
   ]
 }

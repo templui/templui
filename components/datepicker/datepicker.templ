@@ -48,7 +48,6 @@ type Props struct {
 }
 
 templ DatePicker(props ...Props) {
-	@script()
 	{{
 		var p Props
 		if len(props) > 0 {
@@ -70,7 +69,6 @@ templ DatePicker(props ...Props) {
 			p.Format = FormatLOCALE_MEDIUM
 		}
 
-		var contentID = p.ID + "-content"
 		var valuePtr *time.Time
 		var initialSelectedISO string
 		if !p.Value.IsZero() {
@@ -78,86 +76,85 @@ templ DatePicker(props ...Props) {
 			initialSelectedISO = p.Value.Format("2006-01-02")
 		}
 	}}
-	<div class="relative inline-block w-full">
-		<input
-			type="hidden"
-			name={ p.Name }
-			value={ initialSelectedISO }
-			if p.Form != "" {
-				form={ p.Form }
-			}
-			id={ p.ID + "-hidden" }
-			data-tui-datepicker-hidden-input
-		/>
-		@popover.Trigger(popover.TriggerProps{For: contentID}) {
-			@button.Button(button.Props{
-				ID:      p.ID,
-				Variant: button.VariantOutline,
-				Class: utils.TwMerge(
-					// Base styles matching input
-					"w-full h-9 px-3 py-1 text-base md:text-sm",
-					"flex items-center justify-between",
-					"rounded-md border border-input bg-transparent shadow-xs transition-[color,box-shadow] outline-none",
-					// Dark mode background
-					"dark:bg-input/30",
-					// Selection styles
-					"selection:bg-primary selection:text-primary-foreground",
-					// Focus styles
-					"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-					// Error/Invalid styles
-					"aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40",
-					utils.If(p.HasError, "border-destructive ring-destructive/20 dark:ring-destructive/40"),
-					p.Class,
-				),
-				Disabled: p.Disabled,
-				Attributes: utils.MergeAttributes(p.Attributes, templ.Attributes{
-					"data-tui-datepicker":                "true",
-					"data-tui-datepicker-display-format": string(p.Format),
-					"data-tui-datepicker-locale-tag":     string(p.LocaleTag),
-					"data-tui-datepicker-placeholder":    p.Placeholder,
-					"aria-invalid":                       utils.If(p.HasError, "true"),
-				}),
-			}) {
-				if p.Placeholder != "" {
-					<span data-tui-datepicker-display class={ "text-left grow text-muted-foreground" }>
-						{ p.Placeholder }
+	<div class="relative inline-block w-full" data-tui-datepicker-root>
+		@popover.Root() {
+			<input
+				type="hidden"
+				name={ p.Name }
+				value={ initialSelectedISO }
+				if p.Form != "" {
+					form={ p.Form }
+				}
+				data-tui-datepicker-hidden-input
+			/>
+			@popover.Trigger() {
+				@button.Button(button.Props{
+					ID:      p.ID,
+					Variant: button.VariantOutline,
+					Class: utils.TwMerge(
+						// Base styles matching input
+						"w-full h-9 px-3 py-1 text-base md:text-sm",
+						"flex items-center justify-between",
+						"rounded-md border border-input bg-transparent shadow-xs transition-[color,box-shadow] outline-none",
+						// Dark mode background
+						"dark:bg-input/30",
+						// Selection styles
+						"selection:bg-primary selection:text-primary-foreground",
+						// Focus styles
+						"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+						// Error/Invalid styles
+						"aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40",
+						utils.If(p.HasError, "border-destructive ring-destructive/20 dark:ring-destructive/40"),
+						p.Class,
+					),
+					Disabled: p.Disabled,
+					Attributes: utils.MergeAttributes(p.Attributes, templ.Attributes{
+						"data-tui-datepicker":                "true",
+						"data-tui-datepicker-display-format": string(p.Format),
+						"data-tui-datepicker-locale-tag":     string(p.LocaleTag),
+						"data-tui-datepicker-placeholder":    p.Placeholder,
+						"aria-invalid":                       utils.If(p.HasError, "true"),
+					}),
+				}) {
+					if p.Placeholder != "" {
+						<span data-tui-datepicker-display class={ "text-left grow text-muted-foreground" }>
+							{ p.Placeholder }
+						</span>
+					}
+					<span class="text-muted-foreground flex items-center ml-2">
+						@icon.Calendar(icon.Props{Class: "size-4"})
 					</span>
 				}
-				<span class="text-muted-foreground flex items-center ml-2">
-					@icon.Calendar(icon.Props{Class: "size-4"})
-				</span>
 			}
-		}
-		@popover.Content(popover.ContentProps{
-			ID:        contentID,
-			Placement: popover.PlacementBottomStart,
-			Class:     "p-0",
-		}) {
-			@card.Card(card.Props{
-				Class: "border-0 shadow-none",
+			@popover.Content(popover.ContentProps{
+				Placement: popover.PlacementBottomStart,
+				Class:     "p-0",
 			}) {
-				@card.Content(card.ContentProps{
-					Class: "p-3",
+				@card.Card(card.Props{
+					Class: "border-0 shadow-none",
 				}) {
-					@calendar.Calendar(calendar.Props{
-						ID:                p.ID + "-calendar-instance",     // Pass ID for calendar instance
-						LocaleTag:         calendar.LocaleTag(p.LocaleTag), // Pass locale tag to calendar
-						StartOfWeek:       p.StartOfWeek,                   // Pass start of week to calendar
-						Value:             valuePtr,                        // Pass pointer to value
-						RenderHiddenInput: false,                           // Don't render hidden input inside popover
-					})
+					@card.Content(card.ContentProps{
+						Class: "p-3",
+					}) {
+						@calendar.Calendar(calendar.Props{
+							LocaleTag:         calendar.LocaleTag(p.LocaleTag),
+							StartOfWeek:       p.StartOfWeek,
+							Value:             valuePtr,
+							RenderHiddenInput: false,
+						})
+					}
 				}
 			}
 		}
 	</div>
 }
 
-var onceHandle = templ.NewOnceHandle()
+var scriptOnce = templ.NewOnceHandle()
 
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("datepicker") }></script>
-		}
+templ Script() {
+	@scriptOnce.Once() {
+		@calendar.Script()
+		@popover.Script()
+		@utils.ComponentScript("datepicker")
 	}
 }

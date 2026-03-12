@@ -67,28 +67,39 @@
   }
   
   // DOM helpers
-  function findTrigger(element) {
-    const popup = element.closest('[data-tui-timepicker-popup]');
-    if (!popup) return null;
-    
-    const popupId = popup.closest('[id]')?.id;
-    if (!popupId) return null;
-    
-    return document.getElementById(popupId.replace('-content', ''));
+  function findRoot(element) {
+    return element?.closest('[data-tui-timepicker-root]') || null;
   }
   
+  function findTrigger(element) {
+    return findRoot(element)?.querySelector('[data-tui-timepicker="true"]') || null;
+  }
+
   function getElements(trigger) {
-    const popupId = trigger.id + '-content';
-    const popup = document.getElementById(popupId)?.querySelector('[data-tui-timepicker-popup]');
+    const root = findRoot(trigger);
+    const popup = root?.querySelector('[data-tui-timepicker-popup]');
     if (!popup) return null;
     
     return {
+      root,
+      trigger,
       popup,
       hourList: popup.querySelector('[data-tui-timepicker-hour-list]'),
       minuteList: popup.querySelector('[data-tui-timepicker-minute-list]'),
-      hiddenInput: document.getElementById(trigger.id + '-hidden') || 
-                   trigger.parentElement?.querySelector('[data-tui-timepicker-hidden-input]')
+      hiddenInput: root?.querySelector('[data-tui-timepicker-hidden-input]')
     };
+  }
+
+  function closePopover(trigger) {
+    const root = findRoot(trigger);
+    const popoverContent = root?.querySelector('[data-tui-popover-content]');
+    if (!popoverContent?.matches(':popover-open')) return;
+
+    try {
+      popoverContent.hidePopover();
+    } catch {
+      // ignore
+    }
   }
   
   // State management
@@ -281,8 +292,8 @@
     // Done button
     if (target.matches('[data-tui-timepicker-done]')) {
       const trigger = findTrigger(target);
-      if (trigger && window.closePopover) {
-        window.closePopover(trigger.id + '-content');
+      if (trigger) {
+        closePopover(trigger);
       }
       return;
     }
@@ -292,7 +303,7 @@
   document.addEventListener('input', (e) => {
     if (!e.target.matches('[data-tui-timepicker-hidden-input]')) return;
 
-    const trigger = document.getElementById(e.target.id.replace('-hidden', ''));
+    const trigger = findTrigger(e.target);
     if (trigger) {
       const parsed = parseTime(e.target.value);
       if (parsed) {
@@ -307,7 +318,10 @@
   document.addEventListener('reset', (e) => {
     if (!e.target.matches('form')) return;
 
-    e.target.querySelectorAll('[data-tui-timepicker="true"]').forEach(trigger => {
+    e.target.querySelectorAll('[data-tui-timepicker-root]').forEach(root => {
+      const trigger = root.querySelector('[data-tui-timepicker="true"]');
+      if (!trigger) return;
+
       setState(trigger, null, null);
       const elements = getElements(trigger);
       if (elements?.hiddenInput) {
@@ -318,9 +332,10 @@
 
   // Initialize timepickers
   function initializeTimePickers() {
-    document.querySelectorAll('[data-tui-timepicker="true"]').forEach(trigger => {
-      // Find hidden input directly via ID
-      const hiddenInput = document.getElementById(trigger.id + '-hidden');
+    document.querySelectorAll('[data-tui-timepicker-root]').forEach(root => {
+      const trigger = root.querySelector('[data-tui-timepicker="true"]');
+      const hiddenInput = root.querySelector('[data-tui-timepicker-hidden-input]');
+      if (!trigger) return;
       if (!hiddenInput || hiddenInput._tui) return;
 
       // Read initial value from hidden input

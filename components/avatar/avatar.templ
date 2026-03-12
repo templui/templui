@@ -23,7 +23,6 @@ type FallbackProps struct {
 }
 
 templ Avatar(props ...Props) {
-	@script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -91,12 +90,10 @@ templ Fallback(props ...FallbackProps) {
 	</span>
 }
 
-var onceHandle = templ.NewOnceHandle()
+var scriptOnce = templ.NewOnceHandle()
 
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("avatar") }></script>
-		}
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("avatar")
 	}
 }

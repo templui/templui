@@ -1,7 +1,6 @@
 package dropdown
 
 import (
-	"context"
 	"github.com/templui/templui/components/popover"
 	"github.com/templui/templui/utils"
 )
@@ -23,25 +22,16 @@ const (
 	PlacementLeftEnd     = popover.PlacementLeftEnd
 )
 
-type contextKey string
-
-var (
-	contentIDKey    contextKey = "contentID"
-	subContentIDKey contextKey = "subContentID"
-)
-
 type Props struct {
 	ID string
 }
 
 type TriggerProps struct {
-	ID         string
 	Class      string
 	Attributes templ.Attributes
 }
 
 type ContentProps struct {
-	ID         string
 	Class      string
 	Attributes templ.Attributes
 	Placement  Placement
@@ -88,13 +78,11 @@ type SubProps struct {
 }
 
 type SubTriggerProps struct {
-	ID         string
 	Class      string
 	Attributes templ.Attributes
 }
 
 type SubContentProps struct {
-	ID         string
 	Class      string
 	Attributes templ.Attributes
 }
@@ -106,37 +94,25 @@ type PortalProps struct {
 }
 
 templ Dropdown(props ...Props) {
-	@script()
-	{{
-		var p Props
-		if len(props) > 0 {
-			p = props[0]
-		}
-		contentID := p.ID
-		if contentID == "" {
-			contentID = utils.RandomID()
-		}
-		ctx = context.WithValue(ctx, contentIDKey, contentID)
-	}}
-	{ children... }
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@popover.Root(popover.RootProps{
+		ID: p.ID,
+	}) {
+		{ children... }
+	}
 }
 
 templ Trigger(props ...TriggerProps) {
-	{{
-		var p TriggerProps
-		if len(props) > 0 {
-			p = props[0]
-		}
-		contentID, ok := ctx.Value(contentIDKey).(string)
-		if !ok {
-			contentID = "fallback-content-id"
-		}
-	}}
+	{{ var p TriggerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
 	@popover.Trigger(popover.TriggerProps{
-		ID:          p.ID,
 		Class:       p.Class,
 		Attributes:  p.Attributes,
-		For:         contentID,
 		TriggerType: popover.TriggerTypeClick,
 	}) {
 		{ children... }
@@ -148,10 +124,6 @@ templ Content(props ...ContentProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	{{ contentID, ok := ctx.Value(contentIDKey).(string) }}
-	if !ok {
-		{{ contentID = "fallback-content-id" }} // Must match fallback in Trigger
-	}
 	{{
 		placement := p.Placement
 		if placement == "" {
@@ -159,7 +131,6 @@ templ Content(props ...ContentProps) {
 		}
 	}}
 	@popover.Content(popover.ContentProps{
-		ID:        contentID,
 		Placement: placement,
 		Class: utils.TwMerge(
 			"z-50 rounded-md bg-popover p-1 shadow-md focus:outline-none overflow-auto",
@@ -171,6 +142,15 @@ templ Content(props ...ContentProps) {
 		Exclusive:  true,
 	}) {
 		{ children... }
+	}
+}
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@popover.Script()
+		@utils.ComponentScript("dropdown")
 	}
 }
 
@@ -297,43 +277,25 @@ templ Shortcut(props ...ShortcutProps) {
 }
 
 templ Sub(props ...SubProps) {
-	{{
-		var p SubProps
-		if len(props) > 0 {
-			p = props[0]
-		}
-		subContentID := p.ID
-		if subContentID == "" {
-			subContentID = utils.RandomID()
-		}
-		ctx = context.WithValue(ctx, subContentIDKey, subContentID)
-	}}
-	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		data-tui-dropdown-submenu
-		class={ utils.TwMerge("relative", p.Class) }
-		{ p.Attributes... }
-	>
+	{{ var p SubProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@popover.Root(popover.RootProps{
+		ID:         p.ID,
+		Class:      p.Class,
+		Attributes: p.Attributes,
+	}) {
 		{ children... }
-	</div>
+	}
 }
 
 templ SubTrigger(props ...SubTriggerProps) {
-	{{
-		var p SubTriggerProps
-		if len(props) > 0 {
-			p = props[0]
-		}
-		subContentID, ok := ctx.Value(subContentIDKey).(string)
-		if !ok {
-			subContentID = "fallback-subcontent-id"
-		}
-	}}
+	{{ var p SubTriggerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
 	@popover.Trigger(popover.TriggerProps{
-		ID:          p.ID,
-		For:         subContentID,
 		TriggerType: popover.TriggerTypeHover,
 	}) {
 		<button
@@ -359,18 +321,11 @@ templ SubTrigger(props ...SubTriggerProps) {
 }
 
 templ SubContent(props ...SubContentProps) {
-	{{
-		var p SubContentProps
-		if len(props) > 0 {
-			p = props[0]
-		}
-		subContentID, ok := ctx.Value(subContentIDKey).(string)
-		if !ok {
-			subContentID = "fallback-subcontent-id"
-		}
-	}}
+	{{ var p SubContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
 	@popover.Content(popover.ContentProps{
-		ID:            subContentID,
 		Placement:     popover.PlacementRightStart,
 		Offset:        -4,  // Adjust as needed
 		HoverDelay:    100, // ms
@@ -382,15 +337,5 @@ templ SubContent(props ...SubContentProps) {
 		Attributes: p.Attributes,
 	}) {
 		{ children... }
-	}
-}
-
-var onceHandle = templ.NewOnceHandle()
-
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("dropdown") }></script>
-		}
 	}
 }

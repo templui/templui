@@ -6,11 +6,15 @@
     if (!item || 
         item.hasAttribute('data-tui-dropdown-submenu-trigger') ||
         item.getAttribute('data-tui-dropdown-prevent-close') === 'true') return;
-    
-    const popoverContent = item.closest('[data-tui-popover-id]');
-    if (!popoverContent) return;
-    
-    const popoverId = popoverContent.getAttribute('data-tui-popover-id') || popoverContent.id;
-    if (window.closePopover) window.closePopover(popoverId);
+
+    const popoverRoot = item.closest('[data-tui-popover-root]');
+    const popoverContent = popoverRoot?.querySelector(':scope > [data-tui-popover-content]');
+    if (!popoverContent?.matches(':popover-open')) return;
+
+    try {
+      popoverContent.hidePopover();
+    } catch {
+      // ignore
+    }
   });
 })();

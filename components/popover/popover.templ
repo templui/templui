@@ -30,11 +30,16 @@ const (
 	TriggerTypeManual TriggerType = "manual"
 )
 
+type RootProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
 type TriggerProps struct {
 	ID          string
 	Class       string
 	Attributes  templ.Attributes
-	For         string
 	TriggerType TriggerType
 }
 
@@ -49,12 +54,27 @@ type ContentProps struct {
 	ShowArrow        bool
 	HoverDelay       int
 	HoverOutDelay    int
-	MatchWidth       bool
 	Exclusive        bool
 }
 
+templ Root(props ...RootProps) {
+	{{ var p RootProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-tui-popover-root
+		class={ utils.TwMerge("contents", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
 templ Trigger(props ...TriggerProps) {
-	@script()
 	{{ var p TriggerProps }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -66,11 +86,8 @@ templ Trigger(props ...TriggerProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("group cursor-pointer", p.Class) }
-		if p.For != "" {
-			data-tui-popover-trigger={ p.For }
-		}
-		data-tui-popover-open="false"
+		class={ utils.TwMerge("contents", p.Class) }
+		data-tui-popover-trigger
 		data-tui-popover-type={ string(p.TriggerType) }
 		{ p.Attributes... }
 	>
@@ -79,7 +96,6 @@ templ Trigger(props ...TriggerProps) {
 }
 
 templ Content(props ...ContentProps) {
-	@script()
 	{{ var p ContentProps }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -95,8 +111,11 @@ templ Content(props ...ContentProps) {
 		}
 	}
 	<div
-		id={ p.ID }
-		data-tui-popover-id={ p.ID }
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		popover="manual"
+		data-tui-popover-content
 		data-tui-popover-open="false"
 		data-tui-popover-placement={ string(p.Placement) }
 		data-tui-popover-offset={ strconv.Itoa(p.Offset) }
@@ -106,11 +125,8 @@ templ Content(props ...ContentProps) {
 		data-tui-popover-hover-delay={ strconv.Itoa(p.HoverDelay) }
 		data-tui-popover-hover-out-delay={ strconv.Itoa(p.HoverOutDelay) }
 		data-tui-popover-exclusive={ strconv.FormatBool(p.Exclusive) }
-		if p.MatchWidth {
-			data-tui-popover-match-width="true"
-		}
 		class={ utils.TwMerge(
-			"bg-popover rounded-lg border text-popover-foreground text-sm shadow-lg pointer-events-auto absolute z-[9999] hidden top-0 left-0",
+			"bg-popover rounded-lg border text-popover-foreground text-sm shadow-lg pointer-events-auto fixed top-0 left-0 max-w-[min(24rem,calc(100vw-2rem))] overflow-visible outline-none",
 			p.Class,
 		) }
 		{ p.Attributes... }
@@ -121,22 +137,16 @@ templ Content(props ...ContentProps) {
 		if p.ShowArrow {
 			<div
 				data-tui-popover-arrow
-				class="absolute h-2.5 w-2.5 rotate-45 bg-popover border border-border
-					data-[tui-popover-placement^=top]:-bottom-[5px] data-[tui-popover-placement^=top]:border-t-transparent data-[tui-popover-placement^=top]:border-l-transparent
-					data-[tui-popover-placement^=bottom]:-top-[5px] data-[tui-popover-placement^=bottom]:border-b-transparent data-[tui-popover-placement^=bottom]:border-r-transparent
-					data-[tui-popover-placement^=left]:-right-[5px] data-[tui-popover-placement^=left]:border-l-transparent data-[tui-popover-placement^=left]:border-b-transparent
-					data-[tui-popover-placement^=right]:-left-[5px] data-[tui-popover-placement^=right]:border-r-transparent data-[tui-popover-placement^=right]:border-t-transparent"
+				class="absolute h-2.5 w-2.5 rotate-45 bg-popover border border-border"
 			></div>
 		}
 	</div>
 }
 
-var onceHandle = templ.NewOnceHandle()
+var scriptOnce = templ.NewOnceHandle()
 
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("popover") }></script>
-		}
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("popover")
 	}
 }

@@ -149,13 +149,6 @@ templ Tooltip() {
 								Description: "Additional HTML attributes to apply to the trigger element.",
 								Required:    false,
 							},
-							{
-								Name:        "For",
-								Type:        "string",
-								Default:     "",
-								Description: "ID of the tooltip content this trigger controls.",
-								Required:    true,
-							},
 						},
 					})
 				</div>
@@ -168,8 +161,8 @@ templ Tooltip() {
 								Name:        "ID",
 								Type:        "string",
 								Default:     "",
-								Description: "Unique identifier for the content element.",
-								Required:    true,
+								Description: "Optional HTML id for the content element.",
+								Required:    false,
 							},
 							{
 								Name:        "Class",

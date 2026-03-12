@@ -1,14 +1,18 @@
 package utils
 
 import (
+	"context"
+	"crypto/rand"
 	"fmt"
-	"os"
+	"io"
+	"io/fs"
+	"net/http"
+	"path/filepath"
 	"strings"
 	"time"
 
-	"crypto/rand"
-
 	"github.com/a-h/templ"
+	"github.com/templui/templui/components"
 
 	twmerge "github.com/Oudwins/tailwind-merge-go"
 )
@@ -74,26 +78,75 @@ var ScriptURL = func(path string) string {
 	return path + "?v=" + ScriptVersion
 }
 
-var (
-	SuppressComponentScripts bool
-	RemoteScriptCDNBase      = "https://cdn.jsdelivr.net/gh/templui/templui"
-	ComponentScriptURL       = func(component string) string {
-		return RemoteComponentScriptURL(component)
-	}
-)
+// componentScriptBasePath is the base public path for component JavaScript files.
+// In the import workflow this stays "/templui/js". The CLI rewrites it to the user's local jsPublicPath.
+var componentScriptBasePath = "/templui/js"
 
-func remoteScriptRef() string {
-	if ref := strings.TrimSpace(os.Getenv("TEMPLUI_SCRIPT_REF")); ref != "" {
-		return ref
-	}
-	return "latest"
+// ComponentScript renders a deferred script tag for a component JavaScript file.
+// Example: ComponentScript("datepicker") → <script defer src="/templui/js/datepicker.min.js?..."></script>
+func ComponentScript(component string) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
+		nonce := templ.GetNonce(ctx)
+		src := ScriptURL(componentScriptBasePath + "/" + component + ".min.js")
+
+		if _, err := io.WriteString(w, `<script defer`); err != nil {
+			return err
+		}
+		if nonce != "" {
+			if _, err := io.WriteString(w, ` nonce="`); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(w, templ.EscapeString(nonce)); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(w, `"`); err != nil {
+				return err
+			}
+		}
+		if _, err := io.WriteString(w, ` src="`); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, templ.EscapeString(src)); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, `"></script>`); err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
-func RemoteComponentScriptURL(component string) string {
-	ref := remoteScriptRef()
-	return fmt.Sprintf("%s@%s/components/%s/%s.min.js", RemoteScriptCDNBase, ref, component, component)
-}
+// SetupScriptRoutes serves embedded component JavaScript files for the import workflow.
+// Example: SetupScriptRoutes(mux, true) mounts /templui/js/*.min.js with no-store caching in development.
+func SetupScriptRoutes(mux *http.ServeMux, isDevelopment bool) {
+	if mux == nil || componentScriptBasePath != "/templui/js" {
+		return
+	}
 
-func LocalComponentScriptURL(component string) string {
-	return ScriptURL(fmt.Sprintf("/components/js/%s/%s.min.js", component, component))
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/templui/js/")
+		if path == r.URL.Path || path == "" || strings.Contains(path, "..") {
+			http.NotFound(w, r)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/javascript")
+		if isDevelopment {
+			w.Header().Set("Cache-Control", "no-store")
+		} else {
+			w.Header().Set("Cache-Control", "public, max-age=31536000")
+		}
+
+		componentPath := strings.TrimSuffix(path, ".min.js")
+		component := strings.Trim(strings.Split(componentPath, "/")[0], "/")
+		file, err := fs.ReadFile(components.TemplFiles, filepath.Join(component, component+".min.js"))
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		_, _ = w.Write(file)
+	})
+
+	mux.Handle("GET /templui/js/", handler)
 }

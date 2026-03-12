@@ -7,9 +7,7 @@ import (
 
 templ TooltipDefault() {
 	@tooltip.Tooltip() {
-		@tooltip.Trigger(tooltip.TriggerProps{
-			For: "tooltip-default",
-		}) {
+		@tooltip.Trigger(tooltip.TriggerProps{}) {
 			@button.Button(button.Props{
 				Variant: button.VariantOutline,
 			}) {

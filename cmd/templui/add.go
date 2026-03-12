@@ -278,9 +278,6 @@ func installComponent(
 			modifiedData := append([]byte(versionComment), data...)
 			if strings.HasSuffix(repoFilePath, ".templ") || strings.HasSuffix(repoFilePath, ".go") {
 				modifiedData = replaceImports(modifiedData, config, comp.Name)
-				if comp.HasJS {
-					modifiedData = rewriteComponentScriptURL(modifiedData, config, comp.Name)
-				}
 			}
 
 			// Write the file.
@@ -299,6 +296,9 @@ func installComponent(
 	// Collect required utils for later installation.
 	for _, repoUtilPath := range comp.RequiredUtils {
 		requiredUtils[repoUtilPath] = true
+	}
+	if comp.HasJS {
+		requiredUtils["utils/templui.go"] = true
 	}
 
 	// Download the component's JavaScript asset when it has one.
@@ -386,6 +386,9 @@ func installUtils(config Config, utilPaths []string, ref string, force bool) err
 				// Replace package name to match the destination directory name
 				targetPkgName := filepath.Base(utilsBaseDestDir)
 				modifiedData = bytes.Replace(modifiedData, []byte("package utils"), []byte("package "+targetPkgName), 1)
+				if config.JSDir != "" && repoUtilPath == "utils/templui.go" {
+					modifiedData = rewriteScriptLoaderURL(modifiedData, config)
+				}
 			}
 
 			// Write the file.
@@ -468,18 +471,19 @@ func utilRelativePath(repoPath string) (string, bool) {
 	return "", false
 }
 
-func rewriteComponentScriptURL(content []byte, config Config, componentName string) []byte {
-	jsFileName := componentName + ".min.js"
+func rewriteScriptLoaderURL(content []byte, config Config) []byte {
 	var webPath string
 	if config.JSPublicPath != "" {
-		webPath = strings.TrimSuffix(config.JSPublicPath, "/") + "/" + jsFileName
+		webPath = strings.TrimSuffix(config.JSPublicPath, "/")
 	} else {
-		webPath = "/" + filepath.ToSlash(filepath.Join(config.JSDir, jsFileName))
+		webPath = "/" + filepath.ToSlash(config.JSDir)
 	}
 
-	old := []byte(fmt.Sprintf(`utils.ComponentScriptURL("%s")`, componentName))
-	new := []byte(fmt.Sprintf(`utils.ScriptURL("%s")`, webPath))
-	return bytes.ReplaceAll(content, old, new)
+	webPath = strings.TrimRight(webPath, "/")
+	old := []byte(`var componentScriptBasePath = "/templui/js"`)
+	new := []byte(fmt.Sprintf(`var componentScriptBasePath = "%s"`, webPath))
+	content = bytes.ReplaceAll(content, old, new)
+	return content
 }
 
 // getInstalledComponentNames returns the names of all installed components

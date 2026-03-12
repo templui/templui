@@ -22,11 +22,13 @@ type Props struct {
 }
 
 templ TagsInput(props ...Props) {
-	@script()
 	{{
 		var p Props
 		if len(props) > 0 {
 			p = props[0]
+		}
+		if p.ID == "" {
+			p.ID = utils.RandomID()
 		}
 		suggestionsID := p.ID + "-suggestions"
 	}}
@@ -78,32 +80,35 @@ templ TagsInput(props ...Props) {
 			}
 		</div>
 		<!-- Input row -->
-		<div
-			class="relative w-full"
-			if len(p.Suggestions) > 0 {
-				data-tui-popover-trigger={ suggestionsID }
-				data-tui-popover-type="manual"
-			}
-		>
-			@input.Input(input.Props{
-				ID:          p.ID,
-				Class:       "border-0 shadow-none focus-visible:ring-0 h-auto py-0 px-0 bg-transparent rounded-none min-h-0 disabled:opacity-100 dark:bg-transparent w-full",
-				Type:        input.TypeText,
-				Placeholder: p.Placeholder,
-				Disabled:    p.Disabled,
-				Readonly:    p.Readonly,
-				Attributes: utils.MergeAttributes(
-					templ.Attributes{"data-tui-tagsinput-text-input": ""},
-					p.Attributes,
-				),
-			})
-			if len(p.Suggestions) > 0 {
+		if len(p.Suggestions) > 0 {
+			@popover.Root(popover.RootProps{
+				ID: suggestionsID,
+			}) {
+				@popover.Trigger(popover.TriggerProps{
+					TriggerType: popover.TriggerTypeManual,
+				}) {
+					<div class="relative w-full">
+						@input.Input(input.Props{
+							ID:          p.ID,
+							Class:       "border-0 shadow-none focus-visible:ring-0 h-auto py-0 px-0 bg-transparent rounded-none min-h-0 disabled:opacity-100 dark:bg-transparent w-full",
+							Type:        input.TypeText,
+							Placeholder: p.Placeholder,
+							Disabled:    p.Disabled,
+							Readonly:    p.Readonly,
+							Attributes: utils.MergeAttributes(
+								templ.Attributes{"data-tui-tagsinput-text-input": ""},
+								p.Attributes,
+							),
+						})
+					</div>
+				}
 				@popover.Content(popover.ContentProps{
-					ID:               suggestionsID,
 					Placement:        popover.PlacementBottomStart,
-					MatchWidth:       true,
 					DisableClickAway: true,
-					Class:            "p-1 max-h-[200px] overflow-y-auto",
+					Class:            "p-1 max-h-[200px] overflow-y-auto min-w-[var(--trigger-width,12rem)] w-[var(--trigger-width,12rem)]",
+					Attributes: templ.Attributes{
+						"data-tui-tagsinput-suggestions-content": "true",
+					},
 				}) {
 					for _, suggestion := range p.Suggestions {
 						<div
@@ -116,7 +121,22 @@ templ TagsInput(props ...Props) {
 					}
 				}
 			}
-		</div>
+		} else {
+			<div class="relative w-full">
+				@input.Input(input.Props{
+					ID:          p.ID,
+					Class:       "border-0 shadow-none focus-visible:ring-0 h-auto py-0 px-0 bg-transparent rounded-none min-h-0 disabled:opacity-100 dark:bg-transparent w-full",
+					Type:        input.TypeText,
+					Placeholder: p.Placeholder,
+					Disabled:    p.Disabled,
+					Readonly:    p.Readonly,
+					Attributes: utils.MergeAttributes(
+						templ.Attributes{"data-tui-tagsinput-text-input": ""},
+						p.Attributes,
+					),
+				})
+			</div>
+		}
 		<div data-tui-tagsinput-hidden-inputs class="hidden">
 			for _, tag := range p.Value {
 				<input type="hidden" name={ p.Name } value={ tag }/>
@@ -125,12 +145,11 @@ templ TagsInput(props ...Props) {
 	</div>
 }
 
-var onceHandle = templ.NewOnceHandle()
+var scriptOnce = templ.NewOnceHandle()
 
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("tagsinput") }></script>
-		}
+templ Script() {
+	@scriptOnce.Once() {
+		@popover.Script()
+		@utils.ComponentScript("tagsinput")
 	}
 }

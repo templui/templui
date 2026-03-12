@@ -20,7 +20,6 @@ type Props struct {
 }
 
 templ Checkbox(props ...Props) {
-	@script()
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -81,12 +80,10 @@ templ Checkbox(props ...Props) {
 	</div>
 }
 
-var onceHandle = templ.NewOnceHandle()
+var scriptOnce = templ.NewOnceHandle()
 
-templ script() {
-	@onceHandle.Once() {
-		if !utils.SuppressComponentScripts {
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ComponentScriptURL("checkbox") }></script>
-		}
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("checkbox")
 	}
 }

@@ -314,3 +314,11 @@ func getSideClasses(side Side) string {
 			"data-[tui-dialog-open=true]:!translate-x-0"
 	}
 }
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@dialog.Script()
+	}
+}
