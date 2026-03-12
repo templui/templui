@@ -78,8 +78,12 @@ var ScriptURL = func(path string) string {
 	return path + "?v=" + ScriptVersion
 }
 
+// componentScriptBasePath is the base public path for component JavaScript files.
+// In the import workflow this stays "/templui/js". The CLI rewrites it to the user's local jsPublicPath.
 var componentScriptBasePath = "/templui/js"
 
+// ComponentScript renders a deferred script tag for a component JavaScript file.
+// Example: ComponentScript("datepicker") → <script defer src="/templui/js/datepicker.min.js?..."></script>
 func ComponentScript(component string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		nonce := templ.GetNonce(ctx)
@@ -113,6 +117,8 @@ func ComponentScript(component string) templ.Component {
 	})
 }
 
+// SetupScriptRoutes serves embedded component JavaScript files for the import workflow.
+// Example: SetupScriptRoutes(mux, true) mounts /templui/js/*.min.js with no-store caching in development.
 func SetupScriptRoutes(mux *http.ServeMux, isDevelopment bool) {
 	if mux == nil || componentScriptBasePath != "/templui/js" {
 		return
