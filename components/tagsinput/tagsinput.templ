@@ -144,3 +144,12 @@ templ TagsInput(props ...Props) {
 		</div>
 	</div>
 }
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@popover.Script()
+		@utils.ComponentScript("tagsinput")
+	}
+}

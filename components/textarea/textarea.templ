@@ -77,3 +77,11 @@ templ Textarea(props ...Props) {
 		{ p.Attributes... }
 	>{ p.Value }</textarea>
 }
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("textarea")
+	}
+}

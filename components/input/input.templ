@@ -120,3 +120,11 @@ templ Input(props ...Props) {
 		}
 	</div>
 }
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("input")
+	}
+}

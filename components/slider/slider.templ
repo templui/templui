@@ -113,3 +113,11 @@ templ Value(props ...ValueProps) {
 		<!-- Initial value will be set by JS -->
 	</span>
 }
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("slider")
+	}
+}

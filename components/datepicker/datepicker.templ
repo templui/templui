@@ -148,3 +148,13 @@ templ DatePicker(props ...Props) {
 		}
 	</div>
 }
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@calendar.Script()
+		@popover.Script()
+		@utils.ComponentScript("datepicker")
+	}
+}

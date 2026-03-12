@@ -145,6 +145,15 @@ templ Content(props ...ContentProps) {
 	}
 }
 
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@popover.Script()
+		@utils.ComponentScript("dropdown")
+	}
+}
+
 templ Group(props ...GroupProps) {
 	{{ var p GroupProps }}
 	if len(props) > 0 {

@@ -324,3 +324,11 @@ templ Description(props ...DescriptionProps) {
 		{ children... }
 	</p>
 }
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("dialog")
+	}
+}

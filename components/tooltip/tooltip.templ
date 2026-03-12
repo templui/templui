@@ -97,3 +97,11 @@ templ Content(props ...ContentProps) {
 		{ children... }
 	}
 }
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@popover.Script()
+	}
+}

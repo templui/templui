@@ -203,3 +203,11 @@ templ Indicators(props ...IndicatorsProps) {
 		}
 	</div>
 }
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("carousel")
+	}
+}

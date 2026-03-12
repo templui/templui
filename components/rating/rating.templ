@@ -185,3 +185,11 @@ func (p *Props) setDefaults() {
 		p.Precision = 1.0
 	}
 }
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("rating")
+	}
+}

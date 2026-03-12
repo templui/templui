@@ -86,6 +86,81 @@ templ SelectBox(props ...Props) {
 	</div>
 }
 
+templ Group(props ...GroupProps) {
+	{{ var p GroupProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("p-1", p.Class) }
+		role="group"
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Label(props ...LabelProps) {
+	{{ var p LabelProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("px-2 py-1.5 text-sm font-medium", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}
+
+templ Item(props ...ItemProps) {
+	{{ var p ItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={
+			utils.TwMerge(
+				"select-item group relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 px-2 text-sm font-light outline-none",
+				"hover:bg-accent hover:text-accent-foreground",
+				"focus-visible:bg-accent focus-visible:text-accent-foreground",
+				"data-[tui-selectbox-selected=true]:bg-accent data-[tui-selectbox-selected=true]:text-accent-foreground",
+				utils.If(p.Disabled, "pointer-events-none opacity-50"),
+				p.Class,
+			),
+		}
+		role="option"
+		data-tui-selectbox-value={ p.Value }
+		data-tui-selectbox-selected={ strconv.FormatBool(p.Selected) }
+		data-tui-selectbox-disabled={ strconv.FormatBool(p.Disabled) }
+		tabindex="0"
+		{ p.Attributes... }
+	>
+		<span class="truncate select-item-text">
+			{ children... }
+		</span>
+		<span
+			class={
+				utils.TwMerge(
+					"select-check absolute right-2 flex h-3.5 w-3.5 items-center justify-center opacity-0",
+					"group-data-[tui-selectbox-selected=true]:opacity-100",
+				),
+			}
+		>
+			@icon.Check(icon.Props{Class: "size-4"})
+		</span>
+	</div>
+}
+
 templ Trigger(props ...TriggerProps) {
 	{{
 		var p TriggerProps
@@ -227,77 +302,12 @@ templ Content(props ...ContentProps) {
 	}
 }
 
-templ Group(props ...GroupProps) {
-	{{ var p GroupProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
-	}
-	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={ utils.TwMerge("p-1", p.Class) }
-		role="group"
-		{ p.Attributes... }
-	>
-		{ children... }
-	</div>
-}
+var scriptOnce = templ.NewOnceHandle()
 
-templ Label(props ...LabelProps) {
-	{{ var p LabelProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
+templ Script() {
+	@scriptOnce.Once() {
+		@input.Script()
+		@popover.Script()
+		@utils.ComponentScript("selectbox")
 	}
-	<span
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={ utils.TwMerge("px-2 py-1.5 text-sm font-medium", p.Class) }
-		{ p.Attributes... }
-	>
-		{ children... }
-	</span>
-}
-
-templ Item(props ...ItemProps) {
-	{{ var p ItemProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
-	}
-	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={
-			utils.TwMerge(
-				"select-item group relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 px-2 text-sm font-light outline-none",
-				"hover:bg-accent hover:text-accent-foreground",
-				"focus-visible:bg-accent focus-visible:text-accent-foreground",
-				"data-[tui-selectbox-selected=true]:bg-accent data-[tui-selectbox-selected=true]:text-accent-foreground",
-				utils.If(p.Disabled, "pointer-events-none opacity-50"),
-				p.Class,
-			),
-		}
-		role="option"
-		data-tui-selectbox-value={ p.Value }
-		data-tui-selectbox-selected={ strconv.FormatBool(p.Selected) }
-		data-tui-selectbox-disabled={ strconv.FormatBool(p.Disabled) }
-		tabindex="0"
-		{ p.Attributes... }
-	>
-		<span class="truncate select-item-text">
-			{ children... }
-		</span>
-		<span
-			class={
-				utils.TwMerge(
-					"select-check absolute right-2 flex h-3.5 w-3.5 items-center justify-center opacity-0",
-					"group-data-[tui-selectbox-selected=true]:opacity-100",
-				),
-			}
-		>
-			@icon.Check(icon.Props{Class: "size-4"})
-		</span>
-	</div>
 }

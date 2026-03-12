@@ -6,6 +6,40 @@ type ComponentUsageProps struct {
 	ComponentName string
 }
 
+func hasComponentScript(componentName string) bool {
+	switch componentName {
+	case "avatar",
+		"calendar",
+		"carousel",
+		"chart",
+		"checkbox",
+		"collapsible",
+		"copybutton",
+		"datepicker",
+		"dialog",
+		"dropdown",
+		"input",
+		"inputotp",
+		"label",
+		"popover",
+		"progress",
+		"rating",
+		"selectbox",
+		"sheet",
+		"sidebar",
+		"slider",
+		"tabs",
+		"tagsinput",
+		"textarea",
+		"timepicker",
+		"toast",
+		"tooltip":
+		return true
+	default:
+		return false
+	}
+}
+
 templ ComponentUsage(props ComponentUsageProps) {
 	{{
 		componentAlias := props.ComponentName
@@ -19,6 +53,8 @@ templ ComponentUsage(props ComponentUsageProps) {
 		}
 
 		importCode := "import " + componentImportLine
+		scriptCode := "<head>\n  @" + componentAlias + ".Script()\n</head>"
+		showScriptCode := hasComponentScript(props.ComponentName)
 	}}
 	@tabs.Tabs(tabs.Props{
 		ID: "installation-" + props.ComponentName,
@@ -47,6 +83,13 @@ templ ComponentUsage(props ComponentUsageProps) {
 					CodeContent:    "templui add " + props.ComponentName,
 					ShowCopyButton: true,
 				})
+				if showScriptCode {
+					<p class="mt-4 mb-2 text-sm text-muted-foreground">Load the script once in your layout:</p>
+					@Code(CodeProps{
+						CodeContent:    scriptCode,
+						ShowCopyButton: true,
+					})
+				}
 			}
 			@tabs.Content(tabs.ContentProps{
 				Value: "import",
@@ -55,6 +98,13 @@ templ ComponentUsage(props ComponentUsageProps) {
 					CodeContent:    importCode,
 					ShowCopyButton: true,
 				})
+				if showScriptCode {
+					<p class="mt-4 mb-2 text-sm text-muted-foreground">Load the script once in your layout:</p>
+					@Code(CodeProps{
+						CodeContent:    scriptCode,
+						ShowCopyButton: true,
+					})
+				}
 			}
 		</div>
 	}

@@ -1,6 +1,7 @@
 package inputotp
 
 import (
+	"github.com/templui/templui/components/input"
 	"github.com/templui/templui/utils"
 	"strconv"
 )
@@ -172,4 +173,13 @@ templ Separator(props ...SeparatorProps) {
 	>
 		<span>-</span>
 	</div>
+}
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@input.Script()
+		@utils.ComponentScript("inputotp")
+	}
 }

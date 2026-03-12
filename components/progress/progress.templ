@@ -119,3 +119,11 @@ func variantClasses(variant Variant) string {
 		return "bg-primary"
 	}
 }
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("progress")
+	}
+}

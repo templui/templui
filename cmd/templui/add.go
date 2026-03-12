@@ -298,7 +298,7 @@ func installComponent(
 		requiredUtils[repoUtilPath] = true
 	}
 	if comp.HasJS {
-		requiredUtils["utils/scripts.go"] = true
+		requiredUtils["utils/templui.go"] = true
 	}
 
 	// Download the component's JavaScript asset when it has one.
@@ -386,7 +386,7 @@ func installUtils(config Config, utilPaths []string, ref string, force bool) err
 				// Replace package name to match the destination directory name
 				targetPkgName := filepath.Base(utilsBaseDestDir)
 				modifiedData = bytes.Replace(modifiedData, []byte("package utils"), []byte("package "+targetPkgName), 1)
-				if config.JSDir != "" && repoUtilPath == "utils/scripts.go" {
+				if config.JSDir != "" && repoUtilPath == "utils/templui.go" {
 					modifiedData = rewriteScriptLoaderURL(modifiedData, config)
 				}
 			}
@@ -480,9 +480,10 @@ func rewriteScriptLoaderURL(content []byte, config Config) []byte {
 	}
 
 	webPath = strings.TrimRight(webPath, "/")
-	old := []byte("return ComponentScriptURL(component)")
-	new := []byte(fmt.Sprintf(`return ScriptURL("%s/" + component + ".min.js")`, webPath))
-	return bytes.ReplaceAll(content, old, new)
+	old := []byte(`var componentScriptBasePath = "/templui/js"`)
+	new := []byte(fmt.Sprintf(`var componentScriptBasePath = "%s"`, webPath))
+	content = bytes.ReplaceAll(content, old, new)
+	return content
 }
 
 // getInstalledComponentNames returns the names of all installed components

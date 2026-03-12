@@ -114,3 +114,11 @@ templ Chart(props ...Props) {
 	}}
 	@templ.JSONScript(dataId, chartConfig)
 }
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("chart")
+	}
+}

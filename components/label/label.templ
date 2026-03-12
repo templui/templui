@@ -35,3 +35,11 @@ templ Label(props ...Props) {
 		{ children... }
 	</label>
 }
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("label")
+	}
+}

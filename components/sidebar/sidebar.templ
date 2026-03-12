@@ -45,6 +45,113 @@ type Props struct {
 	KeyboardShortcut string      // default: "b"
 }
 
+templ Inset(props ...InsetProps) {
+	{{ var p InsetProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<main
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge(
+			"relative flex w-full flex-1 flex-col bg-background",
+			// Add special styling when peer sidebar has variant="inset"
+			"md:peer-data-[tui-sidebar-variant=inset]:m-2",
+			"md:peer-data-[tui-sidebar-variant=inset]:ml-0",
+			"md:peer-data-[tui-sidebar-variant=inset]:rounded-xl",
+			"md:peer-data-[tui-sidebar-variant=inset]:shadow-sm",
+			// When sidebar is collapsed (offcanvas mode) and variant is inset, add left margin back
+			"md:peer-data-[tui-sidebar-variant=inset]:peer-data-[tui-sidebar-state=collapsed]:peer-data-[tui-sidebar-collapsible=offcanvas]:ml-2",
+			p.Class,
+		) }
+		data-tui-sidebar="inset"
+		{ p.Attributes... }
+	>
+		{ children... }
+	</main>
+}
+
+templ Group(props ...GroupProps) {
+	{{ var p GroupProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("relative flex w-full min-w-0 flex-col p-2", p.Class) }
+		data-tui-sidebar="group"
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ GroupLabel(props ...GroupLabelProps) {
+	{{ var p GroupLabelProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge(
+			"flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70",
+			"ring-sidebar-ring outline-none transition-[margin,opacity] duration-200 ease-linear",
+			"focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+			"group-data-[tui-sidebar-state=collapsed]:group-data-[tui-sidebar-collapsible=icon]:-mt-8 group-data-[tui-sidebar-state=collapsed]:group-data-[tui-sidebar-collapsible=icon]:opacity-0",
+			p.Class,
+		) }
+		data-tui-sidebar="group-label"
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ MenuBadge(props ...MenuBadgeProps) {
+	{{ var p MenuBadgeProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge(
+				"ml-auto flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-xs font-medium",
+				"bg-sidebar-accent text-sidebar-accent-foreground",
+				"group-data-[tui-sidebar-state=collapsed]:group-data-[tui-sidebar-collapsible=icon]:hidden",
+				p.Class,
+			) }
+		data-tui-sidebar="menu-badge"
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}
+
+templ Separator(props ...SeparatorProps) {
+	{{ var p SeparatorProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<hr
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge(
+			"mx-2 my-2 border-t border-sidebar-border",
+			p.Class,
+		) }
+		data-tui-sidebar="separator"
+		{ p.Attributes... }
+	/>
+}
+
 type TriggerProps struct {
 	ID         string
 	Class      string
@@ -637,109 +744,12 @@ templ MenuSubButton(props ...MenuSubButtonProps) {
 	}
 }
 
-templ Inset(props ...InsetProps) {
-	{{ var p InsetProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
-	}
-	<main
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={ utils.TwMerge(
-			"relative flex w-full flex-1 flex-col bg-background",
-			// Add special styling when peer sidebar has variant="inset"
-			"md:peer-data-[tui-sidebar-variant=inset]:m-2",
-			"md:peer-data-[tui-sidebar-variant=inset]:ml-0",
-			"md:peer-data-[tui-sidebar-variant=inset]:rounded-xl",
-			"md:peer-data-[tui-sidebar-variant=inset]:shadow-sm",
-			// When sidebar is collapsed (offcanvas mode) and variant is inset, add left margin back
-			"md:peer-data-[tui-sidebar-variant=inset]:peer-data-[tui-sidebar-state=collapsed]:peer-data-[tui-sidebar-collapsible=offcanvas]:ml-2",
-			p.Class,
-		) }
-		data-tui-sidebar="inset"
-		{ p.Attributes... }
-	>
-		{ children... }
-	</main>
-}
+var scriptOnce = templ.NewOnceHandle()
 
-templ Group(props ...GroupProps) {
-	{{ var p GroupProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
+templ Script() {
+	@scriptOnce.Once() {
+		@sheet.Script()
+		@tooltip.Script()
+		@utils.ComponentScript("sidebar")
 	}
-	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={ utils.TwMerge("relative flex w-full min-w-0 flex-col p-2", p.Class) }
-		data-tui-sidebar="group"
-		{ p.Attributes... }
-	>
-		{ children... }
-	</div>
-}
-
-templ GroupLabel(props ...GroupLabelProps) {
-	{{ var p GroupLabelProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
-	}
-	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={ utils.TwMerge(
-			"flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70",
-			"ring-sidebar-ring outline-none transition-[margin,opacity] duration-200 ease-linear",
-			"focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
-			"group-data-[tui-sidebar-state=collapsed]:group-data-[tui-sidebar-collapsible=icon]:-mt-8 group-data-[tui-sidebar-state=collapsed]:group-data-[tui-sidebar-collapsible=icon]:opacity-0",
-			p.Class,
-		) }
-		data-tui-sidebar="group-label"
-		{ p.Attributes... }
-	>
-		{ children... }
-	</div>
-}
-
-templ MenuBadge(props ...MenuBadgeProps) {
-	{{ var p MenuBadgeProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
-	}
-	<span
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={ utils.TwMerge(
-				"ml-auto flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-xs font-medium",
-				"bg-sidebar-accent text-sidebar-accent-foreground",
-				"group-data-[tui-sidebar-state=collapsed]:group-data-[tui-sidebar-collapsible=icon]:hidden",
-				p.Class,
-			) }
-		data-tui-sidebar="menu-badge"
-		{ p.Attributes... }
-	>
-		{ children... }
-	</span>
-}
-
-templ Separator(props ...SeparatorProps) {
-	{{ var p SeparatorProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
-	}
-	<hr
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={ utils.TwMerge(
-			"mx-2 my-2 border-t border-sidebar-border",
-			p.Class,
-		) }
-		data-tui-sidebar="separator"
-		{ p.Attributes... }
-	/>
 }
