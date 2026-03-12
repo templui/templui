@@ -118,3 +118,8 @@ tasks:
     desc: Install compinstall tool
     cmds:
       - go install ./cmd/compinstall
+
+  install-templui:
+    desc: Install templui CLI from the current local checkout
+    cmds:
+      - go install ./cmd/templui
