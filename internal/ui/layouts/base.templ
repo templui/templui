@@ -55,7 +55,7 @@ templ BaseLayout(title, description string) {
 			// Custom CSS
 			<link href="/assets/css/themes.css" rel="stylesheet"/>
 			// HTMX
-			<script nonce={ templ.GetNonce(ctx) } src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js"></script>
+			<script nonce={ templ.GetNonce(ctx) } src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.0-alpha7/dist/htmx.min.js"></script>
 			// Set script nonce for HTMX // without this, HTMX will not work with CSP
 			<meta
 				name="htmx-config"
