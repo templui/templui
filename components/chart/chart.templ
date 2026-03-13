@@ -51,11 +51,17 @@ type Config struct {
 	BeginAtZero *bool    `json:"beginAtZero,omitempty"`
 }
 
+type ScriptConfig struct {
+	RawConfig       map[string]any `json:"rawConfig,omitempty"`
+	GeneratedConfig *Config        `json:"generatedConfig,omitempty"`
+}
+
 type Props struct {
 	ID          string
 	Variant     Variant
 	Data        Data
 	Options     Options
+	RawConfig   map[string]any
 	ShowLegend  bool
 	ShowXAxis   bool
 	ShowYAxis   bool
@@ -94,25 +100,31 @@ templ Chart(props ...Props) {
 		<canvas id={ canvasId } data-tui-chart-id={ dataId }></canvas>
 	</div>
 	{{
-		chartConfig := Config{
-			Type:        p.Variant,
-			Data:        p.Data,
-			Options:     p.Options,
-			ShowLegend:  p.ShowLegend,
-			ShowXAxis:   p.ShowXAxis,
-			ShowYAxis:   p.ShowYAxis,
-			ShowXLabels: p.ShowXLabels,
-			ShowYLabels: p.ShowYLabels,
-			ShowXGrid:   p.ShowXGrid,
-			ShowYGrid:   p.ShowYGrid,
-			Horizontal:  p.Horizontal,
-			Stacked:     p.Stacked,
-			YMin:        p.YMin,
-			YMax:        p.YMax,
-			BeginAtZero: p.BeginAtZero,
+		scriptConfig := ScriptConfig{
+			RawConfig: p.RawConfig,
+		}
+		if p.RawConfig == nil {
+			generatedConfig := Config{
+				Type:        p.Variant,
+				Data:        p.Data,
+				Options:     p.Options,
+				ShowLegend:  p.ShowLegend,
+				ShowXAxis:   p.ShowXAxis,
+				ShowYAxis:   p.ShowYAxis,
+				ShowXLabels: p.ShowXLabels,
+				ShowYLabels: p.ShowYLabels,
+				ShowXGrid:   p.ShowXGrid,
+				ShowYGrid:   p.ShowYGrid,
+				Horizontal:  p.Horizontal,
+				Stacked:     p.Stacked,
+				YMin:        p.YMin,
+				YMax:        p.YMax,
+				BeginAtZero: p.BeginAtZero,
+			}
+			scriptConfig.GeneratedConfig = &generatedConfig
 		}
 	}}
-	@templ.JSONScript(dataId, chartConfig)
+	@templ.JSONScript(dataId, scriptConfig)
 }
 
 var scriptOnce = templ.NewOnceHandle()

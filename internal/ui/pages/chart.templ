@@ -54,6 +54,10 @@ templ Chart() {
 						Text: "Line Chart - Multiple",
 					},
 					{
+						ID:   "raw-config",
+						Text: "RawConfig - Mixed Chart",
+					},
+					{
 						ID:   "area",
 						Text: "Area Chart",
 					},
@@ -202,6 +206,12 @@ templ Chart() {
 					PreviewCodeFile: "chart_line_multiple.templ",
 					ID:              "line-multiple",
 				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "RawConfig - Mixed Chart",
+					ShowcaseFile:    showcase.ChartRawConfig(),
+					PreviewCodeFile: "chart_raw_config.templ",
+					ID:              "raw-config",
+				})
 				// Area Charts
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Area Chart",
@@ -314,6 +324,12 @@ templ Chart() {
 								Description: "Chart configuration options",
 							},
 							{
+								Name:        "RawConfig",
+								Type:        "map[string]any",
+								Default:     "nil",
+								Description: "Passes a JSON-serializable Chart.js config through directly and bypasses the helper props",
+							},
+							{
 								Name:        "ShowLegend",
 								Type:        "bool",
 								Default:     "false",
@@ -399,6 +415,9 @@ templ Chart() {
 							},
 						},
 					})
+					<p class="mt-4 text-sm text-muted-foreground">
+						Use <code>RawConfig</code> as an escape hatch when you need native Chart.js settings that are not covered by the simplified API. When set, templui forwards that config directly to Chart.js and ignores the helper props above.
+					</p>
 				</div>
 			}
 		}

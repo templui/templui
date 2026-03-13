@@ -59,11 +59,17 @@ type Config struct {
 	BeginAtZero *bool    `json:"beginAtZero,omitempty"`
 }
 
+type ScriptConfig struct {
+	RawConfig       map[string]any `json:"rawConfig,omitempty"`
+	GeneratedConfig *Config        `json:"generatedConfig,omitempty"`
+}
+
 type Props struct {
 	ID          string
 	Variant     Variant
 	Data        Data
 	Options     Options
+	RawConfig   map[string]any
 	ShowLegend  bool
 	ShowXAxis   bool
 	ShowYAxis   bool
@@ -125,7 +131,7 @@ func Chart(props ...Props) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 86, Col: 11}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 92, Col: 11}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -159,7 +165,7 @@ func Chart(props ...Props) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(canvasId)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 94, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 100, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -172,7 +178,7 @@ func Chart(props ...Props) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(dataId)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 94, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 100, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -182,24 +188,30 @@ func Chart(props ...Props) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		chartConfig := Config{
-			Type:        p.Variant,
-			Data:        p.Data,
-			Options:     p.Options,
-			ShowLegend:  p.ShowLegend,
-			ShowXAxis:   p.ShowXAxis,
-			ShowYAxis:   p.ShowYAxis,
-			ShowXLabels: p.ShowXLabels,
-			ShowYLabels: p.ShowYLabels,
-			ShowXGrid:   p.ShowXGrid,
-			ShowYGrid:   p.ShowYGrid,
-			Horizontal:  p.Horizontal,
-			Stacked:     p.Stacked,
-			YMin:        p.YMin,
-			YMax:        p.YMax,
-			BeginAtZero: p.BeginAtZero,
+		scriptConfig := ScriptConfig{
+			RawConfig: p.RawConfig,
 		}
-		templ_7745c5c3_Err = templ.JSONScript(dataId, chartConfig).Render(ctx, templ_7745c5c3_Buffer)
+		if p.RawConfig == nil {
+			generatedConfig := Config{
+				Type:        p.Variant,
+				Data:        p.Data,
+				Options:     p.Options,
+				ShowLegend:  p.ShowLegend,
+				ShowXAxis:   p.ShowXAxis,
+				ShowYAxis:   p.ShowYAxis,
+				ShowXLabels: p.ShowXLabels,
+				ShowYLabels: p.ShowYLabels,
+				ShowXGrid:   p.ShowXGrid,
+				ShowYGrid:   p.ShowYGrid,
+				Horizontal:  p.Horizontal,
+				Stacked:     p.Stacked,
+				YMin:        p.YMin,
+				YMax:        p.YMax,
+				BeginAtZero: p.BeginAtZero,
+			}
+			scriptConfig.GeneratedConfig = &generatedConfig
+		}
+		templ_7745c5c3_Err = templ.JSONScript(dataId, scriptConfig).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
