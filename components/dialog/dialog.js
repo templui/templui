@@ -1,8 +1,69 @@
 (function () {
   "use strict";
 
+  const LAYER_ID = "tui-dialog-layer-root";
+
+  function getLayerRoot() {
+    let root = document.getElementById(LAYER_ID);
+    if (root) return root;
+
+    root = document.createElement("div");
+    root.id = LAYER_ID;
+    root.setAttribute("data-tui-dialog-layer-root", "true");
+    document.body.appendChild(root);
+    return root;
+  }
+
+  function syncDialog(dialogId) {
+    const root = getLayerRoot();
+    const wrapper = document.querySelector(
+      `[data-tui-dialog][data-dialog-instance="${dialogId}"]`,
+    );
+    const backdrop = document.querySelector(
+      `[data-tui-dialog-backdrop][data-dialog-instance="${dialogId}"]`,
+    );
+    const content = document.querySelector(
+      `[data-tui-dialog-content][data-dialog-instance="${dialogId}"]`,
+    );
+
+    if (!wrapper) {
+      backdrop?.remove();
+      content?.remove();
+      return;
+    }
+
+    if (backdrop && backdrop.parentElement !== root) {
+      root.appendChild(backdrop);
+    }
+    if (content && content.parentElement !== root) {
+      root.appendChild(content);
+    }
+  }
+
+  function syncDialogs() {
+    document.querySelectorAll("[data-tui-dialog]").forEach((wrapper) => {
+      const dialogId = wrapper.getAttribute("data-dialog-instance");
+      if (dialogId) syncDialog(dialogId);
+    });
+  }
+
+  function updateBodyOverflow() {
+    const hasOpenDialogs = document.querySelector(
+      '[data-tui-dialog-content][data-tui-dialog-open="true"]',
+    );
+    document.body.style.overflow = hasOpenDialogs ? "hidden" : "";
+  }
+
+  function afterNextPaint(callback) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(callback);
+    });
+  }
+
   // Open dialog
   function openDialog(dialogId) {
+    syncDialog(dialogId);
+
     // Find backdrop and content by instance ID
     const backdrop = document.querySelector(
       `[data-tui-dialog-backdrop][data-dialog-instance="${dialogId}"]`,
@@ -13,15 +74,18 @@
 
     if (!backdrop || !content) return;
 
-    // First, remove hidden state to make visible (but still in closed position)
+    backdrop.setAttribute("data-tui-dialog-open", "false");
+    content.setAttribute("data-tui-dialog-open", "false");
     backdrop.removeAttribute("data-tui-dialog-hidden");
     content.removeAttribute("data-tui-dialog-hidden");
+    backdrop.offsetHeight;
+    content.offsetHeight;
 
-    // Then trigger the open animation after a frame
-    requestAnimationFrame(() => {
+    // Then trigger the open animation after the browser painted the closed state
+    afterNextPaint(() => {
       backdrop.setAttribute("data-tui-dialog-open", "true");
       content.setAttribute("data-tui-dialog-open", "true");
-      document.body.style.overflow = "hidden";
+      updateBodyOverflow();
 
       // Update triggers
       document
@@ -76,14 +140,7 @@
     setTimeout(() => {
       backdrop.setAttribute("data-tui-dialog-hidden", "true");
       content.setAttribute("data-tui-dialog-hidden", "true");
-
-      // Restore body overflow if no dialogs are open (check DOM)
-      const hasOpenDialogs = document.querySelector(
-        '[data-tui-dialog-content][data-tui-dialog-open="true"]',
-      );
-      if (!hasOpenDialogs) {
-        document.body.style.overflow = "";
-      }
+      updateBodyOverflow();
     }, 300);
   }
 
@@ -93,11 +150,8 @@
     const instance = element.getAttribute("data-dialog-instance");
     if (instance) return instance;
 
-    // Try to find parent dialog
-    const parentDialog = element.closest("[data-tui-dialog]");
-    if (parentDialog) {
-      return parentDialog.getAttribute("data-dialog-instance");
-    }
+    const owner = element.closest("[data-dialog-instance]");
+    if (owner) return owner.getAttribute("data-dialog-instance");
 
     return null;
   }
@@ -195,24 +249,14 @@
 
   // Initialize dialogs that should be open on load
   document.addEventListener("DOMContentLoaded", () => {
-    // Find all dialogs that should be initially open
-    const openDialogs = document.querySelectorAll(
-      '[data-tui-dialog-content][data-tui-dialog-open="true"]',
-    );
-    if (openDialogs.length > 0) {
-      document.body.style.overflow = "hidden";
-    }
+    syncDialogs();
+    updateBodyOverflow();
   });
 
   // Cleanup when dialog elements are removed from DOM (HTMX, innerHTML, etc.)
   const observer = new MutationObserver(() => {
-    // Check if any dialogs are still open in DOM
-    const hasOpenDialogs = document.querySelector(
-      '[data-tui-dialog-content][data-tui-dialog-open="true"]',
-    );
-    if (!hasOpenDialogs) {
-      document.body.style.overflow = "";
-    }
+    syncDialogs();
+    updateBodyOverflow();
   });
 
   // Start observing
@@ -230,4 +274,3 @@
     isOpen: isDialogOpen,
   };
 })();
-
