@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.8.0] - 2026-03-13
+
+This release stabilizes the `v1.7.x` import and script changes.
+The automatic component script injection introduced in `v1.7.x` has been reverted. Interactive components should be loaded explicitly via `@component.Script()` in your layout again to avoid duplicate execution and swap-related bugs with HTMX and DataStar.
+
+### Added
+
+- chart: Added `RawConfig map[string]any` as an escape hatch for passing native Chart.js configs directly, plus a new mixed-chart showcase example (#502)
+
+### Changed
+
+- scripts: Reverted the `v1.7.x` automatic component script injection experiment; interactive components must be loaded explicitly via `@component.Script()` in your layout again
+- popover: Rebuilt the component around a root/content structure without the previous global portal behavior, making popover-based components safer during partial swaps and repeated DOM updates
+- dialog: Moved dialog layers into a shared root synced from each dialog instance, improving nested overlay behavior and DOM cleanup
+- docs: Simplified the import and CLI workflow documentation, including clearer asset-routing and script-loading instructions
+- docs: Updated per-component usage snippets so interactive components show the required `@component.Script()` call directly in the docs
+- docs: Updated the docs site to load `htmx@4.0.0-alpha7`
+
+### Fixed
+
+- scripts: Fixed the `v1.7.x` duplicate-script and re-execution problems that broke popovers and other interactive components, including sidebar/popover conflicts and Datastar fragment patch regressions (#516, #518)
+- popover: Fixed duplicate popover content IDs and stale floating layers during HTMX swaps or repeated client-side/template instantiation (#500, #495)
+- dialog: Fixed dialog usage inside dropdowns and other popover-based overlays (#513)
+
 ## [v1.7.1] - 2026-03-10
 
 ### Important
