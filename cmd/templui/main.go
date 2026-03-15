@@ -11,8 +11,8 @@ import (
 const (
 	configFileName = ".templui.json"
 	registryPath   = "internal/registry/registry.json" // Path to the registry within the repository
-	// Base URL for fetching raw file content.
-	rawContentBaseURL = "https://raw.githubusercontent.com/templui/templui/"
+	// Default base URL for fetching raw file content.
+	defaultRawContentBaseURL = "https://raw.githubusercontent.com/templui/templui/"
 )
 
 // getVersion returns the version from build info or dev version for local builds.
@@ -79,7 +79,7 @@ func main() {
 	// Handle help display.
 	if *helpFlag {
 		fmt.Println("Fetching registry for help...")
-		registry, err := fetchRegistry(getDefaultRef())
+		registry, err := fetchRegistry(defaultRawContentBaseURL, getDefaultRef())
 		if err != nil {
 			fmt.Println("Could not fetch component list for help:", err)
 			showHelp(nil, getDefaultRef())

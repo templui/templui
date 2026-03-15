@@ -32,8 +32,8 @@ type UtilDef struct {
 }
 
 // fetchRegistry downloads and parses the registry.json file for a given git ref.
-func fetchRegistry(ref string) (Registry, error) {
-	registryURL := rawContentBaseURL + ref + "/" + registryPath
+func fetchRegistry(baseURL, ref string) (Registry, error) {
+	registryURL := baseURL + ref + "/" + registryPath
 	resp, err := http.Get(registryURL)
 	if err != nil {
 		return Registry{}, fmt.Errorf("failed to start download: %w", err)

@@ -114,7 +114,7 @@ func initConfig(ref string, force bool) {
 
 		// Install all available utils from the specified ref.
 		fmt.Printf("\nAttempting to install initial utils from ref '%s'...\n", ref)
-		registry, err := fetchRegistry(ref)
+		registry, err := fetchRegistry(config.RawContentBaseURL, ref)
 		if err != nil {
 			if strings.Contains(err.Error(), "status code 404") {
 				fmt.Printf("Warning: Could not fetch registry from ref '%s': %v\n", ref, err)

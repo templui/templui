@@ -101,12 +101,12 @@ func runAdd(args []string, commandArg string, force bool, installed bool) {
 	// Fetch the registry for the target ref.
 	fmt.Printf("\n📦 Using ref: %s\n", targetRef)
 	fmt.Printf("🔍 Fetching component registry from ref '%s'...\n", targetRef)
-	registry, err := fetchRegistry(targetRef)
+	registry, err := fetchRegistry(config.RawContentBaseURL, targetRef)
 	if err != nil {
 		if strings.Contains(err.Error(), "status code 404") {
 			fmt.Printf("❌ Error fetching registry: %v\n", err)
 			fmt.Printf("   Check if the ref '%s' exists and contains the file '%s'.\n", targetRef, registryPath)
-			fmt.Printf("   Registry URL attempted: %s%s/%s\n", rawContentBaseURL, targetRef, registryPath)
+			fmt.Printf("   Registry URL attempted: %s%s/%s\n", config.RawContentBaseURL, targetRef, registryPath)
 		} else {
 			fmt.Printf("❌ Error fetching registry: %v\n", err)
 		}
@@ -264,7 +264,7 @@ func installComponent(
 
 		// Proceed with download and write only if necessary.
 		if shouldWriteFile {
-			fileURL := rawContentBaseURL + ref + "/" + repoFilePath
+			fileURL := config.RawContentBaseURL + ref + "/" + repoFilePath
 			fmt.Printf("      ⬇️  Downloading %s...\n", fileURL)
 			data, err := downloadFile(fileURL)
 			if err != nil {
@@ -369,7 +369,7 @@ func installUtils(config Config, utilPaths []string, ref string, force bool) err
 		}
 
 		if shouldWriteFile {
-			fileURL := rawContentBaseURL + ref + "/" + repoUtilPath
+			fileURL := config.RawContentBaseURL + ref + "/" + repoUtilPath
 			fmt.Printf("   Downloading util %s...\n", fileURL)
 			data, err := downloadFile(fileURL)
 			if err != nil {
@@ -434,7 +434,7 @@ func installComponentJS(config Config, comp ComponentDef, ref string, force bool
 		return nil
 	}
 
-	jsSourceURL := rawContentBaseURL + ref + "/components/" + comp.Name + "/" + jsFileName
+	jsSourceURL := config.RawContentBaseURL + ref + "/components/" + comp.Name + "/" + jsFileName
 	fmt.Printf("   Downloading JavaScript: %s\n", jsSourceURL)
 	jsData, err := downloadFile(jsSourceURL)
 	if err != nil {

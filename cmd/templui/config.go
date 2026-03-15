@@ -11,11 +11,12 @@ import (
 
 // Config defines the structure for the .templui.json configuration file.
 type Config struct {
-	ComponentsDir string `json:"componentsDir"`
-	UtilsDir      string `json:"utilsDir"`
-	ModuleName    string `json:"moduleName"`
-	JSDir         string `json:"jsDir,omitempty"`        // Directory for component JavaScript files
-	JSPublicPath  string `json:"jsPublicPath,omitempty"` // Public path where JS files are served (e.g., "/app/assets/js")
+	ComponentsDir    string `json:"componentsDir"`
+	UtilsDir         string `json:"utilsDir"`
+	ModuleName       string `json:"moduleName"`
+	JSDir            string `json:"jsDir,omitempty"`            // Directory for component JavaScript files
+	JSPublicPath     string `json:"jsPublicPath,omitempty"`     // Public path where JS files are served (e.g., "/app/assets/js")
+	RawContentBaseURL string `json:"rawContentBaseURL,omitempty"` // Base URL for fetching raw file content (overrides default repo)
 }
 
 // loadConfig reads and parses the .templui.json configuration file.
@@ -66,6 +67,11 @@ func loadConfig() (Config, error) {
 		}
 		errorMsg.WriteString("\n🔧 To fix this, run: templui -f init")
 		return config, fmt.Errorf("%s", errorMsg.String())
+	}
+
+	// Apply default for optional fields
+	if config.RawContentBaseURL == "" {
+		config.RawContentBaseURL = defaultRawContentBaseURL
 	}
 
 	return config, nil

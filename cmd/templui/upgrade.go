@@ -75,7 +75,7 @@ func updateUtils(ref string) error {
 	fmt.Printf("\nUpdating utils to ref '%s'...\n", utilsRef)
 
 	// Fetch registry
-	registry, err := fetchRegistry(utilsRef)
+	registry, err := fetchRegistry(config.RawContentBaseURL, utilsRef)
 	if err != nil {
 		return fmt.Errorf("failed to fetch registry: %w", err)
 	}

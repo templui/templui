@@ -40,7 +40,7 @@ func runList(args []string, commandArg string) {
 // listComponents fetches the registry and lists available components and utils.
 func listComponents(ref string) error {
 	fmt.Printf("Fetching component registry from ref '%s'...\n", ref)
-	registry, err := fetchRegistry(ref)
+	registry, err := fetchRegistry(defaultRawContentBaseURL, ref)
 	if err != nil {
 		if strings.Contains(err.Error(), "status code 404") {
 			return fmt.Errorf("could not fetch registry: ref '%s' not found or does not contain '%s'", ref, registryPath)
