@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.8.1] - 2026-03-17
+
+### Added
+
+- scripts: Added optional unminified component script loading for debugging in both the import and CLI workflows; set `utils.UseUnminifiedScripts = true` during app startup to use `.js` instead of `.min.js` (#523)
+
+### Fixed
+
+- popover: Fixed incorrect or off-screen positioning by switching to a fixed floating strategy and resetting conflicting native popover defaults (#522)
+
 ## [v1.8.0] - 2026-03-13
 
 This release stabilizes the `v1.7.x` import and script changes.
