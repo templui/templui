@@ -97,7 +97,7 @@ func ComponentScript(component string) templ.Component {
 		}
 		src := ScriptURL(componentScriptBasePath + "/" + fileName)
 
-		if _, err := io.WriteString(w, `<script defer`); err != nil {
+		if _, err := io.WriteString(w, `<script type="module"`); err != nil {
 			return err
 		}
 		if nonce != "" {

@@ -19,10 +19,10 @@ type ComponentDef struct {
 	Slug          string   `json:"slug"`
 	DisplayName   string   `json:"displayName"`
 	Description   string   `json:"description"`
-	Files         []string `json:"files"`           // Paths relative to the repository root
-	Dependencies  []string `json:"dependencies"`    // Names of other required components
-	RequiredUtils []string `json:"requiredUtils"`   // Paths to required utils relative to the repository root
-	HasJS         bool     `json:"hasJS,omitempty"` // Whether this component requires JavaScript
+	Files         []string `json:"files"`             // Paths relative to the repository root
+	JSFiles       []string `json:"jsFiles,omitempty"` // JavaScript asset paths relative to the repository root
+	Dependencies  []string `json:"dependencies"`      // Names of other required components
+	RequiredUtils []string `json:"requiredUtils"`     // Paths to required utils relative to the repository root
 }
 
 // UtilDef describes a single utility file within the registry.

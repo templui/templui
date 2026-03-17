@@ -297,13 +297,13 @@ func installComponent(
 	for _, repoUtilPath := range comp.RequiredUtils {
 		requiredUtils[repoUtilPath] = true
 	}
-	if comp.HasJS {
+	if len(comp.JSFiles) > 0 {
 		requiredUtils["utils/templui.go"] = true
 	}
 
 	// Download the component's JavaScript asset when it has one.
-	if config.JSDir != "" && comp.HasJS {
-		err := installComponentJS(config, comp, ref, force)
+	if config.JSDir != "" && len(comp.JSFiles) > 0 {
+		err := installComponentJS(config, ref, comp.JSFiles, force)
 		if err != nil {
 			return fmt.Errorf("failed to install JavaScript for component '%s': %w", comp.Name, err)
 		}
@@ -407,11 +407,14 @@ func installUtils(config Config, utilPaths []string, ref string, force bool) err
 	return nil
 }
 
-// installComponentJS downloads both script variants so callers can switch
-// between minified and unminified assets without reinstalling components.
-func installComponentJS(config Config, comp ComponentDef, ref string, force bool) error {
-	for _, jsFileName := range []string{comp.Name + ".js", comp.Name + ".min.js"} {
-		if err := installComponentJSFile(config, comp, ref, force, jsFileName); err != nil {
+// installComponentJS downloads all component JavaScript assets listed in the registry.
+func installComponentJS(config Config, ref string, jsFiles []string, force bool) error {
+	if err := os.MkdirAll(config.JSDir, 0755); err != nil {
+		return fmt.Errorf("failed to create JS directory '%s': %w", config.JSDir, err)
+	}
+
+	for _, sourceRepoPath := range jsFiles {
+		if err := installComponentJSFile(config, ref, sourceRepoPath, force); err != nil {
 			return err
 		}
 	}
@@ -419,13 +422,8 @@ func installComponentJS(config Config, comp ComponentDef, ref string, force bool
 	return nil
 }
 
-func installComponentJSFile(config Config, comp ComponentDef, ref string, force bool, jsFileName string) error {
-	jsDestPath := filepath.Join(config.JSDir, jsFileName)
-
-	err := os.MkdirAll(config.JSDir, 0755)
-	if err != nil {
-		return fmt.Errorf("failed to create JS directory '%s': %w", config.JSDir, err)
-	}
+func installComponentJSFile(config Config, ref string, sourceRepoPath string, force bool) error {
+	jsDestPath := filepath.Join(config.JSDir, filepath.Base(sourceRepoPath))
 
 	fileExists := false
 	if _, err := os.Stat(jsDestPath); err == nil {
@@ -444,15 +442,18 @@ func installComponentJSFile(config Config, comp ComponentDef, ref string, force 
 		return nil
 	}
 
+<<<<<<< Updated upstream
 	jsSourceURL := rawContentBaseURL + ref + "/components/" + comp.Name + "/" + jsFileName
+=======
+	jsSourceURL := buildRawContentURL(ref, sourceRepoPath)
+>>>>>>> Stashed changes
 	fmt.Printf("   Downloading JavaScript: %s\n", jsSourceURL)
 	jsData, err := downloadFile(jsSourceURL)
 	if err != nil {
-		return fmt.Errorf("failed to download JS file for component '%s' from %s: %w", comp.Name, jsSourceURL, err)
+		return fmt.Errorf("failed to download JS file from %s: %w", jsSourceURL, err)
 	}
 
-	err = os.WriteFile(jsDestPath, jsData, 0644)
-	if err != nil {
+	if err := os.WriteFile(jsDestPath, jsData, 0644); err != nil {
 		return fmt.Errorf("failed to write JS file '%s': %w", jsDestPath, err)
 	}
 

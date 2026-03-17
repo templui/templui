@@ -36,8 +36,8 @@
       "displayName": "Avatar",
       "description": "Avatar component for user profiles.",
       "files": ["components/avatar/avatar.templ"],
+      "jsFiles": ["components/avatar/avatar.js", "components/avatar/avatar.min.js"],
       "dependencies": [],
-      "hasJS": true,
       "categories": ["display-media"],
       "tags": ["avatar", "profile", "user", "image"]
     },
@@ -77,8 +77,8 @@
       "displayName": "Calendar",
       "description": "Calendar component for date selection.",
       "files": ["components/calendar/calendar.templ"],
+      "jsFiles": ["components/calendar/calendar.js", "components/calendar/calendar.min.js"],
       "dependencies": ["icon"],
-      "hasJS": true,
       "categories": ["form-input"],
       "tags": ["calendar", "date", "picker", "time"]
     },
@@ -98,8 +98,8 @@
       "displayName": "Carousel",
       "description": "Carousel component with navigation controls.",
       "files": ["components/carousel/carousel.templ"],
+      "jsFiles": ["components/carousel/carousel.js", "components/carousel/carousel.min.js"],
       "dependencies": ["icon"],
-      "hasJS": true,
       "categories": ["display-media"],
       "tags": ["carousel", "slider", "gallery", "slideshow"]
     },
@@ -109,8 +109,8 @@
       "displayName": "Charts",
       "description": "Chart components for data visualization.",
       "files": ["components/chart/chart.templ"],
+      "jsFiles": ["components/chart/chart.js", "components/chart/chart.min.js", "components/chart/chartjs.js"],
       "dependencies": [],
-      "hasJS": true,
       "categories": ["display-media"],
       "tags": ["chart", "graph", "visualization", "data"]
     },
@@ -120,8 +120,8 @@
       "displayName": "Checkbox",
       "description": "Checkbox input component.",
       "files": ["components/checkbox/checkbox.templ"],
+      "jsFiles": ["components/checkbox/checkbox.js", "components/checkbox/checkbox.min.js"],
       "dependencies": ["icon"],
-      "hasJS": true,
       "categories": ["form-input"],
       "tags": ["checkbox", "input", "form", "selection"]
     },
@@ -131,7 +131,7 @@
       "displayName": "Collapsible",
       "description": "Collapsible container component.",
       "files": ["components/collapsible/collapsible.templ"],
-      "hasJS": true,
+      "jsFiles": ["components/collapsible/collapsible.js", "components/collapsible/collapsible.min.js"],
       "categories": ["misc"],
       "tags": ["collapsible", "toggle", "expand", "collapse"]
     },
@@ -141,8 +141,8 @@
       "displayName": "Copy Button",
       "description": "Copy to clipboard button component.",
       "files": ["components/copybutton/copybutton.templ"],
+      "jsFiles": ["components/copybutton/copybutton.js", "components/copybutton/copybutton.min.js"],
       "dependencies": ["button", "icon"],
-      "hasJS": true,
       "categories": ["misc"],
       "tags": ["copy", "clipboard", "button", "utility"]
     },
@@ -152,8 +152,8 @@
       "displayName": "Date Picker",
       "description": "Date picker component combining input and calendar.",
       "files": ["components/datepicker/datepicker.templ"],
+      "jsFiles": ["components/datepicker/datepicker.js", "components/datepicker/datepicker.min.js"],
       "dependencies": ["button", "calendar", "card", "icon", "popover"],
-      "hasJS": true,
       "categories": ["form-input"],
       "tags": ["datepicker", "date", "calendar", "input", "form"]
     },
@@ -173,8 +173,8 @@
       "displayName": "Dropdown",
       "description": "Dropdown menu component.",
       "files": ["components/dropdown/dropdown.templ"],
+      "jsFiles": ["components/dropdown/dropdown.js", "components/dropdown/dropdown.min.js"],
       "dependencies": ["popover"],
-      "hasJS": true,
       "categories": ["overlays-dialogs"],
       "tags": ["dropdown", "menu", "select", "options"]
     },
@@ -208,8 +208,8 @@
       "displayName": "Input",
       "description": "Text input component.",
       "files": ["components/input/input.templ"],
+      "jsFiles": ["components/input/input.js", "components/input/input.min.js"],
       "dependencies": ["button", "icon"],
-      "hasJS": true,
       "categories": ["form-input"],
       "tags": ["input", "text", "form", "field"]
     },
@@ -219,8 +219,8 @@
       "displayName": "Input OTP",
       "description": "One-time password input component.",
       "files": ["components/inputotp/inputotp.templ"],
+      "jsFiles": ["components/inputotp/inputotp.js", "components/inputotp/inputotp.min.js"],
       "dependencies": ["input"],
-      "hasJS": true,
       "categories": ["form-input"],
       "tags": ["otp", "password", "input", "verification", "security"]
     },
@@ -230,8 +230,8 @@
       "displayName": "Label",
       "description": "Form label component.",
       "files": ["components/label/label.templ"],
+      "jsFiles": ["components/label/label.js", "components/label/label.min.js"],
       "dependencies": [],
-      "hasJS": true,
       "categories": ["form-input"],
       "tags": ["label", "form", "accessibility", "text"]
     },
@@ -241,8 +241,8 @@
       "displayName": "Dialog",
       "description": "Modal dialog component.",
       "files": ["components/dialog/dialog.templ"],
+      "jsFiles": ["components/dialog/dialog.js", "components/dialog/dialog.min.js"],
       "dependencies": ["icon"],
-      "hasJS": true,
       "categories": ["overlays-dialogs"],
       "tags": ["dialog", "modal", "overlay", "popup"]
     },
@@ -262,8 +262,8 @@
       "displayName": "Popover",
       "description": "Floating popover component using the browser popover API and Floating UI positioning.",
       "files": ["components/popover/popover.templ"],
+      "jsFiles": ["components/popover/popover.js", "components/popover/popover.min.js", "components/popover/floating_ui_core.js", "components/popover/floating_ui_dom.js"],
       "dependencies": [],
-      "hasJS": true,
       "categories": ["overlays-dialogs"],
       "tags": ["popover", "tooltip", "overlay", "floating"]
     },
@@ -273,8 +273,8 @@
       "displayName": "Progress",
       "description": "Progress bar component.",
       "files": ["components/progress/progress.templ"],
+      "jsFiles": ["components/progress/progress.js", "components/progress/progress.min.js"],
       "dependencies": [],
-      "hasJS": true,
       "categories": ["feedback-status"],
       "tags": ["progress", "loading", "indicator", "status"]
     },
@@ -294,8 +294,8 @@
       "displayName": "Rating",
       "description": "Star rating input component.",
       "files": ["components/rating/rating.templ"],
+      "jsFiles": ["components/rating/rating.js", "components/rating/rating.min.js"],
       "dependencies": ["icon"],
-      "hasJS": true,
       "categories": ["form-input"],
       "tags": ["rating", "star", "review", "feedback", "score"]
     },
@@ -305,8 +305,8 @@
       "displayName": "Select Box",
       "description": "Searchable select component.",
       "files": ["components/selectbox/selectbox.templ"],
+      "jsFiles": ["components/selectbox/selectbox.js", "components/selectbox/selectbox.min.js"],
       "dependencies": ["button", "icon", "popover", "input"],
-      "hasJS": true,
       "categories": ["form-input"],
       "tags": ["select", "dropdown", "input", "form", "search"]
     },
@@ -326,8 +326,8 @@
       "displayName": "Sidebar",
       "description": "Collapsible sidebar component for app layouts.",
       "files": ["components/sidebar/sidebar.templ"],
+      "jsFiles": ["components/sidebar/sidebar.js", "components/sidebar/sidebar.min.js"],
       "dependencies": ["button", "icon", "sheet", "tooltip"],
-      "hasJS": true,
       "categories": ["layout-navigation"],
       "tags": ["sidebar", "navigation", "menu", "layout", "panel"]
     },
@@ -347,8 +347,8 @@
       "displayName": "Slider",
       "description": "Slider input component.",
       "files": ["components/slider/slider.templ"],
+      "jsFiles": ["components/slider/slider.js", "components/slider/slider.min.js"],
       "dependencies": [],
-      "hasJS": true,
       "categories": ["form-input"],
       "tags": ["slider", "range", "input", "form", "control"]
     },
@@ -378,8 +378,8 @@
       "displayName": "Tabs",
       "description": "Tabbed interface component.",
       "files": ["components/tabs/tabs.templ"],
+      "jsFiles": ["components/tabs/tabs.js", "components/tabs/tabs.min.js"],
       "dependencies": [],
-      "hasJS": true,
       "categories": ["layout-navigation"],
       "tags": ["tabs", "navigation", "panels", "content"]
     },
@@ -389,8 +389,8 @@
       "displayName": "Tags Input",
       "description": "Tags input component.",
       "files": ["components/tagsinput/tagsinput.templ"],
+      "jsFiles": ["components/tagsinput/tagsinput.js", "components/tagsinput/tagsinput.min.js"],
       "dependencies": ["badge", "input", "popover"],
-      "hasJS": true,
       "categories": ["form-input"],
       "tags": ["tags", "input", "form", "multi-value", "chips"]
     },
@@ -400,8 +400,8 @@
       "displayName": "Textarea",
       "description": "Multi-line text input component.",
       "files": ["components/textarea/textarea.templ"],
+      "jsFiles": ["components/textarea/textarea.js", "components/textarea/textarea.min.js"],
       "dependencies": [],
-      "hasJS": true,
       "categories": ["form-input"],
       "tags": ["textarea", "input", "form", "text", "multiline"]
     },
@@ -411,8 +411,8 @@
       "displayName": "Time Picker",
       "description": "Time picker component.",
       "files": ["components/timepicker/timepicker.templ"],
+      "jsFiles": ["components/timepicker/timepicker.js", "components/timepicker/timepicker.min.js"],
       "dependencies": ["button", "card", "icon", "popover"],
-      "hasJS": true,
       "categories": ["form-input"],
       "tags": ["timepicker", "time", "clock", "input", "form"]
     },
@@ -422,8 +422,8 @@
       "displayName": "Toast",
       "description": "Toast notification component.",
       "files": ["components/toast/toast.templ"],
+      "jsFiles": ["components/toast/toast.js", "components/toast/toast.min.js"],
       "dependencies": ["icon"],
-      "hasJS": true,
       "categories": ["feedback-status"],
       "tags": ["toast", "notification", "message", "snackbar"]
     },
