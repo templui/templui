@@ -126,7 +126,7 @@ templ Content(props ...ContentProps) {
 		data-tui-popover-hover-out-delay={ strconv.Itoa(p.HoverOutDelay) }
 		data-tui-popover-exclusive={ strconv.FormatBool(p.Exclusive) }
 		class={ utils.TwMerge(
-			"bg-popover rounded-lg border text-popover-foreground text-sm shadow-lg pointer-events-auto fixed top-0 left-0 max-w-[min(24rem,calc(100vw-2rem))] overflow-visible outline-none",
+			"bg-popover rounded-lg border text-popover-foreground text-sm shadow-lg pointer-events-auto fixed inset-auto top-0 left-0 m-0 max-w-[min(24rem,calc(100vw-2rem))] overflow-visible outline-none",
 			p.Class,
 		) }
 		{ p.Attributes... }

@@ -297,7 +297,7 @@ func Content(props ...ContentProps) templ.Component {
 			}
 		}
 		var templ_7745c5c3_Var11 = []any{utils.TwMerge(
-			"bg-popover rounded-lg border text-popover-foreground text-sm shadow-lg pointer-events-auto fixed top-0 left-0 max-w-[min(24rem,calc(100vw-2rem))] overflow-visible outline-none",
+			"bg-popover rounded-lg border text-popover-foreground text-sm shadow-lg pointer-events-auto fixed inset-auto top-0 left-0 m-0 max-w-[min(24rem,calc(100vw-2rem))] overflow-visible outline-none",
 			p.Class,
 		)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
