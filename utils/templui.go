@@ -82,12 +82,20 @@ var ScriptURL = func(path string) string {
 // In the import workflow this stays "/templui/js". The CLI rewrites it to the user's local jsPublicPath.
 var componentScriptBasePath = "/templui/js"
 
+// UseUnminifiedScripts switches component script loading to the unminified files.
+// Leave this false in normal use and set it to true during app startup for debugging.
+var UseUnminifiedScripts = false
+
 // ComponentScript renders a deferred script tag for a component JavaScript file.
 // Example: ComponentScript("datepicker") → <script defer src="/templui/js/datepicker.min.js?..."></script>
 func ComponentScript(component string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		nonce := templ.GetNonce(ctx)
-		src := ScriptURL(componentScriptBasePath + "/" + component + ".min.js")
+		fileName := component + ".min.js"
+		if UseUnminifiedScripts {
+			fileName = component + ".js"
+		}
+		src := ScriptURL(componentScriptBasePath + "/" + fileName)
 
 		if _, err := io.WriteString(w, `<script defer`); err != nil {
 			return err
@@ -118,7 +126,7 @@ func ComponentScript(component string) templ.Component {
 }
 
 // SetupScriptRoutes serves embedded component JavaScript files for the import workflow.
-// Example: SetupScriptRoutes(mux, true) mounts /templui/js/*.min.js with no-store caching in development.
+// Example: SetupScriptRoutes(mux, true) mounts /templui/js/*.js with no-store caching in development.
 func SetupScriptRoutes(mux *http.ServeMux, isDevelopment bool) {
 	if mux == nil || componentScriptBasePath != "/templui/js" {
 		return
@@ -138,9 +146,10 @@ func SetupScriptRoutes(mux *http.ServeMux, isDevelopment bool) {
 			w.Header().Set("Cache-Control", "public, max-age=31536000")
 		}
 
-		componentPath := strings.TrimSuffix(path, ".min.js")
-		component := strings.Trim(strings.Split(componentPath, "/")[0], "/")
-		file, err := fs.ReadFile(components.TemplFiles, filepath.Join(component, component+".min.js"))
+		fileName := filepath.Base(path)
+		component := strings.TrimSuffix(fileName, ".min.js")
+		component = strings.TrimSuffix(component, ".js")
+		file, err := fs.ReadFile(components.TemplFiles, filepath.Join(component, fileName))
 		if err != nil {
 			http.NotFound(w, r)
 			return

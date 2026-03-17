@@ -253,6 +253,21 @@ import (
 
 `@datepicker.Script()` loads the `datepicker` script and its direct dependencies like `calendar` and `popover`.
 
+For debugging, you can switch to the unminified scripts during app startup:
+
+```go
+func init() {
+  utils.UseUnminifiedScripts = true
+}
+```
+
+```go
+func main() {
+  utils.UseUnminifiedScripts = true
+  // setup routes, then start server
+}
+```
+
 ### 6. Serve Assets
 
 Use `setupAssetsRoutes(...)` to serve your app assets like Tailwind CSS output, fonts, images, and local files. In the import workflow, this is also where you mount templUI's embedded component scripts.
@@ -526,7 +541,20 @@ import (
 </head>
 ```
 
-`templui add` downloads the matching `.min.js` files into your project.
+`templui add` downloads both the matching `.js` and `.min.js` files into your project. By default `@component.Script()` uses the minified file. For debugging, set `utils.UseUnminifiedScripts = true` during app startup, either in `init()` or early in `main()`.
+
+```go
+func init() {
+  utils.UseUnminifiedScripts = true
+}
+```
+
+```go
+func main() {
+  utils.UseUnminifiedScripts = true
+  // setup routes, then start server
+}
+```
 
 ### 9. Serve Assets
 
@@ -557,7 +585,7 @@ func setupAssetsRoutes(mux *http.ServeMux) {
 }
 ```
 
-`templui init` installs the shared utils files. `templui add` downloads the matching `.min.js` files into your configured `jsDir`, and the copied `utils/templui.go` already points each `@component.Script()` call at your configured `jsPublicPath`.
+`templui init` installs the shared utils files. `templui add` downloads both script variants into your configured `jsDir`, and the copied `utils/templui.go` already points each `@component.Script()` call at your configured `jsPublicPath`.
 
 ### 10. Update Components
 

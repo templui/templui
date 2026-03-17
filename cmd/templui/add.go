@@ -407,9 +407,19 @@ func installUtils(config Config, utilPaths []string, ref string, force bool) err
 	return nil
 }
 
-// installComponentJS downloads the component's own JS asset when present.
+// installComponentJS downloads both script variants so callers can switch
+// between minified and unminified assets without reinstalling components.
 func installComponentJS(config Config, comp ComponentDef, ref string, force bool) error {
-	jsFileName := comp.Name + ".min.js"
+	for _, jsFileName := range []string{comp.Name + ".js", comp.Name + ".min.js"} {
+		if err := installComponentJSFile(config, comp, ref, force, jsFileName); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func installComponentJSFile(config Config, comp ComponentDef, ref string, force bool, jsFileName string) error {
 	jsDestPath := filepath.Join(config.JSDir, jsFileName)
 
 	err := os.MkdirAll(config.JSDir, 0755)
