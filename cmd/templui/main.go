@@ -11,8 +11,6 @@ import (
 const (
 	configFileName = ".templui.json"
 	registryPath   = "internal/registry/registry.json" // Path to the registry within the repository
-	// Base URL for fetching raw file content.
-	rawContentBaseURL = "https://raw.githubusercontent.com/templui/templui/"
 )
 
 // getVersion returns the version from build info or dev version for local builds.
