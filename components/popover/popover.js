@@ -1,5 +1,5 @@
-import "./floating_ui_dom.js";
 import "./floating_ui_core.js";
+import "./floating_ui_dom.js";
 
 (function () {
   "use strict";
