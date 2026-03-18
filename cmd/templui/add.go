@@ -106,7 +106,7 @@ func runAdd(args []string, commandArg string, force bool, installed bool) {
 		if strings.Contains(err.Error(), "status code 404") {
 			fmt.Printf("❌ Error fetching registry: %v\n", err)
 			fmt.Printf("   Check if the ref '%s' exists and contains the file '%s'.\n", targetRef, registryPath)
-			fmt.Printf("   Registry URL attempted: %s%s/%s\n", rawContentBaseURL, targetRef, registryPath)
+			fmt.Printf("   Registry URL attempted: %s\n", buildRawContentURL(targetRef, registryPath))
 		} else {
 			fmt.Printf("❌ Error fetching registry: %v\n", err)
 		}
@@ -264,7 +264,7 @@ func installComponent(
 
 		// Proceed with download and write only if necessary.
 		if shouldWriteFile {
-			fileURL := rawContentBaseURL + ref + "/" + repoFilePath
+			fileURL := buildRawContentURL(ref, repoFilePath)
 			fmt.Printf("      ⬇️  Downloading %s...\n", fileURL)
 			data, err := downloadFile(fileURL)
 			if err != nil {
@@ -369,7 +369,7 @@ func installUtils(config Config, utilPaths []string, ref string, force bool) err
 		}
 
 		if shouldWriteFile {
-			fileURL := rawContentBaseURL + ref + "/" + repoUtilPath
+			fileURL := buildRawContentURL(ref, repoUtilPath)
 			fmt.Printf("   Downloading util %s...\n", fileURL)
 			data, err := downloadFile(fileURL)
 			if err != nil {
@@ -442,11 +442,7 @@ func installComponentJSFile(config Config, ref string, sourceRepoPath string, fo
 		return nil
 	}
 
-<<<<<<< Updated upstream
-	jsSourceURL := rawContentBaseURL + ref + "/components/" + comp.Name + "/" + jsFileName
-=======
 	jsSourceURL := buildRawContentURL(ref, sourceRepoPath)
->>>>>>> Stashed changes
 	fmt.Printf("   Downloading JavaScript: %s\n", jsSourceURL)
 	jsData, err := downloadFile(jsSourceURL)
 	if err != nil {

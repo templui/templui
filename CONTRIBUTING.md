@@ -11,6 +11,7 @@ First off, thank you for considering contributing to templUI! We're excited to h
 - [Task](https://taskfile.dev) - Cross-platform task runner
 
 Install Task:
+
 ```bash
 go install github.com/go-task/task/v3/cmd/task@latest
 ```
@@ -18,19 +19,37 @@ go install github.com/go-task/task/v3/cmd/task@latest
 ### Development Workflow
 
 Start the development server:
+
 ```bash
 task dev
 ```
 
 This runs all watchers in parallel:
+
 - `templ` - Template generation with integrated server and hot reload
 - `tailwindcss` - CSS compilation
 - `shiki-highlighter` - Syntax highlighting service
 - `esbuild` - JavaScript minification for component scripts
 
 See available tasks:
+
 ```bash
 task --list
+```
+
+### Testing CLI changes against your fork
+
+Set `TEMPLUI_REPO` in your shell before running the CLI:
+
+```bash
+task install-templui
+
+# current shell session
+export TEMPLUI_REPO=your-github-user/templui
+templui add@your-branch button
+
+# one command
+TEMPLUI_REPO=your-github-user/templui templui add@your-branch button
 ```
 
 ## Our Vision and Your Contributions
