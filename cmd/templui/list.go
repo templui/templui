@@ -60,7 +60,7 @@ func listComponents(ref string) error {
 			}
 
 			jsStatus := ""
-			if comp.HasJS {
+			if len(comp.JSFiles) > 0 {
 				jsStatus = " [JS]"
 			}
 
