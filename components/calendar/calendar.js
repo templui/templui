@@ -171,7 +171,7 @@
 
     // Add empty cells for offset
     for (let i = 0; i < startOffset; i++) {
-      daysContainer.innerHTML += '<div class="h-8 w-8"></div>';
+      daysContainer.innerHTML += '<div class="h-[var(--cell-size)] w-[var(--cell-size)]"></div>';
     }
 
     // Add day buttons
@@ -182,7 +182,7 @@
       const isToday = currentDate.getTime() === todayUTC.getTime();
 
       let classes =
-        "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium focus:outline-none focus:ring-1 focus:ring-ring";
+        "inline-flex h-[var(--cell-size)] w-[var(--cell-size)] items-center justify-center rounded-md text-sm font-medium focus:outline-none focus:ring-1 focus:ring-ring";
 
       if (isSelected) {
         classes += " bg-primary text-primary-foreground hover:bg-primary/90";

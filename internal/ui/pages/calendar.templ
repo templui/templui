@@ -16,6 +16,16 @@ templ Calendar() {
 				Text: "Installation",
 			},
 			{
+				ID:   "examples",
+				Text: "Examples",
+				Children: []modules.TableOfContentsItem{
+					{
+						ID:   "sizes",
+						Text: "Sizes",
+					},
+				},
+			},
+			{
 				ID:   "api",
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
@@ -61,6 +71,17 @@ templ Calendar() {
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
+				Title: "Examples",
+				ID:    "examples",
+			}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Sizes",
+					ShowcaseFile:    showcase.CalendarSizes(),
+					PreviewCodeFile: "calendar_sizes.templ",
+					ID:              "sizes",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "API Reference",
 				ID:    "api",
 			}) {
@@ -81,7 +102,7 @@ templ Calendar() {
 								Name:        "Class",
 								Type:        "string",
 								Default:     "",
-								Description: "Additional CSS classes to apply to the calendar.",
+								Description: "Additional CSS classes to apply to the calendar, e.g. `[--cell-size:2.5rem]` to override the cell size.",
 								Required:    false,
 							},
 							{

@@ -104,7 +104,11 @@ templ Calendar(props ...Props) {
 		// Generate short month names (English only, JS will update with localized)
 		monthNames := []string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 	}}
-	<div class={ p.Class } id={ p.ID + "-wrapper" } data-tui-calendar-wrapper="true">
+	<div
+		class={ utils.TwMerge("inline-flex flex-col [--cell-size:2rem]", p.Class) }
+		id={ p.ID + "-wrapper" }
+		data-tui-calendar-wrapper="true"
+	>
 		if p.RenderHiddenInput {
 			<input
 				type="hidden"
@@ -116,6 +120,7 @@ templ Calendar(props ...Props) {
 		}
 		<div
 			id={ p.ID }
+			class="inline-flex flex-col"
 			data-tui-calendar-container="true"
 			data-tui-calendar-locale-tag={ string(p.LocaleTag) }
 			data-tui-calendar-initial-month={ strconv.Itoa(initialMonth) }
@@ -124,7 +129,7 @@ templ Calendar(props ...Props) {
 			data-tui-calendar-start-of-week={ int(initialStartOfWeek) }
 		>
 			<!-- Calendar Header -->
-			<div class="flex items-center gap-2 mb-4">
+			<div class="flex w-full items-center gap-2 mb-4">
 				<button
 					type="button"
 					data-tui-calendar-prev
@@ -183,9 +188,9 @@ templ Calendar(props ...Props) {
 				</button>
 			</div>
 			<!-- Weekday Headers -->
-			<div data-tui-calendar-weekdays class="grid grid-cols-7 gap-1 mb-1 place-items-center"></div>
+			<div data-tui-calendar-weekdays class="inline-grid grid-cols-[repeat(7,var(--cell-size))] gap-1 mb-1 place-items-center"></div>
 			<!-- Calendar Day Grid -->
-			<div data-tui-calendar-days class="grid grid-cols-7 gap-1 place-items-center"></div>
+			<div data-tui-calendar-days class="inline-grid grid-cols-[repeat(7,var(--cell-size))] gap-1 place-items-center"></div>
 		</div>
 	</div>
 }

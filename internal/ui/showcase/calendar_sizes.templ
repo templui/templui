@@ -5,11 +5,13 @@ import (
 	"github.com/templui/templui/components/card"
 )
 
-templ CalendarDefault() {
+templ CalendarSizes() {
 	<div>
 		@card.Card() {
 			@card.Content() {
-				@calendar.Calendar()
+				@calendar.Calendar(calendar.Props{
+					Class: "[--cell-size:2.5rem]",
+				})
 			}
 		}
 	</div>

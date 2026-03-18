@@ -73,6 +73,7 @@ func main() {
 
 		// Calendar
 		"out/showcase/calendar_default.html": showcase.CalendarDefault(),
+		"out/showcase/calendar_sizes.html":   showcase.CalendarSizes(),
 
 		// Card
 		"out/showcase/card_default.html":    showcase.CardDefault(),
