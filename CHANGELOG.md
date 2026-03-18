@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.9.0] - 2026-03-18
+
+### Added
+
+- calendar: Added configurable calendar cell sizing via the `--cell-size` CSS custom property, plus a new size showcase for the docs
+- CLI: Added `TEMPLUI_REPO` so the CLI can fetch registry and component assets from a fork or alternate GitHub repository (#524)
+
+### Fixed
+
+- CLI: Fixed component installs so registry-managed JavaScript assets are downloaded correctly and component scripts are loaded as ES modules (#525)
+
 ## [v1.8.1] - 2026-03-17
 
 ### Added
