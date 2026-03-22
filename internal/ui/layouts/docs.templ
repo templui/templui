@@ -27,7 +27,7 @@ templ DocsLayout(title, description string, tocItems []modules.TableOfContentsIt
 				</main>
 				<div class="hidden lg:block w-64 overflow-y-auto">
 					@templ.Fragment("toc") {
-						<div class="pt-8 pb-8 pr-6 pl-4" id="toc-container" hx-swap-oob="true">
+						<div class="pt-8 pb-16 pr-6 pl-4" id="toc-container" hx-swap-oob="true">
 							@modules.TableOfContents(modules.TableOfContentsProps{
 								Items: tocItems,
 							})

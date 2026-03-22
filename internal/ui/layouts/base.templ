@@ -95,6 +95,7 @@ templ BaseLayout(title, description string) {
 		>
 			<div class="min-h-screen flex flex-col">
 				{ children... }
+				@modules.FloatingXBadge()
 			</div>
 		</body>
 		// HTMX
