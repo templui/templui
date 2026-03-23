@@ -7,7 +7,7 @@ import (
 	"io"
 	"io/fs"
 	"net/http"
-	"path/filepath"
+	"path"
 	"strings"
 	"time"
 
@@ -133,8 +133,8 @@ func SetupScriptRoutes(mux *http.ServeMux, isDevelopment bool) {
 	}
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		path := strings.TrimPrefix(r.URL.Path, "/templui/js/")
-		if path == r.URL.Path || path == "" || strings.Contains(path, "..") {
+		urlPath := strings.TrimPrefix(r.URL.Path, "/templui/js/")
+		if urlPath == r.URL.Path || urlPath == "" || strings.Contains(urlPath, "..") {
 			http.NotFound(w, r)
 			return
 		}
@@ -146,10 +146,10 @@ func SetupScriptRoutes(mux *http.ServeMux, isDevelopment bool) {
 			w.Header().Set("Cache-Control", "public, max-age=31536000")
 		}
 
-		fileName := filepath.Base(path)
+		fileName := path.Base(urlPath)
 		component := strings.TrimSuffix(fileName, ".min.js")
 		component = strings.TrimSuffix(component, ".js")
-		file, err := fs.ReadFile(components.TemplFiles, filepath.Join(component, fileName))
+		file, err := fs.ReadFile(components.TemplFiles, path.Join(component, fileName))
 		if err != nil {
 			http.NotFound(w, r)
 			return
