@@ -204,7 +204,7 @@ tasks:
     desc: Watch Tailwind CSS changes
     cmds:
       - |
-        TEMPLUI_PATH="$(go list -m -f {{`'{{.Dir}}'`}} github.com/templui/templui)" && \
+        TEMPLUI_PATH="$(go list -mod=mod -m -f {{`'{{.Dir}}'`}} github.com/templui/templui)" && \
         printf '%s\n' \
           '@source "./**/*.templ";' \
           "@source \"$TEMPLUI_PATH/components/**/*.templ\";" \
