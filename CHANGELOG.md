@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.9.2] - 2026-03-23
+
+### Fixed
+
+- scripts: Fixed embedded component script routes on Windows by switching to slash-separated paths when reading from the embedded filesystem, so `/templui/js/...` no longer returns `404` for valid component assets (#526)
+- docs: Fixed the import workflow Tailwind watcher example to resolve `TEMPLUI_PATH` with `go list -mod=mod`, which restores vendored and Docker-based setups (#527)
+
 ## [v1.9.1] - 2026-03-18
 
 ### Fixed
