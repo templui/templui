@@ -35,16 +35,14 @@ type TriggerProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	For        string // Reference to a specific sheet ID (for external triggers)
+	For        string // Sheet root ID for external triggers
 }
 
 type ContentProps struct {
-	ID              string
 	Class           string
 	Attributes      templ.Attributes
 	HideCloseButton bool
-	Side            Side //
-	Open            bool // Initial open state for standalone usage
+	Side            Side
 }
 
 type HeaderProps struct {
@@ -138,20 +136,16 @@ templ Content(props ...ContentProps) {
 	}
 	// Sheet content uses Dialog content with sheet-specific styles
 	@dialog.Content(dialog.ContentProps{
-		ID:              p.ID,
-		Open:            p.Open,
 		HideCloseButton: p.HideCloseButton,
 		Class: utils.TwMerge(
 			// First apply side-specific positioning and animations
 			getSideClasses(p.Side),
-			// Default gap matching shadcn (no padding in content)
-			"gap-4 !p-0", // Remove Dialog's p-6 padding
+			// Move panel layout overrides to the inner dialog panel
+			"[&_[data-tui-dialog-panel]]:gap-4 [&_[data-tui-dialog-panel]]:!p-0",
 			// Override Dialog styles
 			"!scale-100",    // Reset Dialog's scale animation
 			"!rounded-none", // Remove dialog rounded corners
 			"!opacity-100",  // Keep fully opaque - no fade, only slide
-			// Remove pointer-events control during animation
-			"!pointer-events-auto data-[tui-dialog-hidden=true]:!pointer-events-none",
 			// User-provided classes last
 			p.Class,
 		),
@@ -254,26 +248,26 @@ func getSideClasses(side Side) string {
 	case SideRight:
 		return baseClasses +
 			// Positioning
-			"!inset-y-0 !right-0 !left-auto !top-auto " +
+			"!top-0 !bottom-0 !right-0 !left-auto " +
 			// Size
-			"h-full w-3/4 sm:max-w-sm " +
+			"!h-dvh !max-h-dvh w-3/4 sm:!max-w-sm " +
 			// Border
 			"border-l border-t-0 border-r-0 border-b-0 " +
 			// Reset Dialog transforms
-			"!translate-y-0 " +
+			"!translate-x-0 !translate-y-0 " +
 			// Slide animation
 			"data-[tui-dialog-open=false]:!translate-x-full " +
 			"data-[tui-dialog-open=true]:!translate-x-0"
 	case SideLeft:
 		return baseClasses +
 			// Positioning
-			"!inset-y-0 !left-0 !right-auto !top-auto " +
+			"!top-0 !bottom-0 !left-0 !right-auto " +
 			// Size
-			"h-full w-3/4 sm:max-w-sm " +
+			"!h-dvh !max-h-dvh w-3/4 sm:!max-w-sm " +
 			// Border
 			"border-r border-t-0 border-l-0 border-b-0 " +
 			// Reset Dialog transforms
-			"!translate-y-0 " +
+			"!translate-x-0 !translate-y-0 " +
 			// Slide animation
 			"data-[tui-dialog-open=false]:!-translate-x-full " +
 			"data-[tui-dialog-open=true]:!translate-x-0"
@@ -306,10 +300,10 @@ func getSideClasses(side Side) string {
 	default:
 		return baseClasses +
 			// Default to right side
-			"!inset-y-0 !right-0 !left-auto !top-auto " +
-			"h-full w-3/4 " +
+			"!top-0 !bottom-0 !right-0 !left-auto " +
+			"!h-dvh !max-h-dvh w-3/4 sm:!max-w-sm " +
 			"border-l border-t-0 border-r-0 border-b-0 " +
-			"!translate-y-0 " +
+			"!translate-x-0 !translate-y-0 " +
 			"data-[tui-dialog-open=false]:!translate-x-full " +
 			"data-[tui-dialog-open=true]:!translate-x-0"
 	}

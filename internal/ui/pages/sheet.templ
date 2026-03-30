@@ -27,10 +27,6 @@ templ Sheet() {
 						ID:   "external-trigger",
 						Text: "External Trigger",
 					},
-					{
-						ID:   "standalone-content",
-						Text: "Standalone Content",
-					},
 				},
 			},
 			{
@@ -114,12 +110,6 @@ templ Sheet() {
 					PreviewCodeFile: "sheet_external_trigger.templ",
 					ID:              "external-trigger",
 				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Standalone Content",
-					ShowcaseFile:    showcase.SheetStandalone(),
-					PreviewCodeFile: "sheet_standalone.templ",
-					ID:              "standalone-content",
-				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Installation",
@@ -141,8 +131,8 @@ templ Sheet() {
 							{
 								Name:        "ID",
 								Type:        "string",
-								Default:     "randomID",
-								Description: "Unique identifier for the sheet (auto-generated if not provided)",
+								Default:     "\"\"",
+								Description: "Optional HTML id for the sheet root. Useful for external targeting.",
 							},
 							{
 								Name:        "Class",
@@ -209,7 +199,7 @@ templ Sheet() {
 								Name:        "For",
 								Type:        "string",
 								Default:     "\"\"",
-								Description: "ID of the sheet to trigger (for external triggers outside Sheet wrapper)",
+								Description: "Optional sheet root id for external triggers outside Sheet wrapper",
 							},
 						},
 					})
@@ -237,22 +227,10 @@ templ Sheet() {
 								Description: "Hide the close X button in the top right corner",
 							},
 							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Sheet ID for standalone usage (when not wrapped in Sheet component)",
-							},
-							{
 								Name:        "Side",
 								Type:        "Side",
 								Default:     "SideRight",
-								Description: "Side for standalone usage (when not wrapped in Sheet component)",
-							},
-							{
-								Name:        "Open",
-								Type:        "bool",
-								Default:     "false",
-								Description: "Initial open state for standalone usage (when not wrapped in Sheet component)",
+								Description: "Side from which the sheet slides in. Usually inherited from Sheet.",
 							},
 						},
 					})

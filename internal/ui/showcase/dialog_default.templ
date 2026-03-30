@@ -8,9 +8,7 @@ import (
 )
 
 templ DialogDefault() {
-	@dialog.Dialog(dialog.Props{
-		ID: "default-dialog",
-	}) {
+	@dialog.Dialog() {
 		@dialog.Trigger() {
 			@button.Button(button.Props{
 				Variant: button.VariantOutline,

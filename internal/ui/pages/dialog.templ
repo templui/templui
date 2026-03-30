@@ -23,10 +23,6 @@ templ Dialog() {
 						ID:   "external-trigger",
 						Text: "External Trigger",
 					},
-					{
-						ID:   "standalone",
-						Text: "Standalone Content",
-					},
 				},
 			},
 			{
@@ -121,12 +117,6 @@ templ Dialog() {
 					ShowcaseFile:    showcase.DialogExternalTrigger(),
 					PreviewCodeFile: "dialog_external_trigger.templ",
 				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					ID:              "standalone",
-					SectionName:     "Standalone Content",
-					ShowcaseFile:    showcase.DialogStandalone(),
-					PreviewCodeFile: "dialog_standalone.templ",
-				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "API Reference",
@@ -141,8 +131,8 @@ templ Dialog() {
 							{
 								Name:        "ID",
 								Type:        "string",
-								Default:     "randomID",
-								Description: "Unique identifier for the dialog",
+								Default:     "\"\"",
+								Description: "Optional HTML id for the dialog root. Useful for external targeting.",
 							},
 							{
 								Name:        "Class",
@@ -180,7 +170,7 @@ templ Dialog() {
 				<div id="trigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Trigger",
-						Description: "Element that triggers the dialog to open. Can be used inside Dialog wrapper or externally with For prop.",
+						Description: "Element that triggers the dialog to open. Usually used inside Dialog, or externally by targeting a dialog root ID with For.",
 						Items: []modules.APITableItem{
 							{
 								Name:        "ID",
@@ -204,7 +194,7 @@ templ Dialog() {
 								Name:        "For",
 								Type:        "string",
 								Default:     "\"\"",
-								Description: "ID of a specific dialog to trigger (for external triggers)",
+								Description: "Optional dialog root id for external triggers",
 							},
 						},
 					})
@@ -212,14 +202,8 @@ templ Dialog() {
 				<div id="content" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Content",
-						Description: "Dialog content container. Can be used standalone for HTMX or inside Dialog wrapper.",
+						Description: "Native dialog content rendered inside Dialog.",
 						Items: []modules.APITableItem{
-							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Dialog ID for standalone usage (when no context)",
-							},
 							{
 								Name:        "Class",
 								Type:        "string",
@@ -237,18 +221,6 @@ templ Dialog() {
 								Type:        "bool",
 								Default:     "false",
 								Description: "Whether to hide the default close button",
-							},
-							{
-								Name:        "Open",
-								Type:        "bool",
-								Default:     "false",
-								Description: "Initial open state for standalone usage",
-							},
-							{
-								Name:        "DisableAutoFocus",
-								Type:        "bool",
-								Default:     "false",
-								Description: "Whether to disable automatic focusing of the first focusable element",
 							},
 						},
 					})
@@ -410,7 +382,7 @@ templ Dialog() {
 								Name:        "For",
 								Type:        "string",
 								Default:     "\"\"",
-								Description: "ID of the dialog to close (defaults to closest dialog if empty)",
+								Description: "Optional dialog root id to close (defaults to closest dialog if empty)",
 							},
 						},
 					})
@@ -423,16 +395,16 @@ templ Dialog() {
 						Language:       "javascript",
 						ShowCopyButton: true,
 						CodeContent: `// Open a dialog programmatically
-window.tui.dialog.open("dialog-id");
+window.tui.dialog.open("dialog-root-id");
 
 // Close a dialog
-window.tui.dialog.close("dialog-id");
+window.tui.dialog.close("dialog-root-id");
 
 // Toggle dialog state
-window.tui.dialog.toggle("dialog-id");
+window.tui.dialog.toggle("dialog-root-id");
 
 // Check if dialog is open (returns true/false)
-const isOpen = window.tui.dialog.isOpen("dialog-id");`,
+const isOpen = window.tui.dialog.isOpen("dialog-root-id");`,
 					})
 				}
 			}
