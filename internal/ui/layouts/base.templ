@@ -100,17 +100,16 @@ templ BaseLayout(title, description string) {
 		</body>
 		// HTMX
 		<script nonce={ templ.GetNonce(ctx) }>
-			// Active link updater
-			document.body.addEventListener('htmx:afterSettle', () => {
+			document.body.addEventListener('htmx:after:swap', (e) => {
+				// Active link updater
 				document.querySelectorAll('aside a').forEach(a => {
 					a.classList.toggle('bg-accent', a.href === location.href);
 				});
-			});
 
-			// Scroll to top after content swap
-			document.body.addEventListener('htmx:afterSwap', (e) => {
-				if (e.detail.target.id === 'main-content') {
-					e.detail.target.scrollTop = 0;
+				// Scroll to top after content swap
+				const target = e.detail.ctx.target;
+				if (target && target.id === 'main-content') {
+					target.scrollTop = 0;
 				}
 			});
 		</script>
