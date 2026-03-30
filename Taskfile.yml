@@ -1,9 +1,5 @@
 version: "3"
 
-vars:
-  TAILWIND_CMD:
-    sh: command -v tailwindcss >/dev/null 2>&1 && echo "tailwindcss" || echo "npx tailwindcss@latest"
-
 tasks:
   # Development Tools
   templ:
@@ -20,12 +16,12 @@ tasks:
   tailwind-clean:
     desc: Clean tailwind output
     cmds:
-      - "{{.TAILWIND_CMD}} -i ./assets/css/input.css -o ./assets/css/output.css --clean"
+      - "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --clean"
 
   tailwind-watch:
     desc: Run tailwindcss in watch mode
     cmds:
-      - "{{.TAILWIND_CMD}} -i ./assets/css/input.css -o ./assets/css/output.css --watch"
+      - "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch"
 
   minify-js-components:
     desc: Minify and watch JavaScript component files

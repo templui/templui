@@ -48,15 +48,9 @@ go install github.com/a-h/templ/cmd/templ@latest
 
 ### Tailwind CSS v4.1+
 
-**Standalone CLI (Recommended)** - Best performance, no Node.js required:
+The Tailwind CSS standalone CLI is required:
 - Download from [GitHub Releases](https://github.com/tailwindlabs/tailwindcss/releases/latest)
 - Or use your package manager
-
-**Alternative:** Use via npx:
-
-```shell
-npx tailwindcss@latest
-```
 
 ### Task
 
@@ -190,10 +184,6 @@ This is your Tailwind entry file. Tailwind reads it and writes the compiled resu
 ```yaml
 version: "3"
 
-vars:
-  TAILWIND_CMD:
-    sh: command -v tailwindcss >/dev/null 2>&1 && echo "tailwindcss" || echo "npx tailwindcss@latest"
-
 tasks:
   templ:
     desc: Run templ with integrated server and hot reload
@@ -209,7 +199,7 @@ tasks:
           '@source "./**/*.templ";' \
           "@source \"$TEMPLUI_PATH/components/**/*.templ\";" \
           > ./assets/css/sources.generated.css && \
-        {{.TAILWIND_CMD}} -i ./assets/css/input.css -o ./assets/css/output.css --watch
+        tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch
 
   dev:
     desc: Start development server with hot reload
@@ -466,10 +456,6 @@ Create `Taskfile.yml` in your project root:
 ```yaml
 version: "3"
 
-vars:
-  TAILWIND_CMD:
-    sh: command -v tailwindcss >/dev/null 2>&1 && echo "tailwindcss" || echo "npx tailwindcss@latest"
-
 tasks:
   templ:
     desc: Run templ with integrated server and hot reload
@@ -479,7 +465,7 @@ tasks:
   tailwind:
     desc: Watch Tailwind CSS changes
     cmds:
-      - "{{.TAILWIND_CMD}} -i ./assets/css/input.css -o ./assets/css/output.css --watch"
+      - "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch"
 
   dev:
     desc: Start development server with hot reload
@@ -493,7 +479,7 @@ Run everything with:
 task dev
 ```
 
-> **💡 Tip:** Smart Tailwind Detection automatically uses standalone CLI if installed, falls back to `npx` - no configuration needed!
+> **📝 Note:** The Tailwind CSS standalone CLI is required for this workflow.
 
 > **📝 Note:** Adjust the `--proxy` port (default: 8090) if your app uses a different port. templ's dev server runs at http://localhost:7331
 
