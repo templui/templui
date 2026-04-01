@@ -137,10 +137,10 @@ templ DatePicker(props ...Props) {
 						Class: "p-3",
 					}) {
 						@calendar.Calendar(calendar.Props{
-							LocaleTag:         calendar.LocaleTag(p.LocaleTag),
-							StartOfWeek:       p.StartOfWeek,
-							Value:             valuePtr,
-							RenderHiddenInput: false,
+							LocaleTag:       calendar.LocaleTag(p.LocaleTag),
+							StartOfWeek:     p.StartOfWeek,
+							Value:           valuePtr,
+							HideHiddenInput: true,
 						})
 					}
 				}

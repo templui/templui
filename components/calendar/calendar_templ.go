@@ -41,15 +41,15 @@ var (
 )
 
 type Props struct {
-	ID                string
-	Class             string
-	LocaleTag         LocaleTag
-	Value             *time.Time
-	Name              string
-	InitialMonth      int  // Optional: 0-11 (Default: current or from Value). Controls the initially displayed month view.
-	InitialYear       int  // Optional: (Default: current or from Value). Controls the initially displayed year view.
-	StartOfWeek       *Day // Optional: 0-6 [Sun-Sat] (Default: 1).
-	RenderHiddenInput bool // Optional: Whether to render the hidden input (Default: true). Set to false when used inside DatePicker.
+	ID              string
+	Class           string
+	LocaleTag       LocaleTag
+	Value           *time.Time
+	Name            string
+	InitialMonth    int  // Optional: 0-11 (Default: current or from Value). Controls the initially displayed month view.
+	InitialYear     int  // Optional: (Default: current or from Value). Controls the initially displayed year view.
+	StartOfWeek     *Day // Optional: 0-6 [Sun-Sat] (Default: 1).
+	HideHiddenInput bool // Optional: Hide the hidden input when a parent component owns form submission.
 }
 
 func Calendar(props ...Props) templ.Component {
@@ -86,13 +86,6 @@ func Calendar(props ...Props) templ.Component {
 		}
 		if p.LocaleTag == "" {
 			p.LocaleTag = LocaleDefaultTag
-		}
-		// Default to rendering hidden input unless explicitly set to false
-		if p.RenderHiddenInput == false && len(props) > 0 {
-			// Only respect false if it was explicitly passed
-			p.RenderHiddenInput = props[0].RenderHiddenInput
-		} else {
-			p.RenderHiddenInput = true
 		}
 
 		initialStartOfWeek := Monday
@@ -155,7 +148,7 @@ func Calendar(props ...Props) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID + "-wrapper")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 109, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 102, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -165,7 +158,7 @@ func Calendar(props ...Props) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if p.RenderHiddenInput {
+		if !p.HideHiddenInput {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<input type=\"hidden\" name=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -173,7 +166,7 @@ func Calendar(props ...Props) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 115, Col: 17}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 108, Col: 17}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -186,7 +179,7 @@ func Calendar(props ...Props) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(initialSelectedISO)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 116, Col: 30}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 109, Col: 30}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -199,7 +192,7 @@ func Calendar(props ...Props) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID + "-hidden")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 117, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 110, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -217,7 +210,7 @@ func Calendar(props ...Props) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 122, Col: 12}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 115, Col: 12}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -230,7 +223,7 @@ func Calendar(props ...Props) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.LocaleTag))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 125, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 118, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -243,7 +236,7 @@ func Calendar(props ...Props) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(initialMonth))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 126, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 119, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -256,7 +249,7 @@ func Calendar(props ...Props) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(initialYear))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 127, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 120, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -269,7 +262,7 @@ func Calendar(props ...Props) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(initialSelectedISO)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 128, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 121, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -282,7 +275,7 @@ func Calendar(props ...Props) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(int(initialStartOfWeek))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 129, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 122, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -303,7 +296,7 @@ func Calendar(props ...Props) templ.Component {
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID + "-month-select")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 145, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 138, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -321,7 +314,7 @@ func Calendar(props ...Props) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(i))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 151, Col: 39}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 144, Col: 39}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -344,7 +337,7 @@ func Calendar(props ...Props) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(i))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 151, Col: 121}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 144, Col: 121}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -357,7 +350,7 @@ func Calendar(props ...Props) templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(monthNames[i])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 152, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 145, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -375,7 +368,7 @@ func Calendar(props ...Props) templ.Component {
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID + "-month-value")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 157, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 150, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -388,7 +381,7 @@ func Calendar(props ...Props) templ.Component {
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(monthNames[currentMonth])
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 157, Col: 68}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 150, Col: 68}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -409,7 +402,7 @@ func Calendar(props ...Props) templ.Component {
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID + "-year-select")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 165, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 158, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -427,7 +420,7 @@ func Calendar(props ...Props) templ.Component {
 			var templ_7745c5c3_Var21 string
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(year))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 171, Col: 42}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 164, Col: 42}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
@@ -450,7 +443,7 @@ func Calendar(props ...Props) templ.Component {
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(year))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 172, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 165, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -468,7 +461,7 @@ func Calendar(props ...Props) templ.Component {
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID + "-year-value")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 177, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 170, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
@@ -481,7 +474,7 @@ func Calendar(props ...Props) templ.Component {
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(currentYear))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 177, Col: 68}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 170, Col: 68}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {

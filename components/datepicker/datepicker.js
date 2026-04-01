@@ -1,5 +1,5 @@
 (function () {
-  'use strict';
+  "use strict";
 
   /**
    * Reactive Binding for hidden inputs
@@ -14,19 +14,22 @@
     if (input._tui) return;
     input._tui = true;
 
-    const desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+    const desc = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value",
+    );
     if (!desc?.set) return;
 
-    Object.defineProperty(input, 'value', {
+    Object.defineProperty(input, "value", {
       get: desc.get,
       set(v) {
         const old = this.value;
         desc.set.call(this, v);
         if (old !== v) {
-          this.dispatchEvent(new Event('input', { bubbles: true }));
+          this.dispatchEvent(new Event("input", { bubbles: true }));
         }
       },
-      configurable: true
+      configurable: true,
     });
   }
 
@@ -35,33 +38,35 @@
     if (!isoString) return null;
     const parts = isoString.match(/^(\d{4})-(\d{2})-(\d{2})$/);
     if (!parts) return null;
-    
+
     const year = parseInt(parts[1], 10);
     const month = parseInt(parts[2], 10) - 1;
     const day = parseInt(parts[3], 10);
     const date = new Date(Date.UTC(year, month, day));
-    
-    if (date.getUTCFullYear() === year && 
-        date.getUTCMonth() === month && 
-        date.getUTCDate() === day) {
+
+    if (
+      date.getUTCFullYear() === year &&
+      date.getUTCMonth() === month &&
+      date.getUTCDate() === day
+    ) {
       return date;
     }
     return null;
   }
-  
+
   function formatDate(date, format, locale) {
     if (!date || isNaN(date.getTime())) return "";
-    
+
     const options = { timeZone: "UTC" };
     const formatMap = {
       "locale-short": "short",
       "locale-long": "long",
       "locale-full": "full",
-      "locale-medium": "medium"
+      "locale-medium": "medium",
     };
-    
+
     options.dateStyle = formatMap[format] || "medium";
-    
+
     try {
       return new Intl.DateTimeFormat(locale, options).format(date);
     } catch (e) {
@@ -72,7 +77,7 @@
       return `${year}-${month}-${day}`;
     }
   }
-  
+
   function findRoot(element) {
     return element?.closest("[data-tui-datepicker-root]") || null;
   }
@@ -80,7 +85,9 @@
   function findElements(root) {
     const trigger = root?.querySelector("[data-tui-datepicker='true']");
     const calendar = root?.querySelector("[data-tui-calendar-container]");
-    const hiddenInput = root?.querySelector("[data-tui-datepicker-hidden-input]");
+    const hiddenInput = root?.querySelector(
+      "[data-tui-datepicker-hidden-input]",
+    );
     const display = trigger?.querySelector("[data-tui-datepicker-display]");
 
     return { trigger, calendar, hiddenInput, display };
@@ -96,16 +103,22 @@
       // ignore
     }
   }
-  
+
   // Update display
   function updateDisplay(root) {
     const elements = findElements(root);
     if (!elements.trigger || !elements.display || !elements.hiddenInput) return;
-    
-    const format = elements.trigger.getAttribute("data-tui-datepicker-display-format") || "locale-medium";
-    const locale = elements.trigger.getAttribute("data-tui-datepicker-locale-tag") || "en-US";
-    const placeholder = elements.trigger.getAttribute("data-tui-datepicker-placeholder") || "Select a date";
-    
+
+    const format =
+      elements.trigger.getAttribute("data-tui-datepicker-display-format") ||
+      "locale-medium";
+    const locale =
+      elements.trigger.getAttribute("data-tui-datepicker-locale-tag") ||
+      "en-US";
+    const placeholder =
+      elements.trigger.getAttribute("data-tui-datepicker-placeholder") ||
+      "Select a date";
+
     if (elements.hiddenInput.value) {
       const date = parseISODate(elements.hiddenInput.value);
       if (date) {
@@ -114,29 +127,31 @@
         return;
       }
     }
-    
+
     elements.display.textContent = placeholder;
     elements.display.classList.add("text-muted-foreground");
   }
-  
+
+  function toISODate(date) {
+    if (!date || isNaN(date.getTime())) return "";
+    return date.toISOString().split("T")[0];
+  }
+
   // Handle calendar date selection
   document.addEventListener("calendar-date-selected", (e) => {
     const calendar = e.target;
     const root = findRoot(calendar);
     const elements = findElements(root);
-    if (!elements.display || !e.detail?.date) return;
-    
-    const format = elements.trigger?.getAttribute("data-tui-datepicker-display-format") || "locale-medium";
-    const locale = elements.trigger?.getAttribute("data-tui-datepicker-locale-tag") || "en-US";
-    
-    elements.display.textContent = formatDate(e.detail.date, format, locale);
-    elements.display.classList.remove("text-muted-foreground");
+    if (!elements.hiddenInput || !e.detail?.date) return;
+
+    elements.hiddenInput.value = toISODate(e.detail.date);
+    updateDisplay(root);
     closePopover(root);
   });
-  
+
   // Handle hidden input value changes (for reactive frameworks)
-  document.addEventListener('input', (e) => {
-    if (!e.target.matches('[data-tui-datepicker-hidden-input]')) return;
+  document.addEventListener("input", (e) => {
+    if (!e.target.matches("[data-tui-datepicker-hidden-input]")) return;
 
     const root = findRoot(e.target);
     if (root) {
@@ -148,7 +163,7 @@
   document.addEventListener("reset", (e) => {
     if (!e.target.matches("form")) return;
 
-    e.target.querySelectorAll('[data-tui-datepicker-root]').forEach(root => {
+    e.target.querySelectorAll("[data-tui-datepicker-root]").forEach((root) => {
       const elements = findElements(root);
       if (elements.hiddenInput) {
         elements.hiddenInput.value = "";
@@ -159,7 +174,7 @@
 
   // Initialize datepickers
   function initializeDatePickers() {
-    document.querySelectorAll('[data-tui-datepicker-root]').forEach(root => {
+    document.querySelectorAll("[data-tui-datepicker-root]").forEach((root) => {
       const elements = findElements(root);
       if (!elements.hiddenInput || elements.hiddenInput._tui) return;
 
@@ -170,12 +185,15 @@
   }
 
   // Initialize on DOM ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeDatePickers);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeDatePickers);
   } else {
     initializeDatePickers();
   }
 
   // MutationObserver for dynamically added elements
-  new MutationObserver(initializeDatePickers).observe(document.body, { childList: true, subtree: true });
+  new MutationObserver(initializeDatePickers).observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
 })();
