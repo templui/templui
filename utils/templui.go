@@ -23,18 +23,19 @@ func TwMerge(classes ...string) string {
 	return twmerge.Merge(classes...)
 }
 
-// TwIf returns value if condition is true, otherwise an empty string.
+// If returns value if condition is true, otherwise the zero value of T.
 // Example: true, "bg-red-500" → "bg-red-500"
-func If(condition bool, value string) string {
+func If[T any](condition bool, value T) T {
+	var empty T
 	if condition {
 		return value
 	}
-	return ""
+	return empty
 }
 
-// TwIfElse returns trueValue if condition is true, otherwise falseValue.
+// IfElse returns trueValue if condition is true, otherwise falseValue.
 // Example: true, "bg-red-500", "bg-gray-300" → "bg-red-500"
-func IfElse(condition bool, trueValue string, falseValue string) string {
+func IfElse[T any](condition bool, trueValue T, falseValue T) T {
 	if condition {
 		return trueValue
 	}
