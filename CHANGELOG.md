@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.9.3] - 2026-04-01
+
+### Changed
+
+- dialog,sheet: Rebuilt dialog-based overlays around the native `<dialog>` element, simplifying trigger targeting, click-away handling, ESC handling, and sheet positioning while removing the previous duplicated overlay-layer approach (#534)
+
+### Fixed
+
+- datepicker: Fixed hidden-input ownership so date selections and reactive value updates stay in sync without duplicate calendar bindings (#536)
+- docs: Fixed the docs sidebar active-state and scroll reset handling after HTMX 4 swaps
+- docs: Fixed Tailwind setup instructions to require the standalone `tailwindcss` CLI explicitly instead of the previous `npx` fallback
+- utils: Fixed `TwIf` and `TwIfElse` to always return strings, avoiding generic-type mismatches in templ/class helpers
+
 ## [v1.9.2] - 2026-03-23
 
 ### Fixed
