@@ -62,19 +62,8 @@
   }
 
   function findHiddenInput(container) {
-    // Check wrapper first
     const wrapper = container.closest("[data-tui-calendar-wrapper]");
-    let hiddenInput = wrapper?.querySelector(
-      "[data-tui-calendar-hidden-input]",
-    );
-
-    // For datepicker integration
-    if (!hiddenInput && container.id) {
-      const parentId = container.id.replace("-calendar-instance", "");
-      hiddenInput = document.getElementById(parentId + "-hidden");
-    }
-
-    return hiddenInput;
+    return wrapper?.querySelector("[data-tui-calendar-hidden-input]") || null;
   }
 
   function renderCalendar(container) {
@@ -171,7 +160,8 @@
 
     // Add empty cells for offset
     for (let i = 0; i < startOffset; i++) {
-      daysContainer.innerHTML += '<div class="h-[var(--cell-size)] w-[var(--cell-size)]"></div>';
+      daysContainer.innerHTML +=
+        '<div class="h-[var(--cell-size)] w-[var(--cell-size)]"></div>';
     }
 
     // Add day buttons
@@ -194,9 +184,11 @@
 
       const attrs = [
         `data-tui-calendar-day="${day}"`,
-        isToday ? 'data-tui-calendar-today="true"' : '',
-        isSelected ? 'data-tui-calendar-selected="true"' : ''
-      ].filter(Boolean).join(' ');
+        isToday ? 'data-tui-calendar-today="true"' : "",
+        isSelected ? 'data-tui-calendar-selected="true"' : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
 
       daysContainer.innerHTML += `<button type="button" class="${classes}" ${attrs}>${day}</button>`;
     }
@@ -309,7 +301,6 @@
       const hiddenInput = findHiddenInput(container);
       if (hiddenInput) {
         hiddenInput.value = selectedDate.toISOString().split("T")[0];
-        hiddenInput.dispatchEvent(new Event("change", { bubbles: true }));
       }
 
       // Dispatch custom event

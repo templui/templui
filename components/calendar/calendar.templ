@@ -33,15 +33,15 @@ var (
 )
 
 type Props struct {
-	ID                string
-	Class             string
-	LocaleTag         LocaleTag
-	Value             *time.Time
-	Name              string
-	InitialMonth      int  // Optional: 0-11 (Default: current or from Value). Controls the initially displayed month view.
-	InitialYear       int  // Optional: (Default: current or from Value). Controls the initially displayed year view.
-	StartOfWeek       *Day // Optional: 0-6 [Sun-Sat] (Default: 1).
-	RenderHiddenInput bool // Optional: Whether to render the hidden input (Default: true). Set to false when used inside DatePicker.
+	ID              string
+	Class           string
+	LocaleTag       LocaleTag
+	Value           *time.Time
+	Name            string
+	InitialMonth    int  // Optional: 0-11 (Default: current or from Value). Controls the initially displayed month view.
+	InitialYear     int  // Optional: (Default: current or from Value). Controls the initially displayed year view.
+	StartOfWeek     *Day // Optional: 0-6 [Sun-Sat] (Default: 1).
+	HideHiddenInput bool // Optional: Hide the hidden input when a parent component owns form submission.
 }
 
 templ Calendar(props ...Props) {
@@ -59,13 +59,6 @@ templ Calendar(props ...Props) {
 		}
 		if p.LocaleTag == "" {
 			p.LocaleTag = LocaleDefaultTag
-		}
-		// Default to rendering hidden input unless explicitly set to false
-		if p.RenderHiddenInput == false && len(props) > 0 {
-			// Only respect false if it was explicitly passed
-			p.RenderHiddenInput = props[0].RenderHiddenInput
-		} else {
-			p.RenderHiddenInput = true
 		}
 
 		initialStartOfWeek := Monday
@@ -109,7 +102,7 @@ templ Calendar(props ...Props) {
 		id={ p.ID + "-wrapper" }
 		data-tui-calendar-wrapper="true"
 	>
-		if p.RenderHiddenInput {
+		if !p.HideHiddenInput {
 			<input
 				type="hidden"
 				name={ p.Name }

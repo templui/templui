@@ -324,10 +324,10 @@ func DatePicker(props ...Props) templ.Component {
 						}
 						ctx = templ.InitializeContext(ctx)
 						templ_7745c5c3_Err = calendar.Calendar(calendar.Props{
-							LocaleTag:         calendar.LocaleTag(p.LocaleTag),
-							StartOfWeek:       p.StartOfWeek,
-							Value:             valuePtr,
-							RenderHiddenInput: false,
+							LocaleTag:       calendar.LocaleTag(p.LocaleTag),
+							StartOfWeek:     p.StartOfWeek,
+							Value:           valuePtr,
+							HideHiddenInput: true,
 						}).Render(ctx, templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
