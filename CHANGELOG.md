@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- dialog,sheet: Rebuilt dialog-based overlays around the native `<dialog>` element, simplifying trigger targeting, click-away handling, ESC handling, and sheet positioning while removing the previous duplicated overlay-layer approach (#534)
+- dialog,sheet: Rebuilt dialog-based overlays around the native `<dialog>` element, simplifying trigger targeting, click-away handling, ESC handling, and sheet positioning while removing the previous duplicated overlay-layer approach (breaking for `dialog.Content` / `sheet.Content` users who were setting `ID` or `Open` there) (#534)
 
 ### Fixed
 
