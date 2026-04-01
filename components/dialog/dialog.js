@@ -1,271 +1,210 @@
 (function () {
   "use strict";
 
-  const LAYER_ID = "tui-dialog-layer-root";
+  const CLOSE_DURATION_MS = 200;
 
-  function getLayerRoot() {
-    let root = document.getElementById(LAYER_ID);
-    if (root) return root;
+  function getRoot(target) {
+    if (!target) return null;
 
-    root = document.createElement("div");
-    root.id = LAYER_ID;
-    root.setAttribute("data-tui-dialog-layer-root", "true");
-    document.body.appendChild(root);
-    return root;
-  }
-
-  function syncDialog(dialogId) {
-    const root = getLayerRoot();
-    const wrapper = document.querySelector(
-      `[data-tui-dialog][data-dialog-instance="${dialogId}"]`,
-    );
-    const backdrop = document.querySelector(
-      `[data-tui-dialog-backdrop][data-dialog-instance="${dialogId}"]`,
-    );
-    const content = document.querySelector(
-      `[data-tui-dialog-content][data-dialog-instance="${dialogId}"]`,
-    );
-
-    if (!wrapper) {
-      backdrop?.remove();
-      content?.remove();
-      return;
-    }
-
-    if (backdrop && backdrop.parentElement !== root) {
-      root.appendChild(backdrop);
-    }
-    if (content && content.parentElement !== root) {
-      root.appendChild(content);
-    }
-  }
-
-  function syncDialogs() {
-    document.querySelectorAll("[data-tui-dialog]").forEach((wrapper) => {
-      const dialogId = wrapper.getAttribute("data-dialog-instance");
-      if (dialogId) syncDialog(dialogId);
-    });
-  }
-
-  function updateBodyOverflow() {
-    const hasOpenDialogs = document.querySelector(
-      '[data-tui-dialog-content][data-tui-dialog-open="true"]',
-    );
-    document.body.style.overflow = hasOpenDialogs ? "hidden" : "";
-  }
-
-  function afterNextPaint(callback) {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(callback);
-    });
-  }
-
-  // Open dialog
-  function openDialog(dialogId) {
-    syncDialog(dialogId);
-
-    // Find backdrop and content by instance ID
-    const backdrop = document.querySelector(
-      `[data-tui-dialog-backdrop][data-dialog-instance="${dialogId}"]`,
-    );
-    const content = document.querySelector(
-      `[data-tui-dialog-content][data-dialog-instance="${dialogId}"]`,
-    );
-
-    if (!backdrop || !content) return;
-
-    backdrop.setAttribute("data-tui-dialog-open", "false");
-    content.setAttribute("data-tui-dialog-open", "false");
-    backdrop.removeAttribute("data-tui-dialog-hidden");
-    content.removeAttribute("data-tui-dialog-hidden");
-    backdrop.offsetHeight;
-    content.offsetHeight;
-
-    // Then trigger the open animation after the browser painted the closed state
-    afterNextPaint(() => {
-      backdrop.setAttribute("data-tui-dialog-open", "true");
-      content.setAttribute("data-tui-dialog-open", "true");
-      updateBodyOverflow();
-
-      // Update triggers
-      document
-        .querySelectorAll(
-          `[data-tui-dialog-trigger][data-dialog-instance="${dialogId}"]`,
-        )
-        .forEach((trigger) => {
-          trigger.setAttribute("data-tui-dialog-trigger-open", "true");
-        });
-
-      // Focus first focusable element (unless disabled)
-      const disableAutoFocus = content.hasAttribute(
-        "data-tui-dialog-disable-autofocus",
-      );
-      if (!disableAutoFocus) {
-        setTimeout(() => {
-          const focusable = content.querySelector(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-          );
-          focusable?.focus();
-        }, 50);
+    if (typeof target === "string") {
+      const byId = document.getElementById(target);
+      if (byId?.matches?.("[data-tui-dialog]")) {
+        return byId;
       }
-    });
+
+      try {
+        return document.querySelector(target)?.closest("[data-tui-dialog]") || null;
+      } catch {
+        return null;
+      }
+    }
+
+    if (target.matches?.("[data-tui-dialog]")) {
+      return target;
+    }
+
+    return target.closest?.("[data-tui-dialog]") || null;
   }
 
-  // Close dialog
-  function closeDialog(dialogId) {
-    // Find backdrop and content by instance ID
-    const backdrop = document.querySelector(
-      `[data-tui-dialog-backdrop][data-dialog-instance="${dialogId}"]`,
+  function getDialog(root) {
+    if (!root) return null;
+    return ensureDialog(root.querySelector("[data-tui-dialog-content]"));
+  }
+
+  function getOwnedTriggers(root) {
+    if (!root) return [];
+
+    return Array.from(root.querySelectorAll("[data-tui-dialog-trigger]")).filter(
+      (trigger) => !trigger.hasAttribute("data-tui-dialog-target"),
     );
-    const content = document.querySelector(
-      `[data-tui-dialog-content][data-dialog-instance="${dialogId}"]`,
+  }
+
+  function getTargetedTriggers(targetId) {
+    if (!targetId) return [];
+
+    return Array.from(
+      document.querySelectorAll(
+        `[data-tui-dialog-trigger][data-tui-dialog-target="${targetId}"]`,
+      ),
     );
+  }
 
-    if (!backdrop || !content) return;
+  function getTargetValue(element) {
+    const target = element?.getAttribute("data-tui-dialog-target");
+    return target && target.trim() ? target.trim() : null;
+  }
 
-    // Start close animation
-    backdrop.setAttribute("data-tui-dialog-open", "false");
-    content.setAttribute("data-tui-dialog-open", "false");
+  function getRootForElement(element) {
+    return getRoot(getTargetValue(element) || element);
+  }
 
-    // Update triggers
-    document
-      .querySelectorAll(
-        `[data-tui-dialog-trigger][data-dialog-instance="${dialogId}"]`,
-      )
-      .forEach((trigger) => {
-        trigger.setAttribute("data-tui-dialog-trigger-open", "false");
+  function ensureDialog(dialog) {
+    if (!dialog || dialog.dataset.tuiDialogInitialized === "true") return dialog;
+
+    dialog.dataset.tuiDialogInitialized = "true";
+
+    dialog.addEventListener("cancel", (event) => {
+      const root = getRoot(dialog);
+      if (root?.hasAttribute("data-tui-dialog-disable-esc")) {
+        event.preventDefault();
+        return;
+      }
+
+      event.preventDefault();
+      closeDialog(root);
+    });
+
+    dialog.addEventListener("close", () => {
+      const root = getRoot(dialog);
+      window.clearTimeout(dialog._tuiDialogCloseTimer);
+      delete dialog._tuiDialogCloseTimer;
+      dialog.removeAttribute("data-tui-dialog-closing");
+      root?.removeAttribute("data-tui-dialog-closing");
+      updateState(getRoot(dialog), false);
+    });
+
+    dialog.addEventListener("click", (event) => {
+      if (event.target !== dialog) return;
+
+      const root = getRoot(dialog);
+      if (root?.hasAttribute("data-tui-dialog-disable-click-away")) {
+        return;
+      }
+
+      closeDialog(root);
+    });
+
+    return dialog;
+  }
+
+  function updateState(root, isOpen) {
+    const dialog = getDialog(root);
+    dialog?.setAttribute("data-tui-dialog-open", isOpen ? "true" : "false");
+    root?.setAttribute("data-tui-dialog-open", isOpen ? "true" : "false");
+
+    getOwnedTriggers(root).forEach((trigger) => {
+      trigger.setAttribute("data-tui-dialog-trigger-open", isOpen ? "true" : "false");
+    });
+
+    if (root?.id) {
+      getTargetedTriggers(root.id).forEach((trigger) => {
+        trigger.setAttribute("data-tui-dialog-trigger-open", isOpen ? "true" : "false");
       });
+    }
 
-    // Wait for animation to complete before hiding
-    setTimeout(() => {
-      backdrop.setAttribute("data-tui-dialog-hidden", "true");
-      content.setAttribute("data-tui-dialog-hidden", "true");
-      updateBodyOverflow();
-    }, 300);
   }
 
-  // Get dialog instance from element
-  function getDialogInstance(element) {
-    // Try to get from data attribute
-    const instance = element.getAttribute("data-dialog-instance");
-    if (instance) return instance;
+  function openDialog(target) {
+    const root = getRoot(target);
+    const dialog = getDialog(root);
+    if (!dialog) return;
 
-    const owner = element.closest("[data-dialog-instance]");
-    if (owner) return owner.getAttribute("data-dialog-instance");
+    window.clearTimeout(dialog._tuiDialogCloseTimer);
+    delete dialog._tuiDialogCloseTimer;
+    dialog.removeAttribute("data-tui-dialog-closing");
+    root?.removeAttribute("data-tui-dialog-closing");
 
-    return null;
+    if (!dialog.open) {
+      try {
+        dialog.showModal();
+      } catch {
+        return;
+      }
+    }
+
+    updateState(root, true);
   }
 
-  // Helper function for checking dialog state
-  function isDialogOpen(dialogId) {
-    const content = document.querySelector(
-      `[data-tui-dialog-content][data-dialog-instance="${dialogId}"]`,
-    );
-    return content?.getAttribute("data-tui-dialog-open") === "true" || false;
+  function closeDialog(target) {
+    const root = getRoot(target);
+    const dialog = getDialog(root);
+    if (!dialog) return;
+
+    if (!dialog.open) {
+      updateState(root, false);
+      return;
+    }
+
+    if (dialog.dataset.tuiDialogClosing === "true") {
+      return;
+    }
+
+    dialog.setAttribute("data-tui-dialog-closing", "true");
+    root?.setAttribute("data-tui-dialog-closing", "true");
+    updateState(root, false);
+
+    dialog._tuiDialogCloseTimer = window.setTimeout(() => {
+      if (dialog.open) {
+        dialog.close();
+      } else {
+        dialog.removeAttribute("data-tui-dialog-closing");
+        root?.removeAttribute("data-tui-dialog-closing");
+      }
+    }, CLOSE_DURATION_MS);
   }
 
-  // Helper function for toggling dialog
-  function toggleDialog(dialogId) {
-    isDialogOpen(dialogId) ? closeDialog(dialogId) : openDialog(dialogId);
+  function isDialogOpen(target) {
+    return getDialog(getRoot(target))?.open || false;
   }
 
-  // Event delegation
-  document.addEventListener("click", (e) => {
-    // Handle trigger clicks
-    // Disabled buttons don't fire click events, so if we get here, it's enabled
-    const trigger = e.target.closest("[data-tui-dialog-trigger]");
+  function toggleDialog(target) {
+    isDialogOpen(target) ? closeDialog(target) : openDialog(target);
+  }
+
+  function initDialogs(root = document) {
+    root.querySelectorAll("[data-tui-dialog]").forEach((dialogRoot) => {
+      const dialog = getDialog(dialogRoot);
+      if (!dialog) return;
+
+      ensureDialog(dialog);
+
+      if (dialog.getAttribute("data-tui-dialog-initial-open") === "true") {
+        openDialog(dialogRoot);
+      } else {
+        updateState(dialogRoot, dialog.open);
+      }
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-tui-dialog-trigger]");
     if (trigger) {
-      const dialogId = trigger.getAttribute("data-dialog-instance");
-      if (!dialogId) return;
-
-      toggleDialog(dialogId);
+      toggleDialog(getRootForElement(trigger));
       return;
     }
 
-    // Handle close button clicks
-    const closeBtn = e.target.closest("[data-tui-dialog-close]");
-    if (closeBtn) {
-      // First check if the close button has a For value (dialog ID specified)
-      const forValue = closeBtn.getAttribute("data-tui-dialog-close");
-      const dialogId = forValue || getDialogInstance(closeBtn);
-
-      if (dialogId) {
-        closeDialog(dialogId);
-      }
-      return;
-    }
-
-    // Handle click away - close when clicking on backdrop
-    const backdrop = e.target.closest("[data-tui-dialog-backdrop]");
-    if (backdrop) {
-      const dialogId = backdrop.getAttribute("data-dialog-instance");
-      if (!dialogId) return;
-
-      // Check if click away is disabled
-      const wrapper = document.querySelector(
-        `[data-tui-dialog][data-dialog-instance="${dialogId}"]`,
-      );
-      const content = document.querySelector(
-        `[data-tui-dialog-content][data-dialog-instance="${dialogId}"]`,
-      );
-
-      const isDisabled =
-        wrapper?.hasAttribute("data-tui-dialog-disable-click-away") ||
-        content?.hasAttribute("data-tui-dialog-disable-click-away");
-
-      if (!isDisabled) {
-        closeDialog(dialogId);
-      }
+    const closeButton = event.target.closest("[data-tui-dialog-close]");
+    if (closeButton) {
+      closeDialog(getRootForElement(closeButton));
     }
   });
 
-  // ESC key handler
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      // Find the most recently opened dialog (last in DOM)
-      const openDialogs = document.querySelectorAll(
-        '[data-tui-dialog-content][data-tui-dialog-open="true"]',
-      );
-      if (openDialogs.length === 0) return;
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => initDialogs());
+  } else {
+    initDialogs();
+  }
 
-      const content = openDialogs[openDialogs.length - 1];
-      const dialogId = content.getAttribute("data-dialog-instance");
-      if (!dialogId) return;
-
-      // Check if ESC is disabled
-      const wrapper = document.querySelector(
-        `[data-tui-dialog][data-dialog-instance="${dialogId}"]`,
-      );
-
-      const isDisabled =
-        wrapper?.hasAttribute("data-tui-dialog-disable-esc") ||
-        content?.hasAttribute("data-tui-dialog-disable-esc");
-
-      if (!isDisabled) {
-        closeDialog(dialogId);
-      }
-    }
-  });
-
-  // Initialize dialogs that should be open on load
-  document.addEventListener("DOMContentLoaded", () => {
-    syncDialogs();
-    updateBodyOverflow();
-  });
-
-  // Cleanup when dialog elements are removed from DOM (HTMX, innerHTML, etc.)
-  const observer = new MutationObserver(() => {
-    syncDialogs();
-    updateBodyOverflow();
-  });
-
-  // Start observing
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
-
-  // Expose public API
   window.tui = window.tui || {};
   window.tui.dialog = {
     open: openDialog,
