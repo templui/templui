@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.9.4] - 2026-04-01
+
+### Fixed
+
+- utils: Restored the generic `If` and `IfElse` helpers after `v1.9.3`, so existing non-string uses compile again while keeping the `If[T any]` fix for non-`comparable` types (#537)
+
 ## [v1.9.3] - 2026-04-01
 
 ### Changed
