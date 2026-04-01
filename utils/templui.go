@@ -25,7 +25,7 @@ func TwMerge(classes ...string) string {
 
 // TwIf returns value if condition is true, otherwise an empty value of type T.
 // Example: true, "bg-red-500" → "bg-red-500"
-func If[T comparable](condition bool, value T) T {
+func If[T any](condition bool, value T) T {
 	var empty T
 	if condition {
 		return value
