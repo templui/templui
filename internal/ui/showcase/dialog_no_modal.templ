@@ -8,14 +8,14 @@ import (
 templ DialogNoModal() {
 	{{ fls := false }}
 	<div class="space-y-4">
-		// External trigger button
+		// Non-modal version
 		@dialog.Trigger(dialog.TriggerProps{
 			For: "non-modal-dialog",
 		}) {
 			@button.Button(button.Props{
 				Variant: button.VariantOutline,
 			}) {
-				Open External Dialog
+				Open Non-modal Dialog
 			}
 		}
 		// Dialog defined separately
