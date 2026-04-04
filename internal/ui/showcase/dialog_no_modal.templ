@@ -1,0 +1,47 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/dialog"
+)
+
+templ DialogNoModal() {
+	{{ fls := false }}
+	<div class="space-y-4">
+		// External trigger button
+		@dialog.Trigger(dialog.TriggerProps{
+			For: "non-modal-dialog",
+		}) {
+			@button.Button(button.Props{
+				Variant: button.VariantOutline,
+			}) {
+				Open External Dialog
+			}
+		}
+		// Dialog defined separately
+		@dialog.Dialog(dialog.Props{
+			ID: "non-modal-dialog",
+		}) {
+			@dialog.Content(dialog.ContentProps{
+				Class: "max-w-md",
+				ShowModal: &fls,
+			}) {
+				@dialog.Header() {
+					@dialog.Title() {
+						Non-Modal Mode
+					}
+					@dialog.Description() {
+						This dialog does not use a backdrop.
+					}
+				}
+				@dialog.Footer() {
+					@dialog.Close() {
+						@button.Button() {
+							Close
+						}
+					}
+				}
+			}
+		}
+	</div>
+}

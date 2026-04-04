@@ -117,6 +117,12 @@ templ Dialog() {
 					ShowcaseFile:    showcase.DialogExternalTrigger(),
 					PreviewCodeFile: "dialog_external_trigger.templ",
 				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					ID:              "no-modal",
+					SectionName:     "Non-modal",
+					ShowcaseFile:    showcase.DialogNoModal(),
+					PreviewCodeFile: "dialog_no_modal.templ",
+				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "API Reference",
@@ -221,6 +227,12 @@ templ Dialog() {
 								Type:        "bool",
 								Default:     "false",
 								Description: "Whether to hide the default close button",
+							},
+							{
+								Name:        "ShowModal",
+								Type:        "*bool",
+								Default:     "true",
+								Description: "Whether to show the dialog using a modal",
 							},
 						},
 					})
