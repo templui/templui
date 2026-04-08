@@ -118,8 +118,11 @@
     // Get other settings
     const locale =
       container.getAttribute("data-tui-calendar-locale-tag") || "en-US";
-    const startOfWeek =
-      parseInt(container.getAttribute("data-tui-calendar-start-of-week")) || 1;
+    let startOfWeek = parseInt(
+      container.getAttribute("data-tui-calendar-start-of-week"),
+      10,
+    );
+    if (isNaN(startOfWeek)) startOfWeek = 1;
     const selectedDateStr = container.getAttribute(
       "data-tui-calendar-selected-date",
     );
