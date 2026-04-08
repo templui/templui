@@ -8,6 +8,7 @@ import "./floating_ui_dom.js";
   const hoverTimeouts = new WeakMap();
   const arrowBaseClass =
     "absolute h-2.5 w-2.5 rotate-45 bg-popover border border-border";
+  const exitAnimationDuration = 150;
 
   function getRootById(id) {
     const root = document.getElementById(id);
@@ -55,7 +56,7 @@ import "./floating_ui_dom.js";
   }
 
   function isOpenRoot(root) {
-    return !!getContent(root)?.matches(":popover-open");
+    return getContent(root)?.getAttribute("data-tui-popover-open") === "true";
   }
 
   function isOpen(id) {
@@ -76,6 +77,46 @@ import "./floating_ui_dom.js";
     if (!cleanup) return;
     cleanup();
     floatingCleanups.delete(root);
+  }
+
+  function showContent(content) {
+    clearTimeout(content._tuiPopoverCloseTimeout);
+    content._tuiPopoverCloseTimeout = null;
+
+    if (!content.matches(":popover-open")) {
+      try {
+        content.showPopover();
+      } catch {
+        return false;
+      }
+    }
+
+    requestAnimationFrame(() => {
+      content.setAttribute("data-tui-popover-open", "true");
+    });
+
+    return true;
+  }
+
+  function hideContent(content) {
+    clearTimeout(content._tuiPopoverCloseTimeout);
+    content._tuiPopoverCloseTimeout = null;
+    content.setAttribute("data-tui-popover-open", "false");
+
+    if (!content.matches(":popover-open")) {
+      return;
+    }
+
+    content._tuiPopoverCloseTimeout = setTimeout(() => {
+      content._tuiPopoverCloseTimeout = null;
+      if (content.matches(":popover-open")) {
+        try {
+          content.hidePopover();
+        } catch {
+          // ignore
+        }
+      }
+    }, exitAnimationDuration);
   }
 
   function arrowClassForPlacement(placement) {
@@ -112,7 +153,8 @@ import "./floating_ui_dom.js";
       window.FloatingUIDOM;
     const reference = getReferenceElement(trigger);
     const arrowEl = content.querySelector("[data-tui-popover-arrow]");
-    const placement = content.getAttribute("data-tui-popover-placement") || "bottom";
+    const placement =
+      content.getAttribute("data-tui-popover-placement") || "bottom";
     const offsetValue =
       parseInt(content.getAttribute("data-tui-popover-offset"), 10) ||
       (arrowEl ? 8 : 4);
@@ -132,25 +174,23 @@ import "./floating_ui_dom.js";
       placement,
       middleware,
       strategy: "fixed",
-    }).then(
-      ({ x, y, placement: finalPlacement, middlewareData }) => {
-        Object.assign(content.style, {
-          left: `${x}px`,
-          top: `${y}px`,
+    }).then(({ x, y, placement: finalPlacement, middlewareData }) => {
+      Object.assign(content.style, {
+        left: `${x}px`,
+        top: `${y}px`,
+      });
+
+      if (arrowEl && middlewareData.arrow) {
+        const { x: arrowX, y: arrowY } = middlewareData.arrow;
+
+        arrowEl.setAttribute("data-tui-popover-placement", finalPlacement);
+        arrowEl.className = arrowClassForPlacement(finalPlacement);
+        Object.assign(arrowEl.style, {
+          left: arrowX != null ? `${arrowX}px` : "",
+          top: arrowY != null ? `${arrowY}px` : "",
         });
-
-        if (arrowEl && middlewareData.arrow) {
-          const { x: arrowX, y: arrowY } = middlewareData.arrow;
-
-          arrowEl.setAttribute("data-tui-popover-placement", finalPlacement);
-          arrowEl.className = arrowClassForPlacement(finalPlacement);
-          Object.assign(arrowEl.style, {
-            left: arrowX != null ? `${arrowX}px` : "",
-            top: arrowY != null ? `${arrowY}px` : "",
-          });
-        }
-      },
-    );
+      }
+    });
   }
 
   function closeRoot(root) {
@@ -159,19 +199,12 @@ import "./floating_ui_dom.js";
 
     stopAutoUpdate(root);
     clearHoverTimeouts(root);
-    content.setAttribute("data-tui-popover-open", "false");
 
     getTriggers(root).forEach((trigger) => {
       trigger.setAttribute("data-tui-popover-open", "false");
     });
 
-    if (content.matches(":popover-open")) {
-      try {
-        content.hidePopover();
-      } catch {
-        // ignore
-      }
-    }
+    hideContent(content);
   }
 
   function close(id) {
@@ -202,15 +235,8 @@ import "./floating_ui_dom.js";
       closeAllRoots(root);
     }
 
-    if (!content.matches(":popover-open")) {
-      try {
-        content.showPopover();
-      } catch {
-        return;
-      }
-    }
+    if (!showContent(content)) return;
 
-    content.setAttribute("data-tui-popover-open", "true");
     getTriggers(root).forEach((item) => {
       item.setAttribute("data-tui-popover-open", "true");
     });
