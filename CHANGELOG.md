@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.9.5] - 2026-04-08
+
+### Fixed
+
+- docs: Added the previously missing sidebar color variables to the docs styling guide so sidebar theming is easier to customize
+- calendar: Preserved `startOfWeek=0` so Sunday-first calendars no longer fall back to the default start-of-week value (#538)
+- popover: Restored the minimal fade animation for popover content transitions (#540)
+
 ## [v1.9.4] - 2026-04-01
 
 ### Fixed
