@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.9.6] - 2026-04-14
+
+### Fixed
+
+- checkbox: Fixed reactive binding so it is only applied to child checkboxes, not the parent, preventing incorrect state propagation in checkbox groups
+
 ## [v1.9.5] - 2026-04-08
 
 ### Fixed
