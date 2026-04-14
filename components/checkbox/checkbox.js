@@ -69,7 +69,9 @@
     var groups = new Set();
     document.querySelectorAll("[data-tui-checkbox-group]").forEach(function (el) {
       groups.add(el.getAttribute("data-tui-checkbox-group"));
-      enableReactiveBinding(el);
+      if (!el.hasAttribute("data-tui-checkbox-parent")) {
+        enableReactiveBinding(el);
+      }
     });
     groups.forEach(updateParent);
   }
