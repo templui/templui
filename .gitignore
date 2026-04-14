@@ -1,3 +1,5 @@
+.claude/worktrees/
+
 # Ignore internal generated files
 internal/**/*_templ.go
 **/*_templ.txt
