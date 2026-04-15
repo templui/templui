@@ -32,6 +32,7 @@ type ContentProps struct {
 	Class           string
 	Attributes      templ.Attributes
 	HideCloseButton bool
+	DisableModal    bool
 }
 
 type CloseProps struct {
@@ -140,6 +141,7 @@ templ Content(props ...ContentProps) {
 		data-tui-dialog-content
 		data-tui-dialog-open={ utils.IfElse(open, "true", "false") }
 		data-tui-dialog-initial-open={ utils.IfElse(open, "true", "false") }
+		data-tui-dialog-show-modal={ utils.IfElse(!p.DisableModal, "true", "false") }
 		{ p.Attributes... }
 	>
 		<div class="relative grid gap-4 p-6" data-tui-dialog-panel>

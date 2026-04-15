@@ -23,6 +23,10 @@ templ Dialog() {
 						ID:   "external-trigger",
 						Text: "External Trigger",
 					},
+					{
+						ID:   "no-modal",
+						Text: "Non-modal",
+					},
 				},
 			},
 			{
@@ -116,6 +120,12 @@ templ Dialog() {
 					SectionName:     "External Trigger",
 					ShowcaseFile:    showcase.DialogExternalTrigger(),
 					PreviewCodeFile: "dialog_external_trigger.templ",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					ID:              "no-modal",
+					SectionName:     "Non-modal",
+					ShowcaseFile:    showcase.DialogNoModal(),
+					PreviewCodeFile: "dialog_no_modal.templ",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -221,6 +231,12 @@ templ Dialog() {
 								Type:        "bool",
 								Default:     "false",
 								Description: "Whether to hide the default close button",
+							},
+							{
+								Name:        "DisableModal",
+								Type:        "bool",
+								Default:     "false",
+								Description: "Whether to disable modal mode (removes the backdrop)",
 							},
 						},
 					})

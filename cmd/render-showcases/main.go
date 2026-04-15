@@ -163,6 +163,7 @@ func main() {
 		// Dialog
 		"out/showcase/dialog_default.html":          showcase.DialogDefault(),
 		"out/showcase/dialog_external_trigger.html": showcase.DialogExternalTrigger(),
+		"out/showcase/dialog_no_modal.html":         showcase.DialogNoModal(),
 
 		// Pagination
 		"out/showcase/pagination_default.html":     showcase.PaginationDefault(),

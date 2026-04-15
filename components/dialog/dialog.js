@@ -126,7 +126,11 @@
 
     if (!dialog.open) {
       try {
-        dialog.showModal();
+        if (dialog.getAttribute("data-tui-dialog-show-modal") === "true") {
+          dialog.showModal();
+        } else {
+          dialog.show();
+        }
       } catch {
         return;
       }
