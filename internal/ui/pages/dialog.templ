@@ -23,6 +23,10 @@ templ Dialog() {
 						ID:   "external-trigger",
 						Text: "External Trigger",
 					},
+					{
+						ID:   "no-modal",
+						Text: "Non-modal",
+					},
 				},
 			},
 			{
@@ -229,10 +233,10 @@ templ Dialog() {
 								Description: "Whether to hide the default close button",
 							},
 							{
-								Name:        "ShowModal",
-								Type:        "*bool",
-								Default:     "true",
-								Description: "Whether to show the dialog using a modal",
+								Name:        "DisableModal",
+								Type:        "bool",
+								Default:     "false",
+								Description: "Whether to disable modal mode (removes the backdrop)",
 							},
 						},
 					})

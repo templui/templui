@@ -6,9 +6,7 @@ import (
 )
 
 templ DialogNoModal() {
-	{{ fls := false }}
 	<div class="space-y-4">
-		// Non-modal version
 		@dialog.Trigger(dialog.TriggerProps{
 			For: "non-modal-dialog",
 		}) {
@@ -18,13 +16,12 @@ templ DialogNoModal() {
 				Open Non-modal Dialog
 			}
 		}
-		// Dialog defined separately
 		@dialog.Dialog(dialog.Props{
 			ID: "non-modal-dialog",
 		}) {
 			@dialog.Content(dialog.ContentProps{
-				Class: "max-w-md",
-				ShowModal: &fls,
+				Class:        "max-w-md",
+				DisableModal: true,
 			}) {
 				@dialog.Header() {
 					@dialog.Title() {
