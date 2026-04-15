@@ -356,14 +356,13 @@ templ ThemeShowcase() {
 						@form.Label(form.LabelProps{For: "volume"}) {
 							Volume
 						}
-						@slider.Slider(slider.Props{ID: "volume"}) {
-							@slider.Input(slider.InputProps{
-								Min:   0,
-								Max:   100,
-								Step:  1,
-								Value: 50,
-							})
-						}
+						@slider.Slider(slider.Props{
+							ID:    "volume",
+							Min:   0,
+							Max:   100,
+							Step:  1,
+							Value: 50,
+						})
 					</div>
 					<div class="flex flex-col gap-3">
 						@form.Label() {

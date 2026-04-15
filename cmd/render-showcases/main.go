@@ -219,6 +219,7 @@ func main() {
 		"out/showcase/slider_default.html":        showcase.SliderDefault(),
 		"out/showcase/slider_disabled.html":       showcase.SliderDisabled(),
 		"out/showcase/slider_external_value.html": showcase.SliderExternalValue(),
+		"out/showcase/slider_range.html":          showcase.SliderRange(),
 		"out/showcase/slider_steps.html":          showcase.SliderSteps(),
 		"out/showcase/slider_value.html":          showcase.SliderValue(),
 

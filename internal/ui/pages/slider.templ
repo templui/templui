@@ -35,6 +35,10 @@ templ Slider() {
 						Text: "External Value",
 						ID:   "external-value",
 					},
+					{
+						Text: "Range",
+						ID:   "range",
+					},
 				},
 			},
 			{
@@ -42,15 +46,15 @@ templ Slider() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "slider",
+						ID:   "api-slider",
 						Text: "Slider",
 					},
 					{
-						ID:   "input",
-						Text: "Input",
+						ID:   "api-range",
+						Text: "Range",
 					},
 					{
-						ID:   "value",
+						ID:   "api-value",
 						Text: "Value",
 					},
 				},
@@ -118,128 +122,182 @@ templ Slider() {
 					PreviewCodeFile: "slider_external_value.templ",
 					ID:              "external-value",
 				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Range",
+					ShowcaseFile:    showcase.SliderRange(),
+					PreviewCodeFile: "slider_range.templ",
+					ID:              "range",
+				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "API Reference",
 				ID:    "api-reference",
 			}) {
 				@modules.APILegend()
-				<div id="slider" class="mb-8">
+				<div id="api-slider" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Slider",
-						Description: "Main slider container component.",
-						Items: []modules.APITableItem{
-							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Unique identifier for the slider component",
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Additional CSS classes to apply to the slider container",
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "nil",
-								Description: "Additional HTML attributes to apply to the slider container",
-							},
-						},
-					})
-				</div>
-				<div id="input" class="mb-8">
-					@modules.APITable(modules.APITableProps{
-						Title:       "Input",
-						Description: "The actual range input element.",
+						Description: "Single-thumb slider component.",
 						Items: []modules.APITableItem{
 							{
 								Name:        "ID",
 								Type:        "string",
 								Default:     "randomID",
-								Description: "Unique identifier for the input element",
+								Description: "Unique identifier for the slider. Required when using the Value component.",
 							},
 							{
 								Name:        "Class",
 								Type:        "string",
 								Default:     "\"\"",
-								Description: "Additional CSS classes to apply to the input",
+								Description: "Additional CSS classes.",
 							},
 							{
 								Name:        "Attributes",
 								Type:        "templ.Attributes",
 								Default:     "nil",
-								Description: "Additional HTML attributes to apply to the input",
+								Description: "Additional HTML attributes.",
 							},
 							{
 								Name:        "Name",
 								Type:        "string",
 								Default:     "\"\"",
-								Description: "Name attribute for the input field",
+								Description: "Name attribute for the hidden form input.",
 							},
 							{
 								Name:        "Min",
 								Type:        "int",
 								Default:     "0",
-								Description: "Minimum value for the slider",
+								Description: "Minimum value.",
 							},
 							{
 								Name:        "Max",
 								Type:        "int",
-								Default:     "0",
-								Description: "Maximum value for the slider",
+								Default:     "100",
+								Description: "Maximum value.",
 							},
 							{
 								Name:        "Step",
 								Type:        "int",
-								Default:     "0",
-								Description: "Step increment for slider values",
+								Default:     "1",
+								Description: "Step increment.",
 							},
 							{
 								Name:        "Value",
 								Type:        "int",
 								Default:     "0",
-								Description: "Current value of the slider",
+								Description: "Initial value.",
 							},
 							{
 								Name:        "Disabled",
 								Type:        "bool",
 								Default:     "false",
-								Description: "Whether the slider is disabled",
+								Description: "Whether the slider is disabled.",
 							},
 						},
 					})
 				</div>
-				<div id="value">
+				<div id="api-range" class="mb-8">
 					@modules.APITable(modules.APITableProps{
-						Title:       "Value",
-						Description: "Display element for the current slider value.",
+						Title:       "Range",
+						Description: "Dual-thumb range slider. Value displays use the slider ID with a -min or -max suffix.",
 						Items: []modules.APITableItem{
 							{
 								Name:        "ID",
 								Type:        "string",
-								Default:     "\"\"",
-								Description: "Unique identifier for the value display element",
+								Default:     "randomID",
+								Description: "Unique identifier. Value components use {ID}-min and {ID}-max as their For value.",
 							},
 							{
 								Name:        "Class",
 								Type:        "string",
 								Default:     "\"\"",
-								Description: "Additional CSS classes to apply to the value display",
+								Description: "Additional CSS classes.",
 							},
 							{
 								Name:        "Attributes",
 								Type:        "templ.Attributes",
 								Default:     "nil",
-								Description: "Additional HTML attributes to apply to the value display",
+								Description: "Additional HTML attributes.",
+							},
+							{
+								Name:        "NameMin",
+								Type:        "string",
+								Default:     "\"\"",
+								Description: "Name attribute for the min hidden input.",
+							},
+							{
+								Name:        "NameMax",
+								Type:        "string",
+								Default:     "\"\"",
+								Description: "Name attribute for the max hidden input.",
+							},
+							{
+								Name:        "Min",
+								Type:        "int",
+								Default:     "0",
+								Description: "Minimum allowed value.",
+							},
+							{
+								Name:        "Max",
+								Type:        "int",
+								Default:     "100",
+								Description: "Maximum allowed value.",
+							},
+							{
+								Name:        "Step",
+								Type:        "int",
+								Default:     "1",
+								Description: "Step increment.",
+							},
+							{
+								Name:        "MinValue",
+								Type:        "int",
+								Default:     "0",
+								Description: "Initial value for the min thumb.",
+							},
+							{
+								Name:        "MaxValue",
+								Type:        "int",
+								Default:     "Max",
+								Description: "Initial value for the max thumb.",
+							},
+							{
+								Name:        "Disabled",
+								Type:        "bool",
+								Default:     "false",
+								Description: "Whether the slider is disabled.",
+							},
+						},
+					})
+				</div>
+				<div id="api-value">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Value",
+						Description: "Displays the current slider value. For range sliders use {sliderID}-min or {sliderID}-max as the For value.",
+						Items: []modules.APITableItem{
+							{
+								Name:        "ID",
+								Type:        "string",
+								Default:     "\"\"",
+								Description: "Unique identifier.",
+							},
+							{
+								Name:        "Class",
+								Type:        "string",
+								Default:     "\"\"",
+								Description: "Additional CSS classes.",
+							},
+							{
+								Name:        "Attributes",
+								Type:        "templ.Attributes",
+								Default:     "nil",
+								Description: "Additional HTML attributes.",
 							},
 							{
 								Name:        "For",
 								Type:        "string",
 								Default:     "\"\"",
-								Description: "ID of the slider input this value display is connected to",
+								Description: "ID of the slider to link to. For range sliders append -min or -max.",
 							},
 						},
 					})

@@ -4,17 +4,10 @@ import "github.com/templui/templui/components/slider"
 
 templ SliderExternalValue() {
 	<div class="space-y-6 w-full max-w-sm">
-		<div>
-			@slider.Slider() {
-				@slider.Input(slider.InputProps{
-					ID:    "slider-external-value",
-					Value: 50,
-					Min:   0,
-					Max:   100,
-					Step:  1,
-				})
-			}
-		</div>
+		@slider.Slider(slider.Props{
+			ID:    "slider-external-value",
+			Value: 50,
+		})
 		<div class="bg-muted p-4 rounded-md">
 			<p class="text-sm text-muted-foreground mb-2">External value (linked to the slider):</p>
 			<div class="text-3xl font-bold flex gap-1">

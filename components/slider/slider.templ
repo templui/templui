@@ -9,12 +9,6 @@ type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-}
-
-type InputProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
 	Name       string
 	Min        int
 	Max        int
@@ -23,11 +17,25 @@ type InputProps struct {
 	Disabled   bool
 }
 
+type RangeProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	NameMin    string
+	NameMax    string
+	Min        int
+	Max        int
+	Step       int
+	MinValue   int
+	MaxValue   int
+	Disabled   bool
+}
+
 type ValueProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	For        string // Corresponds to the ID of the Slider Input
+	For        string // For single slider: slider ID. For range: slider ID + "-min" or "-max"
 }
 
 templ Slider(props ...Props) {
@@ -35,62 +43,132 @@ templ Slider(props ...Props) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	if p.Max == 0 {
+		{{ p.Max = 100 }}
+	}
+	if p.Step == 0 {
+		{{ p.Step = 1 }}
+	}
 	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={ utils.TwMerge("w-full", p.Class) }
-		data-tui-slider-wrapper
+		id={ p.ID }
+		data-tui-slider
+		data-min={ fmt.Sprintf("%d", p.Min) }
+		data-max={ fmt.Sprintf("%d", p.Max) }
+		data-step={ fmt.Sprintf("%d", p.Step) }
+		class={ utils.TwMerge("relative flex items-center w-full select-none", p.Class) }
 		{ p.Attributes... }
 	>
-		{ children... }
+		<div data-track class="relative w-full h-2 rounded-full bg-secondary">
+			<div
+				data-fill
+				class="absolute inset-y-0 rounded-full bg-primary pointer-events-none"
+				style={ fmt.Sprintf("left:0%%;right:%.2f%%", 100-float64(p.Value-p.Min)/float64(p.Max-p.Min)*100) }
+			></div>
+			<div
+				data-thumb
+				role="slider"
+				tabindex={ utils.IfElse(p.Disabled, "-1", "0") }
+				aria-valuemin={ fmt.Sprintf("%d", p.Min) }
+				aria-valuemax={ fmt.Sprintf("%d", p.Max) }
+				aria-valuenow={ fmt.Sprintf("%d", p.Value) }
+				if p.Disabled {
+					aria-disabled="true"
+				}
+				style={ fmt.Sprintf("left:%.2f%%", float64(p.Value-p.Min)/float64(p.Max-p.Min)*100) }
+				class={
+					utils.TwMerge(
+						"absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary touch-none",
+						"ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+						"hover:bg-primary/90",
+						utils.IfElse(p.Disabled, "opacity-50 cursor-not-allowed", "cursor-grab active:cursor-grabbing"),
+					)
+				}
+			></div>
+		</div>
+		<input
+			data-input
+			type="hidden"
+			if p.Name != "" {
+				name={ p.Name }
+			}
+			value={ fmt.Sprintf("%d", p.Value) }
+		/>
 	</div>
 }
 
-templ Input(props ...InputProps) {
-	{{ var p InputProps }}
+templ Range(props ...RangeProps) {
+	{{ var p RangeProps }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	<input
-		type="range"
+	if p.Max == 0 {
+		{{ p.Max = 100 }}
+	}
+	if p.Step == 0 {
+		{{ p.Step = 1 }}
+	}
+	if p.MaxValue == 0 {
+		{{ p.MaxValue = p.Max }}
+	}
+	{{ sharedThumbClass := utils.TwMerge(
+		"absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary touch-none",
+		"ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+		"hover:bg-primary/90",
+		utils.IfElse(p.Disabled, "opacity-50 cursor-not-allowed", "cursor-grab active:cursor-grabbing"),
+	) }}
+	<div
 		id={ p.ID }
-		data-tui-slider-input
-		if p.Name != "" {
-			name={ p.Name }
-		}
-		if p.Value != 0 {
-			value={ fmt.Sprintf("%d", p.Value) }
-		}
-		if p.Min != 0 {
-			min={ fmt.Sprintf("%d", p.Min) }
-		}
-		if p.Max != 0 {
-			max={ fmt.Sprintf("%d", p.Max) }
-		}
-		if p.Step != 0 {
-			step={ fmt.Sprintf("%d", p.Step) }
-		}
-		class={
-			utils.TwMerge(
-				"w-full h-2 rounded-full bg-secondary appearance-none cursor-pointer",
-				"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-				"[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4",
-				"[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary",
-				"[&::-webkit-slider-thumb]:hover:bg-primary/90",
-				"[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:border-0",
-				"[&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary",
-				"[&::-moz-range-thumb]:hover:bg-primary/90",
-				"disabled:opacity-50 disabled:cursor-not-allowed",
-				p.Class,
-			),
-		}
-		disabled?={ p.Disabled }
+		data-tui-slider
+		data-min={ fmt.Sprintf("%d", p.Min) }
+		data-max={ fmt.Sprintf("%d", p.Max) }
+		data-step={ fmt.Sprintf("%d", p.Step) }
+		class={ utils.TwMerge("relative flex items-center w-full select-none", p.Class) }
 		{ p.Attributes... }
-	/>
+	>
+		<div data-track class="relative w-full h-2 rounded-full bg-secondary">
+			<div
+				data-fill
+				class="absolute inset-y-0 rounded-full bg-primary pointer-events-none"
+				style={ fmt.Sprintf("left:%.2f%%;right:%.2f%%", float64(p.MinValue-p.Min)/float64(p.Max-p.Min)*100, 100-float64(p.MaxValue-p.Min)/float64(p.Max-p.Min)*100) }
+			></div>
+			<div
+				data-thumb
+				role="slider"
+				tabindex={ utils.IfElse(p.Disabled, "-1", "0") }
+				aria-label="Minimum"
+				aria-valuemin={ fmt.Sprintf("%d", p.Min) }
+				aria-valuemax={ fmt.Sprintf("%d", p.Max) }
+				aria-valuenow={ fmt.Sprintf("%d", p.MinValue) }
+				if p.Disabled {
+					aria-disabled="true"
+				}
+				style={ fmt.Sprintf("left:%.2f%%", float64(p.MinValue-p.Min)/float64(p.Max-p.Min)*100) }
+				class={ sharedThumbClass }
+			></div>
+			<div
+				data-thumb
+				role="slider"
+				tabindex={ utils.IfElse(p.Disabled, "-1", "0") }
+				aria-label="Maximum"
+				aria-valuemin={ fmt.Sprintf("%d", p.Min) }
+				aria-valuemax={ fmt.Sprintf("%d", p.Max) }
+				aria-valuenow={ fmt.Sprintf("%d", p.MaxValue) }
+				if p.Disabled {
+					aria-disabled="true"
+				}
+				style={ fmt.Sprintf("left:%.2f%%", float64(p.MaxValue-p.Min)/float64(p.Max-p.Min)*100) }
+				class={ sharedThumbClass }
+			></div>
+		</div>
+		<input data-input type="hidden" if p.NameMin != "" { name={ p.NameMin } } value={ fmt.Sprintf("%d", p.MinValue) }/>
+		<input data-input type="hidden" if p.NameMax != "" { name={ p.NameMax } } value={ fmt.Sprintf("%d", p.MaxValue) }/>
+	</div>
 }
 
 templ Value(props ...ValueProps) {
@@ -99,7 +177,7 @@ templ Value(props ...ValueProps) {
 		{{ p = props[0] }}
 	}
 	if p.For == "" {
-		<span class="text-xs text-destructive">Error: SliderValue missing 'For' attribute.</span>
+		<span class="text-xs text-destructive">Error: Value missing &#39;For&#39; attribute.</span>
 	}
 	<span
 		if p.ID != "" {
@@ -109,9 +187,7 @@ templ Value(props ...ValueProps) {
 		data-tui-slider-value-for={ p.For }
 		class={ utils.TwMerge("text-sm text-muted-foreground", p.Class) }
 		{ p.Attributes... }
-	>
-		<!-- Initial value will be set by JS -->
-	</span>
+	></span>
 }
 
 var scriptOnce = templ.NewOnceHandle()

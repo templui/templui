@@ -7,25 +7,21 @@ import (
 
 templ SliderSteps() {
 	<div class="w-full max-w-sm">
-		@slider.Slider() {
-			<div class="flex justify-between items-center mb-1">
-				@label.Label() {
-					Zoom Level
-				}
-				<div class="flex items-center">
-					@slider.Value(slider.ValueProps{
-						For: "slider-steps",
-					})
-				</div>
-			</div>
-			@slider.Input(slider.InputProps{
-				ID:    "slider-steps",
-				Name:  "slider-steps",
-				Value: 100,
-				Min:   0,
-				Max:   200,
-				Step:  25,
+		<div class="flex justify-between items-center mb-1">
+			@label.Label() {
+				Zoom Level
+			}
+			@slider.Value(slider.ValueProps{
+				For: "slider-steps",
 			})
-		}
+		</div>
+		@slider.Slider(slider.Props{
+			ID:    "slider-steps",
+			Name:  "slider-steps",
+			Value: 100,
+			Min:   0,
+			Max:   200,
+			Step:  25,
+		})
 	</div>
 }
