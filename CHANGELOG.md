@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.10.0] - 2026-04-18
+
+### Added
+
+- slider: Added a Range component for selecting a value range with two handles
+- dialog: Added optional modal mode via `DisableModal bool` on `dialog.Content`, allowing the native backdrop to be disabled for dialogs that contain nested overlays (#541, #542, thanks @BillBuilt)
+
+### Changed
+
+- slider: Rebuilt the slider around a custom implementation, replacing the native `<input type="range">`; existing usages will need to be updated to the new component API (breaking change)
+
+### Fixed
+
+- popover: Ignored hover-based open/close triggers on touch devices so tooltips and hover-popovers no longer appear unexpectedly on mobile (#539, #546)
+
 ## [v1.9.6] - 2026-04-14
 
 ### Fixed
