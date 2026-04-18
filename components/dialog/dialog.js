@@ -28,6 +28,9 @@
 
   function getDialog(root) {
     if (!root) return null;
+    if (root.hasAttribute("data-tui-sheet")) {
+      return ensureDialog(root.querySelector("[data-tui-sheet-content]"));
+    }
     return ensureDialog(root.querySelector("[data-tui-dialog-content]"));
   }
 
