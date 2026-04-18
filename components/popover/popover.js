@@ -365,7 +365,9 @@ import "./floating_ui_dom.js";
     });
   });
 
-  document.addEventListener("mouseover", (event) => {
+  document.addEventListener("pointerover", (event) => {
+    if (event.pointerType !== "mouse") return;
+
     const trigger = event.target.closest("[data-tui-popover-trigger]");
     const root = trigger?.closest("[data-tui-popover-root]");
     if (
@@ -392,7 +394,9 @@ import "./floating_ui_dom.js";
     }
   });
 
-  document.addEventListener("mouseout", (event) => {
+  document.addEventListener("pointerout", (event) => {
+    if (event.pointerType !== "mouse") return;
+
     const trigger = event.target.closest("[data-tui-popover-trigger]");
     const root = trigger?.closest("[data-tui-popover-root]");
     if (
