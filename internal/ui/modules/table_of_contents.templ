@@ -1,7 +1,5 @@
 package modules
 
-import "github.com/templui/templui/components/card"
-
 type TableOfContentsItem struct {
 	ID       string
 	Text     string
@@ -26,37 +24,27 @@ templ TableOfContents(props TableOfContentsProps) {
 			</div>
 		}
 		<div class="px-4 pt-3">
-			@card.Card(card.Props{Class: "shadow-none"}) {
-				@card.Content(card.ContentProps{Class: "p-3"}) {
-					<p class="mb-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Build faster</p>
-					<div class="divide-y divide-border">
-						<div class="pb-2.5">
-							<p class="text-[0.8rem] font-semibold text-foreground">templUI Pro</p>
-							<p class="mt-1 text-[0.72rem] text-muted-foreground">222+ premium UI blocks for Go + templ.</p>
-							<a
-								href="https://pro.templui.io"
-								target="_blank"
-								rel="noopener"
-								class="mt-2 inline-flex text-[0.72rem] font-medium text-primary transition-colors hover:text-primary/80"
-							>
-								Open
-							</a>
-						</div>
-						<div class="pt-2.5">
-							<p class="text-[0.8rem] font-semibold text-foreground">goilerplate</p>
-							<p class="mt-1 text-[0.72rem] text-muted-foreground">Production-ready Go SaaS boilerplate.</p>
-							<a
-								href="https://goilerplate.com"
-								target="_blank"
-								rel="noopener"
-								class="mt-2 inline-flex text-[0.72rem] font-medium text-primary transition-colors hover:text-primary/80"
-							>
-								View
-							</a>
-						</div>
+			<a
+				href="https://baselite.io"
+				target="_blank"
+				rel="noopener"
+				class="group relative block overflow-hidden rounded-lg border border-border bg-gradient-to-br from-emerald-500/5 via-background to-background p-3 transition-colors hover:border-emerald-500/40"
+			>
+				<div class="pointer-events-none absolute -right-8 -top-8 size-24 rounded-full bg-emerald-500/10 blur-2xl transition-opacity group-hover:opacity-80"></div>
+				<div class="relative">
+					<div class="flex items-center gap-1.5">
+						<span class="size-1.5 rounded-full bg-emerald-500"></span>
+						<p class="text-[0.9rem] font-semibold text-foreground">baselite</p>
 					</div>
-				}
-			}
+					<p class="mt-1.5 text-[0.75rem] leading-relaxed text-muted-foreground">
+						Your SQLite is one <code class="rounded bg-destructive/10 px-1 font-mono text-[0.7rem] text-destructive">rm -f</code> away. Automatic backups to your own S3 bucket. One-click restore.
+					</p>
+					<span class="mt-2.5 inline-flex items-center gap-1 text-[0.72rem] font-medium text-emerald-600 dark:text-emerald-400">
+						Back up SQLite
+						<span class="transition-transform group-hover:translate-x-0.5">→</span>
+					</span>
+				</div>
+			</a>
 		</div>
 	</aside>
 }
