@@ -28,7 +28,12 @@
 
   function getDialog(root) {
     if (!root) return null;
-    return ensureDialog(root.querySelector("[data-tui-dialog-content]"));
+    // Skip content nodes owned by a nested dialog when one sits between this root's trigger and content.
+    return ensureDialog(
+      [...root.querySelectorAll("[data-tui-dialog-content]")].find(
+        (el) => el.closest("[data-tui-dialog]") === root,
+      ),
+    );
   }
 
   function getOwnedTriggers(root) {
