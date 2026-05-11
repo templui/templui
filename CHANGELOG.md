@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.10.1] - 2026-05-11
+
+### Fixed
+
+- dialog: Scoped content resolution to the dialog's own root so a trigger only opens content it owns, fixing cases where a sheet (or dialog) trigger opened a dialog nested between trigger and content (#547, #551, thanks @primableatom)
+
 ## [v1.10.0] - 2026-04-18
 
 ### Added
