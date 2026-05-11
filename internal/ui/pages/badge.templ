@@ -46,7 +46,7 @@ templ Badge() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "badge",
+						ID:   "api-badge",
 						Text: "Badge",
 					},
 				},
@@ -125,7 +125,7 @@ templ Badge() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="badge">
+				<div id="api-badge">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Badge",
 						Description: "Badge component for displaying small pieces of information.",

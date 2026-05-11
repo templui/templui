@@ -34,39 +34,39 @@ templ Dialog() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "dialog",
+						ID:   "api-dialog",
 						Text: "Dialog",
 					},
 					{
-						ID:   "trigger",
+						ID:   "api-trigger",
 						Text: "Trigger",
 					},
 					{
-						ID:   "content",
+						ID:   "api-content",
 						Text: "Content",
 					},
 					{
-						ID:   "header",
+						ID:   "api-header",
 						Text: "Header",
 					},
 					{
-						ID:   "title",
+						ID:   "api-title",
 						Text: "Title",
 					},
 					{
-						ID:   "description",
+						ID:   "api-description",
 						Text: "Description",
 					},
 					{
-						ID:   "body",
+						ID:   "api-body",
 						Text: "Body",
 					},
 					{
-						ID:   "footer",
+						ID:   "api-footer",
 						Text: "Footer",
 					},
 					{
-						ID:   "close",
+						ID:   "api-close",
 						Text: "Close",
 					},
 				},
@@ -133,7 +133,7 @@ templ Dialog() {
 				ID:    "api-reference",
 			}) {
 				@modules.APILegend()
-				<div id="dialog" class="mb-8">
+				<div id="api-dialog" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Dialog",
 						Description: "Main dialog wrapper component. Provides context for child components.",
@@ -177,7 +177,7 @@ templ Dialog() {
 						},
 					})
 				</div>
-				<div id="trigger" class="mb-8">
+				<div id="api-trigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Trigger",
 						Description: "Element that triggers the dialog to open. Usually used inside Dialog, or externally by targeting a dialog root ID with For.",
@@ -209,7 +209,7 @@ templ Dialog() {
 						},
 					})
 				</div>
-				<div id="content" class="mb-8">
+				<div id="api-content" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Content",
 						Description: "Native dialog content rendered inside Dialog.",
@@ -241,7 +241,7 @@ templ Dialog() {
 						},
 					})
 				</div>
-				<div id="header" class="mb-8">
+				<div id="api-header" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Header",
 						Description: "Header section of the dialog.",
@@ -267,7 +267,7 @@ templ Dialog() {
 						},
 					})
 				</div>
-				<div id="title" class="mb-8">
+				<div id="api-title" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Title",
 						Description: "Dialog title component. Should be used inside Header.",
@@ -293,7 +293,7 @@ templ Dialog() {
 						},
 					})
 				</div>
-				<div id="description" class="mb-8">
+				<div id="api-description" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Description",
 						Description: "Dialog description component. Should be used inside Header.",
@@ -319,7 +319,7 @@ templ Dialog() {
 						},
 					})
 				</div>
-				<div id="body" class="mb-8">
+				<div id="api-body" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Body",
 						Description: "Body/content section of the dialog.",
@@ -345,7 +345,7 @@ templ Dialog() {
 						},
 					})
 				</div>
-				<div id="footer" class="mb-8">
+				<div id="api-footer" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Footer",
 						Description: "Footer section of the dialog.",
@@ -371,7 +371,7 @@ templ Dialog() {
 						},
 					})
 				</div>
-				<div id="close">
+				<div id="api-close">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Close",
 						Description: "Element that closes the dialog.",

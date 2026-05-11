@@ -30,27 +30,27 @@ templ Pagination() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "pagination",
+						ID:   "api-pagination",
 						Text: "Pagination",
 					},
 					{
-						ID:   "content",
+						ID:   "api-content",
 						Text: "Content",
 					},
 					{
-						ID:   "item",
+						ID:   "api-item",
 						Text: "Item",
 					},
 					{
-						ID:   "link",
+						ID:   "api-link",
 						Text: "Link",
 					},
 					{
-						ID:   "previous",
+						ID:   "api-previous",
 						Text: "Previous",
 					},
 					{
-						ID:   "next",
+						ID:   "api-next",
 						Text: "Next",
 					},
 				},
@@ -105,7 +105,7 @@ templ Pagination() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="pagination" class="mb-8">
+				<div id="api-pagination" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Pagination",
 						Description: "Root navigation container for pagination controls.",
@@ -134,7 +134,7 @@ templ Pagination() {
 						},
 					})
 				</div>
-				<div id="content" class="mb-8">
+				<div id="api-content" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Content",
 						Description: "List container that holds pagination items.",
@@ -163,7 +163,7 @@ templ Pagination() {
 						},
 					})
 				</div>
-				<div id="item" class="mb-8">
+				<div id="api-item" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Item",
 						Description: "Individual list item that wraps pagination links or buttons.",
@@ -192,7 +192,7 @@ templ Pagination() {
 						},
 					})
 				</div>
-				<div id="link" class="mb-8">
+				<div id="api-link" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Link",
 						Description: "Clickable link or button for page navigation.",
@@ -242,7 +242,7 @@ templ Pagination() {
 						},
 					})
 				</div>
-				<div id="previous" class="mb-8">
+				<div id="api-previous" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Previous",
 						Description: "Navigation button for going to the previous page.",
@@ -292,7 +292,7 @@ templ Pagination() {
 						},
 					})
 				</div>
-				<div id="next" class="mb-8">
+				<div id="api-next" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Next",
 						Description: "Navigation button for going to the next page.",

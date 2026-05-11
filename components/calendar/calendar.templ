@@ -32,16 +32,26 @@ var (
 	Saturday  = Day(6)
 )
 
+type SelectionMode string
+
+const (
+	SelectionModeSingle SelectionMode = "single"
+	SelectionModeRange  SelectionMode = "range"
+)
+
 type Props struct {
 	ID              string
 	Class           string
 	LocaleTag       LocaleTag
-	Value           *time.Time
-	Name            string
-	InitialMonth    int  // Optional: 0-11 (Default: current or from Value). Controls the initially displayed month view.
-	InitialYear     int  // Optional: (Default: current or from Value). Controls the initially displayed year view.
-	StartOfWeek     *Day // Optional: 0-6 [Sun-Sat] (Default: 1).
-	HideHiddenInput bool // Optional: Hide the hidden input when a parent component owns form submission.
+	Mode            SelectionMode // Optional: "single" (default) or "range".
+	Value           *time.Time    // Selected date (single mode) or range start (range mode).
+	EndValue        *time.Time    // Range end date (range mode only).
+	Name            string        // Hidden input name for Value.
+	EndName         string        // Hidden input name for EndValue. Defaults to Name + "-end".
+	InitialMonth    int           // Optional: 0-11 (Default: current or from Value). Controls the initially displayed month view.
+	InitialYear     int           // Optional: (Default: current or from Value). Controls the initially displayed year view.
+	StartOfWeek     *Day          // Optional: 0-6 [Sun-Sat] (Default: 1).
+	HideHiddenInput bool          // Optional: Hide the hidden input when a parent component owns form submission.
 }
 
 templ Calendar(props ...Props) {
@@ -59,6 +69,12 @@ templ Calendar(props ...Props) {
 		}
 		if p.LocaleTag == "" {
 			p.LocaleTag = LocaleDefaultTag
+		}
+		if p.Mode == "" {
+			p.Mode = SelectionModeSingle
+		}
+		if p.Mode == SelectionModeRange && p.EndName == "" {
+			p.EndName = p.Name + "-end"
 		}
 
 		initialStartOfWeek := Monday
@@ -90,6 +106,11 @@ templ Calendar(props ...Props) {
 			initialSelectedISO = p.Value.Format("2006-01-02")
 		}
 
+		initialEndISO := ""
+		if p.Mode == SelectionModeRange && p.EndValue != nil {
+			initialEndISO = p.EndValue.Format("2006-01-02")
+		}
+
 		// For SelectBox display
 		currentMonth := initialMonth
 		currentYear := initialYear
@@ -110,15 +131,26 @@ templ Calendar(props ...Props) {
 				id={ p.ID + "-hidden" }
 				data-tui-calendar-hidden-input
 			/>
+			if p.Mode == SelectionModeRange {
+				<input
+					type="hidden"
+					name={ p.EndName }
+					value={ initialEndISO }
+					id={ p.ID + "-hidden-end" }
+					data-tui-calendar-hidden-end-input
+				/>
+			}
 		}
 		<div
 			id={ p.ID }
 			class="inline-flex flex-col"
 			data-tui-calendar-container="true"
+			data-tui-calendar-mode={ string(p.Mode) }
 			data-tui-calendar-locale-tag={ string(p.LocaleTag) }
 			data-tui-calendar-initial-month={ strconv.Itoa(initialMonth) }
 			data-tui-calendar-initial-year={ strconv.Itoa(initialYear) }
 			data-tui-calendar-selected-date={ initialSelectedISO }
+			data-tui-calendar-end-date={ initialEndISO }
 			data-tui-calendar-start-of-week={ int(initialStartOfWeek) }
 		>
 			<!-- Calendar Header -->

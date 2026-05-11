@@ -20,47 +20,47 @@ templ Dropdown() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "dropdown",
+						ID:   "api-dropdown",
 						Text: "Dropdown",
 					},
 					{
-						ID:   "trigger",
+						ID:   "api-trigger",
 						Text: "Trigger",
 					},
 					{
-						ID:   "content",
+						ID:   "api-content",
 						Text: "Content",
 					},
 					{
-						ID:   "group",
+						ID:   "api-group",
 						Text: "Group",
 					},
 					{
-						ID:   "label",
+						ID:   "api-label",
 						Text: "Label",
 					},
 					{
-						ID:   "item",
+						ID:   "api-item",
 						Text: "Item",
 					},
 					{
-						ID:   "separator",
+						ID:   "api-separator",
 						Text: "Separator",
 					},
 					{
-						ID:   "shortcut",
+						ID:   "api-shortcut",
 						Text: "Shortcut",
 					},
 					{
-						ID:   "sub",
+						ID:   "api-sub",
 						Text: "Sub",
 					},
 					{
-						ID:   "subtrigger",
+						ID:   "api-subtrigger",
 						Text: "SubTrigger",
 					},
 					{
-						ID:   "subcontent",
+						ID:   "api-subcontent",
 						Text: "SubContent",
 					},
 				},
@@ -105,7 +105,7 @@ templ Dropdown() {
 				ID:    "api-reference",
 			}) {
 				@modules.APILegend()
-				<div id="dropdown" class="mb-8">
+				<div id="api-dropdown" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Dropdown",
 						Items: []modules.APITableItem{
@@ -118,7 +118,7 @@ templ Dropdown() {
 						},
 					})
 				</div>
-				<div id="trigger" class="mb-8">
+				<div id="api-trigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Trigger",
 						Items: []modules.APITableItem{
@@ -143,7 +143,7 @@ templ Dropdown() {
 						},
 					})
 				</div>
-				<div id="content" class="mb-8">
+				<div id="api-content" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Content",
 						Items: []modules.APITableItem{
@@ -174,7 +174,7 @@ templ Dropdown() {
 						},
 					})
 				</div>
-				<div id="group" class="mb-8">
+				<div id="api-group" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Group",
 						Items: []modules.APITableItem{
@@ -199,7 +199,7 @@ templ Dropdown() {
 						},
 					})
 				</div>
-				<div id="label" class="mb-8">
+				<div id="api-label" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Label",
 						Items: []modules.APITableItem{
@@ -224,7 +224,7 @@ templ Dropdown() {
 						},
 					})
 				</div>
-				<div id="item" class="mb-8">
+				<div id="api-item" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Item",
 						Items: []modules.APITableItem{
@@ -273,7 +273,7 @@ templ Dropdown() {
 						},
 					})
 				</div>
-				<div id="separator" class="mb-8">
+				<div id="api-separator" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Separator",
 						Items: []modules.APITableItem{
@@ -298,7 +298,7 @@ templ Dropdown() {
 						},
 					})
 				</div>
-				<div id="shortcut" class="mb-8">
+				<div id="api-shortcut" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Shortcut",
 						Items: []modules.APITableItem{
@@ -323,7 +323,7 @@ templ Dropdown() {
 						},
 					})
 				</div>
-				<div id="sub" class="mb-8">
+				<div id="api-sub" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Sub",
 						Items: []modules.APITableItem{
@@ -348,7 +348,7 @@ templ Dropdown() {
 						},
 					})
 				</div>
-				<div id="subtrigger" class="mb-8">
+				<div id="api-subtrigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "SubTrigger",
 						Items: []modules.APITableItem{
@@ -373,7 +373,7 @@ templ Dropdown() {
 						},
 					})
 				</div>
-				<div id="subcontent">
+				<div id="api-subcontent">
 					@modules.APITable(modules.APITableProps{
 						Title: "SubContent",
 						Items: []modules.APITableItem{

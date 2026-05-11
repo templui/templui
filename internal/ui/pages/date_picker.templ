@@ -32,6 +32,10 @@ templ DatePicker() {
 						ID:   "selected-date",
 					},
 					{
+						Text: "Range",
+						ID:   "range",
+					},
+					{
 						Text: "Disabled",
 						ID:   "disabled",
 					},
@@ -55,7 +59,7 @@ templ DatePicker() {
 				Children: []modules.TableOfContentsItem{
 					{
 						Text: "DatePicker",
-						ID:   "date-picker",
+						ID:   "api-date-picker",
 					},
 				},
 			},
@@ -117,6 +121,12 @@ templ DatePicker() {
 					ID:              "selected-date",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Range",
+					ShowcaseFile:    showcase.DatePickerRange(),
+					PreviewCodeFile: "date_picker_range.templ",
+					ID:              "range",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Disabled",
 					ShowcaseFile:    showcase.DatePickerDisabled(),
 					PreviewCodeFile: "date_picker_disabled.templ",
@@ -146,7 +156,7 @@ templ DatePicker() {
 				ID:    "api-reference",
 			}) {
 				@modules.APILegend()
-				<div id="date-picker">
+				<div id="api-date-picker">
 					@modules.APITable(modules.APITableProps{
 						Title:       "DatePicker",
 						Description: "Main date picker component that triggers the popover calendar.",
@@ -216,6 +226,30 @@ templ DatePicker() {
 								Type:        "string",
 								Default:     "ID value",
 								Description: "Name attribute for the hidden input field",
+							},
+							{
+								Name:        "Mode",
+								Type:        "calendar.SelectionMode",
+								Default:     "single",
+								Description: "Selection mode. Use calendar.SelectionModeRange for two-date range selection.",
+							},
+							{
+								Name:        "EndValue",
+								Type:        "time.Time",
+								Default:     "time.Time{}",
+								Description: "Range end date (range mode only).",
+							},
+							{
+								Name:        "EndName",
+								Type:        "string",
+								Default:     "Name + \"-end\"",
+								Description: "Name attribute for the range end hidden input (range mode only).",
+							},
+							{
+								Name:        "EndPlaceholder",
+								Type:        "string",
+								Default:     "End date",
+								Description: "Placeholder for the range end date (range mode only).",
 							},
 						},
 					})

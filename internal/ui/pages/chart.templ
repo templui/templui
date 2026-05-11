@@ -112,7 +112,7 @@ templ Chart() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "chart",
+						ID:   "api-chart",
 						Text: "Chart",
 					},
 				},
@@ -294,7 +294,7 @@ templ Chart() {
 				ID:    "api-reference",
 			}) {
 				@modules.APILegend()
-				<div id="chart">
+				<div id="api-chart">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Chart",
 						Description: "Main chart component that renders various chart types.",

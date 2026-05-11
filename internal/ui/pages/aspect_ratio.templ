@@ -19,7 +19,7 @@ templ AspectRatio() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "aspectratio",
+						ID:   "api-aspectratio",
 						Text: "AspectRatio",
 					},
 				},
@@ -63,7 +63,7 @@ templ AspectRatio() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="aspectratio">
+				<div id="api-aspectratio">
 					@modules.APITable(modules.APITableProps{
 						Title:       "AspectRatio",
 						Description: "Component for maintaining consistent width-to-height ratios across different screen sizes.",

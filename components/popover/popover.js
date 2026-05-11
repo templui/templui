@@ -6,6 +6,12 @@ import "./floating_ui_dom.js";
 
   const floatingCleanups = new WeakMap();
   const hoverTimeouts = new WeakMap();
+  // Tracks whether pointerdown landed inside each open popover's content/trigger.
+  // Captured before any bubble-phase click handler can mutate the DOM, so the
+  // subsequent click handler can decide "outside" by user intent rather than by
+  // post-mutation event.target — which becomes unreliable when a child (e.g.
+  // Calendar) re-renders its grid during the click.
+  const pointerDownInside = new WeakMap();
   const arrowBaseClass =
     "absolute h-2.5 w-2.5 rotate-45 bg-popover border border-border";
   const exitAnimationDuration = 150;
@@ -56,7 +62,10 @@ import "./floating_ui_dom.js";
   }
 
   function isOpenRoot(root) {
-    return getContent(root)?.getAttribute("data-tui-popover-open") === "true";
+    // Use the native popover state as source of truth: the data-attribute is
+    // only a CSS hook for fade animations and can drift when something else
+    // (e.g. DatePicker) closes via content.hidePopover() directly.
+    return getContent(root)?.matches(":popover-open") === true;
   }
 
   function isOpen(id) {
@@ -214,6 +223,17 @@ import "./floating_ui_dom.js";
     }
   }
 
+  // Close the popover associated with the given element. The element may be
+  // the popover root, anything inside it (trigger, content, day button), or a
+  // wrapping component (e.g. a DatePicker root that contains a popover).
+  function closeNearest(element) {
+    if (!element) return;
+    const root =
+      element.closest?.("[data-tui-popover-root]") ||
+      element.querySelector?.("[data-tui-popover-root]");
+    if (root) closeRoot(root);
+  }
+
   function closeAllRoots(exceptRoot = null) {
     getRoots().forEach((root) => {
       if (root !== exceptRoot && isOpenRoot(root)) {
@@ -320,6 +340,25 @@ import "./floating_ui_dom.js";
     }
   }
 
+  document.addEventListener(
+    "pointerdown",
+    (event) => {
+      getRoots().forEach((root) => {
+        const content = getContent(root);
+        if (!content?.matches(":popover-open")) {
+          pointerDownInside.delete(root);
+          return;
+        }
+        const inContent = content.contains(event.target);
+        const inTrigger = getTriggers(root).some((t) =>
+          t.contains(event.target),
+        );
+        pointerDownInside.set(root, inContent || inTrigger);
+      });
+    },
+    true,
+  );
+
   document.addEventListener("click", (event) => {
     const trigger = event.target.closest("[data-tui-popover-trigger]");
     const root = trigger?.closest("[data-tui-popover-root]");
@@ -354,12 +393,21 @@ import "./floating_ui_dom.js";
         return;
       }
 
-      const clickedInsideContent = content.contains(event.target);
-      const clickedTrigger = getTriggers(currentRoot).some((item) =>
-        item.contains(event.target),
-      );
+      // Prefer the pointerdown location: by the time we get here, a child may
+      // have replaced the clicked node (e.g. Calendar re-rendering on day
+      // click), making event.target appear "outside" even though the user
+      // pressed inside. For synthesized clicks with no preceding pointerdown,
+      // fall back to event.target.
+      const downInside = pointerDownInside.get(currentRoot);
+      const clickedInside =
+        downInside !== undefined
+          ? downInside
+          : content.contains(event.target) ||
+            getTriggers(currentRoot).some((item) =>
+              item.contains(event.target),
+            );
 
-      if (!clickedInsideContent && !clickedTrigger) {
+      if (!clickedInside) {
         closeRoot(currentRoot);
       }
     });
@@ -406,7 +454,7 @@ import "./floating_ui_dom.js";
       trigger.getAttribute("data-tui-popover-type") === "hover"
     ) {
       const content = getContent(root);
-      handleHoverLeave(root, !!content?.contains(event.relatedTarget));
+      handleHoverLeave(root, content?.contains(event.relatedTarget) === true);
     }
 
     const content = event.target.closest("[data-tui-popover-content]");
@@ -445,6 +493,7 @@ import "./floating_ui_dom.js";
     open,
     close,
     closeAll,
+    closeNearest,
     toggle,
     isOpen,
   };

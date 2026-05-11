@@ -34,35 +34,35 @@ templ Sheet() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "sheet",
+						ID:   "api-sheet",
 						Text: "Sheet",
 					},
 					{
-						ID:   "trigger",
+						ID:   "api-trigger",
 						Text: "Trigger",
 					},
 					{
-						ID:   "content",
+						ID:   "api-content",
 						Text: "Content",
 					},
 					{
-						ID:   "header",
+						ID:   "api-header",
 						Text: "Header",
 					},
 					{
-						ID:   "title",
+						ID:   "api-title",
 						Text: "Title",
 					},
 					{
-						ID:   "description",
+						ID:   "api-description",
 						Text: "Description",
 					},
 					{
-						ID:   "footer",
+						ID:   "api-footer",
 						Text: "Footer",
 					},
 					{
-						ID:   "close",
+						ID:   "api-close",
 						Text: "Close",
 					},
 				},
@@ -124,7 +124,7 @@ templ Sheet() {
 				ID:    "api-reference",
 			}) {
 				@modules.APILegend()
-				<div id="sheet" class="mb-8">
+				<div id="api-sheet" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Sheet",
 						Items: []modules.APITableItem{
@@ -173,7 +173,7 @@ templ Sheet() {
 						},
 					})
 				</div>
-				<div id="trigger" class="mb-8">
+				<div id="api-trigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Trigger",
 						Items: []modules.APITableItem{
@@ -204,7 +204,7 @@ templ Sheet() {
 						},
 					})
 				</div>
-				<div id="content" class="mb-8">
+				<div id="api-content" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Content",
 						Items: []modules.APITableItem{
@@ -235,7 +235,7 @@ templ Sheet() {
 						},
 					})
 				</div>
-				<div id="header" class="mb-8">
+				<div id="api-header" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Header",
 						Items: []modules.APITableItem{
@@ -260,7 +260,7 @@ templ Sheet() {
 						},
 					})
 				</div>
-				<div id="title" class="mb-8">
+				<div id="api-title" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Title",
 						Items: []modules.APITableItem{
@@ -285,7 +285,7 @@ templ Sheet() {
 						},
 					})
 				</div>
-				<div id="description" class="mb-8">
+				<div id="api-description" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Description",
 						Items: []modules.APITableItem{
@@ -310,7 +310,7 @@ templ Sheet() {
 						},
 					})
 				</div>
-				<div id="footer" class="mb-8">
+				<div id="api-footer" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title: "Footer",
 						Items: []modules.APITableItem{
@@ -335,7 +335,7 @@ templ Sheet() {
 						},
 					})
 				</div>
-				<div id="close">
+				<div id="api-close">
 					@modules.APITable(modules.APITableProps{
 						Title: "Close",
 						Items: []modules.APITableItem{

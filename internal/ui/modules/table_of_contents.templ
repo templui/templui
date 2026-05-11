@@ -83,7 +83,10 @@ templ TableOfContentsScript() {
 
                 e.preventDefault();
                 const section = document.getElementById(link.dataset.sectionId);
-                if (section) main.scrollTo({ top: section.offsetTop - 100 });
+                if (section) {
+                    main.scrollTo({ top: section.offsetTop - 100 });
+                    history.pushState(null, '', '#' + link.dataset.sectionId);
+                }
             });
         });
     </script>

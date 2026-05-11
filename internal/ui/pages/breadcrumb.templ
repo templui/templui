@@ -38,23 +38,23 @@ templ Breadcrumb() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "breadcrumb",
+						ID:   "api-breadcrumb",
 						Text: "Breadcrumb",
 					},
 					{
-						ID:   "list",
+						ID:   "api-list",
 						Text: "List",
 					},
 					{
-						ID:   "item",
+						ID:   "api-item",
 						Text: "Item",
 					},
 					{
-						ID:   "link",
+						ID:   "api-link",
 						Text: "Link",
 					},
 					{
-						ID:   "separator",
+						ID:   "api-separator",
 						Text: "Separator",
 					},
 				},
@@ -121,7 +121,7 @@ templ Breadcrumb() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="breadcrumb" class="mb-8">
+				<div id="api-breadcrumb" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Breadcrumb",
 						Description: "Main breadcrumb navigation container component.",
@@ -150,7 +150,7 @@ templ Breadcrumb() {
 						},
 					})
 				</div>
-				<div id="list" class="mb-8">
+				<div id="api-list" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "List",
 						Description: "Breadcrumb list container for organizing breadcrumb items.",
@@ -179,7 +179,7 @@ templ Breadcrumb() {
 						},
 					})
 				</div>
-				<div id="item" class="mb-8">
+				<div id="api-item" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Item",
 						Description: "Individual breadcrumb item component.",
@@ -215,7 +215,7 @@ templ Breadcrumb() {
 						},
 					})
 				</div>
-				<div id="link" class="mb-8">
+				<div id="api-link" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Link",
 						Description: "Clickable breadcrumb link component.",
@@ -251,7 +251,7 @@ templ Breadcrumb() {
 						},
 					})
 				</div>
-				<div id="separator">
+				<div id="api-separator">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Separator",
 						Description: "Visual separator between breadcrumb items.",

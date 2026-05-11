@@ -73,6 +73,7 @@ func main() {
 
 		// Calendar
 		"out/showcase/calendar_default.html": showcase.CalendarDefault(),
+		"out/showcase/calendar_range.html":   showcase.CalendarRange(),
 		"out/showcase/calendar_sizes.html":   showcase.CalendarSizes(),
 
 		// Card
@@ -123,6 +124,7 @@ func main() {
 		"out/showcase/date_picker_disabled.html":           showcase.DatePickerDisabled(),
 		"out/showcase/date_picker_form.html":               showcase.DatePickerForm(),
 		"out/showcase/date_picker_formats.html":            showcase.DatePickerFormats(),
+		"out/showcase/date_picker_range.html":              showcase.DatePickerRange(),
 		"out/showcase/date_picker_selected_date.html":      showcase.DatePickerSelectedDate(),
 		"out/showcase/date_picker_with_label.html":         showcase.DatePickerWithLabel(),
 		"out/showcase/date_picker_with_time.html":          showcase.DatePickerWithTime(),

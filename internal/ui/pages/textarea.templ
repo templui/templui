@@ -46,7 +46,7 @@ templ Textarea() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "textarea",
+						ID:   "api-textarea",
 						Text: "Textarea",
 					},
 				},
@@ -126,7 +126,7 @@ templ Textarea() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="textarea" class="mb-8">
+				<div id="api-textarea" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Textarea",
 						Description: "Multi-line text field component for longer form content with auto-resize capability.",
