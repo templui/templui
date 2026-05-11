@@ -59,7 +59,7 @@ templ DatePicker() {
 				Children: []modules.TableOfContentsItem{
 					{
 						Text: "DatePicker",
-						ID:   "date-picker",
+						ID:   "api-date-picker",
 					},
 				},
 			},
@@ -156,7 +156,7 @@ templ DatePicker() {
 				ID:    "api-reference",
 			}) {
 				@modules.APILegend()
-				<div id="date-picker">
+				<div id="api-date-picker">
 					@modules.APITable(modules.APITableProps{
 						Title:       "DatePicker",
 						Description: "Main date picker component that triggers the popover calendar.",

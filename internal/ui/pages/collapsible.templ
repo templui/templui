@@ -20,15 +20,15 @@ templ Collapsible() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "collapsible",
+						ID:   "api-collapsible",
 						Text: "Collapsible",
 					},
 					{
-						ID:   "trigger",
+						ID:   "api-trigger",
 						Text: "Trigger",
 					},
 					{
-						ID:   "content",
+						ID:   "api-content",
 						Text: "Content",
 					},
 				},
@@ -73,7 +73,7 @@ templ Collapsible() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="collapsible" class="mb-8">
+				<div id="api-collapsible" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Collapsible",
 						Description: "Root container for collapsible content. Controls the open/closed state.",
@@ -109,7 +109,7 @@ templ Collapsible() {
 						},
 					})
 				</div>
-				<div id="trigger" class="mb-8">
+				<div id="api-trigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Trigger",
 						Description: "Button that toggles the collapsible content. Automatically handles click events and keyboard navigation.",
@@ -138,7 +138,7 @@ templ Collapsible() {
 						},
 					})
 				</div>
-				<div id="content" class="mb-8">
+				<div id="api-content" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Content",
 						Description: "Content that expands and collapses. Uses smooth height transitions for animations.",

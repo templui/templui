@@ -66,7 +66,7 @@ templ Button() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "button",
+						ID:   "api-button",
 						Text: "Button",
 					},
 				},
@@ -175,7 +175,7 @@ templ Button() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="button" class="mb-8">
+				<div id="api-button" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Button",
 						Description: "Interactive button component with multiple variants and states.",

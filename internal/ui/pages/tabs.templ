@@ -20,19 +20,19 @@ templ Tabs() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "tabs",
+						ID:   "api-tabs",
 						Text: "Tabs",
 					},
 					{
-						ID:   "list",
+						ID:   "api-list",
 						Text: "List",
 					},
 					{
-						ID:   "trigger",
+						ID:   "api-trigger",
 						Text: "Trigger",
 					},
 					{
-						ID:   "content",
+						ID:   "api-content",
 						Text: "Content",
 					},
 				},
@@ -81,7 +81,7 @@ templ Tabs() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="tabs" class="mb-8">
+				<div id="api-tabs" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Tabs",
 						Description: "Root container for the tabs component.",
@@ -110,7 +110,7 @@ templ Tabs() {
 						},
 					})
 				</div>
-				<div id="list" class="mb-8">
+				<div id="api-list" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "List",
 						Description: "Container for tab triggers with styled background and indicator.",
@@ -139,7 +139,7 @@ templ Tabs() {
 						},
 					})
 				</div>
-				<div id="trigger" class="mb-8">
+				<div id="api-trigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Trigger",
 						Description: "Individual tab button that activates corresponding content.",
@@ -189,7 +189,7 @@ templ Tabs() {
 						},
 					})
 				</div>
-				<div id="content" class="mb-8">
+				<div id="api-content" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Content",
 						Description: "Container for tab content that shows when corresponding trigger is active.",

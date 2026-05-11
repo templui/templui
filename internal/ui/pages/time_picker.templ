@@ -54,7 +54,7 @@ templ TimePicker() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "timepicker",
+						ID:   "api-timepicker",
 						Text: "TimePicker",
 					},
 				},
@@ -146,7 +146,7 @@ templ TimePicker() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="timepicker">
+				<div id="api-timepicker">
 					@modules.APITable(modules.APITableProps{
 						Title:       "TimePicker",
 						Description: "Time picker component for selecting time values with 12/24 hour format support.",

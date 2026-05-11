@@ -38,7 +38,7 @@ templ Separator() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "separator",
+						ID:   "api-separator",
 						Text: "Separator",
 					},
 				},
@@ -105,7 +105,7 @@ templ Separator() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="separator" class="mb-8">
+				<div id="api-separator" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Separator",
 						Description: "Visual divider component for separating content sections with optional labeling.",

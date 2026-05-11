@@ -34,7 +34,7 @@ templ Checkbox() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "checkbox",
+						ID:   "api-checkbox",
 						Text: "Checkbox",
 					},
 				},
@@ -96,7 +96,7 @@ templ Checkbox() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="checkbox">
+				<div id="api-checkbox">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Checkbox",
 						Description: "Control that allows selecting multiple options from a list.",

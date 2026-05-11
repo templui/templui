@@ -54,7 +54,7 @@ templ Input() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "input",
+						ID:   "api-input",
 						Text: "Input",
 					},
 				},
@@ -146,7 +146,7 @@ templ Input() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="input">
+				<div id="api-input">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Input",
 						Description: "Text field that allows users to enter and edit values.",

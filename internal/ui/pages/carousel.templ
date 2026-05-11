@@ -20,27 +20,27 @@ templ Carousel() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "carousel",
+						ID:   "api-carousel",
 						Text: "Carousel",
 					},
 					{
-						ID:   "content",
+						ID:   "api-content",
 						Text: "Content",
 					},
 					{
-						ID:   "item",
+						ID:   "api-item",
 						Text: "Item",
 					},
 					{
-						ID:   "previous",
+						ID:   "api-previous",
 						Text: "Previous",
 					},
 					{
-						ID:   "next",
+						ID:   "api-next",
 						Text: "Next",
 					},
 					{
-						ID:   "indicators",
+						ID:   "api-indicators",
 						Text: "Indicators",
 					},
 				},
@@ -85,7 +85,7 @@ templ Carousel() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="carousel" class="mb-8">
+				<div id="api-carousel" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Carousel",
 						Description: "Main carousel container component for interactive slideshows.",
@@ -135,7 +135,7 @@ templ Carousel() {
 						},
 					})
 				</div>
-				<div id="content" class="mb-8">
+				<div id="api-content" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Content",
 						Description: "Container for carousel slides with smooth transitions.",
@@ -164,7 +164,7 @@ templ Carousel() {
 						},
 					})
 				</div>
-				<div id="item" class="mb-8">
+				<div id="api-item" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Item",
 						Description: "Individual carousel slide container.",
@@ -193,7 +193,7 @@ templ Carousel() {
 						},
 					})
 				</div>
-				<div id="previous" class="mb-8">
+				<div id="api-previous" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Previous",
 						Description: "Navigation button to go to the previous slide.",
@@ -222,7 +222,7 @@ templ Carousel() {
 						},
 					})
 				</div>
-				<div id="next" class="mb-8">
+				<div id="api-next" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Next",
 						Description: "Navigation button to go to the next slide.",
@@ -251,7 +251,7 @@ templ Carousel() {
 						},
 					})
 				</div>
-				<div id="indicators">
+				<div id="api-indicators">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Indicators",
 						Description: "Dot indicators showing current slide position and allowing direct navigation.",

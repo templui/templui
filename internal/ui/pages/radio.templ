@@ -30,7 +30,7 @@ templ Radio() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "radio",
+						ID:   "api-radio",
 						Text: "Radio",
 					},
 				},
@@ -85,7 +85,7 @@ templ Radio() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="radio">
+				<div id="api-radio">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Radio",
 						Description: "Radio button input for selecting a single option from multiple choices.",

@@ -34,7 +34,7 @@ templ Calendar() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "calendar",
+						ID:   "api-calendar",
 						Text: "Calendar",
 					},
 				},
@@ -96,7 +96,7 @@ templ Calendar() {
 				ID:    "api",
 			}) {
 				@modules.APILegend()
-				<div id="calendar">
+				<div id="api-calendar">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Calendar",
 						Description: "Calendar component for date selection with internationalization support.",

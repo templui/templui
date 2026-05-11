@@ -50,19 +50,19 @@ templ InputOtp() {
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
 					{
-						ID:   "inputotp",
+						ID:   "api-inputotp",
 						Text: "InputOTP",
 					},
 					{
-						ID:   "group",
+						ID:   "api-group",
 						Text: "Group",
 					},
 					{
-						ID:   "slot",
+						ID:   "api-slot",
 						Text: "Slot",
 					},
 					{
-						ID:   "separator",
+						ID:   "api-separator",
 						Text: "Separator",
 					},
 				},
@@ -148,7 +148,7 @@ templ InputOtp() {
 				ID:    "api-reference",
 			}) {
 				@modules.APILegend()
-				<div id="inputotp" class="mb-8">
+				<div id="api-inputotp" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "InputOTP",
 						Description: "Main container for the OTP input component.",
@@ -192,7 +192,7 @@ templ InputOtp() {
 						},
 					})
 				</div>
-				<div id="group" class="mb-8">
+				<div id="api-group" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Group",
 						Description: "Container for grouping OTP slots together.",
@@ -218,7 +218,7 @@ templ InputOtp() {
 						},
 					})
 				</div>
-				<div id="slot" class="mb-8">
+				<div id="api-slot" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Slot",
 						Description: "Individual input slot for a single character.",
@@ -268,7 +268,7 @@ templ InputOtp() {
 						},
 					})
 				</div>
-				<div id="separator">
+				<div id="api-separator">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Separator",
 						Description: "Visual separator between groups of slots.",
