@@ -1,0 +1,9 @@
+package showcase
+
+import "github.com/templui/templui/components/calendar"
+
+templ CalendarRange() {
+	@calendar.Calendar(calendar.Props{
+		Mode: calendar.SelectionModeRange,
+	})
+}

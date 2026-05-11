@@ -33,18 +33,22 @@ var (
 )
 
 type Props struct {
-	ID          string
-	Class       string
-	Attributes  templ.Attributes
-	Name        string
-	Value       time.Time
-	Form        string
-	Format      Format        // Controls the display format using Intl dateStyle options.
-	LocaleTag   LocaleTag     // BCP 47 Locale Tag (e.g., "en-US", "es-ES"). Determines language and regional format defaults.
-	StartOfWeek *calendar.Day // Optional: 0-6 [Sun-Sat] (Default: 1).
-	Placeholder string
-	Disabled    bool
-	HasError    bool
+	ID             string
+	Class          string
+	Attributes     templ.Attributes
+	Name           string
+	Value          time.Time
+	Form           string
+	Format         Format                 // Controls the display format using Intl dateStyle options.
+	LocaleTag      LocaleTag              // BCP 47 Locale Tag (e.g., "en-US", "es-ES"). Determines language and regional format defaults.
+	StartOfWeek    *calendar.Day          // Optional: 0-6 [Sun-Sat] (Default: 1).
+	Placeholder    string
+	Disabled       bool
+	HasError       bool
+	Mode           calendar.SelectionMode // Optional: "single" (default) or "range".
+	EndValue       time.Time              // Range end date (range mode only).
+	EndName        string                 // Hidden input name for EndValue. Defaults to Name + "-end".
+	EndPlaceholder string                 // Placeholder for the end date (range mode only).
 }
 
 templ DatePicker(props ...Props) {
@@ -68,12 +72,32 @@ templ DatePicker(props ...Props) {
 		if p.Format == "" {
 			p.Format = FormatLOCALE_MEDIUM
 		}
+		if p.Mode == "" {
+			p.Mode = calendar.SelectionModeSingle
+		}
+
+		isRange := p.Mode == calendar.SelectionModeRange
+		if isRange {
+			if p.EndName == "" {
+				p.EndName = p.Name + "-end"
+			}
+			if p.EndPlaceholder == "" {
+				p.EndPlaceholder = "End date"
+			}
+		}
 
 		var valuePtr *time.Time
-		var initialSelectedISO string
+		var initialStartISO string
 		if !p.Value.IsZero() {
 			valuePtr = &p.Value
-			initialSelectedISO = p.Value.Format("2006-01-02")
+			initialStartISO = p.Value.Format("2006-01-02")
+		}
+
+		var endValuePtr *time.Time
+		var initialEndISO string
+		if isRange && !p.EndValue.IsZero() {
+			endValuePtr = &p.EndValue
+			initialEndISO = p.EndValue.Format("2006-01-02")
 		}
 	}}
 	<div class="relative inline-block w-full" data-tui-datepicker-root>
@@ -81,12 +105,23 @@ templ DatePicker(props ...Props) {
 			<input
 				type="hidden"
 				name={ p.Name }
-				value={ initialSelectedISO }
+				value={ initialStartISO }
 				if p.Form != "" {
 					form={ p.Form }
 				}
 				data-tui-datepicker-hidden-input
 			/>
+			if isRange {
+				<input
+					type="hidden"
+					name={ p.EndName }
+					value={ initialEndISO }
+					if p.Form != "" {
+						form={ p.Form }
+					}
+					data-tui-datepicker-hidden-end-input
+				/>
+			}
 			@popover.Trigger() {
 				@button.Button(button.Props{
 					ID:      p.ID,
@@ -109,18 +144,22 @@ templ DatePicker(props ...Props) {
 					),
 					Disabled: p.Disabled,
 					Attributes: utils.MergeAttributes(p.Attributes, templ.Attributes{
-						"data-tui-datepicker":                "true",
-						"data-tui-datepicker-display-format": string(p.Format),
-						"data-tui-datepicker-locale-tag":     string(p.LocaleTag),
-						"data-tui-datepicker-placeholder":    p.Placeholder,
-						"aria-invalid":                       utils.If(p.HasError, "true"),
+						"data-tui-datepicker":                 "true",
+						"data-tui-datepicker-display-format":  string(p.Format),
+						"data-tui-datepicker-locale-tag":      string(p.LocaleTag),
+						"data-tui-datepicker-placeholder":     p.Placeholder,
+						"data-tui-datepicker-mode":            string(p.Mode),
+						"data-tui-datepicker-end-placeholder": utils.If(isRange, p.EndPlaceholder),
+						"aria-invalid":                        utils.If(p.HasError, "true"),
 					}),
 				}) {
-					if p.Placeholder != "" {
-						<span data-tui-datepicker-display class={ "text-left grow text-muted-foreground" }>
+					<span data-tui-datepicker-display class={ "text-left grow text-muted-foreground" }>
+						if isRange {
+							{ p.Placeholder } – { p.EndPlaceholder }
+						} else {
 							{ p.Placeholder }
-						</span>
-					}
+						}
+					</span>
 					<span class="text-muted-foreground flex items-center ml-2">
 						@icon.Calendar(icon.Props{Class: "size-4"})
 					</span>
@@ -139,7 +178,9 @@ templ DatePicker(props ...Props) {
 						@calendar.Calendar(calendar.Props{
 							LocaleTag:       calendar.LocaleTag(p.LocaleTag),
 							StartOfWeek:     p.StartOfWeek,
+							Mode:            p.Mode,
 							Value:           valuePtr,
+							EndValue:        endValuePtr,
 							HideHiddenInput: true,
 						})
 					}

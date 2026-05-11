@@ -1,0 +1,15 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/calendar"
+	"github.com/templui/templui/components/datepicker"
+)
+
+templ DatePickerRange() {
+	<div class="w-full max-w-sm">
+		@datepicker.DatePicker(datepicker.Props{
+			Mode:        calendar.SelectionModeRange,
+			Placeholder: "Start date",
+		})
+	</div>
+}

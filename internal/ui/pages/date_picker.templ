@@ -32,6 +32,10 @@ templ DatePicker() {
 						ID:   "selected-date",
 					},
 					{
+						Text: "Range",
+						ID:   "range",
+					},
+					{
 						Text: "Disabled",
 						ID:   "disabled",
 					},
@@ -115,6 +119,12 @@ templ DatePicker() {
 					ShowcaseFile:    showcase.DatePickerSelectedDate(),
 					PreviewCodeFile: "date_picker_selected_date.templ",
 					ID:              "selected-date",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Range",
+					ShowcaseFile:    showcase.DatePickerRange(),
+					PreviewCodeFile: "date_picker_range.templ",
+					ID:              "range",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Disabled",
@@ -216,6 +226,30 @@ templ DatePicker() {
 								Type:        "string",
 								Default:     "ID value",
 								Description: "Name attribute for the hidden input field",
+							},
+							{
+								Name:        "Mode",
+								Type:        "calendar.SelectionMode",
+								Default:     "single",
+								Description: "Selection mode. Use calendar.SelectionModeRange for two-date range selection.",
+							},
+							{
+								Name:        "EndValue",
+								Type:        "time.Time",
+								Default:     "time.Time{}",
+								Description: "Range end date (range mode only).",
+							},
+							{
+								Name:        "EndName",
+								Type:        "string",
+								Default:     "Name + \"-end\"",
+								Description: "Name attribute for the range end hidden input (range mode only).",
+							},
+							{
+								Name:        "EndPlaceholder",
+								Type:        "string",
+								Default:     "End date",
+								Description: "Placeholder for the range end date (range mode only).",
 							},
 						},
 					})

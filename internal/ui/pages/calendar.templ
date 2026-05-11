@@ -23,6 +23,10 @@ templ Calendar() {
 						ID:   "sizes",
 						Text: "Sizes",
 					},
+					{
+						ID:   "range",
+						Text: "Range",
+					},
 				},
 			},
 			{
@@ -79,6 +83,12 @@ templ Calendar() {
 					ShowcaseFile:    showcase.CalendarSizes(),
 					PreviewCodeFile: "calendar_sizes.templ",
 					ID:              "sizes",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Range",
+					ShowcaseFile:    showcase.CalendarRange(),
+					PreviewCodeFile: "calendar_range.templ",
+					ID:              "range",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -145,6 +155,27 @@ templ Calendar() {
 								Type:        "*Day",
 								Default:     "nil",
 								Description: "Optional start of week (0-6, Sun-Sat). When nil, defaults to Monday (1). Use calendar.Sunday through calendar.Saturday constants.",
+								Required:    false,
+							},
+							{
+								Name:        "Mode",
+								Type:        "SelectionMode",
+								Default:     "single",
+								Description: "Selection mode. Use SelectionModeRange for two-date range selection (start and end).",
+								Required:    false,
+							},
+							{
+								Name:        "EndValue",
+								Type:        "*time.Time",
+								Default:     "nil",
+								Description: "Range end date (range mode only).",
+								Required:    false,
+							},
+							{
+								Name:        "EndName",
+								Type:        "string",
+								Default:     "Name + \"-end\"",
+								Description: "Name attribute for the range end hidden input (range mode only).",
 								Required:    false,
 							},
 						},
