@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . .
 
 # Install templ
-RUN go install github.com/a-h/templ/cmd/templ@latest
+RUN go install github.com/a-h/templ/cmd/templ@v0.3.1001
 
 # Generate templ files
 RUN templ generate
