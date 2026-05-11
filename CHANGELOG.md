@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.11.0] - 2026-05-11
+
+### Added
+
+- calendar: Added range selection via a new `SelectionMode` (single/range) plus `EndValue` and `EndName` props, with a corresponding range showcase
+- datepicker: Forwarded the new calendar range props and rendered the selected value as `start – end` when in range mode, with a corresponding range showcase
+- popover: Added `window.tui.popover.closeNearest(element)` so parent code can close the nearest enclosing popover from outside the trigger (#552)
+
+### Changed
+
+- calendar: Renamed the selection event from `calendar-date-selected` to `calendar-selected` and unified its payload for both single and range modes; update any direct listeners (breaking change) (#552)
+
+### Fixed
+
+- popover: Switched clickaway to `pointerdown` so re-rendering popover content during a click no longer triggers a false outside-click and immediate close (#552)
+
 ## [v1.10.1] - 2026-05-11
 
 ### Fixed
