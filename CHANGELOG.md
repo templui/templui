@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.11.1] - 2026-05-12
+
+### Fixed
+
+- dialog, sheet: Removed the inner `data-tui-dialog-panel` wrapper whose `grid` layout broke Sheet's flex height chain, causing mobile sidebar content to not scroll and footers with `mt-auto` to not stick to the bottom; layout (`flex-col`, `gap-4`, `p-6`) now sits directly on the native `<dialog>` (#553, thanks @hainguyen27798)
+
 ## [v1.11.0] - 2026-05-11
 
 ### Added
