@@ -124,7 +124,7 @@ templ Content(props ...ContentProps) {
 	<dialog
 		class={
 			utils.TwMerge(
-				"fixed left-[50%] top-[50%] z-50 m-0 w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-hidden border bg-background text-foreground p-0 shadow-lg outline-none sm:max-w-lg",
+				"fixed left-[50%] top-[50%] z-50 m-0 flex w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-hidden border bg-background p-6 text-foreground shadow-lg outline-none sm:max-w-lg",
 				"[&:not([open]):not([data-tui-dialog-closing=true])]:hidden",
 				"rounded-lg",
 				"[&::backdrop]:transition-all [&::backdrop]:duration-200",
@@ -144,40 +144,38 @@ templ Content(props ...ContentProps) {
 		data-tui-dialog-show-modal={ utils.IfElse(!p.DisableModal, "true", "false") }
 		{ p.Attributes... }
 	>
-		<div class="relative grid gap-4 p-6" data-tui-dialog-panel>
-			{ children... }
-			if !p.HideCloseButton {
-				<button
-					class={ utils.TwMerge(
-							// Positioning
-							"absolute top-4 right-4",
-							// Style
-							"rounded-xs opacity-70",
-							// Interactions
-							"transition-opacity hover:opacity-100",
-							// Focus states
-							"focus:outline-none focus:ring-2",
-							"focus:ring-ring focus:ring-offset-2",
-							"ring-offset-background",
-							// Hover/Data states
-							"data-[tui-dialog-open=true]:bg-accent",
-							"data-[tui-dialog-open=true]:text-muted-foreground",
-							// Disabled state
-							"disabled:pointer-events-none",
-							// Icon styles
-							"[&_svg]:pointer-events-none",
-						"[&_svg]:shrink-0",
-						"[&_svg:not([class*='size-'])]:size-4",
-					) }
-					data-tui-dialog-close
-					aria-label="Close"
-					type="button"
-				>
-					@icon.X()
-					<span class="sr-only">Close</span>
-				</button>
-			}
-		</div>
+		{ children... }
+		if !p.HideCloseButton {
+			<button
+				class={ utils.TwMerge(
+						// Positioning
+						"absolute top-4 right-4",
+						// Style
+						"rounded-xs opacity-70",
+						// Interactions
+						"transition-opacity hover:opacity-100",
+						// Focus states
+						"focus:outline-none focus:ring-2",
+						"focus:ring-ring focus:ring-offset-2",
+						"ring-offset-background",
+						// Hover/Data states
+						"data-[tui-dialog-open=true]:bg-accent",
+						"data-[tui-dialog-open=true]:text-muted-foreground",
+						// Disabled state
+						"disabled:pointer-events-none",
+						// Icon styles
+						"[&_svg]:pointer-events-none",
+					"[&_svg]:shrink-0",
+					"[&_svg:not([class*='size-'])]:size-4",
+				) }
+				data-tui-dialog-close
+				aria-label="Close"
+				type="button"
+			>
+				@icon.X()
+				<span class="sr-only">Close</span>
+			</button>
+		}
 	</dialog>
 }
 

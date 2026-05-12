@@ -140,8 +140,8 @@ templ Content(props ...ContentProps) {
 		Class: utils.TwMerge(
 			// First apply side-specific positioning and animations
 			getSideClasses(p.Side),
-			// Move panel layout overrides to the inner dialog panel
-			"[&_[data-tui-dialog-panel]]:gap-4 [&_[data-tui-dialog-panel]]:!p-0",
+			// Drop Dialog's default padding so sheet sub-components own their own.
+			"!p-0",
 			// Override Dialog styles
 			"!scale-100",    // Reset Dialog's scale animation
 			"!rounded-none", // Remove dialog rounded corners
