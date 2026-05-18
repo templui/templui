@@ -43,7 +43,6 @@ type ContentProps struct {
 	Attributes        templ.Attributes
 	NoSearch          bool
 	SearchPlaceholder string
-  DisableExclusive  bool
 }
 
 type GroupProps struct {
@@ -278,7 +277,7 @@ templ Content(props ...ContentProps) {
 			},
 			p.Attributes,
 		),
-		Exclusive: !p.DisableExclusive,
+		Exclusive: true,
 	}) {
 		if !p.NoSearch {
 			<div class="sticky top-0 bg-popover p-1">

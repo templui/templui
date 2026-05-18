@@ -242,6 +242,17 @@ import "./floating_ui_dom.js";
     });
   }
 
+  // Like closeAllRoots, but skips DOM ancestors of activeRoot. Used for the
+  // automatic exclusive cleanup so a popover nested inside another popover
+  // (e.g. SelectBox inside Popover) closes peers without killing its parent.
+  function closeOtherRoots(activeRoot) {
+    getRoots().forEach((root) => {
+      if (root === activeRoot || !isOpenRoot(root)) return;
+      if (root.contains(activeRoot)) return;
+      closeRoot(root);
+    });
+  }
+
   function closeAll(exceptId = null) {
     closeAllRoots(exceptId ? getRootById(exceptId) : null);
   }
@@ -252,7 +263,7 @@ import "./floating_ui_dom.js";
     if (!content || !trigger) return;
 
     if (content.getAttribute("data-tui-popover-exclusive") === "true") {
-      closeAllRoots(root);
+      closeOtherRoots(root);
     }
 
     if (!showContent(content)) return;
@@ -303,6 +314,7 @@ import "./floating_ui_dom.js";
       if (root === activeRoot || !isHoverRoot(root)) {
         return;
       }
+      if (root.contains(activeRoot)) return;
 
       clearHoverTimeouts(root);
       closeRoot(root);
