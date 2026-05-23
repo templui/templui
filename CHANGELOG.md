@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.11.2] - 2026-05-23
+
+### Fixed
+
+- popover: Made the exclusive close behavior skip ancestor popovers so a popover-based component (SelectBox, Dropdown) nested inside another popover no longer closes its parent when opened; the public `closeAll` / `window.tui.popover.closeAll` API keeps its close-everything semantics (#555, thanks @derkan)
+
 ## [v1.11.1] - 2026-05-12
 
 ### Fixed
