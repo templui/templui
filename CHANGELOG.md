@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.12.0] - 2026-06-01
+
+### Added
+
+- hovercard: Added a Hover Card component that shows rich content on hover, built as a thin wrapper around Popover with hover defaults (150ms open / 300ms close)
+- popover: Hover-based popovers (Tooltip, Hover Card) now also open on keyboard focus and close on blur for accessibility
+
+### Changed
+
+- tooltip: Default open/close delay is now instant (0ms) to match shadcn; the tooltip showcases no longer hardcode a 500ms delay
+
+### Fixed
+
+- dialog: Initialize dialogs added to the DOM after load (e.g. via HTMX swaps) so their triggers work without a full page reload (#557)
+- popover: An explicit hover delay of `0` is now respected as instant instead of falling back to 100ms, so instant tooltips/popovers are configurable
+
 ## [v1.11.2] - 2026-05-23
 
 ### Fixed
