@@ -1,0 +1,39 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/avatar"
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/hovercard"
+	"github.com/templui/templui/components/icon"
+)
+
+templ HoverCardDefault() {
+	@hovercard.Root() {
+		@hovercard.Trigger() {
+			@button.Button(button.Props{Variant: button.VariantLink}) {
+				{ "@templ" }
+			}
+		}
+		@hovercard.Content() {
+			<div class="flex gap-4">
+				@avatar.Avatar() {
+					@avatar.Image(avatar.ImageProps{
+						Src: "https://avatars.githubusercontent.com/u/26936893?v=4",
+						Alt: "templ avatar",
+					})
+					@avatar.Fallback() {
+						TM
+					}
+				}
+				<div class="space-y-1">
+					<h4 class="text-sm font-semibold">{ "@templ" }</h4>
+					<p class="text-sm">A HTML templating language for Go with great developer tooling.</p>
+					<div class="flex items-center pt-2 text-xs text-muted-foreground">
+						@icon.Calendar(icon.Props{Class: "mr-2 size-4"})
+						<span>Joined December 2021</span>
+					</div>
+				</div>
+			</div>
+		}
+	}
+}

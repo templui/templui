@@ -45,7 +45,8 @@ Components are designed to be composable, customizable, and easy to integrate in
 
 - [Dialog](https://templui.io/docs/components/dialog): Modal dialog component.
 - [Dropdown](https://templui.io/docs/components/dropdown): Dropdown menu component.
-- [Popover](https://templui.io/docs/components/popover): Floating popover component.
+- [Hover Card](https://templui.io/docs/components/hover-card): Displays rich content in a card when hovering over a trigger. Uses Popover for the popup.
+- [Popover](https://templui.io/docs/components/popover): Floating popover component using the browser popover API and Floating UI positioning.
 - [Sheet](https://templui.io/docs/components/sheet): Slide-out panel component (drawer).
 - [Tooltip](https://templui.io/docs/components/tooltip): Tooltip component for additional context.
 
@@ -71,3 +72,4 @@ Components are designed to be composable, customizable, and easy to integrate in
 - [Collapsible](https://templui.io/docs/components/collapsible): Collapsible container component.
 - [Copy Button](https://templui.io/docs/components/copy-button): Copy to clipboard button component.
 - [Icon](https://templui.io/docs/components/icon): SVG icon component library.
+

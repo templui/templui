@@ -1,0 +1,104 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/internal/ui/showcase"
+)
+
+templ HoverCard() {
+	@layouts.DocsLayout(
+		"Hover Card",
+		"Displays rich content in a card when hovering over a trigger. Uses Popover for the popup.",
+		[]modules.TableOfContentsItem{
+			{ID: "installation", Text: "Installation"},
+			{
+				Text: "Examples",
+				ID:   "examples",
+				Children: []modules.TableOfContentsItem{
+					{Text: "Positions", ID: "positions"},
+				},
+			},
+			{
+				ID:   "api",
+				Text: "API Reference",
+				Children: []modules.TableOfContentsItem{
+					{ID: "api-root", Text: "Root"},
+					{ID: "api-trigger", Text: "Trigger"},
+					{ID: "api-content", Text: "Content"},
+				},
+			},
+		},
+	) {
+		@modules.PageWrapper(modules.PageWrapperProps{
+			Name:        "Hover Card",
+			Description: templ.Raw("Displays rich content in a card when hovering over a trigger. Uses Popover for the popup and positioning."),
+			Tailwind:    true,
+			VanillaJS:   true,
+			Breadcrumbs: modules.Breadcrumbs{
+				Items: []modules.BreadcrumbItem{
+					{Text: "Docs", Path: "/docs"},
+					{Text: "Components", Path: "/docs/components"},
+					{Text: "Hover Card"},
+				},
+			},
+		}) {
+			@modules.ExampleWrapper(modules.ExampleWrapperProps{
+				ShowcaseFile:    showcase.HoverCardDefault(),
+				PreviewCodeFile: "hovercard_default.templ",
+			})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{ComponentName: "hovercard"})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Positions",
+					ShowcaseFile:    showcase.HoverCardPositions(),
+					PreviewCodeFile: "hovercard_positions.templ",
+					ID:              "positions",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {
+				@modules.APILegend()
+				<div id="api-root" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Root",
+						Description: "Groups one trigger with one hover card content element.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Optional root ID for the JavaScript API.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the root wrapper.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the root wrapper.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-trigger" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Trigger",
+						Description: "Element that opens the hover card on hover.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the trigger element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the trigger.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the trigger element.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-content" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Content",
+						Description: "The hover card surface. Placement and hover delays are configured here.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the content element.", Required: false},
+							{Name: "Class", Type: "string", Default: "w-64 p-4", Description: "Additional CSS classes to apply to the content. Override the default width here.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the content element.", Required: false},
+							{Name: "Placement", Type: "Placement", Default: "bottom", Description: "Position of the card relative to trigger. Options: 'top', 'top-start', 'top-end', 'right', 'right-start', 'right-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'left-start', 'left-end'.", Required: false},
+							{Name: "Offset", Type: "int", Default: "4 (or 8 with arrow)", Description: "Distance in pixels between the trigger and card.", Required: false},
+							{Name: "ShowArrow", Type: "bool", Default: "false", Description: "Whether to show an arrow pointing to the trigger element.", Required: false},
+							{Name: "OpenDelay", Type: "int", Default: "150", Description: "Delay in milliseconds before showing the card on hover.", Required: false},
+							{Name: "CloseDelay", Type: "int", Default: "300", Description: "Delay in milliseconds before hiding the card on hover out.", Required: false},
+						},
+					})
+				</div>
+			}
+		}
+	}
+}

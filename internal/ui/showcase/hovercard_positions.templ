@@ -1,0 +1,32 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/hovercard"
+)
+
+templ HoverCardPositions() {
+	<div class="flex flex-wrap gap-2">
+		@hoverCardPosition("Top", hovercard.PlacementTop)
+		@hoverCardPosition("Right", hovercard.PlacementRight)
+		@hoverCardPosition("Bottom", hovercard.PlacementBottom)
+		@hoverCardPosition("Left", hovercard.PlacementLeft)
+	</div>
+}
+
+templ hoverCardPosition(label string, placement hovercard.Placement) {
+	@hovercard.Root() {
+		@hovercard.Trigger() {
+			@button.Button(button.Props{Variant: button.VariantOutline}) {
+				{ label }
+			}
+		}
+		@hovercard.Content(hovercard.ContentProps{
+			Placement: placement,
+			ShowArrow: true,
+			Class:     "w-auto",
+		}) {
+			<p class="text-sm">Opens on { label }</p>
+		}
+	}
+}

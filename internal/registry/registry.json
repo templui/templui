@@ -268,6 +268,16 @@
       "tags": ["popover", "tooltip", "overlay", "floating"]
     },
     {
+      "name": "hovercard",
+      "slug": "hover-card",
+      "displayName": "Hover Card",
+      "description": "Displays rich content in a card when hovering over a trigger. Uses Popover for the popup.",
+      "files": ["components/hovercard/hovercard.templ"],
+      "dependencies": ["popover"],
+      "categories": ["overlays-dialogs"],
+      "tags": ["hover-card", "hovercard", "popover", "overlay", "preview"]
+    },
+    {
       "name": "progress",
       "slug": "progress",
       "displayName": "Progress",
