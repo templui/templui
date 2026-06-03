@@ -1,8 +1,11 @@
 package showcase
 
-import "github.com/templui/templui/components/avatar"
+import (
+	"github.com/templui/templui/components/avatar"
+	"github.com/templui/templui/components/icon"
+)
 
-templ AvatarGroup() {
+templ AvatarGroupCountIcon() {
 	@avatar.Group(avatar.GroupProps{Class: "grayscale"}) {
 		@avatar.Avatar() {
 			@avatar.Image(avatar.ImageProps{
@@ -30,6 +33,9 @@ templ AvatarGroup() {
 			@avatar.Fallback() {
 				JD
 			}
+		}
+		@avatar.GroupCount() {
+			@icon.Plus()
 		}
 	}
 }

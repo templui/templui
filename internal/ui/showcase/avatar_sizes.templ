@@ -3,47 +3,32 @@ package showcase
 import "github.com/templui/templui/components/avatar"
 
 templ AvatarSizes() {
-	<div class="flex flex-wrap items-center gap-4">
-		@avatar.Avatar(avatar.Props{
-			Class: "size-6",
-		}) {
+	<div class="flex flex-wrap items-center gap-2 grayscale">
+		@avatar.Avatar(avatar.Props{Size: avatar.SizeSm}) {
 			@avatar.Image(avatar.ImageProps{
-				Src: "https://avatars.githubusercontent.com/u/26936893?v=4",
-				Alt: "Small avatar",
+				Src: "https://github.com/axadrn.png",
+				Alt: "@axadrn",
 			})
 			@avatar.Fallback() {
-				SM 
+				AA
 			}
 		}
 		@avatar.Avatar() {
 			@avatar.Image(avatar.ImageProps{
-				Src: "https://avatars.githubusercontent.com/u/26936893?v=4",
-				Alt: "Default avatar",
+				Src: "https://github.com/axadrn.png",
+				Alt: "@axadrn",
 			})
 			@avatar.Fallback() {
-				MD 
+				AA
 			}
 		}
-		@avatar.Avatar(avatar.Props{
-			Class: "size-12",
-		}) {
+		@avatar.Avatar(avatar.Props{Size: avatar.SizeLg}) {
 			@avatar.Image(avatar.ImageProps{
-				Src: "https://avatars.githubusercontent.com/u/26936893?v=4",
-				Alt: "Large avatar",
+				Src: "https://github.com/axadrn.png",
+				Alt: "@axadrn",
 			})
 			@avatar.Fallback() {
-				LG 
-			}
-		}
-		@avatar.Avatar(avatar.Props{
-			Class: "size-16",
-		}) {
-			@avatar.Image(avatar.ImageProps{
-				Src: "https://avatars.githubusercontent.com/u/26936893?v=4",
-				Alt: "Extra large avatar",
-			})
-			@avatar.Fallback() {
-				XL 
+				AA
 			}
 		}
 	</div>

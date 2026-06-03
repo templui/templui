@@ -11,44 +11,29 @@ templ Avatar() {
 		"Avatar",
 		"Visual representation of a user through images or initials.",
 		[]modules.TableOfContentsItem{
-			{
-				ID:   "installation",
-				Text: "Installation",
-			},
+			{ID: "installation", Text: "Installation"},
 			{
 				ID:   "examples",
 				Text: "Examples",
 				Children: []modules.TableOfContentsItem{
-					{
-						ID:   "fallback",
-						Text: "Fallback",
-					},
-					{
-						ID:   "sizes",
-						Text: "Sizes",
-					},
-					{
-						ID:   "with_icon",
-						Text: "With Icon",
-					},
+					{ID: "basic", Text: "Basic"},
+					{ID: "badge", Text: "Badge"},
+					{ID: "badge-icon", Text: "Badge with Icon"},
+					{ID: "group", Text: "Avatar Group"},
+					{ID: "group-count", Text: "Avatar Group Count"},
+					{ID: "group-count-icon", Text: "Avatar Group with Icon"},
+					{ID: "sizes", Text: "Sizes"},
+					{ID: "dropdown", Text: "Dropdown"},
 				},
 			},
 			{
 				ID:   "api",
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
-					{
-						ID:   "api-avatar",
-						Text: "Avatar",
-					},
-					{
-						ID:   "api-image",
-						Text: "Image",
-					},
-					{
-						ID:   "api-fallback",
-						Text: "Fallback",
-					},
+					{ID: "api-avatar", Text: "Avatar"},
+					{ID: "api-image", Text: "Image"},
+					{ID: "api-fallback", Text: "Fallback"},
+					{ID: "api-badge", Text: "Badge"},
 				},
 			},
 		},
@@ -60,17 +45,9 @@ templ Avatar() {
 			VanillaJS:   true,
 			Breadcrumbs: modules.Breadcrumbs{
 				Items: []modules.BreadcrumbItem{
-					{
-						Text: "Docs",
-						Path: "/docs",
-					},
-					{
-						Text: "Components",
-						Path: "/docs/components",
-					},
-					{
-						Text: "Avatar",
-					},
+					{Text: "Docs", Path: "/docs"},
+					{Text: "Components", Path: "/docs/components"},
+					{Text: "Avatar"},
 				},
 			},
 		}) {
@@ -78,23 +55,45 @@ templ Avatar() {
 				ShowcaseFile:    showcase.AvatarDefault(),
 				PreviewCodeFile: "avatar_default.templ",
 			})
-			@modules.ContainerWrapper(modules.ContainerWrapperProps{
-				Title: "Installation",
-				ID:    "installation",
-			}) {
-				@modules.ComponentUsage(modules.ComponentUsageProps{
-					ComponentName: "avatar",
-				})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{ComponentName: "avatar"})
 			}
-			@modules.ContainerWrapper(modules.ContainerWrapperProps{
-				Title: "Examples",
-				ID:    "examples",
-			}) {
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Fallback",
-					ShowcaseFile:    showcase.AvatarFallback(),
-					PreviewCodeFile: "avatar_fallback.templ",
-					ID:              "fallback",
+					SectionName:     "Basic",
+					ShowcaseFile:    showcase.AvatarBasic(),
+					PreviewCodeFile: "avatar_basic.templ",
+					ID:              "basic",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Badge",
+					ShowcaseFile:    showcase.AvatarBadgeExample(),
+					PreviewCodeFile: "avatar_badge.templ",
+					ID:              "badge",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Badge with Icon",
+					ShowcaseFile:    showcase.AvatarBadgeIcon(),
+					PreviewCodeFile: "avatar_badge_icon.templ",
+					ID:              "badge-icon",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Avatar Group",
+					ShowcaseFile:    showcase.AvatarGroup(),
+					PreviewCodeFile: "avatar_group.templ",
+					ID:              "group",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Avatar Group Count",
+					ShowcaseFile:    showcase.AvatarGroupCount(),
+					PreviewCodeFile: "avatar_group_count.templ",
+					ID:              "group-count",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Avatar Group with Icon",
+					ShowcaseFile:    showcase.AvatarGroupCountIcon(),
+					PreviewCodeFile: "avatar_group_count_icon.templ",
+					ID:              "group-count-icon",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Sizes",
@@ -103,121 +102,58 @@ templ Avatar() {
 					ID:              "sizes",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "With Icon",
-					ShowcaseFile:    showcase.AvatarWithIcon(),
-					PreviewCodeFile: "avatar_with_icon.templ",
-					ID:              "with_icon",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Group",
-					ShowcaseFile:    showcase.AvatarGroup(),
-					PreviewCodeFile: "avatar_group.templ",
-					ID:              "group",
+					SectionName:     "Dropdown",
+					ShowcaseFile:    showcase.AvatarDropdown(),
+					PreviewCodeFile: "avatar_dropdown.templ",
+					ID:              "dropdown",
 				})
 			}
-			@modules.ContainerWrapper(modules.ContainerWrapperProps{
-				Title: "API Reference",
-				ID:    "api",
-			}) {
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {
 				@modules.APILegend()
 				<div id="api-avatar" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Avatar",
-						Description: "Root container for avatar component. Default size is 8 (size-8). Use the Class prop to customize size and styling.",
+						Description: "Root container. Compose with Image, Fallback and Badge; stack avatars in a Group.",
 						Items: []modules.APITableItem{
-							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "",
-								Description: "Unique identifier for the avatar element.",
-								Required:    false,
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "",
-								Description: "Additional CSS classes to apply to the avatar. Use this to set custom sizes (e.g. 'size-12', 'size-16') or other styles.",
-								Required:    false,
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "",
-								Description: "Additional HTML attributes to apply to the avatar element.",
-								Required:    false,
-							},
+							{Name: "Size", Type: "Size", Default: "default", Description: "Avatar size. Options: 'default' (size-8), 'sm' (size-6), 'lg' (size-10).", Required: false},
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes. Override the size with size-* if needed.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
 						},
 					})
 				</div>
 				<div id="api-image" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Image",
-						Description: "Image element within the avatar that displays the user's photo.",
+						Description: "The user's photo.",
 						Items: []modules.APITableItem{
-							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "",
-								Description: "Unique identifier for the image element.",
-								Required:    false,
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "",
-								Description: "Additional CSS classes to apply to the image.",
-								Required:    false,
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "",
-								Description: "Additional HTML attributes to apply to the image element.",
-								Required:    false,
-							},
-							{
-								Name:        "Src",
-								Type:        "string",
-								Default:     "",
-								Description: "Image source URL.",
-								Required:    true,
-							},
-							{
-								Name:        "Alt",
-								Type:        "string",
-								Default:     "",
-								Description: "Alternative text for the image.",
-								Required:    false,
-							},
+							{Name: "Src", Type: "string", Default: "", Description: "Image source URL.", Required: true},
+							{Name: "Alt", Type: "string", Default: "", Description: "Alternative text for the image.", Required: false},
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
 						},
 					})
 				</div>
 				<div id="api-fallback" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Fallback",
-						Description: "Fallback element displayed when the image fails to load, typically showing initials or an icon.",
+						Description: "Shown when the image fails to load — typically initials.",
 						Items: []modules.APITableItem{
-							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "",
-								Description: "Unique identifier for the fallback element.",
-								Required:    false,
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "",
-								Description: "Additional CSS classes to apply to the fallback.",
-								Required:    false,
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "",
-								Description: "Additional HTML attributes to apply to the fallback element.",
-								Required:    false,
-							},
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-badge">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Badge",
+						Description: "A small status dot or icon on the avatar. Stack avatars with Group and GroupCount.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes (e.g. a status color).", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
 						},
 					})
 				</div>

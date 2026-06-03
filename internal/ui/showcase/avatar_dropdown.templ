@@ -1,0 +1,48 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/avatar"
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/dropdown"
+)
+
+templ AvatarDropdown() {
+	@dropdown.Dropdown() {
+		@dropdown.Trigger() {
+			@button.Button(button.Props{
+				Variant: button.VariantGhost,
+				Size: button.SizeIcon,
+				Class: "rounded-full",
+			}) {
+				@avatar.Avatar() {
+					@avatar.Image(avatar.ImageProps{
+						Src: "https://github.com/axadrn.png",
+						Alt: "axadrn",
+					})
+					@avatar.Fallback() {
+						AA
+					}
+				}
+			}
+		}
+		@dropdown.Content(dropdown.ContentProps{Class: "w-32"}) {
+			@dropdown.Group() {
+				@dropdown.Item() {
+					Profile
+				}
+				@dropdown.Item() {
+					Billing
+				}
+				@dropdown.Item() {
+					Settings
+				}
+			}
+			@dropdown.Separator()
+			@dropdown.Group() {
+				@dropdown.Item(dropdown.ItemProps{Class: "text-destructive"}) {
+					Log out
+				}
+			}
+		}
+	}
+}

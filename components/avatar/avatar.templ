@@ -2,10 +2,19 @@ package avatar
 
 import "github.com/templui/templui/utils"
 
+type Size string
+
+const (
+	SizeDefault Size = "default"
+	SizeSm      Size = "sm"
+	SizeLg      Size = "lg"
+)
+
 type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
+	Size       Size
 }
 
 type ImageProps struct {
@@ -22,22 +31,40 @@ type FallbackProps struct {
 	Attributes templ.Attributes
 }
 
+type BadgeProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type GroupProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type GroupCountProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+
 templ Avatar(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	if p.Size == "" {
+		{{ p.Size = SizeDefault }}
+	}
 	<div
-		data-tui-avatar
+		data-slot="avatar"
+		data-size={ string(p.Size) }
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={
-			utils.TwMerge(
-				"relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
-				p.Class,
-			),
-		}
+		class={ utils.TwMerge("group/avatar relative flex size-8 shrink-0 rounded-full select-none after:absolute after:inset-0 after:rounded-full after:border after:border-border after:mix-blend-darken data-[size=lg]:size-10 data-[size=sm]:size-6 dark:after:mix-blend-lighten", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -51,6 +78,7 @@ templ Image(props ...ImageProps) {
 	}
 	<img
 		data-tui-avatar-image
+		data-slot="avatar-image"
 		if p.ID != "" {
 			id={ p.ID }
 		}
@@ -58,12 +86,7 @@ templ Image(props ...ImageProps) {
 			src={ p.Src }
 		}
 		alt={ p.Alt }
-		class={
-			utils.TwMerge(
-				"aspect-square h-full w-full",
-				p.Class,
-			),
-		}
+		class={ utils.TwMerge("absolute inset-0 aspect-square size-full rounded-full object-cover transition-opacity duration-300 [@media(scripting:enabled)]:not-data-[loaded=true]:opacity-0", p.Class) }
 		{ p.Attributes... }
 	/>
 }
@@ -74,20 +97,66 @@ templ Fallback(props ...FallbackProps) {
 		{{ p = props[0] }}
 	}
 	<span
-		data-tui-avatar-fallback
+		data-slot="avatar-fallback"
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={
-			utils.TwMerge(
-				"flex h-full w-full items-center justify-center rounded-full bg-muted",
-				p.Class,
-			),
-		}
+		class={ utils.TwMerge("flex size-full items-center justify-center rounded-full bg-muted text-sm text-muted-foreground group-data-[size=sm]/avatar:text-xs", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
 	</span>
+}
+
+templ Badge(props ...BadgeProps) {
+	{{ var p BadgeProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		data-slot="avatar-badge"
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("absolute right-0 bottom-0 z-10 inline-flex items-center justify-center rounded-full bg-blend-color bg-primary text-primary-foreground ring-2 ring-background select-none group-data-[size=sm]/avatar:size-2 group-data-[size=sm]/avatar:[&>svg]:hidden group-data-[size=default]/avatar:size-2.5 group-data-[size=default]/avatar:[&>svg]:size-2 group-data-[size=lg]/avatar:size-3 group-data-[size=lg]/avatar:[&>svg]:size-2", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}
+
+templ Group(props ...GroupProps) {
+	{{ var p GroupProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		data-slot="avatar-group"
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("group/avatar-group flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-background", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ GroupCount(props ...GroupCountProps) {
+	{{ var p GroupCountProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		data-slot="avatar-group-count"
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("relative flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-sm text-muted-foreground ring-2 ring-background group-has-data-[size=lg]/avatar-group:size-10 group-has-data-[size=sm]/avatar-group:size-6 [&>svg]:size-4 group-has-data-[size=lg]/avatar-group:[&>svg]:size-5 group-has-data-[size=sm]/avatar-group:[&>svg]:size-3", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
 }
 
 var scriptOnce = templ.NewOnceHandle()
