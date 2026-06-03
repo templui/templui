@@ -64,11 +64,12 @@ func main() {
 		"out/showcase/button_ghost.html":       showcase.ButtonGhost(),
 		"out/showcase/button_icon.html":        showcase.ButtonIcon(),
 		"out/showcase/button_link.html":        showcase.ButtonLink(),
-		"out/showcase/button_loading.html":     showcase.ButtonLoading(),
 		"out/showcase/button_outline.html":     showcase.ButtonOutline(),
 		"out/showcase/button_primary.html":     showcase.ButtonPrimary(),
+		"out/showcase/button_rounded.html":     showcase.ButtonRounded(),
 		"out/showcase/button_secondary.html":   showcase.ButtonSecondary(),
 		"out/showcase/button_sizes.html":       showcase.ButtonSizes(),
+		"out/showcase/button_spinner.html":     showcase.ButtonSpinner(),
 		"out/showcase/button_with_icon.html":   showcase.ButtonWithIcon(),
 
 		// Calendar

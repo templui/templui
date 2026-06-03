@@ -7,11 +7,9 @@ import (
 
 templ ButtonIcon() {
 	@button.Button(button.Props{
-		Size:    button.SizeIcon,
-		Variant: button.VariantSecondary,
+		Variant: button.VariantOutline,
+		Size: button.SizeIcon,
 	}) {
-		// Default icon size in @button is 16x16
-		// Use Class: "size-6" for larger icons
-		@icon.ChevronRight(icon.Props{Class: "size-4"})
+		@icon.CircleFadingArrowUp()
 	}
 }

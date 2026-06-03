@@ -7,12 +7,10 @@ import (
 
 templ ButtonWithIcon() {
 	@button.Button(button.Props{
-		Class:   "flex gap-2 items-center",
-		Variant: button.VariantSecondary,
+		Variant: button.VariantOutline,
+		Size: button.SizeSm,
 	}) {
-		// Default icon size in @button is 16x16
-		// Use Class: "size-6" for larger icons
-		@icon.Mail()
-		Login with Email
+		@icon.GitBranch()
+		New Branch
 	}
 }
