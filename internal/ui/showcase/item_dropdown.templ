@@ -1,0 +1,75 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/avatar"
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/dropdown"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/item"
+)
+
+templ ItemDropdown() {
+	{{
+		people := []itemPerson{
+			{
+				Username: "axadrn",
+				Avatar:   "https://github.com/axadrn.png",
+				Email:    "axel@example.com",
+			},
+			{
+				Username: "a-h",
+				Avatar:   "https://github.com/a-h.png",
+				Email:    "adrian@example.com",
+			},
+			{
+				Username: "joerdav",
+				Avatar:   "https://github.com/joerdav.png",
+				Email:    "joe@example.com",
+			},
+		}
+	}}
+	@dropdown.Dropdown() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: dropdown.Trigger(),
+		}) {
+			Select
+			@icon.ChevronDown()
+		}
+		@dropdown.Content(dropdown.ContentProps{
+			Class:     "w-48",
+			Placement: dropdown.PlacementBottomEnd,
+		}) {
+			@dropdown.Group() {
+				for _, person := range people {
+					@dropdown.Item() {
+						@item.Item(item.Props{
+							Size:  item.SizeXs,
+							Class: "w-full p-2",
+						}) {
+							@item.Media() {
+								@avatar.Avatar(avatar.Props{Class: "size-[1.625rem]"}) {
+									@avatar.Image(avatar.ImageProps{
+										Src:   person.Avatar,
+										Class: "grayscale",
+									})
+									@avatar.Fallback() {
+										{ person.Username[:1] }
+									}
+								}
+							}
+							@item.Content(item.ContentProps{Class: "gap-0"}) {
+								@item.Title() {
+									{ person.Username }
+								}
+								@item.Description(item.DescriptionProps{Class: "leading-none"}) {
+									{ person.Email }
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

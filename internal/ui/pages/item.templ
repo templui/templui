@@ -1,0 +1,147 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/internal/ui/showcase"
+)
+
+templ Item() {
+	@layouts.DocsLayout(
+		"Item",
+		"A flexible row for lists — media, title, description and actions.",
+		[]modules.TableOfContentsItem{
+			{ID: "installation", Text: "Installation"},
+			{ID: "variant", Text: "Variant"},
+			{ID: "size", Text: "Size"},
+			{
+				Text: "Examples",
+				ID:   "examples",
+				Children: []modules.TableOfContentsItem{
+					{Text: "Icon", ID: "icon"},
+					{Text: "Avatar", ID: "avatar"},
+					{Text: "Image", ID: "image"},
+					{Text: "Group", ID: "group"},
+					{Text: "Header", ID: "header"},
+					{Text: "Link", ID: "link"},
+					{Text: "Dropdown", ID: "dropdown"},
+				},
+			},
+			{
+				ID:   "api",
+				Text: "API Reference",
+				Children: []modules.TableOfContentsItem{
+					{ID: "api-item", Text: "Item"},
+					{ID: "api-media", Text: "Media"},
+				},
+			},
+		},
+	) {
+		@modules.PageWrapper(modules.PageWrapperProps{
+			Name:        "Item",
+			Description: templ.Raw("A flexible row for lists and cards. Compose it from Media, Content, Title, Description and Actions, and stack rows in a Group."),
+			Tailwind:    true,
+			Breadcrumbs: modules.Breadcrumbs{
+				Items: []modules.BreadcrumbItem{
+					{Text: "Docs", Path: "/docs"},
+					{Text: "Components", Path: "/docs/components"},
+					{Text: "Item"},
+				},
+			},
+		}) {
+			@modules.ExampleWrapper(modules.ExampleWrapperProps{
+				ShowcaseFile:    showcase.ItemDefault(),
+				PreviewCodeFile: "item_default.templ",
+			})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{ComponentName: "item"})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Variant", ID: "variant"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					ShowcaseFile:    showcase.ItemVariant(),
+					PreviewCodeFile: "item_variant.templ",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Size", ID: "size"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					ShowcaseFile:    showcase.ItemSizeDemo(),
+					PreviewCodeFile: "item_size.templ",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Icon",
+					ShowcaseFile:    showcase.ItemIcon(),
+					PreviewCodeFile: "item_icon.templ",
+					ID:              "icon",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Avatar",
+					ShowcaseFile:    showcase.ItemAvatar(),
+					PreviewCodeFile: "item_avatar.templ",
+					ID:              "avatar",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Image",
+					ShowcaseFile:    showcase.ItemImage(),
+					PreviewCodeFile: "item_image.templ",
+					ID:              "image",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Group",
+					ShowcaseFile:    showcase.ItemGroupExample(),
+					PreviewCodeFile: "item_group.templ",
+					ID:              "group",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Header",
+					ShowcaseFile:    showcase.ItemHeaderDemo(),
+					PreviewCodeFile: "item_header.templ",
+					ID:              "header",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Link",
+					ShowcaseFile:    showcase.ItemLink(),
+					PreviewCodeFile: "item_link.templ",
+					ID:              "link",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Dropdown",
+					ShowcaseFile:    showcase.ItemDropdown(),
+					PreviewCodeFile: "item_dropdown.templ",
+					ID:              "dropdown",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {
+				@modules.APILegend()
+				<div id="api-item" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Item",
+						Description: "A row. Compose with Media, Content, Title, Description, Actions, Header and Footer. Stack rows in a Group, divide with Separator. Renders as a link when Href is set.",
+						Items: []modules.APITableItem{
+							{Name: "Variant", Type: "Variant", Default: "default", Description: "Visual style. Options: 'default', 'outline', 'muted'.", Required: false},
+							{Name: "Size", Type: "Size", Default: "default", Description: "Row density. Options: 'default', 'sm', 'xs'.", Required: false},
+							{Name: "Href", Type: "string", Default: "", Description: "URL to navigate to; renders the item as an anchor.", Required: false},
+							{Name: "Target", Type: "string", Default: "", Description: "Target attribute for anchor items.", Required: false},
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-media" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Media",
+						Description: "Holds an icon, avatar or image on the left of the row.",
+						Items: []modules.APITableItem{
+							{Name: "Variant", Type: "MediaVariant", Default: "default", Description: "Visual style. Options: 'default', 'icon', 'image'.", Required: false},
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+			}
+		}
+	}
+}

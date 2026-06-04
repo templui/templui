@@ -1,0 +1,340 @@
+package item
+
+import "github.com/templui/templui/utils"
+
+type Variant string
+type Size string
+
+const (
+	VariantDefault Variant = "default"
+	VariantOutline Variant = "outline"
+	VariantMuted   Variant = "muted"
+)
+
+const (
+	SizeDefault Size = "default"
+	SizeSm      Size = "sm"
+	SizeXs      Size = "xs"
+)
+
+type MediaVariant string
+
+const (
+	MediaVariantDefault MediaVariant = "default"
+	MediaVariantIcon    MediaVariant = "icon"
+	MediaVariantImage   MediaVariant = "image"
+)
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Variant    Variant
+	Size       Size
+	Href       string
+	Target     string
+}
+
+type GroupProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type MediaProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Variant    MediaVariant
+}
+
+type ContentProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type TitleProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type DescriptionProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ActionsProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type HeaderProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type FooterProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type SeparatorProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+func itemClasses(variant Variant, size Size) string {
+	base := "group/item flex w-full flex-wrap items-center rounded-lg border text-sm transition-colors duration-100 outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+
+	variantClass := "border-transparent"
+	switch variant {
+	case VariantOutline:
+		variantClass = "border-border"
+	case VariantMuted:
+		variantClass = "border-transparent bg-muted/50"
+	}
+
+	sizeClass := "gap-2.5 px-3 py-2.5"
+	if size == SizeXs {
+		sizeClass = "gap-2 px-2.5 py-2 in-data-[slot=dropdown-menu-content]:p-0"
+	}
+
+	return utils.TwMerge(base, variantClass, sizeClass)
+}
+
+func mediaClasses(variant MediaVariant) string {
+	// Named-group variants are kept out of TwMerge to avoid its parser choking.
+	base := "flex shrink-0 items-center justify-center gap-2 [&_svg]:pointer-events-none group-has-data-[slot=item-description]/item:translate-y-0.5 group-has-data-[slot=item-description]/item:self-start"
+	switch variant {
+	case MediaVariantIcon:
+		return base + " [&_svg:not([class*='size-'])]:size-4"
+	case MediaVariantImage:
+		return base + " size-10 overflow-hidden rounded-sm group-data-[size=sm]/item:size-8 group-data-[size=xs]/item:size-6 [&_img]:size-full [&_img]:object-cover"
+	default:
+		return base + " bg-transparent"
+	}
+}
+
+templ Group(props ...GroupProps) {
+	{{ var p GroupProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ class := "group/item-group flex w-full flex-col gap-4 has-data-[size=sm]:gap-2.5 has-data-[size=xs]:gap-2" }}
+	if p.Class != "" {
+		{{ class = class + " " + p.Class }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="list"
+		data-slot="item-group"
+		class={ class }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Item(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Variant == "" {
+		{{ p.Variant = VariantDefault }}
+	}
+	if p.Size == "" {
+		{{ p.Size = SizeDefault }}
+	}
+	if p.Href != "" {
+		<a
+			if p.ID != "" {
+				id={ p.ID }
+			}
+			href={ templ.SafeURL(p.Href) }
+			if p.Target != "" {
+				target={ p.Target }
+			}
+			data-slot="item"
+			data-variant={ string(p.Variant) }
+			data-size={ string(p.Size) }
+			class={ utils.TwMerge(itemClasses(p.Variant, p.Size), "transition-colors hover:bg-muted", p.Class) }
+			{ p.Attributes... }
+		>
+			{ children... }
+		</a>
+	} else {
+		<div
+			if p.ID != "" {
+				id={ p.ID }
+			}
+			data-slot="item"
+			data-variant={ string(p.Variant) }
+			data-size={ string(p.Size) }
+			class={ utils.TwMerge(itemClasses(p.Variant, p.Size), p.Class) }
+			{ p.Attributes... }
+		>
+			{ children... }
+		</div>
+	}
+}
+
+templ Media(props ...MediaProps) {
+	{{ var p MediaProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Variant == "" {
+		{{ p.Variant = MediaVariantDefault }}
+	}
+	{{ class := mediaClasses(p.Variant) }}
+	if p.Class != "" {
+		{{ class = class + " " + p.Class }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="item-media"
+		data-variant={ string(p.Variant) }
+		class={ class }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ class := "flex flex-1 flex-col gap-1 group-data-[size=xs]/item:gap-0 [&+[data-slot=item-content]]:flex-none" }}
+	if p.Class != "" {
+		{{ class = class + " " + p.Class }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="item-content"
+		class={ class }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Title(props ...TitleProps) {
+	{{ var p TitleProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="item-title"
+		class={ utils.TwMerge("line-clamp-1 flex w-fit items-center gap-2 text-sm leading-snug font-medium underline-offset-4", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Description(props ...DescriptionProps) {
+	{{ var p DescriptionProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ class := "line-clamp-2 text-left text-sm leading-normal font-normal text-muted-foreground group-data-[size=xs]/item:text-xs [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary" }}
+	if p.Class != "" {
+		{{ class = class + " " + p.Class }}
+	}
+	<p
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="item-description"
+		class={ class }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</p>
+}
+
+templ Actions(props ...ActionsProps) {
+	{{ var p ActionsProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="item-actions"
+		class={ utils.TwMerge("flex items-center gap-2", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Header(props ...HeaderProps) {
+	{{ var p HeaderProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="item-header"
+		class={ utils.TwMerge("flex basis-full items-center justify-between gap-2", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Footer(props ...FooterProps) {
+	{{ var p FooterProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="item-footer"
+		class={ utils.TwMerge("flex basis-full items-center justify-between gap-2", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Separator(props ...SeparatorProps) {
+	{{ var p SeparatorProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="item-separator"
+		role="separator"
+		class={ utils.TwMerge("my-2 h-px w-full shrink-0 bg-border", p.Class) }
+		{ p.Attributes... }
+	></div>
+}
