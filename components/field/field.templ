@@ -1,0 +1,297 @@
+package field
+
+import "github.com/templui/templui/utils"
+
+type Orientation string
+
+const (
+	OrientationVertical   Orientation = "vertical"
+	OrientationHorizontal Orientation = "horizontal"
+	OrientationResponsive Orientation = "responsive"
+)
+
+type LegendVariant string
+
+const (
+	LegendVariantLegend LegendVariant = "legend"
+	LegendVariantLabel  LegendVariant = "label"
+)
+
+type SetProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type LegendProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Variant    LegendVariant
+}
+
+type GroupProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type Props struct {
+	ID          string
+	Class       string
+	Attributes  templ.Attributes
+	Orientation Orientation
+}
+
+type ContentProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type LabelProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	For        string
+}
+
+type TitleProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type DescriptionProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type SeparatorProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ErrorProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+func fieldClasses(o Orientation) string {
+	base := "group/field flex w-full gap-2 data-[invalid=true]:text-destructive"
+	switch o {
+	case OrientationHorizontal:
+		return base + " flex-row items-center has-[>[data-slot=field-content]]:items-start *:data-[slot=field-label]:flex-auto has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px"
+	case OrientationResponsive:
+		return base + " flex-col *:w-full @md/field-group:flex-row @md/field-group:items-center @md/field-group:*:w-auto @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:*:data-[slot=field-label]:flex-auto [&>.sr-only]:w-auto @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px"
+	default:
+		return base + " flex-col *:w-full [&>.sr-only]:w-auto"
+	}
+}
+
+templ Set(props ...SetProps) {
+	{{ var p SetProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<fieldset
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="field-set"
+		class={ utils.TwMerge("flex flex-col gap-4 has-[>[data-slot=checkbox-group]]:gap-3 has-[>[data-slot=radio-group]]:gap-3", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</fieldset>
+}
+
+templ Legend(props ...LegendProps) {
+	{{ var p LegendProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Variant == "" {
+		{{ p.Variant = LegendVariantLegend }}
+	}
+	<legend
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="field-legend"
+		data-variant={ string(p.Variant) }
+		class={ utils.TwMerge("mb-1.5 font-medium data-[variant=label]:text-sm data-[variant=legend]:text-base", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</legend>
+}
+
+templ Group(props ...GroupProps) {
+	{{ var p GroupProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{
+		// Allow data-slot to be overridden (e.g. "checkbox-group") without
+		// emitting a duplicate attribute, so the matching gap variants fire.
+		slot := "field-group"
+		attrs := templ.Attributes{}
+		for k, v := range p.Attributes {
+			if k == "data-slot" {
+				if s, ok := v.(string); ok && s != "" {
+					slot = s
+				}
+				continue
+			}
+			attrs[k] = v
+		}
+	}}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot={ slot }
+		class={ utils.TwMerge("group/field-group @container/field-group flex w-full flex-col gap-5 data-[slot=checkbox-group]:gap-3 *:data-[slot=field-group]:gap-4", p.Class) }
+		{ attrs... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Field(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Orientation == "" {
+		{{ p.Orientation = OrientationVertical }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="group"
+		data-slot="field"
+		data-orientation={ string(p.Orientation) }
+		class={ utils.TwMerge(fieldClasses(p.Orientation), p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="field-content"
+		class={ utils.TwMerge("group/field-content flex flex-1 flex-col gap-0.5 leading-snug", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Label(props ...LabelProps) {
+	{{ var p LabelProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<label
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		if p.For != "" {
+			for={ p.For }
+		}
+		data-slot="field-label"
+		class={ utils.TwMerge("group/field-label peer/field-label flex w-fit items-center gap-2 text-sm leading-snug font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 peer-has-[:disabled]:cursor-not-allowed peer-has-[:disabled]:opacity-50 group-data-[disabled=true]/field:opacity-50 has-[:checked]:border-primary/30 has-[:checked]:bg-primary/5 has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col has-[>[data-slot=field]]:rounded-lg has-[>[data-slot=field]]:border *:data-[slot=field]:p-2.5 dark:has-[:checked]:border-primary/20 dark:has-[:checked]:bg-primary/10", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</label>
+}
+
+templ Title(props ...TitleProps) {
+	{{ var p TitleProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="field-label"
+		class={ utils.TwMerge("flex w-fit items-center gap-2 text-sm font-medium group-data-[disabled=true]/field:opacity-50", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Description(props ...DescriptionProps) {
+	{{ var p DescriptionProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<p
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="field-description"
+		class={ utils.TwMerge("text-left text-sm leading-normal font-normal text-muted-foreground group-has-data-horizontal/field:text-balance [[data-variant=legend]+&]:-mt-1.5 last:mt-0 nth-last-2:-mt-1 [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</p>
+}
+
+templ Separator(props ...SeparatorProps) {
+	{{ var p SeparatorProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="field-separator"
+		class={ utils.TwMerge("relative -my-2 h-5 text-sm group-data-[variant=outline]/field-group:-mb-2", p.Class) }
+		{ p.Attributes... }
+	>
+		<div data-slot="separator" class="absolute inset-0 top-1/2 h-px w-full bg-border"></div>
+		<span
+			class="relative mx-auto block w-fit bg-background px-2 text-muted-foreground"
+			data-slot="field-separator-content"
+		>
+			{ children... }
+		</span>
+	</div>
+}
+
+templ Error(props ...ErrorProps) {
+	{{ var p ErrorProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="alert"
+		data-slot="field-error"
+		class={ utils.TwMerge("text-sm font-normal text-destructive", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}

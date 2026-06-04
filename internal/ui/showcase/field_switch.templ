@@ -1,0 +1,18 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/field"
+	switchcomp "github.com/templui/templui/components/switch"
+)
+
+templ FieldSwitch() {
+	@field.Field(field.Props{
+		Orientation: field.OrientationHorizontal,
+		Class: "w-fit",
+	}) {
+		@field.Label(field.LabelProps{For: "2fa"}) {
+			Multi-factor authentication
+		}
+		@switchcomp.Switch(switchcomp.Props{ID: "2fa"})
+	}
+}

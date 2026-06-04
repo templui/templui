@@ -1,0 +1,48 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/selectbox"
+)
+
+templ FieldSelect() {
+	@field.Field(field.Props{Class: "w-full max-w-xs"}) {
+		@field.Label() {
+			Department
+		}
+		@selectbox.SelectBox() {
+			@selectbox.Trigger() {
+				@selectbox.Value(selectbox.ValueProps{Placeholder: "Choose department"})
+			}
+			@selectbox.Content() {
+				@selectbox.Item(selectbox.ItemProps{Value: "engineering"}) {
+					Engineering
+				}
+				@selectbox.Item(selectbox.ItemProps{Value: "design"}) {
+					Design
+				}
+				@selectbox.Item(selectbox.ItemProps{Value: "marketing"}) {
+					Marketing
+				}
+				@selectbox.Item(selectbox.ItemProps{Value: "sales"}) {
+					Sales
+				}
+				@selectbox.Item(selectbox.ItemProps{Value: "support"}) {
+					Customer Support
+				}
+				@selectbox.Item(selectbox.ItemProps{Value: "hr"}) {
+					Human Resources
+				}
+				@selectbox.Item(selectbox.ItemProps{Value: "finance"}) {
+					Finance
+				}
+				@selectbox.Item(selectbox.ItemProps{Value: "operations"}) {
+					Operations
+				}
+			}
+		}
+		@field.Description() {
+			Select your department or area of work.
+		}
+	}
+}
