@@ -47,17 +47,14 @@ func Radio(props ...Props) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
-			"relative h-4 w-4",
-			"before:absolute before:left-1/2 before:top-1/2",
-			"before:h-1.5 before:w-1.5 before:-translate-x-1/2 before:-translate-y-1/2",
-			"appearance-none rounded-full",
-			"border-2 border-primary",
-			"before:content[''] before:rounded-full before:bg-background",
-			"checked:border-primary checked:bg-primary",
-			"checked:before:visible",
-			"focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
-			"focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-			"disabled:cursor-not-allowed",
+			// shadcn radix-nova radio: gray border, fills with primary when checked
+			"peer relative aspect-square size-4 shrink-0 appearance-none rounded-full border border-input bg-transparent outline-none transition-colors",
+			// primary-foreground dot, shown only when checked
+			"before:absolute before:top-1/2 before:left-1/2 before:size-2 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:bg-primary-foreground before:opacity-0 before:content-['']",
+			"focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+			"disabled:cursor-not-allowed disabled:opacity-50",
+			"checked:border-primary checked:bg-primary checked:before:opacity-100",
+			"dark:bg-input/30 dark:checked:bg-primary",
 			p.Class,
 		),
 		}
