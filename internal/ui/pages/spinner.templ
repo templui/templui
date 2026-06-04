@@ -1,0 +1,97 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/internal/ui/showcase"
+)
+
+templ Spinner() {
+	@layouts.DocsLayout(
+		"Spinner",
+		"An animated loading indicator built from a spinning icon.",
+		[]modules.TableOfContentsItem{
+			{ID: "installation", Text: "Installation"},
+			{ID: "customization", Text: "Customization"},
+			{
+				Text: "Examples",
+				ID:   "examples",
+				Children: []modules.TableOfContentsItem{
+					{Text: "Size", ID: "size"},
+					{Text: "Button", ID: "button"},
+					{Text: "Badge", ID: "badge"},
+				},
+			},
+			{
+				ID:   "api",
+				Text: "API Reference",
+				Children: []modules.TableOfContentsItem{
+					{ID: "api-spinner", Text: "Spinner"},
+				},
+			},
+		},
+	) {
+		@modules.PageWrapper(modules.PageWrapperProps{
+			Name:        "Spinner",
+			Description: templ.Raw("An animated loading indicator built from a spinning icon. Resize and recolor it with utility classes."),
+			Tailwind:    true,
+			Breadcrumbs: modules.Breadcrumbs{
+				Items: []modules.BreadcrumbItem{
+					{Text: "Docs", Path: "/docs"},
+					{Text: "Components", Path: "/docs/components"},
+					{Text: "Spinner"},
+				},
+			},
+		}) {
+			@modules.ExampleWrapper(modules.ExampleWrapperProps{
+				ShowcaseFile:    showcase.SpinnerDefault(),
+				PreviewCodeFile: "spinner_default.templ",
+			})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{ComponentName: "spinner"})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Customization", ID: "customization"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					ShowcaseFile:    showcase.SpinnerCustom(),
+					PreviewCodeFile: "spinner_custom.templ",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Size",
+					ShowcaseFile:    showcase.SpinnerSize(),
+					PreviewCodeFile: "spinner_size.templ",
+					ID:              "size",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Button",
+					ShowcaseFile:    showcase.SpinnerButton(),
+					PreviewCodeFile: "spinner_button.templ",
+					ID:              "button",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Badge",
+					ShowcaseFile:    showcase.SpinnerBadge(),
+					PreviewCodeFile: "spinner_badge.templ",
+					ID:              "badge",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {
+				@modules.APILegend()
+				<div id="api-spinner" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Spinner",
+						Description: "Renders a spinning loader icon with an accessible status role.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the spinner element.", Required: false},
+							{Name: "Class", Type: "string", Default: "size-4", Description: "Classes applied to the icon. Use size-* and text-* to resize and recolor.", Required: false},
+							{Name: "Label", Type: "string", Default: "Loading", Description: "Accessible name announced to screen readers.", Required: false},
+							{Name: "Icon", Type: "func(...icon.Props) templ.Component", Default: "icon.LoaderCircle", Description: "Optionally overrides the spinning icon (e.g. icon.Loader, icon.LoaderPinwheel).", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes for the wrapper element.", Required: false},
+						},
+					})
+				</div>
+			}
+		}
+	}
+}

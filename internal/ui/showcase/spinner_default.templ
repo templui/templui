@@ -1,0 +1,24 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/item"
+	"github.com/templui/templui/components/spinner"
+)
+
+templ SpinnerDefault() {
+	<div class="flex w-full max-w-xs flex-col gap-4 [--radius:1rem]">
+		@item.Item(item.Props{Variant: item.VariantMuted}) {
+			@item.Media() {
+				@spinner.Spinner()
+			}
+			@item.Content() {
+				@item.Title(item.TitleProps{Class: "line-clamp-1"}) {
+					Processing payment...
+				}
+			}
+			@item.Content(item.ContentProps{Class: "flex-none justify-end"}) {
+				<span class="text-sm tabular-nums">$100.00</span>
+			}
+		}
+	</div>
+}
