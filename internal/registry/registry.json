@@ -208,8 +208,7 @@
       "displayName": "Input",
       "description": "Text input component.",
       "files": ["components/input/input.templ"],
-      "jsFiles": ["components/input/input.js", "components/input/input.min.js"],
-      "dependencies": ["button", "icon"],
+      "dependencies": [],
       "categories": ["form-input"],
       "tags": ["input", "text", "form", "field"]
     },
@@ -410,7 +409,6 @@
       "displayName": "Textarea",
       "description": "Multi-line text input component.",
       "files": ["components/textarea/textarea.templ"],
-      "jsFiles": ["components/textarea/textarea.js", "components/textarea/textarea.min.js"],
       "dependencies": [],
       "categories": ["form-input"],
       "tags": ["textarea", "input", "form", "text", "multiline"]

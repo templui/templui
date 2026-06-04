@@ -149,7 +149,6 @@ func main() {
 		"out/showcase/input_disabled.html":     showcase.InputDisabled(),
 		"out/showcase/input_file.html":         showcase.InputFile(),
 		"out/showcase/input_form.html":         showcase.InputForm(),
-		"out/showcase/input_password.html":     showcase.InputPassword(),
 		"out/showcase/input_time_default.html": showcase.InputTimeDefault(),
 		"out/showcase/input_time_styled.html":  showcase.InputTimeStyled(),
 		"out/showcase/input_with_label.html":   showcase.InputWithLabel(),
@@ -240,7 +239,6 @@ func main() {
 		"out/showcase/tagsinput_with_label.html":  showcase.TagsInputWithLabel(),
 
 		// Textarea
-		"out/showcase/textarea_auto_resize.html": showcase.TextareaAutoResize(),
 		"out/showcase/textarea_custom_rows.html": showcase.TextareaCustomRows(),
 		"out/showcase/textarea_default.html":     showcase.TextareaDefault(),
 		"out/showcase/textarea_disabled.html":    showcase.TextareaDisabled(),

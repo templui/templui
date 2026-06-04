@@ -20,24 +20,8 @@ templ Textarea() {
 				ID:   "examples",
 				Children: []modules.TableOfContentsItem{
 					{
-						Text: "Custom Rows",
-						ID:   "custom-rows",
-					},
-					{
-						Text: "Auto Resize",
-						ID:   "auto-resize",
-					},
-					{
-						Text: "With Label",
-						ID:   "with-label",
-					},
-					{
-						Text: "Disabled",
-						ID:   "disabled",
-					},
-					{
-						Text: "Form",
-						ID:   "form",
+						Text: "Button",
+						ID:   "button",
 					},
 				},
 			},
@@ -57,7 +41,6 @@ templ Textarea() {
 			Name:        "Textarea",
 			Description: templ.Raw("Multi-line text field for longer form content."),
 			Tailwind:    true,
-			VanillaJS:   true,
 			Breadcrumbs: modules.Breadcrumbs{
 				Items: []modules.BreadcrumbItem{
 					{
@@ -91,34 +74,10 @@ templ Textarea() {
 				ID:    "examples",
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Custom Rows",
-					ShowcaseFile:    showcase.TextareaCustomRows(),
-					PreviewCodeFile: "textarea_custom_rows.templ",
-					ID:              "custom-rows",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Auto Resize",
-					ShowcaseFile:    showcase.TextareaAutoResize(),
-					PreviewCodeFile: "textarea_auto_resize.templ",
-					ID:              "auto-resize",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "With Label",
-					ShowcaseFile:    showcase.TextareaWithLabel(),
-					PreviewCodeFile: "textarea_with_label.templ",
-					ID:              "with-label",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Disabled",
-					ShowcaseFile:    showcase.TextareaDisabled(),
-					PreviewCodeFile: "textarea_disabled.templ",
-					ID:              "disabled",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Form",
-					ShowcaseFile:    showcase.TextareaForm(),
-					PreviewCodeFile: "textarea_form.templ",
-					ID:              "form",
+					SectionName:     "Button",
+					ShowcaseFile:    showcase.TextareaButton(),
+					PreviewCodeFile: "textarea_button.templ",
+					ID:              "button",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -185,13 +144,6 @@ templ Textarea() {
 								Type:        "bool",
 								Default:     "false",
 								Description: "Whether the textarea is disabled and non-interactive.",
-								Required:    false,
-							},
-							{
-								Name:        "AutoResize",
-								Type:        "bool",
-								Default:     "false",
-								Description: "Whether the textarea should automatically resize based on content.",
 								Required:    false,
 							},
 							{

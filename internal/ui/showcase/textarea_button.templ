@@ -1,0 +1,15 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/textarea"
+)
+
+templ TextareaButton() {
+	<div class="grid w-full max-w-sm gap-2">
+		@textarea.Textarea(textarea.Props{Placeholder: "Type your message here."})
+		@button.Button() {
+			Send message
+		}
+	</div>
+}

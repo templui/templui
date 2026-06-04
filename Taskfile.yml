@@ -38,7 +38,6 @@ tasks:
         components/datepicker/datepicker.js \
         components/dialog/dialog.js \
         components/dropdown/dropdown.js \
-        components/input/input.js \
         components/inputotp/inputotp.js \
         components/label/label.js \
         components/popover/popover.js \
@@ -49,7 +48,6 @@ tasks:
         components/slider/slider.js \
         components/tabs/tabs.js \
         components/tagsinput/tagsinput.js \
-        components/textarea/textarea.js \
         components/timepicker/timepicker.js \
         components/toast/toast.js \
         --minify \

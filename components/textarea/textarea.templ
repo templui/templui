@@ -14,7 +14,6 @@ type Props struct {
 	Form        string
 	Placeholder string
 	Rows        int
-	AutoResize  bool
 	Disabled    bool
 	Readonly    bool
 	HasError    bool
@@ -30,7 +29,7 @@ templ Textarea(props ...Props) {
 	}
 	<textarea
 		id={ p.ID }
-		data-tui-textarea
+		data-slot="textarea"
 		if p.Name != "" {
 			name={ p.Name }
 		}
@@ -48,40 +47,25 @@ templ Textarea(props ...Props) {
 		if p.HasError {
 			aria-invalid="true"
 		}
-		if p.AutoResize {
-			data-tui-textarea-auto-resize="true"
-		}
 		class={
 			utils.TwMerge(
-				// Base styles
-				"flex w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm",
-				"min-h-[80px]", // Default min-height
+				// Base styles (shadcn radix-nova)
+				"flex field-sizing-content min-h-16 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none md:text-sm",
 				// Dark mode background
 				"dark:bg-input/30",
-				// Selection styles
-				"selection:bg-primary selection:text-primary-foreground",
 				// Placeholder
 				"placeholder:text-muted-foreground",
 				// Focus styles
-				"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-				// Disabled styles
-				"disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+				"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3",
+				// Disabled styles (shadcn: textarea keeps pointer events so the
+				// not-allowed cursor shows; the input disables them)
+				"disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 dark:disabled:bg-input/80",
 				// Error/Invalid styles
-				"aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40",
+				"aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
 				utils.If(p.HasError, "border-destructive ring-destructive/20 dark:ring-destructive/40"),
-				// Add overflow-hidden only if auto-resizing to prevent scrollbar flicker
-				utils.If(p.AutoResize, "overflow-hidden resize-none"),
 				p.Class,
 			),
 		}
 		{ p.Attributes... }
 	>{ p.Value }</textarea>
-}
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("textarea")
-	}
 }

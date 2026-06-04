@@ -20,32 +20,8 @@ templ Input() {
 				ID:   "examples",
 				Children: []modules.TableOfContentsItem{
 					{
-						Text: "File",
-						ID:   "file",
-					},
-					{
-						Text: "Disabled",
-						ID:   "disabled",
-					},
-					{
-						Text: "With Label",
-						ID:   "with-label",
-					},
-					{
-						Text: "Password",
-						ID:   "password",
-					},
-					{
-						Text: "Time",
-						ID:   "time",
-					},
-					{
-						Text: "Time (Styled)",
-						ID:   "time-styled",
-					},
-					{
-						Text: "Form",
-						ID:   "form",
+						Text: "Basic",
+						ID:   "basic",
 					},
 				},
 			},
@@ -65,7 +41,6 @@ templ Input() {
 			Name:        "Input",
 			Description: templ.Raw("Text field that allows users to enter and edit values."),
 			Tailwind:    true,
-			VanillaJS:   true,
 			Breadcrumbs: modules.Breadcrumbs{
 				Items: []modules.BreadcrumbItem{
 					{
@@ -99,46 +74,10 @@ templ Input() {
 				ID:    "examples",
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "File",
-					ShowcaseFile:    showcase.InputFile(),
-					PreviewCodeFile: "input_file.templ",
-					ID:              "file",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Disabled",
-					ShowcaseFile:    showcase.InputDisabled(),
-					PreviewCodeFile: "input_disabled.templ",
-					ID:              "disabled",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "With Label",
-					ShowcaseFile:    showcase.InputWithLabel(),
-					PreviewCodeFile: "input_with_label.templ",
-					ID:              "with-label",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Password",
-					ShowcaseFile:    showcase.InputPassword(),
-					PreviewCodeFile: "input_password.templ",
-					ID:              "password",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Time",
-					ShowcaseFile:    showcase.InputTimeDefault(),
-					PreviewCodeFile: "input_time_default.templ",
-					ID:              "time",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Time (Styled)",
-					ShowcaseFile:    showcase.InputTimeStyled(),
-					PreviewCodeFile: "input_time_styled.templ",
-					ID:              "time-styled",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Form",
-					ShowcaseFile:    showcase.InputForm(),
-					PreviewCodeFile: "input_form.templ",
-					ID:              "form",
+					SectionName:     "Basic",
+					ShowcaseFile:    showcase.InputBasic(),
+					PreviewCodeFile: "input_basic.templ",
+					ID:              "basic",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -228,14 +167,7 @@ templ Input() {
 								Description: "Whether the input has a validation error.",
 								Required:    false,
 							},
-							{
-								Name:        "NoTogglePassword",
-								Type:        "bool",
-								Default:     "false",
-								Description: "Disable password visibility toggle for password inputs.",
-								Required:    false,
 							},
-						},
 					})
 				</div>
 			}

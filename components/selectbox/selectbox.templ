@@ -306,7 +306,6 @@ var scriptOnce = templ.NewOnceHandle()
 
 templ Script() {
 	@scriptOnce.Once() {
-		@input.Script()
 		@popover.Script()
 		@utils.ComponentScript("selectbox")
 	}
