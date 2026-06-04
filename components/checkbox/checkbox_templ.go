@@ -52,18 +52,18 @@ func Checkbox(props ...Props) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"relative inline-flex items-center\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"peer relative inline-flex items-center has-[:disabled]:opacity-50\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
-			"peer size-4 shrink-0 rounded-[4px] border border-input shadow-xs",
-			"focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
-			"disabled:cursor-not-allowed disabled:opacity-50",
+			"peer relative size-4 shrink-0 appearance-none cursor-pointer rounded-[4px] border border-input bg-transparent outline-none transition-colors group-has-disabled/field:opacity-50",
+			"focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+			"disabled:cursor-not-allowed",
 			"checked:bg-primary checked:text-primary-foreground checked:border-primary",
 			"indeterminate:bg-primary indeterminate:text-primary-foreground indeterminate:border-primary",
-			"appearance-none cursor-pointer transition-shadow",
-			"relative",
+			"aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
+			"dark:bg-input/30 dark:checked:bg-primary",
 			p.Class,
 		),
 		}

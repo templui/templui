@@ -24,7 +24,7 @@ templ Checkbox(props ...Props) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<div class="relative inline-flex items-center">
+	<div class="peer relative inline-flex items-center has-[:disabled]:opacity-50">
 		<input
 			checked?={ p.Checked }
 			disabled?={ p.Disabled }
@@ -51,13 +51,13 @@ templ Checkbox(props ...Props) {
 			type="checkbox"
 			class={
 				utils.TwMerge(
-					"peer size-4 shrink-0 rounded-[4px] border border-input shadow-xs",
-					"focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
-					"disabled:cursor-not-allowed disabled:opacity-50",
+					"peer relative size-4 shrink-0 appearance-none cursor-pointer rounded-[4px] border border-input bg-transparent outline-none transition-colors group-has-disabled/field:opacity-50",
+					"focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+					"disabled:cursor-not-allowed",
 					"checked:bg-primary checked:text-primary-foreground checked:border-primary",
 					"indeterminate:bg-primary indeterminate:text-primary-foreground indeterminate:border-primary",
-					"appearance-none cursor-pointer transition-shadow",
-					"relative",
+					"aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
+					"dark:bg-input/30 dark:checked:bg-primary",
 					p.Class,
 				),
 			}
