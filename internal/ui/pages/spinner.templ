@@ -20,6 +20,8 @@ templ Spinner() {
 					{Text: "Size", ID: "size"},
 					{Text: "Button", ID: "button"},
 					{Text: "Badge", ID: "badge"},
+					{Text: "Input Group", ID: "input-group"},
+					{Text: "Empty", ID: "empty"},
 				},
 			},
 			{
@@ -74,6 +76,18 @@ templ Spinner() {
 					ShowcaseFile:    showcase.SpinnerBadge(),
 					PreviewCodeFile: "spinner_badge.templ",
 					ID:              "badge",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Input Group",
+					ShowcaseFile:    showcase.SpinnerInputGroup(),
+					PreviewCodeFile: "spinner_input_group.templ",
+					ID:              "input-group",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Empty",
+					ShowcaseFile:    showcase.SpinnerEmpty(),
+					PreviewCodeFile: "spinner_empty.templ",
+					ID:              "empty",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {

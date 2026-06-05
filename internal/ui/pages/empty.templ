@@ -1,0 +1,115 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/internal/ui/showcase"
+)
+
+templ Empty() {
+	@layouts.DocsLayout(
+		"Empty",
+		"A placeholder for empty states — no results, first-run or offline screens.",
+		[]modules.TableOfContentsItem{
+			{ID: "installation", Text: "Installation"},
+			{
+				Text: "Examples",
+				ID:   "examples",
+				Children: []modules.TableOfContentsItem{
+					{Text: "Outline", ID: "outline"},
+					{Text: "Background", ID: "background"},
+					{Text: "Avatar", ID: "avatar"},
+					{Text: "Avatar Group", ID: "avatar-group"},
+					{Text: "Input Group", ID: "input-group"},
+				},
+			},
+			{
+				ID:   "api",
+				Text: "API Reference",
+				Children: []modules.TableOfContentsItem{
+					{ID: "api-empty", Text: "Empty"},
+					{ID: "api-media", Text: "Media"},
+				},
+			},
+		},
+	) {
+		@modules.PageWrapper(modules.PageWrapperProps{
+			Name:        "Empty",
+			Description: templ.Raw("A placeholder for empty states — no results, first-run or offline screens. Compose it from Header, Media, Title, Description and Content."),
+			Tailwind:    true,
+			Breadcrumbs: modules.Breadcrumbs{
+				Items: []modules.BreadcrumbItem{
+					{Text: "Docs", Path: "/docs"},
+					{Text: "Components", Path: "/docs/components"},
+					{Text: "Empty"},
+				},
+			},
+		}) {
+			@modules.ExampleWrapper(modules.ExampleWrapperProps{
+				ShowcaseFile:    showcase.EmptyDefault(),
+				PreviewCodeFile: "empty_default.templ",
+			})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{ComponentName: "empty"})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Outline",
+					ShowcaseFile:    showcase.EmptyOutline(),
+					PreviewCodeFile: "empty_outline.templ",
+					ID:              "outline",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Background",
+					ShowcaseFile:    showcase.EmptyBackground(),
+					PreviewCodeFile: "empty_background.templ",
+					ID:              "background",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Avatar",
+					ShowcaseFile:    showcase.EmptyAvatar(),
+					PreviewCodeFile: "empty_avatar.templ",
+					ID:              "avatar",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Avatar Group",
+					ShowcaseFile:    showcase.EmptyAvatarGroup(),
+					PreviewCodeFile: "empty_avatar_group.templ",
+					ID:              "avatar-group",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Input Group",
+					ShowcaseFile:    showcase.EmptyInputGroup(),
+					PreviewCodeFile: "empty_input_group.templ",
+					ID:              "input-group",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {
+				@modules.APILegend()
+				<div id="api-empty" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Empty",
+						Description: "The container. Compose with Header, Media, Title, Description and Content. Add 'border border-dashed' for an outlined look.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-media" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Media",
+						Description: "Holds the icon or avatar above the title.",
+						Items: []modules.APITableItem{
+							{Name: "Variant", Type: "MediaVariant", Default: "default", Description: "Visual style. 'icon' renders a muted rounded square; 'default' is transparent.", Required: false},
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+			}
+		}
+	}
+}

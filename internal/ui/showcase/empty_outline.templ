@@ -1,0 +1,31 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/empty"
+	"github.com/templui/templui/components/icon"
+)
+
+templ EmptyOutline() {
+	@empty.Empty(empty.Props{Class: "border border-dashed"}) {
+		@empty.Header() {
+			@empty.Media(empty.MediaProps{Variant: empty.MediaVariantIcon}) {
+				@icon.Cloud()
+			}
+			@empty.Title() {
+				Cloud Storage Empty
+			}
+			@empty.Description() {
+				Upload files to your cloud storage to access them anywhere.
+			}
+		}
+		@empty.Content() {
+			@button.Button(button.Props{
+				Variant: button.VariantOutline,
+				Size:    button.SizeSm,
+			}) {
+				Upload Files
+			}
+		}
+	}
+}

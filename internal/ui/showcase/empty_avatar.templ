@@ -1,0 +1,36 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/avatar"
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/empty"
+)
+
+templ EmptyAvatar() {
+	@empty.Empty() {
+		@empty.Header() {
+			@empty.Media(empty.MediaProps{Variant: empty.MediaVariantDefault}) {
+				@avatar.Avatar(avatar.Props{Class: "size-12"}) {
+					@avatar.Image(avatar.ImageProps{
+						Src:   "https://github.com/axadrn.png",
+						Class: "grayscale",
+					})
+					@avatar.Fallback() {
+						AA
+					}
+				}
+			}
+			@empty.Title() {
+				User Offline
+			}
+			@empty.Description() {
+				This user is currently offline. You can leave a message to notify them or try again later.
+			}
+		}
+		@empty.Content() {
+			@button.Button(button.Props{Size: button.SizeSm}) {
+				Leave Message
+			}
+		}
+	}
+}
