@@ -1,0 +1,100 @@
+package togglegroup
+
+import "github.com/templui/templui/components/toggle"
+
+type Type string
+type Orientation string
+
+const (
+	TypeSingle   Type = "single"
+	TypeMultiple Type = "multiple"
+)
+
+const (
+	OrientationHorizontal Orientation = "horizontal"
+	OrientationVertical   Orientation = "vertical"
+)
+
+// Re-export toggle's variant/size so consumers only import togglegroup.
+type Variant = toggle.Variant
+type Size = toggle.Size
+
+const (
+	VariantDefault = toggle.VariantDefault
+	VariantOutline = toggle.VariantOutline
+	SizeDefault    = toggle.SizeDefault
+	SizeSm         = toggle.SizeSm
+	SizeLg         = toggle.SizeLg
+)
+
+type Props struct {
+	ID          string
+	Class       string
+	Attributes  templ.Attributes
+	Type        Type
+	Variant     Variant
+	Size        Size
+	Orientation Orientation
+	// Spacing is the gap between items in Tailwind units. 0 uses the default (2).
+	Spacing int
+}
+
+func gapClass(spacing int) string {
+	switch spacing {
+	case 1:
+		return "gap-1"
+	case 3:
+		return "gap-3"
+	case 4:
+		return "gap-4"
+	case 6:
+		return "gap-6"
+	case 8:
+		return "gap-8"
+	default: // 0 (unset) and 2 fall back to the default gap.
+		return "gap-2"
+	}
+}
+
+func groupClasses(o Orientation, spacing int) string {
+	// shadcn renders toggle groups as separated items with a small gap.
+	if o == OrientationVertical {
+		return "inline-flex w-fit flex-col items-start " + gapClass(spacing)
+	}
+	return "inline-flex w-fit items-center " + gapClass(spacing)
+}
+
+templ Group(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Type == "" {
+		{{ p.Type = TypeSingle }}
+	}
+	if p.Orientation == "" {
+		{{ p.Orientation = OrientationHorizontal }}
+	}
+	{{ ctx = toggle.WithGroupDefaults(ctx, p.Variant, p.Size) }}
+	{{ class := groupClasses(p.Orientation, p.Spacing) }}
+	if p.Class != "" {
+		{{ class = class + " " + p.Class }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="group"
+		data-tui-toggle-group
+		data-type={ string(p.Type) }
+		data-orientation={ string(p.Orientation) }
+		class={ class }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Script() {
+	@toggle.Script()
+}

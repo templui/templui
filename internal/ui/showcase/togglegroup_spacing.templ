@@ -1,0 +1,41 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/toggle"
+	"github.com/templui/templui/components/togglegroup"
+)
+
+templ ToggleGroupSpacing() {
+	@togglegroup.Group(togglegroup.Props{
+		Type:    togglegroup.TypeSingle,
+		Size:    togglegroup.SizeSm,
+		Variant: togglegroup.VariantOutline,
+		Spacing: 2,
+	}) {
+		@toggle.Toggle(toggle.Props{
+			Value:      "top",
+			Pressed:    true,
+			Attributes: templ.Attributes{"aria-label": "Toggle top"},
+		}) {
+			Top
+		}
+		@toggle.Toggle(toggle.Props{
+			Value:      "bottom",
+			Attributes: templ.Attributes{"aria-label": "Toggle bottom"},
+		}) {
+			Bottom
+		}
+		@toggle.Toggle(toggle.Props{
+			Value:      "left",
+			Attributes: templ.Attributes{"aria-label": "Toggle left"},
+		}) {
+			Left
+		}
+		@toggle.Toggle(toggle.Props{
+			Value:      "right",
+			Attributes: templ.Attributes{"aria-label": "Toggle right"},
+		}) {
+			Right
+		}
+	}
+}
