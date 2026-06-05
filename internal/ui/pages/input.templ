@@ -19,10 +19,15 @@ templ Input() {
 				Text: "Examples",
 				ID:   "examples",
 				Children: []modules.TableOfContentsItem{
-					{
-						Text: "Basic",
-						ID:   "basic",
-					},
+					{Text: "Basic", ID: "basic"},
+					{Text: "Field", ID: "field"},
+					{Text: "Disabled", ID: "disabled"},
+					{Text: "Invalid", ID: "invalid"},
+					{Text: "File", ID: "file"},
+					{Text: "Inline", ID: "inline"},
+					{Text: "Grid", ID: "grid"},
+					{Text: "Required", ID: "required"},
+					{Text: "Badge", ID: "badge"},
 				},
 			},
 			{
@@ -78,6 +83,54 @@ templ Input() {
 					ShowcaseFile:    showcase.InputBasic(),
 					PreviewCodeFile: "input_basic.templ",
 					ID:              "basic",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Field",
+					ShowcaseFile:    showcase.InputField(),
+					PreviewCodeFile: "input_field.templ",
+					ID:              "field",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Disabled",
+					ShowcaseFile:    showcase.InputDisabled(),
+					PreviewCodeFile: "input_disabled.templ",
+					ID:              "disabled",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Invalid",
+					ShowcaseFile:    showcase.InputInvalid(),
+					PreviewCodeFile: "input_invalid.templ",
+					ID:              "invalid",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "File",
+					ShowcaseFile:    showcase.InputFile(),
+					PreviewCodeFile: "input_file.templ",
+					ID:              "file",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Inline",
+					ShowcaseFile:    showcase.InputInline(),
+					PreviewCodeFile: "input_inline.templ",
+					ID:              "inline",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Grid",
+					ShowcaseFile:    showcase.InputGrid(),
+					PreviewCodeFile: "input_grid.templ",
+					ID:              "grid",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Required",
+					ShowcaseFile:    showcase.InputRequired(),
+					PreviewCodeFile: "input_required.templ",
+					ID:              "required",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Badge",
+					ShowcaseFile:    showcase.InputBadge(),
+					PreviewCodeFile: "input_badge.templ",
+					ID:              "badge",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

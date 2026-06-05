@@ -1,9 +1,21 @@
 package showcase
 
-import "github.com/templui/templui/components/input"
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/input"
+)
 
 templ InputFile() {
-	<div class="w-full max-w-sm">
-		@input.Input(input.Props{Type: input.TypeFile})
-	</div>
+	@field.Field() {
+		@field.Label(field.LabelProps{For: "picture"}) {
+			Picture
+		}
+		@input.Input(input.Props{
+			ID:   "picture",
+			Type: input.TypeFile,
+		})
+		@field.Description() {
+			Select a picture to upload.
+		}
+	}
 }

@@ -19,10 +19,10 @@ templ Textarea() {
 				Text: "Examples",
 				ID:   "examples",
 				Children: []modules.TableOfContentsItem{
-					{
-						Text: "Button",
-						ID:   "button",
-					},
+					{Text: "Field", ID: "field"},
+					{Text: "Disabled", ID: "disabled"},
+					{Text: "Invalid", ID: "invalid"},
+					{Text: "Button", ID: "button"},
 				},
 			},
 			{
@@ -73,6 +73,24 @@ templ Textarea() {
 				Title: "Examples",
 				ID:    "examples",
 			}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Field",
+					ShowcaseFile:    showcase.TextareaField(),
+					PreviewCodeFile: "textarea_field.templ",
+					ID:              "field",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Disabled",
+					ShowcaseFile:    showcase.TextareaDisabled(),
+					PreviewCodeFile: "textarea_disabled.templ",
+					ID:              "disabled",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Invalid",
+					ShowcaseFile:    showcase.TextareaInvalid(),
+					PreviewCodeFile: "textarea_invalid.templ",
+					ID:              "invalid",
+				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Button",
 					ShowcaseFile:    showcase.TextareaButton(),

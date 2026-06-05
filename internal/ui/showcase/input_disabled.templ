@@ -1,14 +1,23 @@
 package showcase
 
-import "github.com/templui/templui/components/input"
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/input"
+)
 
 templ InputDisabled() {
-	<div class="w-full max-w-sm">
+	@field.Field(field.Props{Disabled: true}) {
+		@field.Label(field.LabelProps{For: "input-demo-disabled"}) {
+			Email
+		}
 		@input.Input(input.Props{
+			ID:          "input-demo-disabled",
 			Type:        input.TypeEmail,
 			Placeholder: "Email",
 			Disabled:    true,
-		},
-		)
-	</div>
+		})
+		@field.Description() {
+			This field is currently disabled.
+		}
+	}
 }
