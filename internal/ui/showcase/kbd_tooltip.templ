@@ -1,0 +1,48 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/buttongroup"
+	"github.com/templui/templui/components/kbd"
+	"github.com/templui/templui/components/tooltip"
+)
+
+templ KbdTooltip() {
+	<div class="flex flex-wrap gap-4">
+		@buttongroup.ButtonGroup() {
+			@tooltip.Tooltip() {
+				@button.Button(button.Props{
+					Variant:    button.VariantOutline,
+					Attributes: tooltip.Trigger(),
+				}) {
+					Save
+				}
+				@tooltip.Content() {
+					Save Changes
+					@kbd.Kbd() {
+						S
+					}
+				}
+			}
+			@tooltip.Tooltip() {
+				@button.Button(button.Props{
+					Variant:    button.VariantOutline,
+					Attributes: tooltip.Trigger(),
+				}) {
+					Print
+				}
+				@tooltip.Content() {
+					Print Document
+					@kbd.Group() {
+						@kbd.Kbd() {
+							Ctrl
+						}
+						@kbd.Kbd() {
+							P
+						}
+					}
+				}
+			}
+		}
+	</div>
+}

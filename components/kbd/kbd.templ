@@ -1,0 +1,54 @@
+package kbd
+
+import "github.com/templui/templui/utils"
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type GroupProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+templ Kbd(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<kbd
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="kbd"
+		class={
+			utils.TwMerge(
+				"pointer-events-none inline-flex h-5 w-fit min-w-5 items-center justify-center gap-1 rounded-sm bg-muted px-1 font-sans text-xs font-medium text-muted-foreground select-none in-data-[slot=tooltip-content]:bg-background/20 in-data-[slot=tooltip-content]:text-background dark:in-data-[slot=tooltip-content]:bg-background/10 [&_svg:not([class*='size-'])]:size-3",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</kbd>
+}
+
+templ Group(props ...GroupProps) {
+	{{ var p GroupProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<kbd
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="kbd-group"
+		class={ utils.TwMerge("inline-flex items-center gap-1", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</kbd>
+}

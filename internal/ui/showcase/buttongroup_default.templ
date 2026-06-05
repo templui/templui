@@ -1,0 +1,101 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/buttongroup"
+	"github.com/templui/templui/components/dropdown"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/utils"
+)
+
+templ ButtonGroupDefault() {
+	@buttongroup.ButtonGroup() {
+		@buttongroup.ButtonGroup(buttongroup.Props{Class: "hidden sm:flex"}) {
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Size:       button.SizeIcon,
+				Attributes: templ.Attributes{"aria-label": "Go Back"},
+			}) {
+				@icon.ArrowLeft()
+			}
+		}
+		@buttongroup.ButtonGroup() {
+			@button.Button(button.Props{Variant: button.VariantOutline}) {
+				Archive
+			}
+			@button.Button(button.Props{Variant: button.VariantOutline}) {
+				Report
+			}
+		}
+		@buttongroup.ButtonGroup() {
+			@button.Button(button.Props{Variant: button.VariantOutline}) {
+				Snooze
+			}
+			@dropdown.Dropdown() {
+				@button.Button(button.Props{
+					Variant:    button.VariantOutline,
+					Size:       button.SizeIcon,
+					Attributes: utils.MergeAttributes(dropdown.Trigger(), templ.Attributes{"aria-label": "More Options"}),
+				}) {
+					@icon.Ellipsis()
+				}
+				@dropdown.Content(dropdown.ContentProps{
+					Placement: dropdown.PlacementBottomEnd,
+					Class:     "w-40",
+				}) {
+					@dropdown.Group() {
+						@dropdown.Item() {
+							@icon.MailCheck()
+							Mark as Read
+						}
+						@dropdown.Item() {
+							@icon.Archive()
+							Archive
+						}
+					}
+					@dropdown.Separator()
+					@dropdown.Group() {
+						@dropdown.Item() {
+							@icon.Clock()
+							Snooze
+						}
+						@dropdown.Item() {
+							@icon.CalendarPlus()
+							Add to Calendar
+						}
+						@dropdown.Item() {
+							@icon.ListFilter()
+							Add to List
+						}
+						@dropdown.Sub() {
+							@dropdown.SubTrigger() {
+								@icon.Tag()
+								Label As...
+							}
+							@dropdown.SubContent() {
+								@dropdown.RadioGroup() {
+									@dropdown.RadioItem(dropdown.RadioItemProps{Value: "personal", Checked: true}) {
+										Personal
+									}
+									@dropdown.RadioItem(dropdown.RadioItemProps{Value: "work"}) {
+										Work
+									}
+									@dropdown.RadioItem(dropdown.RadioItemProps{Value: "other"}) {
+										Other
+									}
+								}
+							}
+						}
+					}
+					@dropdown.Separator()
+					@dropdown.Group() {
+						@dropdown.Item(dropdown.ItemProps{Variant: dropdown.ItemVariantDestructive}) {
+							@icon.Trash2()
+							Trash
+						}
+					}
+				}
+			}
+		}
+	}
+}

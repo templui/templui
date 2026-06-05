@@ -1,0 +1,24 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/inputgroup"
+)
+
+templ InputGroupInlineEnd() {
+	@field.Field(field.Props{Class: "max-w-sm"}) {
+		@field.Label(field.LabelProps{For: "inline-end-input"}) {
+			Input
+		}
+		@inputgroup.InputGroup() {
+			@inputgroup.Input(inputgroup.InputProps{ID: "inline-end-input", Type: "password", Placeholder: "Enter password"})
+			@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignInlineEnd}) {
+				@icon.EyeOff()
+			}
+		}
+		@field.Description() {
+			Icon positioned at the end.
+		}
+	}
+}

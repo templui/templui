@@ -1,0 +1,142 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/internal/ui/showcase"
+)
+
+templ ButtonGroup() {
+	@layouts.DocsLayout(
+		"Button Group",
+		"Group related buttons together with shared borders.",
+		[]modules.TableOfContentsItem{
+			{ID: "installation", Text: "Installation"},
+			{
+				ID:   "examples",
+				Text: "Examples",
+				Children: []modules.TableOfContentsItem{
+					{ID: "orientation", Text: "Orientation"},
+					{ID: "size", Text: "Size"},
+					{ID: "nested", Text: "Nested"},
+					{ID: "separator", Text: "Separator"},
+					{ID: "split", Text: "Split"},
+					{ID: "input", Text: "Input"},
+					{ID: "input-group", Text: "Input Group"},
+				},
+			},
+			{
+				ID:   "api",
+				Text: "API Reference",
+				Children: []modules.TableOfContentsItem{
+					{ID: "api-button-group", Text: "ButtonGroup"},
+					{ID: "api-text", Text: "Text"},
+					{ID: "api-separator", Text: "Separator"},
+				},
+			},
+		},
+	) {
+		@modules.PageWrapper(modules.PageWrapperProps{
+			Name:        "Button Group",
+			Description: templ.Raw("Group a set of buttons (or button-like controls) so they share borders and act as one unit."),
+			Tailwind:    true,
+			Breadcrumbs: modules.Breadcrumbs{
+				Items: []modules.BreadcrumbItem{
+					{Text: "Docs", Path: "/docs"},
+					{Text: "Components", Path: "/docs/components"},
+					{Text: "Button Group"},
+				},
+			},
+		}) {
+			@modules.ExampleWrapper(modules.ExampleWrapperProps{
+				ShowcaseFile:    showcase.ButtonGroupDefault(),
+				PreviewCodeFile: "buttongroup_default.templ",
+			})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{ComponentName: "buttongroup"})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Orientation",
+					ShowcaseFile:    showcase.ButtonGroupOrientation(),
+					PreviewCodeFile: "buttongroup_orientation.templ",
+					ID:              "orientation",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Size",
+					ShowcaseFile:    showcase.ButtonGroupSize(),
+					PreviewCodeFile: "buttongroup_size.templ",
+					ID:              "size",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Nested",
+					ShowcaseFile:    showcase.ButtonGroupNested(),
+					PreviewCodeFile: "buttongroup_nested.templ",
+					ID:              "nested",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Separator",
+					ShowcaseFile:    showcase.ButtonGroupSeparatorExample(),
+					PreviewCodeFile: "buttongroup_separator.templ",
+					ID:              "separator",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Split",
+					ShowcaseFile:    showcase.ButtonGroupSplit(),
+					PreviewCodeFile: "buttongroup_split.templ",
+					ID:              "split",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Input",
+					ShowcaseFile:    showcase.ButtonGroupInput(),
+					PreviewCodeFile: "buttongroup_input.templ",
+					ID:              "input",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Input Group",
+					ShowcaseFile:    showcase.ButtonGroupInputGroup(),
+					PreviewCodeFile: "buttongroup_input_group.templ",
+					ID:              "input-group",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {
+				@modules.APILegend()
+				<div id="api-button-group" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "ButtonGroup",
+						Description: "Container that visually joins its children. Nest groups to space clusters apart.",
+						Items: []modules.APITableItem{
+							{Name: "Orientation", Type: "Orientation", Default: "horizontal", Description: "Layout direction. Options: 'horizontal', 'vertical'.", Required: false},
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-text" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Text",
+						Description: "A non-interactive label segment inside a group (e.g. a prefix or unit).",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-separator">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Separator",
+						Description: "A thin divider between buttons in a group (e.g. for split buttons).",
+						Items: []modules.APITableItem{
+							{Name: "Orientation", Type: "Orientation", Default: "vertical", Description: "Divider direction. Options: 'vertical', 'horizontal'.", Required: false},
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+			}
+		}
+	}
+}

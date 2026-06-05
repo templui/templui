@@ -1,0 +1,18 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/kbd"
+)
+
+templ KbdButton() {
+	@button.Button(button.Props{Variant: button.VariantOutline}) {
+		Accept
+		@kbd.Kbd(kbd.Props{
+			Class:      "translate-x-0.5",
+			Attributes: templ.Attributes{"data-icon": "inline-end"},
+		}) {
+			⏎
+		}
+	}
+}

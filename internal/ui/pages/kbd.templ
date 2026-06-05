@@ -1,0 +1,107 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/internal/ui/showcase"
+)
+
+templ Kbd() {
+	@layouts.DocsLayout(
+		"Kbd",
+		"Displays a keyboard key or shortcut.",
+		[]modules.TableOfContentsItem{
+			{ID: "installation", Text: "Installation"},
+			{
+				Text: "Examples",
+				ID:   "examples",
+				Children: []modules.TableOfContentsItem{
+					{Text: "Group", ID: "group"},
+					{Text: "Button", ID: "button"},
+					{Text: "Tooltip", ID: "tooltip"},
+					{Text: "Input Group", ID: "input-group"},
+				},
+			},
+			{
+				ID:   "api",
+				Text: "API Reference",
+				Children: []modules.TableOfContentsItem{
+					{ID: "api-kbd", Text: "Kbd"},
+					{ID: "api-group", Text: "Group"},
+				},
+			},
+		},
+	) {
+		@modules.PageWrapper(modules.PageWrapperProps{
+			Name:        "Kbd",
+			Description: templ.Raw("Displays a keyboard key or shortcut. Combine multiple keys with Group."),
+			Tailwind:    true,
+			Breadcrumbs: modules.Breadcrumbs{
+				Items: []modules.BreadcrumbItem{
+					{Text: "Docs", Path: "/docs"},
+					{Text: "Components", Path: "/docs/components"},
+					{Text: "Kbd"},
+				},
+			},
+		}) {
+			@modules.ExampleWrapper(modules.ExampleWrapperProps{
+				ShowcaseFile:    showcase.KbdDefault(),
+				PreviewCodeFile: "kbd_default.templ",
+			})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{ComponentName: "kbd"})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Group",
+					ShowcaseFile:    showcase.KbdGroupExample(),
+					PreviewCodeFile: "kbd_group.templ",
+					ID:              "group",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Button",
+					ShowcaseFile:    showcase.KbdButton(),
+					PreviewCodeFile: "kbd_button.templ",
+					ID:              "button",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Tooltip",
+					ShowcaseFile:    showcase.KbdTooltip(),
+					PreviewCodeFile: "kbd_tooltip.templ",
+					ID:              "tooltip",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Input Group",
+					ShowcaseFile:    showcase.KbdInputGroup(),
+					PreviewCodeFile: "kbd_input_group.templ",
+					ID:              "input-group",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {
+				@modules.APILegend()
+				<div id="api-kbd" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Kbd",
+						Description: "A single keyboard key.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-group">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Group",
+						Description: "Groups multiple keys into one shortcut.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+			}
+		}
+	}
+}

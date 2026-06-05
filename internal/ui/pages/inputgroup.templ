@@ -1,0 +1,179 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/internal/ui/showcase"
+)
+
+templ InputGroup() {
+	@layouts.DocsLayout(
+		"Input Group",
+		"An input with leading or trailing addons — icons, text or buttons.",
+		[]modules.TableOfContentsItem{
+			{ID: "installation", Text: "Installation"},
+			{
+				ID:   "align",
+				Text: "Align",
+				Children: []modules.TableOfContentsItem{
+					{Text: "Inline Start", ID: "inline-start"},
+					{Text: "Inline End", ID: "inline-end"},
+					{Text: "Block Start", ID: "block-start"},
+					{Text: "Block End", ID: "block-end"},
+				},
+			},
+			{
+				Text: "Examples",
+				ID:   "examples",
+				Children: []modules.TableOfContentsItem{
+					{Text: "Icon", ID: "icon"},
+					{Text: "Text", ID: "text"},
+					{Text: "Kbd", ID: "kbd"},
+					{Text: "Spinner", ID: "spinner"},
+					{Text: "Textarea", ID: "textarea"},
+				},
+			},
+			{
+				ID:   "api",
+				Text: "API Reference",
+				Children: []modules.TableOfContentsItem{
+					{ID: "api-input-group", Text: "InputGroup"},
+					{ID: "api-input", Text: "Input"},
+					{ID: "api-addon", Text: "Addon"},
+					{ID: "api-button", Text: "Button"},
+				},
+			},
+		},
+	) {
+		@modules.PageWrapper(modules.PageWrapperProps{
+			Name:        "Input Group",
+			Description: templ.Raw("An input wrapped with leading or trailing addons — icons, text, spinners or buttons. Compose InputGroup with Input, Addon and Button."),
+			Tailwind:    true,
+			Breadcrumbs: modules.Breadcrumbs{
+				Items: []modules.BreadcrumbItem{
+					{Text: "Docs", Path: "/docs"},
+					{Text: "Components", Path: "/docs/components"},
+					{Text: "Input Group"},
+				},
+			},
+		}) {
+			@modules.ExampleWrapper(modules.ExampleWrapperProps{
+				ShowcaseFile:    showcase.InputGroupDefault(),
+				PreviewCodeFile: "inputgroup_default.templ",
+			})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{ComponentName: "inputgroup"})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Align", ID: "align"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Inline Start",
+					ShowcaseFile:    showcase.InputGroupInlineStart(),
+					PreviewCodeFile: "inputgroup_inline_start.templ",
+					ID:              "inline-start",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Inline End",
+					ShowcaseFile:    showcase.InputGroupInlineEnd(),
+					PreviewCodeFile: "inputgroup_inline_end.templ",
+					ID:              "inline-end",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Block Start",
+					ShowcaseFile:    showcase.InputGroupBlockStart(),
+					PreviewCodeFile: "inputgroup_block_start.templ",
+					ID:              "block-start",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Block End",
+					ShowcaseFile:    showcase.InputGroupBlockEnd(),
+					PreviewCodeFile: "inputgroup_block_end.templ",
+					ID:              "block-end",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Icon",
+					ShowcaseFile:    showcase.InputGroupIcon(),
+					PreviewCodeFile: "inputgroup_icon.templ",
+					ID:              "icon",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Text",
+					ShowcaseFile:    showcase.InputGroupText(),
+					PreviewCodeFile: "inputgroup_text.templ",
+					ID:              "text",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Kbd",
+					ShowcaseFile:    showcase.InputGroupKbd(),
+					PreviewCodeFile: "inputgroup_kbd.templ",
+					ID:              "kbd",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Spinner",
+					ShowcaseFile:    showcase.InputGroupSpinner(),
+					PreviewCodeFile: "inputgroup_spinner.templ",
+					ID:              "spinner",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Textarea",
+					ShowcaseFile:    showcase.InputGroupTextareaExample(),
+					PreviewCodeFile: "inputgroup_textarea.templ",
+					ID:              "textarea",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {
+				@modules.APILegend()
+				<div id="api-input-group" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "InputGroup",
+						Description: "The container. Wrap an Input and one or more Addons.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-input" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Input",
+						Description: "The borderless input control inside the group.",
+						Items: []modules.APITableItem{
+							{Name: "Type", Type: "string", Default: "text", Description: "The input type.", Required: false},
+							{Name: "Name", Type: "string", Default: "", Description: "The form field name.", Required: false},
+							{Name: "Value", Type: "string", Default: "", Description: "The input value.", Required: false},
+							{Name: "Placeholder", Type: "string", Default: "", Description: "Placeholder text.", Required: false},
+							{Name: "Disabled", Type: "bool", Default: "false", Description: "Whether the input is disabled.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-addon" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Addon",
+						Description: "A leading or trailing slot for icons, text, spinners or buttons.",
+						Items: []modules.APITableItem{
+							{Name: "Align", Type: "Align", Default: "inline-start", Description: "Where the addon sits. Options: 'inline-start', 'inline-end'.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-button">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Button",
+						Description: "A compact ghost button for inside an Addon.",
+						Items: []modules.APITableItem{
+							{Name: "Type", Type: "string", Default: "button", Description: "The button type attribute.", Required: false},
+							{Name: "Disabled", Type: "bool", Default: "false", Description: "Whether the button is disabled.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+			}
+		}
+	}
+}

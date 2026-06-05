@@ -1,0 +1,102 @@
+package buttongroup
+
+import "github.com/templui/templui/utils"
+
+type Orientation string
+
+const (
+	OrientationHorizontal Orientation = "horizontal"
+	OrientationVertical   Orientation = "vertical"
+)
+
+type Props struct {
+	ID          string
+	Class       string
+	Attributes  templ.Attributes
+	Orientation Orientation
+}
+
+type TextProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type SeparatorProps struct {
+	ID          string
+	Class       string
+	Attributes  templ.Attributes
+	Orientation Orientation
+}
+
+func variantClasses(o Orientation) string {
+	base := "group/button-group flex w-fit items-stretch *:focus-visible:relative *:focus-visible:z-10 has-[>[data-slot=button-group]]:gap-2 [&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1"
+	// A popover trigger (tooltip/dropdown/…) renders a display:contents
+	// [data-tui-popover-root] wrapper around [trigger, content]. The wrapper is
+	// still a `>` child here, so the join rules pierce it via `>*:first-child`
+	// (the trigger) — generic across trigger types (button, select-trigger, …).
+	switch o {
+	case OrientationVertical:
+		return base + " [&>*:not(:first-child)]:rounded-t-none [&>*:not(:first-child)]:border-t-0 [&>*:not(:last-child)]:rounded-b-none [&>[data-tui-popover-root]:not(:first-child)>*:first-child]:rounded-t-none [&>[data-tui-popover-root]:not(:first-child)>*:first-child]:border-t-0 [&>[data-tui-popover-root]:not(:last-child)>*:first-child]:rounded-b-none [&>[data-slot]:not(:has(~[data-slot]))]:rounded-b-lg! flex-col"
+	default:
+		return base + " [&>*:not(:first-child)]:rounded-l-none [&>*:not(:first-child)]:border-l-0 [&>*:not(:last-child)]:rounded-r-none [&>[data-tui-popover-root]:not(:first-child)>*:first-child]:rounded-l-none [&>[data-tui-popover-root]:not(:first-child)>*:first-child]:border-l-0 [&>[data-tui-popover-root]:not(:last-child)>*:first-child]:rounded-r-none [&>[data-slot]:not(:has(~[data-slot])):not(:has(~[data-tui-popover-root]))]:rounded-r-lg!"
+	}
+}
+
+templ ButtonGroup(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Orientation == "" {
+		{{ p.Orientation = OrientationHorizontal }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="group"
+		data-slot="button-group"
+		data-orientation={ string(p.Orientation) }
+		class={ utils.TwMerge(variantClasses(p.Orientation), p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Text(props ...TextProps) {
+	{{ var p TextProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		class={ utils.TwMerge("flex items-center gap-2 rounded-lg border bg-muted px-2.5 text-sm font-medium [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Separator(props ...SeparatorProps) {
+	{{ var p SeparatorProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Orientation == "" {
+		{{ p.Orientation = OrientationVertical }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="separator"
+		data-slot="button-group-separator"
+		data-orientation={ string(p.Orientation) }
+		class={ utils.TwMerge("relative self-stretch bg-input shrink-0 data-[orientation=vertical]:my-px data-[orientation=vertical]:h-auto data-[orientation=vertical]:w-px data-[orientation=horizontal]:mx-px data-[orientation=horizontal]:w-auto data-[orientation=horizontal]:h-px", p.Class) }
+		{ p.Attributes... }
+	></div>
+}

@@ -1,0 +1,38 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/buttongroup"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/inputgroup"
+	"github.com/templui/templui/components/tooltip"
+)
+
+templ ButtonGroupNested() {
+	@buttongroup.ButtonGroup() {
+		@buttongroup.ButtonGroup() {
+			@button.Button(button.Props{
+				Variant: button.VariantOutline,
+				Size: button.SizeIcon,
+			}) {
+				@icon.Plus()
+			}
+		}
+		@buttongroup.ButtonGroup() {
+			@inputgroup.InputGroup() {
+				@inputgroup.Input(inputgroup.InputProps{Placeholder: "Send a message..."})
+				@tooltip.Tooltip() {
+					@inputgroup.Addon(inputgroup.AddonProps{
+						Align:      inputgroup.AlignInlineEnd,
+						Attributes: tooltip.Trigger(),
+					}) {
+						@icon.AudioLines()
+					}
+					@tooltip.Content() {
+						Voice Mode
+					}
+				}
+			}
+		}
+	}
+}
