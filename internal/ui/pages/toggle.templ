@@ -1,0 +1,101 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/internal/ui/showcase"
+)
+
+templ Toggle() {
+	@layouts.DocsLayout(
+		"Toggle",
+		"A two-state button that can be on or off, optionally grouped into a segmented control.",
+		[]modules.TableOfContentsItem{
+			{ID: "installation", Text: "Installation"},
+			{
+				Text: "Examples",
+				ID:   "examples",
+				Children: []modules.TableOfContentsItem{
+					{Text: "Outline", ID: "outline"},
+					{Text: "With Text", ID: "with-text"},
+					{Text: "Size", ID: "size"},
+					{Text: "Disabled", ID: "disabled"},
+				},
+			},
+			{
+				ID:   "api",
+				Text: "API Reference",
+				Children: []modules.TableOfContentsItem{
+					{ID: "api-toggle", Text: "Toggle"},
+				},
+			},
+		},
+	) {
+		@modules.PageWrapper(modules.PageWrapperProps{
+			Name:        "Toggle",
+			Description: templ.Raw("A two-state button that can be toggled on or off. Group toggles together for a segmented control."),
+			Tailwind:    true,
+			VanillaJS:   true,
+			Breadcrumbs: modules.Breadcrumbs{
+				Items: []modules.BreadcrumbItem{
+					{Text: "Docs", Path: "/docs"},
+					{Text: "Components", Path: "/docs/components"},
+					{Text: "Toggle"},
+				},
+			},
+		}) {
+			@modules.ExampleWrapper(modules.ExampleWrapperProps{
+				ShowcaseFile:    showcase.ToggleDefault(),
+				PreviewCodeFile: "toggle_default.templ",
+			})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{ComponentName: "toggle"})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Outline",
+					ShowcaseFile:    showcase.ToggleOutline(),
+					PreviewCodeFile: "toggle_outline.templ",
+					ID:              "outline",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "With Text",
+					ShowcaseFile:    showcase.ToggleWithText(),
+					PreviewCodeFile: "toggle_with_text.templ",
+					ID:              "with-text",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Size",
+					ShowcaseFile:    showcase.ToggleSizes(),
+					PreviewCodeFile: "toggle_sizes.templ",
+					ID:              "size",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Disabled",
+					ShowcaseFile:    showcase.ToggleDisabled(),
+					PreviewCodeFile: "toggle_disabled.templ",
+					ID:              "disabled",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {
+				@modules.APILegend()
+				<div id="api-toggle" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Toggle",
+						Description: "A single two-state button. Inside a Group it inherits Variant and Size.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the toggle.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the toggle.", Required: false},
+							{Name: "Variant", Type: "Variant", Default: "default", Description: "Visual style. Options: 'default', 'outline'.", Required: false},
+							{Name: "Size", Type: "Size", Default: "default", Description: "Size of the toggle. Options: 'sm', 'default', 'lg'.", Required: false},
+							{Name: "Pressed", Type: "bool", Default: "false", Description: "Whether the toggle starts in the on state.", Required: false},
+							{Name: "Disabled", Type: "bool", Default: "false", Description: "Whether the toggle is disabled.", Required: false},
+							{Name: "Value", Type: "string", Default: "", Description: "Identifies the toggle within a Group; exposed in the toggle-change event detail.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the toggle.", Required: false},
+						},
+					})
+				</div>
+			}
+		}
+	}
+}

@@ -1,0 +1,125 @@
+package toggle
+
+import (
+	"context"
+	"strconv"
+
+	"github.com/templui/templui/utils"
+)
+
+type Variant string
+type Size string
+
+const (
+	VariantDefault Variant = "default"
+	VariantOutline Variant = "outline"
+)
+
+const (
+	SizeDefault Size = "default"
+	SizeSm      Size = "sm"
+	SizeLg      Size = "lg"
+)
+
+type ctxKey string
+
+const (
+	variantKey ctxKey = "toggleVariant"
+	sizeKey    ctxKey = "toggleSize"
+)
+
+// WithGroupDefaults stores a group's variant/size in the context so child
+// Toggles inherit them. Used by the togglegroup component.
+func WithGroupDefaults(ctx context.Context, variant Variant, size Size) context.Context {
+	ctx = context.WithValue(ctx, variantKey, variant)
+	ctx = context.WithValue(ctx, sizeKey, size)
+	return ctx
+}
+
+func variantFromCtx(ctx context.Context) Variant {
+	if v, ok := ctx.Value(variantKey).(Variant); ok && v != "" {
+		return v
+	}
+	return VariantDefault
+}
+
+func sizeFromCtx(ctx context.Context) Size {
+	if s, ok := ctx.Value(sizeKey).(Size); ok && s != "" {
+		return s
+	}
+	return SizeDefault
+}
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Variant    Variant
+	Size       Size
+	Pressed    bool
+	Disabled   bool
+	// Value identifies the toggle within a group (exposed in the toggle-change event).
+	Value string
+}
+
+func toggleClasses(variant Variant, size Size) string {
+	base := "group/toggle inline-flex items-center justify-center gap-1 rounded-lg text-sm font-medium whitespace-nowrap transition-all outline-none hover:bg-muted hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 aria-pressed:bg-muted data-[state=on]:bg-muted dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+
+	variantClass := "bg-transparent"
+	if variant == VariantOutline {
+		variantClass = "border border-input bg-transparent hover:bg-muted"
+	}
+
+	sizeClass := "h-8 min-w-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"
+	switch size {
+	case SizeSm:
+		sizeClass = "h-7 min-w-7 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5"
+	case SizeLg:
+		sizeClass = "h-9 min-w-9 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"
+	}
+
+	return utils.TwMerge(base, variantClass, sizeClass)
+}
+
+templ Toggle(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Variant == "" {
+		{{ p.Variant = variantFromCtx(ctx) }}
+	}
+	if p.Size == "" {
+		{{ p.Size = sizeFromCtx(ctx) }}
+	}
+	<button
+		type="button"
+		data-slot="toggle"
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-tui-toggle
+		if p.Value != "" {
+			data-tui-toggle-value={ p.Value }
+		}
+		aria-pressed={ strconv.FormatBool(p.Pressed) }
+		if p.Pressed {
+			data-state="on"
+		} else {
+			data-state="off"
+		}
+		disabled?={ p.Disabled }
+		class={ utils.TwMerge(toggleClasses(p.Variant, p.Size), p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</button>
+}
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("toggle")
+	}
+}
