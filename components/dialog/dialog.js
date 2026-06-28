@@ -193,6 +193,14 @@
       const dialog = getDialog(dialogRoot);
       if (!dialog) return;
 
+      // Already set up? Skip it. The MutationObserver re-runs this on every DOM
+      // change anywhere on the page; without this guard we'd re-write state on
+      // every existing dialog each time, which with reactive frameworks (e.g.
+      // Datastar patching content inside an open dialog) spirals into an
+      // observer feedback loop. Same skip-on-init pattern the other components
+      // use. See #562.
+      if (dialog.dataset.tuiDialogInitialized === "true") return;
+
       ensureDialog(dialog);
 
       if (dialog.getAttribute("data-tui-dialog-initial-open") === "true") {
