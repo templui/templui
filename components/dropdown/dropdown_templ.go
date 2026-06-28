@@ -259,9 +259,9 @@ func Content(props ...ContentProps) templ.Component {
 		templ_7745c5c3_Err = popover.Content(popover.ContentProps{
 			Placement: placement,
 			Class: utils.TwMerge(
-				"z-50 rounded-md bg-popover p-1 shadow-md focus:outline-none overflow-auto",
+				"z-50 rounded-md bg-popover p-1 shadow-md focus:outline-none overflow-y-auto overflow-x-hidden",
 				"border border-border",
-				"min-w-[8rem] max-h-[300px]",
+				"min-w-[8rem] max-h-[min(24rem,calc(100dvh_-_2rem))]",
 				p.Class,
 			),
 			Attributes: p.Attributes,
