@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.12.1] - 2026-06-28
+
+### Fixed
+
+- dialog, sheet: Force a reflow before opening so Safari renders the off-screen start position first, restoring the missing slide-in (enter) animation on Safari (most visible on the mobile sidebar, which is built on Sheet → Dialog) (#560, thanks @louishamelers)
+- dialog: Skip already-initialized dialogs when the MutationObserver re-scans, so unrelated DOM patches (e.g. Datastar updating content inside an open dialog) no longer rewrite state on every dialog and spiral into a feedback loop / UI lockup (#562, thanks @akthe-at)
+- dropdown: Switched to `overflow-y-auto`/`overflow-x-hidden` with a more generous, viewport-bounded max height so a normal-length menu no longer renders with a premature scrollbar (#563, thanks @RimJur)
+
 ## [v1.12.0] - 2026-06-01
 
 ### Added
