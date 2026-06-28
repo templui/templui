@@ -141,6 +141,14 @@
       }
     }
 
+    // Makes the slide-in animation work on Safari. The panel starts off-screen
+    // and slides in when we set open=true below. For the slide to show, the
+    // browser must first render the off-screen start position. Chrome/Firefox do
+    // that on their own; Safari skips straight to the end (panel just pops in).
+    // Reading offsetWidth forces the browser to render that start position now,
+    // before the next line moves it. Looks pointless, isn't.
+    void dialog.offsetWidth;
+
     updateState(root, true);
   }
 
