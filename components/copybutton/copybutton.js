@@ -66,22 +66,30 @@
         .then(showCopied)
         .catch((err) => {
           console.error("CopyButton: Failed to copy text", err);
-          fallbackCopy(textToCopy.trim(), showCopied);
+          fallbackCopy(textToCopy.trim(), showCopied, copyButton);
         });
     } else {
       // Fallback for older browsers or non-secure contexts
-      fallbackCopy(textToCopy.trim(), showCopied);
+      fallbackCopy(textToCopy.trim(), showCopied, copyButton);
     }
   });
 
   // Fallback copy method for older browsers
-  function fallbackCopy(text, callback) {
+  function fallbackCopy(text, callback, sourceEl) {
     const textArea = document.createElement("textarea");
     textArea.value = text;
     textArea.style.position = "fixed";
     textArea.style.top = "-9999px";
     textArea.style.left = "-9999px";
-    document.body.appendChild(textArea);
+
+    // A native <dialog> shown via showModal() makes everything outside its
+    // own subtree inert (unfocusable), so document.body isn't always a
+    // valid mount point for the scratch textarea below -- appending it
+    // there while such a dialog is open means focus()/select() silently
+    // no-op, and execCommand("copy") ends up with nothing meaningful
+    // selected. Mount inside the open dialog instead when there is one.
+    const mountPoint = sourceEl?.closest("dialog[open]") || document.body;
+    mountPoint.appendChild(textArea);
     textArea.focus();
     textArea.select();
 
@@ -96,6 +104,6 @@
       console.error("CopyButton: Fallback copy error", err);
     }
 
-    document.body.removeChild(textArea);
+    mountPoint.removeChild(textArea);
   }
 })();
