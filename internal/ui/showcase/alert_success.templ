@@ -1,0 +1,20 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/alert"
+	"github.com/templui/templui/components/icon"
+)
+
+templ AlertSuccess() {
+	<div class="w-full max-w-xl">
+		@alert.Alert(alert.Props{Variant: alert.VariantSuccess}) {
+			@icon.CircleCheck()
+			@alert.Title() {
+				Success
+			}
+			@alert.Description() {
+				Your changes have been saved successfully.
+			}
+		}
+	</div>
+}

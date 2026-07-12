@@ -6,7 +6,10 @@ type Variant string
 
 const (
 	VariantDefault     Variant = "default"
+	VariantSuccess     Variant = "success"
 	VariantDestructive Variant = "destructive"
+	VariantWarning     Variant = "warning"
+	VariantInfo        Variant = "info"
 )
 
 type Props struct {
@@ -100,8 +103,14 @@ templ Description(props ...DescriptionProps) {
 
 func variantClasses(variant Variant) string {
 	switch variant {
+	case VariantSuccess:
+		return "text-green-500 bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-green-500/90"
 	case VariantDestructive:
 		return "text-destructive bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90"
+	case VariantWarning:
+		return "text-yellow-500 bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-yellow-500/90"
+	case VariantInfo:
+		return "text-blue-500 bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-blue-500/90"
 	default:
 		return "bg-card text-card-foreground"
 	}

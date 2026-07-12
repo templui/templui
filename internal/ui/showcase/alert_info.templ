@@ -1,0 +1,20 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/alert"
+	"github.com/templui/templui/components/icon"
+)
+
+templ AlertInfo() {
+	<div class="w-full max-w-xl">
+		@alert.Alert(alert.Props{Variant: alert.VariantInfo}) {
+			@icon.Info()
+			@alert.Title() {
+				Info
+			}
+			@alert.Description() {
+				A new version is available. Refresh the page to update.
+			}
+		}
+	</div>
+}

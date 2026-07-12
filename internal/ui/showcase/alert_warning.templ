@@ -1,0 +1,20 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/alert"
+	"github.com/templui/templui/components/icon"
+)
+
+templ AlertWarning() {
+	<div class="w-full max-w-xl">
+		@alert.Alert(alert.Props{Variant: alert.VariantWarning}) {
+			@icon.TriangleAlert()
+			@alert.Title() {
+				Warning
+			}
+			@alert.Description() {
+				Your subscription expires in 3 days. Renew now to avoid interruption.
+			}
+		}
+	</div>
+}

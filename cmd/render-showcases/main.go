@@ -33,6 +33,9 @@ func main() {
 
 		// Alert
 		"out/showcase/alert_default.html":     showcase.AlertDefault(),
+		"out/showcase/alert_info.html":        showcase.AlertInfo(),
+		"out/showcase/alert_success.html":     showcase.AlertSuccess(),
+		"out/showcase/alert_warning.html":     showcase.AlertWarning(),
 		"out/showcase/alert_destructive.html": showcase.AlertDestructive(),
 
 		// Aspect Ratio

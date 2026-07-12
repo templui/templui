@@ -14,7 +14,10 @@ type Variant string
 
 const (
 	VariantDefault     Variant = "default"
+	VariantSuccess     Variant = "success"
 	VariantDestructive Variant = "destructive"
+	VariantWarning     Variant = "warning"
+	VariantInfo        Variant = "info"
 )
 
 type Props struct {
@@ -85,7 +88,7 @@ func Alert(props ...Props) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/alert/alert.templ`, Line: 38, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/alert/alert.templ`, Line: 41, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -179,7 +182,7 @@ func Title(props ...TitleProps) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/alert/alert.templ`, Line: 64, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/alert/alert.templ`, Line: 67, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -273,7 +276,7 @@ func Description(props ...DescriptionProps) templ.Component {
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/alert/alert.templ`, Line: 86, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/alert/alert.templ`, Line: 89, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -323,8 +326,14 @@ func Description(props ...DescriptionProps) templ.Component {
 
 func variantClasses(variant Variant) string {
 	switch variant {
+	case VariantSuccess:
+		return "text-green-500 bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-green-500/90"
 	case VariantDestructive:
 		return "text-destructive bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90"
+	case VariantWarning:
+		return "text-yellow-500 bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-yellow-500/90"
+	case VariantInfo:
+		return "text-blue-500 bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-blue-500/90"
 	default:
 		return "bg-card text-card-foreground"
 	}
