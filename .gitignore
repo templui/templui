@@ -24,3 +24,10 @@ assets/css/output.css
 
 .gocache
 
+
+# Root-level markdown is personal notes by default; whitelist the real docs.
+/*.md
+!/README.md
+!/CHANGELOG.md
+!/CONTRIBUTING.md
+!/AGENTS.md
