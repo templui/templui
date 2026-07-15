@@ -39,9 +39,9 @@ templ ItemGroupExample() {
 				@item.Media() {
 					@avatar.Avatar() {
 						@avatar.Image(avatar.ImageProps{
-								Src:   person.Avatar,
-								Class: "grayscale",
-							})
+							Src:   person.Avatar,
+							Class: "grayscale",
+						})
 						@avatar.Fallback() {
 							{ person.Username[:1] }
 						}

@@ -26,7 +26,7 @@ templ FieldDefault() {
 								Name on Card
 							}
 							@input.Input(input.Props{
-								ID: "checkout-7j9-card-name-43j",
+								ID:          "checkout-7j9-card-name-43j",
 								Placeholder: "Axel Adrian",
 							})
 						}
@@ -35,7 +35,7 @@ templ FieldDefault() {
 								Card Number
 							}
 							@input.Input(input.Props{
-								ID: "checkout-7j9-card-number-uw1",
+								ID:          "checkout-7j9-card-number-uw1",
 								Placeholder: "1234 5678 9012 3456",
 							})
 							@field.Description() {
@@ -126,7 +126,7 @@ templ FieldDefault() {
 									CVV
 								}
 								@input.Input(input.Props{
-									ID: "checkout-7j9-cvv",
+									ID:          "checkout-7j9-cvv",
 									Placeholder: "123",
 								})
 							}
@@ -144,11 +144,11 @@ templ FieldDefault() {
 					@field.Group() {
 						@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 							@checkbox.Checkbox(checkbox.Props{
-								ID: "checkout-7j9-same-as-shipping-wgm",
+								ID:      "checkout-7j9-same-as-shipping-wgm",
 								Checked: true,
 							})
 							@field.Label(field.LabelProps{
-								For: "checkout-7j9-same-as-shipping-wgm",
+								For:   "checkout-7j9-same-as-shipping-wgm",
 								Class: "font-normal",
 							}) {
 								Same as shipping address
@@ -163,9 +163,9 @@ templ FieldDefault() {
 								Comments
 							}
 							@textarea.Textarea(textarea.Props{
-								ID: "checkout-7j9-optional-comments",
+								ID:          "checkout-7j9-optional-comments",
 								Placeholder: "Add any additional comments",
-								Class: "resize-none",
+								Class:       "resize-none",
 							})
 						}
 					}
@@ -176,7 +176,7 @@ templ FieldDefault() {
 					}
 					@button.Button(button.Props{
 						Variant: button.VariantOutline,
-						Type: button.TypeButton,
+						Type:    button.TypeButton,
 					}) {
 						Cancel
 					}

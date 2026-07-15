@@ -16,13 +16,13 @@ templ FieldRadio() {
 		<div data-slot="radio-group" class="grid gap-3">
 			@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 				@radio.Radio(radio.Props{
-					Name: "plan",
-					Value: "monthly",
-					ID: "plan-monthly",
+					Name:    "plan",
+					Value:   "monthly",
+					ID:      "plan-monthly",
 					Checked: true,
 				})
 				@field.Label(field.LabelProps{
-					For: "plan-monthly",
+					For:   "plan-monthly",
 					Class: "font-normal",
 				}) {
 					Monthly ($9.99/month)
@@ -30,12 +30,12 @@ templ FieldRadio() {
 			}
 			@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 				@radio.Radio(radio.Props{
-					Name: "plan",
+					Name:  "plan",
 					Value: "yearly",
-					ID: "plan-yearly",
+					ID:    "plan-yearly",
 				})
 				@field.Label(field.LabelProps{
-					For: "plan-yearly",
+					For:   "plan-yearly",
 					Class: "font-normal",
 				}) {
 					Yearly ($99.99/year)
@@ -43,12 +43,12 @@ templ FieldRadio() {
 			}
 			@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 				@radio.Radio(radio.Props{
-					Name: "plan",
+					Name:  "plan",
 					Value: "lifetime",
-					ID: "plan-lifetime",
+					ID:    "plan-lifetime",
 				})
 				@field.Label(field.LabelProps{
-					For: "plan-lifetime",
+					For:   "plan-lifetime",
 					Class: "font-normal",
 				}) {
 					Lifetime ($299.99)

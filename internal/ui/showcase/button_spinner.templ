@@ -8,14 +8,14 @@ import (
 templ ButtonSpinner() {
 	<div class="flex gap-2">
 		@button.Button(button.Props{
-			Variant: button.VariantOutline,
+			Variant:  button.VariantOutline,
 			Disabled: true,
 		}) {
 			@spinner.Spinner(spinner.Props{Attributes: templ.Attributes{"data-icon": "inline-start"}})
 			Generating
 		}
 		@button.Button(button.Props{
-			Variant: button.VariantSecondary,
+			Variant:  button.VariantSecondary,
 			Disabled: true,
 		}) {
 			Downloading

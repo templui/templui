@@ -17,12 +17,12 @@ templ FieldGroupExample() {
 			@field.Group(field.GroupProps{Attributes: templ.Attributes{"data-slot": "checkbox-group"}}) {
 				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 					@checkbox.Checkbox(checkbox.Props{
-						ID: "push",
-						Checked: true,
+						ID:       "push",
+						Checked:  true,
 						Disabled: true,
 					})
 					@field.Label(field.LabelProps{
-						For: "push",
+						For:   "push",
 						Class: "font-normal",
 					}) {
 						Push notifications
@@ -43,7 +43,7 @@ templ FieldGroupExample() {
 				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 					@checkbox.Checkbox(checkbox.Props{ID: "push-tasks"})
 					@field.Label(field.LabelProps{
-						For: "push-tasks",
+						For:   "push-tasks",
 						Class: "font-normal",
 					}) {
 						Push notifications
@@ -52,7 +52,7 @@ templ FieldGroupExample() {
 				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 					@checkbox.Checkbox(checkbox.Props{ID: "email-tasks"})
 					@field.Label(field.LabelProps{
-						For: "email-tasks",
+						For:   "email-tasks",
 						Class: "font-normal",
 					}) {
 						Email notifications
