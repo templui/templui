@@ -1,14 +1,14 @@
 package showcase
 
 import (
-	"github.com/templui/templui/components/form"
+	"github.com/templui/templui/components/field"
 	"github.com/templui/templui/components/rating"
 )
 
 templ RatingForm() {
 	<form class="max-w-sm mx-auto">
-		@form.Item() {
-			@form.Label(form.LabelProps{
+		@field.Field() {
+			@field.Label(field.LabelProps{
 				For: "product_quality",
 			}) {
 				Product Quality
@@ -28,12 +28,10 @@ templ RatingForm() {
 					}
 				}
 			}
-			@form.Description() {
+			@field.Description() {
 				Rate the quality of the product you received.
 			}
-			@form.Message(form.MessageProps{
-				Variant: form.MessageVariantError,
-			}) {
+			@field.Error() {
 				Please rate the product quality.
 			}
 		}

@@ -2,13 +2,13 @@ package showcase
 
 import (
 	"github.com/templui/templui/components/datepicker"
-	"github.com/templui/templui/components/form"
+	"github.com/templui/templui/components/field"
 )
 
 templ DatePickerForm() {
 	<div class="w-full max-w-sm">
-		@form.Item() {
-			@form.Label(form.LabelProps{
+		@field.Field() {
+			@field.Label(field.LabelProps{
 				For: "date-picker-form",
 			}) {
 				Select a date
@@ -17,12 +17,10 @@ templ DatePickerForm() {
 				ID:       "date-picker-form",
 				HasError: true,
 			})
-			@form.Description() {
+			@field.Description() {
 				Select a date from the calendar.
 			}
-			@form.Message(form.MessageProps{
-				Variant: form.MessageVariantError,
-			}) {
+			@field.Error() {
 				Select a valid date
 			}
 		}

@@ -7,7 +7,7 @@ import (
 	"github.com/templui/templui/components/card"
 	"github.com/templui/templui/components/checkbox"
 	"github.com/templui/templui/components/dialog"
-	"github.com/templui/templui/components/form"
+	"github.com/templui/templui/components/field"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/components/input"
 	"github.com/templui/templui/components/inputotp"
@@ -127,7 +127,7 @@ templ ThemeShowcase() {
 			@card.Card() {
 				@card.Content(card.ContentProps{Class: "p-6 space-y-4"}) {
 					<div class="flex flex-col gap-3">
-						@form.Label(form.LabelProps{For: "email"}) {
+						@field.Label(field.LabelProps{For: "email"}) {
 							Email
 						}
 						@input.Input(input.Props{
@@ -137,7 +137,7 @@ templ ThemeShowcase() {
 						})
 					</div>
 					<div class="flex flex-col gap-3">
-						@form.Label(form.LabelProps{For: "message"}) {
+						@field.Label(field.LabelProps{For: "message"}) {
 							Message
 						}
 						@textarea.Textarea(textarea.Props{
@@ -256,7 +256,7 @@ templ ThemeShowcase() {
 			@card.Card() {
 				@card.Content(card.ContentProps{Class: "p-6"}) {
 					<div class="flex flex-col gap-3">
-						@form.Label(form.LabelProps{For: "go-framework"}) {
+						@field.Label(field.LabelProps{For: "go-framework"}) {
 							Go Framework
 						}
 						@selectbox.SelectBox() {
@@ -331,7 +331,7 @@ templ ThemeShowcase() {
 				}
 				@card.Content(card.ContentProps{Class: "p-6"}) {
 					<div class="space-y-4">
-						@form.Label(form.LabelProps{For: "otp-verification", Class: "sr-only"}) {
+						@field.Label(field.LabelProps{For: "otp-verification", Class: "sr-only"}) {
 							Verification Code
 						}
 						@inputotp.InputOTP(inputotp.Props{
@@ -354,7 +354,7 @@ templ ThemeShowcase() {
 			@card.Card() {
 				@card.Content(card.ContentProps{Class: "p-6 space-y-6"}) {
 					<div class="flex flex-col gap-3">
-						@form.Label(form.LabelProps{For: "volume"}) {
+						@field.Label(field.LabelProps{For: "volume"}) {
 							Volume
 						}
 						@slider.Slider(slider.Props{
@@ -366,7 +366,7 @@ templ ThemeShowcase() {
 						})
 					</div>
 					<div class="flex flex-col gap-3">
-						@form.Label() {
+						@field.Label() {
 							Upload progress
 						}
 						@progress.Progress(progress.Props{
@@ -388,7 +388,7 @@ templ ThemeShowcase() {
 									Name:       "plan",
 									Attributes: templ.Attributes{"checked": "true"},
 								})
-								@form.Label(form.LabelProps{For: "free"}) {
+								@field.Label(field.LabelProps{For: "free"}) {
 									Free
 								}
 							</div>
@@ -397,7 +397,7 @@ templ ThemeShowcase() {
 									ID:   "pro",
 									Name: "plan",
 								})
-								@form.Label(form.LabelProps{For: "pro"}) {
+								@field.Label(field.LabelProps{For: "pro"}) {
 									Pro
 								}
 							</div>
@@ -406,7 +406,7 @@ templ ThemeShowcase() {
 									ID:   "enterprise",
 									Name: "plan",
 								})
-								@form.Label(form.LabelProps{For: "enterprise"}) {
+								@field.Label(field.LabelProps{For: "enterprise"}) {
 									Enterprise
 								}
 							</div>
@@ -418,7 +418,7 @@ templ ThemeShowcase() {
 			@card.Card() {
 				@card.Content(card.ContentProps{Class: "p-6 space-y-4"}) {
 					<div class="flex items-center justify-between">
-						@form.Label(form.LabelProps{For: "notifications"}) {
+						@field.Label(field.LabelProps{For: "notifications"}) {
 							Notifications
 						}
 						@switchcomp.Switch(switchcomp.Props{
@@ -427,7 +427,7 @@ templ ThemeShowcase() {
 						})
 					</div>
 					<div class="flex items-center justify-between">
-						@form.Label(form.LabelProps{For: "marketing"}) {
+						@field.Label(field.LabelProps{For: "marketing"}) {
 							Marketing emails
 						}
 						@switchcomp.Switch(switchcomp.Props{ID: "marketing"})
@@ -439,13 +439,13 @@ templ ThemeShowcase() {
 									ID:      "terms",
 									Checked: true,
 								})
-								@form.Label(form.LabelProps{For: "terms"}) {
+								@field.Label(field.LabelProps{For: "terms"}) {
 									Accept terms
 								}
 							</div>
 							<div class="flex items-center space-x-2">
 								@checkbox.Checkbox(checkbox.Props{ID: "privacy"})
-								@form.Label(form.LabelProps{For: "privacy"}) {
+								@field.Label(field.LabelProps{For: "privacy"}) {
 									Privacy policy
 								}
 							</div>
@@ -464,7 +464,7 @@ templ ThemeShowcase() {
 					}
 				}
 				@card.Content(card.ContentProps{Class: "p-6"}) {
-					@form.Label(form.LabelProps{For: "project-tags", Class: "sr-only"}) {
+					@field.Label(field.LabelProps{For: "project-tags", Class: "sr-only"}) {
 						Project Tags
 					}
 					@tagsinput.TagsInput(tagsinput.Props{

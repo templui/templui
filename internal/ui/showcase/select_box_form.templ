@@ -1,14 +1,14 @@
 package showcase
 
 import (
-	"github.com/templui/templui/components/form"
+	"github.com/templui/templui/components/field"
 	"github.com/templui/templui/components/selectbox"
 )
 
 templ SelectBoxForm() {
 	<div class="w-full max-w-sm">
-		@form.Item() {
-			@form.Label(form.LabelProps{
+		@field.Field() {
+			@field.Label(field.LabelProps{
 				For: "select-form",
 			}) {
 				Fruit
@@ -53,12 +53,10 @@ templ SelectBoxForm() {
 					}
 				}
 			}
-			@form.Description() {
+			@field.Description() {
 				Select a fruit category.
 			}
-			@form.Message(form.MessageProps{
-				Variant: form.MessageVariantError,
-			}) {
+			@field.Error() {
 				A fruit selection is required.
 			}
 		}

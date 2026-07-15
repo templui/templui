@@ -1,13 +1,13 @@
 package showcase
 
 import (
-	"github.com/templui/templui/components/form"
+	"github.com/templui/templui/components/field"
 	"github.com/templui/templui/components/inputotp"
 )
 
 templ InputOTPForm() {
-	@form.Item() {
-		@form.Label(form.LabelProps{
+	@field.Field() {
+		@field.Label(field.LabelProps{
 			For: "otp-form",
 		}) {
 			Verification Code
@@ -38,12 +38,10 @@ templ InputOTPForm() {
 				})
 			}
 		}
-		@form.Description() {
+		@field.Description() {
 			Enter the 6-digit code sent to your phone
 		}
-		@form.Message(form.MessageProps{
-			Variant: form.MessageVariantError,
-		}) {
+		@field.Error() {
 			Invalid verification code.
 		}
 	}

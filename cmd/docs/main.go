@@ -144,7 +144,6 @@ func main() {
 	mux.Handle("GET /docs/components/date-picker", htmxHandler(pages.DatePicker()))
 	mux.Handle("GET /docs/components/sheet", htmxHandler(pages.Sheet()))
 	mux.Handle("GET /docs/components/dropdown-menu", htmxHandler(pages.DropdownMenu()))
-	mux.Handle("GET /docs/components/form", htmxHandler(pages.Form()))
 	mux.Handle("GET /docs/components/icon", htmxHandler(pages.Icon()))
 	mux.Handle("GET /docs/components/input", htmxHandler(pages.Input()))
 	mux.Handle("GET /docs/components/input-otp", htmxHandler(pages.InputOtp()))

@@ -1,14 +1,14 @@
 package showcase
 
 import (
-	"github.com/templui/templui/components/form"
+	"github.com/templui/templui/components/field"
 	"github.com/templui/templui/components/input"
 )
 
 templ InputForm() {
 	<div class="w-full max-w-sm">
-		@form.Item() {
-			@form.Label(form.LabelProps{
+		@field.Field() {
+			@field.Label(field.LabelProps{
 				For: "email-form",
 			}) {
 				Email
@@ -19,12 +19,10 @@ templ InputForm() {
 				Placeholder: "m@example.com",
 				HasError:    true,
 			})
-			@form.Description() {
+			@field.Description() {
 				Enter your email address for notifications.
 			}
-			@form.Message(form.MessageProps{
-				Variant: form.MessageVariantError,
-			}) {
+			@field.Error() {
 				Please enter a valid email address
 			}
 		}
