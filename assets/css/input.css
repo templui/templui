@@ -16,6 +16,9 @@
 
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+/* Vendored tw-animate-css (the exact library shadcn uses) so animate-in/out,
+   fade/zoom/slide utilities match shadcn 1:1. Local file, no npm dependency. */
+@import "./tw-animate.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

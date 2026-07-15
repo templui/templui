@@ -1,0 +1,493 @@
+package contextmenu
+
+import (
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/utils"
+)
+
+type ItemVariant string
+
+const (
+	ItemVariantDefault     ItemVariant = "default"
+	ItemVariantDestructive ItemVariant = "destructive"
+)
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type TriggerProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type Side string
+
+const (
+	SideTop    Side = "top"
+	SideRight  Side = "right"
+	SideBottom Side = "bottom"
+	SideLeft   Side = "left"
+)
+
+type ContentProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Side of the cursor the menu opens on. Defaults to bottom; flips
+	// automatically when there is no room.
+	Side Side
+}
+
+type ItemProps struct {
+	ID           string
+	Class        string
+	Attributes   templ.Attributes
+	Variant      ItemVariant
+	Disabled     bool
+	Inset        bool
+	Href         string
+	Target       string
+	PreventClose bool
+}
+
+type CheckboxItemProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Checked    bool
+	Disabled   bool
+}
+
+type RadioGroupProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type RadioItemProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Value      string
+	Checked    bool
+	Disabled   bool
+}
+
+type SeparatorProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type LabelProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Inset      bool
+}
+
+type ShortcutProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type GroupProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type SubProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type SubTriggerProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Inset      bool
+}
+
+type SubContentProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+func itemClasses(variant ItemVariant, disabled, inset bool) string {
+	return utils.TwMerge(
+		"group/context-menu-item relative w-full text-left flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+		utils.If(inset, "pl-7"),
+		utils.If(!disabled && variant == ItemVariantDefault, "focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground"),
+		utils.If(!disabled && variant == ItemVariantDestructive, "text-destructive focus:bg-destructive/10 focus:text-destructive hover:bg-destructive/10 hover:text-destructive dark:focus:bg-destructive/20 dark:hover:bg-destructive/20 [&_svg]:text-destructive"),
+		utils.If(disabled, "pointer-events-none opacity-50"),
+	)
+}
+
+func checkItemClasses(disabled bool) string {
+	return utils.TwMerge(
+		"group/cmitem relative w-full text-left flex cursor-default items-center gap-1.5 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+		utils.If(!disabled, "focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground"),
+		utils.If(disabled, "pointer-events-none opacity-50"),
+	)
+}
+
+templ Root(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="context-menu"
+		data-tui-contextmenu-root
+		class={ utils.TwMerge("contents", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Trigger(props ...TriggerProps) {
+	{{ var p TriggerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="context-menu-trigger"
+		data-tui-contextmenu-trigger
+		class={ utils.TwMerge("select-none", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Side == "" {
+		{{ p.Side = SideBottom }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="context-menu-content"
+		data-tui-contextmenu-content
+		data-tui-contextmenu-side={ string(p.Side) }
+		data-state="closed"
+		popover="manual"
+		role="menu"
+		class={
+			utils.TwMerge(
+				"fixed inset-auto left-0 top-0 z-50 m-0 min-w-36 rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 focus:outline-none duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Item(props ...ItemProps) {
+	{{ var p ItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	if p.Variant == "" {
+		{{ p.Variant = ItemVariantDefault }}
+	}
+	if p.Href != "" {
+		<a
+			id={ p.ID }
+			href={ templ.SafeURL(p.Href) }
+			if p.Target != "" {
+				target={ p.Target }
+			}
+			data-slot="context-menu-item"
+			data-variant={ string(p.Variant) }
+			data-tui-contextmenu-item
+			if p.PreventClose {
+				data-tui-contextmenu-prevent-close="true"
+			}
+			if p.Disabled {
+				aria-disabled="true"
+			}
+			role="menuitem"
+			class={ utils.TwMerge(itemClasses(p.Variant, p.Disabled, p.Inset), p.Class) }
+			{ p.Attributes... }
+		>
+			{ children... }
+		</a>
+	} else {
+		<button
+			id={ p.ID }
+			type="button"
+			data-slot="context-menu-item"
+			data-variant={ string(p.Variant) }
+			data-tui-contextmenu-item
+			if p.PreventClose {
+				data-tui-contextmenu-prevent-close="true"
+			}
+			disabled?={ p.Disabled }
+			role="menuitem"
+			class={ utils.TwMerge(itemClasses(p.Variant, p.Disabled, p.Inset), p.Class) }
+			{ p.Attributes... }
+		>
+			{ children... }
+		</button>
+	}
+}
+
+templ CheckboxItem(props ...CheckboxItemProps) {
+	{{ var p CheckboxItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	<button
+		id={ p.ID }
+		type="button"
+		data-slot="context-menu-checkbox-item"
+		data-tui-contextmenu-checkbox-item
+		role="menuitemcheckbox"
+		if p.Checked {
+			data-state="checked"
+			aria-checked="true"
+		} else {
+			data-state="unchecked"
+			aria-checked="false"
+		}
+		disabled?={ p.Disabled }
+		class={ utils.TwMerge(checkItemClasses(p.Disabled), p.Class) }
+		{ p.Attributes... }
+	>
+		<span class="pointer-events-none absolute right-2 opacity-0 group-data-[state=checked]/cmitem:opacity-100">
+			@icon.Check(icon.Props{Class: "size-4"})
+		</span>
+		{ children... }
+	</button>
+}
+
+templ RadioGroup(props ...RadioGroupProps) {
+	{{ var p RadioGroupProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="group"
+		data-slot="context-menu-radio-group"
+		data-tui-contextmenu-radio-group
+		class={ utils.TwMerge("", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ RadioItem(props ...RadioItemProps) {
+	{{ var p RadioItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	<button
+		id={ p.ID }
+		type="button"
+		data-slot="context-menu-radio-item"
+		data-tui-contextmenu-radio-item
+		if p.Value != "" {
+			data-tui-contextmenu-radio-value={ p.Value }
+		}
+		role="menuitemradio"
+		if p.Checked {
+			data-state="checked"
+			aria-checked="true"
+		} else {
+			data-state="unchecked"
+			aria-checked="false"
+		}
+		disabled?={ p.Disabled }
+		class={ utils.TwMerge(checkItemClasses(p.Disabled), p.Class) }
+		{ p.Attributes... }
+	>
+		<span class="pointer-events-none absolute right-2 opacity-0 group-data-[state=checked]/cmitem:opacity-100">
+			@icon.Check(icon.Props{Class: "size-4"})
+		</span>
+		{ children... }
+	</button>
+}
+
+templ Group(props ...GroupProps) {
+	{{ var p GroupProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="group"
+		data-slot="context-menu-group"
+		class={ utils.TwMerge("", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Label(props ...LabelProps) {
+	{{ var p LabelProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="context-menu-label"
+		class={ utils.TwMerge("px-1.5 py-1 text-xs font-medium text-muted-foreground", utils.If(p.Inset, "pl-7"), p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Separator(props ...SeparatorProps) {
+	{{ var p SeparatorProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="separator"
+		data-slot="context-menu-separator"
+		class={ utils.TwMerge("-mx-1 my-1 h-px bg-border", p.Class) }
+		{ p.Attributes... }
+	></div>
+}
+
+templ Shortcut(props ...ShortcutProps) {
+	{{ var p ShortcutProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="context-menu-shortcut"
+		class={ utils.TwMerge("ml-auto text-xs tracking-widest text-muted-foreground group-focus/context-menu-item:text-accent-foreground group-hover/context-menu-item:text-accent-foreground", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}
+
+templ Sub(props ...SubProps) {
+	{{ var p SubProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="context-menu-sub"
+		data-tui-contextmenu-sub
+		class={ utils.TwMerge("", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ SubTrigger(props ...SubTriggerProps) {
+	{{ var p SubTriggerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<button
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		type="button"
+		data-slot="context-menu-sub-trigger"
+		data-tui-contextmenu-sub-trigger
+		data-state="closed"
+		role="menuitem"
+		aria-haspopup="menu"
+		class={
+			utils.TwMerge(
+				"w-full text-left flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
+				utils.If(p.Inset, "pl-7"),
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+		@icon.ChevronRight(icon.Props{Class: "ml-auto size-4"})
+	</button>
+}
+
+templ SubContent(props ...SubContentProps) {
+	{{ var p SubContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="context-menu-sub-content"
+		data-tui-contextmenu-sub-content
+		data-state="closed"
+		role="menu"
+		class={
+			utils.TwMerge(
+				"hidden fixed inset-auto left-0 top-0 z-50 min-w-32 rounded-lg border bg-popover p-1 text-popover-foreground shadow-lg duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("contextmenu")
+	}
+}

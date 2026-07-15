@@ -1,0 +1,44 @@
+package showcase
+
+import "github.com/templui/templui/components/contextmenu"
+
+templ ContextMenuRadio() {
+	@contextmenu.Root() {
+		@contextmenu.Trigger(contextmenu.TriggerProps{Class: "flex aspect-video w-full max-w-xs items-center justify-center rounded-xl border border-dashed text-sm"}) {
+			<span class="hidden pointer-fine:inline-block">Right click here</span>
+			<span class="hidden pointer-coarse:inline-block">Long press here</span>
+		}
+		@contextmenu.Content() {
+			@contextmenu.Group() {
+				@contextmenu.Label() {
+					People
+				}
+				@contextmenu.RadioGroup() {
+					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "pedro", Checked: true}) {
+						Pedro Duarte
+					}
+					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "colm"}) {
+						Colm Tuite
+					}
+				}
+			}
+			@contextmenu.Separator()
+			@contextmenu.Group() {
+				@contextmenu.Label() {
+					Theme
+				}
+				@contextmenu.RadioGroup() {
+					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "light", Checked: true}) {
+						Light
+					}
+					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "dark"}) {
+						Dark
+					}
+					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "system"}) {
+						System
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,200 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/internal/ui/showcase"
+)
+
+templ ContextMenu() {
+	@layouts.DocsLayout(
+		"Context Menu",
+		"A menu shown at the cursor on right click, with submenus, checkboxes, radios and shortcuts.",
+		[]modules.TableOfContentsItem{
+			{ID: "installation", Text: "Installation"},
+			{
+				Text: "Examples",
+				ID:   "examples",
+				Children: []modules.TableOfContentsItem{
+					{Text: "Basic", ID: "basic"},
+						{Text: "Submenu", ID: "submenu"},
+					{Text: "Shortcuts", ID: "shortcuts"},
+					{Text: "Groups", ID: "groups"},
+					{Text: "Icons", ID: "icons"},
+					{Text: "Checkboxes", ID: "checkboxes"},
+					{Text: "Radio", ID: "radio"},
+					{Text: "Destructive", ID: "destructive"},
+					{Text: "Sides", ID: "sides"},
+				},
+			},
+			{
+				ID:   "api",
+				Text: "API Reference",
+				Children: []modules.TableOfContentsItem{
+					{ID: "api-content", Text: "Content"},
+					{ID: "api-item", Text: "Item"},
+					{ID: "api-checkbox-item", Text: "CheckboxItem"},
+					{ID: "api-radio-group", Text: "RadioGroup"},
+					{ID: "api-radio-item", Text: "RadioItem"},
+					{ID: "api-sub-trigger", Text: "SubTrigger"},
+				},
+			},
+		},
+	) {
+		@modules.PageWrapper(modules.PageWrapperProps{
+			Name:        "Context Menu",
+			Description: templ.Raw("A menu that appears at the cursor on right click. Reuses the dropdown menu styles."),
+			Tailwind:    true,
+			VanillaJS:   true,
+			Breadcrumbs: modules.Breadcrumbs{
+				Items: []modules.BreadcrumbItem{
+					{Text: "Docs", Path: "/docs"},
+					{Text: "Components", Path: "/docs/components"},
+					{Text: "Context Menu"},
+				},
+			},
+		}) {
+			@modules.ExampleWrapper(modules.ExampleWrapperProps{
+				ShowcaseFile:    showcase.ContextMenuDefault(),
+				PreviewCodeFile: "contextmenu_default.templ",
+			})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{ComponentName: "contextmenu"})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Basic",
+					ShowcaseFile:    showcase.ContextMenuBasic(),
+					PreviewCodeFile: "contextmenu_basic.templ",
+					ID:              "basic",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Submenu",
+					ShowcaseFile:    showcase.ContextMenuSubmenu(),
+					PreviewCodeFile: "contextmenu_submenu.templ",
+					ID:              "submenu",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Shortcuts",
+					ShowcaseFile:    showcase.ContextMenuShortcuts(),
+					PreviewCodeFile: "contextmenu_shortcuts.templ",
+					ID:              "shortcuts",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Groups",
+					ShowcaseFile:    showcase.ContextMenuGroups(),
+					PreviewCodeFile: "contextmenu_groups.templ",
+					ID:              "groups",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Icons",
+					ShowcaseFile:    showcase.ContextMenuIcons(),
+					PreviewCodeFile: "contextmenu_icons.templ",
+					ID:              "icons",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Checkboxes",
+					ShowcaseFile:    showcase.ContextMenuCheckboxes(),
+					PreviewCodeFile: "contextmenu_checkboxes.templ",
+					ID:              "checkboxes",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Radio",
+					ShowcaseFile:    showcase.ContextMenuRadio(),
+					PreviewCodeFile: "contextmenu_radio.templ",
+					ID:              "radio",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Destructive",
+					ShowcaseFile:    showcase.ContextMenuDestructive(),
+					PreviewCodeFile: "contextmenu_destructive.templ",
+					ID:              "destructive",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Sides",
+					ShowcaseFile:    showcase.ContextMenuSides(),
+					PreviewCodeFile: "contextmenu_sides.templ",
+					ID:              "sides",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {
+				@modules.APILegend()
+				<div id="api-content" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Content",
+						Description: "The menu surface, positioned at the cursor and clamped to the viewport. Use Root, Trigger and Content together.",
+						Items: []modules.APITableItem{
+							{Name: "Side", Type: "Side", Default: "bottom", Description: "Side of the cursor the menu opens on. Options: 'top', 'right', 'bottom', 'left'. Flips automatically when there is no room.", Required: false},
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the content.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes. Set a width here (e.g. w-52).", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the content.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-item" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Item",
+						Description: "A selectable entry. Renders as a link when Href is set; closes the menu on click.",
+						Items: []modules.APITableItem{
+							{Name: "Variant", Type: "ItemVariant", Default: "default", Description: "Visual style. Options: 'default', 'destructive'.", Required: false},
+							{Name: "Inset", Type: "bool", Default: "false", Description: "Adds left padding to align with checkbox/radio items.", Required: false},
+							{Name: "Disabled", Type: "bool", Default: "false", Description: "Whether the item is disabled.", Required: false},
+							{Name: "Href", Type: "string", Default: "", Description: "URL to navigate to; renders the item as an anchor.", Required: false},
+							{Name: "Target", Type: "string", Default: "", Description: "Target attribute for anchor items.", Required: false},
+							{Name: "PreventClose", Type: "bool", Default: "false", Description: "Keep the menu open after the item is clicked.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the item.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the item.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-checkbox-item" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "CheckboxItem",
+						Description: "A toggleable item with a check indicator. Keeps the menu open on click.",
+						Items: []modules.APITableItem{
+							{Name: "Checked", Type: "bool", Default: "false", Description: "Whether the item starts checked.", Required: false},
+							{Name: "Disabled", Type: "bool", Default: "false", Description: "Whether the item is disabled.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the item.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the item.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-radio-group" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "RadioGroup",
+						Description: "Wraps RadioItems and enforces single selection among them.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the group.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the group.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the group.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-radio-item" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "RadioItem",
+						Description: "A single-select item with a dot indicator. Keeps the menu open on click.",
+						Items: []modules.APITableItem{
+							{Name: "Value", Type: "string", Default: "", Description: "Identifies the item; exposed in the contextmenu-value-change event.", Required: false},
+							{Name: "Checked", Type: "bool", Default: "false", Description: "Whether the item starts selected.", Required: false},
+							{Name: "Disabled", Type: "bool", Default: "false", Description: "Whether the item is disabled.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the item.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the item.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-sub-trigger">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Sub / SubTrigger / SubContent",
+						Description: "Nested submenu. Wrap a SubTrigger and SubContent in a Sub; the submenu opens on hover.",
+						Items: []modules.APITableItem{
+							{Name: "Inset", Type: "bool", Default: "false", Description: "SubTrigger only. Adds left padding to align with checkbox/radio items.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the element.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the element.", Required: false},
+						},
+					})
+				</div>
+			}
+		}
+	}
+}
