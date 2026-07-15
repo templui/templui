@@ -362,6 +362,16 @@
       "tags": ["slider", "range", "input", "form", "control"]
     },
     {
+      "name": "spinner",
+      "slug": "spinner",
+      "displayName": "Spinner",
+      "description": "Animated loading indicator built from a spinning icon.",
+      "files": ["components/spinner/spinner.templ"],
+      "dependencies": ["icon"],
+      "categories": ["feedback-status"],
+      "tags": ["spinner", "loader", "loading", "progress"]
+    },
+    {
       "name": "switch",
       "slug": "switch",
       "displayName": "Switch",

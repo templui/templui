@@ -56,6 +56,7 @@ Components are designed to be composable, customizable, and easy to integrate in
 - [Badge](https://templui.io/docs/components/badge): Badge component for labels and status indicators.
 - [Progress](https://templui.io/docs/components/progress): Progress bar component.
 - [Skeleton](https://templui.io/docs/components/skeleton): Skeleton loading placeholder.
+- [Spinner](https://templui.io/docs/components/spinner): Animated loading indicator built from a spinning icon.
 - [Toast](https://templui.io/docs/components/toast): Toast notification component.
 
 ## Display & Media

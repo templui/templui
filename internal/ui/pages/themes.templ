@@ -15,6 +15,7 @@ import (
 	"github.com/templui/templui/components/radio"
 	"github.com/templui/templui/components/selectbox"
 	"github.com/templui/templui/components/slider"
+	"github.com/templui/templui/components/spinner"
 	switchcomp "github.com/templui/templui/components/switch"
 	"github.com/templui/templui/components/tabs"
 	"github.com/templui/templui/components/tagsinput"
@@ -232,8 +233,8 @@ templ ThemeShowcase() {
 				}
 				@card.Content(card.ContentProps{Class: "p-6"}) {
 					<div class="flex flex-col items-center space-y-4">
-						@icon.LoaderCircle(icon.Props{
-							Class: "animate-spin size-8 text-primary",
+						@spinner.Spinner(spinner.Props{
+							Class: "size-8 text-primary",
 						})
 						<p class="text-sm text-muted-foreground">Uploading files...</p>
 					</div>
