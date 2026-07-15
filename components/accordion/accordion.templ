@@ -1,20 +1,34 @@
 package accordion
 
 import (
+	"context"
+
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/utils"
 )
+
+type contextKey struct{}
+
+type ctxData struct {
+	GroupName string
+	Multiple  bool
+	Disabled  bool
+}
 
 type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
+	Multiple   bool
+	Disabled   bool
 }
 
 type ItemProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
+	Open       bool
+	Disabled   bool
 }
 
 type TriggerProps struct {
@@ -34,12 +48,22 @@ templ Accordion(props ...Props) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	{{ groupName := p.ID }}
+	if groupName == "" {
+		{{ groupName = utils.RandomID() }}
+	}
+	{{ ctx = context.WithValue(ctx, contextKey{}, ctxData{
+		GroupName: groupName,
+		Multiple:  p.Multiple,
+		Disabled:  p.Disabled,
+	}) }}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
 		class={
 			utils.TwMerge(
+				"flex w-full flex-col",
 				p.Class,
 			),
 		}
@@ -54,15 +78,25 @@ templ Item(props ...ItemProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	{{ data := fromContext(ctx) }}
+	{{ disabled := p.Disabled || data.Disabled }}
 	<details
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		name="accordion"
+		if !data.Multiple {
+			name={ data.GroupName }
+		}
+		open?={ p.Open }
+		inert?={ disabled }
+		if disabled {
+			aria-disabled="true"
+		}
 		class={
 			utils.TwMerge(
 				"group border-b last:border-b-0",
 				"[&[open]>summary>svg]:rotate-180",
+				utils.If(disabled, "pointer-events-none opacity-50"),
 				p.Class,
 			),
 		}
@@ -87,7 +121,7 @@ templ Trigger(props ...TriggerProps) {
 				"text-left text-sm font-medium",
 				"transition-all hover:underline cursor-pointer",
 				"outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring rounded-md",
-				"disabled:pointer-events-none disabled:opacity-50",
+				"aria-disabled:pointer-events-none aria-disabled:opacity-50",
 				"list-none [&::-webkit-details-marker]:hidden",
 				p.Class,
 			),
@@ -118,4 +152,11 @@ templ Content(props ...ContentProps) {
 	>
 		{ children... }
 	</div>
+}
+
+func fromContext(ctx context.Context) ctxData {
+	if data, ok := ctx.Value(contextKey{}).(ctxData); ok {
+		return data
+	}
+	return ctxData{}
 }

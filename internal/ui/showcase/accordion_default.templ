@@ -4,10 +4,8 @@ import "github.com/templui/templui/components/accordion"
 
 templ AccordionDefault() {
 	<div class="w-full max-w-sm">
-		@accordion.Accordion(accordion.Props{
-			Class: "w-full",
-		}) {
-			@accordion.Item() {
+		@accordion.Accordion() {
+			@accordion.Item(accordion.ItemProps{Open: true}) {
 				@accordion.Trigger() {
 					Is it accessible?
 				}
@@ -25,10 +23,10 @@ templ AccordionDefault() {
 			}
 			@accordion.Item() {
 				@accordion.Trigger() {
-					Is it animated?
+					Is it CSS-only?
 				}
 				@accordion.Content() {
-					Yes. It is animated by default, but you can disable it if you prefer.
+					Yes. It uses native details and summary elements with no JavaScript.
 				}
 			}
 		}

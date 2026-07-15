@@ -1,0 +1,34 @@
+package showcase
+
+import "github.com/templui/templui/components/accordion"
+
+templ AccordionDisabled() {
+	<div class="w-full max-w-lg">
+		@accordion.Accordion() {
+			@accordion.Item() {
+				@accordion.Trigger() {
+					Can I access my account history?
+				}
+				@accordion.Content() {
+					Yes, you can view your complete account history including all transactions, plan changes, and support tickets in the Account History section of your dashboard.
+				}
+			}
+			@accordion.Item(accordion.ItemProps{Disabled: true}) {
+				@accordion.Trigger() {
+					Premium feature information
+				}
+				@accordion.Content() {
+					This section contains information about premium features. Upgrade your plan to access this content.
+				}
+			}
+			@accordion.Item() {
+				@accordion.Trigger() {
+					How do I update my email address?
+				}
+				@accordion.Content() {
+					You can update your email address in your account settings. You'll receive a verification email at your new address to confirm the change.
+				}
+			}
+		}
+	</div>
+}

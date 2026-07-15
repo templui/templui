@@ -29,7 +29,11 @@ func writeHTML(filename string, c templ.Component) error {
 func main() {
 	showcases := map[string]templ.Component{
 		// Accordion
-		"out/showcase/accordion_default.html": showcase.AccordionDefault(),
+		"out/showcase/accordion_default.html":  showcase.AccordionDefault(),
+		"out/showcase/accordion_multiple.html": showcase.AccordionMultiple(),
+		"out/showcase/accordion_disabled.html": showcase.AccordionDisabled(),
+		"out/showcase/accordion_borders.html":  showcase.AccordionBorders(),
+		"out/showcase/accordion_card.html":     showcase.AccordionCard(),
 
 		// Alert
 		"out/showcase/alert_default.html":     showcase.AlertDefault(),

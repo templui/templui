@@ -1,0 +1,34 @@
+package showcase
+
+import "github.com/templui/templui/components/accordion"
+
+templ AccordionMultiple() {
+	<div class="w-full max-w-lg">
+		@accordion.Accordion(accordion.Props{Multiple: true}) {
+			@accordion.Item(accordion.ItemProps{Open: true}) {
+				@accordion.Trigger() {
+					Notification Settings
+				}
+				@accordion.Content() {
+					Manage how you receive notifications. You can enable email alerts for updates or push notifications for mobile devices.
+				}
+			}
+			@accordion.Item() {
+				@accordion.Trigger() {
+					Privacy & Security
+				}
+				@accordion.Content() {
+					Control your privacy settings and security preferences. Enable two-factor authentication, manage connected devices, and review active sessions.
+				}
+			}
+			@accordion.Item() {
+				@accordion.Trigger() {
+					Billing & Subscription
+				}
+				@accordion.Content() {
+					View your current plan, payment history, and upcoming invoices. Update your payment method or change your subscription tier.
+				}
+			}
+		}
+	</div>
+}

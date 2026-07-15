@@ -1,0 +1,47 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/accordion"
+	"github.com/templui/templui/components/card"
+)
+
+templ AccordionCard() {
+	@card.Card(card.Props{Class: "w-full max-w-sm"}) {
+		@card.Header() {
+			@card.Title() {
+				Subscription & Billing
+			}
+			@card.Description() {
+				Common questions about your account, plans, payments and cancellations.
+			}
+		}
+		@card.Content() {
+			@accordion.Accordion() {
+				@accordion.Item(accordion.ItemProps{Open: true}) {
+					@accordion.Trigger() {
+						What subscription plans do you offer?
+					}
+					@accordion.Content() {
+						We offer three subscription tiers: Starter, Professional, and Enterprise. Each plan includes increasing storage limits, API access, and team collaboration features.
+					}
+				}
+				@accordion.Item() {
+					@accordion.Trigger() {
+						How does billing work?
+					}
+					@accordion.Content() {
+						Billing occurs automatically at the start of each billing cycle. We accept all major credit cards and PayPal.
+					}
+				}
+				@accordion.Item() {
+					@accordion.Trigger() {
+						How do I cancel my subscription?
+					}
+					@accordion.Content() {
+						You can cancel your subscription anytime from your account settings. Your access will continue until the end of your current billing period.
+					}
+				}
+			}
+		}
+	}
+}

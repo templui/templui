@@ -1,4 +1,3 @@
-
 package pages
 
 import (
@@ -15,6 +14,28 @@ templ Accordion() {
 			{
 				ID:   "installation",
 				Text: "Installation",
+			},
+			{
+				ID:   "examples",
+				Text: "Examples",
+				Children: []modules.TableOfContentsItem{
+					{
+						ID:   "multiple",
+						Text: "Multiple",
+					},
+					{
+						ID:   "disabled",
+						Text: "Disabled",
+					},
+					{
+						ID:   "borders",
+						Text: "Borders",
+					},
+					{
+						ID:   "card",
+						Text: "Card",
+					},
+				},
 			},
 			{
 				ID:   "api",
@@ -73,6 +94,35 @@ templ Accordion() {
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
+				Title: "Examples",
+				ID:    "examples",
+			}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Multiple",
+					ShowcaseFile:    showcase.AccordionMultiple(),
+					PreviewCodeFile: "accordion_multiple.templ",
+					ID:              "multiple",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Disabled",
+					ShowcaseFile:    showcase.AccordionDisabled(),
+					PreviewCodeFile: "accordion_disabled.templ",
+					ID:              "disabled",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Borders",
+					ShowcaseFile:    showcase.AccordionBorders(),
+					PreviewCodeFile: "accordion_borders.templ",
+					ID:              "borders",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Card",
+					ShowcaseFile:    showcase.AccordionCard(),
+					PreviewCodeFile: "accordion_card.templ",
+					ID:              "card",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "API Reference",
 				ID:    "api",
 			}) {
@@ -86,7 +136,7 @@ templ Accordion() {
 								Name:        "ID",
 								Type:        "string",
 								Default:     "",
-								Description: "Unique identifier for the accordion element.",
+								Description: "Unique identifier for the accordion. Also used as the exclusive group name when Multiple is false.",
 								Required:    false,
 							},
 							{
@@ -101,6 +151,20 @@ templ Accordion() {
 								Type:        "templ.Attributes",
 								Default:     "",
 								Description: "Additional HTML attributes to apply to the accordion element.",
+								Required:    false,
+							},
+							{
+								Name:        "Multiple",
+								Type:        "bool",
+								Default:     "false",
+								Description: "When true, multiple items can stay open at once. When false, items share an exclusive name group.",
+								Required:    false,
+							},
+							{
+								Name:        "Disabled",
+								Type:        "bool",
+								Default:     "false",
+								Description: "Disables all accordion items.",
 								Required:    false,
 							},
 						},
@@ -130,6 +194,20 @@ templ Accordion() {
 								Type:        "templ.Attributes",
 								Default:     "",
 								Description: "Additional HTML attributes to apply to the item element.",
+								Required:    false,
+							},
+							{
+								Name:        "Open",
+								Type:        "bool",
+								Default:     "false",
+								Description: "Renders the item open initially via the native open attribute.",
+								Required:    false,
+							},
+							{
+								Name:        "Disabled",
+								Type:        "bool",
+								Default:     "false",
+								Description: "Disables this item (combined with Accordion.Disabled from context).",
 								Required:    false,
 							},
 						},

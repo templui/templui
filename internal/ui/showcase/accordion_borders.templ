@@ -1,0 +1,43 @@
+package showcase
+
+import "github.com/templui/templui/components/accordion"
+
+templ AccordionBorders() {
+	<div class="w-full max-w-lg">
+		@accordion.Accordion(accordion.Props{
+			Class: "rounded-lg border",
+		}) {
+			@accordion.Item(accordion.ItemProps{
+				Open:  true,
+				Class: "border-b px-4 last:border-b-0",
+			}) {
+				@accordion.Trigger() {
+					How does billing work?
+				}
+				@accordion.Content() {
+					We offer monthly and annual subscription plans. Billing is charged at the beginning of each cycle, and you can cancel anytime.
+				}
+			}
+			@accordion.Item(accordion.ItemProps{
+				Class: "border-b px-4 last:border-b-0",
+			}) {
+				@accordion.Trigger() {
+					Is my data secure?
+				}
+				@accordion.Content() {
+					Yes. We use end-to-end encryption and regular third-party security audits. All data is encrypted at rest and in transit.
+				}
+			}
+			@accordion.Item(accordion.ItemProps{
+				Class: "border-b px-4 last:border-b-0",
+			}) {
+				@accordion.Trigger() {
+					What integrations do you support?
+				}
+				@accordion.Content() {
+					We integrate with popular tools including Slack, Zapier, and Salesforce. You can also build custom integrations using our REST API.
+				}
+			}
+		}
+	</div>
+}
