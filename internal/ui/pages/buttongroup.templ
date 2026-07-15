@@ -23,6 +23,7 @@ templ ButtonGroup() {
 					{ID: "split", Text: "Split"},
 					{ID: "input", Text: "Input"},
 					{ID: "input-group", Text: "Input Group"},
+					{ID: "dropdown-menu", Text: "Dropdown Menu"},
 				},
 			},
 			{
@@ -97,6 +98,12 @@ templ ButtonGroup() {
 					ShowcaseFile:    showcase.ButtonGroupInputGroup(),
 					PreviewCodeFile: "buttongroup_input_group.templ",
 					ID:              "input-group",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Dropdown Menu",
+					ShowcaseFile:    showcase.ButtonGroupDropdown(),
+					PreviewCodeFile: "buttongroup_dropdown.templ",
+					ID:              "dropdown-menu",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {

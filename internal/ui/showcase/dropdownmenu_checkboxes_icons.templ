@@ -1,0 +1,37 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/dropdownmenu"
+	"github.com/templui/templui/components/icon"
+)
+
+templ DropdownMenuCheckboxesIcons() {
+	@dropdownmenu.Root() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: dropdownmenu.Trigger(ctx),
+		}) {
+			Notifications
+		}
+		@dropdownmenu.Content(dropdownmenu.ContentProps{Class: "w-48"}) {
+			@dropdownmenu.Group() {
+				@dropdownmenu.Label() {
+					Notification Preferences
+				}
+				@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+					@icon.Mail()
+					Email notifications
+				}
+				@dropdownmenu.CheckboxItem() {
+					@icon.MessageSquare()
+					SMS notifications
+				}
+				@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+					@icon.Bell()
+					Push notifications
+				}
+			}
+		}
+	}
+}

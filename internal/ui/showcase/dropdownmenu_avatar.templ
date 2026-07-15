@@ -4,9 +4,10 @@ import (
 	"github.com/templui/templui/components/avatar"
 	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/dropdownmenu"
+	"github.com/templui/templui/components/icon"
 )
 
-templ AvatarDropdown() {
+templ DropdownMenuAvatar() {
 	@dropdownmenu.Root() {
 		@button.Button(button.Props{
 			Variant:    button.VariantGhost,
@@ -24,23 +25,25 @@ templ AvatarDropdown() {
 				}
 			}
 		}
-		@dropdownmenu.Content(dropdownmenu.ContentProps{Class: "w-32"}) {
+		@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignEnd}) {
 			@dropdownmenu.Group() {
 				@dropdownmenu.Item() {
-					Profile
+					@icon.BadgeCheck()
+					Account
 				}
 				@dropdownmenu.Item() {
+					@icon.CreditCard()
 					Billing
 				}
 				@dropdownmenu.Item() {
-					Settings
+					@icon.Bell()
+					Notifications
 				}
 			}
 			@dropdownmenu.Separator()
-			@dropdownmenu.Group() {
-				@dropdownmenu.Item(dropdownmenu.ItemProps{Class: "text-destructive"}) {
-					Log out
-				}
+			@dropdownmenu.Item() {
+				@icon.LogOut()
+				Sign Out
 			}
 		}
 	}

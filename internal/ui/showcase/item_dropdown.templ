@@ -3,7 +3,7 @@ package showcase
 import (
 	"github.com/templui/templui/components/avatar"
 	"github.com/templui/templui/components/button"
-	"github.com/templui/templui/components/dropdown"
+	"github.com/templui/templui/components/dropdownmenu"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/components/item"
 )
@@ -28,21 +28,21 @@ templ ItemDropdown() {
 			},
 		}
 	}}
-	@dropdown.Dropdown() {
+	@dropdownmenu.Root() {
 		@button.Button(button.Props{
 			Variant:    button.VariantOutline,
-			Attributes: dropdown.Trigger(),
+			Attributes: dropdownmenu.Trigger(ctx),
 		}) {
 			Select
 			@icon.ChevronDown()
 		}
-		@dropdown.Content(dropdown.ContentProps{
-			Class:     "w-48",
-			Placement: dropdown.PlacementBottomEnd,
+		@dropdownmenu.Content(dropdownmenu.ContentProps{
+			Class: "w-48",
+			Align: dropdownmenu.AlignEnd,
 		}) {
-			@dropdown.Group() {
+			@dropdownmenu.Group() {
 				for _, person := range people {
-					@dropdown.Item() {
+					@dropdownmenu.Item() {
 						@item.Item(item.Props{
 							Size:  item.SizeXs,
 							Class: "w-full p-2",

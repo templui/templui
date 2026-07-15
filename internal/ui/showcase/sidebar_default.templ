@@ -3,7 +3,7 @@ package showcase
 import "github.com/templui/templui/components/sidebar"
 import "github.com/templui/templui/components/icon"
 import "github.com/templui/templui/components/collapsible"
-import "github.com/templui/templui/components/dropdown"
+import "github.com/templui/templui/components/dropdownmenu"
 import "github.com/templui/templui/components/avatar"
 
 templ SidebarDefault() {
@@ -211,45 +211,44 @@ templ SidebarDefault() {
 			@sidebar.Footer() {
 				@sidebar.Menu() {
 					@sidebar.MenuItem() {
-						@dropdown.Dropdown() {
-							@dropdown.Trigger() {
-								@sidebar.MenuButton(sidebar.MenuButtonProps{
-									Size: sidebar.MenuButtonSizeLg,
-								}) {
-									@avatar.Avatar(avatar.Props{Class: "size-8 rounded-lg"}) {
-										@avatar.Image(avatar.ImageProps{
-											Src: "https://avatars.githubusercontent.com/u/26936893?v=4",
-										})
-									}
-									<div class="grid flex-1 text-left text-sm leading-tight">
-										<span class="truncate font-medium">John Doe</span>
-										<span class="truncate text-xs">john@example.com</span>
-									</div>
-									@icon.ChevronsUpDown(icon.Props{Class: "ml-auto size-4"})
-								}
-							}
-							@dropdown.Content(dropdown.ContentProps{
-								Class:     "w-56",
-								Placement: dropdown.PlacementTopStart,
+						@dropdownmenu.Root() {
+							@sidebar.MenuButton(sidebar.MenuButtonProps{
+								Size:       sidebar.MenuButtonSizeLg,
+								Attributes: dropdownmenu.Trigger(ctx),
 							}) {
-								@dropdown.Label() {
+								@avatar.Avatar(avatar.Props{Class: "size-8 rounded-lg"}) {
+									@avatar.Image(avatar.ImageProps{
+										Src: "https://avatars.githubusercontent.com/u/26936893?v=4",
+									})
+								}
+								<div class="grid flex-1 text-left text-sm leading-tight">
+									<span class="truncate font-medium">John Doe</span>
+									<span class="truncate text-xs">john@example.com</span>
+								</div>
+								@icon.ChevronsUpDown(icon.Props{Class: "ml-auto size-4"})
+							}
+							@dropdownmenu.Content(dropdownmenu.ContentProps{
+								Class: "w-56",
+								Side:  dropdownmenu.SideTop,
+							}) {
+								@dropdownmenu.Label() {
 									John Doe
 								}
-								@dropdown.Separator()
-								@dropdown.Item() {
+								@dropdownmenu.Separator()
+								@dropdownmenu.Item() {
 									<span class="flex items-center">
 										@icon.User(icon.Props{Class: "size-4 mr-2"})
 										Profile
 									</span>
 								}
-								@dropdown.Item() {
+								@dropdownmenu.Item() {
 									<span class="flex items-center">
 										@icon.Settings(icon.Props{Class: "size-4 mr-2"})
 										Settings
 									</span>
 								}
-								@dropdown.Separator()
-								@dropdown.Item() {
+								@dropdownmenu.Separator()
+								@dropdownmenu.Item() {
 									<span class="flex items-center">
 										@icon.LogOut(icon.Props{Class: "size-4 mr-2"})
 										Log out

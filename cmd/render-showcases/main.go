@@ -135,8 +135,19 @@ func main() {
 		"out/showcase/sheet_sides.html":            showcase.SheetSides(),
 		"out/showcase/sheet_external_trigger.html": showcase.SheetExternalTrigger(),
 
-		// Dropdown
-		"out/showcase/dropdown_default.html": showcase.DropdownDefault(),
+		// Dropdown Menu
+		"out/showcase/dropdownmenu_default.html":          showcase.DropdownMenuDefault(),
+		"out/showcase/dropdownmenu_basic.html":            showcase.DropdownMenuBasic(),
+		"out/showcase/dropdownmenu_submenu.html":          showcase.DropdownMenuSubmenu(),
+		"out/showcase/dropdownmenu_shortcuts.html":        showcase.DropdownMenuShortcuts(),
+		"out/showcase/dropdownmenu_icons.html":            showcase.DropdownMenuIcons(),
+		"out/showcase/dropdownmenu_checkboxes.html":       showcase.DropdownMenuCheckboxes(),
+		"out/showcase/dropdownmenu_checkboxes_icons.html": showcase.DropdownMenuCheckboxesIcons(),
+		"out/showcase/dropdownmenu_radio_group.html":      showcase.DropdownMenuRadioGroupExample(),
+		"out/showcase/dropdownmenu_radio_icons.html":      showcase.DropdownMenuRadioIcons(),
+		"out/showcase/dropdownmenu_destructive.html":      showcase.DropdownMenuDestructive(),
+		"out/showcase/dropdownmenu_avatar.html":           showcase.DropdownMenuAvatar(),
+		"out/showcase/dropdownmenu_complex.html":          showcase.DropdownMenuComplex(),
 
 		// Icon
 		"out/showcase/icon_colored.html": showcase.IconColored(),

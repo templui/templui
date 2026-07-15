@@ -37,7 +37,7 @@ tasks:
         components/copybutton/copybutton.js \
         components/datepicker/datepicker.js \
         components/dialog/dialog.js \
-        components/dropdown/dropdown.js \
+        components/dropdownmenu/dropdownmenu.js \
         components/inputotp/inputotp.js \
         components/label/label.js \
         components/popover/popover.js \
