@@ -12,6 +12,9 @@ templ BaseLayout(title, description string) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
+			// 2.0 beta (v2.templui.io): keep search engines out. REMOVE at the 2.0 release
+			// (tracked in COMMIT_PLAN.md, "Pre-Release / Beta").
+			<meta name="robots" content="noindex"/>
 			// Google
 			<meta name="google-site-verification" content="lcKF60IRUofKfZpOIYKOD7xyvrL220KpjmGjJcflde4"/>
 			// SEO
