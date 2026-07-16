@@ -376,7 +376,7 @@ templ Sidebar(props ...Props) {
 		<aside
 			id={ p.ID }
 			class={ utils.TwMerge(
-					"fixed inset-y-0 z-10 hidden h-svh transition-transform duration-200 ease-linear md:flex",
+					"fixed inset-y-0 z-10 hidden h-svh transition-[transform,width] duration-200 ease-linear md:flex",
 					"w-[var(--sidebar-width,16rem)]",
 					// Side positioning with data attributes
 					"group-data-[tui-sidebar-side=right]:right-0 group-data-[tui-sidebar-side=right]:group-data-[tui-sidebar-state=collapsed]:group-data-[tui-sidebar-collapsible=offcanvas]:translate-x-full",
