@@ -29,6 +29,7 @@ templ BaseLayout(title, description string) {
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/copybutton/copybutton.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/datepicker/datepicker.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/dropdownmenu/dropdownmenu.min.js") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/hovercard/hovercard.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/input/input.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/inputotp/inputotp.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/label/label.min.js") }></script>
@@ -43,6 +44,7 @@ templ BaseLayout(title, description string) {
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/tagsinput/tagsinput.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/textarea/textarea.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/timepicker/timepicker.min.js") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/tooltip/tooltip.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/toast/toast.min.js") }></script>
 			// Plausible Analytics
 			if config.AppConfig.GoEnv == "production" {

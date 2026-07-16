@@ -13,7 +13,7 @@ templ KbdTooltip() {
 			@tooltip.Tooltip() {
 				@button.Button(button.Props{
 					Variant:    button.VariantOutline,
-					Attributes: tooltip.Trigger(),
+					Attributes: tooltip.Trigger(ctx),
 				}) {
 					Save
 				}
@@ -27,7 +27,7 @@ templ KbdTooltip() {
 			@tooltip.Tooltip() {
 				@button.Button(button.Props{
 					Variant:    button.VariantOutline,
-					Attributes: tooltip.Trigger(),
+					Attributes: tooltip.Trigger(ctx),
 				}) {
 					Print
 				}

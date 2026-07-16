@@ -25,7 +25,7 @@ templ ButtonGroupInputGroup() {
 				@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignInlineEnd}) {
 					@tooltip.Tooltip() {
 						@inputgroup.Button(inputgroup.ButtonProps{
-							Attributes: utils.MergeAttributes(tooltip.Trigger(), templ.Attributes{"aria-label": "Voice Mode"}),
+							Attributes: utils.MergeAttributes(tooltip.Trigger(ctx), templ.Attributes{"aria-label": "Voice Mode"}),
 						}) {
 							@icon.AudioLines()
 						}

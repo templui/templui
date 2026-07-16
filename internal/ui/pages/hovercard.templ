@@ -16,7 +16,7 @@ templ HoverCard() {
 				Text: "Examples",
 				ID:   "examples",
 				Children: []modules.TableOfContentsItem{
-					{Text: "Positions", ID: "positions"},
+					{Text: "Sides", ID: "sides"},
 				},
 			},
 			{
@@ -52,10 +52,10 @@ templ HoverCard() {
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Positions",
-					ShowcaseFile:    showcase.HoverCardPositions(),
-					PreviewCodeFile: "hovercard_positions.templ",
-					ID:              "positions",
+					SectionName:     "Sides",
+					ShowcaseFile:    showcase.HoverCardSides(),
+					PreviewCodeFile: "hovercard_sides.templ",
+					ID:              "sides",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {

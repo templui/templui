@@ -1,0 +1,159 @@
+import "../floatingui/floating_ui_core.js";
+import "../floatingui/floating_ui_dom.js";
+
+(function () {
+  // Exit animations run for 100ms (duration-100); hide shortly after.
+  const EXIT_MS = 120;
+
+  function allContents() {
+    return document.querySelectorAll("[data-tui-hovercard-content]");
+  }
+
+  function contentFor(trigger) {
+    return document.getElementById(trigger.getAttribute("data-tui-hovercard-for"));
+  }
+
+  function triggerFor(content) {
+    return document.querySelector(
+      '[data-tui-hovercard-trigger][data-tui-hovercard-for="' + content.id + '"]',
+    );
+  }
+
+  // "bottom" -> "top center": the corner the card grows out of.
+  function transformOrigin(placement) {
+    const side = placement.split("-")[0];
+    const align = placement.split("-")[1] || "center";
+    const opposite = { top: "bottom", bottom: "top", left: "right", right: "left" }[side];
+    if (side === "top" || side === "bottom") {
+      return opposite + " " + ({ start: "left", end: "right", center: "center" }[align]);
+    }
+    return ({ start: "top", end: "bottom", center: "center" }[align]) + " " + opposite;
+  }
+
+  // Moves the content to <body> (shadcn portals it the same way). Also removes
+  // contents whose trigger is gone (leftovers from swapped-out pages).
+  function portal(content) {
+    document.querySelectorAll("body > [data-tui-hovercard-content]").forEach((c) => {
+      if (c !== content && !triggerFor(c)) c.remove();
+    });
+    if (content.parentElement !== document.body) {
+      document.body.appendChild(content);
+    }
+  }
+
+  function positionContent(content, trigger) {
+    const { computePosition, offset, flip, shift } = window.FloatingUIDOM;
+    const side = content.getAttribute("data-tui-hovercard-side") || "bottom";
+    const align = content.getAttribute("data-tui-hovercard-align") || "center";
+    const sideOffset =
+      parseInt(content.getAttribute("data-tui-hovercard-side-offset"), 10) || 4;
+    const placement = align === "center" ? side : side + "-" + align;
+
+    return computePosition(trigger, content, {
+      placement: placement,
+      strategy: "fixed",
+      middleware: [offset(sideOffset), flip(), shift({ padding: 8 })],
+    }).then((result) => {
+      content.style.transition = "none";
+      content.style.left = result.x + "px";
+      content.style.top = result.y + "px";
+      content.style.transformOrigin = transformOrigin(result.placement);
+      content.setAttribute("data-side", result.placement.split("-")[0]);
+      content.offsetHeight; // flush styles before re-enabling transitions
+      content.style.transition = "";
+    });
+  }
+
+  function open(content, trigger) {
+    clearTimeout(content._tuiHide);
+    portal(content);
+    if (!content.matches(":popover-open")) {
+      content.showPopover(); // native top layer
+    }
+
+    // Position it invisibly first, then play the enter animation in place.
+    content.style.visibility = "hidden";
+    positionContent(content, trigger).then(() => {
+      if (!content.matches(":popover-open")) return; // closed meanwhile
+      content.style.visibility = "";
+      content.setAttribute("data-state", "open");
+    });
+  }
+
+  function close(content) {
+    if (!content.matches(":popover-open")) return;
+    content.setAttribute("data-state", "closed");
+    clearTimeout(content._tuiHide);
+    content._tuiHide = setTimeout(() => {
+      if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
+        content.hidePopover();
+      }
+    }, EXIT_MS);
+  }
+
+  // Hover intent: entering trigger or card keeps it open; leaving both
+  // schedules the close after the card's close delay.
+  function scheduleOpen(content, trigger) {
+    clearTimeout(content._tuiClose);
+    content._tuiClose = null;
+    if (content.getAttribute("data-state") === "open" || content._tuiOpen) return;
+    const delay = parseInt(content.getAttribute("data-tui-hovercard-open-delay"), 10) || 700;
+    content._tuiOpen = setTimeout(() => {
+      content._tuiOpen = null;
+      open(content, trigger);
+    }, delay);
+  }
+
+  function scheduleClose(content) {
+    clearTimeout(content._tuiOpen);
+    content._tuiOpen = null;
+    if (content.getAttribute("data-state") !== "open" || content._tuiClose) return;
+    const delay = parseInt(content.getAttribute("data-tui-hovercard-close-delay"), 10) || 300;
+    content._tuiClose = setTimeout(() => {
+      content._tuiClose = null;
+      close(content);
+    }, delay);
+  }
+
+  document.addEventListener("mouseover", (e) => {
+    const trigger = e.target.closest("[data-tui-hovercard-trigger]");
+    if (trigger) {
+      const content = contentFor(trigger);
+      if (content) scheduleOpen(content, trigger);
+      return;
+    }
+    const content = e.target.closest("[data-tui-hovercard-content]");
+    if (content) {
+      clearTimeout(content._tuiClose);
+      content._tuiClose = null;
+    }
+  });
+
+  document.addEventListener("mouseout", (e) => {
+    const from = e.target.closest("[data-tui-hovercard-trigger], [data-tui-hovercard-content]");
+    if (!from) return;
+    if (e.relatedTarget) {
+      const to = e.relatedTarget.closest("[data-tui-hovercard-trigger], [data-tui-hovercard-content]");
+      if (to) return; // moving between trigger and card
+    }
+    const content = from.hasAttribute("data-tui-hovercard-content")
+      ? from
+      : contentFor(from);
+    if (content) scheduleClose(content);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") allContents().forEach(close);
+  });
+
+  // Keep open cards anchored while scrolling or resizing.
+  function repositionOpen() {
+    allContents().forEach((content) => {
+      if (content.getAttribute("data-state") !== "open") return;
+      const trigger = triggerFor(content);
+      if (trigger) positionContent(content, trigger);
+    });
+  }
+  window.addEventListener("scroll", repositionOpen, true);
+  window.addEventListener("resize", repositionOpen);
+})();

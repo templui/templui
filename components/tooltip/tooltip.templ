@@ -1,83 +1,71 @@
 package tooltip
 
 import (
-	"github.com/templui/templui/components/popover"
+	"context"
+	"strconv"
+
 	"github.com/templui/templui/utils"
 )
 
-type Position string
+type Side string
 
 const (
-	PositionTop    Position = "top"
-	PositionRight  Position = "right"
-	PositionBottom Position = "bottom"
-	PositionLeft   Position = "left"
+	SideTop    Side = "top"
+	SideRight  Side = "right"
+	SideBottom Side = "bottom"
+	SideLeft   Side = "left"
 )
 
-func mapTooltipPositionToPopover(position Position) popover.Placement {
-	switch position {
-	case PositionTop:
-		return popover.PlacementTop
-	case PositionRight:
-		return popover.PlacementRight
-	case PositionBottom:
-		return popover.PlacementBottom
-	case PositionLeft:
-		return popover.PlacementLeft
-	default:
-		return popover.PlacementTop
+type ctxKey string
+
+const idKey ctxKey = "tooltipID"
+
+func tooltipID(ctx context.Context) string {
+	if id, ok := ctx.Value(idKey).(string); ok {
+		return id
+	}
+	return ""
+}
+
+// Trigger returns the attributes that turn any element into the tooltip
+// trigger — the asChild equivalent: no wrapper element. Spread them onto your
+// own element:
+//
+//	@button.Button(button.Props{Attributes: tooltip.Trigger(ctx)}) { ... }
+func Trigger(ctx context.Context) templ.Attributes {
+	return templ.Attributes{
+		"data-tui-tooltip-trigger": true,
+		"aria-describedby":         tooltipID(ctx),
 	}
 }
 
 type Props struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-}
-
-type TriggerProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
+	ID string
 }
 
 type ContentProps struct {
-	ID            string
-	Class         string
-	Attributes    templ.Attributes
-	ShowArrow     bool
-	Position      Position
-	HoverDelay    int
-	HoverOutDelay int
+	Class      string
+	Attributes templ.Attributes
+	// Side of the trigger the tooltip shows on. Defaults to top; flips
+	// automatically when there is no room.
+	Side Side
+	// SideOffset is the extra gap to the trigger in px. Defaults to 0
+	// (the arrow already provides the visual gap).
+	SideOffset int
 }
 
+// Tooltip renders no element: it only generates the id that links Trigger and
+// Content (via ctx), so the trigger stays a direct child of its layout.
 templ Tooltip(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	@popover.Root(popover.RootProps{
-		ID:         p.ID,
-		Class:      p.Class,
-		Attributes: p.Attributes,
-	}) {
-		{ children... }
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
 	}
-}
-
-templ Trigger(props ...TriggerProps) {
-	{{ var p TriggerProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
-	}
-	@popover.Trigger(popover.TriggerProps{
-		ID:          p.ID,
-		Class:       p.Class,
-		Attributes:  p.Attributes,
-		TriggerType: popover.TriggerTypeHover,
-	}) {
-		{ children... }
-	}
+	{{ ctx = context.WithValue(ctx, idKey, p.ID) }}
+	{ children... }
 }
 
 templ Content(props ...ContentProps) {
@@ -85,23 +73,37 @@ templ Content(props ...ContentProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	@popover.Content(popover.ContentProps{
-		ID:            p.ID,
-		Class:         utils.TwMerge("px-4 py-1 bg-foreground text-background [&_[data-tui-popover-arrow]]:!bg-foreground [&_[data-tui-popover-arrow]]:!border-0", p.Class),
-		Attributes:    p.Attributes,
-		Placement:     mapTooltipPositionToPopover(p.Position),
-		ShowArrow:     p.ShowArrow,
-		HoverDelay:    p.HoverDelay,
-		HoverOutDelay: p.HoverOutDelay,
-	}) {
-		{ children... }
+	if p.Side == "" {
+		{{ p.Side = SideTop }}
 	}
+	<div
+		id={ tooltipID(ctx) }
+		data-slot="tooltip-content"
+		data-tui-tooltip-content
+		data-tui-tooltip-side={ string(p.Side) }
+		data-tui-tooltip-side-offset={ strconv.Itoa(p.SideOffset) }
+		data-state="closed"
+		popover="manual"
+		role="tooltip"
+		class={
+			utils.TwMerge(
+				"pointer-events-none fixed inset-auto left-0 top-0 m-0 z-50 inline-flex w-fit max-w-xs items-center gap-1.5 overflow-visible rounded-md bg-foreground px-3 py-1.5 text-xs text-background has-data-[slot=kbd]:pr-1.5 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-sm data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+		<span data-tui-tooltip-arrow class="absolute">
+			<span class="block z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px] bg-foreground"></span>
+		</span>
+	</div>
 }
 
 var scriptOnce = templ.NewOnceHandle()
 
 templ Script() {
 	@scriptOnce.Once() {
-		@popover.Script()
+		@utils.ComponentScript("tooltip")
 	}
 }

@@ -39,6 +39,7 @@ tasks:
         components/dialog/dialog.js \
         components/dropdownmenu/dropdownmenu.js \
         components/inputotp/inputotp.js \
+        components/hovercard/hovercard.js \
         components/label/label.js \
         components/popover/popover.js \
         components/progress/progress.js \
@@ -50,6 +51,7 @@ tasks:
         components/tagsinput/tagsinput.js \
         components/timepicker/timepicker.js \
         components/toast/toast.js \
+        components/tooltip/tooltip.js \
         --minify \
         --watch \
         --bundle \

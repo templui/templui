@@ -19,28 +19,17 @@ templ Tooltip() {
 				Text: "Examples",
 				ID:   "examples",
 				Children: []modules.TableOfContentsItem{
-					{
-						Text: "Positions",
-						ID:   "positions",
-					},
+					{Text: "Side", ID: "side"},
+					{Text: "With Keyboard Shortcut", ID: "keyboard"},
+					{Text: "Disabled Button", ID: "disabled"},
 				},
 			},
 			{
 				ID:   "api",
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
-					{
-						ID:   "api-tooltip",
-						Text: "Tooltip",
-					},
-					{
-						ID:   "api-trigger",
-						Text: "Trigger",
-					},
-					{
-						ID:   "api-content",
-						Text: "Content",
-					},
+					{ID: "api-tooltip", Text: "Tooltip"},
+					{ID: "api-content", Text: "Content"},
 				},
 			},
 		},
@@ -83,10 +72,22 @@ templ Tooltip() {
 				ID:    "examples",
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Positions",
-					PreviewCodeFile: "tooltip_positions.templ",
-					ShowcaseFile:    showcase.TooltipPositions(),
-					ID:              "positions",
+					SectionName:     "Side",
+					PreviewCodeFile: "tooltip_sides.templ",
+					ShowcaseFile:    showcase.TooltipSides(),
+					ID:              "side",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "With Keyboard Shortcut",
+					PreviewCodeFile: "tooltip_keyboard.templ",
+					ShowcaseFile:    showcase.TooltipKeyboard(),
+					ID:              "keyboard",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Disabled Button",
+					PreviewCodeFile: "tooltip_disabled.templ",
+					ShowcaseFile:    showcase.TooltipDisabled(),
+					ID:              "disabled",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -123,36 +124,8 @@ templ Tooltip() {
 						},
 					})
 				</div>
-				<div id="api-trigger" class="mb-8">
-					@modules.APITable(modules.APITableProps{
-						Title:       "Trigger",
-						Description: "Element that triggers the tooltip on hover.",
-						Items: []modules.APITableItem{
-							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "",
-								Description: "Unique identifier for the trigger element.",
-								Required:    false,
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "",
-								Description: "Additional CSS classes to apply to the trigger.",
-								Required:    false,
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "",
-								Description: "Additional HTML attributes to apply to the trigger element.",
-								Required:    false,
-							},
-						},
-					})
-				</div>
 				<div id="api-content" class="mb-8">
+					<p class="mb-4 text-sm text-muted-foreground">Make any element the trigger by spreading <code>tooltip.Trigger()</code> onto its Attributes — the templ equivalent of shadcn's <code>asChild</code>.</p>
 					@modules.APITable(modules.APITableProps{
 						Title:       "Content",
 						Description: "Container for the tooltip content with positioning options.",

@@ -1,79 +1,95 @@
 package hovercard
 
 import (
-	"github.com/templui/templui/components/popover"
+	"context"
+	"strconv"
+
 	"github.com/templui/templui/utils"
 )
 
-type Placement = popover.Placement
+type Side string
 
 const (
-	PlacementTop         = popover.PlacementTop
-	PlacementTopStart    = popover.PlacementTopStart
-	PlacementTopEnd      = popover.PlacementTopEnd
-	PlacementRight       = popover.PlacementRight
-	PlacementRightStart  = popover.PlacementRightStart
-	PlacementRightEnd    = popover.PlacementRightEnd
-	PlacementBottom      = popover.PlacementBottom
-	PlacementBottomStart = popover.PlacementBottomStart
-	PlacementBottomEnd   = popover.PlacementBottomEnd
-	PlacementLeft        = popover.PlacementLeft
-	PlacementLeftStart   = popover.PlacementLeftStart
-	PlacementLeftEnd     = popover.PlacementLeftEnd
+	SideTop    Side = "top"
+	SideRight  Side = "right"
+	SideBottom Side = "bottom"
+	SideLeft   Side = "left"
 )
 
+type Align string
+
+const (
+	AlignStart  Align = "start"
+	AlignCenter Align = "center"
+	AlignEnd    Align = "end"
+)
+
+type ctxKey string
+
+const idKey ctxKey = "hovercardID"
+
+type delaysKey struct{}
+
+type delays struct {
+	open  int
+	close int
+}
+
+func cardID(ctx context.Context) string {
+	if id, ok := ctx.Value(idKey).(string); ok {
+		return id
+	}
+	return ""
+}
+
+// Trigger returns the attributes that turn any element into the hover card
+// trigger — the asChild equivalent: no wrapper element.
+func Trigger(ctx context.Context) templ.Attributes {
+	return templ.Attributes{
+		"data-tui-hovercard-trigger": true,
+		"data-tui-hovercard-for":     cardID(ctx),
+	}
+}
+
 type Props struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-}
-
-type TriggerProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-}
-
-type ContentProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-	Placement  Placement
-	Offset     int
-	ShowArrow  bool
-	// OpenDelay is the delay in ms before the card opens on hover.
+	ID string
+	// OpenDelay is the hover intent before showing, in ms. Defaults to 700.
 	OpenDelay int
-	// CloseDelay is the delay in ms before the card closes on hover out.
+	// CloseDelay is the grace period before hiding, in ms. Defaults to 300.
 	CloseDelay int
 }
 
-templ Root(props ...Props) {
+type ContentProps struct {
+	Class      string
+	Attributes templ.Attributes
+	// Side of the trigger the card opens on. Defaults to bottom; flips
+	// automatically when there is no room.
+	Side Side
+	// Align along the trigger edge. Defaults to center.
+	Align Align
+	// SideOffset is the gap to the trigger in px. Defaults to 4.
+	SideOffset int
+}
+
+// HoverCard renders no element: it only generates the id that links Trigger
+// and Content (via ctx), so the trigger stays a direct child of its layout.
+templ HoverCard(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	@popover.Root(popover.RootProps{
-		ID:         p.ID,
-		Class:      p.Class,
-		Attributes: p.Attributes,
-	}) {
-		{ children... }
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
 	}
-}
-
-templ Trigger(props ...TriggerProps) {
-	{{ var p TriggerProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
+	if p.OpenDelay == 0 {
+		{{ p.OpenDelay = 700 }}
 	}
-	@popover.Trigger(popover.TriggerProps{
-		ID:          p.ID,
-		Class:       p.Class,
-		Attributes:  p.Attributes,
-		TriggerType: popover.TriggerTypeHover,
-	}) {
-		{ children... }
+	if p.CloseDelay == 0 {
+		{{ p.CloseDelay = 300 }}
 	}
+	{{ ctx = context.WithValue(ctx, idKey, p.ID) }}
+	{{ ctx = context.WithValue(ctx, delaysKey{}, delays{open: p.OpenDelay, close: p.CloseDelay}) }}
+	{ children... }
 }
 
 templ Content(props ...ContentProps) {
@@ -81,36 +97,43 @@ templ Content(props ...ContentProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	if p.Placement == "" {
-		{{ p.Placement = PlacementBottom }}
+	if p.Side == "" {
+		{{ p.Side = SideBottom }}
 	}
-	if p.OpenDelay == 0 {
-		{{ p.OpenDelay = 150 }}
+	if p.Align == "" {
+		{{ p.Align = AlignCenter }}
 	}
-	if p.CloseDelay == 0 {
-		{{ p.CloseDelay = 300 }}
+	if p.SideOffset == 0 {
+		{{ p.SideOffset = 4 }}
 	}
-	@popover.Content(popover.ContentProps{
-		ID:            p.ID,
-		Placement:     p.Placement,
-		Offset:        p.Offset,
-		ShowArrow:     p.ShowArrow,
-		HoverDelay:    p.OpenDelay,
-		HoverOutDelay: p.CloseDelay,
-		Class: utils.TwMerge(
-			"w-64 p-4",
-			p.Class,
-		),
-		Attributes: p.Attributes,
-	}) {
+	{{ d, _ := ctx.Value(delaysKey{}).(delays) }}
+	<div
+		id={ cardID(ctx) }
+		data-slot="hover-card-content"
+		data-tui-hovercard-content
+		data-tui-hovercard-side={ string(p.Side) }
+		data-tui-hovercard-align={ string(p.Align) }
+		data-tui-hovercard-side-offset={ strconv.Itoa(p.SideOffset) }
+		data-tui-hovercard-open-delay={ strconv.Itoa(d.open) }
+		data-tui-hovercard-close-delay={ strconv.Itoa(d.close) }
+		data-state="closed"
+		popover="manual"
+		class={
+			utils.TwMerge(
+				"fixed inset-auto left-0 top-0 m-0 z-50 w-64 overflow-visible rounded-lg bg-popover p-2.5 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
 		{ children... }
-	}
+	</div>
 }
 
 var scriptOnce = templ.NewOnceHandle()
 
 templ Script() {
 	@scriptOnce.Once() {
-		@popover.Script()
+		@utils.ComponentScript("hovercard")
 	}
 }

@@ -276,8 +276,8 @@ func main() {
 		"out/showcase/switch_form.html":    showcase.SwitchForm(),
 
 		// Tooltip
-		"out/showcase/tooltip_default.html":   showcase.TooltipDefault(),
-		"out/showcase/tooltip_positions.html": showcase.TooltipPositions(),
+		"out/showcase/tooltip_default.html": showcase.TooltipDefault(),
+		"out/showcase/tooltip_sides.html":   showcase.TooltipSides(),
 	}
 
 	for path, comp := range showcases {
