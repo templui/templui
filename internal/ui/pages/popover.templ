@@ -16,8 +16,9 @@ templ Popover() {
 				Text: "Examples",
 				ID:   "examples",
 				Children: []modules.TableOfContentsItem{
-					{Text: "Trigger & Closing", ID: "trigger-closing"},
-					{Text: "Positions", ID: "positions"},
+					{Text: "Basic", ID: "basic"},
+					{Text: "Align", ID: "align"},
+					{Text: "With Form", ID: "with-form"},
 				},
 			},
 			{
@@ -54,16 +55,22 @@ templ Popover() {
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Trigger & Closing",
-					ShowcaseFile:    showcase.PopoverTriggers(),
-					PreviewCodeFile: "popover_triggers.templ",
-					ID:              "trigger-closing",
+					SectionName:     "Basic",
+					ShowcaseFile:    showcase.PopoverBasic(),
+					PreviewCodeFile: "popover_basic.templ",
+					ID:              "basic",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Positions",
-					ShowcaseFile:    showcase.PopoverPositions(),
-					PreviewCodeFile: "popover_positions.templ",
-					ID:              "positions",
+					SectionName:     "Align",
+					ShowcaseFile:    showcase.PopoverAlignments(),
+					PreviewCodeFile: "popover_alignments.templ",
+					ID:              "align",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "With Form",
+					ShowcaseFile:    showcase.PopoverForm(),
+					PreviewCodeFile: "popover_form.templ",
+					ID:              "with-form",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {

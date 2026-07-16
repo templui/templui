@@ -1,0 +1,58 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/input"
+	"github.com/templui/templui/components/popover"
+)
+
+templ PopoverForm() {
+	@popover.Root() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: popover.TriggerAttributes(popover.TriggerTypeClick),
+		}) {
+			Open Popover
+		}
+		@popover.Content(popover.ContentProps{
+			Placement: popover.PlacementBottomStart,
+			Class:     "w-64",
+		}) {
+			@popover.Header() {
+				@popover.Title() {
+					Dimensions
+				}
+				@popover.Description() {
+					Set the dimensions for the layer.
+				}
+			}
+			@field.Group(field.GroupProps{Class: "gap-4"}) {
+				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
+					@field.Label(field.LabelProps{
+						For:   "popover-form-width",
+						Class: "w-1/2",
+					}) {
+						Width
+					}
+					@input.Input(input.Props{
+						ID:    "popover-form-width",
+						Value: "100%",
+					})
+				}
+				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
+					@field.Label(field.LabelProps{
+						For:   "popover-form-height",
+						Class: "w-1/2",
+					}) {
+						Height
+					}
+					@input.Input(input.Props{
+						ID:    "popover-form-height",
+						Value: "25px",
+					})
+				}
+			}
+		}
+	}
+}

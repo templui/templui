@@ -1,0 +1,56 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/popover"
+)
+
+templ PopoverAlignments() {
+	<div class="flex gap-6">
+		@popover.Root() {
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Size:       button.SizeSm,
+				Attributes: popover.TriggerAttributes(popover.TriggerTypeClick),
+			}) {
+				Start
+			}
+			@popover.Content(popover.ContentProps{
+				Placement: popover.PlacementBottomStart,
+				Class:     "w-40",
+			}) {
+				Aligned to start
+			}
+		}
+		@popover.Root() {
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Size:       button.SizeSm,
+				Attributes: popover.TriggerAttributes(popover.TriggerTypeClick),
+			}) {
+				Center
+			}
+			@popover.Content(popover.ContentProps{
+				Placement: popover.PlacementBottom,
+				Class:     "w-40",
+			}) {
+				Aligned to center
+			}
+		}
+		@popover.Root() {
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Size:       button.SizeSm,
+				Attributes: popover.TriggerAttributes(popover.TriggerTypeClick),
+			}) {
+				End
+			}
+			@popover.Content(popover.ContentProps{
+				Placement: popover.PlacementBottomEnd,
+				Class:     "w-40",
+			}) {
+				Aligned to end
+			}
+		}
+	</div>
+}

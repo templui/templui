@@ -183,9 +183,10 @@ func main() {
 		"out/showcase/pagination_with_helper.html": showcase.PaginationWithHelper(),
 
 		// Popover
-		"out/showcase/popover_default.html":   showcase.PopoverDefault(),
-		"out/showcase/popover_positions.html": showcase.PopoverPositions(),
-		"out/showcase/popover_triggers.html":  showcase.PopoverTriggers(),
+		"out/showcase/popover_default.html":    showcase.PopoverDefault(),
+		"out/showcase/popover_basic.html":      showcase.PopoverBasic(),
+		"out/showcase/popover_alignments.html": showcase.PopoverAlignments(),
+		"out/showcase/popover_form.html":       showcase.PopoverForm(),
 
 		// Progress
 		"out/showcase/progress_variants.html": showcase.ProgressVariants(),

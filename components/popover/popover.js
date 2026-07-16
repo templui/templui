@@ -13,7 +13,7 @@ import "../floatingui/floating_ui_dom.js";
   // Calendar) re-renders its grid during the click.
   const pointerDownInside = new WeakMap();
   const arrowBaseClass =
-    "absolute h-2.5 w-2.5 rotate-45 bg-popover border border-border";
+    "absolute h-2.5 w-2.5 rotate-45 rounded-[2px] bg-popover border border-border";
   const exitAnimationDuration = 150;
 
   function getRootById(id) {
@@ -38,9 +38,17 @@ import "../floatingui/floating_ui_dom.js";
   }
 
   function getReferenceElement(trigger) {
+    // If the trigger has its own box (a real element, e.g. an asChild button),
+    // anchor to it directly.
+    const ownRect = trigger.getBoundingClientRect?.();
+    if (ownRect && ownRect.width * ownRect.height > 0) {
+      return trigger;
+    }
+
+    // Otherwise the trigger is a boxless wrapper (display: contents) — fall back
+    // to its largest child so we still anchor to something with a real box.
     let ref = trigger;
     let maxArea = 0;
-
     for (const child of trigger.children) {
       const rect = child.getBoundingClientRect?.();
       if (!rect) continue;
@@ -100,10 +108,6 @@ import "../floatingui/floating_ui_dom.js";
       }
     }
 
-    requestAnimationFrame(() => {
-      content.setAttribute("data-tui-popover-open", "true");
-    });
-
     return true;
   }
 
@@ -133,21 +137,21 @@ import "../floatingui/floating_ui_dom.js";
       case "top-start":
       case "top":
       case "top-end":
-        return `${arrowBaseClass} -bottom-[5px] border-t-transparent border-l-transparent`;
+        return `${arrowBaseClass} -bottom-[3px] border-t-transparent border-l-transparent`;
       case "right-start":
       case "right":
       case "right-end":
-        return `${arrowBaseClass} -left-[5px] border-r-transparent border-t-transparent`;
+        return `${arrowBaseClass} -left-[3px] border-r-transparent border-t-transparent`;
       case "bottom-start":
       case "bottom":
       case "bottom-end":
-        return `${arrowBaseClass} -top-[5px] border-b-transparent border-r-transparent`;
+        return `${arrowBaseClass} -top-[3px] border-b-transparent border-r-transparent`;
       case "left-start":
       case "left":
       case "left-end":
-        return `${arrowBaseClass} -right-[5px] border-l-transparent border-b-transparent`;
+        return `${arrowBaseClass} -right-[3px] border-l-transparent border-b-transparent`;
       default:
-        return `${arrowBaseClass} -top-[5px] border-b-transparent border-r-transparent`;
+        return `${arrowBaseClass} -top-[3px] border-b-transparent border-r-transparent`;
     }
   }
 
@@ -179,15 +183,30 @@ import "../floatingui/floating_ui_dom.js";
     }
 
     // Match the fixed-position popover layer so scroll offsets stay correct.
-    computePosition(reference, content, {
+    return computePosition(reference, content, {
       placement,
       middleware,
       strategy: "fixed",
     }).then(({ x, y, placement: finalPlacement, middlewareData }) => {
+      // Apply instantly (transition suspended), so the popover never slides
+      // over from its previous left/top — it repositions in place.
+      content.style.transition = "none";
       Object.assign(content.style, {
         left: `${x}px`,
         top: `${y}px`,
       });
+      content.offsetHeight; // flush styles before re-enabling transitions
+      content.style.transition = "";
+
+      // Drives the slide-in direction and the zoom origin (like Radix).
+      const side = finalPlacement.split("-")[0];
+      const align = finalPlacement.split("-")[1] || "center";
+      content.setAttribute("data-side", side);
+      const opposite = { top: "bottom", bottom: "top", left: "right", right: "left" }[side];
+      content.style.transformOrigin =
+        side === "top" || side === "bottom"
+          ? opposite + " " + ({ start: "left", end: "right", center: "center" }[align])
+          : ({ start: "top", end: "bottom", center: "center" }[align]) + " " + opposite;
 
       if (arrowEl && middlewareData.arrow) {
         const { x: arrowX, y: arrowY } = middlewareData.arrow;
@@ -273,7 +292,17 @@ import "../floatingui/floating_ui_dom.js";
     });
 
     stopAutoUpdate(root);
-    updatePosition(root, trigger);
+    // Position it invisibly first, then flip to open so the enter animation
+    // plays in place (instead of flying in from the old position).
+    const opening = content.getAttribute("data-tui-popover-open") !== "true";
+    if (opening) content.style.visibility = "hidden";
+    const positioned = updatePosition(root, trigger) || Promise.resolve();
+    positioned.then(() => {
+      if (!opening) return;
+      if (!content.matches(":popover-open")) return; // closed meanwhile
+      content.style.visibility = "";
+      content.setAttribute("data-tui-popover-open", "true");
+    });
 
     if (window.FloatingUIDOM) {
       const cleanup = window.FloatingUIDOM.autoUpdate(
@@ -392,6 +421,22 @@ import "../floatingui/floating_ui_dom.js";
       event.preventDefault();
       event.stopPropagation();
       toggleRoot(root, trigger);
+      // Light dismiss like shadcn: opening one popover closes the other open
+      // ones — except ancestors (a trigger nested inside another popover's
+      // content must not close its parent) and clickaway-disabled ones.
+      getRoots().forEach((otherRoot) => {
+        if (otherRoot === root) return;
+        const otherContent = getContent(otherRoot);
+        if (
+          !otherContent ||
+          !otherContent.matches(":popover-open") ||
+          otherContent.getAttribute("data-tui-popover-disable-clickaway") === "true" ||
+          otherContent.contains(trigger)
+        ) {
+          return;
+        }
+        closeRoot(otherRoot);
+      });
       return;
     }
 

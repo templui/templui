@@ -5,60 +5,65 @@ import (
 	"github.com/templui/templui/components/input"
 	"github.com/templui/templui/components/label"
 	"github.com/templui/templui/components/popover"
-	"github.com/templui/templui/utils"
 )
 
 templ PopoverDefault() {
 	@popover.Root() {
-		@popover.Trigger() {
-			@button.Button(button.Props{
-				Variant: button.VariantOutline,
-			}) {
-				Open Popover
-			}
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: popover.TriggerAttributes(popover.TriggerTypeClick),
+		}) {
+			Open popover
 		}
-		@popover.Content() {
-			@PopoverContent()
+		@popover.Content(popover.ContentProps{Class: "w-80"}) {
+			<div class="grid gap-4">
+				<div class="space-y-2">
+					<h4 class="leading-none font-medium">Dimensions</h4>
+					<p class="text-sm text-muted-foreground">Set the dimensions for the layer.</p>
+				</div>
+				<div class="grid gap-2">
+					<div class="grid grid-cols-3 items-center gap-4">
+						@label.Label(label.Props{For: "width"}) {
+							Width
+						}
+						@input.Input(input.Props{
+							ID:    "width",
+							Value: "100%",
+							Class: "col-span-2 h-8",
+						})
+					</div>
+					<div class="grid grid-cols-3 items-center gap-4">
+						@label.Label(label.Props{For: "maxWidth"}) {
+							Max. width
+						}
+						@input.Input(input.Props{
+							ID:    "maxWidth",
+							Value: "300px",
+							Class: "col-span-2 h-8",
+						})
+					</div>
+					<div class="grid grid-cols-3 items-center gap-4">
+						@label.Label(label.Props{For: "height"}) {
+							Height
+						}
+						@input.Input(input.Props{
+							ID:    "height",
+							Value: "25px",
+							Class: "col-span-2 h-8",
+						})
+					</div>
+					<div class="grid grid-cols-3 items-center gap-4">
+						@label.Label(label.Props{For: "maxHeight"}) {
+							Max. height
+						}
+						@input.Input(input.Props{
+							ID:    "maxHeight",
+							Value: "none",
+							Class: "col-span-2 h-8",
+						})
+					</div>
+				</div>
+			</div>
 		}
 	}
-}
-
-templ PopoverContent() {
-	{{ var id = utils.RandomID() }}
-	<div class="p-4 space-y-4">
-		<div>
-			<h3 class="text-lg font-semibold">Dimensions</h3>
-			<p>Set the dimensions for the layer.</p>
-		</div>
-		<div class="flex flex-col gap-2 max-w-fit">
-			<div class="flex items-center gap-2">
-				@label.Label(label.Props{
-					For:   "width" + id,
-					Class: "w-24",
-				}) {
-					Width
-				}
-				@input.Input(input.Props{
-					ID:          "width" + id,
-					Placeholder: "Width",
-					Value:       "100%",
-					Class:       "flex-1",
-				})
-			</div>
-			<div class="flex items-center gap-2">
-				@label.Label(label.Props{
-					For:   "height" + id,
-					Class: "w-24",
-				}) {
-					Height
-				}
-				@input.Input(input.Props{
-					ID:          "height" + id,
-					Placeholder: "Height",
-					Value:       "100%",
-					Class:       "flex-1",
-				})
-			</div>
-		</div>
-	</div>
 }
