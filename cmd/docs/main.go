@@ -153,7 +153,7 @@ func main() {
 	mux.Handle("GET /docs/components/progress", htmxHandler(pages.Progress()))
 	mux.Handle("GET /docs/components/radio", htmxHandler(pages.Radio()))
 	mux.Handle("GET /docs/components/rating", htmxHandler(pages.Rating()))
-	mux.Handle("GET /docs/components/select-box", htmxHandler(pages.SelectBox()))
+	mux.Handle("GET /docs/components/select", htmxHandler(pages.Select()))
 	mux.Handle("GET /docs/components/separator", htmxHandler(pages.Separator()))
 	mux.Handle("GET /docs/components/sidebar", htmxHandler(pages.Sidebar()))
 	mux.Handle("GET /docs/components/sidebar-fullscreen", htmxHandler(pages.SidebarFullscreen()))

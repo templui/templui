@@ -6,7 +6,7 @@ import (
 	"github.com/templui/templui/components/field"
 	"github.com/templui/templui/components/input"
 	"github.com/templui/templui/components/label"
-	"github.com/templui/templui/components/selectbox"
+	selectcomp "github.com/templui/templui/components/select"
 	switchcomp "github.com/templui/templui/components/switch"
 )
 
@@ -54,39 +54,38 @@ templ ToastPlayground() {
 							}) {
 								Type
 							}
-							@selectbox.SelectBox() {
-								@selectbox.Trigger(selectbox.TriggerProps{
-									Name: "type",
-									ID:   "type",
+							@selectcomp.Select(selectcomp.Props{Name: "type"}) {
+								@selectcomp.Trigger(selectcomp.TriggerProps{
+									ID: "type",
 								}) {
-									@selectbox.Value(selectbox.ValueProps{
+									@selectcomp.Value(selectcomp.ValueProps{
 										Placeholder: "Default",
 									})
 								}
-								@selectbox.Content() {
-									@selectbox.Group() {
-										@selectbox.Item(selectbox.ItemProps{
+								@selectcomp.Content() {
+									@selectcomp.Group() {
+										@selectcomp.Item(selectcomp.ItemProps{
 											Value:    "default",
 											Selected: true,
 										}) {
 											Default
 										}
-										@selectbox.Item(selectbox.ItemProps{
+										@selectcomp.Item(selectcomp.ItemProps{
 											Value: "success",
 										}) {
 											Success
 										}
-										@selectbox.Item(selectbox.ItemProps{
+										@selectcomp.Item(selectcomp.ItemProps{
 											Value: "error",
 										}) {
 											Error
 										}
-										@selectbox.Item(selectbox.ItemProps{
+										@selectcomp.Item(selectcomp.ItemProps{
 											Value: "warning",
 										}) {
 											Warning
 										}
-										@selectbox.Item(selectbox.ItemProps{
+										@selectcomp.Item(selectcomp.ItemProps{
 											Value: "info",
 										}) {
 											Info
@@ -102,44 +101,43 @@ templ ToastPlayground() {
 							}) {
 								Position
 							}
-							@selectbox.SelectBox() {
-								@selectbox.Trigger(selectbox.TriggerProps{
-									Name: "position",
-									ID:   "position",
+							@selectcomp.Select(selectcomp.Props{Name: "position"}) {
+								@selectcomp.Trigger(selectcomp.TriggerProps{
+									ID: "position",
 								}) {
-									@selectbox.Value(selectbox.ValueProps{
+									@selectcomp.Value(selectcomp.ValueProps{
 										Placeholder: "Bottom Right",
 									})
 								}
-								@selectbox.Content() {
-									@selectbox.Group() {
-										@selectbox.Item(selectbox.ItemProps{
+								@selectcomp.Content() {
+									@selectcomp.Group() {
+										@selectcomp.Item(selectcomp.ItemProps{
 											Value: "top-right",
 										}) {
 											Top Right
 										}
-										@selectbox.Item(selectbox.ItemProps{
+										@selectcomp.Item(selectcomp.ItemProps{
 											Value: "top-left",
 										}) {
 											Top Left
 										}
-										@selectbox.Item(selectbox.ItemProps{
+										@selectcomp.Item(selectcomp.ItemProps{
 											Value: "top-center",
 										}) {
 											Top Center
 										}
-										@selectbox.Item(selectbox.ItemProps{
+										@selectcomp.Item(selectcomp.ItemProps{
 											Value:    "bottom-right",
 											Selected: true,
 										}) {
 											Bottom Right
 										}
-										@selectbox.Item(selectbox.ItemProps{
+										@selectcomp.Item(selectcomp.ItemProps{
 											Value: "bottom-left",
 										}) {
 											Bottom Left
 										}
-										@selectbox.Item(selectbox.ItemProps{
+										@selectcomp.Item(selectcomp.ItemProps{
 											Value: "bottom-center",
 										}) {
 											Bottom Center

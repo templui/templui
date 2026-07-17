@@ -24,6 +24,7 @@ templ ButtonGroup() {
 					{ID: "input", Text: "Input"},
 					{ID: "input-group", Text: "Input Group"},
 					{ID: "dropdown-menu", Text: "Dropdown Menu"},
+					{ID: "select", Text: "Select"},
 					{ID: "popover", Text: "Popover"},
 				},
 			},
@@ -105,6 +106,12 @@ templ ButtonGroup() {
 					ShowcaseFile:    showcase.ButtonGroupDropdown(),
 					PreviewCodeFile: "buttongroup_dropdown.templ",
 					ID:              "dropdown-menu",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Select",
+					ShowcaseFile:    showcase.ButtonGroupSelect(),
+					PreviewCodeFile: "buttongroup_select.templ",
+					ID:              "select",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Popover",

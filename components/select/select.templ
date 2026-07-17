@@ -1,0 +1,345 @@
+package selectcomp
+
+import (
+	"context"
+
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/utils"
+)
+
+type Size string
+
+const (
+	SizeDefault Size = "default"
+	SizeSm      Size = "sm"
+)
+
+type Position string
+
+const (
+	// PositionItemAligned overlays the menu so the selected item sits on top
+	// of the trigger (like a native macOS select). This is the default,
+	// matching shadcn (Base UI's alignItemWithTrigger). Falls back to popper
+	// automatically when there is not enough room.
+	PositionItemAligned Position = "item-aligned"
+	// PositionPopper opens the menu below/above the trigger like a dropdown.
+	PositionPopper Position = "popper"
+)
+
+type Align string
+
+const (
+	AlignStart  Align = "start"
+	AlignCenter Align = "center"
+	AlignEnd    Align = "end"
+)
+
+type ctxKey string
+
+const stateKey ctxKey = "selectState"
+
+type ctxState struct {
+	id       string
+	name     string
+	value    string
+	disabled bool
+}
+
+func state(ctx context.Context) ctxState {
+	if s, ok := ctx.Value(stateKey).(ctxState); ok {
+		return s
+	}
+	return ctxState{}
+}
+
+type Props struct {
+	ID string
+	// Name makes the select submit its value in forms (hidden input).
+	Name string
+	// Value preselects the item with this value.
+	Value    string
+	Disabled bool
+}
+
+type TriggerProps struct {
+	// ID for the trigger button (e.g. to point a label at it).
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Size of the trigger. Options: 'default' (h-8), 'sm' (h-7).
+	Size Size
+	// Invalid marks the trigger aria-invalid for error styling.
+	Invalid bool
+}
+
+type ValueProps struct {
+	Class      string
+	Attributes templ.Attributes
+	// Placeholder is shown until an item is selected.
+	Placeholder string
+}
+
+type ContentProps struct {
+	Class      string
+	Attributes templ.Attributes
+	// Position: 'item-aligned' (default, selected item overlays the trigger)
+	// or 'popper' (regular dropdown below the trigger).
+	Position Position
+	// Align along the trigger edge in popper mode. Defaults to center.
+	Align Align
+}
+
+type GroupProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type LabelProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ItemProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Value      string
+	Selected   bool
+	Disabled   bool
+}
+
+type SeparatorProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+// Select renders no element: it only carries the id, name and value that link
+// Trigger, Content and the hidden form input (via ctx).
+templ Select(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, name: p.Name, value: p.Value, disabled: p.Disabled}) }}
+	{ children... }
+}
+
+templ Trigger(props ...TriggerProps) {
+	{{ var p TriggerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Size == "" {
+		{{ p.Size = SizeDefault }}
+	}
+	{{ s := state(ctx) }}
+	if s.name != "" {
+		<input type="hidden" name={ s.name } value={ s.value } data-tui-select-input aria-hidden="true" tabindex="-1"/>
+	}
+	<button
+		type="button"
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="select-trigger"
+		data-tui-select-trigger
+		data-size={ string(p.Size) }
+		role="combobox"
+		aria-controls={ s.id }
+		aria-haspopup="listbox"
+		aria-expanded="false"
+		if s.value == "" {
+			data-placeholder
+		}
+		if p.Invalid {
+			aria-invalid="true"
+		}
+		disabled?={ s.disabled }
+		class={
+			utils.TwMerge(
+				"flex w-fit items-center justify-between whitespace-nowrap outline-none disabled:cursor-not-allowed disabled:opacity-50 border-input data-placeholder:text-muted-foreground dark:bg-input/30 dark:hover:bg-input/50 focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 gap-1.5 rounded-lg border bg-transparent py-2 pr-2 pl-2.5 text-sm transition-colors select-none focus-visible:ring-3 aria-invalid:ring-3 data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+		@icon.ChevronDown(icon.Props{Class: "pointer-events-none size-4 text-muted-foreground"})
+	</button>
+}
+
+templ Value(props ...ValueProps) {
+	{{ var p ValueProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		data-slot="select-value"
+		data-tui-select-value
+		data-tui-select-placeholder={ p.Placeholder }
+		class={ utils.TwMerge("flex flex-1 text-left", p.Class) }
+		{ p.Attributes... }
+	>
+		{ p.Placeholder }
+	</span>
+}
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Position == "" {
+		{{ p.Position = PositionItemAligned }}
+	}
+	if p.Align == "" {
+		{{ p.Align = AlignCenter }}
+	}
+	{{ s := state(ctx) }}
+	<div
+		id={ s.id }
+		data-tui-select-content
+		data-tui-select-position={ string(p.Position) }
+		data-tui-select-align={ string(p.Align) }
+		data-state="closed"
+		popover="manual"
+		class="pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
+	>
+		<div
+			data-slot="select-content"
+			data-tui-select-popup
+			if p.Position == PositionItemAligned {
+				data-align-trigger="true"
+			} else {
+				data-align-trigger="false"
+			}
+			data-state="closed"
+			role="listbox"
+			class={
+				utils.TwMerge(
+					"pointer-events-auto relative isolate z-50 flex min-w-36 flex-col max-h-(--tui-select-available-height) w-(--tui-select-anchor-width) origin-(--tui-select-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards data-[align-trigger=true]:animate-none",
+					p.Class,
+				),
+			}
+			{ p.Attributes... }
+		>
+			<div data-tui-select-scroll-up class="absolute top-0 z-10 flex hidden w-full cursor-default items-center justify-center bg-popover py-1 [&_svg:not([class*='size-'])]:size-4">
+				@icon.ChevronUp()
+			</div>
+			<div data-tui-select-viewport class="relative flex-1 overflow-x-hidden overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+				{ children... }
+			</div>
+			<div data-tui-select-scroll-down class="absolute bottom-0 z-10 flex hidden w-full cursor-default items-center justify-center bg-popover py-1 [&_svg:not([class*='size-'])]:size-4">
+				@icon.ChevronDown()
+			</div>
+		</div>
+	</div>
+}
+
+templ Group(props ...GroupProps) {
+	{{ var p GroupProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="group"
+		data-slot="select-group"
+		class={ utils.TwMerge("scroll-my-1 p-1", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Label(props ...LabelProps) {
+	{{ var p LabelProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="select-label"
+		class={ utils.TwMerge("px-1.5 py-1 text-xs text-muted-foreground", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Item(props ...ItemProps) {
+	{{ var p ItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ s := state(ctx) }}
+	{{ selected := p.Selected || (s.value != "" && s.value == p.Value) }}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="option"
+		data-slot="select-item"
+		data-tui-select-item
+		data-tui-select-value={ p.Value }
+		if selected {
+			data-state="checked"
+			aria-selected="true"
+		} else {
+			data-state="unchecked"
+			aria-selected="false"
+		}
+		if p.Disabled {
+			data-disabled
+			aria-disabled="true"
+		}
+		class={
+			utils.TwMerge(
+				"group/select-item relative flex w-full cursor-default items-center gap-1.5 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground hover:bg-accent hover:text-accent-foreground hover:**:text-accent-foreground *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		<span data-tui-select-item-text class="flex flex-1 shrink-0 gap-2 whitespace-nowrap">
+			{ children... }
+		</span>
+		<span class="pointer-events-none absolute right-2 flex size-4 items-center justify-center opacity-0 group-data-[state=checked]/select-item:opacity-100">
+			@icon.Check(icon.Props{Class: "pointer-events-none size-4"})
+		</span>
+	</div>
+}
+
+templ Separator(props ...SeparatorProps) {
+	{{ var p SeparatorProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="separator"
+		data-slot="select-separator"
+		class={ utils.TwMerge("pointer-events-none -mx-1 my-1 h-px bg-border", p.Class) }
+		{ p.Attributes... }
+	></div>
+}
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("select")
+	}
+}

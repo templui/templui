@@ -1,0 +1,35 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/field"
+	selectcomp "github.com/templui/templui/components/select"
+)
+
+templ SelectInvalid() {
+	@field.Field(field.Props{Invalid: true, Class: "w-full max-w-48"}) {
+		@field.Label() {
+			Fruit
+		}
+		@selectcomp.Select() {
+			@selectcomp.Trigger(selectcomp.TriggerProps{Invalid: true}) {
+				@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a fruit"})
+			}
+			@selectcomp.Content() {
+				@selectcomp.Group() {
+					@selectcomp.Item(selectcomp.ItemProps{Value: "apple"}) {
+						Apple
+					}
+					@selectcomp.Item(selectcomp.ItemProps{Value: "banana"}) {
+						Banana
+					}
+					@selectcomp.Item(selectcomp.ItemProps{Value: "blueberry"}) {
+						Blueberry
+					}
+				}
+			}
+		}
+		@field.Error() {
+			Please select a fruit.
+		}
+	}
+}

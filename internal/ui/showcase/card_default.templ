@@ -5,7 +5,7 @@ import (
 	"github.com/templui/templui/components/card"
 	"github.com/templui/templui/components/input"
 	"github.com/templui/templui/components/label"
-	"github.com/templui/templui/components/selectbox"
+	selectcomp "github.com/templui/templui/components/select"
 )
 
 templ CardDefault() {
@@ -38,27 +38,27 @@ templ CardDefault() {
 						}) {
 							Service
 						}
-						@selectbox.SelectBox() {
-							@selectbox.Trigger(selectbox.TriggerProps{
+						@selectcomp.Select() {
+							@selectcomp.Trigger(selectcomp.TriggerProps{
 								ID: "service",
 							}) {
-								@selectbox.Value(selectbox.ValueProps{
+								@selectcomp.Value(selectcomp.ValueProps{
 									Placeholder: "Select",
 								})
 							}
-							@selectbox.Content() {
-								@selectbox.Group() {
-									@selectbox.Item(selectbox.ItemProps{
+							@selectcomp.Content() {
+								@selectcomp.Group() {
+									@selectcomp.Item(selectcomp.ItemProps{
 										Value: "postgres",
 									}) {
 										PostgreSQL
 									}
-									@selectbox.Item(selectbox.ItemProps{
+									@selectcomp.Item(selectcomp.ItemProps{
 										Value: "mysql",
 									}) {
 										MySQL
 									}
-									@selectbox.Item(selectbox.ItemProps{
+									@selectcomp.Item(selectcomp.ItemProps{
 										Value: "sqlite",
 									}) {
 										SQLite

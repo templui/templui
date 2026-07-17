@@ -1,0 +1,614 @@
+import "../floatingui/floating_ui_core.js";
+import "../floatingui/floating_ui_dom.js";
+
+(function () {
+  // Constants from Base UI's select, shadcn's reference implementation.
+  const EXIT_MS = 120; // popper exit animation (duration-100) + slack
+  const SIDE_OFFSET = 4;
+  const COLLISION_PADDING = 5;
+  const MARGIN = 10; // aligned mode: minimum distance to the viewport edges
+  const MIN_HEIGHT = 100; // less room than this -> fall back to popper
+  const TRIGGER_COLLISION = 20; // trigger this close to an edge -> popper
+  const TOL = 1; // scroll edge tolerance
+  const ARROW_TICK_MS = 40; // hovering a scroll arrow scrolls one item per tick
+
+  function allContents() {
+    return document.querySelectorAll("[data-tui-select-content]");
+  }
+
+  function triggerFor(content) {
+    return document.querySelector(
+      '[data-tui-select-trigger][aria-controls="' + content.id + '"]',
+    );
+  }
+
+  function contentFor(trigger) {
+    return document.getElementById(trigger.getAttribute("aria-controls"));
+  }
+
+  // The hidden form input sits right before the trigger button.
+  function inputFor(trigger) {
+    const prev = trigger.previousElementSibling;
+    return prev && prev.hasAttribute("data-tui-select-input") ? prev : null;
+  }
+
+  function valueSpanFor(trigger) {
+    return trigger.querySelector("[data-tui-select-value]");
+  }
+
+  function popupFor(content) {
+    return content.querySelector("[data-tui-select-popup]");
+  }
+
+  function viewportFor(content) {
+    return content.querySelector("[data-tui-select-viewport]");
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function maxScrollTop(el) {
+    return Math.max(0, el.scrollHeight - el.clientHeight);
+  }
+
+  function isAlignMode(content) {
+    return (content.getAttribute("data-tui-select-position") || "item-aligned") !== "popper";
+  }
+
+  function setState(content, state) {
+    content.setAttribute("data-state", state);
+    const popup = popupFor(content);
+    if (popup) popup.setAttribute("data-state", state);
+  }
+
+  function setSide(content, side) {
+    content.setAttribute("data-side", side);
+    const popup = popupFor(content);
+    if (popup) popup.setAttribute("data-side", side);
+  }
+
+  // "bottom-start" -> "top left": the corner the menu grows out of.
+  function transformOrigin(placement) {
+    const side = placement.split("-")[0];
+    const align = placement.split("-")[1] || "center";
+    const opposite = { top: "bottom", bottom: "top", left: "right", right: "left" }[side];
+    if (side === "top" || side === "bottom") {
+      return ({ start: "left", end: "right", center: "center" }[align]) + " " + opposite;
+    }
+    return opposite + " " + ({ start: "top", end: "bottom", center: "center" }[align]);
+  }
+
+  // Moves the content to <body> (shadcn portals it the same way). Also removes
+  // contents whose trigger is gone (leftovers from swapped-out pages).
+  function portal(content) {
+    document.querySelectorAll("body > [data-tui-select-content]").forEach((c) => {
+      if (c !== content && !triggerFor(c)) c.remove();
+    });
+    if (content.parentElement !== document.body) {
+      document.body.appendChild(content);
+    }
+  }
+
+  // Clears everything a previous open left behind on the positioner and popup.
+  function resetInlineStyles(content) {
+    ["left", "right", "top", "bottom", "height", "maxHeight", "marginTop", "marginBottom"].forEach(
+      (prop) => (content.style[prop] = ""),
+    );
+    const popup = popupFor(content);
+    if (popup) popup.style.height = "";
+  }
+
+  // Regular anchored placement below/above the trigger (Base UI's positioner).
+  function positionPopper(content, trigger) {
+    const { computePosition, offset, flip, shift, size } = window.FloatingUIDOM;
+    const align = content.getAttribute("data-tui-select-align") || "center";
+    const placement = align === "center" ? "bottom" : "bottom-" + align;
+
+    return computePosition(trigger, content, {
+      placement: placement,
+      strategy: "fixed",
+      middleware: [
+        offset(SIDE_OFFSET),
+        flip({ padding: COLLISION_PADDING }),
+        shift({ padding: COLLISION_PADDING }),
+        size({
+          padding: COLLISION_PADDING,
+          apply(args) {
+            content.style.setProperty(
+              "--tui-select-available-height",
+              args.availableHeight + "px",
+            );
+            content.style.setProperty(
+              "--tui-select-anchor-width",
+              args.rects.reference.width + "px",
+            );
+          },
+        }),
+      ],
+    }).then((result) => {
+      content.style.left = result.x + "px";
+      content.style.top = result.y + "px";
+      setSide(content, result.placement.split("-")[0]);
+      const popup = popupFor(content);
+      if (popup) {
+        popup.style.setProperty("--tui-select-transform-origin", transformOrigin(result.placement));
+      }
+    });
+  }
+
+  // Overlays the menu so the selected item sits on the trigger with its text
+  // aligned to the trigger text. Port of Base UI's SelectPopup align logic.
+  // Runs after the popper pass (which sets the CSS vars and fallback coords);
+  // returns false when Base UI would fall back to popper positioning.
+  function positionAligned(content, trigger) {
+    const popup = popupFor(content);
+    const viewport = viewportFor(content);
+    const valueEl = valueSpanFor(trigger);
+    const textEl =
+      content.querySelector('[data-tui-select-item][data-state="checked"] [data-tui-select-item-text]') ||
+      content.querySelector("[data-tui-select-item] [data-tui-select-item-text]");
+
+    const docEl = document.documentElement;
+    const triggerRect = trigger.getBoundingClientRect();
+    const positionerRect = content.getBoundingClientRect(); // natural size from the popper pass
+    const popupStyles = window.getComputedStyle(popup);
+    const borderBottom = parseFloat(popupStyles.borderBottomWidth) || 0;
+    const maxPopupHeight = parseFloat(popupStyles.maxHeight) || Infinity;
+    const viewportHeight = docEl.clientHeight - MARGIN * 2;
+    const viewportWidth = docEl.clientWidth;
+    const availableSpaceBeneathTrigger = viewportHeight - triggerRect.bottom + triggerRect.height;
+
+    let alignedLeft = triggerRect.left;
+    let offsetY = 0;
+    let textRect = null;
+    if (textEl && valueEl) {
+      const valueRect = valueEl.getBoundingClientRect();
+      textRect = textEl.getBoundingClientRect();
+      alignedLeft = positionerRect.left + (valueRect.left - textRect.left);
+      offsetY =
+        textRect.top - positionerRect.top + textRect.height / 2 -
+        (valueRect.top - triggerRect.top + valueRect.height / 2);
+    }
+
+    const idealHeight = availableSpaceBeneathTrigger + offsetY + MARGIN + borderBottom;
+    let height = Math.min(viewportHeight, idealHeight);
+    const maxHeight = viewportHeight - MARGIN * 2;
+    const scrollTop = idealHeight - height;
+
+    content.style.left =
+      clamp(
+        alignedLeft,
+        COLLISION_PADDING,
+        Math.max(COLLISION_PADDING, viewportWidth - COLLISION_PADDING - positionerRect.width),
+      ) + "px";
+    content.style.height = height + "px";
+    content.style.maxHeight = "none";
+    content.style.marginTop = MARGIN + "px";
+    content.style.marginBottom = MARGIN + "px";
+    popup.style.height = "100%";
+
+    const max = maxScrollTop(viewport);
+    const isTopPositioned = scrollTop >= max - TOL;
+
+    if (isTopPositioned) {
+      height = Math.min(viewportHeight, positionerRect.height) - (scrollTop - max);
+    }
+
+    if (
+      triggerRect.top < TRIGGER_COLLISION ||
+      triggerRect.bottom > viewportHeight - TRIGGER_COLLISION ||
+      Math.ceil(height) + TOL < Math.min(viewport.scrollHeight, MIN_HEIGHT)
+    ) {
+      return false;
+    }
+
+    content._tuiReachedMax = false;
+
+    if (isTopPositioned) {
+      const topOffset = Math.max(0, viewportHeight - idealHeight);
+      content.style.top = (positionerRect.height >= maxHeight ? 0 : topOffset) + "px";
+      content.style.height = height + "px";
+      viewport.scrollTop = maxScrollTop(viewport);
+    } else {
+      content.style.top = "auto";
+      content.style.bottom = "0px";
+      viewport.scrollTop = scrollTop;
+    }
+
+    if (textRect) {
+      const clampedY = clamp(
+        positionerRect.height > 0
+          ? ((textRect.top + textRect.height / 2 - positionerRect.top) / positionerRect.height) * 100
+          : 50,
+        0,
+        100,
+      );
+      popup.style.setProperty("--tui-select-transform-origin", "50% " + clampedY + "%");
+    }
+
+    setSide(content, "none");
+    if (height >= viewportHeight || height >= maxPopupHeight) {
+      content._tuiReachedMax = true;
+    }
+    return true;
+  }
+
+  function position(content, trigger) {
+    const popup = popupFor(content);
+    const viewport = viewportFor(content);
+    if (!popup || !viewport) return Promise.resolve();
+    const alignMode = isAlignMode(content);
+    popup.setAttribute("data-align-trigger", alignMode ? "true" : "false");
+    resetInlineStyles(content);
+    content._tuiAligned = false;
+
+    return positionPopper(content, trigger)
+      .then(() => {
+        if (!alignMode) return undefined;
+        if (positionAligned(content, trigger)) {
+          content._tuiAligned = true;
+          return undefined;
+        }
+        // Not enough room: redo the plain popper pass (the aligned attempt
+        // dirtied the inline styles).
+        resetInlineStyles(content);
+        return positionPopper(content, trigger);
+      })
+      .then(() => updateScrollArrows(content));
+  }
+
+  // ----- scroll arrows + capped grow-on-scroll (Base UI behavior) -----------
+
+  function updateScrollArrows(content) {
+    const viewport = viewportFor(content);
+    const up = content.querySelector("[data-tui-select-scroll-up]");
+    const down = content.querySelector("[data-tui-select-scroll-down]");
+    if (!viewport || !up || !down) return;
+    const max = maxScrollTop(viewport);
+    up.classList.toggle("hidden", max <= 0 || viewport.scrollTop <= TOL);
+    down.classList.toggle("hidden", max <= 0 || viewport.scrollTop >= max - TOL);
+  }
+
+  // In aligned mode scrolling first consumes the remaining space toward the
+  // viewport edge (capped by the popup's max-height), then scrolls the list.
+  function handleAlignedScroll(content) {
+    const viewport = viewportFor(content);
+    const popup = popupFor(content);
+    if (!viewport || !popup) return;
+
+    const isTopPositioned = content.style.top === "0px";
+    const isBottomPositioned = content.style.bottom === "0px";
+
+    if (content._tuiReachedMax || !content._tuiAligned || (!isTopPositioned && !isBottomPositioned)) {
+      updateScrollArrows(content);
+      return;
+    }
+
+    const currentHeight = content.getBoundingClientRect().height;
+    const maxPopupHeight = parseFloat(window.getComputedStyle(popup).maxHeight) || Infinity;
+    const maxAvailableHeight = Math.min(
+      document.documentElement.clientHeight - MARGIN * 2,
+      maxPopupHeight,
+    );
+
+    const scrollTop = viewport.scrollTop;
+    const max = maxScrollTop(viewport);
+
+    let nextScrollTop = null;
+    const diff = isTopPositioned ? max - scrollTop : scrollTop;
+    const nextHeight = Math.min(currentHeight + diff, maxAvailableHeight);
+
+    if (diff <= TOL) {
+      const heightDelta = clamp(diff, 0, maxAvailableHeight - currentHeight);
+      if (heightDelta > 0) {
+        content.style.height = currentHeight + heightDelta + "px";
+      }
+      viewport.scrollTop = isTopPositioned ? maxScrollTop(viewport) : 0;
+      if (maxAvailableHeight - (currentHeight + heightDelta) <= TOL) {
+        content._tuiReachedMax = true;
+      }
+      updateScrollArrows(content);
+      return;
+    }
+
+    if (maxAvailableHeight - nextHeight > TOL) {
+      nextScrollTop = isTopPositioned ? Infinity : 0;
+    } else if (isBottomPositioned && scrollTop < max) {
+      const overshoot = currentHeight + diff - maxAvailableHeight;
+      nextScrollTop = scrollTop - (diff - overshoot);
+    }
+
+    const nextPositionerHeight = Math.ceil(nextHeight);
+    if (nextPositionerHeight !== 0) {
+      content.style.height = nextPositionerHeight + "px";
+    }
+
+    if (nextScrollTop != null) {
+      const target = clamp(nextScrollTop, 0, maxScrollTop(viewport));
+      if (Math.abs(viewport.scrollTop - target) > TOL) {
+        viewport.scrollTop = target;
+      }
+    }
+
+    if (nextPositionerHeight >= maxAvailableHeight - TOL) {
+      content._tuiReachedMax = true;
+    }
+    updateScrollArrows(content);
+  }
+
+  // Hovering a scroll arrow scrolls one item per tick, keeping the next item
+  // clear of the arrow overlay (Base UI's getTargetScrollTop).
+  function targetScrollTop(items, isUp, scrollTop, clientHeight, arrowHeight, max) {
+    if (isUp) {
+      let firstVisibleIndex = 0;
+      const visibleTop = scrollTop + arrowHeight - TOL;
+      for (let i = 0; i < items.length; i += 1) {
+        if (items[i].offsetTop >= visibleTop) {
+          firstVisibleIndex = i;
+          break;
+        }
+      }
+      const targetIndex = Math.max(0, firstVisibleIndex - 1);
+      const target = items[targetIndex];
+      return targetIndex < firstVisibleIndex && target
+        ? clamp(target.offsetTop - arrowHeight, 0, max)
+        : 0;
+    }
+
+    let lastVisibleIndex = items.length - 1;
+    const visibleBottom = scrollTop + clientHeight - arrowHeight + TOL;
+    for (let i = 0; i < items.length; i += 1) {
+      if (items[i].offsetTop + items[i].offsetHeight > visibleBottom) {
+        lastVisibleIndex = Math.max(0, i - 1);
+        break;
+      }
+    }
+    const targetIndex = Math.min(items.length - 1, lastVisibleIndex + 1);
+    const target = items[targetIndex];
+    return targetIndex > lastVisibleIndex && target
+      ? clamp(target.offsetTop + target.offsetHeight - clientHeight + arrowHeight, 0, max)
+      : max;
+  }
+
+  let arrowTimer = null;
+
+  function stopArrowScroll() {
+    clearTimeout(arrowTimer);
+    arrowTimer = null;
+  }
+
+  function arrowScrollStep(content, isUp, arrow) {
+    const viewport = viewportFor(content);
+    if (!viewport) return;
+    updateScrollArrows(content);
+    const max = maxScrollTop(viewport);
+    const scrollTop = clamp(viewport.scrollTop, 0, max);
+    if (scrollTop === (isUp ? 0 : max)) {
+      stopArrowScroll();
+      return;
+    }
+    const items = [...content.querySelectorAll("[data-tui-select-item]")];
+    viewport.scrollTop = targetScrollTop(
+      items,
+      isUp,
+      scrollTop,
+      viewport.clientHeight,
+      arrow.offsetHeight || 0,
+      max,
+    );
+    arrowTimer = setTimeout(() => arrowScrollStep(content, isUp, arrow), ARROW_TICK_MS);
+  }
+
+  document.addEventListener("mouseover", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const arrow = e.target.closest("[data-tui-select-scroll-up], [data-tui-select-scroll-down]");
+    if (!arrow || arrowTimer) return;
+    const content = arrow.closest("[data-tui-select-content]");
+    if (content) arrowScrollStep(content, arrow.hasAttribute("data-tui-select-scroll-up"), arrow);
+  });
+
+  document.addEventListener("mouseout", (e) => {
+    if (!(e.target instanceof Element)) return;
+    if (e.target.closest("[data-tui-select-scroll-up], [data-tui-select-scroll-down]")) {
+      stopArrowScroll();
+    }
+  });
+
+  // ----- open / close -------------------------------------------------------
+
+  // The select is modal (Base UI default): the page must not scroll while open.
+  function blockOutsideScroll(e) {
+    if (!(e.target instanceof Element) || !e.target.closest("[data-tui-select-content]")) {
+      e.preventDefault();
+    }
+  }
+  function lockScroll() {
+    document.addEventListener("wheel", blockOutsideScroll, { passive: false });
+    document.addEventListener("touchmove", blockOutsideScroll, { passive: false });
+  }
+  function unlockScroll() {
+    document.removeEventListener("wheel", blockOutsideScroll);
+    document.removeEventListener("touchmove", blockOutsideScroll);
+  }
+
+  function open(content, trigger) {
+    allContents().forEach((c) => {
+      if (c !== content) close(c);
+    });
+    clearTimeout(content._tuiHide);
+    portal(content);
+    lockScroll(); // Base UI's select is modal by default: no page scroll while open
+    if (!content.matches(":popover-open")) {
+      content.showPopover(); // native top layer
+    }
+
+    // Position it invisibly first, then play the enter animation in place.
+    content.style.visibility = "hidden";
+    const finish = () => {
+      content.style.visibility = "";
+      if (!content.matches(":popover-open")) return;
+      setState(content, "open");
+      trigger.setAttribute("aria-expanded", "true");
+    };
+    position(content, trigger).then(finish, finish);
+  }
+
+  function close(content) {
+    if (!content.matches(":popover-open")) return;
+    unlockScroll();
+    stopArrowScroll();
+    content.style.visibility = "";
+    setState(content, "closed");
+    const trigger = triggerFor(content);
+    if (trigger) trigger.setAttribute("aria-expanded", "false");
+    clearTimeout(content._tuiHide);
+    // Aligned mode has no exit animation (animate-none, like shadcn) — hide
+    // immediately instead of waiting for one.
+    const popup = popupFor(content);
+    if (popup && popup.getAttribute("data-align-trigger") === "true") {
+      content.hidePopover();
+      return;
+    }
+    content._tuiHide = setTimeout(() => {
+      if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
+        content.hidePopover();
+      }
+    }, EXIT_MS);
+  }
+
+  function closeAll() {
+    allContents().forEach(close);
+  }
+
+  function selectItem(content, item) {
+    const trigger = triggerFor(content);
+    if (!trigger) return;
+    const value = item.getAttribute("data-tui-select-value") || "";
+    const label = (item.querySelector("[data-tui-select-item-text]") || item).textContent.trim();
+
+    content.querySelectorAll("[data-tui-select-item]").forEach((i) => {
+      i.setAttribute("data-state", "unchecked");
+      i.setAttribute("aria-selected", "false");
+    });
+    item.setAttribute("data-state", "checked");
+    item.setAttribute("aria-selected", "true");
+
+    const span = valueSpanFor(trigger);
+    if (span) span.textContent = label;
+    trigger.removeAttribute("data-placeholder");
+
+    const input = inputFor(trigger);
+    if (input && input.value !== value) {
+      input.value = value;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    trigger.dispatchEvent(
+      new CustomEvent("select-change", { bubbles: true, detail: { value: value, label: label } }),
+    );
+    close(content);
+  }
+
+  // Shows the selected item's label in the trigger (server only knows the
+  // value, the label lives in the item). Runs on load and whenever new selects
+  // appear in the DOM (e.g. content swapped in by a library like htmx) — the
+  // MutationObserver keeps this framework-agnostic.
+  function syncTriggers() {
+    document.querySelectorAll("[data-tui-select-trigger]").forEach((trigger) => {
+      const content = contentFor(trigger);
+      if (!content) return;
+      const checked = content.querySelector('[data-tui-select-item][data-state="checked"]');
+      if (!checked) return;
+      const label = (checked.querySelector("[data-tui-select-item-text]") || checked).textContent.trim();
+      const span = valueSpanFor(trigger);
+      if (span && span.textContent.trim() !== label) span.textContent = label;
+      if (trigger.hasAttribute("data-placeholder")) trigger.removeAttribute("data-placeholder");
+    });
+  }
+
+  let syncQueued = false;
+  function queueSync() {
+    if (syncQueued) return;
+    syncQueued = true;
+    requestAnimationFrame(() => {
+      syncQueued = false;
+      syncTriggers();
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", syncTriggers);
+  } else {
+    syncTriggers();
+  }
+  new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.addedNodes.length) {
+        queueSync();
+        break;
+      }
+    }
+  }).observe(document.documentElement, { childList: true, subtree: true });
+
+  // ----- events -------------------------------------------------------------
+
+  document.addEventListener("click", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const trigger = e.target.closest("[data-tui-select-trigger]");
+    if (trigger) {
+      const content = contentFor(trigger);
+      if (!content) return;
+      if (content.getAttribute("data-state") === "open") {
+        close(content);
+      } else {
+        open(content, trigger);
+      }
+      return;
+    }
+
+    const item = e.target.closest("[data-tui-select-item]");
+    if (item && !item.hasAttribute("data-disabled")) {
+      const content = item.closest("[data-tui-select-content]");
+      if (content) selectItem(content, item);
+      return;
+    }
+
+    // Click outside any open select closes everything.
+    if (!e.target.closest("[data-tui-select-content]")) closeAll();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeAll();
+  });
+
+  window.addEventListener(
+    "scroll",
+    (e) => {
+      const inMenu = e.target instanceof Element && e.target.closest("[data-tui-select-content]");
+      if (inMenu) {
+        if (inMenu._tuiAligned) {
+          handleAlignedScroll(inMenu);
+        } else {
+          updateScrollArrows(inMenu);
+        }
+        return;
+      }
+      // Page scroll: keep open popper menus attached to their trigger
+      // (aligned menus lock page scroll instead).
+      allContents().forEach((content) => {
+        if (content.getAttribute("data-state") !== "open" || content._tuiAligned) return;
+        const trigger = triggerFor(content);
+        if (trigger) positionPopper(content, trigger).then(() => updateScrollArrows(content));
+      });
+    },
+    true,
+  );
+
+  window.addEventListener("resize", () => {
+    allContents().forEach((content) => {
+      if (content.getAttribute("data-state") !== "open") return;
+      const trigger = triggerFor(content);
+      if (trigger) position(content, trigger);
+    });
+  });
+})();

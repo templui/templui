@@ -13,7 +13,7 @@ import (
 	"github.com/templui/templui/components/inputotp"
 	"github.com/templui/templui/components/progress"
 	"github.com/templui/templui/components/radio"
-	"github.com/templui/templui/components/selectbox"
+	selectcomp "github.com/templui/templui/components/select"
 	"github.com/templui/templui/components/slider"
 	"github.com/templui/templui/components/spinner"
 	switchcomp "github.com/templui/templui/components/switch"
@@ -259,28 +259,28 @@ templ ThemeShowcase() {
 						@field.Label(field.LabelProps{For: "go-framework"}) {
 							Go Framework
 						}
-						@selectbox.SelectBox() {
-							@selectbox.Trigger(selectbox.TriggerProps{
+						@selectcomp.Select() {
+							@selectcomp.Trigger(selectcomp.TriggerProps{
 								ID: "go-framework",
 							}) {
-								@selectbox.Value(selectbox.ValueProps{
+								@selectcomp.Value(selectcomp.ValueProps{
 									Placeholder: "Select a Go framework",
 								})
 							}
-							@selectbox.Content() {
-								@selectbox.Item(selectbox.ItemProps{Value: "echo"}) {
+							@selectcomp.Content() {
+								@selectcomp.Item(selectcomp.ItemProps{Value: "echo"}) {
 									Echo
 								}
-								@selectbox.Item(selectbox.ItemProps{Value: "gin"}) {
+								@selectcomp.Item(selectcomp.ItemProps{Value: "gin"}) {
 									Gin
 								}
-								@selectbox.Item(selectbox.ItemProps{Value: "fiber"}) {
+								@selectcomp.Item(selectcomp.ItemProps{Value: "fiber"}) {
 									Fiber
 								}
-								@selectbox.Item(selectbox.ItemProps{Value: "chi"}) {
+								@selectcomp.Item(selectcomp.ItemProps{Value: "chi"}) {
 									Chi
 								}
-								@selectbox.Item(selectbox.ItemProps{Value: "gorilla"}) {
+								@selectcomp.Item(selectcomp.ItemProps{Value: "gorilla"}) {
 									Gorilla Mux
 								}
 							}

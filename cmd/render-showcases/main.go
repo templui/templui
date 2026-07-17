@@ -130,6 +130,14 @@ func main() {
 		"out/showcase/date_picker_with_label.html":         showcase.DatePickerWithLabel(),
 		"out/showcase/date_picker_with_time.html":          showcase.DatePickerWithTime(),
 
+		// Select
+		"out/showcase/select_default.html":    showcase.SelectDefault(),
+		"out/showcase/select_align_item.html": showcase.SelectAlignItem(),
+		"out/showcase/select_groups.html":     showcase.SelectGroupsExample(),
+		"out/showcase/select_scrollable.html": showcase.SelectScrollable(),
+		"out/showcase/select_disabled.html":   showcase.SelectDisabled(),
+		"out/showcase/select_invalid.html":    showcase.SelectInvalid(),
+
 		// Sheet
 		"out/showcase/sheet_default.html":          showcase.SheetDefault(),
 		"out/showcase/sheet_sides.html":            showcase.SheetSides(),
@@ -204,15 +212,6 @@ func main() {
 		"out/showcase/rating_precision.html":  showcase.RatingPrecision(),
 		"out/showcase/rating_styles.html":     showcase.RatingStyles(),
 		"out/showcase/rating_with_label.html": showcase.RatingWithLabel(),
-
-		// Select Box
-		"out/showcase/select_box_default.html":    showcase.SelectBoxDefault(),
-		"out/showcase/select_box_disabled.html":   showcase.SelectBoxDisabled(),
-		"out/showcase/select_box_form.html":       showcase.SelectBoxForm(),
-		"out/showcase/select_box_multiple.html":   showcase.SelectBoxMultipleSelect(),
-		"out/showcase/select_box_no_search.html":  showcase.SelectBoxNoSearch(),
-		"out/showcase/select_box_pills.html":      showcase.SelectBoxMultipleSelectPills(),
-		"out/showcase/select_box_with_label.html": showcase.SelectBoxWithLabel(),
 
 		// Separator
 		"out/showcase/separator_decorated.html": showcase.SeparatorDecorated(),

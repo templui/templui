@@ -2,7 +2,7 @@ package showcase
 
 import (
 	"github.com/templui/templui/components/field"
-	"github.com/templui/templui/components/selectbox"
+	selectcomp "github.com/templui/templui/components/select"
 )
 
 templ FieldSelect() {
@@ -10,33 +10,33 @@ templ FieldSelect() {
 		@field.Label() {
 			Department
 		}
-		@selectbox.SelectBox() {
-			@selectbox.Trigger() {
-				@selectbox.Value(selectbox.ValueProps{Placeholder: "Choose department"})
+		@selectcomp.Select() {
+			@selectcomp.Trigger() {
+				@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Choose department"})
 			}
-			@selectbox.Content() {
-				@selectbox.Item(selectbox.ItemProps{Value: "engineering"}) {
+			@selectcomp.Content() {
+				@selectcomp.Item(selectcomp.ItemProps{Value: "engineering"}) {
 					Engineering
 				}
-				@selectbox.Item(selectbox.ItemProps{Value: "design"}) {
+				@selectcomp.Item(selectcomp.ItemProps{Value: "design"}) {
 					Design
 				}
-				@selectbox.Item(selectbox.ItemProps{Value: "marketing"}) {
+				@selectcomp.Item(selectcomp.ItemProps{Value: "marketing"}) {
 					Marketing
 				}
-				@selectbox.Item(selectbox.ItemProps{Value: "sales"}) {
+				@selectcomp.Item(selectcomp.ItemProps{Value: "sales"}) {
 					Sales
 				}
-				@selectbox.Item(selectbox.ItemProps{Value: "support"}) {
+				@selectcomp.Item(selectcomp.ItemProps{Value: "support"}) {
 					Customer Support
 				}
-				@selectbox.Item(selectbox.ItemProps{Value: "hr"}) {
+				@selectcomp.Item(selectcomp.ItemProps{Value: "hr"}) {
 					Human Resources
 				}
-				@selectbox.Item(selectbox.ItemProps{Value: "finance"}) {
+				@selectcomp.Item(selectcomp.ItemProps{Value: "finance"}) {
 					Finance
 				}
-				@selectbox.Item(selectbox.ItemProps{Value: "operations"}) {
+				@selectcomp.Item(selectcomp.ItemProps{Value: "operations"}) {
 					Operations
 				}
 			}
