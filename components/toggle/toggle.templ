@@ -1,0 +1,102 @@
+package toggle
+
+import "github.com/templui/templui/utils"
+
+type Variant string
+type Size string
+
+const (
+	VariantDefault Variant = "default"
+	VariantGhost   Variant = "ghost"
+)
+
+const (
+	SizeDefault Size = "default"
+	SizeSm      Size = "sm"
+	SizeLg      Size = "lg"
+	SizeIcon    Size = "icon"
+)
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Variant    Variant
+	Size       Size
+	Name       string
+	Value      string
+	Checked    bool
+	Disabled   bool
+	Form       string
+}
+
+templ Toggle(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	<label
+		for={ p.ID }
+		class={
+			utils.TwMerge(
+				"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all",
+				"[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0",
+				"outline-none has-focus-visible:border-ring has-focus-visible:ring-ring/50 has-focus-visible:ring-[3px]",
+				"cursor-pointer select-none",
+				"hover:bg-muted hover:text-muted-foreground",
+				"has-checked:bg-accent has-checked:text-accent-foreground",
+				"has-checked:hover:bg-accent has-checked:hover:text-accent-foreground",
+				"has-disabled:pointer-events-none has-disabled:opacity-50",
+				p.variantClasses(),
+				p.sizeClasses(),
+				p.Class,
+			),
+		}
+	>
+		<input
+			id={ p.ID }
+			type="checkbox"
+			class="sr-only"
+			if p.Name != "" {
+				name={ p.Name }
+			}
+			if p.Value != "" {
+				value={ p.Value }
+			} else {
+				value="on"
+			}
+			if p.Form != "" {
+				form={ p.Form }
+			}
+			checked?={ p.Checked }
+			disabled?={ p.Disabled }
+			{ p.Attributes... }
+		/>
+		{ children... }
+	</label>
+}
+
+func (p Props) variantClasses() string {
+	switch p.Variant {
+	case VariantGhost:
+		return "bg-transparent"
+	default:
+		return "border bg-background shadow-xs dark:bg-input/30 dark:border-input"
+	}
+}
+
+func (p Props) sizeClasses() string {
+	switch p.Size {
+	case SizeSm:
+		return "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5"
+	case SizeLg:
+		return "h-10 rounded-md px-6 has-[>svg]:px-4"
+	case SizeIcon:
+		return "size-9"
+	default: // SizeDefault
+		return "h-9 px-4 py-2 has-[>svg]:px-3"
+	}
+}
