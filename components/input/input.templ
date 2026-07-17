@@ -50,7 +50,9 @@ templ Input(props ...Props) {
 	}
 	<input
 		id={ p.ID }
-		data-slot="input"
+		if _, hasSlot := p.Attributes["data-slot"]; !hasSlot {
+			data-slot="input"
+		}
 		type={ string(p.Type) }
 		if p.Name != "" {
 			name={ p.Name }

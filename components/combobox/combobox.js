@@ -1,0 +1,623 @@
+import "../floatingui/floating_ui_core.js";
+import "../floatingui/floating_ui_dom.js";
+
+(function () {
+  // Constants from Base UI's combobox, shadcn's reference implementation.
+  const EXIT_MS = 120; // exit animation (duration-100) + slack
+  const SIDE_OFFSET = 6;
+  const COLLISION_PADDING = 5;
+
+  function allContents() {
+    return document.querySelectorAll("[data-tui-combobox-content]");
+  }
+
+  // The anchor is the input group, chips container or button trigger OUTSIDE
+  // the content (an input group inside the popup also carries the attribute
+  // but never anchors the position).
+  function anchorFor(content) {
+    return [...document.querySelectorAll('[data-tui-combobox-anchor="' + content.id + '"]')].find(
+      (a) => !content.contains(a),
+    );
+  }
+
+  function contentFor(el) {
+    const anchor = el.closest("[data-tui-combobox-anchor]");
+    return anchor ? document.getElementById(anchor.getAttribute("data-tui-combobox-anchor")) : null;
+  }
+
+  // What the popup is positioned against, like shadcn's runtime: the chips
+  // container or a button trigger anchor as a whole, but for an input group
+  // the INPUT CONTROL itself (Base UI's inputElement default) — that is why
+  // shadcn's min-w adds --spacing(7) and the input-group example uses
+  // alignOffset -28.
+  function positionAnchorFor(content) {
+    const anchor = anchorFor(content);
+    if (!anchor) return null;
+    if (
+      anchor.hasAttribute("data-tui-combobox-chips") ||
+      anchor.hasAttribute("data-tui-combobox-trigger")
+    ) {
+      return anchor;
+    }
+    return anchor.querySelector("[data-tui-combobox-input]") || anchor;
+  }
+
+  // The filter input sits in the anchor, or inside the popup (button-trigger
+  // pattern).
+  function inputFor(content) {
+    const anchor = anchorFor(content);
+    return (
+      (anchor && anchor.querySelector("[data-tui-combobox-input]")) ||
+      content.querySelector("[data-tui-combobox-input]")
+    );
+  }
+
+  function valueDisplayFor(content) {
+    const anchor = anchorFor(content);
+    return anchor ? anchor.querySelector("[data-tui-combobox-value-display]") : null;
+  }
+
+  function setExpanded(content, expanded) {
+    const input = inputFor(content);
+    if (input) input.setAttribute("aria-expanded", expanded ? "true" : "false");
+    const anchor = anchorFor(content);
+    if (anchor && anchor.hasAttribute("data-tui-combobox-trigger")) {
+      anchor.setAttribute("aria-expanded", expanded ? "true" : "false");
+    }
+  }
+
+  function popupFor(content) {
+    return content.querySelector("[data-tui-combobox-popup]");
+  }
+
+  function listFor(content) {
+    return content.querySelector("[data-tui-combobox-list]");
+  }
+
+  function itemsOf(content) {
+    return [...content.querySelectorAll("[data-tui-combobox-item]")];
+  }
+
+  function labelOf(item) {
+    return item.getAttribute("data-tui-combobox-label") || item.textContent.trim();
+  }
+
+  function isMultiple(content) {
+    const popup = popupFor(content);
+    return popup && popup.hasAttribute("data-chips");
+  }
+
+  function selectedItems(content) {
+    return itemsOf(content).filter((i) => i.hasAttribute("data-selected"));
+  }
+
+  function setState(content, state) {
+    content.setAttribute("data-state", state);
+    const popup = popupFor(content);
+    if (popup) popup.setAttribute("data-state", state);
+  }
+
+  function setSide(content, side) {
+    content.setAttribute("data-side", side);
+    const popup = popupFor(content);
+    if (popup) popup.setAttribute("data-side", side);
+  }
+
+  // Base UI zooms the popup out of the anchor's center point (e.g.
+  // "128px -4px"), not out of a placement corner.
+  function anchorOrigin(result, anchorRect) {
+    const side = result.placement.split("-")[0];
+    const centerX = anchorRect.left + anchorRect.width / 2 - result.x + "px";
+    const centerY = anchorRect.top + anchorRect.height / 2 - result.y + "px";
+    if (side === "bottom") return centerX + " " + -SIDE_OFFSET + "px";
+    if (side === "top") return centerX + " calc(100% + " + SIDE_OFFSET + "px)";
+    if (side === "right") return -SIDE_OFFSET + "px " + centerY;
+    return "calc(100% + " + SIDE_OFFSET + "px) " + centerY;
+  }
+
+  // Moves the content to <body> (shadcn portals it the same way). Also removes
+  // contents whose anchor is gone (leftovers from swapped-out pages).
+  function portal(content) {
+    document.querySelectorAll("body > [data-tui-combobox-content]").forEach((c) => {
+      if (c !== content && !anchorFor(c)) c.remove();
+    });
+    if (content.parentElement !== document.body) {
+      document.body.appendChild(content);
+    }
+  }
+
+  function position(content) {
+    const anchor = positionAnchorFor(content);
+    if (!anchor) return Promise.resolve();
+    const { computePosition, offset, flip, shift, size } = window.FloatingUIDOM;
+    const side = content.getAttribute("data-tui-combobox-side") || "bottom";
+    const align = content.getAttribute("data-tui-combobox-align") || "start";
+    const alignOffset = parseFloat(content.getAttribute("data-tui-combobox-align-offset")) || 0;
+    const placement = align === "center" ? side : side + "-" + align;
+
+    return computePosition(anchor, content, {
+      placement: placement,
+      strategy: "fixed",
+      middleware: [
+        offset({ mainAxis: SIDE_OFFSET, crossAxis: alignOffset }),
+        flip({ padding: COLLISION_PADDING }),
+        shift({ padding: COLLISION_PADDING }),
+        size({
+          padding: COLLISION_PADDING,
+          apply(args) {
+            content.style.setProperty("--tui-combobox-available-height", args.availableHeight + "px");
+            content.style.setProperty("--tui-combobox-available-width", args.availableWidth + "px");
+            content.style.setProperty("--tui-combobox-anchor-width", args.rects.reference.width + "px");
+          },
+        }),
+      ],
+    }).then((result) => {
+      content.style.left = result.x + "px";
+      content.style.top = result.y + "px";
+      setSide(content, result.placement.split("-")[0]);
+      const popup = popupFor(content);
+      if (popup) {
+        popup.style.setProperty(
+          "--tui-combobox-transform-origin",
+          anchorOrigin(result, anchor.getBoundingClientRect()),
+        );
+      }
+    });
+  }
+
+  // ----- filtering ----------------------------------------------------------
+
+  function applyFilter(content, query) {
+    const q = query.trim().toLowerCase();
+    let visible = 0;
+    itemsOf(content).forEach((item) => {
+      const match = q === "" || labelOf(item).toLowerCase().includes(q);
+      item.hidden = !match;
+      if (match) visible += 1;
+    });
+    content.querySelectorAll("[data-tui-combobox-group]").forEach((group) => {
+      group.hidden = !group.querySelector("[data-tui-combobox-item]:not([hidden])");
+    });
+    const popup = popupFor(content);
+    const list = listFor(content);
+    popup.toggleAttribute("data-empty", visible === 0);
+    if (list) list.toggleAttribute("data-empty", visible === 0);
+
+    const highlighted = highlightedItem(content);
+    if (highlighted && highlighted.hidden) setHighlight(content, null);
+    if (!highlightedItem(content) && content.hasAttribute("data-tui-combobox-auto-highlight")) {
+      setHighlight(content, visibleItems(content)[0] || null);
+    }
+  }
+
+  function visibleItems(content) {
+    return itemsOf(content).filter((i) => !i.hidden && !i.hasAttribute("data-disabled"));
+  }
+
+  // ----- highlight ----------------------------------------------------------
+
+  function highlightedItem(content) {
+    return content.querySelector("[data-tui-combobox-item][data-highlighted]");
+  }
+
+  function setHighlight(content, item) {
+    itemsOf(content).forEach((i) => {
+      if (i !== item) i.removeAttribute("data-highlighted");
+    });
+    if (item) {
+      item.setAttribute("data-highlighted", "");
+      item.scrollIntoView({ block: "nearest" });
+    }
+  }
+
+  function moveHighlight(content, dir) {
+    const items = visibleItems(content);
+    if (!items.length) return;
+    const current = highlightedItem(content);
+    let index = items.indexOf(current);
+    index = index === -1 ? (dir > 0 ? 0 : items.length - 1) : index + dir;
+    index = Math.max(0, Math.min(items.length - 1, index));
+    setHighlight(content, items[index]);
+  }
+
+  // ----- open / close -------------------------------------------------------
+
+  function open(content) {
+    if (content.getAttribute("data-state") === "open") return;
+    allContents().forEach((c) => {
+      if (c !== content) close(c);
+    });
+    clearTimeout(content._tuiHide);
+    portal(content);
+    if (!content.matches(":popover-open")) {
+      content.showPopover(); // native top layer
+    }
+
+    applyFilter(content, "");
+    // Base UI highlights the current selection on open, else (with
+    // autoHighlight) the first item.
+    const selected = selectedItems(content).find((i) => !i.hidden);
+    setHighlight(content, selected || null);
+    if (!selected && content.hasAttribute("data-tui-combobox-auto-highlight")) {
+      setHighlight(content, visibleItems(content)[0] || null);
+    }
+
+    // Position it invisibly first, then play the enter animation in place.
+    content.style.visibility = "hidden";
+    const finish = () => {
+      content.style.visibility = "";
+      if (!content.matches(":popover-open")) return;
+      setState(content, "open");
+      setExpanded(content, true);
+    };
+    position(content).then(finish, finish);
+  }
+
+  function close(content) {
+    if (!content.matches(":popover-open")) return;
+    content.style.visibility = "";
+    setState(content, "closed");
+    setExpanded(content, false);
+    const input = inputFor(content);
+    if (input) {
+      // Revert the typed text: an in-popup input is a pure search box, an
+      // anchor input shows the selected label.
+      input.value =
+        isMultiple(content) || content.contains(input) ? "" : displayValue(content);
+    }
+    clearTimeout(content._tuiHide);
+    content._tuiHide = setTimeout(() => {
+      if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
+        content.hidePopover();
+      }
+    }, EXIT_MS);
+  }
+
+  function closeAll() {
+    allContents().forEach(close);
+  }
+
+  function displayValue(content) {
+    const selected = selectedItems(content)[0];
+    return selected ? labelOf(selected) : "";
+  }
+
+  // ----- selection ----------------------------------------------------------
+
+  function hiddenInputs(anchor) {
+    return [...anchor.querySelectorAll("[data-tui-combobox-hidden]")];
+  }
+
+  function dispatchChange(content, anchor) {
+    const values = selectedItems(content).map((i) => i.getAttribute("data-tui-combobox-value") || "");
+    const first = hiddenInputs(anchor)[0];
+    if (first) first.dispatchEvent(new Event("change", { bubbles: true }));
+    anchor.dispatchEvent(
+      new CustomEvent("combobox-change", { bubbles: true, detail: { values: values } }),
+    );
+  }
+
+  function syncHiddenInputs(content, anchor) {
+    const inputs = hiddenInputs(anchor);
+    if (!inputs.length) return;
+    const name = inputs[0].name;
+    if (isMultiple(content)) {
+      inputs.slice(1).forEach((i) => i.remove());
+      const values = selectedItems(content).map((i) => i.getAttribute("data-tui-combobox-value") || "");
+      const first = inputs[0];
+      first.value = values[0] || "";
+      values.slice(1).forEach((v) => {
+        const clone = first.cloneNode();
+        clone.value = v;
+        first.parentElement.insertBefore(clone, first.nextSibling);
+      });
+    } else {
+      const selected = selectedItems(content)[0];
+      inputs[0].value = selected ? selected.getAttribute("data-tui-combobox-value") || "" : "";
+    }
+    inputs[0].name = name;
+  }
+
+  function syncChips(content, anchor) {
+    if (!anchor.hasAttribute("data-tui-combobox-chips")) return;
+    const template = anchor.querySelector("[data-tui-combobox-chip-template]");
+    anchor.querySelectorAll("[data-tui-combobox-chip]").forEach((chip) => {
+      if (!chip.closest("[data-tui-combobox-chip-template]")) chip.remove();
+    });
+    if (!template) return;
+    const input = anchor.querySelector("[data-tui-combobox-input]");
+    selectedItems(content).forEach((item) => {
+      const chip = template.content.firstElementChild.cloneNode(true);
+      chip.setAttribute("data-tui-combobox-value", item.getAttribute("data-tui-combobox-value") || "");
+      chip.querySelector("[data-tui-combobox-chip-label]").textContent = labelOf(item);
+      anchor.insertBefore(chip, input);
+    });
+  }
+
+  function toggleClear(content, anchor) {
+    const clear = anchor.querySelector("[data-tui-combobox-clear]");
+    if (clear) clear.hidden = selectedItems(content).length === 0;
+  }
+
+  function syncValueDisplay(content) {
+    const display = valueDisplayFor(content);
+    if (!display) return;
+    const label = displayValue(content);
+    const text = label || display.getAttribute("data-tui-combobox-placeholder") || "";
+    if (display.textContent !== text) display.textContent = text;
+  }
+
+  function afterSelectionChange(content) {
+    const anchor = anchorFor(content);
+    if (!anchor) return;
+    syncChips(content, anchor);
+    syncHiddenInputs(content, anchor);
+    toggleClear(content, anchor);
+    syncValueDisplay(content);
+    dispatchChange(content, anchor);
+  }
+
+  function selectItem(content, item) {
+    const input = inputFor(content);
+    if (isMultiple(content)) {
+      item.toggleAttribute("data-selected");
+      item.setAttribute("aria-selected", item.hasAttribute("data-selected") ? "true" : "false");
+      afterSelectionChange(content);
+      if (input) {
+        input.value = "";
+        input.focus();
+      }
+      applyFilter(content, "");
+      position(content); // the chips anchor may have grown or shrunk
+      return;
+    }
+    itemsOf(content).forEach((i) => {
+      i.removeAttribute("data-selected");
+      i.setAttribute("aria-selected", "false");
+    });
+    item.setAttribute("data-selected", "");
+    item.setAttribute("aria-selected", "true");
+    if (input) input.value = labelOf(item);
+    afterSelectionChange(content);
+    close(content);
+  }
+
+  function clearSelection(content) {
+    itemsOf(content).forEach((i) => {
+      i.removeAttribute("data-selected");
+      i.setAttribute("aria-selected", "false");
+    });
+    const input = inputFor(content);
+    if (input) {
+      input.value = "";
+      input.focus();
+    }
+    afterSelectionChange(content);
+    applyFilter(content, "");
+  }
+
+  // Shows the selected item's label in the input (server only knows the
+  // value, the label lives in the item). Runs on load and whenever new
+  // comboboxes appear in the DOM; the MutationObserver keeps this
+  // framework-agnostic.
+  function syncInputs() {
+    allContents().forEach((content) => {
+      if (isMultiple(content)) return;
+      syncValueDisplay(content);
+      const input = inputFor(content);
+      if (!input || input.value !== "" || content.contains(input)) return;
+      const label = displayValue(content);
+      if (label) input.value = label;
+    });
+  }
+
+  let syncQueued = false;
+  function queueSync() {
+    if (syncQueued) return;
+    syncQueued = true;
+    requestAnimationFrame(() => {
+      syncQueued = false;
+      syncInputs();
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", syncInputs);
+  } else {
+    syncInputs();
+  }
+  new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.addedNodes.length) {
+        queueSync();
+        break;
+      }
+    }
+  }).observe(document.documentElement, { childList: true, subtree: true });
+
+  // ----- events -------------------------------------------------------------
+
+  // Base UI opens on pointerdown, not click — that is what makes it feel
+  // instant. The following click is swallowed so it does not re-toggle.
+  document.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 || !(e.target instanceof Element)) return;
+
+    const trigger = e.target.closest("[data-tui-combobox-trigger]");
+    if (trigger) {
+      const content = contentFor(trigger);
+      if (!content) return;
+      content._tuiSkipClick = true;
+      if (content.getAttribute("data-state") === "open") {
+        close(content);
+      } else {
+        const input = inputFor(content);
+        if (input && input.disabled) return;
+        open(content);
+        if (input) requestAnimationFrame(() => input.focus());
+      }
+      return;
+    }
+
+    // Clear and chip-remove buttons act on the selection, they never open.
+    if (e.target.closest("[data-tui-combobox-clear], [data-tui-combobox-chip-remove]")) return;
+
+    const anchor = e.target.closest("[data-tui-combobox-anchor]");
+    if (anchor && !anchor.closest("[data-tui-combobox-content]")) {
+      const content = document.getElementById(anchor.getAttribute("data-tui-combobox-anchor"));
+      if (!content || content.getAttribute("data-state") === "open") return;
+      const field = inputFor(content);
+      if (field && !field.disabled) open(content);
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!(e.target instanceof Element)) return;
+
+    const remove = e.target.closest("[data-tui-combobox-chip-remove]");
+    if (remove && !remove.closest("[data-tui-combobox-chip-template]")) {
+      const chip = remove.closest("[data-tui-combobox-chip]");
+      const content = contentFor(remove);
+      if (chip && content) {
+        const value = chip.getAttribute("data-tui-combobox-value");
+        const item = itemsOf(content).find(
+          (i) => (i.getAttribute("data-tui-combobox-value") || "") === value,
+        );
+        if (item) {
+          item.removeAttribute("data-selected");
+          item.setAttribute("aria-selected", "false");
+        }
+        afterSelectionChange(content);
+        if (content.getAttribute("data-state") === "open") position(content);
+      }
+      return;
+    }
+
+    const clear = e.target.closest("[data-tui-combobox-clear]");
+    if (clear) {
+      const content = contentFor(clear);
+      if (content) clearSelection(content);
+      return;
+    }
+
+    const trigger = e.target.closest("[data-tui-combobox-trigger]");
+    if (trigger) {
+      const content = contentFor(trigger);
+      if (!content) return;
+      if (content._tuiSkipClick) {
+        content._tuiSkipClick = false;
+        return;
+      }
+      if (content.getAttribute("data-state") === "open") {
+        close(content);
+      } else {
+        open(content);
+        const input = inputFor(content);
+        if (input) input.focus();
+      }
+      return;
+    }
+
+    const anchor = e.target.closest("[data-tui-combobox-anchor]");
+    if (anchor) {
+      const content = document.getElementById(anchor.getAttribute("data-tui-combobox-anchor"));
+      const input = e.target.closest("[data-tui-combobox-input]");
+      if (content && (input || anchor.hasAttribute("data-tui-combobox-chips"))) {
+        const field = inputFor(content);
+        if (field && !field.disabled) {
+          open(content);
+          field.focus();
+        }
+      }
+      return;
+    }
+
+    const item = e.target.closest("[data-tui-combobox-item]");
+    if (item && !item.hasAttribute("data-disabled")) {
+      const content = item.closest("[data-tui-combobox-content]");
+      if (content) selectItem(content, item);
+      return;
+    }
+
+    // Click outside any open combobox closes everything.
+    if (!e.target.closest("[data-tui-combobox-content]")) closeAll();
+  });
+
+  document.addEventListener("input", (e) => {
+    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-combobox-input")) return;
+    const content = contentFor(e.target);
+    if (!content) return;
+    if (content.getAttribute("data-state") !== "open") open(content);
+    applyFilter(content, e.target.value);
+    if (content.getAttribute("data-state") === "open") position(content);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeAll();
+      return;
+    }
+    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-combobox-input")) return;
+    const content = contentFor(e.target);
+    if (!content) return;
+    const isOpen = content.getAttribute("data-state") === "open";
+
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (!isOpen) {
+        open(content);
+        return;
+      }
+      moveHighlight(content, e.key === "ArrowDown" ? 1 : -1);
+      return;
+    }
+    if (e.key === "Enter") {
+      const highlighted = isOpen && highlightedItem(content);
+      if (highlighted) {
+        e.preventDefault();
+        selectItem(content, highlighted);
+      }
+      return;
+    }
+    if (e.key === "Backspace" && isMultiple(content) && e.target.value === "") {
+      const chips = [...e.target.parentElement.querySelectorAll("[data-tui-combobox-chip]")].filter(
+        (c) => !c.closest("[data-tui-combobox-chip-template]"),
+      );
+      const last = chips[chips.length - 1];
+      if (last) {
+        const btn = last.querySelector("[data-tui-combobox-chip-remove]");
+        if (btn) btn.click();
+      }
+      return;
+    }
+    if (e.key === "Tab") {
+      close(content);
+    }
+  });
+
+  // Hovering an item highlights it, exactly like Base UI.
+  document.addEventListener("mousemove", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const item = e.target.closest("[data-tui-combobox-item]");
+    if (!item || item.hasAttribute("data-disabled") || item.hasAttribute("data-highlighted")) return;
+    const content = item.closest("[data-tui-combobox-content]");
+    if (content && content.getAttribute("data-state") === "open") setHighlight(content, item);
+  });
+
+  // Page scroll or resize: keep open menus attached to their anchor.
+  window.addEventListener(
+    "scroll",
+    (e) => {
+      if (e.target instanceof Element && e.target.closest("[data-tui-combobox-content]")) return;
+      allContents().forEach((content) => {
+        if (content.getAttribute("data-state") === "open") position(content);
+      });
+    },
+    true,
+  );
+
+  window.addEventListener("resize", () => {
+    allContents().forEach((content) => {
+      if (content.getAttribute("data-state") === "open") position(content);
+    });
+  });
+})();

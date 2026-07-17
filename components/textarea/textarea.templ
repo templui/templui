@@ -29,7 +29,9 @@ templ Textarea(props ...Props) {
 	}
 	<textarea
 		id={ p.ID }
-		data-slot="textarea"
+		if _, hasSlot := p.Attributes["data-slot"]; !hasSlot {
+			data-slot="textarea"
+		}
 		if p.Name != "" {
 			name={ p.Name }
 		}

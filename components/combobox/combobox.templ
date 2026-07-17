@@ -1,0 +1,544 @@
+package combobox
+
+import (
+	"context"
+	"strconv"
+
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/inputgroup"
+	"github.com/templui/templui/utils"
+)
+
+type Side string
+
+const (
+	SideTop    Side = "top"
+	SideRight  Side = "right"
+	SideBottom Side = "bottom"
+	SideLeft   Side = "left"
+)
+
+type Align string
+
+const (
+	AlignStart  Align = "start"
+	AlignCenter Align = "center"
+	AlignEnd    Align = "end"
+)
+
+type ctxKey string
+
+const stateKey ctxKey = "comboboxState"
+
+type ctxState struct {
+	id            string
+	name          string
+	value         string
+	values        []string
+	multiple      bool
+	autoHighlight bool
+	disabled      bool
+}
+
+func state(ctx context.Context) ctxState {
+	if s, ok := ctx.Value(stateKey).(ctxState); ok {
+		return s
+	}
+	return ctxState{}
+}
+
+type Props struct {
+	ID string
+	// Name makes the combobox submit its value in forms (hidden input).
+	Name string
+	// Value preselects the item with this value (single mode).
+	Value string
+	// Values preselects items in multiple mode.
+	Values []string
+	// Multiple allows selecting several items, rendered as chips.
+	Multiple bool
+	// AutoHighlight keeps the first matching item highlighted while typing.
+	AutoHighlight bool
+	Disabled      bool
+}
+
+type InputProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Placeholder is shown while no item is selected.
+	Placeholder string
+	// Invalid marks the input aria-invalid for error styling.
+	Invalid bool
+	// HideTrigger hides the chevron button.
+	HideTrigger bool
+	// ShowClear renders a clear button while a value is selected.
+	ShowClear bool
+}
+
+type ContentProps struct {
+	Class      string
+	Attributes templ.Attributes
+	// Side of the anchor to open against. Defaults to bottom.
+	Side Side
+	// Align along the anchor edge. Defaults to start.
+	Align Align
+	// AlignOffset shifts the content along the aligned edge, in px.
+	AlignOffset int
+}
+
+type ValueProps struct {
+	Class      string
+	Attributes templ.Attributes
+	// Placeholder is shown until an item is selected.
+	Placeholder string
+}
+
+type ListProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type EmptyProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type GroupProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type LabelProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ItemProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Value      string
+	// Label is what the input shows when this item is selected and what the
+	// filter matches. Defaults to the item's text content.
+	Label    string
+	Disabled bool
+}
+
+type SeparatorProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ChipsProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Placeholder for the inline chips input.
+	Placeholder string
+	// Invalid marks the chips input aria-invalid for error styling.
+	Invalid bool
+}
+
+// Combobox renders no element: it only carries the id, name and selection that
+// link Input/Chips, Content and the hidden form inputs (via ctx).
+templ Combobox(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, name: p.Name, value: p.Value, values: p.Values, multiple: p.Multiple, autoHighlight: p.AutoHighlight, disabled: p.Disabled}) }}
+	{ children... }
+}
+
+// Trigger returns the attributes that turn any element (usually a button)
+// into the combobox trigger — the asChild equivalent, used for the popup
+// pattern where the search input lives inside the content.
+func Trigger(ctx context.Context) templ.Attributes {
+	s := state(ctx)
+	return templ.Attributes{
+		"data-tui-combobox-anchor":  s.id,
+		"data-tui-combobox-trigger": true,
+		"aria-controls":             s.id,
+		"aria-haspopup":             "listbox",
+		"aria-expanded":             "false",
+	}
+}
+
+// Value shows the selected item's label inside a button trigger.
+templ Value(props ...ValueProps) {
+	{{ var p ValueProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		data-slot="combobox-value"
+		data-tui-combobox-value-display
+		data-tui-combobox-placeholder={ p.Placeholder }
+		class={ utils.TwMerge("flex flex-1 text-left", p.Class) }
+		{ p.Attributes... }
+	>
+		{ p.Placeholder }
+	</span>
+}
+
+templ Input(props ...InputProps) {
+	{{ var p InputProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ s := state(ctx) }}
+	@inputgroup.InputGroup(inputgroup.Props{
+		Class: utils.TwMerge("w-auto", p.Class),
+		Attributes: templ.Attributes{"data-tui-combobox-anchor": s.id},
+	}) {
+		if s.name != "" {
+			<input type="hidden" name={ s.name } value={ s.value } data-tui-combobox-hidden aria-hidden="true" tabindex="-1"/>
+		}
+		{{
+			attrs := templ.Attributes{
+				"data-tui-combobox-input": "",
+				"role":                    "combobox",
+				"aria-controls":           s.id,
+				"aria-expanded":           "false",
+				"aria-autocomplete":       "list",
+				"autocomplete":            "off",
+			}
+			if p.Invalid {
+				attrs["aria-invalid"] = "true"
+			}
+			for k, v := range p.Attributes {
+				attrs[k] = v
+			}
+		}}
+		@inputgroup.Input(inputgroup.InputProps{
+			ID:          p.ID,
+			Placeholder: p.Placeholder,
+			Disabled:    s.disabled,
+			Attributes:  attrs,
+		})
+		@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignInlineEnd}) {
+			if !p.HideTrigger {
+				@inputgroup.Button(inputgroup.ButtonProps{
+					Size:     inputgroup.ButtonSizeIconXs,
+					Disabled: s.disabled,
+					Attributes: templ.Attributes{
+						"data-tui-combobox-trigger": "",
+						"data-slot":                 "input-group-button",
+						"tabindex":                  "-1",
+					},
+					Class: "group-has-[[data-tui-combobox-clear]:not([hidden])]/input-group:hidden data-pressed:bg-transparent [&_svg:not([class*='size-'])]:size-4",
+				}) {
+					@icon.ChevronDown(icon.Props{Class: "pointer-events-none size-4 text-muted-foreground"})
+				}
+			}
+			if p.ShowClear {
+				@inputgroup.Button(inputgroup.ButtonProps{
+					Size:     inputgroup.ButtonSizeIconXs,
+					Disabled: s.disabled,
+					Attributes: templ.Attributes{
+						"data-tui-combobox-clear": "",
+						"data-slot":               "combobox-clear",
+						"tabindex":                "-1",
+						"hidden":                  s.value == "" && len(s.values) == 0,
+					},
+				}) {
+					@icon.X(icon.Props{Class: "pointer-events-none"})
+				}
+			}
+		}
+		{ children... }
+	}
+}
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Side == "" {
+		{{ p.Side = SideBottom }}
+	}
+	if p.Align == "" {
+		{{ p.Align = AlignStart }}
+	}
+	{{ s := state(ctx) }}
+	<div
+		id={ s.id }
+		data-tui-combobox-content
+		data-tui-combobox-side={ string(p.Side) }
+		data-tui-combobox-align={ string(p.Align) }
+		if p.AlignOffset != 0 {
+			data-tui-combobox-align-offset={ strconv.Itoa(p.AlignOffset) }
+		}
+		if s.autoHighlight {
+			data-tui-combobox-auto-highlight
+		}
+		data-state="closed"
+		popover="manual"
+		class="pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
+	>
+		<div
+			data-slot="combobox-content"
+			data-tui-combobox-popup
+			data-chips?={ s.multiple }
+			data-state="closed"
+			role="listbox"
+			if s.multiple {
+				aria-multiselectable="true"
+			}
+			class={
+				utils.TwMerge(
+					"pointer-events-auto group/combobox-content relative max-h-(--tui-combobox-available-height) w-(--tui-combobox-anchor-width) max-w-(--tui-combobox-available-width) min-w-[calc(var(--tui-combobox-anchor-width)+--spacing(7))] data-[chips]:min-w-(--tui-combobox-anchor-width) origin-(--tui-combobox-transform-origin) overflow-hidden rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 *:data-[slot=input-group]:m-1 *:data-[slot=input-group]:mb-0 *:data-[slot=input-group]:h-8 *:data-[slot=input-group]:bg-input/30 *:data-[slot=input-group]:border-input/30 *:data-[slot=input-group]:shadow-none",
+					p.Class,
+				),
+			}
+			{ p.Attributes... }
+		>
+			{ children... }
+		</div>
+	</div>
+}
+
+templ List(props ...ListProps) {
+	{{ var p ListProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="combobox-list"
+		data-tui-combobox-list
+		class={
+			utils.TwMerge(
+				"max-h-[min(calc(--spacing(72)---spacing(9)),calc(var(--tui-combobox-available-height)---spacing(9)))] scroll-py-1 overflow-y-auto overscroll-contain p-1 data-[empty]:p-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Empty(props ...EmptyProps) {
+	{{ var p EmptyProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="combobox-empty"
+		class={ utils.TwMerge("hidden w-full justify-center py-2 text-center text-sm text-muted-foreground group-data-[empty]/combobox-content:flex", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Group(props ...GroupProps) {
+	{{ var p GroupProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="group"
+		data-slot="combobox-group"
+		data-tui-combobox-group
+		if p.Class != "" {
+			class={ p.Class }
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Label(props ...LabelProps) {
+	{{ var p LabelProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="combobox-label"
+		class={ utils.TwMerge("px-2 py-1.5 text-xs text-muted-foreground", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Item(props ...ItemProps) {
+	{{ var p ItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ s := state(ctx) }}
+	{{
+		selected := false
+		if s.multiple {
+			for _, v := range s.values {
+				if v == p.Value {
+					selected = true
+					break
+				}
+			}
+		} else {
+			selected = s.value != "" && s.value == p.Value
+		}
+	}}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="option"
+		data-slot="combobox-item"
+		data-tui-combobox-item
+		data-tui-combobox-value={ p.Value }
+		if p.Label != "" {
+			data-tui-combobox-label={ p.Label }
+		}
+		if selected {
+			data-selected
+			aria-selected="true"
+		} else {
+			aria-selected="false"
+		}
+		if p.Disabled {
+			data-disabled
+			aria-disabled="true"
+		}
+		class={
+			utils.TwMerge(
+				"group/combobox-item relative flex w-full cursor-default items-center gap-2 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:bg-accent data-highlighted:text-accent-foreground data-highlighted:**:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+		<span class="pointer-events-none absolute right-2 flex size-4 items-center justify-center opacity-0 group-data-selected/combobox-item:opacity-100">
+			@icon.Check(icon.Props{Class: "pointer-events-none"})
+		</span>
+	</div>
+}
+
+templ Separator(props ...SeparatorProps) {
+	{{ var p SeparatorProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		role="separator"
+		data-slot="combobox-separator"
+		class={ utils.TwMerge("pointer-events-none -mx-1 my-1 h-px bg-border", p.Class) }
+		{ p.Attributes... }
+	></div>
+}
+
+// Chips is the anchor for multiple mode: selected values render as removable
+// chips with an inline filter input.
+templ Chips(props ...ChipsProps) {
+	{{ var p ChipsProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ s := state(ctx) }}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="combobox-chips"
+		data-tui-combobox-anchor={ s.id }
+		data-tui-combobox-chips
+		class={
+			utils.TwMerge(
+				"flex min-h-8 flex-wrap items-center gap-1 rounded-lg border border-input bg-transparent bg-clip-padding px-2.5 py-1 text-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 has-aria-invalid:ring-3 has-aria-invalid:ring-destructive/20 has-aria-invalid:border-destructive has-data-[slot=combobox-chip]:px-1 dark:bg-input/30 dark:has-aria-invalid:ring-destructive/40 dark:has-aria-invalid:border-destructive/50",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		for _, v := range s.values {
+			@Chip(v)
+		}
+		if s.name != "" {
+			for _, v := range s.values {
+				<input type="hidden" name={ s.name } value={ v } data-tui-combobox-hidden aria-hidden="true" tabindex="-1"/>
+			}
+		}
+		<input
+			data-tui-combobox-input
+			data-slot="combobox-chip-input"
+			role="combobox"
+			aria-controls={ s.id }
+			aria-expanded="false"
+			aria-autocomplete="list"
+			autocomplete="off"
+			if p.Placeholder != "" {
+				placeholder={ p.Placeholder }
+			}
+			if p.Invalid {
+				aria-invalid="true"
+			}
+			disabled?={ s.disabled }
+			class="min-w-16 flex-1 outline-none"
+		/>
+		<template data-tui-combobox-chip-template>
+			@Chip("")
+		</template>
+	</div>
+}
+
+templ Chip(value string) {
+	<div
+		data-slot="combobox-chip"
+		data-tui-combobox-chip
+		data-tui-combobox-value={ value }
+		class="flex h-[calc(--spacing(5.25))] w-fit items-center justify-center gap-1 rounded-sm bg-muted px-1.5 text-xs font-medium whitespace-nowrap text-foreground has-data-[slot=combobox-chip-remove]:pr-0 has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50"
+	>
+		<span data-tui-combobox-chip-label>{ value }</span>
+		@button.Button(button.Props{
+			Variant: button.VariantGhost,
+			Size:    button.SizeIconXs,
+			Class:   "-ml-1 opacity-50 hover:opacity-100",
+			Attributes: templ.Attributes{
+				"data-slot":                     "combobox-chip-remove",
+				"data-tui-combobox-chip-remove": "",
+				"tabindex":                      "-1",
+			},
+		}) {
+			@icon.X(icon.Props{Class: "pointer-events-none"})
+		}
+	</div>
+}
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("combobox")
+	}
+}

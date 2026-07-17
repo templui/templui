@@ -34,6 +34,7 @@ tasks:
         components/checkbox/checkbox.js \
         components/chart/chart.js \
         components/collapsible/collapsible.js \
+        components/combobox/combobox.js \
         components/copybutton/copybutton.js \
         components/datepicker/datepicker.js \
         components/dialog/dialog.js \

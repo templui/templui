@@ -130,6 +130,18 @@ func main() {
 		"out/showcase/date_picker_with_label.html":         showcase.DatePickerWithLabel(),
 		"out/showcase/date_picker_with_time.html":          showcase.DatePickerWithTime(),
 
+		// Combobox
+		"out/showcase/combobox_default.html":        showcase.ComboboxDefault(),
+		"out/showcase/combobox_multiple.html":       showcase.ComboboxMultiple(),
+		"out/showcase/combobox_clear.html":          showcase.ComboboxClear(),
+		"out/showcase/combobox_groups.html":         showcase.ComboboxGroups(),
+		"out/showcase/combobox_custom.html":         showcase.ComboboxCustom(),
+		"out/showcase/combobox_invalid.html":        showcase.ComboboxInvalid(),
+		"out/showcase/combobox_disabled.html":       showcase.ComboboxDisabled(),
+		"out/showcase/combobox_auto_highlight.html": showcase.ComboboxAutoHighlight(),
+		"out/showcase/combobox_popup.html":          showcase.ComboboxPopup(),
+		"out/showcase/combobox_input_group.html":    showcase.ComboboxInputGroup(),
+
 		// Select
 		"out/showcase/select_default.html":    showcase.SelectDefault(),
 		"out/showcase/select_align_item.html": showcase.SelectAlignItem(),

@@ -136,6 +136,35 @@
       "tags": ["collapsible", "toggle", "expand", "collapse"]
     },
     {
+      "name": "combobox",
+      "slug": "combobox",
+      "displayName": "Combobox",
+      "description": "An input with a filterable list of options.",
+      "files": [
+        "components/combobox/combobox.templ"
+      ],
+      "jsFiles": [
+        "components/combobox/combobox.js",
+        "components/combobox/combobox.min.js",
+        "components/floatingui/floating_ui_core.js",
+        "components/floatingui/floating_ui_dom.js"
+      ],
+      "dependencies": [
+        "button",
+        "icon",
+        "inputgroup"
+      ],
+      "categories": [
+        "form-input"
+      ],
+      "tags": [
+        "combobox",
+        "autocomplete",
+        "search",
+        "form"
+      ]
+    },
+    {
       "name": "copybutton",
       "slug": "copy-button",
       "displayName": "Copy Button",

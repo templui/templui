@@ -68,15 +68,16 @@ import "../floatingui/floating_ui_dom.js";
     if (popup) popup.setAttribute("data-side", side);
   }
 
-  // "bottom-start" -> "top left": the corner the menu grows out of.
-  function transformOrigin(placement) {
-    const side = placement.split("-")[0];
-    const align = placement.split("-")[1] || "center";
-    const opposite = { top: "bottom", bottom: "top", left: "right", right: "left" }[side];
-    if (side === "top" || side === "bottom") {
-      return ({ start: "left", end: "right", center: "center" }[align]) + " " + opposite;
-    }
-    return opposite + " " + ({ start: "top", end: "bottom", center: "center" }[align]);
+  // Base UI zooms the popup out of the anchor's center point (e.g.
+  // "96px -4px"), not out of a placement corner.
+  function anchorOrigin(result, anchorRect) {
+    const side = result.placement.split("-")[0];
+    const centerX = anchorRect.left + anchorRect.width / 2 - result.x + "px";
+    const centerY = anchorRect.top + anchorRect.height / 2 - result.y + "px";
+    if (side === "bottom") return centerX + " " + -SIDE_OFFSET + "px";
+    if (side === "top") return centerX + " calc(100% + " + SIDE_OFFSET + "px)";
+    if (side === "right") return -SIDE_OFFSET + "px " + centerY;
+    return "calc(100% + " + SIDE_OFFSET + "px) " + centerY;
   }
 
   // Moves the content to <body> (shadcn portals it the same way). Also removes
@@ -132,7 +133,10 @@ import "../floatingui/floating_ui_dom.js";
       setSide(content, result.placement.split("-")[0]);
       const popup = popupFor(content);
       if (popup) {
-        popup.style.setProperty("--tui-select-transform-origin", transformOrigin(result.placement));
+        popup.style.setProperty(
+          "--tui-select-transform-origin",
+          anchorOrigin(result, trigger.getBoundingClientRect()),
+        );
       }
     });
   }
@@ -552,12 +556,32 @@ import "../floatingui/floating_ui_dom.js";
 
   // ----- events -------------------------------------------------------------
 
+  // Base UI opens on pointerdown, not click — that is what makes it feel
+  // instant. The following click is swallowed so it does not re-toggle.
+  document.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 || !(e.target instanceof Element)) return;
+    const trigger = e.target.closest("[data-tui-select-trigger]");
+    if (!trigger || trigger.disabled) return;
+    const content = contentFor(trigger);
+    if (!content) return;
+    content._tuiSkipClick = true;
+    if (content.getAttribute("data-state") === "open") {
+      close(content);
+    } else {
+      open(content, trigger);
+    }
+  });
+
   document.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
     const trigger = e.target.closest("[data-tui-select-trigger]");
     if (trigger) {
       const content = contentFor(trigger);
       if (!content) return;
+      if (content._tuiSkipClick) {
+        content._tuiSkipClick = false;
+        return;
+      }
       if (content.getAttribute("data-state") === "open") {
         close(content);
       } else {
