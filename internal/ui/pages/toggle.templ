@@ -109,13 +109,13 @@ templ Toggle() {
 				<div id="api-toggle" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Toggle",
-						Description: "A two-state button that can be either on or off. Renders as a styled label wrapping a visually hidden checkbox.",
+						Description: "A two-state button that can be switched on or off.",
 						Items: []modules.APITableItem{
 							{
 								Name:        "ID",
 								Type:        "string",
 								Default:     "",
-								Description: "Unique identifier for the underlying checkbox input. Auto-generated if empty.",
+								Description: "Unique identifier for the toggle element.",
 								Required:    false,
 							},
 							{
@@ -129,21 +129,21 @@ templ Toggle() {
 								Name:        "Attributes",
 								Type:        "templ.Attributes",
 								Default:     "",
-								Description: "Additional HTML attributes to apply to the underlying checkbox input.",
+								Description: "Additional HTML attributes to apply to the toggle element.",
 								Required:    false,
 							},
 							{
 								Name:        "Variant",
 								Type:        "Variant",
 								Default:     "default",
-								Description: "Visual style. Options: 'default' (outlined), 'ghost'.",
+								Description: "Visual style of the toggle. Options: 'default' (outlined), 'ghost'.",
 								Required:    false,
 							},
 							{
 								Name:        "Size",
 								Type:        "Size",
 								Default:     "default",
-								Description: "Toggle size. Options: 'default', 'sm', 'lg', 'icon'.",
+								Description: "Size of the toggle. Options: 'default', 'sm', 'lg', 'icon'.",
 								Required:    false,
 							},
 							{
@@ -157,14 +157,14 @@ templ Toggle() {
 								Name:        "Value",
 								Type:        "string",
 								Default:     "on",
-								Description: "Value sent when the toggle is pressed.",
+								Description: "Value sent when the toggle is checked.",
 								Required:    false,
 							},
 							{
 								Name:        "Checked",
 								Type:        "bool",
 								Default:     "false",
-								Description: "Whether the toggle is initially pressed.",
+								Description: "Whether the toggle is initially checked.",
 								Required:    false,
 							},
 							{
@@ -174,7 +174,7 @@ templ Toggle() {
 								Description: "Whether the toggle is disabled and non-interactive.",
 								Required:    false,
 							},
-							},
+						},
 					})
 				</div>
 			}
