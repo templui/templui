@@ -1,0 +1,25 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/toggle"
+	"github.com/templui/templui/components/tooltip"
+)
+
+templ ToggleTooltip() {
+	@tooltip.Tooltip() {
+		@tooltip.Trigger(tooltip.TriggerProps{}) {
+			@toggle.Toggle(toggle.Props{
+				Size:       toggle.SizeIcon,
+				Attributes: templ.Attributes{"aria-label": "Toggle favorite"},
+			}) {
+				@icon.Heart()
+			}
+		}
+		@tooltip.Content(tooltip.ContentProps{
+			Position: tooltip.PositionTop,
+		}) {
+			Favorite
+		}
+	}
+}

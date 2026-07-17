@@ -24,6 +24,7 @@ templ Toggle() {
 					{Text: "Sizes", ID: "sizes"},
 					{Text: "Disabled", ID: "disabled"},
 					{Text: "Form", ID: "form"},
+					{Text: "With Tooltip", ID: "with-tooltip"},
 				},
 			},
 			{
@@ -92,6 +93,12 @@ templ Toggle() {
 					ShowcaseFile:    showcase.ToggleForm(),
 					PreviewCodeFile: "toggle_form.templ",
 					ID:              "form",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "With Tooltip",
+					ShowcaseFile:    showcase.ToggleTooltip(),
+					PreviewCodeFile: "toggle_tooltip.templ",
+					ID:              "with-tooltip",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
