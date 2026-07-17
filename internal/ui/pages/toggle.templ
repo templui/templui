@@ -1,0 +1,183 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/internal/ui/showcase"
+)
+
+templ Toggle() {
+	@layouts.DocsLayout(
+		"Toggle",
+		"A two-state button that can be either on or off.",
+		[]modules.TableOfContentsItem{
+			{
+				ID:   "installation",
+				Text: "Installation",
+			},
+			{
+				Text: "Examples",
+				ID:   "examples",
+				Children: []modules.TableOfContentsItem{
+					{Text: "Ghost", ID: "ghost"},
+					{Text: "With Text", ID: "with-text"},
+					{Text: "Sizes", ID: "sizes"},
+					{Text: "Disabled", ID: "disabled"},
+					{Text: "Form", ID: "form"},
+				},
+			},
+			{
+				ID:   "api",
+				Text: "API Reference",
+				Children: []modules.TableOfContentsItem{
+					{ID: "api-toggle", Text: "Toggle"},
+				},
+			},
+		},
+	) {
+		@modules.PageWrapper(modules.PageWrapperProps{
+			Name:        "Toggle",
+			Description: templ.Raw("A two-state button that can be either on or off."),
+			Tailwind:    true,
+			Breadcrumbs: modules.Breadcrumbs{
+				Items: []modules.BreadcrumbItem{
+					{Text: "Docs", Path: "/docs"},
+					{Text: "Components", Path: "/docs/components"},
+					{Text: "Toggle"},
+				},
+			},
+		}) {
+			@modules.ExampleWrapper(modules.ExampleWrapperProps{
+				ShowcaseFile:    showcase.ToggleDefault(),
+				PreviewCodeFile: "toggle_default.templ",
+			})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{
+				Title: "Installation",
+				ID:    "installation",
+			}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{
+					ComponentName: "toggle",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{
+				Title: "Examples",
+				ID:    "examples",
+			}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Ghost",
+					ShowcaseFile:    showcase.ToggleGhost(),
+					PreviewCodeFile: "toggle_ghost.templ",
+					ID:              "ghost",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "With Text",
+					ShowcaseFile:    showcase.ToggleWithText(),
+					PreviewCodeFile: "toggle_with_text.templ",
+					ID:              "with-text",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Sizes",
+					ShowcaseFile:    showcase.ToggleSizes(),
+					PreviewCodeFile: "toggle_sizes.templ",
+					ID:              "sizes",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Disabled",
+					ShowcaseFile:    showcase.ToggleDisabled(),
+					PreviewCodeFile: "toggle_disabled.templ",
+					ID:              "disabled",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Form",
+					ShowcaseFile:    showcase.ToggleForm(),
+					PreviewCodeFile: "toggle_form.templ",
+					ID:              "form",
+				})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{
+				Title: "API Reference",
+				ID:    "api",
+			}) {
+				@modules.APILegend()
+				<div id="api-toggle" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Toggle",
+						Description: "A two-state button that can be either on or off. Renders as a styled label wrapping a visually hidden checkbox.",
+						Items: []modules.APITableItem{
+							{
+								Name:        "ID",
+								Type:        "string",
+								Default:     "",
+								Description: "Unique identifier for the underlying checkbox input. Auto-generated if empty.",
+								Required:    false,
+							},
+							{
+								Name:        "Class",
+								Type:        "string",
+								Default:     "",
+								Description: "Additional CSS classes to apply to the toggle.",
+								Required:    false,
+							},
+							{
+								Name:        "Attributes",
+								Type:        "templ.Attributes",
+								Default:     "",
+								Description: "Additional HTML attributes to apply to the underlying checkbox input.",
+								Required:    false,
+							},
+							{
+								Name:        "Variant",
+								Type:        "Variant",
+								Default:     "default",
+								Description: "Visual style. Options: 'default' (outlined), 'ghost'.",
+								Required:    false,
+							},
+							{
+								Name:        "Size",
+								Type:        "Size",
+								Default:     "default",
+								Description: "Toggle size. Options: 'default', 'sm', 'lg', 'icon'.",
+								Required:    false,
+							},
+							{
+								Name:        "Name",
+								Type:        "string",
+								Default:     "",
+								Description: "Name attribute for form submission.",
+								Required:    false,
+							},
+							{
+								Name:        "Value",
+								Type:        "string",
+								Default:     "on",
+								Description: "Value sent when the toggle is pressed.",
+								Required:    false,
+							},
+							{
+								Name:        "Checked",
+								Type:        "bool",
+								Default:     "false",
+								Description: "Whether the toggle is initially pressed.",
+								Required:    false,
+							},
+							{
+								Name:        "Disabled",
+								Type:        "bool",
+								Default:     "false",
+								Description: "Whether the toggle is disabled and non-interactive.",
+								Required:    false,
+							},
+							{
+								Name:        "Form",
+								Type:        "string",
+								Default:     "",
+								Description: "Associates the toggle with a form by ID.",
+								Required:    false,
+							},
+						},
+					})
+				</div>
+			}
+		}
+	}
+}
