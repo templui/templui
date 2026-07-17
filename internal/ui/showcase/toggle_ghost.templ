@@ -8,17 +8,15 @@ import (
 templ ToggleGhost() {
 	<div class="flex items-center gap-2">
 		@toggle.Toggle(toggle.Props{
-			Variant:    toggle.VariantGhost,
-			Size:       toggle.SizeIcon,
-			Attributes: templ.Attributes{"aria-label": "Toggle bold"},
+			Variant: toggle.VariantGhost,
+			Size:    toggle.SizeIcon,
 		}) {
 			@icon.Bold()
 		}
 		@toggle.Toggle(toggle.Props{
-			Variant:    toggle.VariantGhost,
-			Size:       toggle.SizeIcon,
-			Checked:    true,
-			Attributes: templ.Attributes{"aria-label": "Toggle italic"},
+			Variant: toggle.VariantGhost,
+			Size:    toggle.SizeIcon,
+			Checked: true,
 		}) {
 			@icon.Italic()
 		}

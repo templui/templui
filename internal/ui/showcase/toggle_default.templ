@@ -7,8 +7,7 @@ import (
 
 templ ToggleDefault() {
 	@toggle.Toggle(toggle.Props{
-		Size:       toggle.SizeIcon,
-		Attributes: templ.Attributes{"aria-label": "Toggle bookmark"},
+		Size: toggle.SizeIcon,
 	}) {
 		@icon.Bookmark()
 	}

@@ -7,7 +7,9 @@ import (
 
 templ ToggleSizes() {
 	<div class="flex items-center gap-2">
-		@toggle.Toggle(toggle.Props{Size: toggle.SizeSm}) {
+		@toggle.Toggle(toggle.Props{
+			Size: toggle.SizeSm,
+		}) {
 			@icon.Italic()
 			Small
 		}
@@ -15,7 +17,9 @@ templ ToggleSizes() {
 			@icon.Italic()
 			Default
 		}
-		@toggle.Toggle(toggle.Props{Size: toggle.SizeLg}) {
+		@toggle.Toggle(toggle.Props{
+			Size: toggle.SizeLg,
+		}) {
 			@icon.Italic()
 			Large
 		}

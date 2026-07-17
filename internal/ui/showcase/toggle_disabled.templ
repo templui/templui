@@ -7,11 +7,16 @@ import (
 
 templ ToggleDisabled() {
 	<div class="flex items-center gap-2">
-		@toggle.Toggle(toggle.Props{Disabled: true}) {
+		@toggle.Toggle(toggle.Props{
+			Disabled: true,
+		}) {
 			@icon.Underline()
 			Disabled
 		}
-		@toggle.Toggle(toggle.Props{Disabled: true, Checked: true}) {
+		@toggle.Toggle(toggle.Props{
+			Disabled: true,
+			Checked:  true,
+		}) {
 			@icon.Underline()
 			Disabled
 		}

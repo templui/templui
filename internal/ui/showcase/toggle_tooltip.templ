@@ -10,8 +10,7 @@ templ ToggleTooltip() {
 	@tooltip.Tooltip() {
 		@tooltip.Trigger(tooltip.TriggerProps{}) {
 			@toggle.Toggle(toggle.Props{
-				Size:       toggle.SizeIcon,
-				Attributes: templ.Attributes{"aria-label": "Toggle favorite"},
+				Size: toggle.SizeIcon,
 			}) {
 				@icon.Heart()
 			}
