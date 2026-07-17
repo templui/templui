@@ -438,6 +438,16 @@
       "tags": ["toast", "notification", "message", "snackbar"]
     },
     {
+      "name": "toggle",
+      "slug": "toggle",
+      "displayName": "Toggle",
+      "description": "A two-state button that can be either on or off.",
+      "files": ["components/toggle/toggle.templ"],
+      "dependencies": [],
+      "categories": ["form-input"],
+      "tags": ["toggle", "button", "pressed", "state", "form"]
+    },
+    {
       "name": "tooltip",
       "slug": "tooltip",
       "displayName": "Tooltip",

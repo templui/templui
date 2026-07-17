@@ -171,6 +171,7 @@ func main() {
 	mux.Handle("GET /docs/components/tooltip", htmxHandler(pages.Tooltip()))
 	mux.Handle("GET /docs/components/popover", htmxHandler(pages.Popover()))
 	mux.Handle("GET /docs/components/hover-card", htmxHandler(pages.HoverCard()))
+	mux.Handle("GET /docs/components/toggle", htmxHandler(pages.Toggle()))
 
 	// Showcase API
 	mux.Handle("POST /docs/toast/demo", http.HandlerFunc(toastDemoHandler))

@@ -31,6 +31,7 @@ Components are designed to be composable, customizable, and easy to integrate in
 - [Tags Input](https://templui.io/docs/components/tags-input): Tags input component.
 - [Textarea](https://templui.io/docs/components/textarea): Multi-line text input component.
 - [Time Picker](https://templui.io/docs/components/time-picker): Time picker component.
+- [Toggle](https://templui.io/docs/components/toggle): A two-state button that can be either on or off.
 
 ## Layout & Navigation
 
