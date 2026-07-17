@@ -1,0 +1,26 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/toggle"
+)
+
+templ ToggleGhost() {
+	<div class="flex items-center gap-2">
+		@toggle.Toggle(toggle.Props{
+			Variant:    toggle.VariantGhost,
+			Size:       toggle.SizeIcon,
+			Attributes: templ.Attributes{"aria-label": "Toggle bold"},
+		}) {
+			@icon.Bold()
+		}
+		@toggle.Toggle(toggle.Props{
+			Variant:    toggle.VariantGhost,
+			Size:       toggle.SizeIcon,
+			Checked:    true,
+			Attributes: templ.Attributes{"aria-label": "Toggle italic"},
+		}) {
+			@icon.Italic()
+		}
+	</div>
+}

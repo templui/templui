@@ -1,0 +1,23 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/toggle"
+)
+
+templ ToggleSizes() {
+	<div class="flex items-center gap-2">
+		@toggle.Toggle(toggle.Props{Size: toggle.SizeSm}) {
+			@icon.Italic()
+			Small
+		}
+		@toggle.Toggle() {
+			@icon.Italic()
+			Default
+		}
+		@toggle.Toggle(toggle.Props{Size: toggle.SizeLg}) {
+			@icon.Italic()
+			Large
+		}
+	</div>
+}

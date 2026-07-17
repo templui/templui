@@ -1,0 +1,25 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/form"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/toggle"
+)
+
+templ ToggleForm() {
+	<div class="w-full max-w-sm">
+		@form.Item() {
+			@toggle.Toggle(toggle.Props{
+				ID:      "notifications-toggle",
+				Name:    "notifications",
+				Checked: true,
+			}) {
+				@icon.Bell()
+				Notifications
+			}
+			@form.Description() {
+				Sends the value "on" for the field "notifications" when submitted while pressed.
+			}
+		}
+	</div>
+}

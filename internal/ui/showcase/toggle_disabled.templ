@@ -1,0 +1,19 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/toggle"
+)
+
+templ ToggleDisabled() {
+	<div class="flex items-center gap-2">
+		@toggle.Toggle(toggle.Props{Disabled: true}) {
+			@icon.Underline()
+			Disabled
+		}
+		@toggle.Toggle(toggle.Props{Disabled: true, Checked: true}) {
+			@icon.Underline()
+			Disabled
+		}
+	</div>
+}
