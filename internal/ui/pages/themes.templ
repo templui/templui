@@ -21,6 +21,7 @@ import (
 	"github.com/templui/templui/components/textarea"
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/utils"
 	"time"
 )
 
@@ -51,16 +52,12 @@ templ Themes() {
 								@icon.RotateCcw(icon.Props{Class: "size-3.5"})
 								<span class="ml-2">Reset to Default</span>
 							}
-							@dialog.Trigger(dialog.TriggerProps{
-								For: "css-dialog",
+							@button.Button(button.Props{
+								Attributes: utils.MergeAttributes(dialog.TriggerFor("css-dialog"), templ.Attributes{
+									"data-action": "generate-css",
+								}),
 							}) {
-								@button.Button(button.Props{
-									Attributes: templ.Attributes{
-										"data-action": "generate-css",
-									},
-								}) {
-									Copy Theme CSS
-								}
+								Copy Theme CSS
 							}
 						</div>
 					</div>
@@ -95,14 +92,11 @@ templ Themes() {
 								}) {
 									Copy to Clipboard
 								}
-								@dialog.Close(dialog.CloseProps{
-									For: "css-dialog",
+								@button.Button(button.Props{
+									Variant:    button.VariantSecondary,
+									Attributes: dialog.CloseFor("css-dialog"),
 								}) {
-									@button.Button(button.Props{
-										Variant: button.VariantSecondary,
-									}) {
-										Close
-									}
+									Close
 								}
 							}
 						}

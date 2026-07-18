@@ -170,7 +170,7 @@
       "displayName": "Sheet",
       "description": "Slide-out panel component (drawer).",
       "files": ["components/sheet/sheet.templ"],
-      "dependencies": ["dialog"],
+      "dependencies": ["button", "dialog", "icon"],
       "categories": ["overlays-dialogs"],
       "tags": ["sheet", "drawer", "panel", "overlay"]
     },
@@ -269,7 +269,7 @@
       "description": "Modal dialog component.",
       "files": ["components/dialog/dialog.templ"],
       "jsFiles": ["components/dialog/dialog.js", "components/dialog/dialog.min.js"],
-      "dependencies": ["icon"],
+      "dependencies": ["button", "icon"],
       "categories": ["overlays-dialogs"],
       "tags": ["dialog", "modal", "overlay", "popup"]
     },

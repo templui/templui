@@ -8,15 +8,12 @@ import (
 )
 
 templ SheetDefault() {
-	@sheet.Sheet(sheet.Props{
-		Side: sheet.SideRight,
-	}) {
-		@sheet.Trigger() {
-			@button.Button(button.Props{
-				Variant: button.VariantOutline,
-			}) {
-				Open
-			}
+	@sheet.Sheet() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: sheet.Trigger(ctx),
+		}) {
+			Open
 		}
 		@sheet.Content() {
 			@sheet.Header() {
@@ -37,7 +34,7 @@ templ SheetDefault() {
 					@input.Input(input.Props{
 						ID:    "sheet-demo-name",
 						Type:  input.TypeText,
-						Value: "Pedro Duarte",
+						Value: "Axel Adrian",
 					})
 				</div>
 				<div class="grid gap-3">
@@ -49,7 +46,7 @@ templ SheetDefault() {
 					@input.Input(input.Props{
 						ID:    "sheet-demo-username",
 						Type:  input.TypeText,
-						Value: "@peduarte",
+						Value: "@axadrn",
 					})
 				</div>
 			</div>
@@ -59,12 +56,11 @@ templ SheetDefault() {
 				}) {
 					Save changes
 				}
-				@sheet.Close() {
-					@button.Button(button.Props{
-						Variant: button.VariantOutline,
-					}) {
-						Close
-					}
+				@button.Button(button.Props{
+					Variant:    button.VariantOutline,
+					Attributes: sheet.Close(ctx),
+				}) {
+					Close
 				}
 			}
 		}

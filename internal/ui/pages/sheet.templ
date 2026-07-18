@@ -126,25 +126,14 @@ templ Sheet() {
 				@modules.APILegend()
 				<div id="api-sheet" class="mb-8">
 					@modules.APITable(modules.APITableProps{
-						Title: "Sheet",
+						Title:       "Sheet",
+						Description: "The root that links Trigger, Content and Close via ctx. Renders no element.",
 						Items: []modules.APITableItem{
 							{
 								Name:        "ID",
 								Type:        "string",
-								Default:     "\"\"",
-								Description: "Optional HTML id for the sheet root. Useful for external targeting.",
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Additional CSS classes to apply to the sheet wrapper",
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "nil",
-								Description: "Additional HTML attributes to apply to the sheet wrapper",
+								Default:     "randomID",
+								Description: "Optional id linking trigger and content, also used for external triggers and the JavaScript API.",
 							},
 							{
 								Name:        "Side",
@@ -175,31 +164,15 @@ templ Sheet() {
 				</div>
 				<div id="api-trigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
-						Title: "Trigger",
+						Title:       "Trigger",
+						Description: "sheet.Trigger(ctx) returns the attributes that turn any element into the trigger, usually spread onto a Button. Use sheet.TriggerFor(id) to target a sheet outside the current root.",
 						Items: []modules.APITableItem{
 							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Unique identifier for the trigger element",
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Additional CSS classes to apply to the trigger",
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "nil",
-								Description: "Additional HTML attributes to apply to the trigger",
-							},
-							{
-								Name:        "For",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Optional sheet root id for external triggers outside Sheet wrapper",
+								Name:        "ctx",
+								Type:        "context.Context",
+								Default:     "",
+								Description: "The templ context inside Sheet, carrying the sheet id.",
+								Required:    true,
 							},
 						},
 					})
@@ -225,12 +198,6 @@ templ Sheet() {
 								Type:        "bool",
 								Default:     "false",
 								Description: "Hide the close X button in the top right corner",
-							},
-							{
-								Name:        "Side",
-								Type:        "Side",
-								Default:     "SideRight",
-								Description: "Side from which the sheet slides in. Usually inherited from Sheet.",
 							},
 						},
 					})
@@ -337,25 +304,15 @@ templ Sheet() {
 				</div>
 				<div id="api-close">
 					@modules.APITable(modules.APITableProps{
-						Title: "Close",
+						Title:       "Close",
+						Description: "sheet.Close(ctx) returns the attributes that make any element close the sheet. Use sheet.CloseFor(id) to target a sheet outside the current root.",
 						Items: []modules.APITableItem{
 							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Unique identifier for the close button",
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Additional CSS classes to apply to the close button",
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "nil",
-								Description: "Additional HTML attributes to apply to the close button",
+								Name:        "ctx",
+								Type:        "context.Context",
+								Default:     "",
+								Description: "The templ context inside Sheet, carrying the sheet id.",
+								Required:    true,
 							},
 						},
 					})

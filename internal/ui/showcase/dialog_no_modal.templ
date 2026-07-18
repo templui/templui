@@ -7,14 +7,11 @@ import (
 
 templ DialogNoModal() {
 	<div class="space-y-4">
-		@dialog.Trigger(dialog.TriggerProps{
-			For: "non-modal-dialog",
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: dialog.TriggerFor("non-modal-dialog"),
 		}) {
-			@button.Button(button.Props{
-				Variant: button.VariantOutline,
-			}) {
-				Open Non-modal Dialog
-			}
+			Open Non-modal Dialog
 		}
 		@dialog.Dialog(dialog.Props{
 			ID: "non-modal-dialog",
@@ -32,10 +29,10 @@ templ DialogNoModal() {
 					}
 				}
 				@dialog.Footer() {
-					@dialog.Close() {
-						@button.Button() {
-							Close
-						}
+					@button.Button(button.Props{
+						Attributes: dialog.Close(ctx),
+					}) {
+						Close
 					}
 				}
 			}

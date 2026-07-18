@@ -11,13 +11,12 @@ templ SheetSides() {
 		@sheet.Sheet(sheet.Props{
 			Side: sheet.SideTop,
 		}) {
-			@sheet.Trigger() {
-				@button.Button(button.Props{
-					Variant: button.VariantOutline,
-					Class:   "w-full",
-				}) {
-					Open from Top
-				}
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Class:      "w-full",
+				Attributes: sheet.Trigger(ctx),
+			}) {
+				Open from Top
 			}
 			@sheet.Content() {
 				@sheet.Header() {
@@ -32,10 +31,10 @@ templ SheetSides() {
 					<p class="text-sm">Content for the top sheet.</p>
 				</div>
 				@sheet.Footer() {
-					@sheet.Close() {
-						@button.Button() {
-							Close
-						}
+					@button.Button(button.Props{
+						Attributes: sheet.Close(ctx),
+					}) {
+						Close
 					}
 				}
 			}
@@ -44,13 +43,12 @@ templ SheetSides() {
 		@sheet.Sheet(sheet.Props{
 			Side: sheet.SideRight,
 		}) {
-			@sheet.Trigger() {
-				@button.Button(button.Props{
-					Variant: button.VariantOutline,
-					Class:   "w-full",
-				}) {
-					Open from Right
-				}
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Class:      "w-full",
+				Attributes: sheet.Trigger(ctx),
+			}) {
+				Open from Right
 			}
 			@sheet.Content() {
 				@sheet.Header() {
@@ -65,10 +63,10 @@ templ SheetSides() {
 					<p class="text-sm">Content for the right sheet.</p>
 				</div>
 				@sheet.Footer() {
-					@sheet.Close() {
-						@button.Button() {
-							Close
-						}
+					@button.Button(button.Props{
+						Attributes: sheet.Close(ctx),
+					}) {
+						Close
 					}
 				}
 			}
@@ -77,13 +75,12 @@ templ SheetSides() {
 		@sheet.Sheet(sheet.Props{
 			Side: sheet.SideBottom,
 		}) {
-			@sheet.Trigger() {
-				@button.Button(button.Props{
-					Variant: button.VariantOutline,
-					Class:   "w-full",
-				}) {
-					Open from Bottom
-				}
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Class:      "w-full",
+				Attributes: sheet.Trigger(ctx),
+			}) {
+				Open from Bottom
 			}
 			@sheet.Content() {
 				@sheet.Header() {
@@ -98,10 +95,10 @@ templ SheetSides() {
 					<p class="text-sm">Content for the bottom sheet.</p>
 				</div>
 				@sheet.Footer() {
-					@sheet.Close() {
-						@button.Button() {
-							Close
-						}
+					@button.Button(button.Props{
+						Attributes: sheet.Close(ctx),
+					}) {
+						Close
 					}
 				}
 			}
@@ -110,13 +107,12 @@ templ SheetSides() {
 		@sheet.Sheet(sheet.Props{
 			Side: sheet.SideLeft,
 		}) {
-			@sheet.Trigger() {
-				@button.Button(button.Props{
-					Variant: button.VariantOutline,
-					Class:   "w-full",
-				}) {
-					Open from Left
-				}
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Class:      "w-full",
+				Attributes: sheet.Trigger(ctx),
+			}) {
+				Open from Left
 			}
 			@sheet.Content() {
 				@sheet.Header() {
@@ -131,10 +127,10 @@ templ SheetSides() {
 					<p class="text-sm">Content for the left sheet.</p>
 				</div>
 				@sheet.Footer() {
-					@sheet.Close() {
-						@button.Button() {
-							Close
-						}
+					@button.Button(button.Props{
+						Attributes: sheet.Close(ctx),
+					}) {
+						Close
 					}
 				}
 			}

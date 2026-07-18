@@ -1,133 +1,75 @@
 (function () {
   "use strict";
 
-  const CLOSE_DURATION_MS = 200;
+  const CLOSE_DURATION_MS = 120;
 
-  function getRoot(target) {
+  // Resolves a <dialog data-tui-dialog-content> from an id, the element
+  // itself, or anything inside it.
+  function getDialog(target) {
     if (!target) return null;
-
     if (typeof target === "string") {
-      const byId = document.getElementById(target);
-      if (byId?.matches?.("[data-tui-dialog]")) {
-        return byId;
-      }
-
-      try {
-        return document.querySelector(target)?.closest("[data-tui-dialog]") || null;
-      } catch {
-        return null;
-      }
+      const el = document.getElementById(target);
+      return el && el.matches("dialog[data-tui-dialog-content]") ? ensureDialog(el) : null;
     }
-
-    if (target.matches?.("[data-tui-dialog]")) {
-      return target;
-    }
-
-    return target.closest?.("[data-tui-dialog]") || null;
+    if (target.matches?.("dialog[data-tui-dialog-content]")) return ensureDialog(target);
+    return ensureDialog(target.closest?.("dialog[data-tui-dialog-content]") || null);
   }
 
-  function getDialog(root) {
-    if (!root) return null;
-    // Skip content nodes owned by a nested dialog when one sits between this root's trigger and content.
-    return ensureDialog(
-      [...root.querySelectorAll("[data-tui-dialog-content]")].find(
-        (el) => el.closest("[data-tui-dialog]") === root,
-      ),
+  function dialogFor(element) {
+    const id =
+      element.getAttribute("aria-controls") || element.getAttribute("data-tui-dialog-target");
+    if (id) return getDialog(id);
+    return getDialog(element);
+  }
+
+  function triggersFor(dialog) {
+    if (!dialog.id) return [];
+    return document.querySelectorAll(
+      '[data-tui-dialog-trigger][aria-controls="' + dialog.id + '"]',
     );
-  }
-
-  function getOwnedTriggers(root) {
-    if (!root) return [];
-
-    return Array.from(root.querySelectorAll("[data-tui-dialog-trigger]")).filter(
-      (trigger) => !trigger.hasAttribute("data-tui-dialog-target"),
-    );
-  }
-
-  function getTargetedTriggers(targetId) {
-    if (!targetId) return [];
-
-    return Array.from(
-      document.querySelectorAll(
-        `[data-tui-dialog-trigger][data-tui-dialog-target="${targetId}"]`,
-      ),
-    );
-  }
-
-  function getTargetValue(element) {
-    const target = element?.getAttribute("data-tui-dialog-target");
-    return target && target.trim() ? target.trim() : null;
-  }
-
-  function getRootForElement(element) {
-    return getRoot(getTargetValue(element) || element);
   }
 
   function ensureDialog(dialog) {
     if (!dialog || dialog.dataset.tuiDialogInitialized === "true") return dialog;
-
     dialog.dataset.tuiDialogInitialized = "true";
 
     dialog.addEventListener("cancel", (event) => {
-      const root = getRoot(dialog);
-      if (root?.hasAttribute("data-tui-dialog-disable-esc")) {
-        event.preventDefault();
-        return;
-      }
-
       event.preventDefault();
-      closeDialog(root);
+      if (dialog.hasAttribute("data-tui-dialog-disable-esc")) return;
+      closeDialog(dialog);
     });
 
     dialog.addEventListener("close", () => {
-      const root = getRoot(dialog);
-      window.clearTimeout(dialog._tuiDialogCloseTimer);
-      delete dialog._tuiDialogCloseTimer;
+      window.clearTimeout(dialog._tuiCloseTimer);
+      delete dialog._tuiCloseTimer;
       dialog.removeAttribute("data-tui-dialog-closing");
-      root?.removeAttribute("data-tui-dialog-closing");
-      updateState(getRoot(dialog), false);
+      updateState(dialog, false);
     });
 
+    // A click on the backdrop targets the dialog element itself.
     dialog.addEventListener("click", (event) => {
       if (event.target !== dialog) return;
-
-      const root = getRoot(dialog);
-      if (root?.hasAttribute("data-tui-dialog-disable-click-away")) {
-        return;
-      }
-
-      closeDialog(root);
+      if (dialog.hasAttribute("data-tui-dialog-disable-click-away")) return;
+      closeDialog(dialog);
     });
 
     return dialog;
   }
 
-  function updateState(root, isOpen) {
-    const dialog = getDialog(root);
-    dialog?.setAttribute("data-tui-dialog-open", isOpen ? "true" : "false");
-    root?.setAttribute("data-tui-dialog-open", isOpen ? "true" : "false");
-
-    getOwnedTriggers(root).forEach((trigger) => {
-      trigger.setAttribute("data-tui-dialog-trigger-open", isOpen ? "true" : "false");
+  function updateState(dialog, isOpen) {
+    dialog.setAttribute("data-tui-dialog-open", isOpen ? "true" : "false");
+    triggersFor(dialog).forEach((trigger) => {
+      trigger.setAttribute("aria-expanded", isOpen ? "true" : "false");
     });
-
-    if (root?.id) {
-      getTargetedTriggers(root.id).forEach((trigger) => {
-        trigger.setAttribute("data-tui-dialog-trigger-open", isOpen ? "true" : "false");
-      });
-    }
-
   }
 
   function openDialog(target) {
-    const root = getRoot(target);
-    const dialog = getDialog(root);
+    const dialog = getDialog(target);
     if (!dialog) return;
 
-    window.clearTimeout(dialog._tuiDialogCloseTimer);
-    delete dialog._tuiDialogCloseTimer;
+    window.clearTimeout(dialog._tuiCloseTimer);
+    delete dialog._tuiCloseTimer;
     dialog.removeAttribute("data-tui-dialog-closing");
-    root?.removeAttribute("data-tui-dialog-closing");
 
     if (!dialog.open) {
       try {
@@ -141,47 +83,37 @@
       }
     }
 
-    // Makes the slide-in animation work on Safari. The panel starts off-screen
-    // and slides in when we set open=true below. For the slide to show, the
-    // browser must first render the off-screen start position. Chrome/Firefox do
-    // that on their own; Safari skips straight to the end (panel just pops in).
-    // Reading offsetWidth forces the browser to render that start position now,
-    // before the next line moves it. Looks pointless, isn't.
+    // Safari needs the closed start position rendered before the open state
+    // lands, otherwise the enter animation is skipped.
     void dialog.offsetWidth;
 
-    updateState(root, true);
+    updateState(dialog, true);
   }
 
   function closeDialog(target) {
-    const root = getRoot(target);
-    const dialog = getDialog(root);
+    const dialog = getDialog(target);
     if (!dialog) return;
 
     if (!dialog.open) {
-      updateState(root, false);
+      updateState(dialog, false);
       return;
     }
-
-    if (dialog.dataset.tuiDialogClosing === "true") {
-      return;
-    }
+    if (dialog.dataset.tuiDialogClosing === "true") return;
 
     dialog.setAttribute("data-tui-dialog-closing", "true");
-    root?.setAttribute("data-tui-dialog-closing", "true");
-    updateState(root, false);
+    updateState(dialog, false);
 
-    dialog._tuiDialogCloseTimer = window.setTimeout(() => {
+    dialog._tuiCloseTimer = window.setTimeout(() => {
       if (dialog.open) {
         dialog.close();
       } else {
         dialog.removeAttribute("data-tui-dialog-closing");
-        root?.removeAttribute("data-tui-dialog-closing");
       }
     }, CLOSE_DURATION_MS);
   }
 
   function isDialogOpen(target) {
-    return getDialog(getRoot(target))?.open || false;
+    return getDialog(target)?.open || false;
   }
 
   function toggleDialog(target) {
@@ -189,41 +121,31 @@
   }
 
   function initDialogs(root = document) {
-    root.querySelectorAll("[data-tui-dialog]").forEach((dialogRoot) => {
-      const dialog = getDialog(dialogRoot);
-      if (!dialog) return;
-
-      // Already set up? Skip it. The MutationObserver re-runs this on every DOM
-      // change anywhere on the page; without this guard we'd re-write state on
-      // every existing dialog each time, which with reactive frameworks (e.g.
-      // Datastar patching content inside an open dialog) spirals into an
-      // observer feedback loop. Same skip-on-init pattern the other components
-      // use. See #562.
+    root.querySelectorAll("dialog[data-tui-dialog-content]").forEach((dialog) => {
       if (dialog.dataset.tuiDialogInitialized === "true") return;
-
       ensureDialog(dialog);
 
       if (dialog.getAttribute("data-tui-dialog-initial-open") === "true") {
-        // One-shot: consume the attribute so a later re-init (e.g. an
-        // unrelated MutationObserver tick) never re-opens a closed dialog.
+        // One-shot: consume the attribute so a later re-init never re-opens
+        // a closed dialog.
         dialog.removeAttribute("data-tui-dialog-initial-open");
-        openDialog(dialogRoot);
+        openDialog(dialog);
       } else {
-        updateState(dialogRoot, dialog.open);
+        updateState(dialog, dialog.open);
       }
     });
   }
 
   document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) return;
     const trigger = event.target.closest("[data-tui-dialog-trigger]");
     if (trigger) {
-      toggleDialog(getRootForElement(trigger));
+      toggleDialog(dialogFor(trigger));
       return;
     }
-
     const closeButton = event.target.closest("[data-tui-dialog-close]");
     if (closeButton) {
-      closeDialog(getRootForElement(closeButton));
+      closeDialog(dialogFor(closeButton));
     }
   });
 
@@ -233,9 +155,8 @@
     initDialogs();
   }
 
-  // Initialize dialogs added to the DOM after load (e.g. swapped in via HTMX),
-  // so a server-rendered dialog with Open:true still gets showModal() and its
-  // backdrop overlay.
+  // Initialize dialogs added later (e.g. swapped in via htmx), so a
+  // server-rendered dialog with Open true still gets showModal().
   new MutationObserver(() => initDialogs()).observe(document.body, {
     childList: true,
     subtree: true,

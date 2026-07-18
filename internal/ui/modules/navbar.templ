@@ -79,13 +79,12 @@ templ NavbarMobileMenu() {
 	@sheet.Sheet(sheet.Props{
 		Side: sheet.SideLeft,
 	}) {
-		@sheet.Trigger() {
-			<button
-				class="mr-2 lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-			>
-				@icon.Menu()
-			</button>
-		}
+		<button
+			class="mr-2 lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+			{ sheet.Trigger(ctx)... }
+		>
+			@icon.Menu()
+		</button>
 		@sheet.Content(sheet.ContentProps{
 			Class: "!p-4",
 		}) {

@@ -420,18 +420,14 @@ templ Trigger(props ...TriggerProps) {
 		{{ sidebarId = ctxId.(string) }}
 	}
 	<!-- Mobile: Trigger to open the sheet created in Sidebar component -->
-	@sheet.Trigger(sheet.TriggerProps{
-		For:   sidebarId + "-mobile",
-		Class: "md:hidden",
+	@button.Button(button.Props{
+		Size:       button.SizeIcon,
+		Variant:    button.VariantGhost,
+		Class:      "size-7 md:hidden",
+		Attributes: sheet.TriggerFor(sidebarId + "-mobile"),
 	}) {
-		@button.Button(button.Props{
-			Size:    button.SizeIcon,
-			Variant: button.VariantGhost,
-			Class:   "size-7",
-		}) {
-			@icon.PanelLeft(icon.Props{Class: "size-4"})
-			<span class="sr-only">Toggle Sidebar</span>
-		}
+		@icon.PanelLeft(icon.Props{Class: "size-4"})
+		<span class="sr-only">Toggle Sidebar</span>
 	}
 	<!-- Desktop: Sidebar Trigger -->
 	<div class="hidden md:block">
@@ -749,3 +745,4 @@ templ Script() {
 		@utils.ComponentScript("sidebar")
 	}
 }
+

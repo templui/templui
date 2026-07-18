@@ -27,24 +27,20 @@ templ SheetExternalTrigger() {
 				</p>
 			</div>
 			@sheet.Footer() {
-				@sheet.Close() {
-					@button.Button(button.Props{
-						Variant: button.VariantOutline,
-					}) {
-						Close
-					}
+				@button.Button(button.Props{
+					Variant:    button.VariantOutline,
+					Attributes: sheet.Close(ctx),
+				}) {
+					Close
 				}
 			}
 		}
 	}
 	// External trigger outside of Sheet component
-	@sheet.Trigger(sheet.TriggerProps{
-		For: "external-trigger-demo",
+	@button.Button(button.Props{
+		Variant:    button.VariantOutline,
+		Attributes: sheet.TriggerFor("external-trigger-demo"),
 	}) {
-		@button.Button(button.Props{
-			Variant: button.VariantOutline,
-		}) {
-			Open Sheet
-		}
+		Open Sheet
 	}
 }

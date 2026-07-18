@@ -58,10 +58,6 @@ templ Dialog() {
 						Text: "Description",
 					},
 					{
-						ID:   "api-body",
-						Text: "Body",
-					},
-					{
 						ID:   "api-footer",
 						Text: "Footer",
 					},
@@ -136,25 +132,13 @@ templ Dialog() {
 				<div id="api-dialog" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Dialog",
-						Description: "Main dialog wrapper component. Provides context for child components.",
+						Description: "The root that links Trigger, Content and Close via ctx. Renders no element.",
 						Items: []modules.APITableItem{
 							{
 								Name:        "ID",
 								Type:        "string",
-								Default:     "\"\"",
-								Description: "Optional HTML id for the dialog root. Useful for external targeting.",
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Additional CSS classes to apply to the dialog container",
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "nil",
-								Description: "Additional HTML attributes to apply to the dialog container",
+								Default:     "randomID",
+								Description: "Optional id linking trigger and content, also used for external triggers and the JavaScript API.",
 							},
 							{
 								Name:        "DisableClickAway",
@@ -180,31 +164,14 @@ templ Dialog() {
 				<div id="api-trigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Trigger",
-						Description: "Element that triggers the dialog to open. Usually used inside Dialog, or externally by targeting a dialog root ID with For.",
+						Description: "dialog.Trigger(ctx) returns the attributes that turn any element into the trigger, usually spread onto a Button. Use dialog.TriggerFor(id) to target a dialog outside the current root.",
 						Items: []modules.APITableItem{
 							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Unique identifier for the trigger element",
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Additional CSS classes to apply to the trigger",
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "nil",
-								Description: "Additional HTML attributes to apply to the trigger",
-							},
-							{
-								Name:        "For",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Optional dialog root id for external triggers",
+								Name:        "ctx",
+								Type:        "context.Context",
+								Default:     "",
+								Description: "The templ context inside Dialog, carrying the dialog id.",
+								Required:    true,
 							},
 						},
 					})
@@ -319,32 +286,6 @@ templ Dialog() {
 						},
 					})
 				</div>
-				<div id="api-body" class="mb-8">
-					@modules.APITable(modules.APITableProps{
-						Title:       "Body",
-						Description: "Body/content section of the dialog.",
-						Items: []modules.APITableItem{
-							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Unique identifier for the body element",
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Additional CSS classes to apply to the body",
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "nil",
-								Description: "Additional HTML attributes to apply to the body",
-							},
-						},
-					})
-				</div>
 				<div id="api-footer" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Footer",
@@ -374,31 +315,14 @@ templ Dialog() {
 				<div id="api-close">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Close",
-						Description: "Element that closes the dialog.",
+						Description: "dialog.Close(ctx) returns the attributes that make any element close the dialog. Use dialog.CloseFor(id) to target a dialog outside the current root.",
 						Items: []modules.APITableItem{
 							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Unique identifier for the close element",
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Additional CSS classes to apply to the close element",
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "nil",
-								Description: "Additional HTML attributes to apply to the close element",
-							},
-							{
-								Name:        "For",
-								Type:        "string",
-								Default:     "\"\"",
-								Description: "Optional dialog root id to close (defaults to closest dialog if empty)",
+								Name:        "ctx",
+								Type:        "context.Context",
+								Default:     "",
+								Description: "The templ context inside Dialog, carrying the dialog id.",
+								Required:    true,
 							},
 						},
 					})

@@ -9,12 +9,11 @@ import (
 
 templ DialogDefault() {
 	@dialog.Dialog() {
-		@dialog.Trigger() {
-			@button.Button(button.Props{
-				Variant: button.VariantOutline,
-			}) {
-				Open Dialog
-			}
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: dialog.Trigger(ctx),
+		}) {
+			Open Dialog
 		}
 		@dialog.Content(dialog.ContentProps{
 			Class: "max-w-md",
@@ -35,7 +34,7 @@ templ DialogDefault() {
 					@input.Input(input.Props{
 						ID:          "name",
 						Placeholder: "Enter your name",
-						Value:       "John Doe",
+						Value:       "Axel Adrian",
 					})
 				</div>
 				<div class="space-y-2">
@@ -45,17 +44,16 @@ templ DialogDefault() {
 					@input.Input(input.Props{
 						ID:          "username",
 						Placeholder: "Enter your username",
-						Value:       "@johndoe",
+						Value:       "@axadrn",
 					})
 				</div>
 			</div>
 			@dialog.Footer() {
-				@dialog.Close() {
-					@button.Button(button.Props{
-						Variant: button.VariantOutline,
-					}) {
-						Cancel
-					}
+				@button.Button(button.Props{
+					Variant:    button.VariantOutline,
+					Attributes: dialog.Close(ctx),
+				}) {
+					Cancel
 				}
 				@button.Button() {
 					Save changes
