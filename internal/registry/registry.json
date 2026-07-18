@@ -165,28 +165,6 @@
       ]
     },
     {
-      "name": "copybutton",
-      "slug": "copy-button",
-      "displayName": "Copy Button",
-      "description": "Copy to clipboard button component.",
-      "files": ["components/copybutton/copybutton.templ"],
-      "jsFiles": ["components/copybutton/copybutton.js", "components/copybutton/copybutton.min.js"],
-      "dependencies": ["button", "icon"],
-      "categories": ["misc"],
-      "tags": ["copy", "clipboard", "button", "utility"]
-    },
-    {
-      "name": "datepicker",
-      "slug": "date-picker",
-      "displayName": "Date Picker",
-      "description": "Date picker component combining input and calendar.",
-      "files": ["components/datepicker/datepicker.templ"],
-      "jsFiles": ["components/datepicker/datepicker.js", "components/datepicker/datepicker.min.js"],
-      "dependencies": ["button", "calendar", "card", "icon", "popover"],
-      "categories": ["form-input"],
-      "tags": ["datepicker", "date", "calendar", "input", "form"]
-    },
-    {
       "name": "sheet",
       "slug": "sheet",
       "displayName": "Sheet",
@@ -327,17 +305,6 @@
       "tags": ["radio", "input", "form", "selection", "choice"]
     },
     {
-      "name": "rating",
-      "slug": "rating",
-      "displayName": "Rating",
-      "description": "Star rating input component.",
-      "files": ["components/rating/rating.templ"],
-      "jsFiles": ["components/rating/rating.js", "components/rating/rating.min.js"],
-      "dependencies": ["icon"],
-      "categories": ["form-input"],
-      "tags": ["rating", "star", "review", "feedback", "score"]
-    },
-    {
       "name": "selectbox",
       "slug": "select-box",
       "displayName": "Select Box",
@@ -432,17 +399,6 @@
       "tags": ["tabs", "navigation", "panels", "content"]
     },
     {
-      "name": "tagsinput",
-      "slug": "tags-input",
-      "displayName": "Tags Input",
-      "description": "Tags input component.",
-      "files": ["components/tagsinput/tagsinput.templ"],
-      "jsFiles": ["components/tagsinput/tagsinput.js", "components/tagsinput/tagsinput.min.js"],
-      "dependencies": ["badge", "input", "popover"],
-      "categories": ["form-input"],
-      "tags": ["tags", "input", "form", "multi-value", "chips"]
-    },
-    {
       "name": "textarea",
       "slug": "textarea",
       "displayName": "Textarea",
@@ -451,17 +407,6 @@
       "dependencies": [],
       "categories": ["form-input"],
       "tags": ["textarea", "input", "form", "text", "multiline"]
-    },
-    {
-      "name": "timepicker",
-      "slug": "time-picker",
-      "displayName": "Time Picker",
-      "description": "Time picker component.",
-      "files": ["components/timepicker/timepicker.templ"],
-      "jsFiles": ["components/timepicker/timepicker.js", "components/timepicker/timepicker.min.js"],
-      "dependencies": ["button", "card", "icon", "popover"],
-      "categories": ["form-input"],
-      "tags": ["timepicker", "time", "clock", "input", "form"]
     },
     {
       "name": "toast",

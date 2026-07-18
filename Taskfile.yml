@@ -36,7 +36,6 @@ tasks:
         components/collapsible/collapsible.js \
         components/combobox/combobox.js \
         components/copybutton/copybutton.js \
-        components/datepicker/datepicker.js \
         components/dialog/dialog.js \
         components/dropdownmenu/dropdownmenu.js \
         components/inputotp/inputotp.js \
@@ -44,13 +43,10 @@ tasks:
         components/label/label.js \
         components/popover/popover.js \
         components/progress/progress.js \
-        components/rating/rating.js \
         components/select/select.js \
         components/sidebar/sidebar.js \
         components/slider/slider.js \
         components/tabs/tabs.js \
-        components/tagsinput/tagsinput.js \
-        components/timepicker/timepicker.js \
         components/toast/toast.js \
         components/tooltip/tooltip.js \
         --minify \

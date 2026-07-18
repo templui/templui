@@ -115,20 +115,7 @@ func main() {
 		// Collapsible
 		"out/showcase/collapsible_default.html": showcase.CollapsibleDefault(),
 
-		// CopyButton
-		"out/showcase/copybutton_default.html":    showcase.CopyButtonDefault(),
-		"out/showcase/copybutton_with_input.html": showcase.CopyButtonWithInput(),
 
-		// Date Picker
-		"out/showcase/date_picker_custom_placeholder.html": showcase.DatePickerCustomPlaceholder(),
-		"out/showcase/date_picker_default.html":            showcase.DatePickerDefault(),
-		"out/showcase/date_picker_disabled.html":           showcase.DatePickerDisabled(),
-		"out/showcase/date_picker_form.html":               showcase.DatePickerForm(),
-		"out/showcase/date_picker_formats.html":            showcase.DatePickerFormats(),
-		"out/showcase/date_picker_range.html":              showcase.DatePickerRange(),
-		"out/showcase/date_picker_selected_date.html":      showcase.DatePickerSelectedDate(),
-		"out/showcase/date_picker_with_label.html":         showcase.DatePickerWithLabel(),
-		"out/showcase/date_picker_with_time.html":          showcase.DatePickerWithTime(),
 
 		// Combobox
 		"out/showcase/combobox_default.html":        showcase.ComboboxDefault(),
@@ -217,13 +204,6 @@ func main() {
 		"out/showcase/radio_default.html": showcase.RadioDefault(),
 		"out/showcase/radio_form.html":    showcase.RadioForm(),
 
-		// Rating
-		"out/showcase/rating_default.html":    showcase.RatingDefault(),
-		"out/showcase/rating_form.html":       showcase.RatingForm(),
-		"out/showcase/rating_max_values.html": showcase.RatingMaxValues(),
-		"out/showcase/rating_precision.html":  showcase.RatingPrecision(),
-		"out/showcase/rating_styles.html":     showcase.RatingStyles(),
-		"out/showcase/rating_with_label.html": showcase.RatingWithLabel(),
 
 		// Separator
 		"out/showcase/separator_decorated.html": showcase.SeparatorDecorated(),
@@ -254,12 +234,6 @@ func main() {
 		// Tabs
 		"out/showcase/tabs_default.html": showcase.TabsDefault(),
 
-		// Tags Input
-		"out/showcase/tagsinput_default.html":     showcase.TagsInputDefault(),
-		"out/showcase/tagsinput_suggestions.html": showcase.TagsInputSuggestions(),
-		"out/showcase/tagsinput_disabled.html":    showcase.TagsInputDisabled(),
-		"out/showcase/tagsinput_form.html":        showcase.TagsInputForm(),
-		"out/showcase/tagsinput_with_label.html":  showcase.TagsInputWithLabel(),
 
 		// Textarea
 		"out/showcase/textarea_custom_rows.html": showcase.TextareaCustomRows(),
@@ -268,15 +242,6 @@ func main() {
 		"out/showcase/textarea_form.html":        showcase.TextareaForm(),
 		"out/showcase/textarea_with_label.html":  showcase.TextareaWithLabel(),
 
-		// Time Picker
-		"out/showcase/time_picker_12hour.html":             showcase.TimePicker12Hour(),
-		"out/showcase/time_picker_custom_placeholder.html": showcase.TimePickerCustomPlaceholder(),
-		"out/showcase/time_picker_default.html":            showcase.TimePickerDefault(),
-		"out/showcase/time_picker_form.html":               showcase.TimePickerForm(),
-		"out/showcase/time_picker_label.html":              showcase.TimePickerLabel(),
-		"out/showcase/time_picker_min_max.html":            showcase.TimePickerMinMax(),
-		"out/showcase/time_picker_selected_time.html":      showcase.TimePickerSelectedTime(),
-		"out/showcase/time_picker_step.html":               showcase.TimePickerStep(),
 
 		// Toast
 		"out/showcase/toast_default.html":    showcase.ToastDefault(),

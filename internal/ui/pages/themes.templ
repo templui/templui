@@ -18,7 +18,6 @@ import (
 	"github.com/templui/templui/components/spinner"
 	switchcomp "github.com/templui/templui/components/switch"
 	"github.com/templui/templui/components/tabs"
-	"github.com/templui/templui/components/tagsinput"
 	"github.com/templui/templui/components/textarea"
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
@@ -451,28 +450,6 @@ templ ThemeShowcase() {
 							</div>
 						</div>
 					</div>
-				}
-			}
-			<!-- Tags Input Card -->
-			@card.Card() {
-				@card.Header() {
-					@card.Title() {
-						Project Tags
-					}
-					@card.Description() {
-						Add tags to categorize your project
-					}
-				}
-				@card.Content(card.ContentProps{Class: "p-6"}) {
-					@field.Label(field.LabelProps{For: "project-tags", Class: "sr-only"}) {
-						Project Tags
-					}
-					@tagsinput.TagsInput(tagsinput.Props{
-						ID:          "project-tags",
-						Name:        "tags",
-						Placeholder: "Add a tag",
-						Value:       []string{"frontend", "react", "typescript"},
-					})
 				}
 			}
 			<!-- Tabs Navigation Card -->
