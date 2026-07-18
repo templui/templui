@@ -166,7 +166,7 @@ func List(props ...ListProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var6 = []any{utils.TwMerge(
-			"flex items-center flex-wrap gap-1 text-sm",
+			"flex flex-wrap items-center gap-1.5 text-sm break-words text-muted-foreground",
 			p.Class,
 		),
 		}
@@ -260,7 +260,7 @@ func Item(props ...ItemProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var10 = []any{utils.TwMerge(
-			"flex items-center",
+			"inline-flex items-center gap-1",
 			p.Class,
 		),
 		}
@@ -354,7 +354,7 @@ func Link(props ...LinkProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var14 = []any{utils.TwMerge(
-			"text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1.5 transition-colors",
+			"transition-colors hover:text-foreground",
 			p.Class,
 		),
 		}
@@ -467,7 +467,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var19 = []any{utils.TwMerge(
-			"mx-2 text-muted-foreground",
+			"[&>svg]:size-3.5",
 			p.Class,
 		),
 		}
@@ -568,7 +568,7 @@ func Page(props ...ItemProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var23 = []any{utils.TwMerge(
-			"font-medium text-foreground flex items-center gap-1.5",
+			"font-normal text-foreground",
 			p.Class,
 		),
 		}
@@ -629,6 +629,44 @@ func Page(props ...ItemProps) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</span>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// Ellipsis marks collapsed breadcrumb items.
+func Ellipsis() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var26 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var26 == nil {
+			templ_7745c5c3_Var26 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<span aria-hidden=\"true\" data-slot=\"breadcrumb-ellipsis\" role=\"presentation\" class=\"flex size-5 items-center justify-center [&>svg]:size-4\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = icon.Ellipsis().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<span class=\"sr-only\">More</span></span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

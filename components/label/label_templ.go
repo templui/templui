@@ -44,7 +44,7 @@ func Label(props ...Props) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
-			"text-sm font-medium leading-none inline-block",
+			"flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
 			utils.If(len(p.Error) > 0, "text-destructive"),
 			p.Class,
 		),

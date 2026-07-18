@@ -56,15 +56,18 @@ templ Table(props ...Props) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<table
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={ utils.TwMerge("w-full caption-bottom text-sm", p.Class) }
-		{ p.Attributes... }
-	>
-		{ children... }
-	</table>
+	<div data-slot="table-container" class="relative w-full overflow-x-auto">
+		<table
+			if p.ID != "" {
+				id={ p.ID }
+			}
+			data-slot="table"
+			class={ utils.TwMerge("w-full caption-bottom text-sm", p.Class) }
+			{ p.Attributes... }
+		>
+			{ children... }
+		</table>
+	</div>
 }
 
 templ Header(props ...HeaderProps) {
@@ -126,7 +129,7 @@ templ Row(props ...RowProps) {
 		}
 		class={
 			utils.TwMerge(
-				"border-b transition-colors hover:bg-muted/50",
+				"border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted has-aria-expanded:bg-muted/50",
 				utils.If(p.Selected, "data-[tui-table-state-selected]:bg-muted"),
 				p.Class,
 			),
@@ -151,7 +154,7 @@ templ Head(props ...HeadProps) {
 		}
 		class={
 			utils.TwMerge(
-				"h-10 px-2 text-left align-middle font-medium text-muted-foreground",
+				"h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0",
 				"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
 				p.Class,
 			),
@@ -173,7 +176,7 @@ templ Cell(props ...CellProps) {
 		}
 		class={
 			utils.TwMerge(
-				"p-2 align-middle",
+				"p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0",
 				"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
 				p.Class,
 			),

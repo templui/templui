@@ -62,7 +62,7 @@ templ Pagination(props ...Props) {
 		}
 		role="navigation"
 		aria-label="pagination"
-		class={ utils.TwMerge("flex flex-wrap justify-center", p.Class) }
+		class={ utils.TwMerge("mx-auto flex w-full justify-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -78,7 +78,7 @@ templ Content(props ...ContentProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class="flex flex-row items-center gap-1"
+		class="flex items-center gap-0.5"
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -140,7 +140,7 @@ templ Previous(props ...PreviousProps) {
 		Href:       p.Href,
 		Disabled:   p.Disabled,
 		Variant:    button.VariantGhost,
-		Class:      utils.TwMerge("gap-1", p.Class),
+		Class:      utils.TwMerge("pl-1.5!", p.Class),
 		Attributes: p.Attributes,
 	}) {
 		@icon.ChevronLeft(icon.Props{Class: "size-4"})
@@ -160,7 +160,7 @@ templ Next(props ...NextProps) {
 		Href:       p.Href,
 		Disabled:   p.Disabled,
 		Variant:    button.VariantGhost,
-		Class:      utils.TwMerge("gap-1", p.Class),
+		Class:      utils.TwMerge("pr-1.5!", p.Class),
 		Attributes: p.Attributes,
 	}) {
 		if p.Label != "" {
@@ -171,7 +171,10 @@ templ Next(props ...NextProps) {
 }
 
 templ Ellipsis() {
-	@icon.Ellipsis(icon.Props{Class: "size-4"})
+	<span aria-hidden="true" data-slot="pagination-ellipsis" class="flex size-8 items-center justify-center [&_svg:not([class*='size-'])]:size-4">
+		@icon.Ellipsis()
+		<span class="sr-only">More pages</span>
+	</span>
 }
 
 func CreatePagination(currentPage, totalPages, maxVisible int) struct {

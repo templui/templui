@@ -71,7 +71,7 @@ templ List(props ...ListProps) {
 		}
 		class={
 			utils.TwMerge(
-				"flex items-center flex-wrap gap-1 text-sm",
+				"flex flex-wrap items-center gap-1.5 text-sm break-words text-muted-foreground",
 				p.Class,
 			),
 		}
@@ -92,7 +92,7 @@ templ Item(props ...ItemProps) {
 		}
 		class={
 			utils.TwMerge(
-				"flex items-center",
+				"inline-flex items-center gap-1",
 				p.Class,
 			),
 		}
@@ -116,7 +116,7 @@ templ Link(props ...LinkProps) {
 		}
 		class={
 			utils.TwMerge(
-				"text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1.5 transition-colors",
+				"transition-colors hover:text-foreground",
 				p.Class,
 			),
 		}
@@ -137,7 +137,7 @@ templ Separator(props ...SeparatorProps) {
 		}
 		class={
 			utils.TwMerge(
-				"mx-2 text-muted-foreground",
+				"[&>svg]:size-3.5",
 				p.Class,
 			),
 		}
@@ -162,7 +162,7 @@ templ Page(props ...ItemProps) {
 		}
 		class={
 			utils.TwMerge(
-				"font-medium text-foreground flex items-center gap-1.5",
+				"font-normal text-foreground",
 				p.Class,
 			),
 		}
@@ -170,5 +170,13 @@ templ Page(props ...ItemProps) {
 		{ p.Attributes... }
 	>
 		{ children... }
+	</span>
+}
+
+// Ellipsis marks collapsed breadcrumb items.
+templ Ellipsis() {
+	<span aria-hidden="true" data-slot="breadcrumb-ellipsis" role="presentation" class="flex size-5 items-center justify-center [&>svg]:size-4">
+		@icon.Ellipsis()
+		<span class="sr-only">More</span>
 	</span>
 }

@@ -87,18 +87,6 @@ templ Separator() {
 					PreviewCodeFile: "separator_vertical.templ",
 					ID:              "vertical",
 				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "With Label",
-					ShowcaseFile:    showcase.SeparatorLabel(),
-					PreviewCodeFile: "separator_label.templ",
-					ID:              "with-label",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Decorated",
-					ShowcaseFile:    showcase.SeparatorDecorated(),
-					PreviewCodeFile: "separator_decorated.templ",
-					ID:              "decorated",
-				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "API Reference",
@@ -136,13 +124,6 @@ templ Separator() {
 								Type:        "Orientation",
 								Default:     "horizontal",
 								Description: "Orientation of the separator. Options: 'horizontal', 'vertical'.",
-								Required:    false,
-							},
-							{
-								Name:        "Decoration",
-								Type:        "Decoration",
-								Default:     "none",
-								Description: "Decoration style for the separator. Options: 'none', 'dashed', 'dotted'.",
 								Required:    false,
 							},
 						},

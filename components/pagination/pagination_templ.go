@@ -84,7 +84,7 @@ func Pagination(props ...Props) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("flex flex-wrap justify-center", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.TwMerge("mx-auto flex w-full justify-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -197,7 +197,7 @@ func Content(props ...ContentProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, " class=\"flex flex-row items-center gap-1\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, " class=\"flex items-center gap-0.5\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -450,7 +450,7 @@ func Previous(props ...PreviousProps) templ.Component {
 			Href:       p.Href,
 			Disabled:   p.Disabled,
 			Variant:    button.VariantGhost,
-			Class:      utils.TwMerge("gap-1", p.Class),
+			Class:      utils.TwMerge("pl-1.5!", p.Class),
 			Attributes: p.Attributes,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var13), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -531,7 +531,7 @@ func Next(props ...NextProps) templ.Component {
 			Href:       p.Href,
 			Disabled:   p.Disabled,
 			Variant:    button.VariantGhost,
-			Class:      utils.TwMerge("gap-1", p.Class),
+			Class:      utils.TwMerge("pr-1.5!", p.Class),
 			Attributes: p.Attributes,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var16), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -562,7 +562,15 @@ func Ellipsis() templ.Component {
 			templ_7745c5c3_Var18 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = icon.Ellipsis(icon.Props{Class: "size-4"}).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<span aria-hidden=\"true\" data-slot=\"pagination-ellipsis\" class=\"flex size-8 items-center justify-center [&_svg:not([class*='size-'])]:size-4\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = icon.Ellipsis().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<span class=\"sr-only\">More pages</span></span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

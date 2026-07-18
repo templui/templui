@@ -42,7 +42,7 @@ func Skeleton(props ...Props) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
-			"animate-pulse rounded bg-muted",
+			"animate-pulse rounded-md bg-muted",
 			p.Class,
 		),
 		}

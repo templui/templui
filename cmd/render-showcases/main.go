@@ -219,9 +219,7 @@ func main() {
 
 
 		// Separator
-		"out/showcase/separator_decorated.html": showcase.SeparatorDecorated(),
 		"out/showcase/separator_default.html":   showcase.SeparatorDefault(),
-		"out/showcase/separator_label.html":     showcase.SeparatorLabel(),
 		"out/showcase/separator_vertical.html":  showcase.SeparatorVertical(),
 
 		// Sidebar
