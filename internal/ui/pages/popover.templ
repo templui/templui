@@ -78,42 +78,33 @@ templ Popover() {
 				<div id="api-root" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Root",
-						Description: "Local popover instance that groups one trigger with one content element.",
+						Description: "The root that links Trigger and Content via ctx. Renders no element.",
 						Items: []modules.APITableItem{
-							{Name: "ID", Type: "string", Default: "", Description: "Optional root ID for the JavaScript API. Internal trigger-content wiring does not use it.", Required: false},
-							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the root wrapper.", Required: false},
-							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the root wrapper.", Required: false},
+							{Name: "ID", Type: "string", Default: "randomID", Description: "Optional id linking trigger and content, also used by the JavaScript API.", Required: false},
 						},
 					})
 				</div>
 				<div id="api-trigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Trigger",
-						Description: "Element inside a Root that opens the matching popover content.",
+						Description: "popover.Trigger(ctx) returns the attributes that turn any element into the trigger, usually spread onto a Button.",
 						Items: []modules.APITableItem{
-							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the trigger element.", Required: false},
-							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the trigger.", Required: false},
-							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the trigger element.", Required: false},
-							{Name: "TriggerType", Type: "TriggerType", Default: "click", Description: "How the popover is triggered. Options: 'click', 'hover', 'manual'.", Required: false},
+							{Name: "ctx", Type: "context.Context", Default: "", Description: "The templ context inside Root, carrying the popover id.", Required: true},
 						},
 					})
 				</div>
 				<div id="api-content" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Content",
-						Description: "Popover content inside the same Root. Placement and closing behavior are configured here.",
+						Description: "The floating surface, portaled to the body and rendered in the native top layer.",
 						Items: []modules.APITableItem{
-							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the content element.", Required: false},
+							{Name: "Side", Type: "Side", Default: "bottom", Description: "Side of the trigger to open against. Options: 'top', 'right', 'bottom', 'left'.", Required: false},
+							{Name: "Align", Type: "Align", Default: "center", Description: "Alignment along the trigger edge. Options: 'start', 'center', 'end'.", Required: false},
+							{Name: "SideOffset", Type: "int", Default: "4", Description: "Gap to the trigger in px.", Required: false},
+							{Name: "AlignOffset", Type: "int", Default: "0", Description: "Shift along the aligned edge in px.", Required: false},
+							{Name: "ID", Type: "string", Default: "Root ID", Description: "Optional HTML id for the content element.", Required: false},
 							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the content.", Required: false},
-							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the content element.", Required: false},
-							{Name: "Placement", Type: "Placement", Default: "bottom", Description: "Position of the popover relative to trigger. Options: 'top', 'top-start', 'top-end', 'right', 'right-start', 'right-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'left-start', 'left-end'.", Required: false},
-							{Name: "Offset", Type: "int", Default: "4 (or 8 with arrow)", Description: "Distance in pixels between the trigger and popover content.", Required: false},
-							{Name: "DisableClickAway", Type: "bool", Default: "false", Description: "Prevents closing the popover when clicking outside.", Required: false},
-							{Name: "DisableESC", Type: "bool", Default: "false", Description: "Prevents closing the popover with the ESC key.", Required: false},
-							{Name: "ShowArrow", Type: "bool", Default: "false", Description: "Whether to show an arrow pointing to the trigger element.", Required: false},
-							{Name: "HoverDelay", Type: "int", Default: "0", Description: "Delay in milliseconds before showing the popover on hover.", Required: false},
-							{Name: "HoverOutDelay", Type: "int", Default: "0", Description: "Delay in milliseconds before hiding the popover on hover out.", Required: false},
-							{Name: "Exclusive", Type: "bool", Default: "false", Description: "When true, opening this popover will close other exclusive popovers.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the content.", Required: false},
 						},
 					})
 				</div>

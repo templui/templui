@@ -521,6 +521,7 @@ import "../floatingui/floating_ui_dom.js";
     document.querySelectorAll("[data-tui-select-trigger]").forEach((trigger) => {
       const content = contentFor(trigger);
       if (!content) return;
+      portal(content); // portal up front, like React does on mount
       const checked = content.querySelector('[data-tui-select-item][data-state="checked"]');
       if (!checked) return;
       const label = (checked.querySelector("[data-tui-select-item-text]") || checked).textContent.trim();

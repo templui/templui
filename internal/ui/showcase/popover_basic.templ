@@ -9,11 +9,11 @@ templ PopoverBasic() {
 	@popover.Root() {
 		@button.Button(button.Props{
 			Variant:    button.VariantOutline,
-			Attributes: popover.TriggerAttributes(popover.TriggerTypeClick),
+			Attributes: popover.Trigger(ctx),
 		}) {
 			Open Popover
 		}
-		@popover.Content(popover.ContentProps{Placement: popover.PlacementBottomStart}) {
+		@popover.Content(popover.ContentProps{Side: popover.SideBottom, Align: popover.AlignStart}) {
 			@popover.Header() {
 				@popover.Title() {
 					Dimensions

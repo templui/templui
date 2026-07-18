@@ -20,12 +20,12 @@ templ ButtonGroupPopover() {
 			@button.Button(button.Props{
 				Variant:    button.VariantOutline,
 				Size:       button.SizeIcon,
-				Attributes: utils.MergeAttributes(popover.TriggerAttributes(popover.TriggerTypeClick), templ.Attributes{"aria-label": "Open Popover"}),
+				Attributes: utils.MergeAttributes(popover.Trigger(ctx), templ.Attributes{"aria-label": "Open Popover"}),
 			}) {
 				@icon.ChevronDown()
 			}
 			@popover.Content(popover.ContentProps{
-				Placement: popover.PlacementBottomEnd,
+				Side: popover.SideBottom, Align: popover.AlignEnd,
 				Class:     "w-80 rounded-xl bg-popover p-4 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10",
 			}) {
 				<div class="flex flex-col gap-1.5">

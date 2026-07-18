@@ -2,560 +2,244 @@ import "../floatingui/floating_ui_core.js";
 import "../floatingui/floating_ui_dom.js";
 
 (function () {
-  "use strict";
+  // Constants from Base UI's popover, shadcn's reference implementation.
+  const EXIT_MS = 120; // exit animation (duration-100) + slack
+  const COLLISION_PADDING = 5;
 
-  const floatingCleanups = new WeakMap();
-  const hoverTimeouts = new WeakMap();
-  // Tracks whether pointerdown landed inside each open popover's content/trigger.
-  // Captured before any bubble-phase click handler can mutate the DOM, so the
-  // subsequent click handler can decide "outside" by user intent rather than by
-  // post-mutation event.target — which becomes unreliable when a child (e.g.
-  // Calendar) re-renders its grid during the click.
-  const pointerDownInside = new WeakMap();
-  const arrowBaseClass =
-    "absolute h-2.5 w-2.5 rotate-45 rounded-[2px] bg-popover border border-border";
-  const exitAnimationDuration = 150;
-
-  function getRootById(id) {
-    const root = document.getElementById(id);
-    return root?.matches("[data-tui-popover-root]") ? root : null;
+  function allContents() {
+    return document.querySelectorAll("[data-tui-popover-content]");
   }
 
-  function getRoots() {
-    return Array.from(document.querySelectorAll("[data-tui-popover-root]"));
-  }
-
-  function getContent(root) {
-    return Array.from(root?.children || []).find((child) =>
-      child.matches("[data-tui-popover-content]"),
+  function triggerFor(content) {
+    return document.querySelector(
+      '[data-tui-popover-trigger][aria-controls="' + content.id + '"]',
     );
   }
 
-  function getTriggers(root) {
-    return Array.from(root?.children || []).filter((child) =>
-      child.matches("[data-tui-popover-trigger]"),
-    );
+  function contentFor(trigger) {
+    return document.getElementById(trigger.getAttribute("aria-controls"));
   }
 
-  function getReferenceElement(trigger) {
-    // If the trigger has its own box (a real element, e.g. an asChild button),
-    // anchor to it directly.
-    const ownRect = trigger.getBoundingClientRect?.();
-    if (ownRect && ownRect.width * ownRect.height > 0) {
-      return trigger;
-    }
-
-    // Otherwise the trigger is a boxless wrapper (display: contents) — fall back
-    // to its largest child so we still anchor to something with a real box.
-    let ref = trigger;
-    let maxArea = 0;
-    for (const child of trigger.children) {
-      const rect = child.getBoundingClientRect?.();
-      if (!rect) continue;
-
-      const area = rect.width * rect.height;
-      if (area > maxArea) {
-        maxArea = area;
-        ref = child;
-      }
-    }
-
-    return ref;
+  function popupFor(content) {
+    return content.querySelector("[data-tui-popover-popup]");
   }
 
-  function isHoverRoot(root) {
-    return getTriggers(root).some(
-      (trigger) => trigger.getAttribute("data-tui-popover-type") === "hover",
-    );
+  function setState(content, state) {
+    content.setAttribute("data-state", state);
+    const popup = popupFor(content);
+    if (popup) popup.setAttribute("data-state", state);
   }
 
-  function isOpenRoot(root) {
-    // Use the native popover state as source of truth: the data-attribute is
-    // only a CSS hook for fade animations and can drift when something else
-    // (e.g. DatePicker) closes via content.hidePopover() directly.
-    return getContent(root)?.matches(":popover-open") === true;
+  function setSide(content, side) {
+    content.setAttribute("data-side", side);
+    const popup = popupFor(content);
+    if (popup) popup.setAttribute("data-side", side);
   }
 
-  function isOpen(id) {
-    const root = getRootById(id);
-    return root ? isOpenRoot(root) : false;
+  // Base UI zooms the popup out of the anchor's center point, not out of a
+  // placement corner.
+  function anchorOrigin(result, anchorRect, sideOffset) {
+    const side = result.placement.split("-")[0];
+    const centerX = anchorRect.left + anchorRect.width / 2 - result.x + "px";
+    const centerY = anchorRect.top + anchorRect.height / 2 - result.y + "px";
+    if (side === "bottom") return centerX + " " + -sideOffset + "px";
+    if (side === "top") return centerX + " calc(100% + " + sideOffset + "px)";
+    if (side === "right") return -sideOffset + "px " + centerY;
+    return "calc(100% + " + sideOffset + "px) " + centerY;
   }
 
-  function clearHoverTimeouts(root) {
-    const timeouts = hoverTimeouts.get(root);
-    if (!timeouts) return;
-    clearTimeout(timeouts.enter);
-    clearTimeout(timeouts.leave);
-    hoverTimeouts.delete(root);
-  }
-
-  function stopAutoUpdate(root) {
-    const cleanup = floatingCleanups.get(root);
-    if (!cleanup) return;
-    cleanup();
-    floatingCleanups.delete(root);
-  }
-
-  function showContent(content) {
-    clearTimeout(content._tuiPopoverCloseTimeout);
-    content._tuiPopoverCloseTimeout = null;
-
-    if (!content.matches(":popover-open")) {
-      try {
-        content.showPopover();
-      } catch {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  function hideContent(content) {
-    clearTimeout(content._tuiPopoverCloseTimeout);
-    content._tuiPopoverCloseTimeout = null;
-    content.setAttribute("data-tui-popover-open", "false");
-
-    if (!content.matches(":popover-open")) {
-      return;
-    }
-
-    content._tuiPopoverCloseTimeout = setTimeout(() => {
-      content._tuiPopoverCloseTimeout = null;
-      if (content.matches(":popover-open")) {
-        try {
-          content.hidePopover();
-        } catch {
-          // ignore
-        }
-      }
-    }, exitAnimationDuration);
-  }
-
-  function arrowClassForPlacement(placement) {
-    switch (placement) {
-      case "top-start":
-      case "top":
-      case "top-end":
-        return `${arrowBaseClass} -bottom-[3px] border-t-transparent border-l-transparent`;
-      case "right-start":
-      case "right":
-      case "right-end":
-        return `${arrowBaseClass} -left-[3px] border-r-transparent border-t-transparent`;
-      case "bottom-start":
-      case "bottom":
-      case "bottom-end":
-        return `${arrowBaseClass} -top-[3px] border-b-transparent border-r-transparent`;
-      case "left-start":
-      case "left":
-      case "left-end":
-        return `${arrowBaseClass} -right-[3px] border-l-transparent border-b-transparent`;
-      default:
-        return `${arrowBaseClass} -top-[3px] border-b-transparent border-r-transparent`;
+  // Moves the content to <body> (shadcn portals it the same way). Also removes
+  // contents whose trigger is gone (leftovers from swapped-out pages).
+  function portal(content) {
+    document.querySelectorAll("body > [data-tui-popover-content]").forEach((c) => {
+      if (c !== content && !triggerFor(c)) c.remove();
+    });
+    if (content.parentElement !== document.body) {
+      document.body.appendChild(content);
     }
   }
 
-  function updatePosition(root, triggerOverride = null) {
-    if (!window.FloatingUIDOM) return;
+  function position(content) {
+    const trigger = triggerFor(content);
+    if (!trigger) return Promise.resolve();
+    const { computePosition, offset, flip, shift } = window.FloatingUIDOM;
+    const side = content.getAttribute("data-tui-popover-side") || "bottom";
+    const align = content.getAttribute("data-tui-popover-align") || "center";
+    const sideOffset = parseFloat(content.getAttribute("data-tui-popover-side-offset")) || 0;
+    const alignOffset = parseFloat(content.getAttribute("data-tui-popover-align-offset")) || 0;
+    const placement = align === "center" ? side : side + "-" + align;
 
-    const trigger = triggerOverride || getTriggers(root)[0];
-    const content = getContent(root);
-    if (!trigger || !content) return;
-
-    const { computePosition, offset, flip, shift, arrow } =
-      window.FloatingUIDOM;
-    const reference = getReferenceElement(trigger);
-    const arrowEl = content.querySelector("[data-tui-popover-arrow]");
-    const placement =
-      content.getAttribute("data-tui-popover-placement") || "bottom";
-    const offsetValue =
-      parseInt(content.getAttribute("data-tui-popover-offset"), 10) ||
-      (arrowEl ? 8 : 4);
-
-    const middleware = [
-      offset(offsetValue),
-      flip({ padding: 10 }),
-      shift({ padding: 10 }),
-    ];
-
-    if (arrowEl) {
-      middleware.push(arrow({ element: arrowEl, padding: 5 }));
-    }
-
-    // Match the fixed-position popover layer so scroll offsets stay correct.
-    return computePosition(reference, content, {
-      placement,
-      middleware,
+    return computePosition(trigger, content, {
+      placement: placement,
       strategy: "fixed",
-    }).then(({ x, y, placement: finalPlacement, middlewareData }) => {
-      // Apply instantly (transition suspended), so the popover never slides
-      // over from its previous left/top — it repositions in place.
-      content.style.transition = "none";
-      Object.assign(content.style, {
-        left: `${x}px`,
-        top: `${y}px`,
-      });
-      content.offsetHeight; // flush styles before re-enabling transitions
-      content.style.transition = "";
-
-      // Drives the slide-in direction and the zoom origin (like Radix).
-      const side = finalPlacement.split("-")[0];
-      const align = finalPlacement.split("-")[1] || "center";
-      content.setAttribute("data-side", side);
-      const opposite = { top: "bottom", bottom: "top", left: "right", right: "left" }[side];
-      content.style.transformOrigin =
-        side === "top" || side === "bottom"
-          ? opposite + " " + ({ start: "left", end: "right", center: "center" }[align])
-          : ({ start: "top", end: "bottom", center: "center" }[align]) + " " + opposite;
-
-      if (arrowEl && middlewareData.arrow) {
-        const { x: arrowX, y: arrowY } = middlewareData.arrow;
-
-        arrowEl.setAttribute("data-tui-popover-placement", finalPlacement);
-        arrowEl.className = arrowClassForPlacement(finalPlacement);
-        Object.assign(arrowEl.style, {
-          left: arrowX != null ? `${arrowX}px` : "",
-          top: arrowY != null ? `${arrowY}px` : "",
-        });
+      middleware: [
+        offset({ mainAxis: sideOffset, crossAxis: alignOffset }),
+        flip({ padding: COLLISION_PADDING }),
+        shift({ padding: COLLISION_PADDING }),
+      ],
+    }).then((result) => {
+      content.style.left = result.x + "px";
+      content.style.top = result.y + "px";
+      setSide(content, result.placement.split("-")[0]);
+      const popup = popupFor(content);
+      if (popup) {
+        popup.style.setProperty(
+          "--tui-popover-transform-origin",
+          anchorOrigin(result, trigger.getBoundingClientRect(), sideOffset),
+        );
       }
     });
   }
 
-  function closeRoot(root) {
-    const content = getContent(root);
-    if (!content) return;
+  function isOpen(content) {
+    return content.getAttribute("data-state") === "open";
+  }
 
-    stopAutoUpdate(root);
-    clearHoverTimeouts(root);
-
-    getTriggers(root).forEach((trigger) => {
-      trigger.setAttribute("data-tui-popover-open", "false");
+  function open(content) {
+    if (typeof content === "string") content = document.getElementById(content);
+    if (!content || isOpen(content)) return;
+    allContents().forEach((c) => {
+      if (c !== content) close(c);
     });
-
-    hideContent(content);
-  }
-
-  function close(id) {
-    const root = getRootById(id);
-    if (root) {
-      closeRoot(root);
+    clearTimeout(content._tuiHide);
+    portal(content);
+    if (!content.matches(":popover-open")) {
+      content.showPopover(); // native top layer
     }
+
+    // Position it invisibly first, then play the enter animation in place.
+    content.style.visibility = "hidden";
+    const finish = () => {
+      content.style.visibility = "";
+      if (!content.matches(":popover-open")) return;
+      setState(content, "open");
+      const trigger = triggerFor(content);
+      if (trigger) trigger.setAttribute("aria-expanded", "true");
+    };
+    position(content).then(finish, finish);
   }
 
-  // Close the popover associated with the given element. The element may be
-  // the popover root, anything inside it (trigger, content, day button), or a
-  // wrapping component (e.g. a DatePicker root that contains a popover).
+  function close(content) {
+    if (typeof content === "string") content = document.getElementById(content);
+    if (!content || !content.matches(":popover-open")) return;
+    content.style.visibility = "";
+    setState(content, "closed");
+    const trigger = triggerFor(content);
+    if (trigger) trigger.setAttribute("aria-expanded", "false");
+    clearTimeout(content._tuiHide);
+    content._tuiHide = setTimeout(() => {
+      if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
+        content.hidePopover();
+      }
+    }, EXIT_MS);
+  }
+
+  function closeAll() {
+    allContents().forEach(close);
+  }
+
   function closeNearest(element) {
     if (!element) return;
-    const root =
-      element.closest?.("[data-tui-popover-root]") ||
-      element.querySelector?.("[data-tui-popover-root]");
-    if (root) closeRoot(root);
+    const content =
+      element.closest?.("[data-tui-popover-content]") ||
+      (element.closest?.("[data-tui-popover-trigger]") &&
+        contentFor(element.closest("[data-tui-popover-trigger]"))) ||
+      element.querySelector?.("[data-tui-popover-content]");
+    if (content) close(content);
   }
 
-  function closeAllRoots(exceptRoot = null) {
-    getRoots().forEach((root) => {
-      if (root !== exceptRoot && isOpenRoot(root)) {
-        closeRoot(root);
-      }
-    });
-  }
-
-  // Like closeAllRoots, but skips DOM ancestors of activeRoot. Used for the
-  // automatic exclusive cleanup so a popover nested inside another popover
-  // (e.g. SelectBox inside Popover) closes peers without killing its parent.
-  function closeOtherRoots(activeRoot) {
-    getRoots().forEach((root) => {
-      if (root === activeRoot || !isOpenRoot(root)) return;
-      if (root.contains(activeRoot)) return;
-      closeRoot(root);
-    });
-  }
-
-  function closeAll(exceptId = null) {
-    closeAllRoots(exceptId ? getRootById(exceptId) : null);
-  }
-
-  function openRoot(root, triggerOverride = null) {
-    const content = getContent(root);
-    const trigger = triggerOverride || getTriggers(root)[0];
-    if (!content || !trigger) return;
-
-    if (content.getAttribute("data-tui-popover-exclusive") === "true") {
-      closeOtherRoots(root);
-    }
-
-    if (!showContent(content)) return;
-
-    getTriggers(root).forEach((item) => {
-      item.setAttribute("data-tui-popover-open", "true");
-    });
-
-    stopAutoUpdate(root);
-    // Position it invisibly first, then flip to open so the enter animation
-    // plays in place (instead of flying in from the old position).
-    const opening = content.getAttribute("data-tui-popover-open") !== "true";
-    if (opening) content.style.visibility = "hidden";
-    const positioned = updatePosition(root, trigger) || Promise.resolve();
-    positioned.then(() => {
-      if (!opening) return;
-      if (!content.matches(":popover-open")) return; // closed meanwhile
-      content.style.visibility = "";
-      content.setAttribute("data-tui-popover-open", "true");
-    });
-
-    if (window.FloatingUIDOM) {
-      const cleanup = window.FloatingUIDOM.autoUpdate(
-        trigger,
-        content,
-        () => updatePosition(root, trigger),
-        { animationFrame: true },
-      );
-      floatingCleanups.set(root, cleanup);
+  function toggle(content) {
+    if (typeof content === "string") content = document.getElementById(content);
+    if (!content) return;
+    if (isOpen(content)) {
+      close(content);
+    } else {
+      open(content);
     }
   }
 
-  function open(id) {
-    const root = getRootById(id);
-    if (root) {
-      openRoot(root);
-    }
-  }
-
-  function toggleRoot(root, triggerOverride = null) {
-    if (isOpenRoot(root)) {
-      closeRoot(root);
+  // Pointer interactions toggle and dismiss on PRESS, exactly like Base UI.
+  // Click is never used for open/close, so the stray click the browser fires
+  // on body when the popup ends up under the released pointer is harmless.
+  document.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 || !(e.target instanceof Element)) return;
+    const trigger = e.target.closest("[data-tui-popover-trigger]");
+    if (trigger) {
+      if (trigger.disabled) return;
+      const content = contentFor(trigger);
+      if (content) toggle(content);
       return;
     }
+    if (!e.target.closest("[data-tui-popover-content]")) closeAll();
+  });
 
-    openRoot(root, triggerOverride);
-  }
-
-  function toggle(id) {
-    const root = getRootById(id);
-    if (root) {
-      toggleRoot(root);
-    }
-  }
-
-  function clearOtherHoverRoots(activeRoot) {
-    getRoots().forEach((root) => {
-      if (root === activeRoot || !isHoverRoot(root)) {
-        return;
+  document.addEventListener("click", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const trigger = e.target.closest("[data-tui-popover-trigger]");
+    if (trigger) {
+      // Keyboard activation only (Enter/Space fire a detail-0 click without
+      // a preceding pointerdown); pointer presses are handled on pointerdown.
+      if (e.detail === 0 && !trigger.disabled) {
+        const content = contentFor(trigger);
+        if (content) toggle(content);
       }
-      if (root.contains(activeRoot)) return;
-
-      clearHoverTimeouts(root);
-      closeRoot(root);
-    });
-  }
-
-  function handleHoverEnter(root, trigger) {
-    const content = getContent(root);
-    if (!content || !isHoverRoot(root)) return;
-
-    const delay =
-      parseInt(content.getAttribute("data-tui-popover-hover-delay"), 10) || 0;
-    const timeouts = hoverTimeouts.get(root) || {};
-
-    clearOtherHoverRoots(root);
-    clearTimeout(timeouts.leave);
-    clearTimeout(timeouts.enter);
-    timeouts.enter = setTimeout(() => openRoot(root, trigger), delay);
-    hoverTimeouts.set(root, timeouts);
-  }
-
-  function handleHoverLeave(root, movingWithinPair) {
-    const content = getContent(root);
-    if (!content || !isHoverRoot(root)) return;
-
-    const delay =
-      parseInt(content.getAttribute("data-tui-popover-hover-out-delay"), 10) ||
-      0;
-    const timeouts = hoverTimeouts.get(root) || {};
-
-    clearTimeout(timeouts.enter);
-    if (!movingWithinPair) {
-      timeouts.leave = setTimeout(() => closeRoot(root), delay);
-      hoverTimeouts.set(root, timeouts);
     }
-  }
+  });
 
-  document.addEventListener(
-    "pointerdown",
-    (event) => {
-      getRoots().forEach((root) => {
-        const content = getContent(root);
-        if (!content?.matches(":popover-open")) {
-          pointerDownInside.delete(root);
-          return;
-        }
-        const inContent = content.contains(event.target);
-        const inTrigger = getTriggers(root).some((t) =>
-          t.contains(event.target),
-        );
-        pointerDownInside.set(root, inContent || inTrigger);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeAll();
+  });
+
+  // Page scroll or resize: keep open popovers attached to their trigger.
+  window.addEventListener(
+    "scroll",
+    (e) => {
+      if (e.target instanceof Element && e.target.closest("[data-tui-popover-content]")) return;
+      allContents().forEach((content) => {
+        if (isOpen(content)) position(content);
       });
     },
     true,
   );
 
-  document.addEventListener("click", (event) => {
-    const trigger = event.target.closest("[data-tui-popover-trigger]");
-    const root = trigger?.closest("[data-tui-popover-root]");
-    const triggerType = trigger?.getAttribute("data-tui-popover-type");
-
-    if (
-      trigger &&
-      root &&
-      triggerType !== "hover" &&
-      triggerType !== "manual"
-    ) {
-      const disabledChild = trigger.querySelector(
-        ':disabled, [disabled], [aria-disabled="true"]',
-      );
-      if (disabledChild) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-      toggleRoot(root, trigger);
-      // Light dismiss like shadcn: opening one popover closes the other open
-      // ones — except ancestors (a trigger nested inside another popover's
-      // content must not close its parent) and clickaway-disabled ones.
-      getRoots().forEach((otherRoot) => {
-        if (otherRoot === root) return;
-        const otherContent = getContent(otherRoot);
-        if (
-          !otherContent ||
-          !otherContent.matches(":popover-open") ||
-          otherContent.getAttribute("data-tui-popover-disable-clickaway") === "true" ||
-          otherContent.contains(trigger)
-        ) {
-          return;
-        }
-        closeRoot(otherRoot);
-      });
-      return;
-    }
-
-    getRoots().forEach((currentRoot) => {
-      const content = getContent(currentRoot);
-      if (
-        !content ||
-        !content.matches(":popover-open") ||
-        content.getAttribute("data-tui-popover-disable-clickaway") === "true"
-      ) {
-        return;
-      }
-
-      // Prefer the pointerdown location: by the time we get here, a child may
-      // have replaced the clicked node (e.g. Calendar re-rendering on day
-      // click), making event.target appear "outside" even though the user
-      // pressed inside. For synthesized clicks with no preceding pointerdown,
-      // fall back to event.target.
-      const downInside = pointerDownInside.get(currentRoot);
-      const clickedInside =
-        downInside !== undefined
-          ? downInside
-          : content.contains(event.target) ||
-            getTriggers(currentRoot).some((item) =>
-              item.contains(event.target),
-            );
-
-      if (!clickedInside) {
-        closeRoot(currentRoot);
-      }
+  window.addEventListener("resize", () => {
+    allContents().forEach((content) => {
+      if (isOpen(content)) position(content);
     });
   });
 
-  document.addEventListener("pointerover", (event) => {
-    if (event.pointerType !== "mouse") return;
-
-    const trigger = event.target.closest("[data-tui-popover-trigger]");
-    const root = trigger?.closest("[data-tui-popover-root]");
-    if (
-      trigger &&
-      root &&
-      !trigger.contains(event.relatedTarget) &&
-      trigger.getAttribute("data-tui-popover-type") === "hover"
-    ) {
-      handleHoverEnter(root, trigger);
-    }
-
-    const content = event.target.closest("[data-tui-popover-content]");
-    const contentRoot = content?.closest("[data-tui-popover-root]");
-    if (
-      content &&
-      contentRoot &&
-      isHoverRoot(contentRoot) &&
-      !content.contains(event.relatedTarget) &&
-      content.matches(":popover-open")
-    ) {
-      const timeouts = hoverTimeouts.get(contentRoot) || {};
-      clearTimeout(timeouts.leave);
-      hoverTimeouts.set(contentRoot, timeouts);
-    }
-  });
-
-  document.addEventListener("pointerout", (event) => {
-    if (event.pointerType !== "mouse") return;
-
-    const trigger = event.target.closest("[data-tui-popover-trigger]");
-    const root = trigger?.closest("[data-tui-popover-root]");
-    if (
-      trigger &&
-      root &&
-      !trigger.contains(event.relatedTarget) &&
-      trigger.getAttribute("data-tui-popover-type") === "hover"
-    ) {
-      const content = getContent(root);
-      handleHoverLeave(root, content?.contains(event.relatedTarget) === true);
-    }
-
-    const content = event.target.closest("[data-tui-popover-content]");
-    const contentRoot = content?.closest("[data-tui-popover-root]");
-    if (
-      content &&
-      contentRoot &&
-      isHoverRoot(contentRoot) &&
-      !content.contains(event.relatedTarget) &&
-      content.matches(":popover-open")
-    ) {
-      const movingToTrigger = getTriggers(contentRoot).some((item) =>
-        item.contains(event.relatedTarget),
-      );
-      handleHoverLeave(contentRoot, movingToTrigger);
-    }
-  });
-
-  // Keyboard a11y: hover popovers also open on focus, close on blur.
-  document.addEventListener("focusin", (e) => {
-    const trigger = e.target.closest('[data-tui-popover-trigger][data-tui-popover-type="hover"]');
-    const root = trigger?.closest("[data-tui-popover-root]");
-    if (root) handleHoverEnter(root, trigger);
-  });
-  document.addEventListener("focusout", (e) => {
-    const trigger = e.target.closest('[data-tui-popover-trigger][data-tui-popover-type="hover"]');
-    const root = trigger?.closest("[data-tui-popover-root]");
-    if (root) handleHoverLeave(root, getContent(root)?.contains(e.relatedTarget));
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") return;
-
-    getRoots().forEach((root) => {
-      const content = getContent(root);
-      if (
-        content &&
-        content.matches(":popover-open") &&
-        content.getAttribute("data-tui-popover-disable-esc") !== "true"
-      ) {
-        closeRoot(root);
-      }
+  // Portal all contents up front (React portals on mount too): popovers must
+  // not sit inside layout groups where hidden siblings break :last-child
+  // rules. Runs on load and whenever new popovers appear in the DOM.
+  function portalAll() {
+    allContents().forEach((content) => {
+      if (triggerFor(content)) portal(content);
     });
-  });
+  }
+
+  let portalQueued = false;
+  function queuePortal() {
+    if (portalQueued) return;
+    portalQueued = true;
+    requestAnimationFrame(() => {
+      portalQueued = false;
+      portalAll();
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", portalAll);
+  } else {
+    portalAll();
+  }
+  new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.addedNodes.length) {
+        queuePortal();
+        break;
+      }
+    }
+  }).observe(document.documentElement, { childList: true, subtree: true });
 
   window.tui = window.tui || {};
   window.tui.popover = {
@@ -564,6 +248,9 @@ import "../floatingui/floating_ui_dom.js";
     closeAll,
     closeNearest,
     toggle,
-    isOpen,
+    isOpen: (c) => {
+      if (typeof c === "string") c = document.getElementById(c);
+      return !!c && isOpen(c);
+    },
   };
 })();

@@ -11,7 +11,7 @@ templ PopoverDefault() {
 	@popover.Root() {
 		@button.Button(button.Props{
 			Variant:    button.VariantOutline,
-			Attributes: popover.TriggerAttributes(popover.TriggerTypeClick),
+			Attributes: popover.Trigger(ctx),
 		}) {
 			Open popover
 		}

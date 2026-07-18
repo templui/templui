@@ -39,15 +39,11 @@ type SeparatorProps struct {
 
 func variantClasses(o Orientation) string {
 	base := "group/button-group flex w-fit items-stretch *:focus-visible:relative *:focus-visible:z-10 has-[>[data-slot=button-group]]:gap-2 [&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1"
-	// A popover trigger (tooltip/dropdown/…) renders a display:contents
-	// [data-tui-popover-root] wrapper around [trigger, content]. The wrapper is
-	// still a `>` child here, so the join rules pierce it via `>*:first-child`
-	// (the trigger) — generic across trigger types (button, select-trigger, …).
 	switch o {
 	case OrientationVertical:
-		return base + " [&>*:not(:first-child)]:rounded-t-none [&>*:not(:first-child)]:border-t-0 [&>*:not(:last-child)]:rounded-b-none [&>[data-tui-popover-root]:not(:first-child)>*:first-child]:rounded-t-none [&>[data-tui-popover-root]:not(:first-child)>*:first-child]:border-t-0 [&>[data-tui-popover-root]:not(:last-child)>*:first-child]:rounded-b-none [&>[data-slot]:not(:has(~[data-slot]))]:rounded-b-lg! flex-col"
+		return base + " [&>*:not(:first-child)]:rounded-t-none [&>*:not(:first-child)]:border-t-0 [&>*:not(:last-child)]:rounded-b-none flex-col"
 	default:
-		return base + " [&>*:not(:first-child)]:rounded-l-none [&>*:not(:first-child)]:border-l-0 [&>*:not(:last-child)]:rounded-r-none [&>[data-tui-popover-root]:not(:first-child)>*:first-child]:rounded-l-none [&>[data-tui-popover-root]:not(:first-child)>*:first-child]:border-l-0 [&>[data-tui-popover-root]:not(:last-child)>*:first-child]:rounded-r-none [&>[data-slot]:not(:has(~[data-slot])):not(:has(~[data-tui-popover-root]))]:rounded-r-lg!"
+		return base + " [&>*:not(:first-child)]:rounded-l-none [&>*:not(:first-child)]:border-l-0 [&>*:not(:last-child)]:rounded-r-none"
 	}
 }
 
@@ -96,7 +92,7 @@ func ButtonGroup(props ...Props) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/buttongroup/buttongroup.templ`, Line: 56, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/buttongroup/buttongroup.templ`, Line: 52, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -114,7 +110,7 @@ func ButtonGroup(props ...Props) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Orientation))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/buttongroup/buttongroup.templ`, Line: 60, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/buttongroup/buttongroup.templ`, Line: 56, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -199,7 +195,7 @@ func Text(props ...TextProps) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/buttongroup/buttongroup.templ`, Line: 75, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/buttongroup/buttongroup.templ`, Line: 71, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -292,7 +288,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/buttongroup/buttongroup.templ`, Line: 94, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/buttongroup/buttongroup.templ`, Line: 90, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -310,7 +306,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Orientation))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/buttongroup/buttongroup.templ`, Line: 98, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/buttongroup/buttongroup.templ`, Line: 94, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {

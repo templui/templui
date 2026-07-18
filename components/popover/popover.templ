@@ -1,76 +1,67 @@
 package popover
 
 import (
-	"github.com/templui/templui/utils"
+	"context"
 	"strconv"
+
+	"github.com/templui/templui/utils"
 )
 
-type Placement string
+type Side string
 
 const (
-	PlacementTop         Placement = "top"
-	PlacementTopStart    Placement = "top-start"
-	PlacementTopEnd      Placement = "top-end"
-	PlacementRight       Placement = "right"
-	PlacementRightStart  Placement = "right-start"
-	PlacementRightEnd    Placement = "right-end"
-	PlacementBottom      Placement = "bottom"
-	PlacementBottomStart Placement = "bottom-start"
-	PlacementBottomEnd   Placement = "bottom-end"
-	PlacementLeft        Placement = "left"
-	PlacementLeftStart   Placement = "left-start"
-	PlacementLeftEnd     Placement = "left-end"
+	SideTop    Side = "top"
+	SideRight  Side = "right"
+	SideBottom Side = "bottom"
+	SideLeft   Side = "left"
 )
 
-type TriggerType string
+type Align string
 
 const (
-	TriggerTypeHover  TriggerType = "hover"
-	TriggerTypeClick  TriggerType = "click"
-	TriggerTypeManual TriggerType = "manual"
+	AlignStart  Align = "start"
+	AlignCenter Align = "center"
+	AlignEnd    Align = "end"
 )
 
-// TriggerAttributes returns the data attributes that turn any element into a
-// popover trigger. It is the "asChild" alternative to wrapping the element in
-// Trigger: spread these onto the element itself (e.g. a button) so it becomes
-// the real trigger — no extra wrapper element, so it composes cleanly inside
-// layouts that rely on direct-child selectors (e.g. ButtonGroup) and anchors
-// the popover to the element's own box.
-func TriggerAttributes(triggerType TriggerType) templ.Attributes {
-	if triggerType == "" {
-		triggerType = TriggerTypeClick
+type ctxKey string
+
+const idKey ctxKey = "popoverID"
+
+func popoverID(ctx context.Context) string {
+	if id, ok := ctx.Value(idKey).(string); ok {
+		return id
 	}
+	return ""
+}
+
+// Trigger returns the attributes that turn any element (usually a button)
+// into the popover trigger — the asChild equivalent: no wrapper element.
+func Trigger(ctx context.Context) templ.Attributes {
 	return templ.Attributes{
 		"data-tui-popover-trigger": true,
-		"data-tui-popover-type":    string(triggerType),
+		"aria-controls":            popoverID(ctx),
+		"aria-haspopup":            "dialog",
+		"aria-expanded":            "false",
 	}
 }
 
 type RootProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-}
-
-type TriggerProps struct {
-	ID          string
-	Class       string
-	Attributes  templ.Attributes
-	TriggerType TriggerType
+	ID string
 }
 
 type ContentProps struct {
-	ID               string
-	Class            string
-	Attributes       templ.Attributes
-	Placement        Placement
-	Offset           int
-	DisableClickAway bool
-	DisableESC       bool
-	ShowArrow        bool
-	HoverDelay       int
-	HoverOutDelay    int
-	Exclusive        bool
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Side of the trigger to open against. Defaults to bottom.
+	Side Side
+	// Align along the trigger edge. Defaults to center.
+	Align Align
+	// SideOffset is the gap to the trigger, in px. Defaults to 4.
+	SideOffset int
+	// AlignOffset shifts the content along the aligned edge, in px.
+	AlignOffset int
 }
 
 type HeaderProps struct {
@@ -91,42 +82,18 @@ type DescriptionProps struct {
 	Attributes templ.Attributes
 }
 
+// Root renders no element: it only carries the id that links Trigger and
+// Content (via ctx).
 templ Root(props ...RootProps) {
 	{{ var p RootProps }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		data-tui-popover-root
-		class={ utils.TwMerge("contents", p.Class) }
-		{ p.Attributes... }
-	>
-		{ children... }
-	</div>
-}
-
-templ Trigger(props ...TriggerProps) {
-	{{ var p TriggerProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
 	}
-	if p.TriggerType == "" {
-		{{ p.TriggerType = TriggerTypeClick }}
-	}
-	<span
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={ utils.TwMerge("contents", p.Class) }
-		data-tui-popover-trigger
-		data-tui-popover-type={ string(p.TriggerType) }
-		{ p.Attributes... }
-	>
-		{ children... }
-	</span>
+	{{ ctx = context.WithValue(ctx, idKey, p.ID) }}
+	{ children... }
 }
 
 templ Content(props ...ContentProps) {
@@ -134,45 +101,50 @@ templ Content(props ...ContentProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	if p.Placement == "" {
-		{{ p.Placement = PlacementBottom }}
+	if p.Side == "" {
+		{{ p.Side = SideBottom }}
 	}
-	if p.Offset == 0 {
-		if p.ShowArrow {
-			{{ p.Offset = 8 }}
-		} else {
-			{{ p.Offset = 4 }}
+	if p.Align == "" {
+		{{ p.Align = AlignCenter }}
+	}
+	{{
+		sideOffset := p.SideOffset
+		if sideOffset == 0 {
+			sideOffset = 4
 		}
-	}
-	<div
+		id := popoverID(ctx)
 		if p.ID != "" {
-			id={ p.ID }
+			id = p.ID
 		}
-		popover="manual"
-		data-slot="popover-content"
+	}}
+	<div
+		id={ id }
 		data-tui-popover-content
-		data-tui-popover-open="false"
-		data-tui-popover-placement={ string(p.Placement) }
-		data-tui-popover-offset={ strconv.Itoa(p.Offset) }
-		data-tui-popover-disable-clickaway={ strconv.FormatBool(p.DisableClickAway) }
-		data-tui-popover-disable-esc={ strconv.FormatBool(p.DisableESC) }
-		data-tui-popover-show-arrow={ strconv.FormatBool(p.ShowArrow) }
-		data-tui-popover-hover-delay={ strconv.Itoa(p.HoverDelay) }
-		data-tui-popover-hover-out-delay={ strconv.Itoa(p.HoverOutDelay) }
-		data-tui-popover-exclusive={ strconv.FormatBool(p.Exclusive) }
-		class={ utils.TwMerge(
-			"pointer-events-auto fixed inset-auto top-0 left-0 m-0 z-50 flex w-72 flex-col gap-2.5 overflow-visible rounded-lg bg-popover p-2.5 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[tui-popover-open=true]:animate-in data-[tui-popover-open=true]:fade-in-0 data-[tui-popover-open=true]:zoom-in-95 data-[tui-popover-open=false]:animate-out data-[tui-popover-open=false]:fade-out-0 data-[tui-popover-open=false]:zoom-out-95 data-[tui-popover-open=false]:fill-mode-forwards",
-			p.Class,
-		) }
-		{ p.Attributes... }
-	>
-		{ children... }
-		if p.ShowArrow {
-			<div
-				data-tui-popover-arrow
-				class="absolute h-2.5 w-2.5 rotate-45 rounded-[2px] bg-popover border border-border"
-			></div>
+		data-tui-popover-side={ string(p.Side) }
+		data-tui-popover-align={ string(p.Align) }
+		data-tui-popover-side-offset={ strconv.Itoa(sideOffset) }
+		if p.AlignOffset != 0 {
+			data-tui-popover-align-offset={ strconv.Itoa(p.AlignOffset) }
 		}
+		data-state="closed"
+		popover="manual"
+		class="pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
+	>
+		<div
+			data-slot="popover-content"
+			data-tui-popover-popup
+			data-state="closed"
+			role="dialog"
+			class={
+				utils.TwMerge(
+					"pointer-events-auto z-50 flex w-72 flex-col gap-2.5 origin-(--tui-popover-transform-origin) rounded-lg bg-popover p-2.5 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden duration-100 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+					p.Class,
+				),
+			}
+			{ p.Attributes... }
+		>
+			{ children... }
+		</div>
 	</div>
 }
 
@@ -215,7 +187,7 @@ templ Description(props ...DescriptionProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<p
+	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
@@ -224,7 +196,7 @@ templ Description(props ...DescriptionProps) {
 		{ p.Attributes... }
 	>
 		{ children... }
-	</p>
+	</div>
 }
 
 var scriptOnce = templ.NewOnceHandle()

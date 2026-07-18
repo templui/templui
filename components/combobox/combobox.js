@@ -402,6 +402,7 @@ import "../floatingui/floating_ui_dom.js";
   // framework-agnostic.
   function syncInputs() {
     allContents().forEach((content) => {
+      if (anchorFor(content)) portal(content); // portal up front, like React on mount
       if (isMultiple(content)) return;
       syncValueDisplay(content);
       const input = inputFor(content);

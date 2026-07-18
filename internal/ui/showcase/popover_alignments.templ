@@ -11,12 +11,12 @@ templ PopoverAlignments() {
 			@button.Button(button.Props{
 				Variant:    button.VariantOutline,
 				Size:       button.SizeSm,
-				Attributes: popover.TriggerAttributes(popover.TriggerTypeClick),
+				Attributes: popover.Trigger(ctx),
 			}) {
 				Start
 			}
 			@popover.Content(popover.ContentProps{
-				Placement: popover.PlacementBottomStart,
+				Side: popover.SideBottom, Align: popover.AlignStart,
 				Class:     "w-40",
 			}) {
 				Aligned to start
@@ -26,12 +26,12 @@ templ PopoverAlignments() {
 			@button.Button(button.Props{
 				Variant:    button.VariantOutline,
 				Size:       button.SizeSm,
-				Attributes: popover.TriggerAttributes(popover.TriggerTypeClick),
+				Attributes: popover.Trigger(ctx),
 			}) {
 				Center
 			}
 			@popover.Content(popover.ContentProps{
-				Placement: popover.PlacementBottom,
+				Side: popover.SideBottom,
 				Class:     "w-40",
 			}) {
 				Aligned to center
@@ -41,12 +41,12 @@ templ PopoverAlignments() {
 			@button.Button(button.Props{
 				Variant:    button.VariantOutline,
 				Size:       button.SizeSm,
-				Attributes: popover.TriggerAttributes(popover.TriggerTypeClick),
+				Attributes: popover.Trigger(ctx),
 			}) {
 				End
 			}
 			@popover.Content(popover.ContentProps{
-				Placement: popover.PlacementBottomEnd,
+				Side: popover.SideBottom, Align: popover.AlignEnd,
 				Class:     "w-40",
 			}) {
 				Aligned to end
