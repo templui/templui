@@ -1,0 +1,55 @@
+package showcase
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/calendar"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/popover"
+)
+
+templ DatePickerDefault() {
+	@popover.Root(popover.RootProps{ID: "date-picker-default"}) {
+		{{
+			triggerAttrs := popover.Trigger(ctx)
+			triggerAttrs["data-empty"] = "true"
+			triggerAttrs["data-tui-datepicker-display"] = ""
+		}}
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Class:      "w-[212px] justify-between text-left font-normal data-[empty=true]:text-muted-foreground",
+			Attributes: triggerAttrs,
+		}) {
+			<span>Pick a date</span>
+			<span data-icon="inline-end" class="contents">
+				@icon.ChevronDown()
+			</span>
+		}
+		@popover.Content(popover.ContentProps{
+			Class:     "w-auto p-0",
+			Side: popover.SideBottom, Align: popover.AlignStart,
+		}) {
+			@calendar.Calendar()
+		}
+	}
+	<script>
+		(() => {
+			const root = document.getElementById("date-picker-default");
+			const fmt = (d) => {
+				const day = d.getDate();
+				const suf = day % 10 === 1 && day !== 11 ? "st" : day % 10 === 2 && day !== 12 ? "nd" : day % 10 === 3 && day !== 13 ? "rd" : "th";
+				return d.toLocaleDateString("en-US", { month: "long" }) + " " + day + suf + ", " + d.getFullYear();
+			};
+			root.addEventListener("calendar-change", (e) => {
+				const display = root.querySelector("[data-tui-datepicker-display] span");
+				const btn = root.querySelector("[data-tui-datepicker-display]");
+				if (e.detail.value) {
+					display.textContent = fmt(e.detail.value);
+					btn.setAttribute("data-empty", "false");
+				} else {
+					display.textContent = "Pick a date";
+					btn.setAttribute("data-empty", "true");
+				}
+			});
+		})();
+	</script>
+}

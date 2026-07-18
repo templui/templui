@@ -1,0 +1,82 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/internal/ui/showcase"
+)
+
+templ DatePicker() {
+	@layouts.DocsLayout(
+		"Date Picker",
+		"A date picker composed of the Calendar, Popover and Button components.",
+		[]modules.TableOfContentsItem{
+			{ID: "installation", Text: "Installation"},
+			{
+				ID:   "examples",
+				Text: "Examples",
+				Children: []modules.TableOfContentsItem{
+					{Text: "Basic", ID: "basic"},
+					{Text: "Range", ID: "range"},
+					{Text: "Date of Birth", ID: "dob"},
+					{Text: "Input", ID: "input"},
+					{Text: "With Time", ID: "time"},
+				},
+			},
+		},
+	) {
+		@modules.PageWrapper(modules.PageWrapperProps{
+			Name:        "Date Picker",
+			Description: templ.Raw("A date picker is a pattern composed of the Calendar, Popover and Button components, exactly like shadcn's. There is no separate component to install."),
+			Tailwind:    true,
+			VanillaJS:   true,
+			Breadcrumbs: modules.Breadcrumbs{
+				Items: []modules.BreadcrumbItem{
+					{Text: "Docs", Path: "/docs"},
+					{Text: "Components", Path: "/docs/components"},
+					{Text: "Date Picker"},
+				},
+			},
+		}) {
+			@modules.ExampleWrapper(modules.ExampleWrapperProps{
+				ShowcaseFile:    showcase.DatePickerDefault(),
+				PreviewCodeFile: "date_picker_default.templ",
+			})
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{ComponentName: "calendar"})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Basic",
+					ShowcaseFile:    showcase.DatePickerBasic(),
+					PreviewCodeFile: "date_picker_basic.templ",
+					ID:              "basic",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Range",
+					ShowcaseFile:    showcase.DatePickerRange(),
+					PreviewCodeFile: "date_picker_range.templ",
+					ID:              "range",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Date of Birth",
+					ShowcaseFile:    showcase.DatePickerDob(),
+					PreviewCodeFile: "date_picker_dob.templ",
+					ID:              "dob",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Input",
+					ShowcaseFile:    showcase.DatePickerInput(),
+					PreviewCodeFile: "date_picker_input.templ",
+					ID:              "input",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "With Time",
+					ShowcaseFile:    showcase.DatePickerTime(),
+					PreviewCodeFile: "date_picker_time.templ",
+					ID:              "time",
+				})
+			}
+		}
+	}
+}

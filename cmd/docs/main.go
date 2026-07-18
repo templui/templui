@@ -135,6 +135,7 @@ func main() {
 	mux.Handle("GET /docs/components/breadcrumb", htmxHandler(pages.Breadcrumb()))
 	mux.Handle("GET /docs/components/button", htmxHandler(pages.Button()))
 	mux.Handle("GET /docs/components/calendar", htmxHandler(pages.Calendar()))
+	mux.Handle("GET /docs/components/date-picker", htmxHandler(pages.DatePicker()))
 	mux.Handle("GET /docs/components/card", htmxHandler(pages.Card()))
 	mux.Handle("GET /docs/components/carousel", htmxHandler(pages.Carousel()))
 	mux.Handle("GET /docs/components/charts", htmxHandler(pages.Chart()))

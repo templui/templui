@@ -1,0 +1,88 @@
+package showcase
+
+import (
+	"time"
+
+	"github.com/templui/templui/components/calendar"
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/inputgroup"
+	"github.com/templui/templui/components/popover"
+)
+
+templ DatePickerInput() {
+	{{
+		selected := time.Date(2025, 6, 1, 0, 0, 0, 0, time.Local)
+	}}
+	@field.Field(field.Props{Class: "mx-auto w-48"}) {
+		@field.Label(field.LabelProps{For: "date-picker-input-field"}) {
+			Subscription Date
+		}
+		@popover.Root(popover.RootProps{ID: "date-picker-input"}) {
+		{{
+			triggerAttrs := popover.Trigger(ctx)
+			triggerAttrs["data-slot"] = "input-group-button"
+			triggerAttrs["aria-label"] = "Select date"
+		}}
+			@inputgroup.InputGroup() {
+				@inputgroup.Input(inputgroup.InputProps{
+					ID:          "date-picker-input-field",
+					Value:       "June 01, 2025",
+					Placeholder: "June 01, 2025",
+					Attributes: templ.Attributes{
+						"data-tui-datepicker-input": "",
+					},
+				})
+				@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignInlineEnd}) {
+					@inputgroup.Button(inputgroup.ButtonProps{
+						Size:       inputgroup.ButtonSizeIconXs,
+						Attributes: triggerAttrs,
+					}) {
+						@icon.Calendar()
+						<span class="sr-only">Select date</span>
+					}
+				}
+			}
+			@popover.Content(popover.ContentProps{
+				ID:        "date-picker-input-popover",
+				Class:     "w-auto overflow-hidden p-0",
+				Side: popover.SideBottom, Align: popover.AlignEnd,
+				SideOffset: 10,
+			}) {
+				@calendar.Calendar(calendar.Props{
+					ID:    "date-picker-input-calendar",
+					Value: selected,
+				})
+			}
+		}
+	}
+	<script>
+		(() => {
+			const root = document.getElementById("date-picker-input");
+			const input = root.querySelector("[data-tui-datepicker-input]");
+			const fmt = (d) => d.toLocaleDateString("en-US", { day: "2-digit", month: "long", year: "numeric" });
+			root.addEventListener("calendar-change", (e) => {
+				if (!e.detail.value) return;
+				input.value = fmt(e.detail.value);
+				if (window.tui && window.tui.popover) {
+					window.tui.popover.closeNearest(root.querySelector("[data-tui-popover-content]"));
+				}
+			});
+			input.addEventListener("input", () => {
+				const date = new Date(input.value);
+				if (!isNaN(date.getTime())) {
+					const iso = date.toLocaleDateString("sv-SE");
+					document.getElementById("date-picker-input-calendar").dispatchEvent(
+						new CustomEvent("calendar-set", { bubbles: true, detail: { date: iso } }),
+					);
+				}
+			});
+			input.addEventListener("keydown", (e) => {
+				if (e.key === "ArrowDown" && window.tui && window.tui.popover) {
+					e.preventDefault();
+					window.tui.popover.open("date-picker-input-popover");
+				}
+			});
+		})();
+	</script>
+}

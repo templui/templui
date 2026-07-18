@@ -242,6 +242,27 @@
       "tags": ["label", "form", "accessibility", "text"]
     },
     {
+      "name": "datepicker",
+      "slug": "date-picker",
+      "displayName": "Date Picker",
+      "description": "A date picker pattern composed of the Calendar, Popover and Button components.",
+      "files": [],
+      "dependencies": [
+        "button",
+        "calendar",
+        "popover"
+      ],
+      "categories": [
+        "form-input"
+      ],
+      "tags": [
+        "date",
+        "picker",
+        "calendar",
+        "popover"
+      ]
+    },
+    {
       "name": "dialog",
       "slug": "dialog",
       "displayName": "Dialog",

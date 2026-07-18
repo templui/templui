@@ -82,6 +82,14 @@ func main() {
 		"out/showcase/calendar_custom_cell_size.html": showcase.CalendarCustomCellSize(),
 		"out/showcase/calendar_week_numbers.html": showcase.CalendarWeekNumbers(),
 
+		// Date Picker
+		"out/showcase/date_picker_default.html": showcase.DatePickerDefault(),
+		"out/showcase/date_picker_basic.html":   showcase.DatePickerBasic(),
+		"out/showcase/date_picker_range.html":   showcase.DatePickerRange(),
+		"out/showcase/date_picker_dob.html":     showcase.DatePickerDob(),
+		"out/showcase/date_picker_input.html":   showcase.DatePickerInput(),
+		"out/showcase/date_picker_time.html":    showcase.DatePickerTime(),
+
 		// Card
 		"out/showcase/card_default.html":    showcase.CardDefault(),
 		"out/showcase/card_with_image.html": showcase.CardWithImage(),
