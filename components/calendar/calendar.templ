@@ -1,10 +1,13 @@
 package calendar
 
 import (
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/utils"
-	"strconv"
-	"time"
 )
 
 type LocaleTag string
@@ -32,26 +35,66 @@ var (
 	Saturday  = Day(6)
 )
 
-type SelectionMode string
+type Mode string
 
 const (
-	SelectionModeSingle SelectionMode = "single"
-	SelectionModeRange  SelectionMode = "range"
+	ModeSingle Mode = "single"
+	ModeRange  Mode = "range"
+)
+
+type CaptionLayout string
+
+const (
+	// CaptionLayoutLabel shows "July 2026" as a static caption (default).
+	CaptionLayoutLabel CaptionLayout = "label"
+	// CaptionLayoutDropdown shows month and year dropdowns.
+	CaptionLayoutDropdown CaptionLayout = "dropdown"
 )
 
 type Props struct {
-	ID              string
-	Class           string
-	LocaleTag       LocaleTag
-	Mode            SelectionMode // Optional: "single" (default) or "range".
-	Value           *time.Time    // Selected date (single mode) or range start (range mode).
-	EndValue        *time.Time    // Range end date (range mode only).
-	Name            string        // Hidden input name for Value.
-	EndName         string        // Hidden input name for EndValue. Defaults to Name + "-end".
-	InitialMonth    int           // Optional: 0-11 (Default: current or from Value). Controls the initially displayed month view.
-	InitialYear     int           // Optional: (Default: current or from Value). Controls the initially displayed year view.
-	StartOfWeek     *Day          // Optional: 0-6 [Sun-Sat] (Default: 1).
-	HideHiddenInput bool          // Optional: Hide the hidden input when a parent component owns form submission.
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Mode: 'single' (default) or 'range'.
+	Mode Mode
+	// CaptionLayout: 'label' (default) or 'dropdown'.
+	CaptionLayout CaptionLayout
+	// Value preselects a date (single mode) or the range start.
+	Value time.Time
+	// EndValue preselects the range end (range mode).
+	EndValue time.Time
+	// Month controls the initially displayed month. Defaults to Value or now.
+	Month time.Time
+	// Name renders a hidden input that submits the selected date (ISO).
+	Name string
+	// EndName is the hidden input name for the range end. Defaults to Name + "-end".
+	EndName   string
+	LocaleTag LocaleTag
+	// StartOfWeek: 0-6, Sunday-Saturday. Defaults to Sunday, like shadcn.
+	StartOfWeek Day
+	// HideOutsideDays hides the leading/trailing days of adjacent months.
+	HideOutsideDays bool
+	// FixedWeeks always renders six weeks, keeping the height stable.
+	FixedWeeks bool
+	// ShowWeekNumbers renders an ISO week number column.
+	ShowWeekNumbers bool
+	// MinDate/MaxDate bound the selectable dates.
+	MinDate time.Time
+	MaxDate time.Time
+	// DisabledDates are not selectable.
+	DisabledDates []time.Time
+	// BookedDates are not selectable and render struck through.
+	BookedDates []time.Time
+	// NumberOfMonths renders several months side by side. Defaults to 1.
+	NumberOfMonths int
+}
+
+func isoList(dates []time.Time) string {
+	parts := make([]string, len(dates))
+	for i, d := range dates {
+		parts[i] = d.Format("2006-01-02")
+	}
+	return strings.Join(parts, ",")
 }
 
 templ Calendar(props ...Props) {
@@ -61,162 +104,173 @@ templ Calendar(props ...Props) {
 			p = props[0]
 		}
 		if p.ID == "" {
-			p.ID = utils.RandomID() + "-calendar"
+			p.ID = utils.RandomID()
 		}
-		if p.Name == "" {
-			// Should be provided by parent (e.g., DatePicker or in standalone usage)
-			p.Name = p.ID + "-value" // Fallback name
+		if p.Mode == "" {
+			p.Mode = ModeSingle
+		}
+		if p.CaptionLayout == "" {
+			p.CaptionLayout = CaptionLayoutLabel
 		}
 		if p.LocaleTag == "" {
 			p.LocaleTag = LocaleDefaultTag
 		}
-		if p.Mode == "" {
-			p.Mode = SelectionModeSingle
-		}
-		if p.Mode == SelectionModeRange && p.EndName == "" {
+		if p.Mode == ModeRange && p.Name != "" && p.EndName == "" {
 			p.EndName = p.Name + "-end"
 		}
-
-		initialStartOfWeek := Monday
-		if p.StartOfWeek != nil {
-			initialStartOfWeek = *p.StartOfWeek
+		view := time.Now()
+		if !p.Value.IsZero() {
+			view = p.Value
 		}
-
-		initialView := time.Now()
-		if p.Value != nil {
-			initialView = *p.Value
+		if !p.Month.IsZero() {
+			view = p.Month
 		}
-
-		initialMonth := p.InitialMonth
-		initialYear := p.InitialYear
-
-		// Use year from initialView if InitialYear prop is invalid/unset (<= 0)
-		if initialYear <= 0 {
-			initialYear = initialView.Year()
+		selectedISO := ""
+		if !p.Value.IsZero() {
+			selectedISO = p.Value.Format("2006-01-02")
 		}
-
-		// Use month from initialView if InitialMonth prop is invalid OR
-		// if InitialMonth is default 0 AND InitialYear was also defaulted (meaning neither was likely set explicitly)
-		if (initialMonth < 0 || initialMonth > 11) || (initialMonth == 0 && p.InitialYear <= 0) {
-			initialMonth = int(initialView.Month()) - 1 // time.Month is 1-12
+		endISO := ""
+		if !p.EndValue.IsZero() {
+			endISO = p.EndValue.Format("2006-01-02")
 		}
-
-		initialSelectedISO := ""
-		if p.Value != nil {
-			initialSelectedISO = p.Value.Format("2006-01-02")
-		}
-
-		initialEndISO := ""
-		if p.Mode == SelectionModeRange && p.EndValue != nil {
-			initialEndISO = p.EndValue.Format("2006-01-02")
-		}
-
-		// For SelectBox display
-		currentMonth := initialMonth
-		currentYear := initialYear
-
-		// Generate short month names (English only, JS will update with localized)
 		monthNames := []string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
+		months := p.NumberOfMonths
+		if months < 1 {
+			months = 1
+		}
 	}}
 	<div
-		class={ utils.TwMerge("inline-flex flex-col [--cell-size:2rem]", p.Class) }
-		id={ p.ID + "-wrapper" }
-		data-tui-calendar-wrapper="true"
+		id={ p.ID }
+		data-slot="calendar"
+		data-tui-calendar
+		data-tui-calendar-mode={ string(p.Mode) }
+		data-tui-calendar-locale-tag={ string(p.LocaleTag) }
+		data-tui-calendar-start-of-week={ strconv.Itoa(int(p.StartOfWeek)) }
+		data-tui-calendar-month={ view.Format("2006-01-02") }
+		if selectedISO != "" {
+			data-tui-calendar-selected={ selectedISO }
+		}
+		if endISO != "" {
+			data-tui-calendar-end={ endISO }
+		}
+		if p.HideOutsideDays {
+			data-tui-calendar-outside-days="false"
+		}
+		if p.FixedWeeks {
+			data-tui-calendar-fixed-weeks
+		}
+		if p.ShowWeekNumbers {
+			data-tui-calendar-week-numbers
+		}
+		if !p.MinDate.IsZero() {
+			data-tui-calendar-min={ p.MinDate.Format("2006-01-02") }
+		}
+		if !p.MaxDate.IsZero() {
+			data-tui-calendar-max={ p.MaxDate.Format("2006-01-02") }
+		}
+		if len(p.DisabledDates) > 0 {
+			data-tui-calendar-disabled-dates={ isoList(p.DisabledDates) }
+		}
+		if len(p.BookedDates) > 0 {
+			data-tui-calendar-booked-dates={ isoList(p.BookedDates) }
+		}
+		class={
+			utils.TwMerge(
+				"group/calendar w-fit bg-background p-2 [--cell-radius:var(--radius-md)] [--cell-size:--spacing(7)] in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
 	>
-		if !p.HideHiddenInput {
-			<input
-				type="hidden"
-				name={ p.Name }
-				value={ initialSelectedISO }
-				id={ p.ID + "-hidden" }
-				data-tui-calendar-hidden-input
-			/>
-			if p.Mode == SelectionModeRange {
-				<input
-					type="hidden"
-					name={ p.EndName }
-					value={ initialEndISO }
-					id={ p.ID + "-hidden-end" }
-					data-tui-calendar-hidden-end-input
-				/>
+		if p.Name != "" {
+			<input type="hidden" name={ p.Name } value={ selectedISO } data-tui-calendar-hidden-input aria-hidden="true" tabindex="-1"/>
+			if p.Mode == ModeRange {
+				<input type="hidden" name={ p.EndName } value={ endISO } data-tui-calendar-hidden-end-input aria-hidden="true" tabindex="-1"/>
 			}
 		}
-		<div
-			id={ p.ID }
-			class="inline-flex flex-col"
-			data-tui-calendar-container="true"
-			data-tui-calendar-mode={ string(p.Mode) }
-			data-tui-calendar-locale-tag={ string(p.LocaleTag) }
-			data-tui-calendar-initial-month={ strconv.Itoa(initialMonth) }
-			data-tui-calendar-initial-year={ strconv.Itoa(initialYear) }
-			data-tui-calendar-selected-date={ initialSelectedISO }
-			data-tui-calendar-end-date={ initialEndISO }
-			data-tui-calendar-start-of-week={ int(initialStartOfWeek) }
-		>
-			<!-- Calendar Header -->
-			<div class="flex w-full items-center gap-2 mb-4">
-				<button
-					type="button"
-					data-tui-calendar-prev
-					class="inline-flex items-center justify-center rounded-md text-sm font-medium h-7 w-7 hover:bg-accent hover:text-accent-foreground focus:outline-none disabled:opacity-50 shrink-0"
-				>
-					@icon.ChevronLeft()
-				</button>
-				<div class="flex gap-2 flex-1 min-w-0">
-					<!-- Month Select -->
-					<!-- Add bg-card to fix rendering in dark mode Chrome -->
-					<div class="relative flex-1 has-[:focus]:border-ring border border-input shadow-xs has-[:focus]:ring-ring/50 has-[:focus]:ring-[3px] rounded-md">
-						<select
-							id={ p.ID + "-month-select" }
-							data-tui-calendar-month-select
-							class="absolute inset-0 opacity-0 cursor-pointer w-full bg-card"
-							aria-label="Choose the Month"
-						>
-							for i := 0; i < 12; i++ {
-								<option value={ strconv.Itoa(i) } selected?={ i == currentMonth } data-tui-calendar-month-index={ strconv.Itoa(i) }>
-									{ monthNames[i] }
-								</option>
-							}
-						</select>
-						<span class="select-none font-medium rounded-md px-2 flex items-center justify-center gap-1 text-sm h-7 pointer-events-none" aria-hidden="true">
-							<span id={ p.ID + "-month-value" }>{ monthNames[currentMonth] }</span>
-							@icon.ChevronDown(icon.Props{Class: "size-3.5 text-muted-foreground"})
-						</span>
-					</div>
-					<!-- Year Select -->
-					<!-- Add bg-card to fix rendering in dark mode Chrome -->
-					<div class="relative flex-1 has-[:focus]:border-ring border border-input shadow-xs has-[:focus]:ring-ring/50 has-[:focus]:ring-[3px] rounded-md">
-						<select
-							id={ p.ID + "-year-select" }
-							data-tui-calendar-year-select
-							class="absolute inset-0 opacity-0 cursor-pointer w-full bg-card"
-							aria-label="Choose the Year"
-						>
-							for year := 2100; year >= 1900; year-- {
-								<option value={ strconv.Itoa(year) } selected?={ year == currentYear }>
-									{ strconv.Itoa(year) }
-								</option>
-							}
-						</select>
-						<span class="select-none font-medium rounded-md px-2 flex items-center justify-center gap-1 text-sm h-7 pointer-events-none" aria-hidden="true">
-							<span id={ p.ID + "-year-value" }>{ strconv.Itoa(currentYear) }</span>
-							@icon.ChevronDown(icon.Props{Class: "size-3.5 text-muted-foreground"})
-						</span>
-					</div>
-				</div>
-				<button
-					type="button"
-					data-tui-calendar-next
-					class="inline-flex items-center justify-center rounded-md text-sm font-medium h-7 w-7 hover:bg-accent hover:text-accent-foreground focus:outline-none disabled:opacity-50 shrink-0"
-				>
-					@icon.ChevronRight()
-				</button>
+		<div class="relative flex flex-col gap-4 md:flex-row">
+			<div class="absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1">
+					@button.Button(button.Props{
+						Variant: button.VariantGhost,
+						Size:    button.SizeIcon,
+						Class:   "size-[var(--cell-size)] p-0 select-none aria-disabled:opacity-50",
+						Attributes: templ.Attributes{
+							"data-tui-calendar-prev": "",
+							"aria-label":             "Go to the previous month",
+						},
+					}) {
+						@icon.ChevronLeft(icon.Props{Class: "size-4"})
+					}
+					@button.Button(button.Props{
+						Variant: button.VariantGhost,
+						Size:    button.SizeIcon,
+						Class:   "size-[var(--cell-size)] p-0 select-none aria-disabled:opacity-50",
+						Attributes: templ.Attributes{
+							"data-tui-calendar-next": "",
+							"aria-label":             "Go to the next month",
+						},
+					}) {
+						@icon.ChevronRight(icon.Props{Class: "size-4"})
+					}
 			</div>
-			<!-- Weekday Headers -->
-			<div data-tui-calendar-weekdays class="inline-grid grid-cols-[repeat(7,var(--cell-size))] gap-1 mb-1 place-items-center"></div>
-			<!-- Calendar Day Grid -->
-			<div data-tui-calendar-days class="inline-grid grid-cols-[repeat(7,var(--cell-size))] gap-1 place-items-center"></div>
+			for m := 0; m < months; m++ {
+				<div class="flex w-full flex-col gap-4" data-tui-calendar-month-block={ strconv.Itoa(m) }>
+					<div class="flex h-(--cell-size) w-full items-center justify-center px-(--cell-size)">
+						if p.CaptionLayout == CaptionLayoutDropdown && months == 1 {
+						<div class="flex h-(--cell-size) w-full items-center justify-center gap-1.5 text-sm font-medium">
+							<div class="relative rounded-(--cell-radius) border border-transparent has-focus-visible:border-ring has-focus-visible:ring-3 has-focus-visible:ring-ring/50">
+								<select
+									data-tui-calendar-month-select
+									class="absolute inset-0 scheme-light bg-popover opacity-0 dark:scheme-dark"
+									aria-label="Choose the month"
+								>
+									for i := 0; i < 12; i++ {
+										<option value={ strconv.Itoa(i) } selected?={ i == int(view.Month())-1 }>{ monthNames[i] }</option>
+									}
+								</select>
+								<span class="flex h-6 items-center gap-1 rounded-(--cell-radius) pr-1 pl-1.5 text-sm font-medium select-none [&>svg]:size-3.5 [&>svg]:text-muted-foreground" aria-hidden="true">
+									<span data-tui-calendar-month-label>{ monthNames[int(view.Month())-1] }</span>
+									@icon.ChevronDown()
+								</span>
+							</div>
+							<div class="relative rounded-(--cell-radius) border border-transparent has-focus-visible:border-ring has-focus-visible:ring-3 has-focus-visible:ring-ring/50">
+								<select
+									data-tui-calendar-year-select
+									class="absolute inset-0 scheme-light bg-popover opacity-0 dark:scheme-dark"
+									aria-label="Choose the year"
+								>
+									for year := time.Now().Year() - 100; year <= time.Now().Year(); year++ {
+										<option value={ strconv.Itoa(year) } selected?={ year == view.Year() }>{ strconv.Itoa(year) }</option>
+									}
+								</select>
+								<span class="flex h-6 items-center gap-1 rounded-(--cell-radius) pr-1 pl-1.5 text-sm font-medium select-none [&>svg]:size-3.5 [&>svg]:text-muted-foreground" aria-hidden="true">
+									<span data-tui-calendar-year-label>{ strconv.Itoa(view.Year()) }</span>
+									@icon.ChevronDown()
+								</span>
+							</div>
+						</div>
+					} else {
+						<span data-tui-calendar-caption class="text-sm font-medium select-none">
+							{ view.AddDate(0, m, 0).Format("January 2006") }
+						</span>
+					}
+				</div>
+				<table class="w-full border-collapse">
+					<thead>
+						<tr data-tui-calendar-weekdays class="flex"></tr>
+					</thead>
+					<tbody data-tui-calendar-weeks></tbody>
+				</table>
+			</div>
+			}
 		</div>
+		<template data-tui-calendar-day-template>
+			@button.Button(button.Props{
+				Variant: button.VariantGhost,
+				Size:    button.SizeIcon,
+				Class:   "relative isolate z-10 flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 border-0 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-[3px] group-data-[focused=true]/day:ring-ring/50 data-[range-end=true]:rounded-(--cell-radius) data-[range-end=true]:rounded-r-(--cell-radius) data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-muted data-[range-middle=true]:text-foreground data-[range-start=true]:rounded-(--cell-radius) data-[range-start=true]:rounded-l-(--cell-radius) data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground dark:hover:text-foreground [&>span]:text-xs [&>span]:opacity-70",
+			})
+		</template>
 	</div>
 }
 

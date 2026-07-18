@@ -73,9 +73,14 @@ func main() {
 		"out/showcase/button_with_icon.html":   showcase.ButtonWithIcon(),
 
 		// Calendar
-		"out/showcase/calendar_default.html": showcase.CalendarDefault(),
-		"out/showcase/calendar_range.html":   showcase.CalendarRange(),
-		"out/showcase/calendar_sizes.html":   showcase.CalendarSizes(),
+		"out/showcase/calendar_default.html":      showcase.CalendarDefault(),
+		"out/showcase/calendar_range.html":        showcase.CalendarRange(),
+		"out/showcase/calendar_caption.html":      showcase.CalendarCaption(),
+		"out/showcase/calendar_presets.html":      showcase.CalendarPresets(),
+		"out/showcase/calendar_time.html":         showcase.CalendarTime(),
+		"out/showcase/calendar_booked_dates.html": showcase.CalendarBookedDates(),
+		"out/showcase/calendar_custom_cell_size.html": showcase.CalendarCustomCellSize(),
+		"out/showcase/calendar_week_numbers.html": showcase.CalendarWeekNumbers(),
 
 		// Card
 		"out/showcase/card_default.html":    showcase.CardDefault(),

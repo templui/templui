@@ -2,10 +2,19 @@ package card
 
 import "github.com/templui/templui/utils"
 
+type Size string
+
+const (
+	SizeDefault Size = "default"
+	SizeSm      Size = "sm"
+)
+
 type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
+	// Size of the card. Options: 'default', 'sm' (tighter spacing).
+	Size Size
 }
 
 type HeaderProps struct {
@@ -21,6 +30,12 @@ type TitleProps struct {
 }
 
 type DescriptionProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ActionProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
@@ -43,13 +58,18 @@ templ Card(props ...Props) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	if p.Size == "" {
+		{{ p.Size = SizeDefault }}
+	}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="card"
+		data-size={ string(p.Size) }
 		class={
 			utils.TwMerge(
-				"w-full rounded-lg border bg-card text-card-foreground shadow-xs",
+				"group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
 				p.Class,
 			),
 		}
@@ -68,9 +88,10 @@ templ Header(props ...HeaderProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="card-header"
 		class={
 			utils.TwMerge(
-				"flex flex-col space-y-1.5 p-6 pb-0",
+				"group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-(--card-spacing) has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-(--card-spacing)",
 				p.Class,
 			),
 		}
@@ -85,20 +106,21 @@ templ Title(props ...TitleProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<h3
+	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="card-title"
 		class={
 			utils.TwMerge(
-				"text-lg font-semibold leading-none tracking-tight",
+				"text-base leading-snug font-medium group-data-[size=sm]/card:text-sm",
 				p.Class,
 			),
 		}
 		{ p.Attributes... }
 	>
 		{ children... }
-	</h3>
+	</div>
 }
 
 templ Description(props ...DescriptionProps) {
@@ -106,10 +128,11 @@ templ Description(props ...DescriptionProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<p
+	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="card-description"
 		class={
 			utils.TwMerge(
 				"text-sm text-muted-foreground",
@@ -119,7 +142,30 @@ templ Description(props ...DescriptionProps) {
 		{ p.Attributes... }
 	>
 		{ children... }
-	</p>
+	</div>
+}
+
+// Action sits in the top-right corner of the header, e.g. a button or badge.
+templ Action(props ...ActionProps) {
+	{{ var p ActionProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="card-action"
+		class={
+			utils.TwMerge(
+				"col-start-2 row-span-2 row-start-1 self-start justify-self-end",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
 }
 
 templ Content(props ...ContentProps) {
@@ -131,9 +177,10 @@ templ Content(props ...ContentProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="card-content"
 		class={
 			utils.TwMerge(
-				"p-6",
+				"px-(--card-spacing)",
 				p.Class,
 			),
 		}
@@ -152,9 +199,10 @@ templ Footer(props ...FooterProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="card-footer"
 		class={
 			utils.TwMerge(
-				"flex items-center p-6 pt-0",
+				"flex items-center rounded-b-xl border-t bg-muted/50 p-(--card-spacing)",
 				p.Class,
 			),
 		}

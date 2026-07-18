@@ -247,7 +247,7 @@ templ ThemeShowcase() {
 				{{ threeDaysFromNow := time.Now().AddDate(0, 0, 3) }}
 				@card.Content() {
 					@calendar.Calendar(calendar.Props{
-						Value: &threeDaysFromNow,
+						Value: threeDaysFromNow,
 					})
 				}
 			}

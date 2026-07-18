@@ -1,0 +1,65 @@
+package showcase
+
+import (
+	"time"
+
+	"github.com/templui/templui/components/calendar"
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/inputgroup"
+)
+
+templ CalendarTime() {
+	{{ selected := time.Date(time.Now().Year(), time.Now().Month(), 12, 0, 0, 0, 0, time.Local) }}
+	@card.Card(card.Props{Size: card.SizeSm, Class: "mx-auto w-fit"}) {
+		@card.Content() {
+			@calendar.Calendar(calendar.Props{
+				Value: selected,
+				Class: "p-0",
+			})
+		}
+		@card.Footer(card.FooterProps{Class: "border-t bg-card"}) {
+			@field.Group() {
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "calendar-time-from"}) {
+						Start Time
+					}
+					@inputgroup.InputGroup() {
+						@inputgroup.Input(inputgroup.InputProps{
+							ID:    "calendar-time-from",
+							Type:  "time",
+							Value: "10:30:00",
+							Class: "appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none",
+							Attributes: templ.Attributes{
+								"step": "1",
+							},
+						})
+						@inputgroup.Addon() {
+							@icon.Clock2(icon.Props{Class: "text-muted-foreground"})
+						}
+					}
+				}
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "calendar-time-to"}) {
+						End Time
+					}
+					@inputgroup.InputGroup() {
+						@inputgroup.Input(inputgroup.InputProps{
+							ID:    "calendar-time-to",
+							Type:  "time",
+							Value: "12:30:00",
+							Class: "appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none",
+							Attributes: templ.Attributes{
+								"step": "1",
+							},
+						})
+						@inputgroup.Addon() {
+							@icon.Clock2(icon.Props{Class: "text-muted-foreground"})
+						}
+					}
+				}
+			}
+		}
+	}
+}
