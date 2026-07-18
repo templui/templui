@@ -98,50 +98,43 @@ templ Tooltip() {
 				<div id="api-tooltip" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Tooltip",
-						Description: "Root wrapper component for tooltip functionality.",
+						Description: "The root that links Trigger and Content via ctx. Renders no element.",
 						Items: []modules.APITableItem{
 							{
 								Name:        "ID",
 								Type:        "string",
-								Default:     "",
-								Description: "Unique identifier for the tooltip wrapper.",
-								Required:    false,
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "",
-								Description: "Additional CSS classes to apply to the tooltip wrapper.",
-								Required:    false,
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "",
-								Description: "Additional HTML attributes to apply to the tooltip wrapper.",
+								Default:     "randomID",
+								Description: "Optional id linking trigger and content.",
 								Required:    false,
 							},
 						},
 					})
 				</div>
 				<div id="api-content" class="mb-8">
-					<p class="mb-4 text-sm text-muted-foreground">Make any element the trigger by spreading <code>tooltip.Trigger()</code> onto its Attributes — the templ equivalent of shadcn's <code>asChild</code>.</p>
+					<p class="mb-4 text-sm text-muted-foreground">Make any element the trigger by spreading <code>tooltip.Trigger(ctx)</code> onto its Attributes — the templ equivalent of shadcn's <code>asChild</code>.</p>
 					@modules.APITable(modules.APITableProps{
 						Title:       "Content",
-						Description: "Container for the tooltip content with positioning options.",
+						Description: "The tooltip surface, portaled to the body and rendered in the native top layer.",
 						Items: []modules.APITableItem{
 							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "",
-								Description: "Optional HTML id for the content element.",
+								Name:        "Side",
+								Type:        "Side",
+								Default:     "top",
+								Description: "Side of the trigger the tooltip shows on. Options: 'top', 'right', 'bottom', 'left'. Flips automatically when there is no room.",
+								Required:    false,
+							},
+							{
+								Name:        "SideOffset",
+								Type:        "int",
+								Default:     "4",
+								Description: "Gap to the trigger in px.",
 								Required:    false,
 							},
 							{
 								Name:        "Class",
 								Type:        "string",
 								Default:     "",
-								Description: "Additional CSS classes to apply to the content. Default styling includes dark background.",
+								Description: "Additional CSS classes to apply to the content.",
 								Required:    false,
 							},
 							{
@@ -149,34 +142,6 @@ templ Tooltip() {
 								Type:        "templ.Attributes",
 								Default:     "",
 								Description: "Additional HTML attributes to apply to the content element.",
-								Required:    false,
-							},
-							{
-								Name:        "ShowArrow",
-								Type:        "bool",
-								Default:     "false",
-								Description: "Whether to show an arrow pointing to the trigger element.",
-								Required:    false,
-							},
-							{
-								Name:        "Position",
-								Type:        "Position",
-								Default:     "top",
-								Description: "Position of the tooltip relative to trigger. Options: 'top', 'right', 'bottom', 'left'.",
-								Required:    false,
-							},
-							{
-								Name:        "HoverDelay",
-								Type:        "int",
-								Default:     "0",
-								Description: "Delay in milliseconds before showing the tooltip on hover.",
-								Required:    false,
-							},
-							{
-								Name:        "HoverOutDelay",
-								Type:        "int",
-								Default:     "0",
-								Description: "Delay in milliseconds before hiding the tooltip on hover out.",
 								Required:    false,
 							},
 						},

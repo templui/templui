@@ -124,8 +124,9 @@ templ ContextMenu() {
 						Title:       "Content",
 						Description: "The menu surface, positioned at the cursor and clamped to the viewport. Use Root, Trigger and Content together.",
 						Items: []modules.APITableItem{
-							{Name: "Side", Type: "Side", Default: "bottom", Description: "Side of the cursor the menu opens on. Options: 'top', 'right', 'bottom', 'left'. Flips automatically when there is no room.", Required: false},
-							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the content.", Required: false},
+							{Name: "Side", Type: "Side", Default: "right", Description: "Side of the cursor the menu opens on. Options: 'top', 'right', 'bottom', 'left'. Flips automatically when there is no room.", Required: false},
+							{Name: "SideOffset", Type: "int", Default: "0", Description: "Gap to the cursor in px.", Required: false},
+							{Name: "AlignOffset", Type: "int", Default: "4", Description: "Shift along the aligned edge in px.", Required: false},
 							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes. Set a width here (e.g. w-52).", Required: false},
 							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the content.", Required: false},
 						},

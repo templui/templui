@@ -4,9 +4,6 @@ import "../floatingui/floating_ui_dom.js";
 (function () {
   // Exit animations run at the tw-animate default (150ms); hide after.
   const EXIT_MS = 170;
-  // Radix offsets by the arrow height: the arrow SVG is 10x5, so 5px —
-  // the tip ends up touching the trigger, like shadcn.
-  const ARROW_GAP = 5;
 
   function allContents() {
     return document.querySelectorAll("[data-tui-tooltip-content]");
@@ -22,41 +19,26 @@ import "../floatingui/floating_ui_dom.js";
     );
   }
 
-  // "top" -> "bottom center": the corner the tooltip grows out of.
-  function transformOrigin(placement) {
-    const side = placement.split("-")[0];
-    const align = placement.split("-")[1] || "center";
-    const opposite = { top: "bottom", bottom: "top", left: "right", right: "left" }[side];
-    if (side === "top" || side === "bottom") {
-      return opposite + " " + ({ start: "left", end: "right", center: "center" }[align]);
-    }
-    return ({ start: "top", end: "bottom", center: "center" }[align]) + " " + opposite;
+  // Base UI zooms the popup out of the anchor's center point (e.g.
+  // "96px -4px"), not out of a placement corner.
+  function anchorOrigin(result, anchorRect, sideOffset) {
+    const side = result.placement.split("-")[0];
+    const centerX = anchorRect.left + anchorRect.width / 2 - result.x + "px";
+    const centerY = anchorRect.top + anchorRect.height / 2 - result.y + "px";
+    if (side === "bottom") return centerX + " " + -sideOffset + "px";
+    if (side === "top") return centerX + " calc(100% + " + sideOffset + "px)";
+    if (side === "right") return -sideOffset + "px " + centerY;
+    return "calc(100% + " + sideOffset + "px) " + centerY;
   }
 
-  // Places the arrow wrapper exactly like Radix popper does: pinned to the
-  // edge facing the trigger, then rotated/translated out of the content box.
-  // (Copied from @radix-ui/react-popper PopperArrow.)
+  // The arrow styles itself per side (data-side classes, like Base UI's
+  // Arrow); the script only feeds it the side and the centered coordinate.
   function placeArrow(content, side, arrowData) {
     const arrowEl = content.querySelector("[data-tui-tooltip-arrow]");
     if (!arrowEl) return;
-    const baseSide = { top: "bottom", right: "left", bottom: "top", left: "right" }[side];
+    arrowEl.setAttribute("data-side", side);
     arrowEl.style.left = arrowData && arrowData.x != null ? arrowData.x + "px" : "";
     arrowEl.style.top = arrowData && arrowData.y != null ? arrowData.y + "px" : "";
-    arrowEl.style.right = "";
-    arrowEl.style.bottom = "";
-    arrowEl.style[baseSide] = "0";
-    arrowEl.style.transformOrigin = {
-      top: "",
-      right: "0 0",
-      bottom: "center 0",
-      left: "100% 0",
-    }[side];
-    arrowEl.style.transform = {
-      top: "translateY(100%)",
-      right: "translateY(50%) rotate(90deg) translateX(-50%)",
-      bottom: "rotate(180deg)",
-      left: "translateY(50%) rotate(-90deg) translateX(50%)",
-    }[side];
   }
 
   // Moves the content to <body> (shadcn portals it the same way). Also removes
@@ -74,14 +56,14 @@ import "../floatingui/floating_ui_dom.js";
     const { computePosition, offset, flip, shift, arrow } = window.FloatingUIDOM;
     const side = content.getAttribute("data-tui-tooltip-side") || "top";
     const sideOffset =
-      parseInt(content.getAttribute("data-tui-tooltip-side-offset"), 10) || 0;
+      parseInt(content.getAttribute("data-tui-tooltip-side-offset"), 10) || 4;
     const arrowEl = content.querySelector("[data-tui-tooltip-arrow]");
 
     return computePosition(trigger, content, {
       placement: side,
       strategy: "fixed",
       middleware: [
-        offset(sideOffset + ARROW_GAP),
+        offset(sideOffset),
         flip(),
         shift({ padding: 8 }),
         arrowEl ? arrow({ element: arrowEl, padding: 6 }) : undefined,
@@ -90,7 +72,10 @@ import "../floatingui/floating_ui_dom.js";
       content.style.transition = "none";
       content.style.left = result.x + "px";
       content.style.top = result.y + "px";
-      content.style.transformOrigin = transformOrigin(result.placement);
+      content.style.setProperty(
+        "--tui-tooltip-transform-origin",
+        anchorOrigin(result, trigger.getBoundingClientRect(), sideOffset),
+      );
       const finalSide = result.placement.split("-")[0];
       content.setAttribute("data-side", finalSide);
       placeArrow(content, finalSide, result.middlewareData.arrow);

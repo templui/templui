@@ -1,6 +1,9 @@
 package contextmenu
 
 import (
+	"context"
+	"strconv"
+
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/utils"
 )
@@ -12,10 +15,20 @@ const (
 	ItemVariantDestructive ItemVariant = "destructive"
 )
 
+type ctxKey string
+
+const idKey ctxKey = "contextmenuID"
+
+// menuID returns the id shared by Root, Trigger and Content via ctx.
+func menuID(ctx context.Context) string {
+	if id, ok := ctx.Value(idKey).(string); ok {
+		return id
+	}
+	return ""
+}
+
 type Props struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
+	ID string
 }
 
 type TriggerProps struct {
@@ -34,12 +47,15 @@ const (
 )
 
 type ContentProps struct {
-	ID         string
 	Class      string
 	Attributes templ.Attributes
-	// Side of the cursor the menu opens on. Defaults to bottom; flips
-	// automatically when there is no room.
+	// Side of the cursor the menu opens on. Defaults to right (Base UI);
+	// flips automatically when there is no room.
 	Side Side
+	// SideOffset is the gap to the cursor in px. Defaults to 0.
+	SideOffset int
+	// AlignOffset shifts the menu along the aligned edge in px. Defaults to 4.
+	AlignOffset int
 }
 
 type ItemProps struct {
@@ -121,40 +137,37 @@ type SubContentProps struct {
 	Attributes templ.Attributes
 }
 
-func itemClasses(variant ItemVariant, disabled, inset bool) string {
+// Items highlight via real focus (Base UI menus move focus to the item under
+// the pointer and with the arrow keys), so there are no hover: styles here.
+func itemClasses(disabled, inset bool) string {
 	return utils.TwMerge(
-		"group/context-menu-item relative w-full text-left flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+		"group/context-menu-item relative flex w-full cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+		"focus:bg-accent focus:text-accent-foreground focus:*:[svg]:text-accent-foreground",
+		"data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:text-destructive",
 		utils.If(inset, "pl-7"),
-		utils.If(!disabled && variant == ItemVariantDefault, "focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground"),
-		utils.If(!disabled && variant == ItemVariantDestructive, "text-destructive focus:bg-destructive/10 focus:text-destructive hover:bg-destructive/10 hover:text-destructive dark:focus:bg-destructive/20 dark:hover:bg-destructive/20 [&_svg]:text-destructive"),
 		utils.If(disabled, "pointer-events-none opacity-50"),
 	)
 }
 
 func checkItemClasses(disabled bool) string {
 	return utils.TwMerge(
-		"group/cmitem relative w-full text-left flex cursor-default items-center gap-1.5 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-		utils.If(!disabled, "focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground"),
+		"group/cmitem relative flex w-full cursor-default items-center gap-1.5 rounded-md py-1 pr-8 pl-1.5 text-left text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
 		utils.If(disabled, "pointer-events-none opacity-50"),
 	)
 }
 
+// Root renders no element: it only generates the id that links Trigger and
+// Content (via ctx).
 templ Root(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		data-slot="context-menu"
-		data-tui-contextmenu-root
-		class={ utils.TwMerge("contents", p.Class) }
-		{ p.Attributes... }
-	>
-		{ children... }
-	</div>
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	{{ ctx = context.WithValue(ctx, idKey, p.ID) }}
+	{ children... }
 }
 
 templ Trigger(props ...TriggerProps) {
@@ -168,6 +181,7 @@ templ Trigger(props ...TriggerProps) {
 		}
 		data-slot="context-menu-trigger"
 		data-tui-contextmenu-trigger
+		data-tui-contextmenu-for={ menuID(ctx) }
 		class={ utils.TwMerge("select-none", p.Class) }
 		{ p.Attributes... }
 	>
@@ -181,27 +195,37 @@ templ Content(props ...ContentProps) {
 		{{ p = props[0] }}
 	}
 	if p.Side == "" {
-		{{ p.Side = SideBottom }}
+		{{ p.Side = SideRight }}
+	}
+	if p.AlignOffset == 0 {
+		{{ p.AlignOffset = 4 }}
 	}
 	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		data-slot="context-menu-content"
+		id={ menuID(ctx) }
 		data-tui-contextmenu-content
 		data-tui-contextmenu-side={ string(p.Side) }
+		data-tui-contextmenu-side-offset={ strconv.Itoa(p.SideOffset) }
+		data-tui-contextmenu-align-offset={ strconv.Itoa(p.AlignOffset) }
 		data-state="closed"
 		popover="manual"
-		role="menu"
-		class={
-			utils.TwMerge(
-				"fixed inset-auto left-0 top-0 z-50 m-0 min-w-36 rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 focus:outline-none duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
-				p.Class,
-			),
-		}
-		{ p.Attributes... }
+		class="pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
 	>
-		{ children... }
+		<div
+			data-slot="context-menu-content"
+			data-tui-contextmenu-popup
+			data-state="closed"
+			role="menu"
+			tabindex="-1"
+			class={
+				utils.TwMerge(
+					"pointer-events-auto relative isolate z-50 max-h-(--tui-contextmenu-available-height) min-w-36 origin-(--tui-contextmenu-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-none duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
+					p.Class,
+				),
+			}
+			{ p.Attributes... }
+		>
+			{ children... }
+		</div>
 	</div>
 }
 
@@ -233,7 +257,7 @@ templ Item(props ...ItemProps) {
 				aria-disabled="true"
 			}
 			role="menuitem"
-			class={ utils.TwMerge(itemClasses(p.Variant, p.Disabled, p.Inset), p.Class) }
+			class={ utils.TwMerge(itemClasses(p.Disabled, p.Inset), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -250,7 +274,7 @@ templ Item(props ...ItemProps) {
 			}
 			disabled?={ p.Disabled }
 			role="menuitem"
-			class={ utils.TwMerge(itemClasses(p.Variant, p.Disabled, p.Inset), p.Class) }
+			class={ utils.TwMerge(itemClasses(p.Disabled, p.Inset), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -405,7 +429,7 @@ templ Shortcut(props ...ShortcutProps) {
 			id={ p.ID }
 		}
 		data-slot="context-menu-shortcut"
-		class={ utils.TwMerge("ml-auto text-xs tracking-widest text-muted-foreground group-focus/context-menu-item:text-accent-foreground group-hover/context-menu-item:text-accent-foreground", p.Class) }
+		class={ utils.TwMerge("ml-auto text-xs tracking-widest text-muted-foreground group-focus/context-menu-item:text-accent-foreground", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -447,7 +471,7 @@ templ SubTrigger(props ...SubTriggerProps) {
 		aria-haspopup="menu"
 		class={
 			utils.TwMerge(
-				"w-full text-left flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
+				"flex w-full cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
 				utils.If(p.Inset, "pl-7"),
 				p.Class,
 			),
@@ -472,9 +496,10 @@ templ SubContent(props ...SubContentProps) {
 		data-tui-contextmenu-sub-content
 		data-state="closed"
 		role="menu"
+		tabindex="-1"
 		class={
 			utils.TwMerge(
-				"hidden fixed inset-auto left-0 top-0 z-50 min-w-32 rounded-lg border bg-popover p-1 text-popover-foreground shadow-lg duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
+				"hidden fixed inset-auto left-0 top-0 z-50 min-w-32 origin-(--tui-contextmenu-transform-origin) rounded-lg border bg-popover p-1 text-popover-foreground shadow-lg outline-none duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
 				p.Class,
 			),
 		}

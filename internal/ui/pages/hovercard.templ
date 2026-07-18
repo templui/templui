@@ -62,39 +62,35 @@ templ HoverCard() {
 				@modules.APILegend()
 				<div id="api-root" class="mb-8">
 					@modules.APITable(modules.APITableProps{
-						Title:       "Root",
-						Description: "Groups one trigger with one hover card content element.",
+						Title:       "HoverCard",
+						Description: "The root that links Trigger and Content via ctx. Renders no element.",
 						Items: []modules.APITableItem{
-							{Name: "ID", Type: "string", Default: "", Description: "Optional root ID for the JavaScript API.", Required: false},
-							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the root wrapper.", Required: false},
-							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the root wrapper.", Required: false},
+							{Name: "ID", Type: "string", Default: "randomID", Description: "Optional id linking trigger and content.", Required: false},
+							{Name: "OpenDelay", Type: "int", Default: "700", Description: "Delay in milliseconds before showing the card on hover.", Required: false},
+							{Name: "CloseDelay", Type: "int", Default: "300", Description: "Delay in milliseconds before hiding the card on hover out.", Required: false},
 						},
 					})
 				</div>
 				<div id="api-trigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Trigger",
-						Description: "Element that opens the hover card on hover.",
+						Description: "hovercard.Trigger(ctx) returns the attributes that turn any element into the trigger, usually spread onto a link.",
 						Items: []modules.APITableItem{
-							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the trigger element.", Required: false},
-							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the trigger.", Required: false},
-							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the trigger element.", Required: false},
+							{Name: "ctx", Type: "context.Context", Default: "", Description: "The templ context inside HoverCard, carrying the card id.", Required: true},
 						},
 					})
 				</div>
 				<div id="api-content" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Content",
-						Description: "The hover card surface. Placement and hover delays are configured here.",
+						Description: "The hover card surface, portaled to the body and rendered in the native top layer.",
 						Items: []modules.APITableItem{
-							{Name: "ID", Type: "string", Default: "", Description: "Optional HTML id for the content element.", Required: false},
-							{Name: "Class", Type: "string", Default: "w-64 p-4", Description: "Additional CSS classes to apply to the content. Override the default width here.", Required: false},
+							{Name: "Side", Type: "Side", Default: "bottom", Description: "Side of the trigger the card opens on. Options: 'top', 'right', 'bottom', 'left'. Flips automatically when there is no room.", Required: false},
+							{Name: "Align", Type: "Align", Default: "center", Description: "Alignment along the trigger edge. Options: 'start', 'center', 'end'.", Required: false},
+							{Name: "SideOffset", Type: "int", Default: "4", Description: "Gap to the trigger in px.", Required: false},
+							{Name: "AlignOffset", Type: "int", Default: "4", Description: "Shift along the aligned edge in px; only applies with Align start or end.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes. Override the default width (w-64) here.", Required: false},
 							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the content element.", Required: false},
-							{Name: "Placement", Type: "Placement", Default: "bottom", Description: "Position of the card relative to trigger. Options: 'top', 'top-start', 'top-end', 'right', 'right-start', 'right-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'left-start', 'left-end'.", Required: false},
-							{Name: "Offset", Type: "int", Default: "4 (or 8 with arrow)", Description: "Distance in pixels between the trigger and card.", Required: false},
-							{Name: "ShowArrow", Type: "bool", Default: "false", Description: "Whether to show an arrow pointing to the trigger element.", Required: false},
-							{Name: "OpenDelay", Type: "int", Default: "150", Description: "Delay in milliseconds before showing the card on hover.", Required: false},
-							{Name: "CloseDelay", Type: "int", Default: "300", Description: "Delay in milliseconds before hiding the card on hover out.", Required: false},
 						},
 					})
 				</div>

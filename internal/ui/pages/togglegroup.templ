@@ -104,7 +104,7 @@ templ ToggleGroup() {
 							{Name: "Variant", Type: "Variant", Default: "default", Description: "Variant applied to child toggles that don't set their own. Options: 'default', 'outline'.", Required: false},
 							{Name: "Size", Type: "Size", Default: "default", Description: "Size applied to child toggles that don't set their own. Options: 'sm', 'default', 'lg'.", Required: false},
 							{Name: "Orientation", Type: "Orientation", Default: "horizontal", Description: "Layout direction. Options: 'horizontal', 'vertical'.", Required: false},
-							{Name: "Spacing", Type: "int", Default: "2", Description: "Gap between items in Tailwind units (e.g. 1, 2, 4, 6). 0 uses the default of 2.", Required: false},
+							{Name: "Spacing", Type: "*int", Default: "2", Description: "Gap between items in Tailwind spacing units. utils.Ptr(0) joins the items into one bar with shared borders.", Required: false},
 							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the group.", Required: false},
 						},
 					})

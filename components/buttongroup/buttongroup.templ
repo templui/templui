@@ -29,13 +29,15 @@ type SeparatorProps struct {
 	Orientation Orientation
 }
 
+// Rounding is data-slot based like base-nova: hidden elements without a
+// data-slot (e.g. a select's form input) never break the first/last rounding.
 func variantClasses(o Orientation) string {
-	base := "group/button-group flex w-fit items-stretch *:focus-visible:relative *:focus-visible:z-10 has-[>[data-slot=button-group]]:gap-2 [&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1"
+	base := "group/button-group flex w-fit items-stretch *:focus-visible:relative *:focus-visible:z-10 has-[>[data-slot=button-group]]:gap-2 has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-lg [&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1"
 	switch o {
 	case OrientationVertical:
-		return base + " [&>*:not(:first-child)]:rounded-t-none [&>*:not(:first-child)]:border-t-0 [&>*:not(:last-child)]:rounded-b-none flex-col"
+		return base + " flex-col *:data-slot:rounded-b-none [&>[data-slot]~[data-slot]]:rounded-t-none [&>[data-slot]~[data-slot]]:border-t-0 [&>[data-slot]:not(:has(~[data-slot]))]:rounded-b-lg!"
 	default:
-		return base + " [&>*:not(:first-child)]:rounded-l-none [&>*:not(:first-child)]:border-l-0 [&>*:not(:last-child)]:rounded-r-none"
+		return base + " *:data-slot:rounded-r-none [&>[data-slot]~[data-slot]]:rounded-l-none [&>[data-slot]~[data-slot]]:border-l-0 [&>[data-slot]:not(:has(~[data-slot]))]:rounded-r-lg!"
 	}
 }
 
@@ -70,6 +72,7 @@ templ Text(props ...TextProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="button-group-text"
 		class={ utils.TwMerge("flex items-center gap-2 rounded-lg border bg-muted px-2.5 text-sm font-medium [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4", p.Class) }
 		{ p.Attributes... }
 	>

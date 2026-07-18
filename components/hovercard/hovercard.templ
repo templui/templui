@@ -69,6 +69,9 @@ type ContentProps struct {
 	Align Align
 	// SideOffset is the gap to the trigger in px. Defaults to 4.
 	SideOffset int
+	// AlignOffset shifts the card along the aligned edge in px. Defaults
+	// to 4 (Base UI); only applies with Align start or end.
+	AlignOffset int
 }
 
 // HoverCard renders no element: it only generates the id that links Trigger
@@ -106,6 +109,9 @@ templ Content(props ...ContentProps) {
 	if p.SideOffset == 0 {
 		{{ p.SideOffset = 4 }}
 	}
+	if p.AlignOffset == 0 {
+		{{ p.AlignOffset = 4 }}
+	}
 	{{ d, _ := ctx.Value(delaysKey{}).(delays) }}
 	<div
 		id={ cardID(ctx) }
@@ -114,13 +120,14 @@ templ Content(props ...ContentProps) {
 		data-tui-hovercard-side={ string(p.Side) }
 		data-tui-hovercard-align={ string(p.Align) }
 		data-tui-hovercard-side-offset={ strconv.Itoa(p.SideOffset) }
+		data-tui-hovercard-align-offset={ strconv.Itoa(p.AlignOffset) }
 		data-tui-hovercard-open-delay={ strconv.Itoa(d.open) }
 		data-tui-hovercard-close-delay={ strconv.Itoa(d.close) }
 		data-state="closed"
 		popover="manual"
 		class={
 			utils.TwMerge(
-				"fixed inset-auto left-0 top-0 m-0 z-50 w-64 overflow-visible rounded-lg bg-popover p-2.5 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
+				"fixed inset-auto left-0 top-0 m-0 z-50 w-64 origin-(--tui-hovercard-transform-origin) overflow-visible rounded-lg bg-popover p-2.5 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
 				p.Class,
 			),
 		}

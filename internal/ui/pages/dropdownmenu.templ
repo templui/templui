@@ -140,7 +140,8 @@ templ DropdownMenu() {
 							{Name: "Side", Type: "Side", Default: "bottom", Description: "Side of the trigger the menu opens on. Options: 'top', 'right', 'bottom', 'left'. Flips automatically when there is no room.", Required: false},
 							{Name: "Align", Type: "Align", Default: "start", Description: "Alignment along the trigger edge. Options: 'start', 'center', 'end'.", Required: false},
 							{Name: "SideOffset", Type: "int", Default: "4", Description: "Gap between trigger and menu in px.", Required: false},
-							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes. Set a width here (e.g. w-40).", Required: false},
+							{Name: "AlignOffset", Type: "int", Default: "0", Description: "Shift along the aligned edge in px.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes. Set a width here (e.g. w-40); the menu defaults to the trigger width.", Required: false},
 							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the content.", Required: false},
 						},
 					})

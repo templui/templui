@@ -19,15 +19,16 @@ import "../floatingui/floating_ui_dom.js";
     );
   }
 
-  // "bottom" -> "top center": the corner the card grows out of.
-  function transformOrigin(placement) {
-    const side = placement.split("-")[0];
-    const align = placement.split("-")[1] || "center";
-    const opposite = { top: "bottom", bottom: "top", left: "right", right: "left" }[side];
-    if (side === "top" || side === "bottom") {
-      return opposite + " " + ({ start: "left", end: "right", center: "center" }[align]);
-    }
-    return ({ start: "top", end: "bottom", center: "center" }[align]) + " " + opposite;
+  // Base UI zooms the popup out of the anchor's center point (e.g.
+  // "96px -4px"), not out of a placement corner.
+  function anchorOrigin(result, anchorRect, sideOffset) {
+    const side = result.placement.split("-")[0];
+    const centerX = anchorRect.left + anchorRect.width / 2 - result.x + "px";
+    const centerY = anchorRect.top + anchorRect.height / 2 - result.y + "px";
+    if (side === "bottom") return centerX + " " + -sideOffset + "px";
+    if (side === "top") return centerX + " calc(100% + " + sideOffset + "px)";
+    if (side === "right") return -sideOffset + "px " + centerY;
+    return "calc(100% + " + sideOffset + "px) " + centerY;
   }
 
   // Moves the content to <body> (shadcn portals it the same way). Also removes
@@ -47,17 +48,26 @@ import "../floatingui/floating_ui_dom.js";
     const align = content.getAttribute("data-tui-hovercard-align") || "center";
     const sideOffset =
       parseInt(content.getAttribute("data-tui-hovercard-side-offset"), 10) || 4;
+    const alignOffset =
+      parseInt(content.getAttribute("data-tui-hovercard-align-offset"), 10) || 0;
     const placement = align === "center" ? side : side + "-" + align;
 
     return computePosition(trigger, content, {
       placement: placement,
       strategy: "fixed",
-      middleware: [offset(sideOffset), flip(), shift({ padding: 8 })],
+      middleware: [
+        offset({ mainAxis: sideOffset, alignmentAxis: alignOffset }),
+        flip(),
+        shift({ padding: 8 }),
+      ],
     }).then((result) => {
       content.style.transition = "none";
       content.style.left = result.x + "px";
       content.style.top = result.y + "px";
-      content.style.transformOrigin = transformOrigin(result.placement);
+      content.style.setProperty(
+        "--tui-hovercard-transform-origin",
+        anchorOrigin(result, trigger.getBoundingClientRect(), sideOffset),
+      );
       content.setAttribute("data-side", result.placement.split("-")[0]);
       content.offsetHeight; // flush styles before re-enabling transitions
       content.style.transition = "";

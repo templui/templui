@@ -3,6 +3,7 @@ package showcase
 import (
 	"github.com/templui/templui/components/toggle"
 	"github.com/templui/templui/components/togglegroup"
+	"github.com/templui/templui/utils"
 )
 
 templ ToggleGroupSpacing() {
@@ -10,7 +11,7 @@ templ ToggleGroupSpacing() {
 		Type:    togglegroup.TypeSingle,
 		Size:    togglegroup.SizeSm,
 		Variant: togglegroup.VariantOutline,
-		Spacing: 2,
+		Spacing: utils.Ptr(2),
 	}) {
 		@toggle.Toggle(toggle.Props{
 			Value:      "top",

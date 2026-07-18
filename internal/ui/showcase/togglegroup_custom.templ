@@ -4,6 +4,7 @@ import (
 	"github.com/templui/templui/components/field"
 	"github.com/templui/templui/components/toggle"
 	"github.com/templui/templui/components/togglegroup"
+	"github.com/templui/templui/utils"
 )
 
 templ ToggleGroupCustom() {
@@ -16,7 +17,7 @@ templ ToggleGroupCustom() {
 			Type:    togglegroup.TypeSingle,
 			Variant: togglegroup.VariantOutline,
 			Size:    togglegroup.SizeLg,
-			Spacing: 2,
+			Spacing: utils.Ptr(2),
 		}) {
 			@toggle.Toggle(toggle.Props{
 				Value:      "light",

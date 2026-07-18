@@ -2,9 +2,9 @@ import "../floatingui/floating_ui_core.js";
 import "../floatingui/floating_ui_dom.js";
 
 (function () {
-  // Exit animations run for 100ms (duration-100); hide shortly after.
-  const EXIT_MS = 120;
-  // Submenu hover intent, like Radix: open fast, close with a grace delay so
+  const EXIT_MS = 120; // exit animation (duration-100) + slack
+  const COLLISION_PADDING = 8;
+  // Submenu hover intent, like Base UI: open fast, close with a grace delay so
   // moving the mouse diagonally into the submenu does not flicker.
   const SUB_OPEN_DELAY = 100;
   const SUB_CLOSE_DELAY = 300;
@@ -19,80 +19,40 @@ import "../floatingui/floating_ui_dom.js";
     );
   }
 
-  // "bottom-start" -> "top left": the corner the menu grows out of.
-  function transformOrigin(placement) {
-    const side = placement.split("-")[0];
-    const align = placement.split("-")[1] || "center";
-    const opposite = { top: "bottom", bottom: "top", left: "right", right: "left" }[side];
-    if (side === "top" || side === "bottom") {
-      return opposite + " " + ({ start: "left", end: "right", center: "center" }[align]);
-    }
-    return ({ start: "top", end: "bottom", center: "center" }[align]) + " " + opposite;
+  function contentFor(trigger) {
+    return document.getElementById(trigger.getAttribute("aria-controls"));
   }
 
-  function applyPosition(content, result) {
-    content.style.left = result.x + "px";
-    content.style.top = result.y + "px";
-    content.style.transformOrigin = transformOrigin(result.placement);
-    content.setAttribute("data-side", result.placement.split("-")[0]);
+  function popupFor(content) {
+    return content.querySelector("[data-tui-dropdownmenu-popup]");
   }
 
-  // Position `content` next to `anchor` with floating-ui (flip + shift keep it
-  // inside the viewport), instantly (transition suspended so left/top apply
-  // without sliding over from the previous position).
-  function placeNow(anchor, content, placement, middleware) {
-    return window.FloatingUIDOM.computePosition(anchor, content, {
-      placement: placement,
-      strategy: "fixed",
-      middleware: middleware,
-    }).then((result) => {
-      content.style.transition = "none";
-      applyPosition(content, result);
-      content.offsetHeight; // flush styles before re-enabling transitions
-      content.style.transition = "";
-    });
+  function setState(content, state) {
+    content.setAttribute("data-state", state);
+    const popup = popupFor(content);
+    if (popup) popup.setAttribute("data-state", state);
   }
 
-  // ----- root menu ----------------------------------------------------------
-
-  function menuMiddleware(content) {
-    const { offset, flip, shift, size } = window.FloatingUIDOM;
-    const sideOffset =
-      parseInt(content.getAttribute("data-tui-dropdownmenu-side-offset"), 10) || 4;
-    return [
-      offset(sideOffset),
-      flip(),
-      shift({ padding: 8 }),
-      // Exposes the trigger width and remaining viewport height as CSS vars,
-      // like Radix does (used for max-height scrolling).
-      size({
-        apply(args) {
-          content.style.setProperty(
-            "--tui-dropdownmenu-available-height",
-            args.availableHeight + "px",
-          );
-          content.style.setProperty(
-            "--tui-dropdownmenu-trigger-width",
-            args.rects.reference.width + "px",
-          );
-        },
-      }),
-    ];
+  function setSide(content, side) {
+    content.setAttribute("data-side", side);
+    const popup = popupFor(content);
+    if (popup) popup.setAttribute("data-side", side);
   }
 
-  function menuPlacement(content) {
-    const side = content.getAttribute("data-tui-dropdownmenu-side") || "bottom";
-    const align = content.getAttribute("data-tui-dropdownmenu-align") || "start";
-    return align === "center" ? side : side + "-" + align;
+  // Base UI zooms the popup out of the anchor's center point (e.g.
+  // "96px -4px"), not out of a placement corner.
+  function anchorOrigin(result, anchorRect, sideOffset) {
+    const side = result.placement.split("-")[0];
+    const centerX = anchorRect.left + anchorRect.width / 2 - result.x + "px";
+    const centerY = anchorRect.top + anchorRect.height / 2 - result.y + "px";
+    if (side === "bottom") return centerX + " " + -sideOffset + "px";
+    if (side === "top") return centerX + " calc(100% + " + sideOffset + "px)";
+    if (side === "right") return -sideOffset + "px " + centerY;
+    return "calc(100% + " + sideOffset + "px) " + centerY;
   }
 
-  function positionMenu(content, trigger) {
-    return placeNow(trigger, content, menuPlacement(content), menuMiddleware(content));
-  }
-
-  // Moves the content to <body> (shadcn portals it the same way), so wrapper
-  // layouts like ButtonGroup never see it as a sibling. Also removes contents
-  // whose trigger is gone (leftovers from swapped-out pages).
+  // Moves the content to <body> (shadcn portals it the same way). Also removes
+  // contents whose trigger is gone (leftovers from swapped-out pages).
   function portal(content) {
     document.querySelectorAll("body > [data-tui-dropdownmenu-content]").forEach((c) => {
       if (c !== content && !triggerFor(c)) c.remove();
@@ -102,7 +62,89 @@ import "../floatingui/floating_ui_dom.js";
     }
   }
 
-  function open(content, trigger) {
+  function positionMenu(content, trigger) {
+    const { computePosition, offset, flip, shift, size } = window.FloatingUIDOM;
+    const side = content.getAttribute("data-tui-dropdownmenu-side") || "bottom";
+    const align = content.getAttribute("data-tui-dropdownmenu-align") || "start";
+    const sideOffset =
+      parseInt(content.getAttribute("data-tui-dropdownmenu-side-offset"), 10) || 4;
+    const alignOffset =
+      parseInt(content.getAttribute("data-tui-dropdownmenu-align-offset"), 10) || 0;
+    const placement = align === "center" ? side : side + "-" + align;
+
+    return computePosition(trigger, content, {
+      placement: placement,
+      strategy: "fixed",
+      middleware: [
+        offset({ mainAxis: sideOffset, alignmentAxis: alignOffset }),
+        flip({ padding: COLLISION_PADDING }),
+        shift({ padding: COLLISION_PADDING }),
+        size({
+          padding: COLLISION_PADDING,
+          apply(args) {
+            content.style.setProperty(
+              "--tui-dropdownmenu-available-height",
+              args.availableHeight + "px",
+            );
+            content.style.setProperty(
+              "--tui-dropdownmenu-anchor-width",
+              args.rects.reference.width + "px",
+            );
+          },
+        }),
+      ],
+    }).then((result) => {
+      content.style.left = result.x + "px";
+      content.style.top = result.y + "px";
+      setSide(content, result.placement.split("-")[0]);
+      const popup = popupFor(content);
+      if (popup) {
+        popup.style.setProperty(
+          "--tui-dropdownmenu-transform-origin",
+          anchorOrigin(result, trigger.getBoundingClientRect(), sideOffset),
+        );
+      }
+    });
+  }
+
+  // ----- focus highlighting (Base UI moves real focus to menu items) --------
+
+  const ITEM_SELECTOR = '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]';
+
+  // The menu container the keyboard navigates in: the deepest open submenu
+  // holding focus, otherwise the root popup.
+  function containerOf(el) {
+    return el.closest("[data-tui-dropdownmenu-sub-content], [data-tui-dropdownmenu-popup]");
+  }
+
+  function itemsIn(container) {
+    return [...container.querySelectorAll(ITEM_SELECTOR)].filter(
+      (item) =>
+        containerOf(item) === container &&
+        !item.disabled &&
+        item.getAttribute("aria-disabled") !== "true",
+    );
+  }
+
+  function focusItem(item) {
+    if (item && document.activeElement !== item) item.focus({ preventScroll: false });
+  }
+
+  function moveFocus(container, delta) {
+    const items = itemsIn(container);
+    if (!items.length) return;
+    const index = items.indexOf(document.activeElement);
+    if (index === -1) {
+      focusItem(delta > 0 ? items[0] : items[items.length - 1]);
+      return;
+    }
+    const next = items[index + delta];
+    if (next) focusItem(next);
+  }
+
+  // ----- open / close --------------------------------------------------------
+
+  function open(content, trigger, focusFirst) {
     allContents().forEach((c) => {
       if (c !== content) close(c);
     });
@@ -114,20 +156,31 @@ import "../floatingui/floating_ui_dom.js";
 
     // Position it invisibly first, then play the enter animation in place.
     content.style.visibility = "hidden";
-    positionMenu(content, trigger).then(() => {
-      if (!content.matches(":popover-open")) return; // closed meanwhile
+    const finish = () => {
       content.style.visibility = "";
-      content.setAttribute("data-state", "open");
+      if (!content.matches(":popover-open")) return;
+      setState(content, "open");
       trigger.setAttribute("aria-expanded", "true");
-    });
+      const popup = popupFor(content);
+      if (!popup) return;
+      if (focusFirst) {
+        focusItem(itemsIn(popup)[0] || popup);
+      } else {
+        popup.focus({ preventScroll: true });
+      }
+    };
+    positionMenu(content, trigger).then(finish, finish);
   }
 
-  function close(content) {
+  function close(content, refocusTrigger) {
     if (!content.matches(":popover-open")) return;
-    content.setAttribute("data-state", "closed");
+    setState(content, "closed");
     content.querySelectorAll("[data-tui-dropdownmenu-sub]").forEach(closeSubNow);
     const trigger = triggerFor(content);
-    if (trigger) trigger.setAttribute("aria-expanded", "false");
+    if (trigger) {
+      trigger.setAttribute("aria-expanded", "false");
+      if (refocusTrigger) trigger.focus({ preventScroll: true });
+    }
     clearTimeout(content._tuiHide);
     content._tuiHide = setTimeout(() => {
       if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
@@ -136,11 +189,15 @@ import "../floatingui/floating_ui_dom.js";
     }, EXIT_MS);
   }
 
-  function closeAll() {
-    allContents().forEach(close);
+  function closeAll(refocusTrigger) {
+    allContents().forEach((content) => close(content, refocusTrigger));
   }
 
-  // ----- submenus -----------------------------------------------------------
+  function anyOpen() {
+    return [...allContents()].find((c) => c.getAttribute("data-state") === "open") || null;
+  }
+
+  // ----- submenus -------------------------------------------------------------
 
   function subParts(sub) {
     return {
@@ -149,24 +206,38 @@ import "../floatingui/floating_ui_dom.js";
     };
   }
 
-  function openSub(sub) {
+  function openSub(sub, focusFirst) {
     const { trigger, content } = subParts(sub);
     if (!trigger || !content) return;
     content.classList.remove("hidden");
     content.style.visibility = "hidden";
 
-    const { offset, flip, shift } = window.FloatingUIDOM;
-    // mainAxis -1 overlaps the menu edges; alignmentAxis -4 lines the first
-    // submenu item up with the trigger (the menu padding is 4px).
-    placeNow(trigger, content, "right-start", [
-      offset({ mainAxis: -1, alignmentAxis: -4 }),
-      flip(),
-      shift({ padding: 8 }),
-    ]).then(() => {
+    const { computePosition, offset, flip, shift } = window.FloatingUIDOM;
+    // Base UI submenu placement: right-start, sideOffset 0, alignOffset -3.
+    computePosition(trigger, content, {
+      placement: "right-start",
+      strategy: "fixed",
+      middleware: [
+        offset({ mainAxis: 0, alignmentAxis: -3 }),
+        flip({ padding: COLLISION_PADDING }),
+        shift({ padding: COLLISION_PADDING }),
+      ],
+    }).then((result) => {
       if (content.classList.contains("hidden")) return; // closed meanwhile
+      content.style.transition = "none";
+      content.style.left = result.x + "px";
+      content.style.top = result.y + "px";
+      content.setAttribute("data-side", result.placement.split("-")[0]);
+      content.style.setProperty(
+        "--tui-dropdownmenu-transform-origin",
+        anchorOrigin(result, trigger.getBoundingClientRect(), 0),
+      );
+      content.offsetHeight; // flush styles before re-enabling transitions
+      content.style.transition = "";
       content.style.visibility = "";
       content.setAttribute("data-state", "open");
       trigger.setAttribute("data-state", "open");
+      if (focusFirst) focusItem(itemsIn(content)[0] || content);
     });
   }
 
@@ -199,6 +270,7 @@ import "../floatingui/floating_ui_dom.js";
   // Hover intent: while the pointer is over a sub (trigger or its content),
   // keep it open; everything else in the menu schedules its subs to close.
   document.addEventListener("mouseover", (e) => {
+    if (!(e.target instanceof Element)) return;
     const menu = e.target.closest("[data-tui-dropdownmenu-content]");
     if (!menu) return;
     const hovered = e.target.closest("[data-tui-dropdownmenu-sub]");
@@ -231,19 +303,89 @@ import "../floatingui/floating_ui_dom.js";
     });
   });
 
-  // ----- events -------------------------------------------------------------
+  // The highlight follows the pointer: focus the item under it, fall back to
+  // the menu container when the pointer sits on empty menu space.
+  document.addEventListener("pointermove", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const content = e.target.closest("[data-tui-dropdownmenu-content]");
+    if (!content || content.getAttribute("data-state") !== "open") return;
+    const item = e.target.closest(ITEM_SELECTOR);
+    if (item && containerOf(item)) {
+      focusItem(item);
+    } else {
+      const container = containerOf(e.target) || popupFor(content);
+      if (container && !container.contains(document.activeElement)) return;
+      if (container && document.activeElement !== container) {
+        container.focus({ preventScroll: true });
+      }
+    }
+  });
 
-  document.addEventListener("click", (e) => {
-    // Trigger toggles its menu.
+  // ----- init (portal up front, like React does on mount) --------------------
+
+  function initMenus() {
+    document.querySelectorAll("[data-tui-dropdownmenu-trigger]").forEach((trigger) => {
+      const content = contentFor(trigger);
+      if (content) portal(content);
+    });
+  }
+
+  let initQueued = false;
+  function queueInit() {
+    if (initQueued) return;
+    initQueued = true;
+    requestAnimationFrame(() => {
+      initQueued = false;
+      initMenus();
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMenus);
+  } else {
+    initMenus();
+  }
+  new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.addedNodes.length) {
+        queueInit();
+        break;
+      }
+    }
+  }).observe(document.documentElement, { childList: true, subtree: true });
+
+  // ----- events ---------------------------------------------------------------
+
+  // Pointer interactions toggle and dismiss on PRESS, exactly like Base UI.
+  // Click is never used for open/close, so the stray click the browser fires
+  // on <body> after the menu opened over the trigger is naturally harmless.
+  function toggle(trigger, focusFirst) {
+    const content = contentFor(trigger);
+    if (!content) return;
+    if (content.getAttribute("data-state") === "open") {
+      close(content);
+    } else {
+      open(content, trigger, focusFirst);
+    }
+  }
+
+  document.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 || !(e.target instanceof Element)) return;
     const trigger = e.target.closest("[data-tui-dropdownmenu-trigger]");
     if (trigger) {
-      const content = document.getElementById(trigger.getAttribute("aria-controls"));
-      if (!content) return;
-      if (content.getAttribute("data-state") === "open") {
-        close(content);
-      } else {
-        open(content, trigger);
-      }
+      if (!trigger.disabled) toggle(trigger, false);
+      return;
+    }
+    if (!e.target.closest("[data-tui-dropdownmenu-content]")) closeAll(false);
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const trigger = e.target.closest("[data-tui-dropdownmenu-trigger]");
+    if (trigger) {
+      // Keyboard activation only (Enter/Space fire a detail-0 click without
+      // a preceding pointerdown); pointer presses are handled on pointerdown.
+      if (e.detail === 0 && !trigger.disabled) toggle(trigger, true);
       return;
     }
 
@@ -254,7 +396,7 @@ import "../floatingui/floating_ui_dom.js";
       if (sub) {
         clearTimeout(sub._tuiOpen);
         sub._tuiOpen = null;
-        openSub(sub);
+        openSub(sub, e.detail === 0);
       }
       return;
     }
@@ -306,16 +448,74 @@ import "../floatingui/floating_ui_dom.js";
         item.getAttribute("data-tui-dropdownmenu-prevent-close") !== "true"
       ) {
         const content = item.closest("[data-tui-dropdownmenu-content]");
-        if (content) close(content);
+        if (content) close(content, true);
       }
       return;
     }
-    // Click outside any open menu closes everything.
-    if (!e.target.closest("[data-tui-dropdownmenu-content]")) closeAll();
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeAll();
+    const content = anyOpen();
+    if (!content) return;
+
+    if (e.key === "Escape") {
+      closeAll(true);
+      return;
+    }
+    if (e.key === "Tab") {
+      closeAll(false);
+      return;
+    }
+
+    const active = document.activeElement;
+    if (!content.contains(active)) return;
+    const container = containerOf(active) || popupFor(content);
+    if (!container) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        moveFocus(container, 1);
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        moveFocus(container, -1);
+        break;
+      case "Home": {
+        e.preventDefault();
+        const items = itemsIn(container);
+        focusItem(items[0]);
+        break;
+      }
+      case "End": {
+        e.preventDefault();
+        const items = itemsIn(container);
+        focusItem(items[items.length - 1]);
+        break;
+      }
+      case "ArrowRight": {
+        const subTrigger = active.closest("[data-tui-dropdownmenu-sub-trigger]");
+        if (subTrigger) {
+          e.preventDefault();
+          const sub = subTrigger.closest("[data-tui-dropdownmenu-sub]");
+          if (sub) openSub(sub, true);
+        }
+        break;
+      }
+      case "ArrowLeft": {
+        const subContent = active.closest("[data-tui-dropdownmenu-sub-content]");
+        if (subContent) {
+          e.preventDefault();
+          const sub = subContent.closest("[data-tui-dropdownmenu-sub]");
+          if (sub) {
+            const { trigger } = subParts(sub);
+            closeSub(sub);
+            if (trigger) trigger.focus({ preventScroll: true });
+          }
+        }
+        break;
+      }
+    }
   });
 
   // Keep open menus anchored to their trigger while scrolling or resizing.

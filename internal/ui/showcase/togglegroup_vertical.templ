@@ -4,13 +4,14 @@ import (
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/components/toggle"
 	"github.com/templui/templui/components/togglegroup"
+	"github.com/templui/templui/utils"
 )
 
 templ ToggleGroupVertical() {
 	@togglegroup.Group(togglegroup.Props{
 		Type:        togglegroup.TypeMultiple,
 		Orientation: togglegroup.OrientationVertical,
-		Spacing:     1,
+		Spacing:     utils.Ptr(1),
 	}) {
 		@toggle.Toggle(toggle.Props{
 			Value:      "bold",

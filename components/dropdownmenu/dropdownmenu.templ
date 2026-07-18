@@ -70,6 +70,8 @@ type ContentProps struct {
 	Align Align
 	// SideOffset is the gap to the trigger in px. Defaults to 4.
 	SideOffset int
+	// AlignOffset shifts the menu along the aligned edge in px. Defaults to 0.
+	AlignOffset int
 }
 
 type GroupProps struct {
@@ -151,20 +153,21 @@ type SubContentProps struct {
 	Attributes templ.Attributes
 }
 
-func itemClasses(variant ItemVariant, disabled, inset bool) string {
+// Items highlight via real focus (Base UI menus move focus to the item under
+// the pointer and with the arrow keys), so there are no hover: styles here.
+func itemClasses(disabled, inset bool) string {
 	return utils.TwMerge(
-		"group/dropdown-menu-item relative w-full text-left flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+		"group/dropdown-menu-item relative flex w-full cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+		"focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground",
+		"data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:text-destructive",
 		utils.If(inset, "pl-7"),
-		utils.If(!disabled && variant == ItemVariantDefault, "focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground"),
-		utils.If(!disabled && variant == ItemVariantDestructive, "text-destructive focus:bg-destructive/10 focus:text-destructive hover:bg-destructive/10 hover:text-destructive dark:focus:bg-destructive/20 dark:hover:bg-destructive/20 [&_svg]:text-destructive"),
 		utils.If(disabled, "pointer-events-none opacity-50"),
 	)
 }
 
 func checkItemClasses(disabled bool) string {
 	return utils.TwMerge(
-		"group/dmitem relative w-full text-left flex cursor-default items-center gap-1.5 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-		utils.If(!disabled, "focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground"),
+		"group/dmitem relative flex w-full cursor-default items-center gap-1.5 rounded-md py-1 pr-8 pl-1.5 text-left text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
 		utils.If(disabled, "pointer-events-none opacity-50"),
 	)
 }
@@ -199,23 +202,31 @@ templ Content(props ...ContentProps) {
 	}
 	<div
 		id={ menuID(ctx) }
-		data-slot="dropdown-menu-content"
 		data-tui-dropdownmenu-content
 		data-tui-dropdownmenu-side={ string(p.Side) }
 		data-tui-dropdownmenu-align={ string(p.Align) }
 		data-tui-dropdownmenu-side-offset={ strconv.Itoa(p.SideOffset) }
+		data-tui-dropdownmenu-align-offset={ strconv.Itoa(p.AlignOffset) }
 		data-state="closed"
 		popover="manual"
-		role="menu"
-		class={
-			utils.TwMerge(
-				"fixed inset-auto left-0 top-0 z-50 m-0 max-h-(--tui-dropdownmenu-available-height) min-w-32 overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:overflow-hidden data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
-				p.Class,
-			),
-		}
-		{ p.Attributes... }
+		class="pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
 	>
-		{ children... }
+		<div
+			data-slot="dropdown-menu-content"
+			data-tui-dropdownmenu-popup
+			data-state="closed"
+			role="menu"
+			tabindex="-1"
+			class={
+				utils.TwMerge(
+					"pointer-events-auto relative isolate z-50 max-h-(--tui-dropdownmenu-available-height) min-w-32 w-[var(--tui-dropdownmenu-anchor-width)] origin-(--tui-dropdownmenu-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-none duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:overflow-hidden data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
+					p.Class,
+				),
+			}
+			{ p.Attributes... }
+		>
+			{ children... }
+		</div>
 	</div>
 }
 
@@ -281,7 +292,7 @@ templ Item(props ...ItemProps) {
 				aria-disabled="true"
 			}
 			role="menuitem"
-			class={ utils.TwMerge(itemClasses(p.Variant, p.Disabled, p.Inset), p.Class) }
+			class={ utils.TwMerge(itemClasses(p.Disabled, p.Inset), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -300,7 +311,7 @@ templ Item(props ...ItemProps) {
 			}
 			disabled?={ p.Disabled }
 			role="menuitem"
-			class={ utils.TwMerge(itemClasses(p.Variant, p.Disabled, p.Inset), p.Class) }
+			class={ utils.TwMerge(itemClasses(p.Disabled, p.Inset), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -424,7 +435,7 @@ templ Shortcut(props ...ShortcutProps) {
 			id={ p.ID }
 		}
 		data-slot="dropdown-menu-shortcut"
-		class={ utils.TwMerge("ml-auto text-xs tracking-widest text-muted-foreground group-focus/dropdown-menu-item:text-accent-foreground group-hover/dropdown-menu-item:text-accent-foreground", p.Class) }
+		class={ utils.TwMerge("ml-auto text-xs tracking-widest text-muted-foreground group-focus/dropdown-menu-item:text-accent-foreground", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -466,7 +477,7 @@ templ SubTrigger(props ...SubTriggerProps) {
 		aria-haspopup="menu"
 		class={
 			utils.TwMerge(
-				"w-full text-left flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
+				"flex w-full cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
 				utils.If(p.Inset, "pl-7"),
 				p.Class,
 			),
@@ -491,9 +502,10 @@ templ SubContent(props ...SubContentProps) {
 		data-tui-dropdownmenu-sub-content
 		data-state="closed"
 		role="menu"
+		tabindex="-1"
 		class={
 			utils.TwMerge(
-				"hidden fixed inset-auto left-0 top-0 z-50 min-w-[96px] rounded-lg bg-popover p-1 text-popover-foreground shadow-lg ring-1 ring-foreground/10 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
+				"hidden fixed inset-auto left-0 top-0 z-50 min-w-[96px] origin-(--tui-dropdownmenu-transform-origin) rounded-lg bg-popover p-1 text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-none duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
 				p.Class,
 			),
 		}
