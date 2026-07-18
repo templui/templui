@@ -1,46 +1,99 @@
 package toast
 
 import (
-	"github.com/templui/templui/components/button"
+	"strconv"
+
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/utils"
-	"strconv"
 )
 
 type Variant string
-type Position string
 
 const (
 	VariantDefault Variant = "default"
 	VariantSuccess Variant = "success"
-	VariantError   Variant = "error"
-	VariantWarning Variant = "warning"
 	VariantInfo    Variant = "info"
+	VariantWarning Variant = "warning"
+	VariantError   Variant = "error"
+	VariantLoading Variant = "loading"
 )
+
+type Position string
 
 const (
-	PositionTopRight     Position = "top-right"
 	PositionTopLeft      Position = "top-left"
 	PositionTopCenter    Position = "top-center"
-	PositionBottomRight  Position = "bottom-right"
+	PositionTopRight     Position = "top-right"
 	PositionBottomLeft   Position = "bottom-left"
 	PositionBottomCenter Position = "bottom-center"
+	PositionBottomRight  Position = "bottom-right"
 )
 
-type Props struct {
-	ID            string
-	Class         string
-	Attributes    templ.Attributes
-	Title         string
-	Description   string
-	Variant       Variant
-	Position      Position
-	Duration      int
-	Dismissible   bool
-	ShowIndicator bool
-	Icon          bool
+type ToasterProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Position of the stack. Defaults to bottom-right, like sonner.
+	Position Position
+	// RichColors colors success/info/warning/error toasts.
+	RichColors bool
+	// CloseButton shows a close button on every toast.
+	CloseButton bool
+	// Duration in ms before toasts auto-dismiss. Defaults to 4000.
+	Duration int
 }
 
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Title      string
+	// Description is the secondary line below the title.
+	Description string
+	// Variant: 'default', 'success', 'info', 'warning', 'error' or 'loading'.
+	Variant Variant
+	// Duration in ms before this toast auto-dismisses. 0 uses the toaster
+	// default, -1 disables auto-dismiss.
+	Duration int
+}
+
+// Toaster renders the stack viewport once per page (usually in the layout).
+// Toasts land here: server-rendered via Toast (e.g. swapped in with htmx) or
+// through the JavaScript API (window.tui.toast).
+templ Toaster(props ...ToasterProps) {
+	{{ var p ToasterProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Position == "" {
+		{{ p.Position = PositionBottomRight }}
+	}
+	if p.Duration == 0 {
+		{{ p.Duration = 4000 }}
+	}
+	<ol
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-sonner-toaster
+		data-tui-toaster
+		data-tui-toaster-position={ string(p.Position) }
+		data-tui-toaster-duration={ strconv.Itoa(p.Duration) }
+		if p.CloseButton {
+			data-tui-toaster-close-button
+		}
+		data-rich-colors?={ p.RichColors }
+		data-lifted="false"
+		dir="ltr"
+		tabindex="-1"
+		class={ utils.TwMerge("toaster group", p.Class) }
+		style="--width: 356px; --gap: 14px; --offset-top: 24px; --offset-right: 24px; --offset-bottom: 24px; --offset-left: 24px; --mobile-offset-top: 16px; --mobile-offset-right: 16px; --mobile-offset-bottom: 16px; --mobile-offset-left: 16px; --normal-bg: var(--popover); --normal-text: var(--popover-foreground); --normal-border: var(--border); --border-radius: var(--radius);"
+		{ p.Attributes... }
+	></ol>
+}
+
+// Toast renders one toast. Place it inside a Toaster (htmx target) — the
+// script mounts, stacks and dismisses it exactly like sonner.
 templ Toast(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
@@ -49,98 +102,52 @@ templ Toast(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	// Set defaults
 	if p.Variant == "" {
 		{{ p.Variant = VariantDefault }}
 	}
-	if p.Position == "" {
-		{{ p.Position = PositionBottomRight }}
-	}
-	if p.Duration == 0 {
-		{{ p.Duration = 3000 }}
-	}
-	<div
+	<li
 		id={ p.ID }
+		data-sonner-toast
 		data-tui-toast
-		data-tui-toast-duration={ strconv.Itoa(p.Duration) }
-		data-position={ string(p.Position) }
-		data-variant={ string(p.Variant) }
-		class={ utils.TwMerge(
-			// Base styles
-			"z-50 fixed pointer-events-auto p-4 w-full md:max-w-[420px]",
-			// Animation
-			"animate-in fade-in slide-in-from-bottom-4 duration-300",
-			// Position-based styles using data attributes
-			"data-[position=top-right]:top-0 data-[position=top-right]:right-0",
-			"data-[position=top-left]:top-0 data-[position=top-left]:left-0",
-			"data-[position=top-center]:top-0 data-[position=top-center]:left-1/2 data-[position=top-center]:-translate-x-1/2",
-			"data-[position=bottom-right]:bottom-0 data-[position=bottom-right]:right-0",
-			"data-[position=bottom-left]:bottom-0 data-[position=bottom-left]:left-0",
-			"data-[position=bottom-center]:bottom-0 data-[position=bottom-center]:left-1/2 data-[position=bottom-center]:-translate-x-1/2",
-			// Slide direction based on position
-			"data-[position*=top]:slide-in-from-top-4",
-			"data-[position*=bottom]:slide-in-from-bottom-4",
-			p.Class,
-		) }
+		data-styled="true"
+		data-type={ string(p.Variant) }
+		if p.Duration != 0 {
+			data-tui-toast-duration={ strconv.Itoa(p.Duration) }
+		}
+		data-mounted="false"
+		data-removed="false"
+		data-swiping="false"
+		data-swipe-out="false"
+		data-expanded="false"
+		class={ utils.TwMerge("cn-toast rounded-2xl", p.Class) }
 		{ p.Attributes... }
 	>
-		<div class="w-full bg-popover text-popover-foreground rounded-lg shadow-xs border pt-5 pb-4 px-4 flex items-center justify-center relative overflow-hidden group">
-			// Progress indicator
-			if p.ShowIndicator && p.Duration > 0 {
-				<div class="absolute top-0 left-0 right-0 h-1 overflow-hidden">
-					<div
-						class={ utils.TwMerge(
-							"toast-progress h-full origin-left transition-transform ease-linear",
-							// Variant colors
-							"data-[variant=default]:bg-gray-500",
-							"data-[variant=success]:bg-green-500",
-							"data-[variant=error]:bg-red-500",
-							"data-[variant=warning]:bg-yellow-500",
-							"data-[variant=info]:bg-blue-500",
-						) }
-						data-variant={ string(p.Variant) }
-						data-duration={ strconv.Itoa(p.Duration) }
-					></div>
-				</div>
-			}
-			// Icon
-			if p.Icon {
+		if p.Variant != VariantDefault {
+			<div data-icon="">
 				switch p.Variant {
 					case VariantSuccess:
-						@icon.CircleCheck(icon.Props{Class: "size-[22px] text-green-500 mr-3 flex-shrink-0"})
-					case VariantError:
-						@icon.CircleX(icon.Props{Class: "size-[22px] text-red-500 mr-3 flex-shrink-0"})
-					case VariantWarning:
-						@icon.TriangleAlert(icon.Props{Class: "size-[22px] text-yellow-500 mr-3 flex-shrink-0"})
+						@icon.CircleCheck(icon.Props{Class: "size-4"})
 					case VariantInfo:
-						@icon.Info(icon.Props{Class: "size-[22px] text-blue-500 mr-3 flex-shrink-0"})
+						@icon.Info(icon.Props{Class: "size-4"})
+					case VariantWarning:
+						@icon.TriangleAlert(icon.Props{Class: "size-4"})
+					case VariantError:
+						@icon.OctagonX(icon.Props{Class: "size-4"})
+					case VariantLoading:
+						@icon.LoaderCircle(icon.Props{Class: "size-4 animate-spin"})
 				}
+			</div>
+		}
+		<div data-content="">
+			if p.Title != "" {
+				<div data-title="">{ p.Title }</div>
 			}
-			// Content
-			<span class="flex-1 min-w-0">
-				if p.Title != "" {
-					<p class="text-sm font-semibold truncate">{ p.Title }</p>
-				}
-				if p.Description != "" {
-					<p class="text-sm opacity-90 mt-1">{ p.Description }</p>
-				}
-			</span>
-			// Dismiss button
-			if p.Dismissible {
-				@button.Button(button.Props{
-					Size:    button.SizeIcon,
-					Variant: button.VariantGhost,
-					Attributes: templ.Attributes{
-						"aria-label":             "Close",
-						"data-tui-toast-dismiss": "",
-						"type":                   "button",
-					},
-				}) {
-					@icon.X(icon.Props{Class: "size-[18px] opacity-75 hover:opacity-100"})
-				}
+			if p.Description != "" {
+				<div data-description="">{ p.Description }</div>
 			}
 		</div>
-	</div>
+		{ children... }
+	</li>
 }
 
 var scriptOnce = templ.NewOnceHandle()

@@ -1,0 +1,56 @@
+package showcase
+
+import "github.com/templui/templui/components/button"
+
+templ ToastTypes() {
+	<div class="flex flex-wrap gap-2" id="toast-types">
+		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: templ.Attributes{"data-toast-type": "default"}}) {
+			Default
+		}
+		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: templ.Attributes{"data-toast-type": "success"}}) {
+			Success
+		}
+		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: templ.Attributes{"data-toast-type": "info"}}) {
+			Info
+		}
+		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: templ.Attributes{"data-toast-type": "warning"}}) {
+			Warning
+		}
+		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: templ.Attributes{"data-toast-type": "error"}}) {
+			Error
+		}
+		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: templ.Attributes{"data-toast-type": "promise"}}) {
+			Promise
+		}
+	</div>
+	<script>
+		(() => {
+			const messages = {
+				default: "Event has been created",
+				success: "Event has been created",
+				info: "Be at the area 10 minutes before the event time",
+				warning: "Event start time cannot be earlier than 8am",
+				error: "Event has not been created",
+			};
+			document.getElementById("toast-types").addEventListener("click", (e) => {
+				const btn = e.target.closest("[data-toast-type]");
+				if (!btn) return;
+				const type = btn.dataset.toastType;
+				if (type === "default") {
+					window.tui.toast(messages[type]);
+				} else if (type === "promise") {
+					window.tui.toast.promise(
+						() => new Promise((resolve) => setTimeout(() => resolve({ name: "Event" }), 2000)),
+						{
+							loading: "Loading...",
+							success: (data) => data.name + " has been created",
+							error: "Error",
+						},
+					);
+				} else {
+					window.tui.toast[type](messages[type]);
+				}
+			});
+		})();
+	</script>
+}

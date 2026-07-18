@@ -1,8 +1,6 @@
 package pages
 
 import (
-	"fmt"
-	"github.com/templui/templui/components/tabs"
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
 	"github.com/templui/templui/internal/ui/showcase"
@@ -11,56 +9,41 @@ import (
 templ Toast() {
 	@layouts.DocsLayout(
 		"Toast",
-		"Flexible toast component for notifications and feedback.",
+		"An opinionated toast component. A vanilla port of sonner, the library shadcn ships.",
 		[]modules.TableOfContentsItem{
+			{ID: "installation", Text: "Installation"},
+			{ID: "usage", Text: "Usage"},
 			{
-				ID:   "installation",
-				Text: "Installation",
-			},
-			{
-				Text: "Usage",
-				ID:   "usage",
-			},
-			{
-				Text: "Examples",
 				ID:   "examples",
+				Text: "Examples",
 				Children: []modules.TableOfContentsItem{
-					{
-						Text: "Playground",
-						ID:   "playground",
-					},
+					{Text: "Types", ID: "types"},
+					{Text: "Description", ID: "description"},
+					{Text: "Position", ID: "position"},
+					{Text: "HTMX", ID: "htmx"},
 				},
 			},
 			{
 				ID:   "api",
 				Text: "API Reference",
 				Children: []modules.TableOfContentsItem{
-					{
-						ID:   "api-toast",
-						Text: "Toast",
-					},
+					{ID: "api-toaster", Text: "Toaster"},
+					{ID: "api-toast", Text: "Toast"},
 				},
 			},
+			{ID: "javascript-api", Text: "JavaScript API"},
 		},
 	) {
 		@modules.PageWrapper(modules.PageWrapperProps{
 			Name:        "Toast",
-			Description: templ.Raw("Flexible toast component for notifications and feedback."),
+			Description: templ.Raw("An opinionated toast component. A vanilla port of sonner, the library shadcn ships."),
 			Tailwind:    true,
 			VanillaJS:   true,
 			Breadcrumbs: modules.Breadcrumbs{
 				Items: []modules.BreadcrumbItem{
-					{
-						Text: "Docs",
-						Path: "/docs",
-					},
-					{
-						Text: "Components",
-						Path: "/docs/components",
-					},
-					{
-						Text: "Toast",
-					},
+					{Text: "Docs", Path: "/docs"},
+					{Text: "Components", Path: "/docs/components"},
+					{Text: "Toast"},
 				},
 			},
 		}) {
@@ -68,204 +51,104 @@ templ Toast() {
 				ShowcaseFile:    showcase.ToastDefault(),
 				PreviewCodeFile: "toast_default.templ",
 			})
-			@modules.ContainerWrapper(modules.ContainerWrapperProps{
-				Title: "Installation",
-				ID:    "installation",
-			}) {
-				@modules.ComponentUsage(modules.ComponentUsageProps{
-					ComponentName: "toast",
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
+				@modules.ComponentUsage(modules.ComponentUsageProps{ComponentName: "toast"})
+			}
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Usage", ID: "usage"}) {
+				<p class="mb-4 text-sm text-muted-foreground">
+					Add the vendored <code>sonner.css</code> next to your input css and import it once:
+				</p>
+				@modules.Code(modules.CodeProps{
+					CodeContent:    `@import "./sonner.css";`,
+					ShowCopyButton: true,
+				})
+				<p class="my-4 text-sm text-muted-foreground">
+					Render the Toaster once in your layout, then trigger toasts from JavaScript or from the server:
+				</p>
+				@modules.Code(modules.CodeProps{
+					CodeContent: `@toast.Toaster(toast.ToasterProps{ID: "toaster"})
+
+// JavaScript
+window.tui.toast("Event has been created")
+
+// Server (htmx): render a toast into the response, out of band
+@toast.Toast(toast.Props{
+	Title:      "Changes saved",
+	Variant:    toast.VariantSuccess,
+	Attributes: templ.Attributes{"hx-swap-oob": "beforeend:#toaster"},
+})`,
+					ShowCopyButton: true,
 				})
 			}
-			@UsageExamples()
-			@modules.ContainerWrapper(modules.ContainerWrapperProps{
-				Title: "Examples",
-				ID:    "examples",
-			}) {
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Playground",
-					ShowcaseFile:    showcase.ToastPlayground(),
-					PreviewCodeFile: "toast_playground.templ",
-					ID:              "playground",
+					SectionName:     "Types",
+					ShowcaseFile:    showcase.ToastTypes(),
+					PreviewCodeFile: "toast_types.templ",
+					ID:              "types",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Description",
+					ShowcaseFile:    showcase.ToastDescription(),
+					PreviewCodeFile: "toast_description.templ",
+					ID:              "description",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "Position",
+					ShowcaseFile:    showcase.ToastPosition(),
+					PreviewCodeFile: "toast_position.templ",
+					ID:              "position",
+				})
+				@modules.ExampleWrapper(modules.ExampleWrapperProps{
+					SectionName:     "HTMX",
+					ShowcaseFile:    showcase.ToastHtmx(),
+					PreviewCodeFile: "toast_htmx.templ",
+					ID:              "htmx",
 				})
 			}
-			@modules.ContainerWrapper(modules.ContainerWrapperProps{
-				Title: "API Reference",
-				ID:    "api",
-			}) {
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "API Reference", ID: "api"}) {
 				@modules.APILegend()
-				<div id="api-toast" class="mb-8">
+				<div id="api-toaster" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Toaster",
+						Description: "The stack viewport, rendered once per page (usually in the layout). Server toasts are swapped into it, e.g. with hx-target and hx-swap beforeend.",
+						Items: []modules.APITableItem{
+							{Name: "Position", Type: "Position", Default: "bottom-right", Description: "Stack position. Options: 'top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right'.", Required: false},
+							{Name: "Duration", Type: "int", Default: "4000", Description: "Default auto-dismiss duration in ms.", Required: false},
+							{Name: "CloseButton", Type: "bool", Default: "false", Description: "Shows a close button on every toast.", Required: false},
+							{Name: "RichColors", Type: "bool", Default: "false", Description: "Colors success, info, warning and error toasts.", Required: false},
+							{Name: "ID", Type: "string", Default: "", Description: "HTML id, e.g. as an htmx target.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-toast">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Toast",
-						Description: "Notification component that appears temporarily to provide feedback.",
+						Description: "One server-rendered toast. Place it inside the Toaster; the script mounts, stacks and dismisses it.",
 						Items: []modules.APITableItem{
-							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "",
-								Description: "Unique identifier for the toast element. Auto-generated if not provided.",
-								Required:    false,
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "",
-								Description: "Additional CSS classes to apply to the toast.",
-								Required:    false,
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "",
-								Description: "Additional HTML attributes to apply to the toast element.",
-								Required:    false,
-							},
-							{
-								Name:        "Title",
-								Type:        "string",
-								Default:     "",
-								Description: "Title text displayed in the toast header.",
-								Required:    false,
-							},
-							{
-								Name:        "Description",
-								Type:        "string",
-								Default:     "",
-								Description: "Description text displayed below the title.",
-								Required:    false,
-							},
-							{
-								Name:        "Variant",
-								Type:        "Variant",
-								Default:     "default",
-								Description: "Visual style variant. Options: 'default', 'success', 'error', 'warning', 'info'.",
-								Required:    false,
-							},
-							{
-								Name:        "Position",
-								Type:        "Position",
-								Default:     "bottom-right",
-								Description: "Screen position for the toast. Options: 'top-right', 'top-left', 'top-center', 'bottom-right', 'bottom-left', 'bottom-center'.",
-								Required:    false,
-							},
-							{
-								Name:        "Duration",
-								Type:        "int",
-								Default:     "3000",
-								Description: "Duration in milliseconds before auto-dismissing the toast.",
-								Required:    false,
-							},
-							{
-								Name:        "Dismissible",
-								Type:        "bool",
-								Default:     "false",
-								Description: "Whether to show a close button for manual dismissal.",
-								Required:    false,
-							},
-							{
-								Name:        "ShowIndicator",
-								Type:        "bool",
-								Default:     "false",
-								Description: "Whether to show a progress indicator bar at the top.",
-								Required:    false,
-							},
-							{
-								Name:        "Icon",
-								Type:        "bool",
-								Default:     "false",
-								Description: "Whether to show an icon based on the variant type.",
-								Required:    false,
-							},
+							{Name: "Title", Type: "string", Default: "", Description: "The toast message.", Required: false},
+							{Name: "Description", Type: "string", Default: "", Description: "Secondary line below the title.", Required: false},
+							{Name: "Variant", Type: "Variant", Default: "default", Description: "Options: 'default', 'success', 'info', 'warning', 'error', 'loading'.", Required: false},
+							{Name: "Duration", Type: "int", Default: "Toaster default", Description: "Auto-dismiss duration in ms, -1 disables.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply.", Required: false},
 						},
 					})
 				</div>
 			}
-		}
-	}
-}
-
-templ UsageExamples() {
-	@tabs.Tabs(tabs.Props{
-		ID: "usage-examples",
-	}) {
-		@tabs.List(tabs.ListProps{
-			Class: "w-full",
-		}) {
-			@tabs.Trigger(tabs.TriggerProps{
-				Value:    "with-htmx",
-				IsActive: true,
-			}) {
-				With HTMX
-			}
-			@tabs.Trigger(tabs.TriggerProps{
-				Value: "full-page-form",
-			}) {
-				Full Page Form
+			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "JavaScript API", ID: "javascript-api"}) {
+				@modules.Code(modules.CodeProps{
+					CodeContent: `window.tui.toast("Event has been created");
+window.tui.toast.success("Saved", { description: "All good." });
+window.tui.toast.error("Something went wrong", { duration: 8000 });
+window.tui.toast("With action", { action: { label: "Undo", onClick: () => {} } });
+window.tui.toast("Elsewhere", { position: "top-center" });
+window.tui.toast.dismiss();`,
+					ShowCopyButton: true,
+				})
 			}
 		}
-		<div class="w-full mt-2">
-			@tabs.Content(tabs.ContentProps{
-				Value:    "with-htmx",
-				IsActive: true,
-			}) {
-				@withHtmx()
-			}
-			@tabs.Content(tabs.ContentProps{
-				Value: "full-page-form",
-			}) {
-				@fullPageForm()
-			}
-		</div>
 	}
-}
-
-var withHtmxCode = fmt.Sprintf(`// Template
-%s UserForm() {
-	<form hx-post="/save" hx-target="#toast">
-	   <input name="email" />
-	</form>
-	<div id="api-toast"></div>
-}
-// Handler
-func Save(w http.ResponseWriter, r *http.Request) {
-	if err != nil {
-		toast.Toast(toast.Props{
-			Description: err.Error(),
-			Variant:     toast.VariantError,
-		}).Render(r.Context(), w)
-	}
-}`, "templ")
-
-templ withHtmx() {
-	@modules.Code(modules.CodeProps{
-		Language:       "templ",
-		ShowCopyButton: true,
-		CodeContent:    withHtmxCode,
-	})
-}
-
-var fullPageFormCode = fmt.Sprintf(`// Template
-%s UserForm(error string) {
-    if error != "" {
-        @toast.Toast(toast.Props{
-            Description: error,
-            Variant:     toast.VariantError,
-        })
-    }
-    <form method="POST">
-        <input name="email"/>
-    </form>
-}
-// Handler
-func Save(w http.ResponseWriter, r *http.Request) {
-    if err != nil {
-        UserForm(err.Error()).Render(r.Context(), w)
-    }
-}`, "templ")
-
-templ fullPageForm() {
-	@modules.Code(modules.CodeProps{
-		Language:       "templ",
-		ShowCopyButton: true,
-		CodeContent:    fullPageFormCode,
-	})
 }

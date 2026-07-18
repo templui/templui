@@ -257,8 +257,11 @@ func main() {
 
 
 		// Toast
-		"out/showcase/toast_default.html":    showcase.ToastDefault(),
-		"out/showcase/toast_playground.html": showcase.ToastPlayground(),
+		"out/showcase/toast_default.html":  showcase.ToastDefault(),
+		"out/showcase/toast_types.html":       showcase.ToastTypes(),
+		"out/showcase/toast_description.html": showcase.ToastDescription(),
+		"out/showcase/toast_position.html": showcase.ToastPosition(),
+		"out/showcase/toast_htmx.html":     showcase.ToastHtmx(),
 
 		// Switch
 		"out/showcase/switch_default.html": showcase.SwitchDefault(),

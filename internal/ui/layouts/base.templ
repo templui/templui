@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/templui/templui/internal/config"
 	"github.com/templui/templui/internal/ctxkeys"
+	"github.com/templui/templui/components/toast"
 	"github.com/templui/templui/internal/ui/modules"
 	"github.com/templui/templui/utils"
 )
@@ -98,6 +99,7 @@ templ BaseLayout(title, description string) {
 			<div class="min-h-screen flex flex-col">
 				{ children... }
 			</div>
+			@toast.Toaster(toast.ToasterProps{ID: "toaster", Position: toast.PositionTopCenter})
 		</body>
 		// HTMX
 		<script nonce={ templ.GetNonce(ctx) }>
