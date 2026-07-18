@@ -58,13 +58,14 @@ templ Slider(props ...Props) {
 		data-min={ fmt.Sprintf("%d", p.Min) }
 		data-max={ fmt.Sprintf("%d", p.Max) }
 		data-step={ fmt.Sprintf("%d", p.Step) }
-		class={ utils.TwMerge("relative flex items-center w-full select-none", p.Class) }
+		class={ utils.TwMerge("relative flex w-full touch-none items-center select-none", utils.If(p.Disabled, "opacity-50"), p.Class) }
 		{ p.Attributes... }
 	>
-		<div data-track class="relative w-full h-2 rounded-full bg-secondary">
+		<div data-track data-slot="slider-track" class="relative h-1 w-full grow overflow-hidden rounded-full bg-muted select-none">
 			<div
 				data-fill
-				class="absolute inset-y-0 rounded-full bg-primary pointer-events-none"
+				data-slot="slider-range"
+				class="pointer-events-none absolute inset-y-0 bg-primary select-none"
 				style={ fmt.Sprintf("left:0%%;right:%.2f%%", 100-float64(p.Value-p.Min)/float64(p.Max-p.Min)*100) }
 			></div>
 			<div
@@ -80,10 +81,9 @@ templ Slider(props ...Props) {
 				style={ fmt.Sprintf("left:%.2f%%", float64(p.Value-p.Min)/float64(p.Max-p.Min)*100) }
 				class={
 					utils.TwMerge(
-						"absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary touch-none",
-						"ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-						"hover:bg-primary/90",
-						utils.IfElse(p.Disabled, "opacity-50 cursor-not-allowed", "cursor-grab active:cursor-grabbing"),
+						"absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-ring bg-white ring-ring/50 transition-[color,box-shadow] touch-none select-none",
+						"after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-hidden active:ring-3",
+						utils.If(p.Disabled, "pointer-events-none opacity-50"),
 					)
 				}
 			></div>
@@ -117,10 +117,9 @@ templ Range(props ...RangeProps) {
 		{{ p.MaxValue = p.Max }}
 	}
 	{{ sharedThumbClass := utils.TwMerge(
-		"absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary touch-none",
-		"ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-		"hover:bg-primary/90",
-		utils.IfElse(p.Disabled, "opacity-50 cursor-not-allowed", "cursor-grab active:cursor-grabbing"),
+		"absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-ring bg-white ring-ring/50 transition-[color,box-shadow] touch-none select-none",
+		"after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-hidden active:ring-3",
+		utils.If(p.Disabled, "pointer-events-none opacity-50"),
 	) }}
 	<div
 		id={ p.ID }
@@ -128,13 +127,14 @@ templ Range(props ...RangeProps) {
 		data-min={ fmt.Sprintf("%d", p.Min) }
 		data-max={ fmt.Sprintf("%d", p.Max) }
 		data-step={ fmt.Sprintf("%d", p.Step) }
-		class={ utils.TwMerge("relative flex items-center w-full select-none", p.Class) }
+		class={ utils.TwMerge("relative flex w-full touch-none items-center select-none", utils.If(p.Disabled, "opacity-50"), p.Class) }
 		{ p.Attributes... }
 	>
-		<div data-track class="relative w-full h-2 rounded-full bg-secondary">
+		<div data-track data-slot="slider-track" class="relative h-1 w-full grow overflow-hidden rounded-full bg-muted select-none">
 			<div
 				data-fill
-				class="absolute inset-y-0 rounded-full bg-primary pointer-events-none"
+				data-slot="slider-range"
+				class="pointer-events-none absolute inset-y-0 bg-primary select-none"
 				style={ fmt.Sprintf("left:%.2f%%;right:%.2f%%", float64(p.MinValue-p.Min)/float64(p.Max-p.Min)*100, 100-float64(p.MaxValue-p.Min)/float64(p.Max-p.Min)*100) }
 			></div>
 			<div

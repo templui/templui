@@ -1,6 +1,7 @@
 package inputotp
 
 import (
+	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/utils"
 	"strconv"
 )
@@ -88,9 +89,10 @@ templ Group(props ...GroupProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="input-otp-group"
 		class={
 			utils.TwMerge(
-				"flex gap-2",
+				"flex items-center rounded-lg has-aria-invalid:border-destructive has-aria-invalid:ring-3 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40",
 				p.Class,
 			),
 		}
@@ -124,20 +126,11 @@ templ Slot(props ...SlotProps) {
 			maxlength="1"
 			class={
 				utils.TwMerge(
-					// Base styles - keeping the specific OTP dimensions
-					"w-10 h-12 text-center rounded-md border border-input bg-transparent text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm",
-					// Dark mode background
-					"dark:bg-input/30",
-					// Selection styles
-					"selection:bg-primary selection:text-primary-foreground",
-					// Placeholder
-					"placeholder:text-muted-foreground",
-					// Focus styles
-					"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-					// Disabled styles
+					"relative size-8 border-y border-r border-input bg-transparent text-center text-sm transition-all outline-none first:rounded-l-lg first:border-l last:rounded-r-lg dark:bg-input/30",
+					"selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground",
+					"focus:z-10 focus:border-ring focus:ring-3 focus:ring-ring/50",
 					"disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
-					// Error/Invalid styles
-					"aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40",
+					"aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 focus:aria-invalid:border-destructive focus:aria-invalid:ring-destructive/20 dark:focus:aria-invalid:ring-destructive/40",
 					utils.If(p.HasError, "border-destructive ring-destructive/20 dark:ring-destructive/40"),
 					p.Class,
 				),
@@ -162,15 +155,17 @@ templ Separator(props ...SeparatorProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="input-otp-separator"
+		role="separator"
 		class={
 			utils.TwMerge(
-				"flex items-center text-muted-foreground text-xl",
+				"flex items-center text-muted-foreground [&_svg:not([class*='size-'])]:size-4",
 				p.Class,
 			),
 		}
 		{ p.Attributes... }
 	>
-		<span>-</span>
+		@icon.Minus()
 	</div>
 }
 
