@@ -556,37 +556,36 @@ import "../floatingui/floating_ui_dom.js";
 
   // ----- events -------------------------------------------------------------
 
-  // Base UI opens on pointerdown, not click — that is what makes it feel
-  // instant. The following click is swallowed so it does not re-toggle.
-  document.addEventListener("pointerdown", (e) => {
-    if (e.button !== 0 || !(e.target instanceof Element)) return;
-    const trigger = e.target.closest("[data-tui-select-trigger]");
-    if (!trigger || trigger.disabled) return;
+  // Pointer interactions toggle and dismiss on PRESS, exactly like Base UI.
+  // Click is never used for open/close, so the stray click the browser fires
+  // on <body> after the menu opened over the trigger is naturally harmless.
+  function toggle(trigger) {
     const content = contentFor(trigger);
     if (!content) return;
-    content._tuiSkipClick = true;
     if (content.getAttribute("data-state") === "open") {
       close(content);
     } else {
       open(content, trigger);
     }
+  }
+
+  document.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 || !(e.target instanceof Element)) return;
+    const trigger = e.target.closest("[data-tui-select-trigger]");
+    if (trigger) {
+      if (!trigger.disabled) toggle(trigger);
+      return;
+    }
+    if (!e.target.closest("[data-tui-select-content]")) closeAll();
   });
 
   document.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
     const trigger = e.target.closest("[data-tui-select-trigger]");
     if (trigger) {
-      const content = contentFor(trigger);
-      if (!content) return;
-      if (content._tuiSkipClick) {
-        content._tuiSkipClick = false;
-        return;
-      }
-      if (content.getAttribute("data-state") === "open") {
-        close(content);
-      } else {
-        open(content, trigger);
-      }
+      // Keyboard activation only (Enter/Space fire a detail-0 click without
+      // a preceding pointerdown); pointer clicks are handled on pointerdown.
+      if (e.detail === 0 && !trigger.disabled) toggle(trigger);
       return;
     }
 
@@ -594,11 +593,7 @@ import "../floatingui/floating_ui_dom.js";
     if (item && !item.hasAttribute("data-disabled")) {
       const content = item.closest("[data-tui-select-content]");
       if (content) selectItem(content, item);
-      return;
     }
-
-    // Click outside any open select closes everything.
-    if (!e.target.closest("[data-tui-select-content]")) closeAll();
   });
 
   document.addEventListener("keydown", (e) => {

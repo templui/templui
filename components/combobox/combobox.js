@@ -437,24 +437,28 @@ import "../floatingui/floating_ui_dom.js";
 
   // ----- events -------------------------------------------------------------
 
-  // Base UI opens on pointerdown, not click — that is what makes it feel
-  // instant. The following click is swallowed so it does not re-toggle.
+  // Pointer interactions toggle and dismiss on PRESS, exactly like Base UI.
+  // Click is never used for open/close, so the stray click the browser fires
+  // on <body> when the popup ends up under the released pointer is harmless.
+  function toggleTrigger(trigger) {
+    const content = contentFor(trigger);
+    if (!content) return;
+    if (content.getAttribute("data-state") === "open") {
+      close(content);
+    } else {
+      const input = inputFor(content);
+      if (input && input.disabled) return;
+      open(content);
+      if (input) requestAnimationFrame(() => input.focus());
+    }
+  }
+
   document.addEventListener("pointerdown", (e) => {
     if (e.button !== 0 || !(e.target instanceof Element)) return;
 
     const trigger = e.target.closest("[data-tui-combobox-trigger]");
     if (trigger) {
-      const content = contentFor(trigger);
-      if (!content) return;
-      content._tuiSkipClick = true;
-      if (content.getAttribute("data-state") === "open") {
-        close(content);
-      } else {
-        const input = inputFor(content);
-        if (input && input.disabled) return;
-        open(content);
-        if (input) requestAnimationFrame(() => input.focus());
-      }
+      toggleTrigger(trigger);
       return;
     }
 
@@ -467,7 +471,11 @@ import "../floatingui/floating_ui_dom.js";
       if (!content || content.getAttribute("data-state") === "open") return;
       const field = inputFor(content);
       if (field && !field.disabled) open(content);
+      return;
     }
+
+    // Base UI dismisses on outside PRESS, not on the later click.
+    if (!e.target.closest("[data-tui-combobox-content]")) closeAll();
   });
 
   document.addEventListener("click", (e) => {
@@ -501,33 +509,9 @@ import "../floatingui/floating_ui_dom.js";
 
     const trigger = e.target.closest("[data-tui-combobox-trigger]");
     if (trigger) {
-      const content = contentFor(trigger);
-      if (!content) return;
-      if (content._tuiSkipClick) {
-        content._tuiSkipClick = false;
-        return;
-      }
-      if (content.getAttribute("data-state") === "open") {
-        close(content);
-      } else {
-        open(content);
-        const input = inputFor(content);
-        if (input) input.focus();
-      }
-      return;
-    }
-
-    const anchor = e.target.closest("[data-tui-combobox-anchor]");
-    if (anchor) {
-      const content = document.getElementById(anchor.getAttribute("data-tui-combobox-anchor"));
-      const input = e.target.closest("[data-tui-combobox-input]");
-      if (content && (input || anchor.hasAttribute("data-tui-combobox-chips"))) {
-        const field = inputFor(content);
-        if (field && !field.disabled) {
-          open(content);
-          field.focus();
-        }
-      }
+      // Keyboard activation only (Enter/Space fire a detail-0 click without
+      // a preceding pointerdown); pointer presses are handled on pointerdown.
+      if (e.detail === 0) toggleTrigger(trigger);
       return;
     }
 
@@ -535,11 +519,7 @@ import "../floatingui/floating_ui_dom.js";
     if (item && !item.hasAttribute("data-disabled")) {
       const content = item.closest("[data-tui-combobox-content]");
       if (content) selectItem(content, item);
-      return;
     }
-
-    // Click outside any open combobox closes everything.
-    if (!e.target.closest("[data-tui-combobox-content]")) closeAll();
   });
 
   document.addEventListener("input", (e) => {
