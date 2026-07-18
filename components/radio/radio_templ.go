@@ -52,6 +52,7 @@ func Radio(props ...Props) templ.Component {
 			// primary-foreground dot, shown only when checked
 			"before:absolute before:top-1/2 before:left-1/2 before:size-2 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:bg-primary-foreground before:opacity-0 before:content-['']",
 			"focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+			"aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 aria-invalid:aria-checked:border-primary dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
 			"disabled:cursor-not-allowed disabled:opacity-50",
 			"checked:border-primary checked:bg-primary checked:before:opacity-100",
 			"dark:bg-input/30 dark:checked:bg-primary",

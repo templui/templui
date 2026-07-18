@@ -2,6 +2,13 @@ package switchcomp
 
 import "github.com/templui/templui/utils"
 
+type Size string
+
+const (
+	SizeDefault Size = "default"
+	SizeSm      Size = "sm"
+)
+
 type Props struct {
 	ID         string
 	Class      string
@@ -11,6 +18,8 @@ type Props struct {
 	Disabled   bool
 	Checked    bool
 	Form       string
+	// Size of the switch. Options: 'default', 'sm'.
+	Size Size
 }
 
 templ Switch(props ...Props) {
@@ -21,14 +30,16 @@ templ Switch(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
+	if p.Size == "" {
+		{{ p.Size = SizeDefault }}
+	}
 	<label
 		for={ p.ID }
 		class={ utils.TwMerge(
-			"inline-flex cursor-pointer items-center gap-2",
+			"group/switch inline-flex items-center gap-2",
 			utils.If(p.Disabled, "cursor-not-allowed"),
 		) }
 	>
-		<!-- Actual checkbox switch -->
 		<input
 			id={ p.ID }
 			if p.Name != "" {
@@ -45,40 +56,23 @@ templ Switch(props ...Props) {
 			}
 			checked?={ p.Checked }
 			disabled?={ p.Disabled }
-			class="peer hidden"
+			class="peer sr-only"
 			role="switch"
 			{ p.Attributes... }
 		/>
-		<!-- Visual switch UI -->
 		<div
+			data-slot="switch"
+			data-size={ string(p.Size) }
+			aria-hidden="true"
 			class={
 				utils.TwMerge(
-					// Container
-					"relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center",
-					"rounded-full border-2 border-transparent",
-					"transition-colors",
-					// Background colors
-					"bg-input",
-					"peer-checked:bg-primary",
-					// Focus styles
-					"peer-focus-visible:outline-none peer-focus-visible:ring-2",
-					"peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2",
-					"peer-focus-visible:ring-offset-background",
-					// Disabled state
-					"peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-					// Thumb
-					"after:pointer-events-none after:block",
-					"after:h-4 after:w-4",
-					"after:rounded-full after:bg-background",
-					"after:shadow-lg after:ring-0",
-					"after:transition-transform",
-					"after:content-['']",
-					// Thumb position
-					"peer-checked:after:translate-x-4",
+					"relative inline-flex shrink-0 items-center rounded-full border border-transparent bg-input transition-all outline-none dark:bg-input/80 data-[size=default]:h-[18.4px] data-[size=default]:w-[32px] data-[size=sm]:h-[14px] data-[size=sm]:w-[24px]",
+					"peer-checked:bg-primary peer-focus-visible:border-ring peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+					"peer-aria-invalid:border-destructive peer-aria-invalid:ring-3 peer-aria-invalid:ring-destructive/20 dark:peer-aria-invalid:border-destructive/50 dark:peer-aria-invalid:ring-destructive/40",
+					"before:pointer-events-none before:block before:rounded-full before:bg-background before:ring-0 before:transition-transform before:content-[''] dark:before:bg-foreground dark:peer-checked:before:bg-primary-foreground data-[size=default]:before:size-4 data-[size=sm]:before:size-3 before:translate-x-0 peer-checked:before:translate-x-[calc(100%-2px)]",
 					p.Class,
 				),
 			}
-			aria-hidden="true"
 		></div>
 	</label>
 }

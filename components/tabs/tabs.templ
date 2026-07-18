@@ -11,10 +11,19 @@ type Props struct {
 	Attributes templ.Attributes
 }
 
+type Variant string
+
+const (
+	VariantDefault Variant = "default"
+	VariantLine    Variant = "line"
+)
+
 type ListProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
+	// Variant of the list. Options: 'default' (filled), 'line' (underline).
+	Variant Variant
 }
 
 type TriggerProps struct {
@@ -50,6 +59,8 @@ templ Tabs(props ...Props) {
 		}
 		class={ utils.TwMerge("flex flex-col gap-2", p.Class) }
 		data-tui-tabs
+		data-orientation="horizontal"
+		data-horizontal
 		data-tui-tabs-id={ tabsID }
 		{ p.Attributes... }
 	>
@@ -70,10 +81,12 @@ templ List(props ...ListProps) {
 		}
 		class={
 			utils.TwMerge(
-				"bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
+				"group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-[3px] text-muted-foreground group-data-horizontal/tabs:h-8 data-[variant=line]:rounded-none",
+				listVariantClasses(p.Variant),
 				p.Class,
 			),
 		}
+		data-variant={ string(listVariant(p.Variant)) }
 		data-tui-tabs-list
 		data-tui-tabs-id={ tabsID }
 		{ p.Attributes... }
@@ -101,7 +114,10 @@ templ Trigger(props ...TriggerProps) {
 		type="button"
 		class={
 			utils.TwMerge(
-				"data-[tui-tabs-state=active]:bg-background dark:data-[tui-tabs-state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[tui-tabs-state=active]:border-input dark:data-[tui-tabs-state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[tui-tabs-state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+				"relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-muted-foreground dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1",
+				"data-[tui-tabs-state=active]:bg-background data-[tui-tabs-state=active]:text-foreground dark:data-[tui-tabs-state=active]:border-input dark:data-[tui-tabs-state=active]:bg-input/30 dark:data-[tui-tabs-state=active]:text-foreground group-data-[variant=default]/tabs-list:data-[tui-tabs-state=active]:shadow-sm",
+				"group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[tui-tabs-state=active]:bg-transparent dark:group-data-[variant=line]/tabs-list:data-[tui-tabs-state=active]:border-transparent dark:group-data-[variant=line]/tabs-list:data-[tui-tabs-state=active]:bg-transparent group-data-[variant=line]/tabs-list:data-[tui-tabs-state=active]:shadow-none",
+				"after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-[variant=line]/tabs-list:data-[tui-tabs-state=active]:after:opacity-100",
 				p.Class,
 			),
 		}
@@ -134,7 +150,7 @@ templ Content(props ...ContentProps) {
 		}
 		class={
 			utils.TwMerge(
-				"flex-1 outline-none",
+				"flex-1 text-sm outline-none",
 				utils.If(!p.IsActive, "hidden"),
 				p.Class,
 			),
@@ -162,4 +178,18 @@ templ Script() {
 	@scriptOnce.Once() {
 		@utils.ComponentScript("tabs")
 	}
+}
+
+func listVariant(v Variant) Variant {
+	if v == "" {
+		return VariantDefault
+	}
+	return v
+}
+
+func listVariantClasses(v Variant) string {
+	if listVariant(v) == VariantLine {
+		return "gap-1 bg-transparent"
+	}
+	return "bg-muted"
 }

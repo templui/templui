@@ -13,21 +13,6 @@ import (
 	"github.com/templui/templui/utils"
 )
 
-type Size string
-type Variant string
-
-const (
-	SizeSm Size = "sm"
-	SizeLg Size = "lg"
-)
-
-const (
-	VariantDefault Variant = "default"
-	VariantSuccess Variant = "success"
-	VariantDanger  Variant = "danger"
-	VariantWarning Variant = "warning"
-)
-
 type Props struct {
 	ID         string
 	Class      string
@@ -36,8 +21,6 @@ type Props struct {
 	Value      int
 	Label      string
 	ShowValue  bool
-	Size       Size
-	Variant    Variant
 	BarClass   string
 }
 
@@ -81,7 +64,7 @@ func Progress(props ...Props) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/progress/progress.templ`, Line: 45, Col: 11}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/progress/progress.templ`, Line: 29, Col: 11}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -107,7 +90,7 @@ func Progress(props ...Props) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", maxValue(p.Max)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/progress/progress.templ`, Line: 48, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/progress/progress.templ`, Line: 32, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -120,7 +103,7 @@ func Progress(props ...Props) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", p.Value))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/progress/progress.templ`, Line: 49, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/progress/progress.templ`, Line: 33, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -139,7 +122,7 @@ func Progress(props ...Props) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if p.Label != "" || p.ShowValue {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"flex justify-between items-center mb-1\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"mb-1 flex items-center justify-between\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -151,7 +134,7 @@ func Progress(props ...Props) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/progress/progress.templ`, Line: 56, Col: 48}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/progress/progress.templ`, Line: 40, Col: 48}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -163,14 +146,14 @@ func Progress(props ...Props) templ.Component {
 				}
 			}
 			if p.ShowValue {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<span class=\"text-sm font-medium\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<span class=\"ml-auto text-sm text-muted-foreground tabular-nums\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d%%", percentage(p.Value, p)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/progress/progress.templ`, Line: 60, Col: 51}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/progress/progress.templ`, Line: 44, Col: 51}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -186,14 +169,12 @@ func Progress(props ...Props) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"w-full overflow-hidden rounded-full bg-secondary\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div data-slot=\"progress\" class=\"h-1 w-full overflow-hidden rounded-full bg-muted\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 = []any{utils.TwMerge(
-			"h-full rounded-full transition-all",
-			sizeClasses(p.Size),
-			variantClasses(p.Variant),
+			"h-full w-full flex-1 rounded-full bg-primary transition-all",
 			p.BarClass,
 		),
 		}
@@ -238,30 +219,6 @@ func percentage(value int, props Props) int {
 		value = max
 	}
 	return (value * 100) / max
-}
-
-func sizeClasses(size Size) string {
-	switch size {
-	case SizeSm:
-		return "h-1"
-	case SizeLg:
-		return "h-4"
-	default:
-		return "h-2.5"
-	}
-}
-
-func variantClasses(variant Variant) string {
-	switch variant {
-	case VariantSuccess:
-		return "bg-green-500"
-	case VariantDanger:
-		return "bg-destructive"
-	case VariantWarning:
-		return "bg-yellow-500"
-	default:
-		return "bg-primary"
-	}
 }
 
 var scriptOnce = templ.NewOnceHandle()

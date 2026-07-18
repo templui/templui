@@ -96,18 +96,6 @@ templ Progress() {
 				Title: "Examples",
 				ID:    "examples",
 			}) {
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Sizes",
-					ShowcaseFile:    showcase.ProgressSizes(),
-					PreviewCodeFile: "progress_sizes.templ",
-					ID:              "sizes",
-				})
-				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					SectionName:     "Variants",
-					ShowcaseFile:    showcase.ProgressVariants(),
-					PreviewCodeFile: "progress_variants.templ",
-					ID:              "variants",
-				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
 				Title: "Integration Patterns",
@@ -206,27 +194,6 @@ templ Progress() {
 								Type:        "int",
 								Default:     "0",
 								Description: "Maximum value for the progress (defaults to 100 if 0 or negative).",
-								Required:    false,
-							},
-							{
-								Name:        "Size",
-								Type:        "Size",
-								Default:     "",
-								Description: "Size of the progress bar. Options: 'sm', 'lg', or default (empty).",
-								Required:    false,
-							},
-							{
-								Name:        "Variant",
-								Type:        "Variant",
-								Default:     "",
-								Description: "Color variant of the progress bar. Options: 'default', 'success', 'danger', 'warning' (defaults to 'default' if empty).",
-								Required:    false,
-							},
-							{
-								Name:        "BarClass",
-								Type:        "string",
-								Default:     "",
-								Description: "Additional CSS classes to apply to the progress bar itself.",
 								Required:    false,
 							},
 							{

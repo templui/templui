@@ -209,9 +209,7 @@ func main() {
 		"out/showcase/popover_form.html":       showcase.PopoverForm(),
 
 		// Progress
-		"out/showcase/progress_variants.html": showcase.ProgressVariants(),
 		"out/showcase/progress_default.html":  showcase.ProgressDefault(),
-		"out/showcase/progress_sizes.html":    showcase.ProgressSizes(),
 
 		// Radio
 		"out/showcase/radio_default.html": showcase.RadioDefault(),

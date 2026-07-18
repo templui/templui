@@ -5,20 +5,6 @@ import (
 	"github.com/templui/templui/utils"
 )
 
-type Size string
-type Variant string
-
-const (
-	SizeSm Size = "sm"
-	SizeLg Size = "lg"
-)
-
-const (
-	VariantDefault Variant = "default"
-	VariantSuccess Variant = "success"
-	VariantDanger  Variant = "danger"
-	VariantWarning Variant = "warning"
-)
 
 type Props struct {
 	ID         string
@@ -28,8 +14,6 @@ type Props struct {
 	Value      int
 	Label      string
 	ShowValue  bool
-	Size       Size
-	Variant    Variant
 	BarClass   string
 }
 
@@ -51,25 +35,23 @@ templ Progress(props ...Props) {
 		{ p.Attributes... }
 	>
 		if p.Label != "" || p.ShowValue {
-			<div class="flex justify-between items-center mb-1">
+			<div class="mb-1 flex items-center justify-between">
 				if p.Label != "" {
 					<span class="text-sm font-medium">{ p.Label }</span>
 				}
 				if p.ShowValue {
-					<span class="text-sm font-medium">
+					<span class="ml-auto text-sm text-muted-foreground tabular-nums">
 						{ fmt.Sprintf("%d%%", percentage(p.Value, p)) }
 					</span>
 				}
 			</div>
 		}
-		<div class="w-full overflow-hidden rounded-full bg-secondary">
+		<div data-slot="progress" class="h-1 w-full overflow-hidden rounded-full bg-muted">
 			<div
 				data-tui-progress-indicator
 				class={
 					utils.TwMerge(
-						"h-full rounded-full transition-all",
-						sizeClasses(p.Size),
-						variantClasses(p.Variant),
+						"h-full w-full flex-1 rounded-full bg-primary transition-all",
 						p.BarClass,
 					),
 				}
@@ -96,29 +78,7 @@ func percentage(value int, props Props) int {
 	return (value * 100) / max
 }
 
-func sizeClasses(size Size) string {
-	switch size {
-	case SizeSm:
-		return "h-1"
-	case SizeLg:
-		return "h-4"
-	default:
-		return "h-2.5"
-	}
-}
 
-func variantClasses(variant Variant) string {
-	switch variant {
-	case VariantSuccess:
-		return "bg-green-500"
-	case VariantDanger:
-		return "bg-destructive"
-	case VariantWarning:
-		return "bg-yellow-500"
-	default:
-		return "bg-primary"
-	}
-}
 
 var scriptOnce = templ.NewOnceHandle()
 
