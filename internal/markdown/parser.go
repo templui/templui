@@ -3,7 +3,10 @@ package markdown
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"regexp"
+	"strings"
+
+	"github.com/a-h/templ"
 
 	"github.com/templui/templui/internal/ui/modules"
 	"github.com/yuin/goldmark"
@@ -97,9 +100,20 @@ func (r *ShikiCodeBlockRenderer) renderFencedCodeBlock(w util.BufWriter, source 
 	}
 
 	n := node.(*ast.FencedCodeBlock)
-	language := string(n.Language(source))
-	if language == "" {
-		language = "text"
+
+	// The full fence info line carries shadcn's rehype-pretty-code meta:
+	// ```css showLineNumbers title="globals.css"
+	info := ""
+	if n.Info != nil {
+		info = string(n.Info.Segment.Value(source))
+	}
+	language := "text"
+	if fields := strings.Fields(info); len(fields) > 0 {
+		language = fields[0]
+	}
+	title := ""
+	if m := fenceTitleRe.FindStringSubmatch(info); m != nil {
+		title = m[1]
 	}
 
 	// Extract code content
@@ -110,11 +124,22 @@ func (r *ShikiCodeBlockRenderer) renderFencedCodeBlock(w util.BufWriter, source 
 		code.Write(line.Value(source))
 	}
 
-	// Get Shiki highlighted HTML with background context
-	highlightedHTML := modules.GetHighlightedHTML(context.Background(), code.String(), language)
+	return writeCodeFigure(w, modules.CodeFigureProps{
+		Language:        language,
+		Title:           title,
+		ShowLineNumbers: strings.Contains(info, "showLineNumbers"),
+		Code:            strings.TrimSuffix(code.String(), "\n"),
+	})
+}
 
-	// Wrap with same structure as modules.Code
-	_, err := w.WriteString(fmt.Sprintf(`<div class="relative code-highlighting-container" data-code-block=""><div class="[&_pre]:block [&_pre]:overflow-x-auto [&_pre]:overflow-y-auto [&_pre]:max-h-96 [&_pre]:p-4 [&_pre]:rounded-md [&_pre]:text-sm">%s</div></div>`, highlightedHTML))
+var fenceTitleRe = regexp.MustCompile(`title="([^"]*)"`)
+
+func writeCodeFigure(w util.BufWriter, props modules.CodeFigureProps) (ast.WalkStatus, error) {
+	html, err := templ.ToGoHTML(context.Background(), modules.CodeFigure(props))
+	if err != nil {
+		return ast.WalkStop, err
+	}
+	_, err = w.WriteString(string(html))
 	return ast.WalkContinue, err
 }
 
@@ -133,12 +158,10 @@ func (r *ShikiCodeBlockRenderer) renderCodeBlock(w util.BufWriter, source []byte
 		code.Write(line.Value(source))
 	}
 
-	// Get Shiki highlighted HTML with default language
-	highlightedHTML := modules.GetHighlightedHTML(context.Background(), code.String(), "text")
-
-	// Wrap with same structure as modules.Code
-	_, err := w.WriteString(fmt.Sprintf(`<div class="relative code-highlighting-container" data-code-block=""><div class="[&_pre]:block [&_pre]:overflow-x-auto [&_pre]:overflow-y-auto [&_pre]:max-h-96 [&_pre]:p-4 [&_pre]:rounded-md [&_pre]:text-sm">%s</div></div>`, highlightedHTML))
-	return ast.WalkContinue, err
+	return writeCodeFigure(w, modules.CodeFigureProps{
+		Language: "text",
+		Code:     strings.TrimSuffix(code.String(), "\n"),
+	})
 }
 
 // Internal type for tracking heading levels during TOC extraction

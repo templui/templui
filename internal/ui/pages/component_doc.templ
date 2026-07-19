@@ -47,8 +47,12 @@ templ renderSegment(segment markdown.Segment) {
 				</div>
 			}
 		case "ComponentSource":
-			@modules.ComponentSourceBlock(segment.Attrs["name"], segment.Attrs["title"])
+			@modules.ComponentSourceBlock(segment.Attrs["name"])
 		case "Installation":
 			@modules.InstallationBlock(segment.Attrs["name"])
+		case "Callout":
+			@modules.CalloutBlock() {
+				@templ.Raw(segment.HTML)
+			}
 	}
 }

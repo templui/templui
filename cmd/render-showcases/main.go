@@ -59,16 +59,16 @@ func main() {
 		"out/showcase/breadcrumb_with_icons.html":       examples.BreadcrumbWithIcons(),
 
 		// Button
-		"out/showcase/button_default.html":     examples.ButtonDefault(),
+		"out/showcase/button_demo.html":        examples.ButtonDemo(),
 		"out/showcase/button_destructive.html": examples.ButtonDestructive(),
 		"out/showcase/button_ghost.html":       examples.ButtonGhost(),
 		"out/showcase/button_icon.html":        examples.ButtonIcon(),
 		"out/showcase/button_link.html":        examples.ButtonLink(),
 		"out/showcase/button_outline.html":     examples.ButtonOutline(),
-		"out/showcase/button_primary.html":     examples.ButtonPrimary(),
+		"out/showcase/button_default.html":     examples.ButtonDefault(),
 		"out/showcase/button_rounded.html":     examples.ButtonRounded(),
 		"out/showcase/button_secondary.html":   examples.ButtonSecondary(),
-		"out/showcase/button_sizes.html":       examples.ButtonSizes(),
+		"out/showcase/button_size.html":        examples.ButtonSize(),
 		"out/showcase/button_spinner.html":     examples.ButtonSpinner(),
 		"out/showcase/button_with_icon.html":   examples.ButtonWithIcon(),
 

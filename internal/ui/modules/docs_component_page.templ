@@ -5,10 +5,13 @@ import (
 	"net/url"
 	"strings"
 
+	componentsrc "github.com/templui/templui/components"
 	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/dropdownmenu"
 	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/tabs"
 	"github.com/templui/templui/internal/ctxkeys"
+	"github.com/templui/templui/internal/registry"
 	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/utils"
 )
@@ -29,14 +32,80 @@ templ ComponentPreviewBlock(entry examples.RegistryEntry) {
 	</div>
 }
 
-// ComponentSourceBlock renders a component's full source, clamped (shadcn's
-// ComponentSource inside the manual installation steps).
-templ ComponentSourceBlock(file, title string) {
-	<div class="my-6 flex flex-col gap-2">
-		if title != "" {
-			<p class="font-mono text-[0.8rem] text-muted-foreground">{ title }</p>
+// ComponentSourceBlock is shadcn's ComponentSource: the component's source
+// files (templ, and the js for scripted components) as collapsible code
+// figures titled with their file path.
+templ ComponentSourceBlock(name string) {
+	for _, file := range componentSourceFiles(name) {
+		@CodeCollapsibleWrapper() {
+			@CodeFigure(CodeFigureProps{
+				Language:        sourceLanguage(file),
+				Title:           file,
+				ShowLineNumbers: true,
+				Code:            componentSourceCode(file),
+			})
 		}
-		@CollapsibleCodeBlock(file)
+	}
+}
+
+// componentSourceFiles returns a component's source paths from the registry;
+// generated .min.js files are noise as a code block and stay out.
+func componentSourceFiles(name string) []string {
+	for _, c := range registry.Get().Components {
+		if c.Name != name {
+			continue
+		}
+		files := append([]string{}, c.Files...)
+		for _, f := range c.JSFiles {
+			if !strings.HasSuffix(f, ".min.js") {
+				files = append(files, f)
+			}
+		}
+		return files
+	}
+	return nil
+}
+
+func componentSourceCode(path string) string {
+	content, err := componentsrc.TemplFiles.ReadFile(strings.TrimPrefix(path, "components/"))
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSuffix(string(content), "\n")
+}
+
+func sourceLanguage(path string) string {
+	if strings.HasSuffix(path, ".js") {
+		return "js"
+	}
+	return "templ"
+}
+
+// CodeCollapsibleWrapper is shadcn's CodeCollapsibleWrapper: source clamped
+// to max-h-64 with an Expand/Collapse button next to the copy button and a
+// gradient trigger across the bottom.
+templ CodeCollapsibleWrapper() {
+	<div data-tui-docs-collapsible data-open="false" class="group/collapsible relative md:-mx-1">
+		<div class="absolute top-1.5 right-9 z-10 flex items-center">
+			@button.Button(button.Props{
+				Variant:    button.VariantGhost,
+				Size:       button.SizeSm,
+				Class:      "h-7 rounded-md px-2 text-muted-foreground",
+				Attributes: templ.Attributes{"data-tui-docs-collapsible-toggle": true},
+			}) {
+				<span class="group-data-[open=true]/collapsible:hidden">Expand</span>
+				<span class="hidden group-data-[open=true]/collapsible:inline">Collapse</span>
+			}
+			<div class="mx-1.5 h-4 w-px bg-border"></div>
+		</div>
+		<div class="relative mt-6 overflow-hidden group-data-[open=false]/collapsible:max-h-64 [&>figure]:mt-0 md:[&>figure]:mx-0">
+			{ children... }
+		</div>
+		<button
+			type="button"
+			data-tui-docs-collapsible-toggle
+			class="absolute inset-x-0 -bottom-2 flex h-20 items-center justify-center rounded-b-lg bg-gradient-to-b from-code/70 to-code text-sm text-muted-foreground group-data-[open=true]/collapsible:hidden"
+		>Expand</button>
 	</div>
 }
 
@@ -93,12 +162,55 @@ func sourcePreviewLines(file string, maxLines int) string {
 	return strings.Join(lines, "\n")
 }
 
-// InstallationBlock is the installation section of a component page; it
-// reuses the existing ComponentUsage module (CLI command + usage snippets).
+// installTabTriggerClass restyles our tabs trigger to shadcn's docs mdx
+// TabsTrigger (underline tabs: border-b-2, text-base, transparent bg).
+const installTabTriggerClass = "h-auto flex-none rounded-none border-0 border-b-2 border-transparent bg-transparent px-0 pt-0 pb-3 text-base font-medium text-muted-foreground shadow-none after:hidden hover:text-primary data-[tui-tabs-state=active]:!border-primary data-[tui-tabs-state=active]:bg-transparent data-[tui-tabs-state=active]:text-foreground"
+
+// InstallationBlock is shadcn's installation section: CodeTabs with a
+// Command tab (the CLI call) and a Manual tab (numbered steps copying the
+// component source).
 templ InstallationBlock(component string) {
-	<div data-not-typeset class="my-6">
-		@ComponentUsage(ComponentUsageProps{ComponentName: component})
-	</div>
+	{{ hasScript := hasComponentScript(component) }}
+	{{ alias := componentAlias(component) }}
+	@tabs.Tabs(tabs.Props{ID: "installation-" + component, Class: "relative mt-6 w-full"}) {
+		@tabs.List(tabs.ListProps{
+			Variant: tabs.VariantLine,
+			Class:   "h-auto w-fit justify-start gap-6 rounded-none bg-transparent p-0 group-data-horizontal/tabs:h-auto",
+		}) {
+			@tabs.Trigger(tabs.TriggerProps{Value: "cli", IsActive: true, Class: installTabTriggerClass}) {
+				Command
+			}
+			@tabs.Trigger(tabs.TriggerProps{Value: "manual", Class: installTabTriggerClass}) {
+				Manual
+			}
+		}
+		@tabs.Content(tabs.ContentProps{Value: "cli", IsActive: true}) {
+			@CodeFigure(CodeFigureProps{Language: "bash", Code: "templui add " + component})
+			if hasScript {
+				<p>Load the script once in your layout:</p>
+				@CodeFigure(CodeFigureProps{Language: "templ", Code: "<head>\n  @" + alias + ".Script()\n</head>"})
+			}
+		}
+		@tabs.Content(tabs.ContentProps{Value: "manual"}) {
+			<div class="steps mb-0 [counter-reset:step] pt-2 md:ml-4 md:border-l md:pl-8 [&>h3]:step">
+				<h3>Copy and paste the following code into your project.</h3>
+				@ComponentSourceBlock(component)
+				if hasScript {
+					<p>Copy <code>{ component }.min.js</code> as well, or minify <code>{ component }.js</code> yourself. <code>{ alias }.Script()</code> loads the minified file.</p>
+					<h3>Add the script once to your layout.</h3>
+					@CodeFigure(CodeFigureProps{Language: "templ", Code: "<head>\n  @" + alias + ".Script()\n</head>"})
+				}
+				<h3>Update the import paths to match your project setup.</h3>
+			</div>
+		}
+	}
+}
+
+func componentAlias(name string) string {
+	if name == "switch" {
+		return "switchcomp"
+	}
+	return name
 }
 
 // DocsPageHeader: title, description and the copy-page/prev-next controls
@@ -246,6 +358,12 @@ templ DocsCodeToggleScript() {
 	<script defer nonce={ templ.GetNonce(ctx) }>
 		document.addEventListener('click', (e) => {
 			if (!(e.target instanceof Element)) return;
+			const collapsibleToggle = e.target.closest('[data-tui-docs-collapsible-toggle]');
+			if (collapsibleToggle) {
+				const wrapper = collapsibleToggle.closest('[data-tui-docs-collapsible]');
+				if (wrapper) wrapper.dataset.open = wrapper.dataset.open === 'true' ? 'false' : 'true';
+				return;
+			}
 			const toggle = e.target.closest('[data-tui-docs-code-toggle]');
 			if (toggle) {
 				const block = toggle.closest('[data-tui-docs-code]');
@@ -281,6 +399,14 @@ templ MarkdownProse() {
 			"[&>div[data-code-block]]:my-4",
 		) }
 	>
+		{ children... }
+	</div>
+}
+
+// CalloutBlock renders shadcn's Callout (surface alert box) around inner
+// markdown.
+templ CalloutBlock() {
+	<div data-not-typeset class="mt-6 w-auto rounded-2xl border border-surface bg-surface p-4 text-sm text-surface-foreground md:-mx-1 [&_code]:border [&_p]:text-card-foreground/80 [&_p:not(:first-child)]:mt-2">
 		{ children... }
 	</div>
 }

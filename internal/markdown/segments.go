@@ -19,8 +19,9 @@ type Segment struct {
 }
 
 // Shortcode tags mirror shadcn's mdx components, so their docs sources can
-// be adopted nearly verbatim.
-var shortcodeRe = regexp.MustCompile(`(?ms)^<(ComponentPreview|ComponentSource|Installation)\b(.*?)/>\s*$`)
+// be adopted nearly verbatim. Callout carries inner markdown, the others are
+// self closing.
+var shortcodeRe = regexp.MustCompile(`(?ms)^(?:<(ComponentPreview|ComponentSource|Installation)\b(.*?)/>|<(Callout)>(.*?)</Callout>)\s*$`)
 
 var attrRe = regexp.MustCompile(`([a-zA-Z-]+)="([^"]*)"`)
 
@@ -74,10 +75,18 @@ func (p *Parser) ParseSegments(source []byte) ([]Segment, map[string]any, []modu
 		if err := flush(chunk); err != nil {
 			return nil, nil, nil, err
 		}
-		segments = append(segments, Segment{
-			Shortcode: string(source[m[2]:m[3]]),
-			Attrs:     parseAttrs(string(source[m[4]:m[5]])),
-		})
+		if m[6] != -1 { // Callout with inner markdown
+			var buf bytes.Buffer
+			if err := p.md.Convert(source[m[8]:m[9]], &buf); err != nil {
+				return nil, nil, nil, err
+			}
+			segments = append(segments, Segment{Shortcode: "Callout", HTML: buf.String()})
+		} else {
+			segments = append(segments, Segment{
+				Shortcode: string(source[m[2]:m[3]]),
+				Attrs:     parseAttrs(string(source[m[4]:m[5]])),
+			})
+		}
 		last = m[1]
 	}
 	tail := source[last:]

@@ -12,9 +12,9 @@ type RegistryEntry struct {
 // Registry resolves <ComponentPreview name="..."/> shortcodes in the
 // markdown component docs. Grows page by page during the docs migration.
 var Registry = map[string]RegistryEntry{
-	"button-demo":        {Component: ButtonDefault(), File: "button_default.templ"},
-	"button-size":        {Component: ButtonSizes(), File: "button_sizes.templ"},
-	"button-default":     {Component: ButtonPrimary(), File: "button_primary.templ"},
+	"button-demo":        {Component: ButtonDemo(), File: "button_demo.templ"},
+	"button-size":        {Component: ButtonSize(), File: "button_size.templ"},
+	"button-default":     {Component: ButtonDefault(), File: "button_default.templ"},
 	"button-outline":     {Component: ButtonOutline(), File: "button_outline.templ"},
 	"button-secondary":   {Component: ButtonSecondary(), File: "button_secondary.templ"},
 	"button-ghost":       {Component: ButtonGhost(), File: "button_ghost.templ"},
@@ -25,5 +25,5 @@ var Registry = map[string]RegistryEntry{
 	"button-rounded":     {Component: ButtonRounded(), File: "button_rounded.templ"},
 	"button-spinner":     {Component: ButtonSpinner(), File: "button_spinner.templ"},
 	"button-group-demo":  {Component: ButtonGroupDefault(), File: "buttongroup_default.templ"},
-	"button-render":      {Component: ButtonAsLink(), File: "button_as_link.templ"},
+	"button-render":      {Component: ButtonRender(), File: "button_render.templ"},
 }
