@@ -25,9 +25,9 @@ templ Sidebar() {
 												hx-swap="innerHTML"
 											}
 											if link.Href == ctx.Value(ctxkeys.URLPathValue) {
-												class="inline-flex items-center gap-2 rounded-md p-2 text-[0.8rem] bg-accent hover:bg-accent"
+												class="inline-flex h-[30px] w-fit items-center gap-2 rounded-md border border-accent bg-accent px-2 text-[0.8rem] font-medium"
 											} else {
-												class="inline-flex items-center gap-2 rounded-md p-2 text-[0.8rem] hover:bg-accent hover:text-accent-foreground"
+												class="inline-flex h-[30px] w-fit items-center gap-2 rounded-md border border-transparent px-2 text-[0.8rem] font-medium hover:bg-accent hover:text-accent-foreground"
 											}
 										>
 											{ link.Text }

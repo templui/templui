@@ -4,7 +4,8 @@ import { codeToHtml, getHighlighter } from "shiki";
 
 // --- Konfiguration ---
 const PORT = process.env.PORT || 3000; // Port für den Service
-const THEME = "dracula"; // VS Code Theme
+// Dual theme like shadcn (source.config.ts): vesper dark, github light.
+const THEMES = { light: "github-light-default", dark: "github-dark-default" };
 const LANGUAGES = [
   "templ",
   "go",
@@ -67,10 +68,14 @@ app.post("/highlight", async (req, res) => {
 
   try {
     // console.log(`Highlighting ${code.length} chars, lang: ${effectiveLang}`);
-    const html = await highlighter.codeToHtml(code, {
+    let html = await highlighter.codeToHtml(code, {
       lang: effectiveLang,
-      theme: THEME,
+      themes: THEMES,
+      defaultColor: "light",
     });
+    // Newlines between the line spans break display:grid (anonymous items);
+    // rehype-pretty-code strips them the same way.
+    html = html.replaceAll("\n", "");
     // logInfo(`Sending response for lang: ${lang}`);
     res.status(200).type("text/html").send(html);
   } catch (error) {
@@ -79,7 +84,8 @@ app.post("/highlight", async (req, res) => {
     try {
       const fallbackHtml = await highlighter.codeToHtml(code, {
         lang: "text",
-        theme: THEME,
+        themes: THEMES,
+        defaultColor: "light",
       });
       console.warn(
         `Highlighting failed for lang "${effectiveLang}", sending plain text fallback.`
@@ -114,7 +120,7 @@ const startServer = async () => {
   try {
     logInfo("Initializing Shiki highlighter...");
     highlighter = await getHighlighter({
-      themes: [THEME],
+      themes: Object.values(THEMES),
       langs: LANGUAGES,
     });
     isHighlighterReady = true;

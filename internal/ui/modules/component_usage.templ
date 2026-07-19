@@ -60,6 +60,7 @@ templ ComponentUsage(props ComponentUsageProps) {
 		ID: "installation-" + props.ComponentName,
 	}) {
 		@tabs.List(tabs.ListProps{
+			Variant: tabs.VariantLine,
 			Class: "w-fit",
 		}) {
 			@tabs.Trigger(tabs.TriggerProps{

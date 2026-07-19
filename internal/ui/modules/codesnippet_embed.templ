@@ -13,3 +13,18 @@ templ CodeSnippetFromEmbedded(filename, language string, embed embed.FS) {
 		})
 	}
 }
+
+// CodeSnippetFromEmbeddedStyled is CodeSnippetFromEmbedded with extra
+// classes for the inner code container (the docs blocks restyle the pre).
+templ CodeSnippetFromEmbeddedStyled(filename, language string, embed embed.FS, codeClass string) {
+	if content, err := embed.ReadFile(filename); err != nil {
+		<div class="error">Error reading file: { filename }: { err.Error() }</div>
+	} else {
+		@Code(CodeProps{
+			Language:       "templ",
+			ShowCopyButton: true,
+			CodeContent:    string(content),
+			CodeClass:      codeClass,
+		})
+	}
+}

@@ -45,17 +45,19 @@ templ Code(p CodeProps) {
 			"[&_pre]:p-4",
 			"[&_pre]:rounded-md",
 			"[&_pre]:text-sm",
+			p.CodeClass,
 		) }
 			data-tui-code-container=""
 		>
 			@templ.Raw(highlightedHTML)
 		</div>
 		if p.ShowCopyButton {
-			@copybutton.CopyButton(copybutton.Props{
-				TargetID: p.ID,
-				// Force dark mode appearance to match the dark code theme
-				Class: "absolute top-2 right-2 !bg-gray-700/10 hover:!bg-gray-600/20 !text-gray-300 hover:!text-white",
-			})
+			<div class="absolute top-3 right-2 z-10">
+				@copybutton.CopyButton(copybutton.Props{
+					TargetID: p.ID,
+					Class:    "size-7 bg-code",
+				})
+			</div>
 		}
 	</div>
 }

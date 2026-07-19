@@ -18,7 +18,7 @@ templ DocsLayout(title, description string, tocItems []modules.TableOfContentsIt
 				<main class="flex-1 overflow-y-auto scroll-smooth" id="main-content">
 					@templ.Fragment("content") {
 						<div class="pt-8 pb-8 px-4">
-							<div class="max-w-3xl mx-auto">
+							<div class="mx-auto w-full max-w-160 text-[1.05rem] sm:text-[15px]">
 								{ children... }
 							</div>
 						</div>
@@ -31,6 +31,7 @@ templ DocsLayout(title, description string, tocItems []modules.TableOfContentsIt
 							@modules.TableOfContents(modules.TableOfContentsProps{
 								Items: tocItems,
 							})
+							@modules.TocAdCard()
 						</div>
 					}
 				</div>

@@ -15,6 +15,7 @@ import (
 	"github.com/templui/templui/internal/config"
 	"github.com/templui/templui/internal/middleware"
 	"github.com/templui/templui/internal/service"
+	"github.com/templui/templui/internal/shared"
 	"github.com/templui/templui/internal/ui/pages"
 	"github.com/templui/templui/static"
 )
@@ -136,7 +137,7 @@ func main() {
 	mux.Handle("GET /docs/components/avatar", htmxHandler(pages.Avatar()))
 	mux.Handle("GET /docs/components/badge", htmxHandler(pages.Badge()))
 	mux.Handle("GET /docs/components/breadcrumb", htmxHandler(pages.Breadcrumb()))
-	mux.Handle("GET /docs/components/button", htmxHandler(pages.Button()))
+	mux.Handle("GET /docs/components/{slug}", componentDocHandler(docsService))
 	mux.Handle("GET /docs/components/button-group", htmxHandler(pages.ButtonGroup()))
 	mux.Handle("GET /docs/components/calendar", htmxHandler(pages.Calendar()))
 	mux.Handle("GET /docs/components/date-picker", htmxHandler(pages.DatePicker()))
@@ -298,4 +299,54 @@ func SetupAssetsRoutes(mux *http.ServeMux) {
 			}
 		})
 	}
+}
+
+// componentDocHandler serves markdown-authored component pages (and their
+// raw markdown under <slug>.md for the copy-page menu).
+func componentDocHandler(docsService *service.DocsService) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		slug := r.PathValue("slug")
+
+		if strings.HasSuffix(slug, ".md") {
+			source, err := docsService.GetComponentPageSource(strings.TrimSuffix(slug, ".md"))
+			if err != nil {
+				http.NotFound(w, r)
+				return
+			}
+			w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
+			w.Write(source)
+			return
+		}
+
+		page, err := docsService.GetComponentPage(slug)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		prev, next := componentPagerLinks("/docs/components/" + slug)
+		htmxHandler(pages.ComponentDoc(page, prev, next)).ServeHTTP(w, r)
+	})
+}
+
+// componentPagerLinks finds the previous/next component from the sidebar's
+// components section.
+func componentPagerLinks(href string) (pages.PagerLink, pages.PagerLink) {
+	var prev, next pages.PagerLink
+	for _, section := range shared.Sections {
+		if section.Title != "Components" {
+			continue
+		}
+		for i, link := range section.Links {
+			if link.Href != href {
+				continue
+			}
+			if i > 0 {
+				prev = pages.PagerLink{Title: section.Links[i-1].Text, Href: section.Links[i-1].Href}
+			}
+			if i < len(section.Links)-1 {
+				next = pages.PagerLink{Title: section.Links[i+1].Text, Href: section.Links[i+1].Href}
+			}
+		}
+	}
+	return prev, next
 }

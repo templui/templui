@@ -1,0 +1,54 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/markdown"
+	"github.com/templui/templui/internal/service"
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/internal/ui/showcase"
+)
+
+// PagerLink points to the previous/next component page.
+type PagerLink struct {
+	Title string
+	Href  string
+}
+
+// ComponentDoc renders a markdown-authored component page (the shadcn mdx
+// pendant): frontmatter header, markdown prose and shortcode blocks resolved
+// against the showcase registry.
+templ ComponentDoc(page *service.ComponentDocPage, prev, next PagerLink) {
+	@layouts.DocsLayout(
+		page.Title+" - templUI",
+		page.Description,
+		page.TOC,
+	) {
+		@modules.DocsCodeToggleScript()
+		@modules.DocsPageHeader(page.Title, page.Description, prev.Href, next.Href)
+		@modules.MarkdownProse() {
+			for _, segment := range page.Segments {
+				@renderSegment(segment)
+			}
+		}
+		@modules.DocsPager(prev.Title, prev.Href, next.Title, next.Href)
+	}
+}
+
+templ renderSegment(segment markdown.Segment) {
+	switch segment.Shortcode {
+		case "":
+			@templ.Raw(segment.HTML)
+		case "ComponentPreview":
+			if entry, ok := showcase.Registry[segment.Attrs["name"]]; ok {
+				@modules.ComponentPreviewBlock(entry)
+			} else {
+				<div class="my-6 rounded-lg border border-destructive/50 p-4 text-sm text-destructive">
+					Unknown preview: { segment.Attrs["name"] }
+				</div>
+			}
+		case "ComponentSource":
+			@modules.ComponentSourceBlock(segment.Attrs["name"], segment.Attrs["title"])
+		case "Installation":
+			@modules.InstallationBlock(segment.Attrs["name"])
+	}
+}

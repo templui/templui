@@ -2,7 +2,6 @@ package copybutton
 
 import (
 	"github.com/templui/templui/components/button"
-	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/utils"
 )
 
@@ -32,10 +31,10 @@ templ CopyButton(props Props) {
 			Type:       button.TypeButton,
 		}) {
 			<span data-copy-icon-clipboard>
-				@icon.Clipboard(icon.Props{Class: "size-4"})
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"></path><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"></path></svg>
 			</span>
 			<span data-copy-icon-check class="hidden">
-				@icon.Check(icon.Props{Class: "size-4"})
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><path d="M5 12l5 5l10 -10"></path></svg>
 			</span>
 		}
 	</div>

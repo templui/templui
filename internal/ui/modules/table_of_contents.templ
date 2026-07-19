@@ -33,6 +33,7 @@ templ renderTOCItems(items []TableOfContentsItem, level int) {
 			class={ templ.Classes(
 				"block py-1 text-[0.8rem] text-muted-foreground hover:text-foreground",
 				"no-underline transition-colors break-words",
+				"data-[active=true]:font-medium data-[active=true]:text-foreground",
 				templ.KV("pl-4", level == 1),
 				templ.KV("pl-6", level >= 2),
 			) }
@@ -65,6 +66,42 @@ templ TableOfContentsScript() {
                     history.pushState(null, '', '#' + link.dataset.sectionId);
                 }
             });
+
+            // Scroll spy: highlight the section under the cursor line, like
+            // shadcn (IntersectionObserver with a -80% bottom root margin).
+            const links = [...toc.querySelectorAll('[data-toc-link]')];
+            const setActive = (id) => {
+                links.forEach((link) => {
+                    link.setAttribute('data-active', link.dataset.sectionId === id ? 'true' : 'false');
+                });
+            };
+            const observer = new IntersectionObserver((entries) => {
+                for (const entry of entries) {
+                    if (entry.isIntersecting) setActive(entry.target.id);
+                }
+            }, { root: main, rootMargin: '0% 0% -80% 0%' });
+            links.forEach((link) => {
+                const section = document.getElementById(link.dataset.sectionId);
+                if (section) observer.observe(section);
+            });
         });
     </script>
+}
+
+// TocAdCard is the promo slot below the table of contents — the pendant of
+// shadcn's Vercel deploy card, advertising Goilerplate.
+templ TocAdCard() {
+	<div class="mx-4 mt-6 flex flex-col items-start gap-3 rounded-2xl bg-surface p-6 text-sm">
+		<p class="text-base font-semibold leading-snug">Ship your templUI app with Goilerplate</p>
+		<p class="text-sm text-muted-foreground">Trusted by Go developers shipping SaaS fast.</p>
+		<p class="text-sm text-muted-foreground">Goilerplate provides the boilerplate and structure to launch your Go app at scale.</p>
+		<a
+			href="https://goilerplate.com"
+			target="_blank"
+			rel="noopener"
+			class="mt-1 inline-flex h-8 items-center rounded-lg border border-border bg-transparent px-3 text-sm font-medium hover:bg-muted"
+		>
+			Get Goilerplate
+		</a>
+	</div>
 }
