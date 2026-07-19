@@ -76,13 +76,13 @@ templ Collapsible() {
 				<div id="api-collapsible" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Collapsible",
-						Description: "Root container for collapsible content. Controls the open/closed state.",
+						Description: "Root container that links Trigger and Content and carries the open state (data-open/data-closed).",
 						Items: []modules.APITableItem{
 							{
 								Name:        "ID",
 								Type:        "string",
-								Default:     "auto-generated",
-								Description: "Unique identifier for the collapsible. Auto-generated if not provided.",
+								Default:     "randomID",
+								Description: "Optional id linking trigger and content.",
 								Required:    false,
 							},
 							{
@@ -112,28 +112,14 @@ templ Collapsible() {
 				<div id="api-trigger" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Trigger",
-						Description: "Button that toggles the collapsible content. Automatically handles click events and keyboard navigation.",
+						Description: "collapsible.Trigger(ctx) returns the attributes that turn any element into the trigger, usually spread onto a Button. Sets data-panel-open while expanded for styling hooks.",
 						Items: []modules.APITableItem{
 							{
-								Name:        "ID",
-								Type:        "string",
+								Name:        "ctx",
+								Type:        "context.Context",
 								Default:     "",
-								Description: "Unique identifier for the trigger button.",
-								Required:    false,
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "",
-								Description: "Additional CSS classes to apply to the trigger button.",
-								Required:    false,
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "",
-								Description: "Additional HTML attributes to apply to the trigger button.",
-								Required:    false,
+								Description: "The templ context inside Collapsible, carrying the collapsible id.",
+								Required:    true,
 							},
 						},
 					})
@@ -141,15 +127,8 @@ templ Collapsible() {
 				<div id="api-content" class="mb-8">
 					@modules.APITable(modules.APITableProps{
 						Title:       "Content",
-						Description: "Content that expands and collapses. Uses smooth height transitions for animations.",
+						Description: "The panel: hidden while closed, unstyled like Base UI. Its measured height is exposed as --tui-collapsible-panel-height for custom animations.",
 						Items: []modules.APITableItem{
-							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "",
-								Description: "Unique identifier for the content element.",
-								Required:    false,
-							},
 							{
 								Name:        "Class",
 								Type:        "string",

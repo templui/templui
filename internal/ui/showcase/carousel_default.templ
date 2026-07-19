@@ -1,40 +1,32 @@
 package showcase
 
-import "github.com/templui/templui/components/carousel"
-import "github.com/templui/templui/components/card"
+import (
+	"strconv"
+
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/carousel"
+)
 
 templ CarouselDefault() {
 	@carousel.Carousel(carousel.Props{
-		Class: "rounded-md",
+		Class: "w-full max-w-xs",
 	}) {
 		@carousel.Content() {
-			@carousel.Item() {
-				@CarouselSlide("Slide 1", "This is the first slide")
-			}
-			@carousel.Item() {
-				@CarouselSlide("Slide 2", "This is the second slide")
-			}
-			@carousel.Item() {
-				@CarouselSlide("Slide 3", "This is the third slide")
+			for i := 1; i <= 5; i++ {
+				@carousel.Item() {
+					<div class="p-1">
+						@card.Card() {
+							@card.Content(card.ContentProps{
+								Class: "flex aspect-square items-center justify-center p-6",
+							}) {
+								<span class="text-4xl font-semibold">{ strconv.Itoa(i) }</span>
+							}
+						}
+					</div>
+				}
 			}
 		}
 		@carousel.Previous()
 		@carousel.Next()
-		@carousel.Indicators(carousel.IndicatorsProps{
-			Count: 3,
-		})
-	}
-}
-
-templ CarouselSlide(title, description string) {
-	@card.Card() {
-		@card.Content() {
-			<div class={ "w-full h-96 flex items-center justify-center" }>
-				<div class="text-center">
-					<h2 class="text-3xl font-bold mb-2">{ title }</h2>
-					<p class="text-xl">{ description }</p>
-				</div>
-			</div>
-		}
 	}
 }

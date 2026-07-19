@@ -56,16 +56,15 @@ templ SidebarDefault() {
 								Open:  true,
 								Class: "group/collapsible w-full",
 							}) {
-								@collapsible.Trigger() {
-									@sidebar.MenuButton(sidebar.MenuButtonProps{
-										Tooltip: "Documents",
-									}) {
-										@icon.FileText(icon.Props{Class: "size-4"})
-										<span>Documents</span>
-										@icon.ChevronRight(icon.Props{
-											Class: "ml-auto size-4 transition-transform group-data-[tui-collapsible-state=open]/collapsible:rotate-90",
-										})
-									}
+								@sidebar.MenuButton(sidebar.MenuButtonProps{
+									Tooltip:    "Documents",
+									Attributes: collapsible.Trigger(ctx),
+								}) {
+									@icon.FileText(icon.Props{Class: "size-4"})
+									<span>Documents</span>
+									@icon.ChevronRight(icon.Props{
+										Class: "ml-auto size-4 transition-transform group-data-open/collapsible:rotate-90",
+									})
 								}
 								@collapsible.Content() {
 									@sidebar.MenuSub() {
@@ -167,16 +166,15 @@ templ SidebarDefault() {
 								Open:  false,
 								Class: "group/collapsible w-full",
 							}) {
-								@collapsible.Trigger() {
-									@sidebar.MenuButton(sidebar.MenuButtonProps{
-										Tooltip: "Settings",
-									}) {
-										@icon.Settings(icon.Props{Class: "size-4"})
-										<span>Settings</span>
-										@icon.ChevronRight(icon.Props{
-											Class: "ml-auto size-4 transition-transform group-data-[tui-collapsible-state=open]/collapsible:rotate-90",
-										})
-									}
+								@sidebar.MenuButton(sidebar.MenuButtonProps{
+									Tooltip:    "Settings",
+									Attributes: collapsible.Trigger(ctx),
+								}) {
+									@icon.Settings(icon.Props{Class: "size-4"})
+									<span>Settings</span>
+									@icon.ChevronRight(icon.Props{
+										Class: "ml-auto size-4 transition-transform group-data-open/collapsible:rotate-90",
+									})
 								}
 								@collapsible.Content() {
 									@sidebar.MenuSub() {

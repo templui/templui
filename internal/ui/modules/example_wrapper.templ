@@ -174,19 +174,6 @@ templ SimplePreviewLayout(content templ.Component) {
 				})();
 				
 				document.addEventListener('DOMContentLoaded', function() {
-					// Ensure sidebar and wrapper are in open state after initialization
-					setTimeout(function() {
-						// Find all sidebars and their wrappers
-						const sidebars = document.querySelectorAll('[data-tui-sidebar="sidebar"]');
-						sidebars.forEach(function(sidebar) {
-							// Find and update the wrapper
-							const wrapper = document.querySelector('[data-tui-sidebar-wrapper][data-tui-sidebar-id="' + sidebar.id + '"]');
-							if (wrapper) {
-								wrapper.setAttribute('data-tui-sidebar-state', 'open');
-							}
-						});
-					}, 50); // Small delay to ensure sidebar.js has initialized
-					
 					// Prevent all link clicks and form submissions
 					document.addEventListener('click', function(e) {
 						const link = e.target.closest('a');

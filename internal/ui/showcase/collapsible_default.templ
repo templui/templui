@@ -12,15 +12,14 @@ templ CollapsibleDefault() {
 			<h4 class="text-sm font-semibold">
 				{ "@axadrn" } starred 3 repositories
 			</h4>
-			@collapsible.Trigger() {
-				@button.Button(button.Props{
-					Variant: button.VariantGhost,
-					Size:    button.SizeIcon,
-					Class:   "size-8",
-				}) {
-					@icon.ChevronsUpDown(icon.Props{Class: "size-4"})
-					<span class="sr-only">Toggle</span>
-				}
+			@button.Button(button.Props{
+				Variant:    button.VariantGhost,
+				Size:       button.SizeIcon,
+				Class:      "size-8",
+				Attributes: collapsible.Trigger(ctx),
+			}) {
+				@icon.ChevronsUpDown(icon.Props{Class: "size-4"})
+				<span class="sr-only">Toggle</span>
 			}
 		</div>
 		<div class="rounded-md border px-4 py-2 font-mono text-sm">

@@ -1,26 +1,42 @@
 package collapsible
 
-import "github.com/templui/templui/utils"
+import (
+	"context"
+
+	"github.com/templui/templui/utils"
+)
+
+type ctxKey string
+
+const stateKey ctxKey = "collapsibleState"
+
+type ctxState struct {
+	id   string
+	open bool
+}
+
+func state(ctx context.Context) ctxState {
+	if s, ok := ctx.Value(stateKey).(ctxState); ok {
+		return s
+	}
+	return ctxState{}
+}
 
 type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	Open       bool
-}
-
-type TriggerProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
+	// Open renders the collapsible expanded on page load.
+	Open bool
 }
 
 type ContentProps struct {
-	ID         string
 	Class      string
 	Attributes templ.Attributes
 }
 
+// Collapsible links Trigger and Content via ctx and carries the open state
+// (data-open/data-closed, like Base UI).
 templ Collapsible(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
@@ -29,53 +45,55 @@ templ Collapsible(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: p.Open}) }}
 	<div
-		id={ p.ID }
+		data-slot="collapsible"
+		data-tui-collapsible
+		data-open?={ p.Open }
+		data-closed?={ !p.Open }
 		class={ utils.TwMerge("", p.Class) }
-		data-tui-collapsible="root"
-		data-tui-collapsible-state={ utils.IfElse(p.Open, "open", "closed") }
 		{ p.Attributes... }
 	>
 		{ children... }
 	</div>
 }
 
-templ Trigger(props ...TriggerProps) {
-	{{ var p TriggerProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
+// Trigger returns the attributes that turn any element (usually a button)
+// into the collapsible trigger — the asChild equivalent: no wrapper element.
+func Trigger(ctx context.Context) templ.Attributes {
+	s := state(ctx)
+	attrs := templ.Attributes{
+		"data-slot":                    "collapsible-trigger",
+		"data-tui-collapsible-trigger": true,
+		"aria-controls":                s.id,
+		"aria-expanded":                utils.IfElse(s.open, "true", "false"),
 	}
-	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={ utils.TwMerge("", p.Class) }
-		data-tui-collapsible="trigger"
-		{ p.Attributes... }
-	>
-		{ children... }
-	</div>
+	if s.open {
+		attrs["data-panel-open"] = true
+	}
+	return attrs
 }
 
+// Content is the collapsible panel: hidden while closed, unstyled like
+// Base UI. Its measured height is exposed as
+// --tui-collapsible-panel-height for custom animations.
 templ Content(props ...ContentProps) {
 	{{ var p ContentProps }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	{{ s := state(ctx) }}
 	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={ utils.TwMerge(
-			"grid grid-rows-[0fr] transition-[grid-template-rows] duration-200 ease-out [&.tui-collapsible-open]:grid-rows-[1fr]",
-			p.Class,
-		) }
-		data-tui-collapsible="content"
+		id={ s.id }
+		data-slot="collapsible-content"
+		data-tui-collapsible-content
+		data-open?={ s.open }
+		data-closed?={ !s.open }
+		hidden?={ !s.open }
+		class={ utils.TwMerge("", p.Class) }
 		{ p.Attributes... }
 	>
-		<div class="overflow-hidden">
-			{ children... }
-		</div>
+		{ children... }
 	</div>
 }
 

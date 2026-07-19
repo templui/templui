@@ -1,70 +1,38 @@
 (function () {
   "use strict";
 
-  // Find the direct content element for a root (not nested ones)
-  function findDirectContent(root) {
-    const allContents = root.querySelectorAll('[data-tui-collapsible="content"]');
-    for (const content of allContents) {
-      if (content.closest('[data-tui-collapsible="root"]') === root) {
-        return content;
-      }
-    }
-    return null;
+  function panelFor(trigger) {
+    return document.getElementById(trigger.getAttribute("aria-controls") || "");
+  }
+
+  function setOpen(el, isOpen) {
+    el.toggleAttribute("data-open", isOpen);
+    el.toggleAttribute("data-closed", !isOpen);
+  }
+
+  // Exposes the measured panel height, like Base UI's
+  // --collapsible-panel-height, so consumers can animate it.
+  function measure(panel) {
+    panel.style.setProperty("--tui-collapsible-panel-height", panel.scrollHeight + "px");
   }
 
   function toggle(trigger) {
-    const root = trigger.closest('[data-tui-collapsible="root"]');
-    if (!root) return;
+    const panel = panelFor(trigger);
+    if (!panel) return;
+    const root = panel.closest("[data-tui-collapsible]");
+    const isOpen = !panel.hasAttribute("data-open");
 
-    const content = findDirectContent(root);
-    const isOpen = root.getAttribute("data-tui-collapsible-state") === "open";
-    const newState = isOpen ? "closed" : "open";
-
-    // Update states
-    root.setAttribute("data-tui-collapsible-state", newState);
-    trigger.setAttribute("aria-expanded", !isOpen);
-
-    // Toggle class on content for nested collapsible support
-    if (content) {
-      content.classList.toggle("tui-collapsible-open", !isOpen);
-    }
+    panel.hidden = !isOpen;
+    setOpen(panel, isOpen);
+    if (root) setOpen(root, isOpen);
+    trigger.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    trigger.toggleAttribute("data-panel-open", isOpen);
+    if (isOpen) measure(panel);
   }
 
-  // Initialize collapsibles on page load
-  function initializeCollapsibles() {
-    document.querySelectorAll('[data-tui-collapsible="root"]').forEach((root) => {
-      const isOpen = root.getAttribute("data-tui-collapsible-state") === "open";
-      const content = findDirectContent(root);
-      if (content) {
-        content.classList.toggle("tui-collapsible-open", isOpen);
-      }
-    });
-  }
-
-  // Click handler
   document.addEventListener("click", (e) => {
-    const trigger = e.target.closest('[data-tui-collapsible="trigger"]');
-    if (trigger) {
-      e.preventDefault();
-      toggle(trigger);
-    }
+    if (!(e.target instanceof Element)) return;
+    const trigger = e.target.closest("[data-tui-collapsible-trigger]");
+    if (trigger) toggle(trigger);
   });
-
-  // Keyboard handler
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== " " && e.key !== "Enter") return;
-    const trigger = e.target.closest('[data-tui-collapsible="trigger"]');
-    if (trigger) {
-      e.preventDefault();
-      toggle(trigger);
-    }
-  });
-
-  // Run on DOM ready
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeCollapsibles);
-  } else {
-    initializeCollapsibles();
-  }
 })();
-

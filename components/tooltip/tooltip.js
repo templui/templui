@@ -85,6 +85,9 @@ import "../floatingui/floating_ui_dom.js";
   }
 
   function open(trigger) {
+    // Consumers can suppress a tooltip situationally (e.g. the sidebar only
+    // shows menu tooltips while collapsed to icons).
+    if (trigger.hasAttribute("data-tui-tooltip-disabled")) return;
     const content = contentFor(trigger);
     if (!content) return;
     clearTimeout(content._tuiHide);

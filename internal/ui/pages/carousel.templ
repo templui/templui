@@ -39,10 +39,6 @@ templ Carousel() {
 						ID:   "api-next",
 						Text: "Next",
 					},
-					{
-						ID:   "api-indicators",
-						Text: "Indicators",
-					},
 				},
 			},
 		},
@@ -112,17 +108,10 @@ templ Carousel() {
 								Required:    false,
 							},
 							{
-								Name:        "Autoplay",
-								Type:        "bool",
-								Default:     "false",
-								Description: "Whether the carousel should automatically advance slides.",
-								Required:    false,
-							},
-							{
-								Name:        "Interval",
-								Type:        "int",
-								Default:     "5000",
-								Description: "Time in milliseconds between automatic slide transitions.",
+								Name:        "Orientation",
+								Type:        "Orientation",
+								Default:     "horizontal",
+								Description: "Scroll axis. Options: 'horizontal', 'vertical'.",
 								Required:    false,
 							},
 							{
@@ -130,6 +119,20 @@ templ Carousel() {
 								Type:        "bool",
 								Default:     "false",
 								Description: "Whether the carousel should loop back to the first slide after the last.",
+								Required:    false,
+							},
+							{
+								Name:        "Autoplay",
+								Type:        "bool",
+								Default:     "false",
+								Description: "Advance the slides automatically; pauses while hovered.",
+								Required:    false,
+							},
+							{
+								Name:        "Interval",
+								Type:        "int",
+								Default:     "5000",
+								Description: "Time in milliseconds between automatic slide transitions.",
 								Required:    false,
 							},
 						},
@@ -247,42 +250,6 @@ templ Carousel() {
 								Default:     "",
 								Description: "Additional HTML attributes to apply to the next button element.",
 								Required:    false,
-							},
-						},
-					})
-				</div>
-				<div id="api-indicators">
-					@modules.APITable(modules.APITableProps{
-						Title:       "Indicators",
-						Description: "Dot indicators showing current slide position and allowing direct navigation.",
-						Items: []modules.APITableItem{
-							{
-								Name:        "ID",
-								Type:        "string",
-								Default:     "",
-								Description: "Unique identifier for the indicators element.",
-								Required:    false,
-							},
-							{
-								Name:        "Class",
-								Type:        "string",
-								Default:     "",
-								Description: "Additional CSS classes to apply to the indicators.",
-								Required:    false,
-							},
-							{
-								Name:        "Attributes",
-								Type:        "templ.Attributes",
-								Default:     "",
-								Description: "Additional HTML attributes to apply to the indicators element.",
-								Required:    false,
-							},
-							{
-								Name:        "Count",
-								Type:        "int",
-								Default:     "",
-								Description: "Number of indicator dots to display (should match number of slides).",
-								Required:    true,
 							},
 						},
 					})

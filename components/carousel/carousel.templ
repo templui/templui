@@ -1,23 +1,48 @@
 package carousel
 
 import (
-	"fmt"
+	"context"
+	"strconv"
+
+	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/utils"
-	"strconv"
 )
+
+type Orientation string
+
+const (
+	OrientationHorizontal Orientation = "horizontal"
+	OrientationVertical   Orientation = "vertical"
+)
+
+type ctxKey string
+
+const orientationKey ctxKey = "carouselOrientation"
+
+func orientation(ctx context.Context) Orientation {
+	if o, ok := ctx.Value(orientationKey).(Orientation); ok && o != "" {
+		return o
+	}
+	return OrientationHorizontal
+}
 
 type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	Autoplay   bool
-	Interval   int
-	Loop       bool
+	// Orientation of the scroll axis. Defaults to horizontal.
+	Orientation Orientation
+	// Loop wraps from the last slide back to the first.
+	Loop bool
+	// Autoplay advances the slides automatically (the embla autoplay
+	// plugin pendant); pauses while hovered.
+	Autoplay bool
+	// Interval between autoplay steps in ms. Defaults to 5000.
+	Interval int
 }
 
 type ContentProps struct {
-	ID         string
 	Class      string
 	Attributes templ.Attributes
 }
@@ -40,38 +65,31 @@ type NextProps struct {
 	Attributes templ.Attributes
 }
 
-type IndicatorsProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-	Count      int
-}
-
 templ Carousel(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	if p.Orientation == "" {
+		{{ p.Orientation = OrientationHorizontal }}
+	}
+	if p.Interval == 0 {
+		{{ p.Interval = 5000 }}
+	}
+	{{ ctx = context.WithValue(ctx, orientationKey, p.Orientation) }}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={
-			utils.TwMerge(
-				"relative overflow-hidden w-full",
-				p.Class,
-			),
-		}
+		role="region"
+		aria-roledescription="carousel"
+		data-slot="carousel"
 		data-tui-carousel
-		data-tui-carousel-current="0"
-		data-tui-carousel-autoplay={ strconv.FormatBool(p.Autoplay) }
-		data-tui-carousel-interval={ fmt.Sprintf("%d", func() int {
-            if p.Interval == 0 {
-                return 5000
-            }
-            return p.Interval
-        }()) }
+		data-tui-carousel-orientation={ string(p.Orientation) }
 		data-tui-carousel-loop={ strconv.FormatBool(p.Loop) }
+		data-tui-carousel-autoplay={ strconv.FormatBool(p.Autoplay) }
+		data-tui-carousel-interval={ strconv.Itoa(p.Interval) }
+		class={ utils.TwMerge("relative", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -83,20 +101,20 @@ templ Content(props ...ContentProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={
-			utils.TwMerge(
-				"flex h-full w-full transition-transform duration-500 ease-in-out cursor-grab",
-				p.Class,
-			),
-		}
-		data-tui-carousel-track
-		{ p.Attributes... }
-	>
-		{ children... }
+	<div data-slot="carousel-content" data-tui-carousel-viewport class="overflow-hidden">
+		<div
+			data-tui-carousel-track
+			class={
+				utils.TwMerge(
+					"flex",
+					utils.IfElse(orientation(ctx) == OrientationHorizontal, "-ml-4", "-mt-4 flex-col"),
+					p.Class,
+				),
+			}
+			{ p.Attributes... }
+		>
+			{ children... }
+		</div>
 	</div>
 }
 
@@ -109,13 +127,17 @@ templ Item(props ...ItemProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		role="group"
+		aria-roledescription="slide"
+		data-slot="carousel-item"
+		data-tui-carousel-item
 		class={
 			utils.TwMerge(
-				"flex-shrink-0 w-full h-full relative",
+				"min-w-0 shrink-0 grow-0 basis-full",
+				utils.IfElse(orientation(ctx) == OrientationHorizontal, "pl-4", "pt-4"),
 				p.Class,
 			),
 		}
-		data-tui-carousel-item
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -127,23 +149,27 @@ templ Previous(props ...PreviousProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<button
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={
-			utils.TwMerge(
-				"absolute left-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 focus:outline-none",
-				p.Class,
+	@button.Button(button.Props{
+		ID:      p.ID,
+		Variant: button.VariantOutline,
+		Size:    button.SizeIconSm,
+		Class: utils.TwMerge(
+			"absolute touch-manipulation rounded-full",
+			utils.IfElse(
+				orientation(ctx) == OrientationHorizontal,
+				"inset-y-0 -left-12 my-auto",
+				"-top-12 left-1/2 -translate-x-1/2 rotate-90",
 			),
-		}
-		data-tui-carousel-prev
-		aria-label="Previous slide"
-		type="button"
-		{ p.Attributes... }
-	>
+			p.Class,
+		),
+		Attributes: utils.MergeAttributes(templ.Attributes{
+			"data-slot":             "carousel-previous",
+			"data-tui-carousel-prev": true,
+		}, p.Attributes),
+	}) {
 		@icon.ChevronLeft()
-	</button>
+		<span class="sr-only">Previous slide</span>
+	}
 }
 
 templ Next(props ...NextProps) {
@@ -151,57 +177,27 @@ templ Next(props ...NextProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<button
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={
-			utils.TwMerge(
-				"absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 focus:outline-none",
-				p.Class,
+	@button.Button(button.Props{
+		ID:      p.ID,
+		Variant: button.VariantOutline,
+		Size:    button.SizeIconSm,
+		Class: utils.TwMerge(
+			"absolute touch-manipulation rounded-full",
+			utils.IfElse(
+				orientation(ctx) == OrientationHorizontal,
+				"inset-y-0 -right-12 my-auto",
+				"-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
 			),
-		}
-		data-tui-carousel-next
-		aria-label="Next slide"
-		type="button"
-		{ p.Attributes... }
-	>
+			p.Class,
+		),
+		Attributes: utils.MergeAttributes(templ.Attributes{
+			"data-slot":             "carousel-next",
+			"data-tui-carousel-next": true,
+		}, p.Attributes),
+	}) {
 		@icon.ChevronRight()
-	</button>
-}
-
-templ Indicators(props ...IndicatorsProps) {
-	{{ var p IndicatorsProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
+		<span class="sr-only">Next slide</span>
 	}
-	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		class={
-			utils.TwMerge(
-				"absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2",
-				p.Class,
-			),
-		}
-		{ p.Attributes... }
-	>
-		for i := 0; i < p.Count; i++ {
-			<button
-				class={
-					utils.TwMerge(
-						"w-3 h-3 rounded-full bg-foreground/30 hover:bg-foreground/50 focus:outline-none transition-colors",
-						utils.If(i == 0, "bg-primary"),
-					),
-				}
-				data-tui-carousel-indicator={ strconv.Itoa(i) }
-				data-tui-carousel-active={ utils.IfElse(i == 0, "true", "false") }
-				aria-label={ fmt.Sprintf("Go to slide %d", i+1) }
-				type="button"
-			></button>
-		}
-	</div>
 }
 
 var scriptOnce = templ.NewOnceHandle()

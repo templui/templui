@@ -353,7 +353,7 @@
       "description": "Collapsible sidebar component for app layouts.",
       "files": ["components/sidebar/sidebar.templ"],
       "jsFiles": ["components/sidebar/sidebar.js", "components/sidebar/sidebar.min.js"],
-      "dependencies": ["button", "icon", "sheet", "tooltip"],
+      "dependencies": ["button", "icon", "input", "sheet", "skeleton", "tooltip"],
       "categories": ["layout-navigation"],
       "tags": ["sidebar", "navigation", "menu", "layout", "panel"]
     },

@@ -95,6 +95,30 @@ templ Sidebar() {
 						ID:   "api-separator",
 						Text: "Separator",
 					},
+					{
+						ID:   "api-rail",
+						Text: "Rail",
+					},
+					{
+						ID:   "api-input",
+						Text: "Input",
+					},
+					{
+						ID:   "api-group-action",
+						Text: "GroupAction",
+					},
+					{
+						ID:   "api-group-content",
+						Text: "GroupContent",
+					},
+					{
+						ID:   "api-menu-action",
+						Text: "MenuAction",
+					},
+					{
+						ID:   "api-menu-skeleton",
+						Text: "MenuSkeleton",
+					},
 				},
 			},
 		},
@@ -521,6 +545,13 @@ templ MyPage(collapsed bool) {
 								Required:    false,
 							},
 							{
+								Name:        "Variant",
+								Type:        "MenuButtonVariant",
+								Default:     "default",
+								Description: "Visual style. Options: 'default', 'outline'.",
+								Required:    false,
+							},
+							{
 								Name:        "Size",
 								Type:        "MenuButtonSize",
 								Default:     "default",
@@ -638,7 +669,7 @@ templ MyPage(collapsed bool) {
 							{
 								Name:        "Size",
 								Type:        "MenuSubButtonSize",
-								Default:     "sm",
+								Default:     "md",
 								Description: "Size of the submenu button. Options: 'sm', 'md'.",
 								Required:    false,
 							},
@@ -787,6 +818,76 @@ templ MyPage(collapsed bool) {
 								Description: "Additional HTML attributes to apply to the separator element.",
 								Required:    false,
 							},
+						},
+					})
+				</div>
+				<div id="api-rail" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Rail",
+						Description: "Invisible strip on the sidebar edge that toggles the sidebar on click.",
+						Items: []modules.APITableItem{
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the rail.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the rail element.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-input" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "Input",
+						Description: "Search input styled for the sidebar.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Unique identifier for the input element.", Required: false},
+							{Name: "Name", Type: "string", Default: "", Description: "Form name of the input.", Required: false},
+							{Name: "Value", Type: "string", Default: "", Description: "Initial value.", Required: false},
+							{Name: "Placeholder", Type: "string", Default: "", Description: "Placeholder text.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the input.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the input element.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-group-action" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "GroupAction",
+						Description: "Action button in the top right corner of a group; hidden in icon mode.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Unique identifier for the action element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the action.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the action element.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-group-content" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "GroupContent",
+						Description: "Content wrapper within a group.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Unique identifier for the content element.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the content.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the content element.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-menu-action" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "MenuAction",
+						Description: "Action button on the right edge of a menu item; hidden in icon mode.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Unique identifier for the action element.", Required: false},
+							{Name: "ShowOnHover", Type: "bool", Default: "false", Description: "Reveal the action only while its menu item is hovered.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the action.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the action element.", Required: false},
+						},
+					})
+				</div>
+				<div id="api-menu-skeleton" class="mb-8">
+					@modules.APITable(modules.APITableProps{
+						Title:       "MenuSkeleton",
+						Description: "Loading placeholder for a menu item with a random text width.",
+						Items: []modules.APITableItem{
+							{Name: "ID", Type: "string", Default: "", Description: "Unique identifier for the skeleton element.", Required: false},
+							{Name: "ShowIcon", Type: "bool", Default: "false", Description: "Show an icon-sized skeleton in front of the text.", Required: false},
+							{Name: "Class", Type: "string", Default: "", Description: "Additional CSS classes to apply to the skeleton.", Required: false},
+							{Name: "Attributes", Type: "templ.Attributes", Default: "", Description: "Additional HTML attributes to apply to the skeleton element.", Required: false},
 						},
 					})
 				</div>

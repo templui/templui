@@ -3,127 +3,90 @@
 
   const SIDEBAR_COOKIE_NAME = "sidebar_state";
   const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+  const MOBILE_QUERY = "(max-width: 767px)";
 
-  // Portal setup - moves content between desktop and mobile views
-  function setupMobilePortals() {
-    const contentElements = document.querySelectorAll(
-      "[data-tui-sidebar-content]",
+  function wrapperFor(sidebarId) {
+    return document.querySelector(
+      '[data-tui-sidebar-wrapper][data-tui-sidebar-id="' + sidebarId + '"]',
     );
+  }
 
-    contentElements.forEach((content) => {
+  // The sidebar content renders once and moves between the desktop container
+  // and the mobile sheet, depending on the viewport.
+  function setupMobilePortals() {
+    document.querySelectorAll("[data-tui-sidebar-content]").forEach((content) => {
       const sidebarId = content.getAttribute("data-tui-sidebar-content");
       const portal = document.querySelector(
-        `[data-tui-sidebar-mobile-portal="${sidebarId}"]`,
+        '[data-tui-sidebar-mobile-portal="' + sidebarId + '"]',
       );
       if (!portal) return;
 
-      // Check viewport and move content if needed
-      const isMobile = window.matchMedia("(max-width: 767px)").matches;
+      const isMobile = window.matchMedia(MOBILE_QUERY).matches;
 
       if (isMobile && content.parentElement !== portal) {
-        // Move to mobile portal
         portal.appendChild(content);
       } else if (!isMobile && content.parentElement === portal) {
-        // Move back to desktop sidebar
-        const desktopContainer = document.querySelector(
-          `[data-tui-sidebar-wrapper][data-tui-sidebar-id="${sidebarId}"] [data-sidebar="sidebar"] > div`,
-        );
-        if (desktopContainer) {
-          desktopContainer.appendChild(content);
-        }
+        const inner = wrapperFor(sidebarId)?.querySelector('[data-slot="sidebar-inner"]');
+        if (inner) inner.appendChild(content);
       }
     });
   }
 
-  // Initial setup
   setupMobilePortals();
-
-  // Handle viewport changes
   window.addEventListener("resize", setupMobilePortals);
-
-  // Handle DOM updates (for HTMX, Alpine, etc.)
-  const observer = new MutationObserver(setupMobilePortals);
-  observer.observe(document.body, {
+  new MutationObserver(setupMobilePortals).observe(document.body, {
     childList: true,
     subtree: true,
   });
 
-  // Event delegation for sidebar interactions (Desktop only - Mobile uses Sheet)
-  document.addEventListener("click", (e) => {
-    const trigger = e.target.closest("[data-tui-sidebar-trigger]");
-    if (trigger) {
-      e.preventDefault();
-      const targetId = trigger.getAttribute("data-tui-sidebar-target");
-      if (targetId) {
-        toggleSidebar(targetId);
-      }
-    }
-  });
-
-  // Handle keyboard shortcuts
-  document.addEventListener("keydown", (e) => {
-    // Ctrl/Cmd + key - toggle sidebar
-    if ((e.ctrlKey || e.metaKey) && e.key.length === 1) {
-      const wrapper = document.querySelector('[data-tui-sidebar-wrapper]');
-      if (!wrapper) return;
-      
-      const shortcut = wrapper.getAttribute("data-tui-sidebar-keyboard-shortcut");
-      if (!shortcut || shortcut.toLowerCase() !== e.key.toLowerCase()) return;
-      
-      e.preventDefault();
-      const sidebar = wrapper.querySelector('[data-sidebar="sidebar"]');
-      if (sidebar && sidebar.id) {
-        toggleSidebar(sidebar.id);
-      }
-    }
-  });
-
   function toggleSidebar(sidebarId) {
-    const wrapper = document.querySelector(
-      `[data-tui-sidebar-wrapper][data-tui-sidebar-id="${sidebarId}"]`,
-    );
-    if (!wrapper) return;
-
-    const collapsible = wrapper.getAttribute("data-tui-sidebar-collapsible");
-
-    // Don't toggle if collapsible is "none"
-    if (collapsible === "none") {
+    // Below md the trigger opens the mobile sheet instead of collapsing.
+    if (window.matchMedia(MOBILE_QUERY).matches) {
+      window.tui?.dialog?.toggle(sidebarId + "-mobile");
       return;
     }
 
-    const currentState = wrapper.getAttribute("data-tui-sidebar-state");
-    const newState = currentState === "expanded" ? "collapsed" : "expanded";
-
-    setSidebarState(sidebarId, newState);
-  }
-
-  function setSidebarState(sidebarId, state) {
-    const wrapper = document.querySelector(
-      `[data-tui-sidebar-wrapper][data-tui-sidebar-id="${sidebarId}"]`,
-    );
+    const wrapper = wrapperFor(sidebarId);
     if (!wrapper) return;
+    const mode = wrapper.getAttribute("data-tui-sidebar-collapsible-mode");
+    if (mode === "none") return;
 
-    const collapsible = wrapper.getAttribute("data-tui-sidebar-collapsible");
+    const collapsed = wrapper.getAttribute("data-state") !== "collapsed";
+    wrapper.setAttribute("data-state", collapsed ? "collapsed" : "expanded");
+    // Like shadcn, data-collapsible carries the mode only while collapsed,
+    // so icon/offcanvas selectors need no extra state check.
+    wrapper.setAttribute("data-collapsible", collapsed ? mode : "");
 
-    // Don't change state if collapsible is "none"
-    if (collapsible === "none") {
-      return;
-    }
+    // Menu button tooltips only show while collapsed to icons.
+    const tooltipsDisabled = !(collapsed && mode === "icon");
+    wrapper.querySelectorAll("[data-tui-tooltip-trigger]").forEach((trigger) => {
+      trigger.toggleAttribute("data-tui-tooltip-disabled", tooltipsDisabled);
+    });
 
-    // Update data-tui-sidebar-state attribute
-    wrapper.setAttribute("data-tui-sidebar-state", state);
-
-    // For icon mode, also set data-tui-sidebar-collapsible when collapsed
-    if (state === "collapsed" && collapsible) {
-      wrapper.setAttribute("data-tui-sidebar-collapsible", collapsible);
-    }
-
-    // Save state to cookie
-    const cookieValue = state === "expanded" ? "true" : "false";
-    saveSidebarState(sidebarId, cookieValue);
+    document.cookie =
+      SIDEBAR_COOKIE_NAME +
+      "=" +
+      (collapsed ? "false" : "true") +
+      "; path=/; max-age=" +
+      SIDEBAR_COOKIE_MAX_AGE;
   }
 
-  function saveSidebarState(sidebarId, cookieValue) {
-    document.cookie = `${SIDEBAR_COOKIE_NAME}=${cookieValue}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
-  }
+  document.addEventListener("click", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const trigger = e.target.closest("[data-tui-sidebar-trigger]");
+    if (!trigger) return;
+    const targetId = trigger.getAttribute("data-tui-sidebar-target");
+    if (targetId) toggleSidebar(targetId);
+  });
+
+  // Cmd/Ctrl + shortcut key toggles the sidebar.
+  document.addEventListener("keydown", (e) => {
+    if (!(e.ctrlKey || e.metaKey) || e.key.length !== 1) return;
+    const wrapper = document.querySelector("[data-tui-sidebar-wrapper]");
+    if (!wrapper) return;
+    const shortcut = wrapper.getAttribute("data-tui-sidebar-keyboard-shortcut");
+    if (!shortcut || shortcut.toLowerCase() !== e.key.toLowerCase()) return;
+    e.preventDefault();
+    toggleSidebar(wrapper.getAttribute("data-tui-sidebar-id"));
+  });
 })();
