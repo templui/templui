@@ -378,7 +378,7 @@ func Sidebar(props ...Props) templ.Component {
 		ctx = context.WithValue(ctx, sidebarStateKey, ctxState{collapsed: p.Collapsed, collapsible: p.Collapsible})
 		if p.Collapsible == CollapsibleNone {
 			var templ_7745c5c3_Var5 = []any{utils.TwMerge(
-				"flex h-full w-(--sidebar-width) flex-col bg-sidebar text-sidebar-foreground",
+				"flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground",
 				p.Class,
 			)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var5...)
@@ -550,7 +550,7 @@ func Sidebar(props ...Props) templ.Component {
 					return nil
 				})
 				templ_7745c5c3_Err = sheet.Content(sheet.ContentProps{
-					Class:           "w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground md:hidden",
+					Class:           "w-[var(--sidebar-width)] bg-sidebar p-0 text-sidebar-foreground md:hidden",
 					HideCloseButton: true,
 					Attributes: templ.Attributes{
 						"data-sidebar": "sidebar",

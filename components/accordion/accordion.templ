@@ -60,7 +60,8 @@ templ Item(props ...ItemProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		name="accordion"
+		data-slot="accordion-item"
+		data-tui-accordion-item
 		class={
 			utils.TwMerge(
 				"group not-last:border-b",
@@ -109,14 +110,26 @@ templ Content(props ...ContentProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="accordion-content"
+		data-tui-accordion-content
 		class={
 			utils.TwMerge(
-				"overflow-hidden pt-0 pb-2.5 text-sm [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4",
+				"overflow-hidden text-sm data-open:animate-accordion-down data-closed:animate-accordion-up",
 				p.Class,
 			),
 		}
 		{ p.Attributes... }
 	>
-		{ children... }
+		<div class="pt-0 pb-2.5 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4">
+			{ children... }
+		</div>
 	</div>
+}
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("accordion")
+	}
 }

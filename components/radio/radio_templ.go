@@ -47,7 +47,7 @@ func Radio(props ...Props) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
-			// shadcn radix-nova radio: gray border, fills with primary when checked
+			// shadcn base-nova radio: gray border, fills with primary when checked
 			"peer relative aspect-square size-4 shrink-0 appearance-none rounded-full border border-input bg-transparent outline-none transition-colors",
 			// primary-foreground dot, shown only when checked
 			"before:absolute before:top-1/2 before:left-1/2 before:size-2 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:bg-primary-foreground before:opacity-0 before:content-['']",

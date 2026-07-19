@@ -19,8 +19,9 @@ Components are designed to be composable, customizable, and easy to integrate in
 - [Calendar](https://templui.io/docs/components/calendar): Calendar component for date selection.
 - [Checkbox](https://templui.io/docs/components/checkbox): Checkbox input component.
 - [Date Picker](https://templui.io/docs/components/date-picker): Date picker component combining input and calendar.
-- [Form](https://templui.io/docs/components/form): Form container with validation support.
+- [Field](https://templui.io/docs/components/field): Compose accessible form fields with labels, descriptions and errors.
 - [Input](https://templui.io/docs/components/input): Text input component.
+- [Input Group](https://templui.io/docs/components/input-group): An input with leading or trailing addons — icons, text or buttons.
 - [Input OTP](https://templui.io/docs/components/input-otp): One-time password input component.
 - [Label](https://templui.io/docs/components/label): Form label component.
 - [Radio](https://templui.io/docs/components/radio): Radio button group component.
@@ -31,11 +32,14 @@ Components are designed to be composable, customizable, and easy to integrate in
 - [Tags Input](https://templui.io/docs/components/tags-input): Tags input component.
 - [Textarea](https://templui.io/docs/components/textarea): Multi-line text input component.
 - [Time Picker](https://templui.io/docs/components/time-picker): Time picker component.
+- [Toggle](https://templui.io/docs/components/toggle): Two-state button, optionally grouped into a segmented control.
+- [Toggle Group](https://templui.io/docs/components/toggle-group): A set of toggles grouped into a segmented control with single or multiple selection.
 
 ## Layout & Navigation
 
 - [Accordion](https://templui.io/docs/components/accordion): Collapsible accordion component.
 - [Breadcrumb](https://templui.io/docs/components/breadcrumb): Breadcrumb navigation component.
+- [Item](https://templui.io/docs/components/item): A flexible row for lists — media, title, description and actions.
 - [Pagination](https://templui.io/docs/components/pagination): Pagination component for lists and tables.
 - [Separator](https://templui.io/docs/components/separator): Visual divider between content sections.
 - [Sidebar](https://templui.io/docs/components/sidebar): Collapsible sidebar component for app layouts.
@@ -43,6 +47,7 @@ Components are designed to be composable, customizable, and easy to integrate in
 
 ## Overlays & Dialogs
 
+- [Context Menu](https://templui.io/docs/components/context-menu): Menu shown at the cursor on right click, with actions and shortcuts.
 - [Dialog](https://templui.io/docs/components/dialog): Modal dialog component.
 - [Dropdown](https://templui.io/docs/components/dropdown): Dropdown menu component.
 - [Hover Card](https://templui.io/docs/components/hover-card): Displays rich content in a card when hovering over a trigger. Uses Popover for the popup.
@@ -54,6 +59,7 @@ Components are designed to be composable, customizable, and easy to integrate in
 
 - [Alert](https://templui.io/docs/components/alert): Alert component for messages and notifications.
 - [Badge](https://templui.io/docs/components/badge): Badge component for labels and status indicators.
+- [Empty](https://templui.io/docs/components/empty): Placeholder for empty states — no results, first-run or offline screens.
 - [Progress](https://templui.io/docs/components/progress): Progress bar component.
 - [Skeleton](https://templui.io/docs/components/skeleton): Skeleton loading placeholder.
 - [Spinner](https://templui.io/docs/components/spinner): Animated loading indicator built from a spinning icon.
@@ -66,6 +72,7 @@ Components are designed to be composable, customizable, and easy to integrate in
 - [Card](https://templui.io/docs/components/card): Card container component.
 - [Carousel](https://templui.io/docs/components/carousel): Carousel component with navigation controls.
 - [Charts](https://templui.io/docs/components/charts): Chart components for data visualization.
+- [Kbd](https://templui.io/docs/components/kbd): Displays a keyboard key or shortcut.
 - [Table](https://templui.io/docs/components/table): Table component for displaying data.
 
 ## Misc

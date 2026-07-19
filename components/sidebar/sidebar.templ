@@ -300,7 +300,7 @@ templ Sidebar(props ...Props) {
 			id={ p.ID }
 			data-slot="sidebar"
 			class={ utils.TwMerge(
-				"flex h-full w-(--sidebar-width) flex-col bg-sidebar text-sidebar-foreground",
+				"flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground",
 				p.Class,
 			) }
 			{ p.Attributes... }
@@ -318,7 +318,7 @@ templ Sidebar(props ...Props) {
 			Side: sheetSide,
 		}) {
 			@sheet.Content(sheet.ContentProps{
-				Class:           "w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground md:hidden",
+				Class:           "w-[var(--sidebar-width)] bg-sidebar p-0 text-sidebar-foreground md:hidden",
 				HideCloseButton: true,
 				Attributes: templ.Attributes{
 					"data-sidebar": "sidebar",

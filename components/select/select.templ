@@ -223,7 +223,7 @@ templ Content(props ...ContentProps) {
 			role="listbox"
 			class={
 				utils.TwMerge(
-					"pointer-events-auto relative isolate z-50 flex min-w-36 flex-col max-h-(--tui-select-available-height) w-(--tui-select-anchor-width) origin-(--tui-select-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards data-[align-trigger=true]:animate-none",
+					"pointer-events-auto relative isolate z-50 flex min-w-36 flex-col max-h-[var(--tui-select-available-height)] w-[var(--tui-select-anchor-width)] origin-(--tui-select-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards data-[align-trigger=true]:animate-none",
 					p.Class,
 				),
 			}

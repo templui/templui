@@ -6,6 +6,7 @@
       "displayName": "Accordion",
       "description": "Collapsible accordion component.",
       "files": ["components/accordion/accordion.templ"],
+      "jsFiles": ["components/accordion/accordion.js", "components/accordion/accordion.min.js"],
       "dependencies": ["icon"],
       "categories": ["layout-navigation"],
       "tags": ["accordion", "collapse", "expandable", "navigation"]

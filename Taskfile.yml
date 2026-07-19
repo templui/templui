@@ -16,18 +16,19 @@ tasks:
   tailwind-clean:
     desc: Clean tailwind output
     cmds:
-      - "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --clean"
+      - "tailwindcss -i ./assets/css/globals.css -o ./assets/css/output.css --clean"
 
   tailwind-watch:
     desc: Run tailwindcss in watch mode
     cmds:
-      - "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch"
+      - "tailwindcss -i ./assets/css/globals.css -o ./assets/css/output.css --watch"
 
   minify-js-components:
     desc: Minify and watch JavaScript component files
     cmds:
       - |
         npx esbuild \
+        components/accordion/accordion.js \
         components/avatar/avatar.js \
         components/calendar/calendar.js \
         components/carousel/carousel.js \
@@ -35,11 +36,12 @@ tasks:
         components/chart/chart.js \
         components/collapsible/collapsible.js \
         components/combobox/combobox.js \
+        components/contextmenu/contextmenu.js \
         components/copybutton/copybutton.js \
         components/dialog/dialog.js \
         components/dropdownmenu/dropdownmenu.js \
-        components/inputotp/inputotp.js \
         components/hovercard/hovercard.js \
+        components/inputotp/inputotp.js \
         components/label/label.js \
         components/popover/popover.js \
         components/progress/progress.js \
@@ -49,6 +51,7 @@ tasks:
         components/tabs/tabs.js \
         components/toast/toast.js \
         components/tooltip/tooltip.js \
+        components/toggle/toggle.js \
         --minify \
         --watch \
         --bundle \

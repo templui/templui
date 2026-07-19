@@ -24,6 +24,7 @@ templ BaseLayout(title, description string) {
 			<link rel="preload" href="/assets/fonts/geist/geist-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous"/>
 			<link rel="preload" href="/assets/fonts/geist/geist-mono-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous"/>
 			// Component JS files
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/accordion/accordion.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/avatar/avatar.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/calendar/calendar.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/carousel/carousel.min.js") }></script>
@@ -31,10 +32,10 @@ templ BaseLayout(title, description string) {
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/chart/chart.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/collapsible/collapsible.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/combobox/combobox.min.js") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/contextmenu/contextmenu.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/copybutton/copybutton.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/dropdownmenu/dropdownmenu.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/hovercard/hovercard.min.js") }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/input/input.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/inputotp/inputotp.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/label/label.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/dialog/dialog.min.js") }></script>
@@ -44,19 +45,17 @@ templ BaseLayout(title, description string) {
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/sidebar/sidebar.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/slider/slider.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/tabs/tabs.min.js") }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/textarea/textarea.min.js") }></script>
-			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/tooltip/tooltip.min.js") }></script>
 			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/toast/toast.min.js") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/toggle/toggle.min.js") }></script>
+			<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/components/js/tooltip/tooltip.min.js") }></script>
 			// Plausible Analytics
 			if config.AppConfig.GoEnv == "production" {
 				<script defer data-domain="templui.io" src="https://plausible.axeladrian.com/js/script.js" nonce={ templ.GetNonce(ctx) }></script>
 			}
 			// Shiki Highlighter Script
 			@modules.CodeHighlightingScript()
-			// Tailwind CSS
+			// Tailwind CSS (themes.css is bundled in via globals.css)
 			<link href="/assets/css/output.css" rel="stylesheet"/>
-			// Custom CSS
-			<link href="/assets/css/themes.css" rel="stylesheet"/>
 			// HTMX
 			<script nonce={ templ.GetNonce(ctx) } src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.0-alpha7/dist/htmx.min.js"></script>
 			// Set script nonce for HTMX // without this, HTMX will not work with CSP

@@ -56,7 +56,7 @@ func Textarea(props ...Props) templ.Component {
 			p.ID = utils.RandomID()
 		}
 		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
-			// Base styles (shadcn radix-nova)
+			// Base styles (shadcn base-nova)
 			"flex field-sizing-content min-h-16 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none md:text-sm",
 			// Dark mode background
 			"dark:bg-input/30",
