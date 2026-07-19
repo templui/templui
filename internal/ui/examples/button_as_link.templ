@@ -1,0 +1,13 @@
+package examples
+
+import "github.com/templui/templui/components/button"
+
+templ ButtonAsLink() {
+	@button.Button(button.Props{
+		Href:    "#",
+		Variant: button.VariantSecondary,
+		Size:    button.SizeSm,
+	}) {
+		Login
+	}
+}

@@ -1,0 +1,15 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/toggle"
+)
+
+templ ToggleWithText() {
+	@toggle.Toggle(toggle.Props{
+		Attributes: templ.Attributes{"aria-label": "Toggle italic"},
+	}) {
+		@icon.Italic()
+		Italic
+	}
+}

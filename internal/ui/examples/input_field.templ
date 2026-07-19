@@ -1,0 +1,22 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/input"
+)
+
+templ InputField() {
+	@field.Field() {
+		@field.Label(field.LabelProps{For: "username"}) {
+			Username
+		}
+		@input.Input(input.Props{
+			ID:          "username",
+			Type:        input.TypeText,
+			Placeholder: "Enter your username",
+		})
+		@field.Description() {
+			Choose a unique username for your account.
+		}
+	}
+}

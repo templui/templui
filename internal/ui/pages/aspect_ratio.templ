@@ -3,7 +3,7 @@ package pages
 
 import "github.com/templui/templui/internal/ui/layouts"
 import "github.com/templui/templui/internal/ui/modules"
-import "github.com/templui/templui/internal/ui/showcase"
+import "github.com/templui/templui/internal/ui/examples"
 
 templ AspectRatio() {
 	@layouts.DocsLayout(
@@ -47,7 +47,7 @@ templ AspectRatio() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.AspectRatioDefault(),
+				ShowcaseFile:    examples.AspectRatioDefault(),
 				PreviewCodeFile: "aspect_ratio_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

@@ -1,0 +1,19 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/textarea"
+)
+
+templ TextareaDisabled() {
+	@field.Field(field.Props{Disabled: true}) {
+		@field.Label(field.LabelProps{For: "textarea-disabled"}) {
+			Message
+		}
+		@textarea.Textarea(textarea.Props{
+			ID:          "textarea-disabled",
+			Placeholder: "Type your message here.",
+			Disabled:    true,
+		})
+	}
+}

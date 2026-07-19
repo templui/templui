@@ -1,0 +1,23 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/input"
+)
+
+templ InputDisabled() {
+	@field.Field(field.Props{Disabled: true}) {
+		@field.Label(field.LabelProps{For: "input-demo-disabled"}) {
+			Email
+		}
+		@input.Input(input.Props{
+			ID:          "input-demo-disabled",
+			Type:        input.TypeEmail,
+			Placeholder: "Email",
+			Disabled:    true,
+		})
+		@field.Description() {
+			This field is currently disabled.
+		}
+	}
+}

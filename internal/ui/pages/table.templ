@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Table() {
@@ -76,7 +76,7 @@ templ Table() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.Table(),
+				ShowcaseFile:    examples.Table(),
 				PreviewCodeFile: "table.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

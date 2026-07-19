@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Checkbox() {
@@ -63,7 +63,7 @@ templ Checkbox() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.CheckboxDefault(),
+				ShowcaseFile:    examples.CheckboxDefault(),
 				PreviewCodeFile: "checkbox_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -80,13 +80,13 @@ templ Checkbox() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Form",
-					ShowcaseFile:    showcase.CheckboxForm(),
+					ShowcaseFile:    examples.CheckboxForm(),
 					PreviewCodeFile: "checkbox_form.templ",
 					ID:              "form",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Indeterminate",
-					ShowcaseFile:    showcase.CheckboxIndeterminate(),
+					ShowcaseFile:    examples.CheckboxIndeterminate(),
 					PreviewCodeFile: "checkbox_indeterminate.templ",
 					ID:              "indeterminate",
 				})

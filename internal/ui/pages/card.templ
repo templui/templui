@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Card() {
@@ -78,7 +78,7 @@ templ Card() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.CardDefault(),
+				ShowcaseFile:    examples.CardDefault(),
 				PreviewCodeFile: "card_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -95,7 +95,7 @@ templ Card() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "With Image",
-					ShowcaseFile:    showcase.CardWithImage(),
+					ShowcaseFile:    examples.CardWithImage(),
 					PreviewCodeFile: "card_with_image.templ",
 					ID:              "with_image",
 				})

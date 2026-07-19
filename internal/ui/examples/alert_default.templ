@@ -1,0 +1,20 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/alert"
+	"github.com/templui/templui/components/icon"
+)
+
+templ AlertDefault() {
+	<div class="w-full max-w-xl">
+		@alert.Alert() {
+			@icon.Rocket()
+			@alert.Title() {
+				Note
+			}
+			@alert.Description() {
+				This is a default alert — check it out!
+			}
+		}
+	</div>
+}

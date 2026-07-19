@@ -1,0 +1,24 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/inputgroup"
+)
+
+templ InputGroupInlineStart() {
+	@field.Field(field.Props{Class: "max-w-sm"}) {
+		@field.Label(field.LabelProps{For: "inline-start-input"}) {
+			Input
+		}
+		@inputgroup.InputGroup() {
+			@inputgroup.Input(inputgroup.InputProps{ID: "inline-start-input", Placeholder: "Search..."})
+			@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignInlineStart}) {
+				@icon.Search(icon.Props{Class: "text-muted-foreground"})
+			}
+		}
+		@field.Description() {
+			Icon positioned at the start.
+		}
+	}
+}

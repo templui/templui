@@ -1,0 +1,69 @@
+package examples
+
+import (
+	"time"
+
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/calendar"
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/popover"
+)
+
+templ DatePickerRange() {
+	{{
+		from := time.Date(time.Now().Year(), 1, 20, 0, 0, 0, 0, time.Local)
+		to := from.AddDate(0, 0, 20)
+	}}
+	@field.Field(field.Props{Class: "mx-auto w-60"}) {
+		@field.Label(field.LabelProps{For: "date-picker-range-trigger"}) {
+			Date Picker Range
+		}
+		@popover.Root(popover.RootProps{ID: "date-picker-range"}) {
+		{{
+			triggerAttrs := popover.Trigger(ctx)
+			triggerAttrs["id"] = "date-picker-range-trigger"
+			triggerAttrs["data-tui-datepicker-display"] = ""
+		}}
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Class:      "justify-start px-2.5 font-normal",
+				Attributes: triggerAttrs,
+			}) {
+				<span data-icon="inline-start" class="contents">
+					@icon.Calendar()
+				</span>
+				<span data-tui-datepicker-label>
+					{ from.Format("Jan 02, 2006") } - { to.Format("Jan 02, 2006") }
+				</span>
+			}
+			@popover.Content(popover.ContentProps{
+				Class:     "w-auto p-0",
+				Side: popover.SideBottom, Align: popover.AlignStart,
+			}) {
+				@calendar.Calendar(calendar.Props{
+					Mode:           calendar.ModeRange,
+					Value:          from,
+					EndValue:       to,
+					NumberOfMonths: 2,
+				})
+			}
+		}
+	}
+	<script>
+		(() => {
+			const root = document.getElementById("date-picker-range");
+			const fmt = (d) => d.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
+			root.addEventListener("calendar-change", (e) => {
+				const display = root.querySelector("[data-tui-datepicker-label]");
+				if (e.detail.value && e.detail.endValue) {
+					display.textContent = fmt(e.detail.value) + " - " + fmt(e.detail.endValue);
+				} else if (e.detail.value) {
+					display.textContent = fmt(e.detail.value);
+				} else {
+					display.textContent = "Pick a date";
+				}
+			});
+		})();
+	</script>
+}

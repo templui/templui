@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Empty() {
@@ -46,7 +46,7 @@ templ Empty() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.EmptyDefault(),
+				ShowcaseFile:    examples.EmptyDefault(),
 				PreviewCodeFile: "empty_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -55,31 +55,31 @@ templ Empty() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Outline",
-					ShowcaseFile:    showcase.EmptyOutline(),
+					ShowcaseFile:    examples.EmptyOutline(),
 					PreviewCodeFile: "empty_outline.templ",
 					ID:              "outline",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Background",
-					ShowcaseFile:    showcase.EmptyBackground(),
+					ShowcaseFile:    examples.EmptyBackground(),
 					PreviewCodeFile: "empty_background.templ",
 					ID:              "background",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Avatar",
-					ShowcaseFile:    showcase.EmptyAvatar(),
+					ShowcaseFile:    examples.EmptyAvatar(),
 					PreviewCodeFile: "empty_avatar.templ",
 					ID:              "avatar",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Avatar Group",
-					ShowcaseFile:    showcase.EmptyAvatarGroup(),
+					ShowcaseFile:    examples.EmptyAvatarGroup(),
 					PreviewCodeFile: "empty_avatar_group.templ",
 					ID:              "avatar-group",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Input Group",
-					ShowcaseFile:    showcase.EmptyInputGroup(),
+					ShowcaseFile:    examples.EmptyInputGroup(),
 					PreviewCodeFile: "empty_input_group.templ",
 					ID:              "input-group",
 				})

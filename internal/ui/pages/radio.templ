@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Radio() {
@@ -58,7 +58,7 @@ templ Radio() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.RadioDefault(),
+				ShowcaseFile:    examples.RadioDefault(),
 				PreviewCodeFile: "radio_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -75,7 +75,7 @@ templ Radio() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Form",
-					ShowcaseFile:    showcase.RadioForm(),
+					ShowcaseFile:    examples.RadioForm(),
 					PreviewCodeFile: "radio_form.templ",
 					ID:              "form",
 				})

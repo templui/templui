@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Sidebar() {
@@ -145,7 +145,7 @@ templ Sidebar() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.SidebarDefault(),
+				ShowcaseFile:    examples.SidebarDefault(),
 				PreviewCodeFile: "sidebar_default.templ",
 				UseIframe:       true,
 				PreviewURL:      "/docs/components/sidebar-preview",

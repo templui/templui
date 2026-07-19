@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ DropdownMenu() {
@@ -56,7 +56,7 @@ templ DropdownMenu() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.DropdownMenuDefault(),
+				ShowcaseFile:    examples.DropdownMenuDefault(),
 				PreviewCodeFile: "dropdownmenu_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -65,67 +65,67 @@ templ DropdownMenu() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Basic",
-					ShowcaseFile:    showcase.DropdownMenuBasic(),
+					ShowcaseFile:    examples.DropdownMenuBasic(),
 					PreviewCodeFile: "dropdownmenu_basic.templ",
 					ID:              "basic",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Submenu",
-					ShowcaseFile:    showcase.DropdownMenuSubmenu(),
+					ShowcaseFile:    examples.DropdownMenuSubmenu(),
 					PreviewCodeFile: "dropdownmenu_submenu.templ",
 					ID:              "submenu",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Shortcuts",
-					ShowcaseFile:    showcase.DropdownMenuShortcuts(),
+					ShowcaseFile:    examples.DropdownMenuShortcuts(),
 					PreviewCodeFile: "dropdownmenu_shortcuts.templ",
 					ID:              "shortcuts",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Icons",
-					ShowcaseFile:    showcase.DropdownMenuIcons(),
+					ShowcaseFile:    examples.DropdownMenuIcons(),
 					PreviewCodeFile: "dropdownmenu_icons.templ",
 					ID:              "icons",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Checkboxes",
-					ShowcaseFile:    showcase.DropdownMenuCheckboxes(),
+					ShowcaseFile:    examples.DropdownMenuCheckboxes(),
 					PreviewCodeFile: "dropdownmenu_checkboxes.templ",
 					ID:              "checkboxes",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Checkboxes Icons",
-					ShowcaseFile:    showcase.DropdownMenuCheckboxesIcons(),
+					ShowcaseFile:    examples.DropdownMenuCheckboxesIcons(),
 					PreviewCodeFile: "dropdownmenu_checkboxes_icons.templ",
 					ID:              "checkboxes-icons",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Radio Group",
-					ShowcaseFile:    showcase.DropdownMenuRadioGroupExample(),
+					ShowcaseFile:    examples.DropdownMenuRadioGroupExample(),
 					PreviewCodeFile: "dropdownmenu_radio_group.templ",
 					ID:              "radio-group",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Radio Icons",
-					ShowcaseFile:    showcase.DropdownMenuRadioIcons(),
+					ShowcaseFile:    examples.DropdownMenuRadioIcons(),
 					PreviewCodeFile: "dropdownmenu_radio_icons.templ",
 					ID:              "radio-icons",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Destructive",
-					ShowcaseFile:    showcase.DropdownMenuDestructive(),
+					ShowcaseFile:    examples.DropdownMenuDestructive(),
 					PreviewCodeFile: "dropdownmenu_destructive.templ",
 					ID:              "destructive",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Avatar",
-					ShowcaseFile:    showcase.DropdownMenuAvatar(),
+					ShowcaseFile:    examples.DropdownMenuAvatar(),
 					PreviewCodeFile: "dropdownmenu_avatar.templ",
 					ID:              "avatar",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Complex",
-					ShowcaseFile:    showcase.DropdownMenuComplex(),
+					ShowcaseFile:    examples.DropdownMenuComplex(),
 					PreviewCodeFile: "dropdownmenu_complex.templ",
 					ID:              "complex",
 				})

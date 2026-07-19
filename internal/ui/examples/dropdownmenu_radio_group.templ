@@ -1,0 +1,38 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/dropdownmenu"
+)
+
+templ DropdownMenuRadioGroupExample() {
+	@dropdownmenu.Root() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: dropdownmenu.Trigger(ctx),
+		}) {
+			Open
+		}
+		@dropdownmenu.Content(dropdownmenu.ContentProps{Class: "w-32"}) {
+			@dropdownmenu.Group() {
+				@dropdownmenu.Label() {
+					Panel Position
+				}
+				@dropdownmenu.RadioGroup() {
+					@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{Value: "top"}) {
+						Top
+					}
+					@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{
+						Value:   "bottom",
+						Checked: true,
+					}) {
+						Bottom
+					}
+					@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{Value: "right"}) {
+						Right
+					}
+				}
+			}
+		}
+	}
+}

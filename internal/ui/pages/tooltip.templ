@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Tooltip() {
@@ -56,7 +56,7 @@ templ Tooltip() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.TooltipDefault(),
+				ShowcaseFile:    examples.TooltipDefault(),
 				PreviewCodeFile: "tooltip_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -74,19 +74,19 @@ templ Tooltip() {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Side",
 					PreviewCodeFile: "tooltip_sides.templ",
-					ShowcaseFile:    showcase.TooltipSides(),
+					ShowcaseFile:    examples.TooltipSides(),
 					ID:              "side",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "With Keyboard Shortcut",
 					PreviewCodeFile: "tooltip_keyboard.templ",
-					ShowcaseFile:    showcase.TooltipKeyboard(),
+					ShowcaseFile:    examples.TooltipKeyboard(),
 					ID:              "keyboard",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Disabled Button",
 					PreviewCodeFile: "tooltip_disabled.templ",
-					ShowcaseFile:    showcase.TooltipDisabled(),
+					ShowcaseFile:    examples.TooltipDisabled(),
 					ID:              "disabled",
 				})
 			}

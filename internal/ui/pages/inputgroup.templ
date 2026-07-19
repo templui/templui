@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ InputGroup() {
@@ -58,7 +58,7 @@ templ InputGroup() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.InputGroupDefault(),
+				ShowcaseFile:    examples.InputGroupDefault(),
 				PreviewCodeFile: "inputgroup_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -67,25 +67,25 @@ templ InputGroup() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Align", ID: "align"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Inline Start",
-					ShowcaseFile:    showcase.InputGroupInlineStart(),
+					ShowcaseFile:    examples.InputGroupInlineStart(),
 					PreviewCodeFile: "inputgroup_inline_start.templ",
 					ID:              "inline-start",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Inline End",
-					ShowcaseFile:    showcase.InputGroupInlineEnd(),
+					ShowcaseFile:    examples.InputGroupInlineEnd(),
 					PreviewCodeFile: "inputgroup_inline_end.templ",
 					ID:              "inline-end",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Block Start",
-					ShowcaseFile:    showcase.InputGroupBlockStart(),
+					ShowcaseFile:    examples.InputGroupBlockStart(),
 					PreviewCodeFile: "inputgroup_block_start.templ",
 					ID:              "block-start",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Block End",
-					ShowcaseFile:    showcase.InputGroupBlockEnd(),
+					ShowcaseFile:    examples.InputGroupBlockEnd(),
 					PreviewCodeFile: "inputgroup_block_end.templ",
 					ID:              "block-end",
 				})
@@ -93,31 +93,31 @@ templ InputGroup() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Icon",
-					ShowcaseFile:    showcase.InputGroupIcon(),
+					ShowcaseFile:    examples.InputGroupIcon(),
 					PreviewCodeFile: "inputgroup_icon.templ",
 					ID:              "icon",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Text",
-					ShowcaseFile:    showcase.InputGroupText(),
+					ShowcaseFile:    examples.InputGroupText(),
 					PreviewCodeFile: "inputgroup_text.templ",
 					ID:              "text",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Kbd",
-					ShowcaseFile:    showcase.InputGroupKbd(),
+					ShowcaseFile:    examples.InputGroupKbd(),
 					PreviewCodeFile: "inputgroup_kbd.templ",
 					ID:              "kbd",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Spinner",
-					ShowcaseFile:    showcase.InputGroupSpinner(),
+					ShowcaseFile:    examples.InputGroupSpinner(),
 					PreviewCodeFile: "inputgroup_spinner.templ",
 					ID:              "spinner",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Textarea",
-					ShowcaseFile:    showcase.InputGroupTextareaExample(),
+					ShowcaseFile:    examples.InputGroupTextareaExample(),
 					PreviewCodeFile: "inputgroup_textarea.templ",
 					ID:              "textarea",
 				})

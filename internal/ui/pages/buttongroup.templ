@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ ButtonGroup() {
@@ -52,7 +52,7 @@ templ ButtonGroup() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.ButtonGroupDefault(),
+				ShowcaseFile:    examples.ButtonGroupDefault(),
 				PreviewCodeFile: "buttongroup_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -61,61 +61,61 @@ templ ButtonGroup() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Orientation",
-					ShowcaseFile:    showcase.ButtonGroupOrientation(),
+					ShowcaseFile:    examples.ButtonGroupOrientation(),
 					PreviewCodeFile: "buttongroup_orientation.templ",
 					ID:              "orientation",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Size",
-					ShowcaseFile:    showcase.ButtonGroupSize(),
+					ShowcaseFile:    examples.ButtonGroupSize(),
 					PreviewCodeFile: "buttongroup_size.templ",
 					ID:              "size",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Nested",
-					ShowcaseFile:    showcase.ButtonGroupNested(),
+					ShowcaseFile:    examples.ButtonGroupNested(),
 					PreviewCodeFile: "buttongroup_nested.templ",
 					ID:              "nested",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Separator",
-					ShowcaseFile:    showcase.ButtonGroupSeparatorExample(),
+					ShowcaseFile:    examples.ButtonGroupSeparatorExample(),
 					PreviewCodeFile: "buttongroup_separator.templ",
 					ID:              "separator",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Split",
-					ShowcaseFile:    showcase.ButtonGroupSplit(),
+					ShowcaseFile:    examples.ButtonGroupSplit(),
 					PreviewCodeFile: "buttongroup_split.templ",
 					ID:              "split",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Input",
-					ShowcaseFile:    showcase.ButtonGroupInput(),
+					ShowcaseFile:    examples.ButtonGroupInput(),
 					PreviewCodeFile: "buttongroup_input.templ",
 					ID:              "input",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Input Group",
-					ShowcaseFile:    showcase.ButtonGroupInputGroup(),
+					ShowcaseFile:    examples.ButtonGroupInputGroup(),
 					PreviewCodeFile: "buttongroup_input_group.templ",
 					ID:              "input-group",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Dropdown Menu",
-					ShowcaseFile:    showcase.ButtonGroupDropdown(),
+					ShowcaseFile:    examples.ButtonGroupDropdown(),
 					PreviewCodeFile: "buttongroup_dropdown.templ",
 					ID:              "dropdown-menu",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Select",
-					ShowcaseFile:    showcase.ButtonGroupSelect(),
+					ShowcaseFile:    examples.ButtonGroupSelect(),
 					PreviewCodeFile: "buttongroup_select.templ",
 					ID:              "select",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Popover",
-					ShowcaseFile:    showcase.ButtonGroupPopover(),
+					ShowcaseFile:    examples.ButtonGroupPopover(),
 					PreviewCodeFile: "buttongroup_popover.templ",
 					ID:              "popover",
 				})

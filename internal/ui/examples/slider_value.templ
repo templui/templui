@@ -1,0 +1,17 @@
+package examples
+
+import "github.com/templui/templui/components/slider"
+
+templ SliderValue() {
+	<div class="w-full max-w-sm">
+		<div class="flex justify-end mb-1">
+			@slider.Value(slider.ValueProps{
+				For: "slider-value",
+			})
+		</div>
+		@slider.Slider(slider.Props{
+			ID:    "slider-value",
+			Value: 75,
+		})
+	</div>
+}

@@ -1,0 +1,26 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/kbd"
+	"github.com/templui/templui/components/tooltip"
+)
+
+templ TooltipKeyboard() {
+	@tooltip.Tooltip() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Size:       button.SizeIconSm,
+			Attributes: tooltip.Trigger(ctx),
+		}) {
+			@icon.Save()
+		}
+		@tooltip.Content() {
+			Save Changes
+			@kbd.Kbd() {
+				S
+			}
+		}
+	}
+}

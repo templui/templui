@@ -1,0 +1,21 @@
+package examples
+
+import "github.com/templui/templui/components/slider"
+
+templ SliderRange() {
+	<div class="w-full max-w-sm">
+		<div class="flex justify-between mb-1">
+			@slider.Value(slider.ValueProps{
+				For: "slider-range-min",
+			})
+			@slider.Value(slider.ValueProps{
+				For: "slider-range-max",
+			})
+		</div>
+		@slider.Range(slider.RangeProps{
+			ID:       "slider-range",
+			MinValue: 25,
+			MaxValue: 75,
+		})
+	</div>
+}

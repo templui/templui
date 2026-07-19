@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Popover() {
@@ -47,7 +47,7 @@ templ Popover() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.PopoverDefault(),
+				ShowcaseFile:    examples.PopoverDefault(),
 				PreviewCodeFile: "popover_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -56,19 +56,19 @@ templ Popover() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Basic",
-					ShowcaseFile:    showcase.PopoverBasic(),
+					ShowcaseFile:    examples.PopoverBasic(),
 					PreviewCodeFile: "popover_basic.templ",
 					ID:              "basic",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Align",
-					ShowcaseFile:    showcase.PopoverAlignments(),
+					ShowcaseFile:    examples.PopoverAlignments(),
 					PreviewCodeFile: "popover_alignments.templ",
 					ID:              "align",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "With Form",
-					ShowcaseFile:    showcase.PopoverForm(),
+					ShowcaseFile:    examples.PopoverForm(),
 					PreviewCodeFile: "popover_form.templ",
 					ID:              "with-form",
 				})

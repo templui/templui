@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Sheet() {
@@ -91,7 +91,7 @@ templ Sheet() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.SheetDefault(),
+				ShowcaseFile:    examples.SheetDefault(),
 				PreviewCodeFile: "sheet_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -100,13 +100,13 @@ templ Sheet() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Sheet Sides",
-					ShowcaseFile:    showcase.SheetSides(),
+					ShowcaseFile:    examples.SheetSides(),
 					PreviewCodeFile: "sheet_sides.templ",
 					ID:              "sheet-sides",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "External Trigger",
-					ShowcaseFile:    showcase.SheetExternalTrigger(),
+					ShowcaseFile:    examples.SheetExternalTrigger(),
 					PreviewCodeFile: "sheet_external_trigger.templ",
 					ID:              "external-trigger",
 				})

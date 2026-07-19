@@ -1,0 +1,22 @@
+package examples
+
+import "github.com/templui/templui/components/button"
+
+templ ToastDescription() {
+	@button.Button(button.Props{
+		Variant: button.VariantOutline,
+		Class:   "w-fit",
+		Attributes: templ.Attributes{
+			"id": "toast-description-trigger",
+		},
+	}) {
+		Show Toast
+	}
+	<script>
+		document.getElementById("toast-description-trigger").addEventListener("click", () => {
+			window.tui.toast("Event has been created", {
+				description: "Monday, January 3rd at 6:00pm",
+			});
+		});
+	</script>
+}

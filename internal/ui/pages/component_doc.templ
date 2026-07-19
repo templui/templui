@@ -5,7 +5,7 @@ import (
 	"github.com/templui/templui/internal/service"
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 // PagerLink points to the previous/next component page.
@@ -16,7 +16,7 @@ type PagerLink struct {
 
 // ComponentDoc renders a markdown-authored component page (the shadcn mdx
 // pendant): frontmatter header, markdown prose and shortcode blocks resolved
-// against the showcase registry.
+// against the examples registry.
 templ ComponentDoc(page *service.ComponentDocPage, prev, next PagerLink) {
 	@layouts.DocsLayout(
 		page.Title+" - templUI",
@@ -39,7 +39,7 @@ templ renderSegment(segment markdown.Segment) {
 		case "":
 			@templ.Raw(segment.HTML)
 		case "ComponentPreview":
-			if entry, ok := showcase.Registry[segment.Attrs["name"]]; ok {
+			if entry, ok := examples.Registry[segment.Attrs["name"]]; ok {
 				@modules.ComponentPreviewBlock(entry)
 			} else {
 				<div class="my-6 rounded-lg border border-destructive/50 p-4 text-sm text-destructive">

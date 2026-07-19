@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Select() {
@@ -49,7 +49,7 @@ templ Select() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.SelectDefault(),
+				ShowcaseFile:    examples.SelectDefault(),
 				PreviewCodeFile: "select_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -58,31 +58,31 @@ templ Select() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Align Item With Trigger",
-					ShowcaseFile:    showcase.SelectAlignItem(),
+					ShowcaseFile:    examples.SelectAlignItem(),
 					PreviewCodeFile: "select_align_item.templ",
 					ID:              "align-item",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Groups",
-					ShowcaseFile:    showcase.SelectGroupsExample(),
+					ShowcaseFile:    examples.SelectGroupsExample(),
 					PreviewCodeFile: "select_groups.templ",
 					ID:              "groups",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Scrollable",
-					ShowcaseFile:    showcase.SelectScrollable(),
+					ShowcaseFile:    examples.SelectScrollable(),
 					PreviewCodeFile: "select_scrollable.templ",
 					ID:              "scrollable",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Disabled",
-					ShowcaseFile:    showcase.SelectDisabled(),
+					ShowcaseFile:    examples.SelectDisabled(),
 					PreviewCodeFile: "select_disabled.templ",
 					ID:              "disabled",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Invalid",
-					ShowcaseFile:    showcase.SelectInvalid(),
+					ShowcaseFile:    examples.SelectInvalid(),
 					PreviewCodeFile: "select_invalid.templ",
 					ID:              "invalid",
 				})

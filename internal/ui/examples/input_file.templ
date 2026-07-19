@@ -1,0 +1,21 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/input"
+)
+
+templ InputFile() {
+	@field.Field() {
+		@field.Label(field.LabelProps{For: "picture"}) {
+			Picture
+		}
+		@input.Input(input.Props{
+			ID:   "picture",
+			Type: input.TypeFile,
+		})
+		@field.Description() {
+			Select a picture to upload.
+		}
+	}
+}

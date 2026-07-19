@@ -1,0 +1,11 @@
+package examples
+
+import "github.com/templui/templui/components/progress"
+
+templ ProgressDefault() {
+	<div class="w-full max-w-sm">
+		@progress.Progress(progress.Props{
+			Value: 25,
+		})
+	</div>
+}

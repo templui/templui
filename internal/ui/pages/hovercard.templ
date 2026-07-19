@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ HoverCard() {
@@ -44,7 +44,7 @@ templ HoverCard() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.HoverCardDefault(),
+				ShowcaseFile:    examples.HoverCardDefault(),
 				PreviewCodeFile: "hovercard_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -53,7 +53,7 @@ templ HoverCard() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Sides",
-					ShowcaseFile:    showcase.HoverCardSides(),
+					ShowcaseFile:    examples.HoverCardSides(),
 					PreviewCodeFile: "hovercard_sides.templ",
 					ID:              "sides",
 				})

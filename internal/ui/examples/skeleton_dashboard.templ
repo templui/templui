@@ -1,0 +1,24 @@
+package examples
+
+import "github.com/templui/templui/components/skeleton"
+
+templ SkeletonDashboard() {
+	<div>
+		<div class="grid gap-6 md:grid-cols-3">
+			for i := 0; i < 3; i++ {
+				<div class="p-4">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-20 mb-2"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-8 w-24 mb-4"})
+					<div class="flex items-center gap-2">
+						@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-12"})
+						@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-4"})
+					</div>
+				</div>
+			}
+		</div>
+		<div class="mt-4 p-4">
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-1/3 mb-6"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-[240px] w-full rounded-md"})
+		</div>
+	</div>
+}

@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Toast() {
@@ -48,7 +48,7 @@ templ Toast() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.ToastDefault(),
+				ShowcaseFile:    examples.ToastDefault(),
 				PreviewCodeFile: "toast_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -83,25 +83,25 @@ window.tui.toast("Event has been created")
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Types",
-					ShowcaseFile:    showcase.ToastTypes(),
+					ShowcaseFile:    examples.ToastTypes(),
 					PreviewCodeFile: "toast_types.templ",
 					ID:              "types",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Description",
-					ShowcaseFile:    showcase.ToastDescription(),
+					ShowcaseFile:    examples.ToastDescription(),
 					PreviewCodeFile: "toast_description.templ",
 					ID:              "description",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Position",
-					ShowcaseFile:    showcase.ToastPosition(),
+					ShowcaseFile:    examples.ToastPosition(),
 					PreviewCodeFile: "toast_position.templ",
 					ID:              "position",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "HTMX",
-					ShowcaseFile:    showcase.ToastHtmx(),
+					ShowcaseFile:    examples.ToastHtmx(),
 					PreviewCodeFile: "toast_htmx.templ",
 					ID:              "htmx",
 				})

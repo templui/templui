@@ -1,0 +1,41 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/dialog"
+)
+
+templ DialogNoModal() {
+	<div class="space-y-4">
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: dialog.TriggerFor("non-modal-dialog"),
+		}) {
+			Open Non-modal Dialog
+		}
+		@dialog.Dialog(dialog.Props{
+			ID: "non-modal-dialog",
+		}) {
+			@dialog.Content(dialog.ContentProps{
+				Class:        "max-w-md",
+				DisableModal: true,
+			}) {
+				@dialog.Header() {
+					@dialog.Title() {
+						Non-Modal Mode
+					}
+					@dialog.Description() {
+						This dialog does not use a backdrop.
+					}
+				}
+				@dialog.Footer() {
+					@button.Button(button.Props{
+						Attributes: dialog.Close(ctx),
+					}) {
+						Close
+					}
+				}
+			}
+		}
+	</div>
+}

@@ -1,0 +1,10 @@
+package examples
+
+import "github.com/templui/templui/components/calendar"
+
+templ CalendarCaption() {
+	@calendar.Calendar(calendar.Props{
+		CaptionLayout: calendar.CaptionLayoutDropdown,
+		Class:         "rounded-lg border",
+	})
+}

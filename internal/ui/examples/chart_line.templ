@@ -1,0 +1,27 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+)
+
+templ ChartLine() {
+	@card.Card(card.Props{Class: "max-w-sm"}) {
+		@card.Content() {
+			@chart.Chart(chart.Props{
+				Variant:     chart.VariantLine,
+				ShowYGrid:   true,
+				ShowXLabels: true,
+				Data: chart.Data{
+					Labels: []string{"Jan", "Feb", "March", "April", "May", "June"},
+					Datasets: []chart.Dataset{
+						{
+							Data:    []float64{12, 3, 9, 3, 12, 7},
+							Tension: 0.5,
+						},
+					},
+				},
+			})
+		}
+	}
+}

@@ -1,0 +1,16 @@
+package examples
+
+import "github.com/templui/templui/components/avatar"
+
+templ AvatarFallback() {
+	@avatar.Avatar() {
+		@avatar.Image(avatar.ImageProps{
+			// simulate a broken image
+			Src: "broken-image.jpg",
+			Alt: "John Doe avatar",
+		})
+		@avatar.Fallback() {
+			JD
+		}
+	}
+}

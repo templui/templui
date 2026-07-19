@@ -1,0 +1,20 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/buttongroup"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/input"
+)
+
+templ ButtonGroupInput() {
+	@buttongroup.ButtonGroup() {
+		@input.Input(input.Props{Placeholder: "Search..."})
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: templ.Attributes{"aria-label": "Search"},
+		}) {
+			@icon.Search()
+		}
+	}
+}

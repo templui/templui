@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Calendar() {
@@ -48,7 +48,7 @@ templ Calendar() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.CalendarDefault(),
+				ShowcaseFile:    examples.CalendarDefault(),
 				PreviewCodeFile: "calendar_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -57,43 +57,43 @@ templ Calendar() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Range Calendar",
-					ShowcaseFile:    showcase.CalendarRange(),
+					ShowcaseFile:    examples.CalendarRange(),
 					PreviewCodeFile: "calendar_range.templ",
 					ID:              "range-calendar",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Month and Year Selector",
-					ShowcaseFile:    showcase.CalendarCaption(),
+					ShowcaseFile:    examples.CalendarCaption(),
 					PreviewCodeFile: "calendar_caption.templ",
 					ID:              "caption",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Presets",
-					ShowcaseFile:    showcase.CalendarPresets(),
+					ShowcaseFile:    examples.CalendarPresets(),
 					PreviewCodeFile: "calendar_presets.templ",
 					ID:              "presets",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Date and Time Picker",
-					ShowcaseFile:    showcase.CalendarTime(),
+					ShowcaseFile:    examples.CalendarTime(),
 					PreviewCodeFile: "calendar_time.templ",
 					ID:              "date-and-time-picker",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Booked dates",
-					ShowcaseFile:    showcase.CalendarBookedDates(),
+					ShowcaseFile:    examples.CalendarBookedDates(),
 					PreviewCodeFile: "calendar_booked_dates.templ",
 					ID:              "booked-dates",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Custom Cell Size",
-					ShowcaseFile:    showcase.CalendarCustomCellSize(),
+					ShowcaseFile:    examples.CalendarCustomCellSize(),
 					PreviewCodeFile: "calendar_custom_cell_size.templ",
 					ID:              "custom-cell-size",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Week Numbers",
-					ShowcaseFile:    showcase.CalendarWeekNumbers(),
+					ShowcaseFile:    examples.CalendarWeekNumbers(),
 					PreviewCodeFile: "calendar_week_numbers.templ",
 					ID:              "week-numbers",
 				})

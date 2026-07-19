@@ -1,0 +1,16 @@
+package examples
+
+import "github.com/templui/templui/components/aspectratio"
+
+templ AspectRatioDefault() {
+	@aspectratio.AspectRatio(aspectratio.Props{
+		Ratio: aspectratio.RatioVideo,
+		Class: "rounded-md overflow-hidden",
+	}) {
+		<img
+			src="/assets/img/aspect_ratio_placeholder.jpeg"
+			alt="Example image"
+			class="h-full w-full object-cover"
+		/>
+	}
+}

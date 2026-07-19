@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Badge() {
@@ -74,7 +74,7 @@ templ Badge() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.BadgeDefault(),
+				ShowcaseFile:    examples.BadgeDefault(),
 				PreviewCodeFile: "badge_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -91,31 +91,31 @@ templ Badge() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Primary",
-					ShowcaseFile:    showcase.BadgeDefault(),
+					ShowcaseFile:    examples.BadgeDefault(),
 					PreviewCodeFile: "badge_default.templ",
 					ID:              "primary",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Secondary",
-					ShowcaseFile:    showcase.BadgeSecondary(),
+					ShowcaseFile:    examples.BadgeSecondary(),
 					PreviewCodeFile: "badge_secondary.templ",
 					ID:              "secondary",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Outline",
-					ShowcaseFile:    showcase.BadgeOutline(),
+					ShowcaseFile:    examples.BadgeOutline(),
 					PreviewCodeFile: "badge_outline.templ",
 					ID:              "outline",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Destructive",
-					ShowcaseFile:    showcase.BadgeDestructive(),
+					ShowcaseFile:    examples.BadgeDestructive(),
 					PreviewCodeFile: "badge_destructive.templ",
 					ID:              "destructive",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "With Icon",
-					ShowcaseFile:    showcase.BadgeWithIcon(),
+					ShowcaseFile:    examples.BadgeWithIcon(),
 					PreviewCodeFile: "badge_with_icon.templ",
 					ID:              "with_icon",
 				})

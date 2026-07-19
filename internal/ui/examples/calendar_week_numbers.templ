@@ -1,0 +1,20 @@
+package examples
+
+import (
+	"time"
+
+	"github.com/templui/templui/components/calendar"
+	"github.com/templui/templui/components/card"
+)
+
+templ CalendarWeekNumbers() {
+	{{ selected := time.Date(time.Now().Year(), 1, 12, 0, 0, 0, 0, time.Local) }}
+	@card.Card(card.Props{Class: "mx-auto w-fit p-0"}) {
+		@card.Content(card.ContentProps{Class: "p-0"}) {
+			@calendar.Calendar(calendar.Props{
+				Value:           selected,
+				ShowWeekNumbers: true,
+			})
+		}
+	}
+}

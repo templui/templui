@@ -1,0 +1,37 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/dropdownmenu"
+	"github.com/templui/templui/components/icon"
+)
+
+templ DropdownMenuIcons() {
+	@dropdownmenu.Root() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: dropdownmenu.Trigger(ctx),
+		}) {
+			Open
+		}
+		@dropdownmenu.Content() {
+			@dropdownmenu.Item() {
+				@icon.User()
+				Profile
+			}
+			@dropdownmenu.Item() {
+				@icon.CreditCard()
+				Billing
+			}
+			@dropdownmenu.Item() {
+				@icon.Settings()
+				Settings
+			}
+			@dropdownmenu.Separator()
+			@dropdownmenu.Item(dropdownmenu.ItemProps{Variant: dropdownmenu.ItemVariantDestructive}) {
+				@icon.LogOut()
+				Log out
+			}
+		}
+	}
+}

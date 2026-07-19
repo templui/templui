@@ -1,0 +1,29 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/input"
+)
+
+templ InputGrid() {
+	@field.Group(field.GroupProps{Class: "grid max-w-sm grid-cols-2"}) {
+		@field.Field() {
+			@field.Label(field.LabelProps{For: "first-name"}) {
+				First Name
+			}
+			@input.Input(input.Props{
+				ID:          "first-name",
+				Placeholder: "Jordan",
+			})
+		}
+		@field.Field() {
+			@field.Label(field.LabelProps{For: "last-name"}) {
+				Last Name
+			}
+			@input.Input(input.Props{
+				ID:          "last-name",
+				Placeholder: "Lee",
+			})
+		}
+	}
+}

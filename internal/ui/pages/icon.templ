@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Icon() {
@@ -66,7 +66,7 @@ templ Icon() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.IconDefault(),
+				ShowcaseFile:    examples.IconDefault(),
 				PreviewCodeFile: "icon_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -83,19 +83,19 @@ templ Icon() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Colored",
-					ShowcaseFile:    showcase.IconColored(),
+					ShowcaseFile:    examples.IconColored(),
 					PreviewCodeFile: "icon_colored.templ",
 					ID:              "colored",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Filled",
-					ShowcaseFile:    showcase.IconFilled(),
+					ShowcaseFile:    examples.IconFilled(),
 					PreviewCodeFile: "icon_filled.templ",
 					ID:              "filled",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Sizes",
-					ShowcaseFile:    showcase.IconSizes(),
+					ShowcaseFile:    examples.IconSizes(),
 					PreviewCodeFile: "icon_sizes.templ",
 					ID:              "sizes",
 				})

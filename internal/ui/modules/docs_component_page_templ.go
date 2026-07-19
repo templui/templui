@@ -17,7 +17,7 @@ import (
 	"github.com/templui/templui/components/dropdownmenu"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/internal/ctxkeys"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/utils"
 )
 
@@ -28,7 +28,7 @@ import (
 // ComponentPreviewBlock mirrors shadcn's ComponentPreview: one rounded-2xl
 // bordered container with the live demo on top and the source attached below
 // (border-t), clamped to a few lines behind a View Code button.
-func ComponentPreviewBlock(entry showcase.RegistryEntry) templ.Component {
+func ComponentPreviewBlock(entry examples.RegistryEntry) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -198,7 +198,7 @@ func CollapsibleCodeBlock(file string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = CodeSnippetFromEmbeddedStyled(file, "templ", showcase.TemplFiles, "[&_pre]:my-0 [&_pre]:max-h-72 [&_pre]:rounded-none [&_pre]:!bg-code [&_pre]:px-0").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = CodeSnippetFromEmbeddedStyled(file, "templ", examples.TemplFiles, "[&_pre]:my-0 [&_pre]:max-h-72 [&_pre]:rounded-none [&_pre]:!bg-code [&_pre]:px-0").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -247,7 +247,7 @@ func codeSnippetPreview(file string, maxLines int) templ.Component {
 }
 
 func sourcePreviewLines(file string, maxLines int) string {
-	content, err := showcase.TemplFiles.ReadFile(file)
+	content, err := examples.TemplFiles.ReadFile(file)
 	if err != nil {
 		return ""
 	}

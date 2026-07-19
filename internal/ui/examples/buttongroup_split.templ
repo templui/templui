@@ -1,0 +1,22 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/buttongroup"
+	"github.com/templui/templui/components/icon"
+)
+
+templ ButtonGroupSplit() {
+	@buttongroup.ButtonGroup() {
+		@button.Button(button.Props{Variant: button.VariantSecondary}) {
+			Button
+		}
+		@buttongroup.Separator()
+		@button.Button(button.Props{
+			Variant: button.VariantSecondary,
+			Size:    button.SizeIcon,
+		}) {
+			@icon.Plus()
+		}
+	}
+}

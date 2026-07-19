@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Kbd() {
@@ -45,7 +45,7 @@ templ Kbd() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.KbdDefault(),
+				ShowcaseFile:    examples.KbdDefault(),
 				PreviewCodeFile: "kbd_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -54,25 +54,25 @@ templ Kbd() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Group",
-					ShowcaseFile:    showcase.KbdGroupExample(),
+					ShowcaseFile:    examples.KbdGroupExample(),
 					PreviewCodeFile: "kbd_group.templ",
 					ID:              "group",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Button",
-					ShowcaseFile:    showcase.KbdButton(),
+					ShowcaseFile:    examples.KbdButton(),
 					PreviewCodeFile: "kbd_button.templ",
 					ID:              "button",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Tooltip",
-					ShowcaseFile:    showcase.KbdTooltip(),
+					ShowcaseFile:    examples.KbdTooltip(),
 					PreviewCodeFile: "kbd_tooltip.templ",
 					ID:              "tooltip",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Input Group",
-					ShowcaseFile:    showcase.KbdInputGroup(),
+					ShowcaseFile:    examples.KbdInputGroup(),
 					PreviewCodeFile: "kbd_input_group.templ",
 					ID:              "input-group",
 				})

@@ -1,0 +1,11 @@
+package examples
+
+import "github.com/templui/templui/components/separator"
+
+templ SeparatorDefault() {
+	<div class="flex flex-col gap-4 items-center w-full max-w-md">
+		<p>Top</p>
+		@separator.Separator()
+		<p>Bottom</p>
+	</div>
+}

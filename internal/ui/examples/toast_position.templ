@@ -1,0 +1,33 @@
+package examples
+
+import "github.com/templui/templui/components/button"
+
+templ ToastPosition() {
+	<div class="flex flex-wrap justify-center gap-2" id="toast-positions">
+		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: templ.Attributes{"data-toast-position": "top-left"}}) {
+			Top Left
+		}
+		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: templ.Attributes{"data-toast-position": "top-center"}}) {
+			Top Center
+		}
+		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: templ.Attributes{"data-toast-position": "top-right"}}) {
+			Top Right
+		}
+		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: templ.Attributes{"data-toast-position": "bottom-left"}}) {
+			Bottom Left
+		}
+		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: templ.Attributes{"data-toast-position": "bottom-center"}}) {
+			Bottom Center
+		}
+		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: templ.Attributes{"data-toast-position": "bottom-right"}}) {
+			Bottom Right
+		}
+	</div>
+	<script>
+		document.getElementById("toast-positions").addEventListener("click", (e) => {
+			const btn = e.target.closest("[data-toast-position]");
+			if (!btn) return;
+			window.tui.toast("Event has been created", { position: btn.dataset.toastPosition });
+		});
+	</script>
+}

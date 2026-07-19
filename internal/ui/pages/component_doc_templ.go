@@ -11,9 +11,9 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"github.com/templui/templui/internal/markdown"
 	"github.com/templui/templui/internal/service"
+	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
 )
 
 // PagerLink points to the previous/next component page.
@@ -24,7 +24,7 @@ type PagerLink struct {
 
 // ComponentDoc renders a markdown-authored component page (the shadcn mdx
 // pendant): frontmatter header, markdown prose and shortcode blocks resolved
-// against the showcase registry.
+// against the examples registry.
 func ComponentDoc(page *service.ComponentDocPage, prev, next PagerLink) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -130,7 +130,7 @@ func renderSegment(segment markdown.Segment) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		case "ComponentPreview":
-			if entry, ok := showcase.Registry[segment.Attrs["name"]]; ok {
+			if entry, ok := examples.Registry[segment.Attrs["name"]]; ok {
 				templ_7745c5c3_Err = modules.ComponentPreviewBlock(entry).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

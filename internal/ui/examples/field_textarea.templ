@@ -1,0 +1,26 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/textarea"
+)
+
+templ FieldTextarea() {
+	@field.Set(field.SetProps{Class: "w-full max-w-xs"}) {
+		@field.Group() {
+			@field.Field() {
+				@field.Label(field.LabelProps{For: "feedback"}) {
+					Feedback
+				}
+				@textarea.Textarea(textarea.Props{
+					ID:          "feedback",
+					Placeholder: "Your feedback helps us improve...",
+					Rows:        4,
+				})
+				@field.Description() {
+					Share your thoughts about our service.
+				}
+			}
+		}
+	}
+}

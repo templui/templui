@@ -1,0 +1,139 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/sheet"
+)
+
+templ SheetSides() {
+	<div class="grid grid-cols-2 gap-4">
+		// Top Sheet
+		@sheet.Sheet(sheet.Props{
+			Side: sheet.SideTop,
+		}) {
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Class:      "w-full",
+				Attributes: sheet.Trigger(ctx),
+			}) {
+				Open from Top
+			}
+			@sheet.Content() {
+				@sheet.Header() {
+					@sheet.Title() {
+						Top Sheet
+					}
+					@sheet.Description() {
+						This slides in from the top.
+					}
+				}
+				<div class="px-4 py-6">
+					<p class="text-sm">Content for the top sheet.</p>
+				</div>
+				@sheet.Footer() {
+					@button.Button(button.Props{
+						Attributes: sheet.Close(ctx),
+					}) {
+						Close
+					}
+				}
+			}
+		}
+		// Right Sheet
+		@sheet.Sheet(sheet.Props{
+			Side: sheet.SideRight,
+		}) {
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Class:      "w-full",
+				Attributes: sheet.Trigger(ctx),
+			}) {
+				Open from Right
+			}
+			@sheet.Content() {
+				@sheet.Header() {
+					@sheet.Title() {
+						Right Sheet
+					}
+					@sheet.Description() {
+						This slides in from the right.
+					}
+				}
+				<div class="px-4 py-6">
+					<p class="text-sm">Content for the right sheet.</p>
+				</div>
+				@sheet.Footer() {
+					@button.Button(button.Props{
+						Attributes: sheet.Close(ctx),
+					}) {
+						Close
+					}
+				}
+			}
+		}
+		// Bottom Sheet
+		@sheet.Sheet(sheet.Props{
+			Side: sheet.SideBottom,
+		}) {
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Class:      "w-full",
+				Attributes: sheet.Trigger(ctx),
+			}) {
+				Open from Bottom
+			}
+			@sheet.Content() {
+				@sheet.Header() {
+					@sheet.Title() {
+						Bottom Sheet
+					}
+					@sheet.Description() {
+						This slides in from the bottom.
+					}
+				}
+				<div class="px-4 py-6">
+					<p class="text-sm">Content for the bottom sheet.</p>
+				</div>
+				@sheet.Footer() {
+					@button.Button(button.Props{
+						Attributes: sheet.Close(ctx),
+					}) {
+						Close
+					}
+				}
+			}
+		}
+		// Left Sheet
+		@sheet.Sheet(sheet.Props{
+			Side: sheet.SideLeft,
+		}) {
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Class:      "w-full",
+				Attributes: sheet.Trigger(ctx),
+			}) {
+				Open from Left
+			}
+			@sheet.Content() {
+				@sheet.Header() {
+					@sheet.Title() {
+						Left Sheet
+					}
+					@sheet.Description() {
+						This slides in from the left.
+					}
+				}
+				<div class="px-4 py-6">
+					<p class="text-sm">Content for the left sheet.</p>
+				</div>
+				@sheet.Footer() {
+					@button.Button(button.Props{
+						Attributes: sheet.Close(ctx),
+					}) {
+						Close
+					}
+				}
+			}
+		}
+	</div>
+}

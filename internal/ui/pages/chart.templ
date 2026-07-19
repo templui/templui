@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 // Chart is an example usage of ChartComponent
@@ -141,7 +141,7 @@ templ Chart() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.ChartDefault(),
+				ShowcaseFile:    examples.ChartDefault(),
 				PreviewCodeFile: "chart_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -158,133 +158,133 @@ templ Chart() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Bar Chart - Multiple",
-					ShowcaseFile:    showcase.ChartBarMultiple(),
+					ShowcaseFile:    examples.ChartBarMultiple(),
 					PreviewCodeFile: "chart_bar_multiple.templ",
 					ID:              "bar-multiple",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Bar Chart - Horizontal",
-					ShowcaseFile:    showcase.ChartBarHorizontal(),
+					ShowcaseFile:    examples.ChartBarHorizontal(),
 					PreviewCodeFile: "chart_bar_horizontal.templ",
 					ID:              "bar-horizontal",
 				})
 				// Bar Charts
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Bar Chart - Negative",
-					ShowcaseFile:    showcase.ChartBarNegative(),
+					ShowcaseFile:    examples.ChartBarNegative(),
 					PreviewCodeFile: "chart_bar_negative.templ",
 					ID:              "bar-negative",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Bar Chart - Stacked",
-					ShowcaseFile:    showcase.ChartBarStacked(),
+					ShowcaseFile:    examples.ChartBarStacked(),
 					PreviewCodeFile: "chart_bar_stacked.templ",
 					ID:              "bar-stacked",
 				})
 				// Line Charts
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Line Chart",
-					ShowcaseFile:    showcase.ChartLine(),
+					ShowcaseFile:    examples.ChartLine(),
 					PreviewCodeFile: "chart_line.templ",
 					ID:              "line",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Line Chart - Linear",
-					ShowcaseFile:    showcase.ChartLineLinear(),
+					ShowcaseFile:    examples.ChartLineLinear(),
 					PreviewCodeFile: "chart_line_linear.templ",
 					ID:              "line-linear",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Line Chart - Step",
-					ShowcaseFile:    showcase.ChartLineStep(),
+					ShowcaseFile:    examples.ChartLineStep(),
 					PreviewCodeFile: "chart_line_step.templ",
 					ID:              "line-step",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Line Chart - Multiple",
-					ShowcaseFile:    showcase.ChartLineMultiple(),
+					ShowcaseFile:    examples.ChartLineMultiple(),
 					PreviewCodeFile: "chart_line_multiple.templ",
 					ID:              "line-multiple",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "RawConfig - Mixed Chart",
-					ShowcaseFile:    showcase.ChartRawConfig(),
+					ShowcaseFile:    examples.ChartRawConfig(),
 					PreviewCodeFile: "chart_raw_config.templ",
 					ID:              "raw-config",
 				})
 				// Area Charts
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Area Chart",
-					ShowcaseFile:    showcase.ChartArea(),
+					ShowcaseFile:    examples.ChartArea(),
 					PreviewCodeFile: "chart_area.templ",
 					ID:              "area",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Area Chart - Linear",
-					ShowcaseFile:    showcase.ChartAreaLinear(),
+					ShowcaseFile:    examples.ChartAreaLinear(),
 					PreviewCodeFile: "chart_area_linear.templ",
 					ID:              "area-linear",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Area Chart - Step",
-					ShowcaseFile:    showcase.ChartAreaStep(),
+					ShowcaseFile:    examples.ChartAreaStep(),
 					PreviewCodeFile: "chart_area_step.templ",
 					ID:              "area-step",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Area Chart - Stacked",
-					ShowcaseFile:    showcase.ChartAreaStacked(),
+					ShowcaseFile:    examples.ChartAreaStacked(),
 					PreviewCodeFile: "chart_area_stacked.templ",
 					ID:              "area-stacked",
 				})
 				// Pie Charts
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Pie Chart",
-					ShowcaseFile:    showcase.ChartPie(),
+					ShowcaseFile:    examples.ChartPie(),
 					PreviewCodeFile: "chart_pie.templ",
 					ID:              "pie",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Pie Chart - Stacked",
-					ShowcaseFile:    showcase.ChartPieStacked(),
+					ShowcaseFile:    examples.ChartPieStacked(),
 					PreviewCodeFile: "chart_pie_stacked.templ",
 					ID:              "pie-stacked",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Pie Chart - Legend",
-					ShowcaseFile:    showcase.ChartPieLegend(),
+					ShowcaseFile:    examples.ChartPieLegend(),
 					PreviewCodeFile: "chart_pie_legend.templ",
 					ID:              "pie-legend",
 				})
 				// Doughnut Charts
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Doughnut Chart",
-					ShowcaseFile:    showcase.ChartDoughnut(),
+					ShowcaseFile:    examples.ChartDoughnut(),
 					PreviewCodeFile: "chart_doughnut.templ",
 					ID:              "doughnut",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Doughnut Chart - Stacked",
-					ShowcaseFile:    showcase.ChartDoughnutStacked(),
+					ShowcaseFile:    examples.ChartDoughnutStacked(),
 					PreviewCodeFile: "chart_doughnut_stacked.templ",
 					ID:              "doughnut-stacked",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Doughnut Chart - Legend",
-					ShowcaseFile:    showcase.ChartDoughnutLegend(),
+					ShowcaseFile:    examples.ChartDoughnutLegend(),
 					PreviewCodeFile: "chart_doughnut_legend.templ",
 					ID:              "doughnut-legend",
 				})
 				// Radar Charts
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Radar Chart",
-					ShowcaseFile:    showcase.ChartRadar(),
+					ShowcaseFile:    examples.ChartRadar(),
 					PreviewCodeFile: "chart_radar.templ",
 					ID:              "radar",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Radar Chart - Stacked",
-					ShowcaseFile:    showcase.CharRadarStacked(),
+					ShowcaseFile:    examples.CharRadarStacked(),
 					PreviewCodeFile: "chart_radar_stacked.templ",
 					ID:              "radar-stacked",
 				})

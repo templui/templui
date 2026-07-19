@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Field() {
@@ -60,7 +60,7 @@ templ Field() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.FieldDefault(),
+				ShowcaseFile:    examples.FieldDefault(),
 				PreviewCodeFile: "field_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -69,67 +69,67 @@ templ Field() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Input",
-					ShowcaseFile:    showcase.FieldInput(),
+					ShowcaseFile:    examples.FieldInput(),
 					PreviewCodeFile: "field_input.templ",
 					ID:              "input",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Textarea",
-					ShowcaseFile:    showcase.FieldTextarea(),
+					ShowcaseFile:    examples.FieldTextarea(),
 					PreviewCodeFile: "field_textarea.templ",
 					ID:              "textarea",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Select",
-					ShowcaseFile:    showcase.FieldSelect(),
+					ShowcaseFile:    examples.FieldSelect(),
 					PreviewCodeFile: "field_select.templ",
 					ID:              "select",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Slider",
-					ShowcaseFile:    showcase.FieldSlider(),
+					ShowcaseFile:    examples.FieldSlider(),
 					PreviewCodeFile: "field_slider.templ",
 					ID:              "slider",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Fieldset",
-					ShowcaseFile:    showcase.FieldFieldset(),
+					ShowcaseFile:    examples.FieldFieldset(),
 					PreviewCodeFile: "field_fieldset.templ",
 					ID:              "fieldset",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Checkbox",
-					ShowcaseFile:    showcase.FieldCheckbox(),
+					ShowcaseFile:    examples.FieldCheckbox(),
 					PreviewCodeFile: "field_checkbox.templ",
 					ID:              "checkbox",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Radio",
-					ShowcaseFile:    showcase.FieldRadio(),
+					ShowcaseFile:    examples.FieldRadio(),
 					PreviewCodeFile: "field_radio.templ",
 					ID:              "radio",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Switch",
-					ShowcaseFile:    showcase.FieldSwitch(),
+					ShowcaseFile:    examples.FieldSwitch(),
 					PreviewCodeFile: "field_switch.templ",
 					ID:              "switch",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Choice Card",
-					ShowcaseFile:    showcase.FieldChoiceCard(),
+					ShowcaseFile:    examples.FieldChoiceCard(),
 					PreviewCodeFile: "field_choice_card.templ",
 					ID:              "choice-card",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Field Group",
-					ShowcaseFile:    showcase.FieldGroupExample(),
+					ShowcaseFile:    examples.FieldGroupExample(),
 					PreviewCodeFile: "field_group.templ",
 					ID:              "field-group",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Responsive Layout",
-					ShowcaseFile:    showcase.FieldResponsive(),
+					ShowcaseFile:    examples.FieldResponsive(),
 					PreviewCodeFile: "field_responsive.templ",
 					ID:              "responsive",
 				})

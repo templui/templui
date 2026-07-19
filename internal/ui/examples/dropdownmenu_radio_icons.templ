@@ -1,0 +1,42 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/dropdownmenu"
+	"github.com/templui/templui/components/icon"
+)
+
+templ DropdownMenuRadioIcons() {
+	@dropdownmenu.Root() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: dropdownmenu.Trigger(ctx),
+		}) {
+			Payment Method
+		}
+		@dropdownmenu.Content(dropdownmenu.ContentProps{Class: "min-w-56"}) {
+			@dropdownmenu.Group() {
+				@dropdownmenu.Label() {
+					Select Payment Method
+				}
+				@dropdownmenu.RadioGroup() {
+					@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{
+						Value:   "card",
+						Checked: true,
+					}) {
+						@icon.CreditCard()
+						Credit Card
+					}
+					@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{Value: "paypal"}) {
+						@icon.Wallet()
+						PayPal
+					}
+					@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{Value: "bank"}) {
+						@icon.Building2()
+						Bank Transfer
+					}
+				}
+			}
+		}
+	}
+}

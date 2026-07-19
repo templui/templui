@@ -1,0 +1,15 @@
+package examples
+
+import "github.com/templui/templui/components/skeleton"
+
+templ SkeletonCard() {
+	<div class="p-4 w-full max-w-sm">
+		@skeleton.Skeleton(skeleton.Props{Class: "h-[200px] w-full rounded-md mb-4"})
+		<div class="space-y-2">
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-2/3"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-full"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-full"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-3/4"})
+		</div>
+	</div>
+}

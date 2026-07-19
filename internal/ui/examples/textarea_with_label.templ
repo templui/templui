@@ -1,0 +1,21 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/label"
+	"github.com/templui/templui/components/textarea"
+)
+
+templ TextareaWithLabel() {
+	<div class="space-y-2 w-full max-w-md">
+		@label.Label(label.Props{
+			For: "textarea-with-label",
+		}) {
+			Your Message
+		}
+		@textarea.Textarea(textarea.Props{
+			ID:          "textarea-with-label",
+			Placeholder: "Type your message here...",
+			Rows:        4,
+		})
+	</div>
+}

@@ -9,7 +9,7 @@ import (
 	"github.com/templui/templui/components/dropdownmenu"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/internal/ctxkeys"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/utils"
 )
 
@@ -20,7 +20,7 @@ import (
 // ComponentPreviewBlock mirrors shadcn's ComponentPreview: one rounded-2xl
 // bordered container with the live demo on top and the source attached below
 // (border-t), clamped to a few lines behind a View Code button.
-templ ComponentPreviewBlock(entry showcase.RegistryEntry) {
+templ ComponentPreviewBlock(entry examples.RegistryEntry) {
 	<div data-not-typeset class="group relative mt-4 mb-12 flex flex-col overflow-hidden rounded-2xl border">
 		<div data-slot="preview" class="preview relative flex h-72 w-full items-center justify-center p-10">
 			@entry.Component
@@ -65,7 +65,7 @@ templ CollapsibleCodeBlock(file string) {
 			</div>
 		</div>
 		<div class="hidden group-data-[open=true]/code:block">
-			@CodeSnippetFromEmbeddedStyled(file, "templ", showcase.TemplFiles, "[&_pre]:my-0 [&_pre]:max-h-72 [&_pre]:rounded-none [&_pre]:!bg-code [&_pre]:px-0")
+			@CodeSnippetFromEmbeddedStyled(file, "templ", examples.TemplFiles, "[&_pre]:my-0 [&_pre]:max-h-72 [&_pre]:rounded-none [&_pre]:!bg-code [&_pre]:px-0")
 		</div>
 	</div>
 }
@@ -82,7 +82,7 @@ templ codeSnippetPreview(file string, maxLines int) {
 }
 
 func sourcePreviewLines(file string, maxLines int) string {
-	content, err := showcase.TemplFiles.ReadFile(file)
+	content, err := examples.TemplFiles.ReadFile(file)
 	if err != nil {
 		return ""
 	}

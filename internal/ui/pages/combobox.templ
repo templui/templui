@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Combobox() {
@@ -54,7 +54,7 @@ templ Combobox() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.ComboboxDefault(),
+				ShowcaseFile:    examples.ComboboxDefault(),
 				PreviewCodeFile: "combobox_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -63,55 +63,55 @@ templ Combobox() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Multiple",
-					ShowcaseFile:    showcase.ComboboxMultiple(),
+					ShowcaseFile:    examples.ComboboxMultiple(),
 					PreviewCodeFile: "combobox_multiple.templ",
 					ID:              "multiple",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Clear",
-					ShowcaseFile:    showcase.ComboboxClear(),
+					ShowcaseFile:    examples.ComboboxClear(),
 					PreviewCodeFile: "combobox_clear.templ",
 					ID:              "clear",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Groups",
-					ShowcaseFile:    showcase.ComboboxGroups(),
+					ShowcaseFile:    examples.ComboboxGroups(),
 					PreviewCodeFile: "combobox_groups.templ",
 					ID:              "groups",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Custom Items",
-					ShowcaseFile:    showcase.ComboboxCustom(),
+					ShowcaseFile:    examples.ComboboxCustom(),
 					PreviewCodeFile: "combobox_custom.templ",
 					ID:              "custom",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Invalid",
-					ShowcaseFile:    showcase.ComboboxInvalid(),
+					ShowcaseFile:    examples.ComboboxInvalid(),
 					PreviewCodeFile: "combobox_invalid.templ",
 					ID:              "invalid",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Disabled",
-					ShowcaseFile:    showcase.ComboboxDisabled(),
+					ShowcaseFile:    examples.ComboboxDisabled(),
 					PreviewCodeFile: "combobox_disabled.templ",
 					ID:              "disabled",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Auto Highlight",
-					ShowcaseFile:    showcase.ComboboxAutoHighlight(),
+					ShowcaseFile:    examples.ComboboxAutoHighlight(),
 					PreviewCodeFile: "combobox_auto_highlight.templ",
 					ID:              "auto-highlight",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Popup",
-					ShowcaseFile:    showcase.ComboboxPopup(),
+					ShowcaseFile:    examples.ComboboxPopup(),
 					PreviewCodeFile: "combobox_popup.templ",
 					ID:              "popup",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Input Group",
-					ShowcaseFile:    showcase.ComboboxInputGroup(),
+					ShowcaseFile:    examples.ComboboxInputGroup(),
 					PreviewCodeFile: "combobox_input_group.templ",
 					ID:              "input-group",
 				})

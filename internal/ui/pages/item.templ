@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Item() {
@@ -50,7 +50,7 @@ templ Item() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.ItemDefault(),
+				ShowcaseFile:    examples.ItemDefault(),
 				PreviewCodeFile: "item_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -58,56 +58,56 @@ templ Item() {
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Variant", ID: "variant"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					ShowcaseFile:    showcase.ItemVariant(),
+					ShowcaseFile:    examples.ItemVariant(),
 					PreviewCodeFile: "item_variant.templ",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Size", ID: "size"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					ShowcaseFile:    showcase.ItemSizeDemo(),
+					ShowcaseFile:    examples.ItemSizeDemo(),
 					PreviewCodeFile: "item_size.templ",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Icon",
-					ShowcaseFile:    showcase.ItemIcon(),
+					ShowcaseFile:    examples.ItemIcon(),
 					PreviewCodeFile: "item_icon.templ",
 					ID:              "icon",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Avatar",
-					ShowcaseFile:    showcase.ItemAvatar(),
+					ShowcaseFile:    examples.ItemAvatar(),
 					PreviewCodeFile: "item_avatar.templ",
 					ID:              "avatar",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Image",
-					ShowcaseFile:    showcase.ItemImage(),
+					ShowcaseFile:    examples.ItemImage(),
 					PreviewCodeFile: "item_image.templ",
 					ID:              "image",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Group",
-					ShowcaseFile:    showcase.ItemGroupExample(),
+					ShowcaseFile:    examples.ItemGroupExample(),
 					PreviewCodeFile: "item_group.templ",
 					ID:              "group",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Header",
-					ShowcaseFile:    showcase.ItemHeaderDemo(),
+					ShowcaseFile:    examples.ItemHeaderDemo(),
 					PreviewCodeFile: "item_header.templ",
 					ID:              "header",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Link",
-					ShowcaseFile:    showcase.ItemLink(),
+					ShowcaseFile:    examples.ItemLink(),
 					PreviewCodeFile: "item_link.templ",
 					ID:              "link",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Dropdown",
-					ShowcaseFile:    showcase.ItemDropdown(),
+					ShowcaseFile:    examples.ItemDropdown(),
 					PreviewCodeFile: "item_dropdown.templ",
 					ID:              "dropdown",
 				})

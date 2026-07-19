@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Textarea() {
@@ -58,7 +58,7 @@ templ Textarea() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.TextareaDefault(),
+				ShowcaseFile:    examples.TextareaDefault(),
 				PreviewCodeFile: "textarea_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -75,25 +75,25 @@ templ Textarea() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Field",
-					ShowcaseFile:    showcase.TextareaField(),
+					ShowcaseFile:    examples.TextareaField(),
 					PreviewCodeFile: "textarea_field.templ",
 					ID:              "field",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Disabled",
-					ShowcaseFile:    showcase.TextareaDisabled(),
+					ShowcaseFile:    examples.TextareaDisabled(),
 					PreviewCodeFile: "textarea_disabled.templ",
 					ID:              "disabled",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Invalid",
-					ShowcaseFile:    showcase.TextareaInvalid(),
+					ShowcaseFile:    examples.TextareaInvalid(),
 					PreviewCodeFile: "textarea_invalid.templ",
 					ID:              "invalid",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Button",
-					ShowcaseFile:    showcase.TextareaButton(),
+					ShowcaseFile:    examples.TextareaButton(),
 					PreviewCodeFile: "textarea_button.templ",
 					ID:              "button",
 				})

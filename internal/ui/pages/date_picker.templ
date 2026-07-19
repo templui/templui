@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ DatePicker() {
@@ -39,7 +39,7 @@ templ DatePicker() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.DatePickerDefault(),
+				ShowcaseFile:    examples.DatePickerDefault(),
 				PreviewCodeFile: "date_picker_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -48,31 +48,31 @@ templ DatePicker() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Basic",
-					ShowcaseFile:    showcase.DatePickerBasic(),
+					ShowcaseFile:    examples.DatePickerBasic(),
 					PreviewCodeFile: "date_picker_basic.templ",
 					ID:              "basic",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Range",
-					ShowcaseFile:    showcase.DatePickerRange(),
+					ShowcaseFile:    examples.DatePickerRange(),
 					PreviewCodeFile: "date_picker_range.templ",
 					ID:              "range",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Date of Birth",
-					ShowcaseFile:    showcase.DatePickerDob(),
+					ShowcaseFile:    examples.DatePickerDob(),
 					PreviewCodeFile: "date_picker_dob.templ",
 					ID:              "dob",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Input",
-					ShowcaseFile:    showcase.DatePickerInput(),
+					ShowcaseFile:    examples.DatePickerInput(),
 					PreviewCodeFile: "date_picker_input.templ",
 					ID:              "input",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "With Time",
-					ShowcaseFile:    showcase.DatePickerTime(),
+					ShowcaseFile:    examples.DatePickerTime(),
 					PreviewCodeFile: "date_picker_time.templ",
 					ID:              "time",
 				})

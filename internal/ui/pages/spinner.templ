@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Spinner() {
@@ -46,7 +46,7 @@ templ Spinner() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.SpinnerDefault(),
+				ShowcaseFile:    examples.SpinnerDefault(),
 				PreviewCodeFile: "spinner_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -54,38 +54,38 @@ templ Spinner() {
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Customization", ID: "customization"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
-					ShowcaseFile:    showcase.SpinnerCustom(),
+					ShowcaseFile:    examples.SpinnerCustom(),
 					PreviewCodeFile: "spinner_custom.templ",
 				})
 			}
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Size",
-					ShowcaseFile:    showcase.SpinnerSize(),
+					ShowcaseFile:    examples.SpinnerSize(),
 					PreviewCodeFile: "spinner_size.templ",
 					ID:              "size",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Button",
-					ShowcaseFile:    showcase.SpinnerButton(),
+					ShowcaseFile:    examples.SpinnerButton(),
 					PreviewCodeFile: "spinner_button.templ",
 					ID:              "button",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Badge",
-					ShowcaseFile:    showcase.SpinnerBadge(),
+					ShowcaseFile:    examples.SpinnerBadge(),
 					PreviewCodeFile: "spinner_badge.templ",
 					ID:              "badge",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Input Group",
-					ShowcaseFile:    showcase.SpinnerInputGroup(),
+					ShowcaseFile:    examples.SpinnerInputGroup(),
 					PreviewCodeFile: "spinner_input_group.templ",
 					ID:              "input-group",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Empty",
-					ShowcaseFile:    showcase.SpinnerEmpty(),
+					ShowcaseFile:    examples.SpinnerEmpty(),
 					PreviewCodeFile: "spinner_empty.templ",
 					ID:              "empty",
 				})

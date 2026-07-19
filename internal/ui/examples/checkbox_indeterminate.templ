@@ -1,0 +1,67 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/checkbox"
+	"github.com/templui/templui/components/label"
+)
+
+templ CheckboxIndeterminate() {
+	<div class="flex flex-col gap-4">
+		<div class="flex items-center gap-3 border-b pb-3">
+			@checkbox.Checkbox(checkbox.Props{
+				ID:          "select-all",
+				Group:       "items",
+				GroupParent: true,
+			})
+			@label.Label(label.Props{
+				For:   "select-all",
+				Class: "font-medium",
+			}) {
+				Select all
+			}
+		</div>
+		<div class="flex flex-col gap-3 pl-6">
+			<div class="flex items-center gap-3">
+				@checkbox.Checkbox(checkbox.Props{
+					ID:      "item-1",
+					Name:    "items",
+					Value:   "1",
+					Group:   "items",
+					Checked: true,
+				})
+				@label.Label(label.Props{
+					For: "item-1",
+				}) {
+					Item 1
+				}
+			</div>
+			<div class="flex items-center gap-3">
+				@checkbox.Checkbox(checkbox.Props{
+					ID:      "item-2",
+					Name:    "items",
+					Value:   "2",
+					Group:   "items",
+					Checked: true,
+				})
+				@label.Label(label.Props{
+					For: "item-2",
+				}) {
+					Item 2
+				}
+			</div>
+			<div class="flex items-center gap-3">
+				@checkbox.Checkbox(checkbox.Props{
+					ID:    "item-3",
+					Name:  "items",
+					Value: "3",
+					Group: "items",
+				})
+				@label.Label(label.Props{
+					For: "item-3",
+				}) {
+					Item 3
+				}
+			</div>
+		</div>
+	</div>
+}

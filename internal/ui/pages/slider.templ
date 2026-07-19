@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Slider() {
@@ -83,7 +83,7 @@ templ Slider() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.SliderDefault(),
+				ShowcaseFile:    examples.SliderDefault(),
 				PreviewCodeFile: "slider_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -100,31 +100,31 @@ templ Slider() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Value",
-					ShowcaseFile:    showcase.SliderValue(),
+					ShowcaseFile:    examples.SliderValue(),
 					PreviewCodeFile: "slider_value.templ",
 					ID:              "value",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Steps",
-					ShowcaseFile:    showcase.SliderSteps(),
+					ShowcaseFile:    examples.SliderSteps(),
 					PreviewCodeFile: "slider_steps.templ",
 					ID:              "steps",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Disabled",
-					ShowcaseFile:    showcase.SliderDisabled(),
+					ShowcaseFile:    examples.SliderDisabled(),
 					PreviewCodeFile: "slider_disabled.templ",
 					ID:              "disabled",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "External Value",
-					ShowcaseFile:    showcase.SliderExternalValue(),
+					ShowcaseFile:    examples.SliderExternalValue(),
 					PreviewCodeFile: "slider_external_value.templ",
 					ID:              "external-value",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Range",
-					ShowcaseFile:    showcase.SliderRange(),
+					ShowcaseFile:    examples.SliderRange(),
 					PreviewCodeFile: "slider_range.templ",
 					ID:              "range",
 				})

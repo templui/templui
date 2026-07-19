@@ -4,7 +4,7 @@ import (
 	"github.com/templui/templui/components/card"
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Label() {
@@ -51,7 +51,7 @@ templ Label() {
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				SectionName:     "",
-				ShowcaseFile:    showcase.CheckboxDefault(),
+				ShowcaseFile:    examples.CheckboxDefault(),
 				PreviewCodeFile: "checkbox_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{

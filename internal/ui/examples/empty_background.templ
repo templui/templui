@@ -1,0 +1,29 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/empty"
+	"github.com/templui/templui/components/icon"
+)
+
+templ EmptyBackground() {
+	@empty.Empty(empty.Props{Class: "h-full bg-muted/30"}) {
+		@empty.Header() {
+			@empty.Media(empty.MediaProps{Variant: empty.MediaVariantIcon}) {
+				@icon.Bell()
+			}
+			@empty.Title() {
+				No Notifications
+			}
+			@empty.Description(empty.DescriptionProps{Class: "max-w-xs text-pretty"}) {
+				You're all caught up. New notifications will appear here.
+			}
+		}
+		@empty.Content() {
+			@button.Button(button.Props{Variant: button.VariantOutline}) {
+				@icon.RefreshCcw()
+				Refresh
+			}
+		}
+	}
+}

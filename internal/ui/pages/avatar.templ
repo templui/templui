@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Avatar() {
@@ -52,7 +52,7 @@ templ Avatar() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.AvatarDefault(),
+				ShowcaseFile:    examples.AvatarDefault(),
 				PreviewCodeFile: "avatar_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -61,49 +61,49 @@ templ Avatar() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Basic",
-					ShowcaseFile:    showcase.AvatarBasic(),
+					ShowcaseFile:    examples.AvatarBasic(),
 					PreviewCodeFile: "avatar_basic.templ",
 					ID:              "basic",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Badge",
-					ShowcaseFile:    showcase.AvatarBadgeExample(),
+					ShowcaseFile:    examples.AvatarBadgeExample(),
 					PreviewCodeFile: "avatar_badge.templ",
 					ID:              "badge",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Badge with Icon",
-					ShowcaseFile:    showcase.AvatarBadgeIcon(),
+					ShowcaseFile:    examples.AvatarBadgeIcon(),
 					PreviewCodeFile: "avatar_badge_icon.templ",
 					ID:              "badge-icon",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Avatar Group",
-					ShowcaseFile:    showcase.AvatarGroup(),
+					ShowcaseFile:    examples.AvatarGroup(),
 					PreviewCodeFile: "avatar_group.templ",
 					ID:              "group",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Avatar Group Count",
-					ShowcaseFile:    showcase.AvatarGroupCount(),
+					ShowcaseFile:    examples.AvatarGroupCount(),
 					PreviewCodeFile: "avatar_group_count.templ",
 					ID:              "group-count",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Avatar Group with Icon",
-					ShowcaseFile:    showcase.AvatarGroupCountIcon(),
+					ShowcaseFile:    examples.AvatarGroupCountIcon(),
 					PreviewCodeFile: "avatar_group_count_icon.templ",
 					ID:              "group-count-icon",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Sizes",
-					ShowcaseFile:    showcase.AvatarSizes(),
+					ShowcaseFile:    examples.AvatarSizes(),
 					PreviewCodeFile: "avatar_sizes.templ",
 					ID:              "sizes",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Dropdown",
-					ShowcaseFile:    showcase.AvatarDropdown(),
+					ShowcaseFile:    examples.AvatarDropdown(),
 					PreviewCodeFile: "avatar_dropdown.templ",
 					ID:              "dropdown",
 				})

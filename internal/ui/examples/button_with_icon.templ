@@ -1,0 +1,16 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/icon"
+)
+
+templ ButtonWithIcon() {
+	@button.Button(button.Props{
+		Variant: button.VariantOutline,
+		Size:    button.SizeSm,
+	}) {
+		@icon.GitBranch()
+		New Branch
+	}
+}

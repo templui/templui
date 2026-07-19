@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Toggle() {
@@ -45,7 +45,7 @@ templ Toggle() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.ToggleDefault(),
+				ShowcaseFile:    examples.ToggleDefault(),
 				PreviewCodeFile: "toggle_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -54,25 +54,25 @@ templ Toggle() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Outline",
-					ShowcaseFile:    showcase.ToggleOutline(),
+					ShowcaseFile:    examples.ToggleOutline(),
 					PreviewCodeFile: "toggle_outline.templ",
 					ID:              "outline",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "With Text",
-					ShowcaseFile:    showcase.ToggleWithText(),
+					ShowcaseFile:    examples.ToggleWithText(),
 					PreviewCodeFile: "toggle_with_text.templ",
 					ID:              "with-text",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Size",
-					ShowcaseFile:    showcase.ToggleSizes(),
+					ShowcaseFile:    examples.ToggleSizes(),
 					PreviewCodeFile: "toggle_sizes.templ",
 					ID:              "size",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Disabled",
-					ShowcaseFile:    showcase.ToggleDisabled(),
+					ShowcaseFile:    examples.ToggleDisabled(),
 					PreviewCodeFile: "toggle_disabled.templ",
 					ID:              "disabled",
 				})

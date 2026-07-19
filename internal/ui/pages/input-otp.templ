@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ InputOtp() {
@@ -91,7 +91,7 @@ templ InputOtp() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.InputOTPDefault(),
+				ShowcaseFile:    examples.InputOTPDefault(),
 				PreviewCodeFile: "input_otp_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -108,37 +108,37 @@ templ InputOtp() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Placeholder",
-					ShowcaseFile:    showcase.InputOTPPlaceholder(),
+					ShowcaseFile:    examples.InputOTPPlaceholder(),
 					PreviewCodeFile: "input_otp_placeholder.templ",
 					ID:              "placeholder",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "With Label",
-					ShowcaseFile:    showcase.InputOTPWithLabel(),
+					ShowcaseFile:    examples.InputOTPWithLabel(),
 					PreviewCodeFile: "input_otp_with_label.templ",
 					ID:              "with-label",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Custom Length",
-					ShowcaseFile:    showcase.InputOTPCustomLength(),
+					ShowcaseFile:    examples.InputOTPCustomLength(),
 					PreviewCodeFile: "input_otp_custom_length.templ",
 					ID:              "custom-length",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Password Type",
-					ShowcaseFile:    showcase.InputOTPPasswordType(),
+					ShowcaseFile:    examples.InputOTPPasswordType(),
 					PreviewCodeFile: "input_otp_password_type.templ",
 					ID:              "password-type",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Custom Styling",
-					ShowcaseFile:    showcase.InputOTPCustomStyling(),
+					ShowcaseFile:    examples.InputOTPCustomStyling(),
 					PreviewCodeFile: "input_otp_custom_styling.templ",
 					ID:              "custom-styling",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Form",
-					ShowcaseFile:    showcase.InputOTPForm(),
+					ShowcaseFile:    examples.InputOTPForm(),
 					PreviewCodeFile: "input_otp_form.templ",
 					ID:              "form",
 				})

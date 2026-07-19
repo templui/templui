@@ -1,0 +1,21 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/textarea"
+)
+
+templ TextareaField() {
+	@field.Field() {
+		@field.Label(field.LabelProps{For: "textarea-message"}) {
+			Message
+		}
+		@field.Description() {
+			Enter your message below.
+		}
+		@textarea.Textarea(textarea.Props{
+			ID:          "textarea-message",
+			Placeholder: "Type your message here.",
+		})
+	}
+}

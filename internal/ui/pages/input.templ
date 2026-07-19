@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Input() {
@@ -63,7 +63,7 @@ templ Input() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.InputDefault(),
+				ShowcaseFile:    examples.InputDefault(),
 				PreviewCodeFile: "input_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -80,55 +80,55 @@ templ Input() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Basic",
-					ShowcaseFile:    showcase.InputBasic(),
+					ShowcaseFile:    examples.InputBasic(),
 					PreviewCodeFile: "input_basic.templ",
 					ID:              "basic",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Field",
-					ShowcaseFile:    showcase.InputField(),
+					ShowcaseFile:    examples.InputField(),
 					PreviewCodeFile: "input_field.templ",
 					ID:              "field",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Disabled",
-					ShowcaseFile:    showcase.InputDisabled(),
+					ShowcaseFile:    examples.InputDisabled(),
 					PreviewCodeFile: "input_disabled.templ",
 					ID:              "disabled",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Invalid",
-					ShowcaseFile:    showcase.InputInvalid(),
+					ShowcaseFile:    examples.InputInvalid(),
 					PreviewCodeFile: "input_invalid.templ",
 					ID:              "invalid",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "File",
-					ShowcaseFile:    showcase.InputFile(),
+					ShowcaseFile:    examples.InputFile(),
 					PreviewCodeFile: "input_file.templ",
 					ID:              "file",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Inline",
-					ShowcaseFile:    showcase.InputInline(),
+					ShowcaseFile:    examples.InputInline(),
 					PreviewCodeFile: "input_inline.templ",
 					ID:              "inline",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Grid",
-					ShowcaseFile:    showcase.InputGrid(),
+					ShowcaseFile:    examples.InputGrid(),
 					PreviewCodeFile: "input_grid.templ",
 					ID:              "grid",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Required",
-					ShowcaseFile:    showcase.InputRequired(),
+					ShowcaseFile:    examples.InputRequired(),
 					PreviewCodeFile: "input_required.templ",
 					ID:              "required",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Badge",
-					ShowcaseFile:    showcase.InputBadge(),
+					ShowcaseFile:    examples.InputBadge(),
 					PreviewCodeFile: "input_badge.templ",
 					ID:              "badge",
 				})

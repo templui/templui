@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Switch() {
@@ -58,7 +58,7 @@ templ Switch() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.SwitchDefault(),
+				ShowcaseFile:    examples.SwitchDefault(),
 				PreviewCodeFile: "switch_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -82,7 +82,7 @@ templ Switch() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Form",
-					ShowcaseFile:    showcase.SwitchForm(),
+					ShowcaseFile:    examples.SwitchForm(),
 					PreviewCodeFile: "switch_form.templ",
 					ID:              "form",
 				})

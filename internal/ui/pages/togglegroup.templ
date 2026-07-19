@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ ToggleGroup() {
@@ -47,7 +47,7 @@ templ ToggleGroup() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.ToggleGroup(),
+				ShowcaseFile:    examples.ToggleGroup(),
 				PreviewCodeFile: "toggle_group.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -56,37 +56,37 @@ templ ToggleGroup() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Outline",
-					ShowcaseFile:    showcase.ToggleGroupOutline(),
+					ShowcaseFile:    examples.ToggleGroupOutline(),
 					PreviewCodeFile: "togglegroup_outline.templ",
 					ID:              "outline",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Size",
-					ShowcaseFile:    showcase.ToggleGroupSize(),
+					ShowcaseFile:    examples.ToggleGroupSize(),
 					PreviewCodeFile: "togglegroup_size.templ",
 					ID:              "size",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Spacing",
-					ShowcaseFile:    showcase.ToggleGroupSpacing(),
+					ShowcaseFile:    examples.ToggleGroupSpacing(),
 					PreviewCodeFile: "togglegroup_spacing.templ",
 					ID:              "spacing",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Vertical",
-					ShowcaseFile:    showcase.ToggleGroupVertical(),
+					ShowcaseFile:    examples.ToggleGroupVertical(),
 					PreviewCodeFile: "togglegroup_vertical.templ",
 					ID:              "vertical",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Disabled",
-					ShowcaseFile:    showcase.ToggleGroupDisabled(),
+					ShowcaseFile:    examples.ToggleGroupDisabled(),
 					PreviewCodeFile: "togglegroup_disabled.templ",
 					ID:              "disabled",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Custom",
-					ShowcaseFile:    showcase.ToggleGroupCustom(),
+					ShowcaseFile:    examples.ToggleGroupCustom(),
 					PreviewCodeFile: "togglegroup_custom.templ",
 					ID:              "custom",
 				})

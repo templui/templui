@@ -1,0 +1,21 @@
+package examples
+
+import "github.com/templui/templui/components/inputotp"
+
+templ InputOTPCustomLength() {
+	@inputotp.InputOTP(inputotp.Props{
+		ID: "otp-custom-length",
+	}) {
+		@inputotp.Group() {
+			@inputotp.Slot(inputotp.SlotProps{
+				Index: 0,
+			})
+			@inputotp.Slot(inputotp.SlotProps{
+				Index: 1,
+			})
+			@inputotp.Slot(inputotp.SlotProps{
+				Index: 2,
+			})
+		}
+	}
+}

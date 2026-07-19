@@ -1,0 +1,11 @@
+package examples
+
+import "github.com/templui/templui/components/icon"
+
+templ IconSizes() {
+	<div class="flex flex-wrap gap-2">
+		@icon.House(icon.Props{Class: "size-4"})
+		@icon.House(icon.Props{Class: "size-8"})
+		@icon.House(icon.Props{Class: "size-12"})
+	</div>
+}

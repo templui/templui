@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Dialog() {
@@ -96,7 +96,7 @@ templ Dialog() {
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
 				SectionName:     "Default",
-				ShowcaseFile:    showcase.DialogDefault(),
+				ShowcaseFile:    examples.DialogDefault(),
 				PreviewCodeFile: "dialog_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -114,13 +114,13 @@ templ Dialog() {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					ID:              "external-trigger",
 					SectionName:     "External Trigger",
-					ShowcaseFile:    showcase.DialogExternalTrigger(),
+					ShowcaseFile:    examples.DialogExternalTrigger(),
 					PreviewCodeFile: "dialog_external_trigger.templ",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					ID:              "no-modal",
 					SectionName:     "Non-modal",
-					ShowcaseFile:    showcase.DialogNoModal(),
+					ShowcaseFile:    examples.DialogNoModal(),
 					PreviewCodeFile: "dialog_no_modal.templ",
 				})
 			}

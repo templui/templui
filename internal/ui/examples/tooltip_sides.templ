@@ -1,0 +1,30 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/tooltip"
+)
+
+templ TooltipSides() {
+	<div class="flex flex-wrap gap-2">
+		@tooltipSide("Left", tooltip.SideLeft)
+		@tooltipSide("Top", tooltip.SideTop)
+		@tooltipSide("Bottom", tooltip.SideBottom)
+		@tooltipSide("Right", tooltip.SideRight)
+	</div>
+}
+
+templ tooltipSide(label string, side tooltip.Side) {
+	@tooltip.Tooltip() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Class:      "w-fit",
+			Attributes: tooltip.Trigger(ctx),
+		}) {
+			{ label }
+		}
+		@tooltip.Content(tooltip.ContentProps{Side: side}) {
+			Add to library
+		}
+	}
+}

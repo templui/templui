@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ ContextMenu() {
@@ -55,7 +55,7 @@ templ ContextMenu() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.ContextMenuDefault(),
+				ShowcaseFile:    examples.ContextMenuDefault(),
 				PreviewCodeFile: "contextmenu_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Installation", ID: "installation"}) {
@@ -64,55 +64,55 @@ templ ContextMenu() {
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{Title: "Examples", ID: "examples"}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Basic",
-					ShowcaseFile:    showcase.ContextMenuBasic(),
+					ShowcaseFile:    examples.ContextMenuBasic(),
 					PreviewCodeFile: "contextmenu_basic.templ",
 					ID:              "basic",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Submenu",
-					ShowcaseFile:    showcase.ContextMenuSubmenu(),
+					ShowcaseFile:    examples.ContextMenuSubmenu(),
 					PreviewCodeFile: "contextmenu_submenu.templ",
 					ID:              "submenu",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Shortcuts",
-					ShowcaseFile:    showcase.ContextMenuShortcuts(),
+					ShowcaseFile:    examples.ContextMenuShortcuts(),
 					PreviewCodeFile: "contextmenu_shortcuts.templ",
 					ID:              "shortcuts",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Groups",
-					ShowcaseFile:    showcase.ContextMenuGroups(),
+					ShowcaseFile:    examples.ContextMenuGroups(),
 					PreviewCodeFile: "contextmenu_groups.templ",
 					ID:              "groups",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Icons",
-					ShowcaseFile:    showcase.ContextMenuIcons(),
+					ShowcaseFile:    examples.ContextMenuIcons(),
 					PreviewCodeFile: "contextmenu_icons.templ",
 					ID:              "icons",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Checkboxes",
-					ShowcaseFile:    showcase.ContextMenuCheckboxes(),
+					ShowcaseFile:    examples.ContextMenuCheckboxes(),
 					PreviewCodeFile: "contextmenu_checkboxes.templ",
 					ID:              "checkboxes",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Radio",
-					ShowcaseFile:    showcase.ContextMenuRadio(),
+					ShowcaseFile:    examples.ContextMenuRadio(),
 					PreviewCodeFile: "contextmenu_radio.templ",
 					ID:              "radio",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Destructive",
-					ShowcaseFile:    showcase.ContextMenuDestructive(),
+					ShowcaseFile:    examples.ContextMenuDestructive(),
 					PreviewCodeFile: "contextmenu_destructive.templ",
 					ID:              "destructive",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Sides",
-					ShowcaseFile:    showcase.ContextMenuSides(),
+					ShowcaseFile:    examples.ContextMenuSides(),
 					PreviewCodeFile: "contextmenu_sides.templ",
 					ID:              "sides",
 				})

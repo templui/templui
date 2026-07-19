@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Separator() {
@@ -66,7 +66,7 @@ templ Separator() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.SeparatorDefault(),
+				ShowcaseFile:    examples.SeparatorDefault(),
 				PreviewCodeFile: "separator_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -83,7 +83,7 @@ templ Separator() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Vertical",
-					ShowcaseFile:    showcase.SeparatorVertical(),
+					ShowcaseFile:    examples.SeparatorVertical(),
 					PreviewCodeFile: "separator_vertical.templ",
 					ID:              "vertical",
 				})

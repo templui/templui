@@ -1,0 +1,30 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/input"
+)
+
+templ InputForm() {
+	<div class="w-full max-w-sm">
+		@field.Field() {
+			@field.Label(field.LabelProps{
+				For: "email-form",
+			}) {
+				Email
+			}
+			@input.Input(input.Props{
+				ID:          "email-form",
+				Type:        input.TypeEmail,
+				Placeholder: "m@example.com",
+				HasError:    true,
+			})
+			@field.Description() {
+				Enter your email address for notifications.
+			}
+			@field.Error() {
+				Please enter a valid email address
+			}
+		}
+	</div>
+}

@@ -1,0 +1,31 @@
+package examples
+
+import "github.com/templui/templui/components/kbd"
+
+templ KbdDefault() {
+	<div class="flex flex-col items-center gap-4">
+		@kbd.Group() {
+			@kbd.Kbd() {
+				⌘
+			}
+			@kbd.Kbd() {
+				⇧
+			}
+			@kbd.Kbd() {
+				⌥
+			}
+			@kbd.Kbd() {
+				⌃
+			}
+		}
+		@kbd.Group() {
+			@kbd.Kbd() {
+				Ctrl
+			}
+			<span>+</span>
+			@kbd.Kbd() {
+				B
+			}
+		}
+	</div>
+}

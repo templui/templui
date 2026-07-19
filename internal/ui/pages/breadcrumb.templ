@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Breadcrumb() {
@@ -82,7 +82,7 @@ templ Breadcrumb() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.BreadcrumbDefault(),
+				ShowcaseFile:    examples.BreadcrumbDefault(),
 				PreviewCodeFile: "breadcrumb_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -99,19 +99,19 @@ templ Breadcrumb() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "With Icons",
-					ShowcaseFile:    showcase.BreadcrumbWithIcons(),
+					ShowcaseFile:    examples.BreadcrumbWithIcons(),
 					PreviewCodeFile: "breadcrumb_with_icons.templ",
 					ID:              "with-icons",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Custom Separator",
-					ShowcaseFile:    showcase.BreadcrumbCustomSeparator(),
+					ShowcaseFile:    examples.BreadcrumbCustomSeparator(),
 					PreviewCodeFile: "breadcrumb_custom_separator.templ",
 					ID:              "custom-separator",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Responsive",
-					ShowcaseFile:    showcase.BreadcrumbResponsive(),
+					ShowcaseFile:    examples.BreadcrumbResponsive(),
 					PreviewCodeFile: "breadcrumb_responsive.templ",
 					ID:              "responsive",
 				})

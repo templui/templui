@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 templ Skeleton() {
@@ -66,7 +66,7 @@ templ Skeleton() {
 			},
 		}) {
 			@modules.ExampleWrapper(modules.ExampleWrapperProps{
-				ShowcaseFile:    showcase.SkeletonDefault(),
+				ShowcaseFile:    examples.SkeletonDefault(),
 				PreviewCodeFile: "skeleton_default.templ",
 			})
 			@modules.ContainerWrapper(modules.ContainerWrapperProps{
@@ -83,19 +83,19 @@ templ Skeleton() {
 			}) {
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Profile",
-					ShowcaseFile:    showcase.SkeletonProfile(),
+					ShowcaseFile:    examples.SkeletonProfile(),
 					PreviewCodeFile: "skeleton_profile.templ",
 					ID:              "profile",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Card",
-					ShowcaseFile:    showcase.SkeletonCard(),
+					ShowcaseFile:    examples.SkeletonCard(),
 					PreviewCodeFile: "skeleton_card.templ",
 					ID:              "card",
 				})
 				@modules.ExampleWrapper(modules.ExampleWrapperProps{
 					SectionName:     "Dashboard",
-					ShowcaseFile:    showcase.SkeletonDashboard(),
+					ShowcaseFile:    examples.SkeletonDashboard(),
 					PreviewCodeFile: "skeleton_dashboard.templ",
 					ID:              "dashboard",
 				})

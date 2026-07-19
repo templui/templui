@@ -7,7 +7,7 @@ import (
 
 	"github.com/templui/templui/internal/markdown"
 	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/showcase"
+	"github.com/templui/templui/internal/ui/examples"
 )
 
 //go:embed all:content/docs
@@ -117,11 +117,11 @@ func (s *DocsService) GetComponentPageSource(slug string) ([]byte, error) {
 		return nil, err
 	}
 	return markdown.ExpandPreviewShortcodes(source, func(name string) ([]byte, bool) {
-		entry, ok := showcase.Registry[name]
+		entry, ok := examples.Registry[name]
 		if !ok {
 			return nil, false
 		}
-		code, err := showcase.TemplFiles.ReadFile(entry.File)
+		code, err := examples.TemplFiles.ReadFile(entry.File)
 		if err != nil {
 			return nil, false
 		}

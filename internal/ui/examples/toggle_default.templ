@@ -1,0 +1,17 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/toggle"
+)
+
+templ ToggleDefault() {
+	@toggle.Toggle(toggle.Props{
+		Variant:    toggle.VariantOutline,
+		Size:       toggle.SizeSm,
+		Attributes: templ.Attributes{"aria-label": "Toggle bookmark"},
+	}) {
+		@icon.Bookmark(icon.Props{Class: "group-data-[state=on]/toggle:fill-foreground"})
+		Bookmark
+	}
+}

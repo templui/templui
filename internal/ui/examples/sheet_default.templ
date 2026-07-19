@@ -1,0 +1,68 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/input"
+	"github.com/templui/templui/components/label"
+	"github.com/templui/templui/components/sheet"
+)
+
+templ SheetDefault() {
+	@sheet.Sheet() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: sheet.Trigger(ctx),
+		}) {
+			Open
+		}
+		@sheet.Content() {
+			@sheet.Header() {
+				@sheet.Title() {
+					Edit profile
+				}
+				@sheet.Description() {
+					Make changes to your profile here. Click save when you're done.
+				}
+			}
+			<div class="grid flex-1 auto-rows-min gap-6 px-4">
+				<div class="grid gap-3">
+					@label.Label(label.Props{
+						For: "sheet-demo-name",
+					}) {
+						Name
+					}
+					@input.Input(input.Props{
+						ID:    "sheet-demo-name",
+						Type:  input.TypeText,
+						Value: "Axel Adrian",
+					})
+				</div>
+				<div class="grid gap-3">
+					@label.Label(label.Props{
+						For: "sheet-demo-username",
+					}) {
+						Username
+					}
+					@input.Input(input.Props{
+						ID:    "sheet-demo-username",
+						Type:  input.TypeText,
+						Value: "@axadrn",
+					})
+				</div>
+			</div>
+			@sheet.Footer() {
+				@button.Button(button.Props{
+					Type: "submit",
+				}) {
+					Save changes
+				}
+				@button.Button(button.Props{
+					Variant:    button.VariantOutline,
+					Attributes: sheet.Close(ctx),
+				}) {
+					Close
+				}
+			}
+		}
+	}
+}

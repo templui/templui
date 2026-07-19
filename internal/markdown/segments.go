@@ -11,7 +11,7 @@ import (
 
 // Segment is one slice of a component doc page: either rendered markdown
 // HTML or a shortcode (ComponentPreview, ComponentSource, Installation) the
-// page template resolves against the showcase registry.
+// page template resolves against the examples registry.
 type Segment struct {
 	HTML      string
 	Shortcode string
