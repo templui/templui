@@ -156,7 +156,7 @@ func componentSourceCode(path string) string {
 	if err != nil {
 		return ""
 	}
-	return strings.TrimSuffix(string(content), "\n")
+	return strings.TrimRight(string(content), "\n")
 }
 
 func sourceLanguage(path string) string {
@@ -365,8 +365,9 @@ func sourcePreviewLines(file string, maxLines int) string {
 }
 
 // installTabTriggerClass restyles our tabs trigger to shadcn's docs mdx
-// TabsTrigger (underline tabs: border-b-2, text-base, transparent bg).
-const installTabTriggerClass = "h-auto flex-none rounded-none border-0 border-b-2 border-transparent bg-transparent px-0 pt-0 pb-3 text-base font-medium text-muted-foreground shadow-none after:hidden hover:text-primary data-[tui-tabs-state=active]:!border-primary data-[tui-tabs-state=active]:bg-transparent data-[tui-tabs-state=active]:text-foreground"
+// TabsTrigger (default variant, underline via border-b-2; the list height
+// clamps the trigger so the underline sits tight under the text).
+const installTabTriggerClass = "rounded-none border-0 border-b-2 border-transparent bg-transparent px-0 pt-1 pb-3 text-base text-muted-foreground hover:text-primary data-[tui-tabs-state=active]:border-primary data-[tui-tabs-state=active]:bg-transparent data-[tui-tabs-state=active]:!shadow-none data-[tui-tabs-state=active]:text-foreground dark:data-[tui-tabs-state=active]:border-primary dark:data-[tui-tabs-state=active]:bg-transparent"
 
 // InstallationBlock is shadcn's installation section: CodeTabs with a
 // Command tab (the CLI call) and a Manual tab (numbered steps copying the
@@ -469,8 +470,7 @@ func InstallationBlock(component string) templ.Component {
 				return nil
 			})
 			templ_7745c5c3_Err = tabs.List(tabs.ListProps{
-				Variant: tabs.VariantLine,
-				Class:   "h-auto w-fit justify-start gap-6 rounded-none bg-transparent p-0 group-data-horizontal/tabs:h-auto",
+				Class: "w-fit justify-start gap-6 rounded-none bg-transparent px-0 group-data-horizontal/tabs:h-9",
 			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var11), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
