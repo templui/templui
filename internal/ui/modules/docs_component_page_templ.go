@@ -49,7 +49,7 @@ func ComponentPreviewBlock(entry showcase.RegistryEntry) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"group relative mt-4 mb-12 flex flex-col overflow-hidden rounded-2xl border\"><div data-slot=\"preview\" class=\"preview relative flex h-72 w-full items-center justify-center p-10\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div data-not-typeset class=\"group relative mt-4 mb-12 flex flex-col overflow-hidden rounded-2xl border\"><div data-slot=\"preview\" class=\"preview relative flex h-72 w-full items-center justify-center p-10\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -281,7 +281,7 @@ func InstallationBlock(component string) templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"my-6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div data-not-typeset class=\"my-6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

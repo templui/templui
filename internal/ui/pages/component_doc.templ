@@ -25,11 +25,11 @@ templ ComponentDoc(page *service.ComponentDocPage, prev, next PagerLink) {
 	) {
 		@modules.DocsCodeToggleScript()
 		@modules.DocsPageHeader(page.Title, page.Description, prev.Href, next.Href)
-		@modules.MarkdownProse() {
+		<div class="typeset w-full flex-1 pb-16 sm:pb-0">
 			for _, segment := range page.Segments {
 				@renderSegment(segment)
 			}
-		}
+		</div>
 		@modules.DocsPager(prev.Title, prev.Href, next.Title, next.Href)
 	}
 }

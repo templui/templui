@@ -2,7 +2,6 @@ package button
 
 import (
 	"github.com/templui/templui/utils"
-	"strings"
 )
 
 type Variant string
@@ -41,7 +40,6 @@ type Props struct {
 	Attributes templ.Attributes
 	Variant    Variant
 	Size       Size
-	FullWidth  bool
 	Href       string
 	Target     string
 	Disabled   bool
@@ -77,7 +75,7 @@ templ Button(props ...Props) {
 			data-slot="button"
 			data-variant={ string(p.Variant) }
 			data-size={ string(p.Size) }
-			class={ utils.TwMerge(baseClasses, p.variantClasses(), p.sizeClasses(), p.modifierClasses(), p.Class) }
+			class={ utils.TwMerge(baseClasses, p.variantClasses(), p.sizeClasses(), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -90,7 +88,7 @@ templ Button(props ...Props) {
 			data-slot="button"
 			data-variant={ string(p.Variant) }
 			data-size={ string(p.Size) }
-			class={ utils.TwMerge(baseClasses, p.variantClasses(), p.sizeClasses(), p.modifierClasses(), p.Class) }
+			class={ utils.TwMerge(baseClasses, p.variantClasses(), p.sizeClasses(), p.Class) }
 			if p.Type != "" {
 				type={ string(p.Type) }
 			}
@@ -143,10 +141,4 @@ func (b Props) sizeClasses() string {
 	}
 }
 
-func (b Props) modifierClasses() string {
-	classes := []string{}
-	if b.FullWidth {
-		classes = append(classes, "w-full")
-	}
-	return strings.Join(classes, " ")
-}
+

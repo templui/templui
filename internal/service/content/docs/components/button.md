@@ -83,11 +83,7 @@ To create a button group, use the `buttongroup` component. See the [Button Group
 
 Set the `Href` prop to render the button as a semantic link that looks like a button.
 
-```templ
-@button.Button(button.Props{Href: "/docs", Variant: button.VariantOutline}) {
-	Documentation
-}
-```
+<ComponentPreview name="button-render" />
 
 ## API Reference
 
@@ -95,14 +91,7 @@ Set the `Href` prop to render the button as a semantic link that looks like a bu
 
 The `Button` component is a wrapper around the `button` element that adds a variety of styles and functionality.
 
-| Prop         | Type                                                                          | Default     |
-| ------------ | ----------------------------------------------------------------------------- | ----------- |
-| `Variant`    | `"default" \| "secondary" \| "outline" \| "ghost" \| "destructive" \| "link"` | `"default"` |
-| `Size`       | `"default" \| "sm" \| "lg" \| "icon" \| "icon-sm"`                            | `"default"` |
-| `Href`       | `string`                                                                      | `""`        |
-| `Target`     | `string`                                                                      | `""`        |
-| `Type`       | `"button" \| "submit" \| "reset"`                                             | `"button"`  |
-| `Disabled`   | `bool`                                                                        | `false`     |
-| `FullWidth`  | `bool`                                                                        | `false`     |
-| `Class`      | `string`                                                                      | `""`        |
-| `Attributes` | `templ.Attributes`                                                            | `nil`       |
+| Prop      | Type                                                                                            | Default          |
+| --------- | ----------------------------------------------------------------------------------------------- | ---------------- |
+| `Variant` | `VariantDefault \| VariantSecondary \| VariantOutline \| VariantGhost \| VariantDestructive \| VariantLink` | `VariantDefault` |
+| `Size`    | `SizeDefault \| SizeSm \| SizeLg \| SizeIcon \| SizeIconSm`                                     | `SizeDefault`    |

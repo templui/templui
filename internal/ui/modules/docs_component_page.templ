@@ -21,7 +21,7 @@ import (
 // bordered container with the live demo on top and the source attached below
 // (border-t), clamped to a few lines behind a View Code button.
 templ ComponentPreviewBlock(entry showcase.RegistryEntry) {
-	<div class="group relative mt-4 mb-12 flex flex-col overflow-hidden rounded-2xl border">
+	<div data-not-typeset class="group relative mt-4 mb-12 flex flex-col overflow-hidden rounded-2xl border">
 		<div data-slot="preview" class="preview relative flex h-72 w-full items-center justify-center p-10">
 			@entry.Component
 		</div>
@@ -96,7 +96,7 @@ func sourcePreviewLines(file string, maxLines int) string {
 // InstallationBlock is the installation section of a component page; it
 // reuses the existing ComponentUsage module (CLI command + usage snippets).
 templ InstallationBlock(component string) {
-	<div class="my-6">
+	<div data-not-typeset class="my-6">
 		@ComponentUsage(ComponentUsageProps{ComponentName: component})
 	</div>
 }

@@ -25,4 +25,5 @@ var Registry = map[string]RegistryEntry{
 	"button-rounded":     {Component: ButtonRounded(), File: "button_rounded.templ"},
 	"button-spinner":     {Component: ButtonSpinner(), File: "button_spinner.templ"},
 	"button-group-demo":  {Component: ButtonGroupDefault(), File: "buttongroup_default.templ"},
+	"button-render":      {Component: ButtonAsLink(), File: "button_as_link.templ"},
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer"
 	goldmarkhtml "github.com/yuin/goldmark/renderer/html"
+	east "github.com/yuin/goldmark/extension/ast"
 	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
 	"go.abhg.dev/goldmark/frontmatter"
@@ -41,6 +42,7 @@ func NewParser() *Parser {
 			// Add custom code block renderer
 			renderer.WithNodeRenderers(
 				util.Prioritized(codeBlockRenderer, 100),
+				util.Prioritized(&TableScrollRenderer{}, 100),
 			),
 		),
 	)
@@ -227,4 +229,21 @@ func buildTOCHierarchy(items []tocItem) []modules.TableOfContentsItem {
 	}
 
 	return result
+}
+
+// TableScrollRenderer wraps GFM tables in the typeset scroll container so
+// wide tables scroll horizontally, like shadcn's mdx table component.
+type TableScrollRenderer struct{}
+
+func (r *TableScrollRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
+	reg.Register(east.KindTable, r.renderTable)
+}
+
+func (r *TableScrollRenderer) renderTable(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	if entering {
+		_, _ = w.WriteString(`<div class="typeset-scroll scrollbar-none"><table>`)
+	} else {
+		_, _ = w.WriteString("</table></div>")
+	}
+	return ast.WalkContinue, nil
 }

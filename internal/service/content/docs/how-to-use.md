@@ -60,6 +60,18 @@ go install github.com/go-task/task/v3/cmd/task@latest
 
 > **📝 Note:** Learn more at [taskfile.dev](https://taskfile.dev)
 
+## Component Props
+
+Every component accepts three universal props that are left out of the per-component API tables:
+
+| Prop         | Type               | Description                                          |
+| ------------ | ------------------ | ---------------------------------------------------- |
+| `ID`         | `string`           | HTML id for the rendered element.                    |
+| `Class`      | `string`           | Additional CSS classes, merged with the defaults.    |
+| `Attributes` | `templ.Attributes` | Additional HTML attributes spread onto the element.  |
+
+Standard HTML behavior (`Disabled`, `Type`, `Href`, ...) works the way the platform defines it; the API tables only document what a component adds on top.
+
 ## Import Workflow
 
 Use this when you want the simplest setup and prefer importing component packages directly.

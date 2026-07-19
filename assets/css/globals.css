@@ -20,6 +20,9 @@
 @import "./tw-animate.css";
 @import "./sonner.css";
 @import "./themes.css";
+/* Vendored shadcn/typeset — the docs typography system (.typeset wrapper,
+   .not-typeset / [data-not-typeset] opt out). */
+@import "./typeset.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -200,6 +203,14 @@
   @apply bg-linear-to-b from-background to-surface/40 dark:bg-background;
 }
 
+@utility scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -282,6 +293,7 @@
   }
   html {
     @apply scroll-smooth;
+    scroll-padding-top: 6rem;
   }
   body {
     @apply bg-background text-foreground;
