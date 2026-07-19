@@ -1,0 +1,311 @@
+package pages
+
+import (
+	"github.com/templui/templui/components/accordion"
+	"github.com/templui/templui/components/badge"
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/calendar"
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/item"
+	selectcomp "github.com/templui/templui/components/select"
+	"github.com/templui/templui/components/separator"
+	"github.com/templui/templui/components/slider"
+	switchcomp "github.com/templui/templui/components/switch"
+	"github.com/templui/templui/components/tabs"
+	"github.com/templui/templui/components/textarea"
+)
+
+// Ports of shadcn's preview-02 cards (registry/bases/base/blocks/preview-02),
+// card by card. Cards that need the chart rewrite are still missing; the
+// remaining ones land incrementally (tracked in COMMIT_PLAN.md).
+
+templ cardClaimableBalance() {
+	@card.Card() {
+		@card.Header() {
+			@card.Description() {
+				Claimable Balance
+			}
+			@card.Title(card.TitleProps{Class: "text-5xl tabular-nums"}) {
+				$0.00
+			}
+			@badge.Badge(badge.Props{Variant: badge.VariantOutline}) {
+				<span class="size-2 rounded-full bg-yellow-500"></span>
+				Pending Setup
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-1 flex-col justify-end"}) {
+			@item.Item(item.Props{Variant: item.VariantMuted, Class: "flex-col items-stretch"}) {
+				@item.Content(item.ContentProps{Class: "gap-3"}) {
+					<div class="flex items-center justify-between">
+						<span class="text-sm text-muted-foreground">Net Royalties</span>
+						<span class="text-sm font-medium tabular-nums">$0.00</span>
+					</div>
+					<div class="flex items-center justify-between">
+						<span class="text-sm text-muted-foreground">Processing Fee</span>
+						<span class="text-sm font-medium tabular-nums">-$0.00</span>
+					</div>
+					@separator.Separator()
+					<div class="flex items-center justify-between">
+						<span class="text-sm text-muted-foreground">Total Ready to Claim</span>
+						<span class="text-sm font-semibold tabular-nums">$0.00 USD</span>
+					</div>
+				}
+			}
+		}
+		@card.Footer() {
+			@card.Description() {
+				Once your bank is connected, balances over $10.00 are automatically eligible for monthly distribution on the 15th of each month.
+			}
+		}
+	}
+}
+
+templ cardUpcomingPayments() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Upcoming Payments
+			}
+			@card.Description() {
+				Select a date to view scheduled payments.
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			@item.Item(item.Props{Variant: item.VariantOutline, Class: "justify-center"}) {
+				@calendar.Calendar(calendar.Props{Class: "w-full [--cell-size:--spacing(8)] md:[--cell-size:--spacing(10)]"})
+			}
+			@item.Group(item.GroupProps{Class: "w-full"}) {
+				@upcomingPayment("Netflix Subscription", "Apr 15, 2024", "$19.99")
+				@upcomingPayment("Rent Payment", "Apr 1, 2024", "$2,400.00")
+				@upcomingPayment("Auto Insurance", "Apr 22, 2024", "$186.00")
+			}
+		}
+	}
+}
+
+templ upcomingPayment(title, date, amount string) {
+	@item.Item(item.Props{Variant: item.VariantMuted}) {
+		@item.Content() {
+			@item.Title() {
+				{ title }
+			}
+			@item.Description() {
+				{ date }
+			}
+		}
+		@badge.Badge(badge.Props{Variant: badge.VariantSecondary}) {
+			{ amount }
+		}
+	}
+}
+
+templ cardPreferences() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Preferences
+			}
+			@card.Description() {
+				Manage your account settings and notifications.
+			}
+			@card.Action() {
+				@button.Button(button.Props{Variant: button.VariantGhost, Size: button.SizeIconSm, Class: "bg-muted"}) {
+					@icon.X()
+				}
+			}
+		}
+		@card.Content() {
+			@field.Group() {
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "default-currency"}) {
+						Default Currency
+					}
+					@currencySelect("default-currency")
+				}
+				@field.Separator(field.SeparatorProps{Class: "-my-4"})
+				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
+					@field.Content() {
+						@field.Label(field.LabelProps{For: "public-statistics"}) {
+							Public Statistics
+						}
+						@field.Description() {
+							Allow others to see your total stream count and listening activity
+						}
+					}
+					@switchcomp.Switch(switchcomp.Props{ID: "public-statistics", Checked: true})
+				}
+				@field.Separator(field.SeparatorProps{Class: "-my-4"})
+				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
+					@field.Content() {
+						@field.Label(field.LabelProps{For: "email-notifications"}) {
+							Email Notifications
+						}
+						@field.Description() {
+							Monthly royalty reports and distribution updates
+						}
+					}
+					@switchcomp.Switch(switchcomp.Props{ID: "email-notifications", Checked: true})
+				}
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Variant: button.VariantOutline}) {
+				Reset
+			}
+			@button.Button(button.Props{Class: "ml-auto"}) {
+				Save Preferences
+			}
+		}
+	}
+}
+
+templ currencySelect(id string) {
+	@selectcomp.Select() {
+		@selectcomp.Trigger(selectcomp.TriggerProps{ID: id, Class: "w-full"}) {
+			@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select"})
+		}
+		@selectcomp.Content() {
+			@selectcomp.Group() {
+				@selectcomp.Item(selectcomp.ItemProps{Value: "usd", Selected: true}) {
+					USD — United States Dollar
+				}
+				@selectcomp.Item(selectcomp.ItemProps{Value: "eur"}) {
+					EUR — Euro
+				}
+				@selectcomp.Item(selectcomp.ItemProps{Value: "gbp"}) {
+					GBP — British Pound
+				}
+				@selectcomp.Item(selectcomp.ItemProps{Value: "jpy"}) {
+					JPY — Japanese Yen
+				}
+			}
+		}
+	}
+}
+
+templ cardPayoutThreshold() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Payout Threshold
+			}
+			@card.Description() {
+				Set the minimum balance required before a payout is triggered.
+			}
+			@card.Action() {
+				@button.Button(button.Props{Variant: button.VariantGhost, Size: button.SizeIconSm, Class: "bg-muted"}) {
+					@icon.X()
+				}
+			}
+		}
+		@card.Content() {
+			@field.Group() {
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "preferred-currency"}) {
+						Preferred Currency
+					}
+					@currencySelect("preferred-currency")
+				}
+				@field.Field() {
+					<div class="flex items-baseline justify-between">
+						@field.Label(field.LabelProps{For: "min-payout"}) {
+							Minimum Payout Amount
+						}
+						<span class="text-2xl font-semibold tabular-nums">$2500.00</span>
+					</div>
+					@slider.Slider(slider.Props{ID: "min-payout", Min: 50, Max: 10000, Step: 50, Value: 2500})
+					<div class="flex items-center justify-between">
+						@field.Description() {
+							$50 (MIN)
+						}
+						@field.Description() {
+							$10,000 (MAX)
+						}
+					</div>
+				}
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "payout-notes"}) {
+						Notes
+					}
+					@textarea.Textarea(textarea.Props{ID: "payout-notes", Placeholder: "Add any notes for this payout configuration...", Class: "min-h-[100px]"})
+				}
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Class: "w-full"}) {
+				Save Threshold
+			}
+		}
+	}
+}
+
+templ cardFaq() {
+	@card.Card() {
+		@card.Content() {
+			@tabs.Tabs() {
+				@tabs.List(tabs.ListProps{Class: "w-full"}) {
+					@tabs.Trigger(tabs.TriggerProps{Value: "general", IsActive: true, Class: "flex-1"}) {
+						General
+					}
+					@tabs.Trigger(tabs.TriggerProps{Value: "billing", Class: "flex-1"}) {
+						Billing
+					}
+					@tabs.Trigger(tabs.TriggerProps{Value: "goals", Class: "flex-1"}) {
+						Goals
+					}
+				}
+				@tabs.Content(tabs.ContentProps{Value: "general", IsActive: true}) {
+					@faqList([]faqEntry{
+						{"How secure is my financial data with Ledger?", "We use bank-level AES-256 encryption, SOC 2 Type II certified infrastructure, and never store your credentials. All connections use read-only access tokens. We are a SEC registered investment advisor."},
+						{"How do I connect my bank or investment accounts?", "Go to Settings > Linked Accounts and search for your institution. We support over 12,000 banks and brokerages via Plaid and MX."},
+						{"Can I export my data for tax purposes?", "Yes. Navigate to Reports > Tax Export to download a CSV or PDF summary of your transactions, dividends, and capital gains for any tax year."},
+					})
+				}
+				@tabs.Content(tabs.ContentProps{Value: "billing"}) {
+					@faqList([]faqEntry{
+						{"What is the difference between Basic and Pro pricing tiers?", "Basic includes budgeting, goal tracking, and up to 3 linked accounts. Pro adds unlimited accounts, dividend tracking, portfolio analysis, and priority support."},
+						{"How do I cancel my subscription?", "Go to Settings > Billing > Manage Plan and click Cancel. Your access continues until the end of your current billing period."},
+						{"Do you offer a free trial?", "Yes. All new accounts start with a 14-day Pro trial. No credit card required."},
+					})
+				}
+				@tabs.Content(tabs.ContentProps{Value: "goals"}) {
+					@faqList([]faqEntry{
+						{"How do I set up a custom financial goal?", "Click New Goal from the Savings Targets card. Choose a category, set a target amount and date, and we'll calculate the monthly contribution needed."},
+						{"Can I track multiple goals at once?", "Yes. Pro accounts can track unlimited goals. Basic accounts support up to 3 active goals."},
+						{"How are monthly contributions calculated?", "We divide the remaining amount by the number of months until your target date, adjusted for your current savings rate and any auto-transfer schedules."},
+					})
+				}
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Variant: button.VariantOutline, Class: "w-full"}) {
+				Contact Support
+			}
+			@button.Button(button.Props{Variant: button.VariantLink, Class: "w-full"}) {
+				Learn More
+			}
+		}
+	}
+}
+
+type faqEntry struct {
+	q string
+	a string
+}
+
+templ faqList(entries []faqEntry) {
+	@accordion.Accordion() {
+		for i, entry := range entries {
+			@accordion.Item(accordion.ItemProps{Attributes: templ.Attributes{"open": i == 0}}) {
+				@accordion.Trigger() {
+					{ entry.q }
+				}
+				@accordion.Content() {
+					{ entry.a }
+				}
+			}
+		}
+	}
+}

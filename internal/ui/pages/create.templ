@@ -1,0 +1,178 @@
+package pages
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/dialog"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/utils"
+)
+
+// Create is the templUI pendant of ui.shadcn.com/create: customizer on the
+// left, live preview iframe on the right, state in the ?preset= param.
+templ Create() {
+	@layouts.BaseLayout("New Project - templUI", "Customize everything. Pick your base color, theme, fonts and create your own version of templUI.") {
+		@modules.AnnouncementBar()
+		@modules.Navbar()
+		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-themes.js") }></script>
+		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create.js") }></script>
+		<main
+			data-tui-create
+			class="section-soft relative z-10 flex h-[calc(100svh-3.5rem)] min-h-0 flex-1 flex-col overflow-hidden [--customizer-width:--spacing(48)] [--gap:--spacing(4)] md:[--gap:--spacing(6)] 2xl:[--customizer-width:--spacing(56)]"
+		>
+			<div
+				data-slot="designer"
+				class="flex min-h-0 flex-1 flex-col gap-(--gap) p-(--gap) pt-[calc(var(--gap)*0.25)] md:flex-row-reverse"
+			>
+				<!-- Preview -->
+				<div class="relative flex flex-1 flex-col justify-center overflow-hidden rounded-2xl ring ring-foreground/10 md:ring-muted dark:ring-foreground/10">
+					<div class="relative z-0 mx-auto flex w-full flex-1 flex-col overflow-hidden">
+						<div class="absolute inset-0 bg-muted dark:bg-muted/30"></div>
+						<iframe
+							data-tui-create-preview
+							src="/create/preview"
+							class="z-10 size-full flex-1"
+							title="Preview"
+						></iframe>
+					</div>
+					<!-- Preview switcher -->
+					<div class="dark absolute right-3 bottom-3 z-20 flex items-center gap-1 rounded-xl bg-card/90 p-1 shadow-xl backdrop-blur-xl">
+						@previewSwitchButton("01", "preview-02")
+						@previewSwitchButton("02", "preview")
+					</div>
+				</div>
+				<!-- Customizer -->
+				<div class="dark isolate z-10 flex max-h-full min-h-0 w-full flex-col self-start overflow-hidden rounded-2xl bg-card/90 text-sm text-card-foreground ring-1 ring-foreground/10 backdrop-blur-xl md:h-full md:w-(--customizer-width)">
+					<div class="hidden items-center justify-between gap-2 border-b p-3 md:flex">
+						<button
+							type="button"
+							data-tui-create-menu
+							class="flex w-full items-center justify-between gap-2 rounded-lg px-1.75 py-1 ring-1 ring-foreground/10 select-none hover:bg-muted focus-visible:ring-1 focus-visible:ring-foreground/50 focus-visible:outline-none data-open:bg-muted"
+						>
+							<span class="font-medium">Menu</span>
+							@icon.Menu(icon.Props{Class: "size-5"})
+						</button>
+					</div>
+					<div class="no-scrollbar min-h-0 flex-1 overflow-x-auto overflow-y-hidden p-3 md:overflow-x-hidden md:overflow-y-auto">
+						<div class="flex flex-row gap-2.5 md:flex-col md:gap-3">
+							@pickerRow("style", "Style", "Nova", true)
+							@pickerRow("iconLibrary", "Icons", "Lucide", true)
+							<div class="hidden h-px bg-border md:block"></div>
+							@pickerRow("baseColor", "Base Color", "Neutral", false)
+							@pickerRow("theme", "Theme", "Neutral", false)
+							@pickerRow("chartColor", "Chart Colors", "Neutral", false)
+							<div class="hidden h-px bg-border md:block"></div>
+							@pickerRow("font", "Font", "Geist", false)
+							@pickerRow("radius", "Radius", "Default", false)
+						</div>
+					</div>
+					<div class="flex min-w-0 flex-col gap-2 border-t p-3 **:[button]:w-full">
+						@button.Button(button.Props{
+							Variant:    button.VariantSecondary,
+							Size:       button.SizeSm,
+							Attributes: templ.Attributes{"data-tui-create-copy": true},
+						}) {
+							Copy Preset
+						}
+						<div class="flex gap-2 *:flex-1">
+							@button.Button(button.Props{
+								Variant:    button.VariantSecondary,
+								Size:       button.SizeSm,
+								Attributes: templ.Attributes{"data-tui-create-random": true},
+							}) {
+								Random
+							}
+							@button.Button(button.Props{
+								Variant:    button.VariantGhost,
+								Size:       button.SizeSm,
+								Attributes: templ.Attributes{"data-tui-create-reset": true},
+							}) {
+								Reset
+							}
+						</div>
+						@button.Button(button.Props{
+							Size:       button.SizeSm,
+							Attributes: dialog.TriggerFor("create-code-dialog"),
+						}) {
+							Get Code
+						}
+					</div>
+				</div>
+			</div>
+			<!-- Picker popup, filled and positioned by create.js -->
+			<div
+				data-tui-create-popup
+				hidden
+				class="dark no-scrollbar fixed z-50 max-h-[70svh] w-52 overflow-x-hidden overflow-y-auto rounded-xl border-0 bg-neutral-950/80 p-1.5 text-neutral-100 ring-1 ring-neutral-950/80 backdrop-blur-xl outline-none"
+			></div>
+		</main>
+		@dialog.Dialog(dialog.Props{ID: "create-code-dialog"}) {
+			@dialog.Content(dialog.ContentProps{Class: "sm:max-w-lg"}) {
+				@dialog.Header() {
+					@dialog.Title() {
+						Your theme
+					}
+					@dialog.Description() {
+						Copy this into your globals.css to apply the design system you built.
+					}
+				}
+				<textarea
+					data-tui-create-css
+					readonly
+					class="h-72 w-full resize-none rounded-lg border bg-surface p-3 font-mono text-xs outline-none"
+				></textarea>
+				@dialog.Footer() {
+					@button.Button(button.Props{
+						Variant:    button.VariantOutline,
+						Attributes: dialog.CloseFor("create-code-dialog"),
+					}) {
+						Close
+					}
+					@button.Button(button.Props{
+						Attributes: templ.Attributes{"data-tui-create-copy-css": true},
+					}) {
+						Copy CSS
+					}
+				}
+			}
+		}
+		@dialog.Script()
+	}
+}
+
+templ previewSwitchButton(label, item string) {
+	<button
+		type="button"
+		data-tui-create-item={ item }
+		class="h-7 min-w-8 cursor-pointer rounded-lg px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
+	>
+		{ label }
+	</button>
+}
+
+// pickerRow is a customizer row: label on top, current value below, opened by
+// create.js as a dark picker menu next to the card.
+templ pickerRow(param, label, initial string, disabled bool) {
+	<div class="group/picker relative">
+		<button
+			type="button"
+			if !disabled {
+				data-tui-create-picker={ param }
+			}
+			disabled?={ disabled }
+			class="relative w-36 shrink-0 touch-manipulation rounded-xl p-3 text-left ring-1 ring-foreground/10 select-none hover:bg-muted focus-visible:ring-foreground/50 focus-visible:outline-none disabled:opacity-50 data-open:bg-muted md:w-full md:rounded-lg md:px-2.5 md:py-2"
+		>
+			<div class="flex flex-col justify-start text-left">
+				<div class="text-xs text-muted-foreground">{ label }</div>
+				<div class="text-sm font-medium text-foreground" data-tui-create-value={ param }>{ initial }</div>
+			</div>
+			if param == "baseColor" || param == "theme" || param == "chartColor" {
+				<span
+					data-tui-create-swatch={ param }
+					class="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 rounded-full bg-(--color) select-none md:right-2.5"
+				></span>
+			}
+		</button>
+	</div>
+}
