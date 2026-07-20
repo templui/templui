@@ -1,0 +1,22 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/alert"
+	"github.com/templui/templui/components/button"
+)
+
+templ AlertAction() {
+	@alert.Alert(alert.Props{Class: "max-w-md"}) {
+		@alert.Title() {
+			Dark mode is now available
+		}
+		@alert.Description() {
+			Enable it under your profile settings to get started.
+		}
+		@alert.Action() {
+			@button.Button(button.Props{Size: button.SizeXs}) {
+				Enable
+			}
+		}
+	}
+}

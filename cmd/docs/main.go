@@ -131,12 +131,6 @@ func main() {
 	mux.Handle("GET /docs/introduction", markdownDocsHandler("introduction"))
 	mux.Handle("GET /docs/how-to-use", markdownDocsHandler("how-to-use"))
 	// Components
-	mux.Handle("GET /docs/components/accordion", htmxHandler(pages.Accordion()))
-	mux.Handle("GET /docs/components/alert", htmxHandler(pages.Alert()))
-	mux.Handle("GET /docs/components/aspect-ratio", htmxHandler(pages.AspectRatio()))
-	mux.Handle("GET /docs/components/avatar", htmxHandler(pages.Avatar()))
-	mux.Handle("GET /docs/components/badge", htmxHandler(pages.Badge()))
-	mux.Handle("GET /docs/components/breadcrumb", htmxHandler(pages.Breadcrumb()))
 	mux.Handle("GET /docs/components/{slug}", componentDocHandler(docsService))
 	mux.Handle("GET /docs/components/button-group", htmxHandler(pages.ButtonGroup()))
 	mux.Handle("GET /docs/components/calendar", htmxHandler(pages.Calendar()))

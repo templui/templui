@@ -2,21 +2,12 @@ package aspectratio
 
 import "github.com/templui/templui/utils"
 
-type Ratio string
-
-const (
-	RatioAuto     Ratio = "auto"
-	RatioSquare   Ratio = "square"
-	RatioVideo    Ratio = "video"
-	RatioPortrait Ratio = "portrait"
-	RatioWide     Ratio = "wide"
-)
-
 type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	Ratio      Ratio
+	// Ratio is the aspect ratio as a CSS ratio value, e.g. "16/9".
+	Ratio string
 }
 
 templ AspectRatio(props ...Props) {
@@ -28,34 +19,13 @@ templ AspectRatio(props ...Props) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={
-			utils.TwMerge(
-				"relative w-full",
-				ratioClass(p.Ratio),
-				p.Class,
-			),
+		data-slot="aspect-ratio"
+		if p.Ratio != "" {
+			style={ "--ratio: " + p.Ratio }
 		}
+		class={ utils.TwMerge("relative aspect-(--ratio)", p.Class) }
 		{ p.Attributes... }
 	>
-		<div class="absolute inset-0">
-			{ children... }
-		</div>
+		{ children... }
 	</div>
-}
-
-func ratioClass(ratio Ratio) string {
-	switch ratio {
-	case RatioSquare:
-		return "aspect-square"
-	case RatioVideo:
-		return "aspect-video"
-	case RatioPortrait:
-		return "aspect-[3/4]"
-	case RatioWide:
-		return "aspect-[2/1]"
-	case RatioAuto:
-		return "aspect-auto"
-	default:
-		return "aspect-auto"
-	}
 }

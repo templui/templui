@@ -1,0 +1,34 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/breadcrumb"
+	"github.com/templui/templui/components/icon"
+)
+
+templ BreadcrumbSeparator() {
+	@breadcrumb.Breadcrumb() {
+		@breadcrumb.List() {
+			@breadcrumb.Item() {
+				@breadcrumb.Link(breadcrumb.LinkProps{Href: "/"}) {
+					Home
+				}
+			}
+			@breadcrumb.Separator(breadcrumb.SeparatorProps{UseCustom: true}) {
+				@icon.Dot()
+			}
+			@breadcrumb.Item() {
+				@breadcrumb.Link(breadcrumb.LinkProps{Href: "/docs/components"}) {
+					Components
+				}
+			}
+			@breadcrumb.Separator(breadcrumb.SeparatorProps{UseCustom: true}) {
+				@icon.Dot()
+			}
+			@breadcrumb.Item() {
+				@breadcrumb.Page() {
+					Breadcrumb
+				}
+			}
+		}
+	}
+}

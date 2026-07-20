@@ -29,34 +29,51 @@ func writeHTML(filename string, c templ.Component) error {
 func main() {
 	showcases := map[string]templ.Component{
 		// Accordion
-		"out/showcase/accordion_default.html": examples.AccordionDefault(),
+		"out/showcase/accordion_demo.html": examples.AccordionDemo(),
+		"out/showcase/accordion_basic.html": examples.AccordionBasic(),
+		"out/showcase/accordion_multiple.html": examples.AccordionMultiple(),
+		"out/showcase/accordion_disabled.html": examples.AccordionDisabled(),
+		"out/showcase/accordion_borders.html": examples.AccordionBorders(),
+		"out/showcase/accordion_card.html": examples.AccordionCard(),
 
 		// Alert
-		"out/showcase/alert_default.html":     examples.AlertDefault(),
+		"out/showcase/alert_demo.html": examples.AlertDemo(),
+		"out/showcase/alert_basic.html": examples.AlertBasic(),
 		"out/showcase/alert_destructive.html": examples.AlertDestructive(),
+		"out/showcase/alert_action.html": examples.AlertAction(),
+		"out/showcase/alert_colors.html": examples.AlertColors(),
 
 		// Aspect Ratio
-		"out/showcase/aspect_ratio_default.html": examples.AspectRatioDefault(),
+		"out/showcase/aspect_ratio_demo.html": examples.AspectRatioDemo(),
+		"out/showcase/aspect_ratio_square.html": examples.AspectRatioSquare(),
+		"out/showcase/aspect_ratio_portrait.html": examples.AspectRatioPortrait(),
 
 		// Avatar
-		"out/showcase/avatar_default.html":   examples.AvatarDefault(),
-		"out/showcase/avatar_fallback.html":  examples.AvatarFallback(),
-		"out/showcase/avatar_group.html":     examples.AvatarGroup(),
-		"out/showcase/avatar_sizes.html":     examples.AvatarSizes(),
-		"out/showcase/avatar_with_icon.html": examples.AvatarWithIcon(),
+		"out/showcase/avatar_demo.html": examples.AvatarDemo(),
+		"out/showcase/avatar_basic.html": examples.AvatarBasic(),
+		"out/showcase/avatar_badge.html": examples.AvatarBadgeExample(),
+		"out/showcase/avatar_badge_icon.html": examples.AvatarBadgeIcon(),
+		"out/showcase/avatar_group.html": examples.AvatarGroup(),
+		"out/showcase/avatar_group_count.html": examples.AvatarGroupCount(),
+		"out/showcase/avatar_group_count_icon.html": examples.AvatarGroupCountIcon(),
+		"out/showcase/avatar_size.html": examples.AvatarSize(),
+		"out/showcase/avatar_dropdown.html": examples.AvatarDropdown(),
 
 		// Badge
-		"out/showcase/badge_default.html":     examples.BadgeDefault(),
-		"out/showcase/badge_destructive.html": examples.BadgeDestructive(),
-		"out/showcase/badge_outline.html":     examples.BadgeOutline(),
-		"out/showcase/badge_secondary.html":   examples.BadgeSecondary(),
-		"out/showcase/badge_with_icon.html":   examples.BadgeWithIcon(),
+		"out/showcase/badge_demo.html": examples.BadgeDemo(),
+		"out/showcase/badge_variants.html": examples.BadgeVariants(),
+		"out/showcase/badge_icon.html": examples.BadgeIcon(),
+		"out/showcase/badge_spinner.html": examples.BadgeSpinner(),
+		"out/showcase/badge_link.html": examples.BadgeLink(),
+		"out/showcase/badge_colors.html": examples.BadgeColors(),
 
 		// Breadcrumb
-		"out/showcase/breadcrumb_custom_separator.html": examples.BreadcrumbCustomSeparator(),
-		"out/showcase/breadcrumb_default.html":          examples.BreadcrumbDefault(),
-		"out/showcase/breadcrumb_responsive.html":       examples.BreadcrumbResponsive(),
-		"out/showcase/breadcrumb_with_icons.html":       examples.BreadcrumbWithIcons(),
+		"out/showcase/breadcrumb_demo.html": examples.BreadcrumbDemo(),
+		"out/showcase/breadcrumb_basic.html": examples.BreadcrumbBasic(),
+		"out/showcase/breadcrumb_separator.html": examples.BreadcrumbSeparator(),
+		"out/showcase/breadcrumb_dropdown.html": examples.BreadcrumbDropdown(),
+		"out/showcase/breadcrumb_ellipsis.html": examples.BreadcrumbEllipsisDemo(),
+		"out/showcase/breadcrumb_link.html": examples.BreadcrumbLink(),
 
 		// Button
 		"out/showcase/button_demo.html":        examples.ButtonDemo(),

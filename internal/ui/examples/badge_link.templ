@@ -1,0 +1,13 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/badge"
+	"github.com/templui/templui/components/icon"
+)
+
+templ BadgeLink() {
+	@badge.Badge(badge.Props{Href: "#link"}) {
+		Open Link
+		@icon.ArrowUpRight(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-end"}})
+	}
+}

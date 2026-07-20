@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"sort"
+	"strings"
 	"sync"
 
 	"github.com/a-h/templ"
@@ -19,6 +21,10 @@ var (
 // Props defines the properties that can be set for an icon.
 type Props struct {
 	Class string
+	// Attributes renders extra HTML attributes on the svg element,
+	// e.g. data-icon="inline-start" for the icon spacing inside buttons
+	// and badges.
+	Attributes templ.Attributes
 }
 
 // Icon returns a function that generates a templ.Component for the specified icon name.
@@ -29,8 +35,9 @@ func Icon(name string) func(...Props) templ.Component {
 			p = props[0]
 		}
 
-		// Cache by icon name and class so repeated renders reuse the generated SVG.
-		cacheKey := fmt.Sprintf("%s|cl:%s", name, p.Class)
+		// Cache by icon name, class and attributes so repeated renders
+		// reuse the generated SVG.
+		cacheKey := fmt.Sprintf("%s|cl:%s|at:%s", name, p.Class, attrString(p.Attributes))
 
 		return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 			iconMutex.RLock()
@@ -71,8 +78,33 @@ func generateSVG(name string, props Props) (string, error) {
 
 	// Construct the final SVG string.
 	// The data-lucide attribute helps identify these as Lucide icons if needed.
-	return fmt.Sprintf("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"%s\" data-lucide=\"icon\">%s</svg>",
-		props.Class, content), nil
+	return fmt.Sprintf("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"%s\" data-lucide=\"icon\"%s>%s</svg>",
+		props.Class, attrString(props.Attributes), content), nil
+}
+
+// attrString renders extra attributes deterministically (sorted by key) so
+// they are stable as part of the cache key and the generated SVG.
+func attrString(attrs templ.Attributes) string {
+	if len(attrs) == 0 {
+		return ""
+	}
+	keys := make([]string, 0, len(attrs))
+	for k := range attrs {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	var b strings.Builder
+	for _, k := range keys {
+		switch v := attrs[k].(type) {
+		case bool:
+			if v {
+				b.WriteString(" " + templ.EscapeString(k))
+			}
+		default:
+			b.WriteString(fmt.Sprintf(" %s=\"%s\"", templ.EscapeString(k), templ.EscapeString(fmt.Sprint(v))))
+		}
+	}
+	return b.String()
 }
 
 // getIconContent retrieves the raw inner SVG content for a given icon name.

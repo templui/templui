@@ -131,7 +131,7 @@ func renderSegment(segment markdown.Segment) templ.Component {
 			}
 		case "ComponentPreview":
 			if entry, ok := examples.Registry[segment.Attrs["name"]]; ok {
-				templ_7745c5c3_Err = modules.ComponentPreviewBlock(entry).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = modules.ComponentPreviewBlock(entry, segment.Attrs).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

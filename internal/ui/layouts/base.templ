@@ -108,10 +108,11 @@ templ BaseLayout(title, description string) {
 					a.classList.toggle('bg-accent', a.href === location.href);
 				});
 
-				// Scroll to top after content swap
+				// Scroll to top after content swap. The page scrolls on the
+				// body since the docs layout rework, not on #main-content.
 				const target = e.detail.ctx.target;
 				if (target && target.id === 'main-content') {
-					target.scrollTop = 0;
+					window.scrollTo({ top: 0, behavior: 'instant' });
 				}
 			});
 		</script>

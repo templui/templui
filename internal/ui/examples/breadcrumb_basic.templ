@@ -1,0 +1,27 @@
+package examples
+
+import "github.com/templui/templui/components/breadcrumb"
+
+templ BreadcrumbBasic() {
+	@breadcrumb.Breadcrumb() {
+		@breadcrumb.List() {
+			@breadcrumb.Item() {
+				@breadcrumb.Link(breadcrumb.LinkProps{Href: "#"}) {
+					Home
+				}
+			}
+			@breadcrumb.Separator()
+			@breadcrumb.Item() {
+				@breadcrumb.Link(breadcrumb.LinkProps{Href: "#"}) {
+					Components
+				}
+			}
+			@breadcrumb.Separator()
+			@breadcrumb.Item() {
+				@breadcrumb.Page() {
+					Breadcrumb
+				}
+			}
+		}
+	}
+}

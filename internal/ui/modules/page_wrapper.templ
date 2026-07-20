@@ -36,7 +36,7 @@ templ PageWrapper(p PageWrapperProps) {
 								@breadcrumb.Separator()
 							}
 							if i == len(p.Breadcrumbs.Items)-1 {
-								@breadcrumb.Page(breadcrumb.ItemProps{Current: true}) {
+								@breadcrumb.Page() {
 									{ path.Text }
 								}
 							} else {

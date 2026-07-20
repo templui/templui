@@ -40,7 +40,7 @@ templ renderSegment(segment markdown.Segment) {
 			@templ.Raw(segment.HTML)
 		case "ComponentPreview":
 			if entry, ok := examples.Registry[segment.Attrs["name"]]; ok {
-				@modules.ComponentPreviewBlock(entry)
+				@modules.ComponentPreviewBlock(entry, segment.Attrs)
 			} else {
 				<div class="my-6 rounded-lg border border-destructive/50 p-4 text-sm text-destructive">
 					Unknown preview: { segment.Attrs["name"] }

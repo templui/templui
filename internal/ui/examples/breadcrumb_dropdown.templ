@@ -1,0 +1,51 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/breadcrumb"
+	"github.com/templui/templui/components/dropdownmenu"
+	"github.com/templui/templui/components/icon"
+)
+
+templ BreadcrumbDropdown() {
+	@breadcrumb.Breadcrumb() {
+		@breadcrumb.List() {
+			@breadcrumb.Item() {
+				@breadcrumb.Link(breadcrumb.LinkProps{Href: "/"}) {
+					Home
+				}
+			}
+			@breadcrumb.Separator(breadcrumb.SeparatorProps{UseCustom: true}) {
+				@icon.Dot()
+			}
+			@breadcrumb.Item() {
+				@dropdownmenu.Root() {
+					<button class="flex items-center gap-1" { dropdownmenu.Trigger(ctx)... }>
+						Components
+						@icon.ChevronDown(icon.Props{Class: "size-3.5", Attributes: templ.Attributes{"data-icon": "inline-end"}})
+					</button>
+					@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignStart}) {
+						@dropdownmenu.Group() {
+							@dropdownmenu.Item() {
+								Documentation
+							}
+							@dropdownmenu.Item() {
+								Themes
+							}
+							@dropdownmenu.Item() {
+								GitHub
+							}
+						}
+					}
+				}
+			}
+			@breadcrumb.Separator(breadcrumb.SeparatorProps{UseCustom: true}) {
+				@icon.Dot()
+			}
+			@breadcrumb.Item() {
+				@breadcrumb.Page() {
+					Breadcrumb
+				}
+			}
+		}
+	}
+}

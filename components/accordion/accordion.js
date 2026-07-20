@@ -1,64 +1,88 @@
 (function () {
   "use strict";
 
-  // Matches the tw-animate accordion animation duration (0.2s ease-out).
-  const DURATION_MS = 200;
+  // Mirrors Base UI's accordion: aria-expanded on the trigger is the single
+  // source of truth, panels animate between 0 and their measured height.
 
-  function contentOf(item) {
-    return item.querySelector("[data-tui-accordion-content]");
+  function triggerOf(item) {
+    return item.querySelector('[data-slot="accordion-trigger"]');
   }
 
-  function setOpen(el, isOpen) {
-    el.toggleAttribute("data-open", isOpen);
-    el.toggleAttribute("data-closed", !isOpen);
+  function panelOf(item) {
+    return item.querySelector('[data-slot="accordion-content"]');
   }
 
   function openItem(item) {
-    const content = contentOf(item);
-    item.open = true;
-    if (!content) return;
-    content.style.setProperty("--tui-accordion-panel-height", content.scrollHeight + "px");
-    setOpen(content, true);
+    const panel = panelOf(item);
+    triggerOf(item).setAttribute("aria-expanded", "true");
+    if (!panel) return;
+    panel.removeAttribute("data-closed");
+    panel.hidden = false;
+    panel.style.setProperty("--tui-accordion-panel-height", panel.scrollHeight + "px");
+    panel.setAttribute("data-open", "");
   }
 
   function closeItem(item) {
-    const content = contentOf(item);
-    if (!content) {
-      item.open = false;
-      return;
-    }
-    content.style.setProperty("--tui-accordion-panel-height", content.scrollHeight + "px");
-    setOpen(content, false);
-    clearTimeout(item._tuiClose);
-    item._tuiClose = setTimeout(() => {
-      if (!content.hasAttribute("data-open")) item.open = false;
-    }, DURATION_MS);
+    const panel = panelOf(item);
+    triggerOf(item).setAttribute("aria-expanded", "false");
+    if (!panel) return;
+    panel.removeAttribute("data-open");
+    panel.style.setProperty("--tui-accordion-panel-height", panel.scrollHeight + "px");
+    panel.setAttribute("data-closed", "");
+    panel.addEventListener(
+      "animationend",
+      () => {
+        if (panel.hasAttribute("data-closed")) {
+          panel.removeAttribute("data-closed");
+          panel.hidden = true;
+        }
+      },
+      { once: true }
+    );
   }
 
   document.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
-    const summary = e.target.closest("[data-tui-accordion-item] > summary");
-    if (!summary) return;
-    e.preventDefault();
+    const trigger = e.target.closest('[data-slot="accordion-trigger"]');
+    if (!trigger) return;
+    const item = trigger.closest('[data-slot="accordion-item"]');
+    const accordion = trigger.closest('[data-slot="accordion"]');
+    if (!item || !accordion || item.hasAttribute("data-disabled")) return;
 
-    const item = summary.parentElement;
-    clearTimeout(item._tuiClose);
-
-    const content = contentOf(item);
-    const isOpen = item.open && (!content || content.hasAttribute("data-open"));
-    if (isOpen) {
+    if (trigger.getAttribute("aria-expanded") === "true") {
       closeItem(item);
       return;
     }
-
-    // One open item per accordion, closed with its exit animation (the
-    // native details name grouping would snap the sibling shut instantly).
-    const accordion = item.closest('[data-slot="accordion"]');
-    if (accordion) {
-      accordion.querySelectorAll("[data-tui-accordion-item][open]").forEach((other) => {
-        if (other !== item) closeItem(other);
+    if (!accordion.hasAttribute("data-multiple")) {
+      accordion.querySelectorAll('[data-slot="accordion-item"]').forEach((other) => {
+        if (other === item) return;
+        if (other.closest('[data-slot="accordion"]') !== accordion) return;
+        if (triggerOf(other)?.getAttribute("aria-expanded") === "true") closeItem(other);
       });
     }
     openItem(item);
+  });
+
+  // WAI-ARIA accordion keyboard support: arrow keys, Home and End move focus
+  // between the triggers of the same accordion.
+  document.addEventListener("keydown", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const trigger = e.target.closest('[data-slot="accordion-trigger"]');
+    if (!trigger) return;
+    const accordion = trigger.closest('[data-slot="accordion"]');
+    if (!accordion) return;
+    const triggers = [...accordion.querySelectorAll('[data-slot="accordion-trigger"]')].filter(
+      (t) => !t.disabled && t.closest('[data-slot="accordion"]') === accordion
+    );
+    const index = triggers.indexOf(trigger);
+    let next;
+    if (e.key === "ArrowDown") next = triggers[(index + 1) % triggers.length];
+    else if (e.key === "ArrowUp") next = triggers[(index - 1 + triggers.length) % triggers.length];
+    else if (e.key === "Home") next = triggers[0];
+    else if (e.key === "End") next = triggers[triggers.length - 1];
+    if (next) {
+      e.preventDefault();
+      next.focus();
+    }
   });
 })();

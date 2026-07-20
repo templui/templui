@@ -106,7 +106,13 @@ Set the `Href` prop to render the button as a semantic link that looks like a bu
 
 The `Button` component is a wrapper around the `button` element that adds a variety of styles and functionality.
 
-| Prop      | Type                                                                                            | Default          |
-| --------- | ----------------------------------------------------------------------------------------------- | ---------------- |
-| `Variant` | `VariantDefault \| VariantSecondary \| VariantOutline \| VariantGhost \| VariantDestructive \| VariantLink` | `VariantDefault` |
-| `Size`    | `SizeDefault \| SizeSm \| SizeLg \| SizeIcon \| SizeIconSm`                                     | `SizeDefault`    |
+| Prop       | Type                                                                                                        | Default          |
+| ---------- | ----------------------------------------------------------------------------------------------------------- | ---------------- |
+| `Variant`  | `VariantDefault \| VariantSecondary \| VariantOutline \| VariantGhost \| VariantDestructive \| VariantLink` | `VariantDefault` |
+| `Size`     | `SizeDefault \| SizeXs \| SizeSm \| SizeLg \| SizeIcon \| SizeIconXs \| SizeIconSm \| SizeIconLg`           | `SizeDefault`    |
+| `Type`     | `TypeButton \| TypeSubmit \| TypeReset`                                                                     | `TypeButton`     |
+| `Href`     | `string`                                                                                                    | -                |
+| `Target`   | `string`                                                                                                    | -                |
+| `Disabled` | `bool`                                                                                                      | `false`          |
+| `Form`     | `string`                                                                                                    | -                |
+| `Class`    | `string`                                                                                                    | -                |

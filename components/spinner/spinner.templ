@@ -26,17 +26,21 @@ templ Spinner(props ...Props) {
 	if p.Icon == nil {
 		{{ p.Icon = icon.LoaderCircle }}
 	}
-	<span
-		if p.ID != "" {
-			id={ p.ID }
+	{{
+		attrs := templ.Attributes{
+			"data-slot":  "spinner",
+			"role":       "status",
+			"aria-label": p.Label,
 		}
-		role="status"
-		aria-label={ p.Label }
-		class="inline-flex"
-		{ p.Attributes... }
-	>
-		@p.Icon(icon.Props{
-			Class: utils.TwMerge("size-4 animate-spin", p.Class),
-		})
-	</span>
+		if p.ID != "" {
+			attrs["id"] = p.ID
+		}
+		for k, v := range p.Attributes {
+			attrs[k] = v
+		}
+	}}
+	@p.Icon(icon.Props{
+		Class:      utils.TwMerge("size-4 animate-spin", p.Class),
+		Attributes: attrs,
+	})
 }

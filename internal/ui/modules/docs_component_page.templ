@@ -23,10 +23,22 @@ import (
 // ComponentPreviewBlock mirrors shadcn's ComponentPreview: one rounded-2xl
 // bordered container with the live demo on top and the source attached below
 // (border-t), clamped to a few lines behind a View Code button.
-templ ComponentPreviewBlock(entry examples.RegistryEntry) {
-	<div data-not-typeset class="group relative mt-4 mb-12 flex flex-col overflow-hidden rounded-2xl border">
-		<div data-slot="preview" class="preview relative flex h-72 w-full items-center justify-center p-10">
-			@entry.Component
+templ ComponentPreviewBlock(entry examples.RegistryEntry, attrs map[string]string) {
+	{{ align := attrs["align"] }}
+	if align == "" {
+		{{ align = "center" }}
+	}
+	<div data-slot="component-preview" data-not-typeset class="group relative mt-4 mb-12 flex flex-col overflow-hidden rounded-2xl border">
+		<div data-slot="preview">
+			<div
+				data-align={ align }
+				class={ utils.TwMerge(
+					"preview relative flex h-72 w-full justify-center p-10 data-[align=center]:items-center data-[align=end]:items-end data-[align=start]:items-start",
+					attrs["previewClassName"],
+				) }
+			>
+				@entry.Component
+			</div>
 		</div>
 		@CollapsibleCodeBlock(entry.File)
 	</div>
@@ -76,7 +88,7 @@ func componentSourceCode(path string) string {
 
 func sourceLanguage(path string) string {
 	if strings.HasSuffix(path, ".js") {
-		return "js"
+		return "javascript"
 	}
 	return "templ"
 }

@@ -21,7 +21,6 @@ type ItemProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	Current    bool
 }
 
 type LinkProps struct {
@@ -131,10 +130,13 @@ templ Separator(props ...SeparatorProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<span
+	<li
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="breadcrumb-separator"
+		role="presentation"
+		aria-hidden="true"
 		class={
 			utils.TwMerge(
 				"[&>svg]:size-3.5",
@@ -146,9 +148,9 @@ templ Separator(props ...SeparatorProps) {
 		if p.UseCustom {
 			{ children... }
 		} else {
-			@icon.ChevronRight(icon.Props{Class: "size-3.5 text-muted-foreground"})
+			@icon.ChevronRight()
 		}
-	</span>
+	</li>
 }
 
 templ Page(props ...ItemProps) {
@@ -160,13 +162,16 @@ templ Page(props ...ItemProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="breadcrumb-page"
+		role="link"
+		aria-disabled="true"
+		aria-current="page"
 		class={
 			utils.TwMerge(
 				"font-normal text-foreground",
 				p.Class,
 			),
 		}
-		aria-current="page"
 		{ p.Attributes... }
 	>
 		{ children... }

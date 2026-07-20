@@ -10,21 +10,12 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "github.com/templui/templui/utils"
 
-type Ratio string
-
-const (
-	RatioAuto     Ratio = "auto"
-	RatioSquare   Ratio = "square"
-	RatioVideo    Ratio = "video"
-	RatioPortrait Ratio = "portrait"
-	RatioWide     Ratio = "wide"
-)
-
 type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	Ratio      Ratio
+	// Ratio is the aspect ratio as a CSS ratio value, e.g. "16/9".
+	Ratio string
 }
 
 func AspectRatio(props ...Props) templ.Component {
@@ -52,12 +43,7 @@ func AspectRatio(props ...Props) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
-			"relative w-full",
-			ratioClass(p.Ratio),
-			p.Class,
-		),
-		}
+		var templ_7745c5c3_Var2 = []any{utils.TwMerge("relative aspect-(--ratio)", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -74,7 +60,7 @@ func AspectRatio(props ...Props) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/aspectratio/aspectratio.templ`, Line: 29, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/aspectratio/aspectratio.templ`, Line: 20, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -85,20 +71,43 @@ func AspectRatio(props ...Props) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " data-slot=\"aspect-ratio\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var2).String())
+		if p.Ratio != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, " style=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("--ratio: " + p.Ratio)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/aspectratio/aspectratio.templ`, Line: 24, Col: 32}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, " class=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var2).String())
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/aspectratio/aspectratio.templ`, Line: 1, Col: 0}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -106,7 +115,7 @@ func AspectRatio(props ...Props) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "><div class=\"absolute inset-0\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, ">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -114,29 +123,12 @@ func AspectRatio(props ...Props) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		return nil
 	})
-}
-
-func ratioClass(ratio Ratio) string {
-	switch ratio {
-	case RatioSquare:
-		return "aspect-square"
-	case RatioVideo:
-		return "aspect-video"
-	case RatioPortrait:
-		return "aspect-[3/4]"
-	case RatioWide:
-		return "aspect-[2/1]"
-	case RatioAuto:
-		return "aspect-auto"
-	default:
-		return "aspect-auto"
-	}
 }
 
 var _ = templruntime.GeneratedTemplate

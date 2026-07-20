@@ -6,15 +6,13 @@ import (
 )
 
 templ AlertDestructive() {
-	<div class="w-full max-w-xl">
-		@alert.Alert(alert.Props{Variant: alert.VariantDestructive}) {
-			@icon.TriangleAlert()
-			@alert.Title() {
-				Error
-			}
-			@alert.Description() {
-				Your session has expired. Please log in again.
-			}
+	@alert.Alert(alert.Props{Variant: alert.VariantDestructive, Class: "max-w-md"}) {
+		@icon.CircleAlert()
+		@alert.Title() {
+			Payment failed
 		}
-	</div>
+		@alert.Description() {
+			Your payment could not be processed. Please check your payment method and try again.
+		}
+	}
 }
