@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"fmt"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -79,8 +80,10 @@ func getShikiServiceURL() string {
 }
 
 type ShikiRequest struct {
-	Code string `json:"code"`
-	Lang string `json:"lang"`
+	Code           string   `json:"code"`
+	Lang           string   `json:"lang"`
+	HighlightLines []int    `json:"highlightLines,omitempty"`
+	HighlightWords []string `json:"highlightWords,omitempty"`
 }
 
 var (
@@ -102,6 +105,12 @@ var (
 // Returns HTML-escaped original code on errors.
 // Uses a simple in-memory cache.
 func GetHighlightedHTML(ctx context.Context, codeContent string, language string) string {
+	return GetHighlightedHTMLMeta(ctx, codeContent, language, nil, nil)
+}
+
+// GetHighlightedHTMLMeta additionally passes rehype-pretty-code style line
+// and word highlights ({4-6} and /word/ fence meta) to the shiki service.
+func GetHighlightedHTMLMeta(ctx context.Context, codeContent string, language string, highlightLines []int, highlightWords []string) string {
 	// log.Printf("INFO: GetHighlightedHTML called for lang '%s'", language)
 	if codeContent == "" {
 		return ""
@@ -111,7 +120,7 @@ func GetHighlightedHTML(ctx context.Context, codeContent string, language string
 	}
 
 	// Create cache key
-	cacheKey := language + "|" + codeContent
+	cacheKey := fmt.Sprintf("%s|%v|%v|%s", language, highlightLines, highlightWords, codeContent)
 
 	// Check cache (with read lock)
 	cacheMutex.RLock()
@@ -126,7 +135,12 @@ func GetHighlightedHTML(ctx context.Context, codeContent string, language string
 	// log.Println("Shiki Cache Miss for lang:", language)
 
 	// log.Printf("INFO: Calling Shiki for lang '%s'...", language)
-	requestBody, err := json.Marshal(ShikiRequest{Code: codeContent, Lang: language})
+	requestBody, err := json.Marshal(ShikiRequest{
+		Code:           codeContent,
+		Lang:           language,
+		HighlightLines: highlightLines,
+		HighlightWords: highlightWords,
+	})
 	if err != nil {
 		log.Printf("WARN: Error marshalling Shiki request: %v. Returning escaped code.", err)
 		return html.EscapeString(codeContent) // Fallback

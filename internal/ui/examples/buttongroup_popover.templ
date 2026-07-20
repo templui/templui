@@ -25,18 +25,19 @@ templ ButtonGroupPopover() {
 				@icon.ChevronDown()
 			}
 			@popover.Content(popover.ContentProps{
-				Side: popover.SideBottom, Align: popover.AlignEnd,
-				Class:     "w-80 rounded-xl bg-popover p-4 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10",
+				Align: popover.AlignEnd,
+				Class: "rounded-xl text-sm",
 			}) {
-				<div class="flex flex-col gap-1.5">
-					<h4 class="leading-none font-medium">Start a new task with Copilot</h4>
-					<p class="text-muted-foreground">Describe your task in natural language.</p>
-				</div>
-				@field.Field(field.Props{Class: "mt-4"}) {
-					@field.Label(field.LabelProps{
-						For:   "task",
-						Class: "sr-only",
-					}) {
+				@popover.Header() {
+					@popover.Title() {
+						Start a new task with Copilot
+					}
+					@popover.Description() {
+						Describe your task in natural language.
+					}
+				}
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "task", Class: "sr-only"}) {
 						Task Description
 					}
 					@textarea.Textarea(textarea.Props{

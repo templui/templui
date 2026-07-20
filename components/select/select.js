@@ -454,6 +454,11 @@ import "../floatingui/floating_ui_dom.js";
       if (!content.matches(":popover-open")) return;
       setState(content, "open");
       trigger.setAttribute("aria-expanded", "true");
+      // Base UI moves focus to the selected item when the listbox opens.
+      const selected =
+        content.querySelector('[data-tui-select-item][data-state="checked"]') ||
+        content.querySelector("[data-tui-select-item]");
+      if (selected) selected.focus({ preventScroll: true });
     };
     position(content, trigger).then(finish, finish);
   }
@@ -489,7 +494,9 @@ import "../floatingui/floating_ui_dom.js";
     const trigger = triggerFor(content);
     if (!trigger) return;
     const value = item.getAttribute("data-tui-select-value") || "";
-    const label = (item.querySelector("[data-tui-select-item-text]") || item).textContent.trim();
+    const label =
+      item.getAttribute("data-tui-select-label") ||
+      (item.querySelector("[data-tui-select-item-text]") || item).textContent.trim();
 
     content.querySelectorAll("[data-tui-select-item]").forEach((i) => {
       i.setAttribute("data-state", "unchecked");
@@ -511,6 +518,7 @@ import "../floatingui/floating_ui_dom.js";
       new CustomEvent("select-change", { bubbles: true, detail: { value: value, label: label } }),
     );
     close(content);
+    trigger.focus();
   }
 
   // Shows the selected item's label in the trigger (server only knows the
@@ -524,7 +532,9 @@ import "../floatingui/floating_ui_dom.js";
       portal(content); // portal up front, like React does on mount
       const checked = content.querySelector('[data-tui-select-item][data-state="checked"]');
       if (!checked) return;
-      const label = (checked.querySelector("[data-tui-select-item-text]") || checked).textContent.trim();
+      const label =
+        checked.getAttribute("data-tui-select-label") ||
+        (checked.querySelector("[data-tui-select-item-text]") || checked).textContent.trim();
       const span = valueSpanFor(trigger);
       if (span && span.textContent.trim() !== label) span.textContent = label;
       if (trigger.hasAttribute("data-placeholder")) trigger.removeAttribute("data-placeholder");
@@ -574,6 +584,9 @@ import "../floatingui/floating_ui_dom.js";
     if (e.button !== 0 || !(e.target instanceof Element)) return;
     const trigger = e.target.closest("[data-tui-select-trigger]");
     if (trigger) {
+      // Keep the browser from focusing the trigger button, focus lives on
+      // the selected item while the listbox is open (Base UI focus scope).
+      e.preventDefault();
       if (!trigger.disabled) toggle(trigger);
       return;
     }
@@ -597,8 +610,75 @@ import "../floatingui/floating_ui_dom.js";
     }
   });
 
+  let typeBuffer = "";
+  let typeTimer;
+
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeAll();
+    if (!(e.target instanceof Element)) return;
+
+    if (e.key === "Escape") {
+      allContents().forEach((content) => {
+        if (content.getAttribute("data-state") !== "open") return;
+        const trigger = triggerFor(content);
+        close(content);
+        if (trigger) trigger.focus();
+      });
+      return;
+    }
+
+    // Closed trigger: arrow keys open the listbox (Enter/Space go through
+    // the native button click path).
+    const trigger = e.target.closest("[data-tui-select-trigger]");
+    if (trigger && !trigger.disabled) {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        const content = contentFor(trigger);
+        if (content && content.getAttribute("data-state") !== "open") open(content, trigger);
+      }
+      return;
+    }
+
+    // Open listbox: roving focus on the items.
+    const item = e.target.closest("[data-tui-select-item]");
+    if (!item) return;
+    const content = item.closest("[data-tui-select-content]");
+    if (!content) return;
+    const items = [...content.querySelectorAll("[data-tui-select-item]")].filter(
+      (i) => !i.hasAttribute("data-disabled"),
+    );
+    const index = items.indexOf(item);
+
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const next = items[index + (e.key === "ArrowDown" ? 1 : -1)];
+      if (next) next.focus();
+    } else if (e.key === "Home" || e.key === "End") {
+      e.preventDefault();
+      const edge = e.key === "Home" ? items[0] : items[items.length - 1];
+      if (edge) edge.focus();
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      selectItem(content, item);
+    } else if (e.key === "Tab") {
+      close(content);
+    } else if (e.key.length === 1) {
+      clearTimeout(typeTimer);
+      typeBuffer += e.key.toLowerCase();
+      typeTimer = setTimeout(() => {
+        typeBuffer = "";
+      }, 500);
+      const match = items.find((i) => i.textContent.trim().toLowerCase().startsWith(typeBuffer));
+      if (match) match.focus();
+    }
+  });
+
+  // The highlight follows the pointer, one highlighted item at a time.
+  document.addEventListener("pointermove", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const item = e.target.closest("[data-tui-select-item]");
+    if (item && !item.hasAttribute("data-disabled") && document.activeElement !== item) {
+      item.focus({ preventScroll: true });
+    }
   });
 
   window.addEventListener(

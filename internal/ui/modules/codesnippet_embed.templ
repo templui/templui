@@ -1,6 +1,9 @@
 package modules
 
-import "embed"
+import (
+	"embed"
+	"strings"
+)
 
 templ CodeSnippetFromEmbedded(filename, language string, embed embed.FS) {
 	if content, err := embed.ReadFile(filename); err != nil {
@@ -9,7 +12,7 @@ templ CodeSnippetFromEmbedded(filename, language string, embed embed.FS) {
 		@Code(CodeProps{
 			Language:       "templ",
 			ShowCopyButton: true,
-			CodeContent:    string(content),
+			CodeContent:    strings.TrimRight(string(content), "\n"),
 		})
 	}
 }
@@ -23,7 +26,7 @@ templ CodeSnippetFromEmbeddedStyled(filename, language string, embed embed.FS, c
 		@Code(CodeProps{
 			Language:       "templ",
 			ShowCopyButton: true,
-			CodeContent:    string(content),
+			CodeContent:    strings.TrimRight(string(content), "\n"),
 			CodeClass:      codeClass,
 		})
 	}

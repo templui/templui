@@ -11,6 +11,8 @@ type CodeFigureProps struct {
 	Title           string
 	ShowLineNumbers bool
 	Code            string
+	HighlightLines  []int
+	HighlightWords  []string
 }
 
 // CodeFigure is a markdown code block, the pendant of shadcn's
@@ -19,7 +21,7 @@ type CodeFigureProps struct {
 // (`css showLineNumbers title="globals.css"`).
 templ CodeFigure(p CodeFigureProps) {
 	{{ id := utils.RandomID() }}
-	{{ highlighted := GetHighlightedHTML(ctx, p.Code, p.Language) }}
+	{{ highlighted := GetHighlightedHTMLMeta(ctx, p.Code, p.Language, p.HighlightLines, p.HighlightWords) }}
 	<figure data-not-typeset class="relative -mx-1 mt-6 overflow-hidden rounded-2xl bg-code text-sm text-code-foreground outline-none">
 		if p.Title != "" {
 			<figcaption

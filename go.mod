@@ -3,7 +3,7 @@ module github.com/templui/templui
 go 1.24
 
 require (
-	github.com/Oudwins/tailwind-merge-go v0.2.1
+	github.com/Oudwins/tailwind-merge-go v0.2.2
 	github.com/a-h/templ v0.3.1001
 	github.com/joho/godotenv v1.5.1
 	github.com/yuin/goldmark v1.7.13

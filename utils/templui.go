@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"net/http"
 	"path"
+	"regexp"
 	"strings"
 	"time"
 
@@ -19,8 +20,24 @@ import (
 
 // TwMerge combines Tailwind classes and resolves conflicts.
 // Example: "bg-red-500 hover:bg-blue-500", "bg-green-500" → "hover:bg-blue-500 bg-green-500"
+// tailwind-merge-go does not understand Tailwind v4's variable shorthand
+// (px-(--card-spacing)) yet, so conflicts against such classes were never
+// resolved. Translate them to the equivalent v3 arbitrary form for the merge
+// and back afterwards. The repo uses the v4 shorthand exclusively, so the
+// back translation cannot collide. DELETE this shim (the two regexes and
+// ReplaceAll calls) once github.com/Oudwins/tailwind-merge-go parses the v4
+// syntax natively.
+var (
+	twV4Var = regexp.MustCompile(`-\((--[A-Za-z0-9-]+)\)`)
+	twV3Var = regexp.MustCompile(`-\[var\((--[A-Za-z0-9-]+)\)\]`)
+)
+
 func TwMerge(classes ...string) string {
-	return twmerge.Merge(classes...)
+	merged := make([]string, len(classes))
+	for i, c := range classes {
+		merged[i] = twV4Var.ReplaceAllString(c, "-[var($1)]")
+	}
+	return twV3Var.ReplaceAllString(twmerge.Merge(merged...), "-($1)")
 }
 
 // If returns value if condition is true, otherwise the zero value of T.

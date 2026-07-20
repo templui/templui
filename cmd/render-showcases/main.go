@@ -90,13 +90,13 @@ func main() {
 		"out/showcase/button_with_icon.html":   examples.ButtonWithIcon(),
 
 		// Calendar
-		"out/showcase/calendar_default.html":      examples.CalendarDefault(),
+		"out/showcase/calendar_demo.html":      examples.CalendarDemo(),
 		"out/showcase/calendar_range.html":        examples.CalendarRange(),
 		"out/showcase/calendar_caption.html":      examples.CalendarCaption(),
 		"out/showcase/calendar_presets.html":      examples.CalendarPresets(),
 		"out/showcase/calendar_time.html":         examples.CalendarTime(),
 		"out/showcase/calendar_booked_dates.html": examples.CalendarBookedDates(),
-		"out/showcase/calendar_custom_cell_size.html": examples.CalendarCustomCellSize(),
+		"out/showcase/calendar_custom_days.html": examples.CalendarCustomCellSize(),
 		"out/showcase/calendar_week_numbers.html": examples.CalendarWeekNumbers(),
 
 		// Date Picker
@@ -108,11 +108,19 @@ func main() {
 		"out/showcase/date_picker_time.html":    examples.DatePickerTime(),
 
 		// Card
-		"out/showcase/card_default.html":    examples.CardDefault(),
-		"out/showcase/card_with_image.html": examples.CardWithImage(),
+		"out/showcase/card_demo.html": examples.CardDemo(),
+		"out/showcase/card_small.html": examples.CardSmall(),
+		"out/showcase/card_spacing.html": examples.CardSpacing(),
+		"out/showcase/card_edge_to_edge.html": examples.CardEdgeToEdge(),
+		"out/showcase/card_image.html": examples.CardImage(),
 
 		// Carousel
-		"out/showcase/carousel_default.html": examples.CarouselDefault(),
+		"out/showcase/carousel_demo.html": examples.CarouselDemo(),
+		"out/showcase/carousel_size.html": examples.CarouselSize(),
+		"out/showcase/carousel_spacing.html": examples.CarouselSpacing(),
+		"out/showcase/carousel_orientation.html": examples.CarouselOrientation(),
+		"out/showcase/carousel_api.html": examples.CarouselApi(),
+		"out/showcase/carousel_plugin.html": examples.CarouselPlugin(),
 
 		// Chart
 		"out/showcase/chart_area.html":             examples.ChartArea(),
@@ -138,12 +146,20 @@ func main() {
 		"out/showcase/chart_radar_stacked.html":    examples.CharRadarStacked(),
 
 		// Checkbox
-		"out/showcase/checkbox_default.html":       examples.CheckboxDefault(),
-		"out/showcase/checkbox_form.html":          examples.CheckboxForm(),
-		"out/showcase/checkbox_indeterminate.html": examples.CheckboxIndeterminate(),
+		"out/showcase/checkbox_default.html": examples.CheckboxDefault(),
+		"out/showcase/checkbox_demo.html": examples.CheckboxDemo(),
+		"out/showcase/checkbox_basic.html": examples.CheckboxBasic(),
+		"out/showcase/checkbox_invalid.html": examples.CheckboxInvalid(),
+		"out/showcase/checkbox_description.html": examples.CheckboxDescription(),
+		"out/showcase/checkbox_disabled.html": examples.CheckboxDisabled(),
+		"out/showcase/checkbox_group.html": examples.CheckboxGroup(),
+		"out/showcase/checkbox_table.html": examples.CheckboxTable(),
 
 		// Collapsible
-		"out/showcase/collapsible_default.html": examples.CollapsibleDefault(),
+		"out/showcase/collapsible_demo.html": examples.CollapsibleDemo(),
+		"out/showcase/collapsible_basic.html": examples.CollapsibleBasic(),
+		"out/showcase/collapsible_settings.html": examples.CollapsibleSettings(),
+		"out/showcase/collapsible_file_tree.html": examples.CollapsibleFileTree(),
 
 
 

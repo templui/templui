@@ -32,7 +32,6 @@ tasks:
         components/avatar/avatar.js \
         components/calendar/calendar.js \
         components/carousel/carousel.js \
-        components/checkbox/checkbox.js \
         components/chart/chart.js \
         components/collapsible/collapsible.js \
         components/combobox/combobox.js \

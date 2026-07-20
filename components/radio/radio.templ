@@ -19,6 +19,7 @@ templ Radio(props ...Props) {
 		{{ p = props[0] }}
 	}
 	<input
+		data-slot="radio"
 		type="radio"
 		if p.ID != "" {
 			id={ p.ID }

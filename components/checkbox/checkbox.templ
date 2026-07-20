@@ -6,25 +6,44 @@ import (
 )
 
 type Props struct {
-	ID          string
-	Class       string
-	Attributes  templ.Attributes
-	Name        string
-	Value       string
-	Disabled    bool
-	Checked     bool
-	Group       string
-	GroupParent bool
-	Form        string
-	Icon        templ.Component
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Name       string
+	Value      string
+	Disabled   bool
+	Checked    bool
+	Form       string
 }
 
+// Checkbox mirrors shadcn's base-nova checkbox structurally: the root carries
+// the box visuals (cn-checkbox resolved), a hidden native input inside is the
+// control (Base UI renders a hidden input the same way), and the indicators
+// show on the checked and indeterminate states. Base UI puts the states on
+// the root as data attributes, our native pendant reads them from the input
+// via has-/peer- variants.
 templ Checkbox(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<div class="peer relative inline-flex items-center has-[:disabled]:opacity-50">
+	<div
+		data-slot="checkbox"
+		class={
+			utils.TwMerge(
+				// Base UI expands the hit area with an ::after on the root, our native
+				// input inside spans the same box instead, a pseudo element would sit
+				// above the input and swallow its clicks.
+				"peer relative flex size-4 shrink-0 items-center justify-center rounded-[4px] border border-input outline-none transition-colors dark:bg-input/30",
+				"has-[:checked]:border-primary has-[:checked]:bg-primary has-[:checked]:text-primary-foreground dark:has-[:checked]:bg-primary",
+				"has-[:indeterminate]:border-primary has-[:indeterminate]:bg-primary has-[:indeterminate]:text-primary-foreground dark:has-[:indeterminate]:bg-primary",
+				"has-[:focus-visible]:border-ring has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
+				"has-[[aria-invalid=true]]:border-destructive has-[[aria-invalid=true]]:ring-destructive/20 has-[[aria-invalid=true]:checked]:border-primary dark:has-[[aria-invalid=true]]:border-destructive/50 dark:has-[[aria-invalid=true]]:ring-destructive/40 has-[[aria-invalid=true]]:ring-3",
+				"has-[:disabled]:opacity-50",
+				p.Class,
+			),
+		}
+	>
 		<input
 			checked?={ p.Checked }
 			disabled?={ p.Disabled }
@@ -42,48 +61,15 @@ templ Checkbox(props ...Props) {
 			if p.Form != "" {
 				form={ p.Form }
 			}
-			if p.Group != "" {
-				data-tui-checkbox-group={ p.Group }
-			}
-			if p.GroupParent {
-				data-tui-checkbox-parent="true"
-			}
 			type="checkbox"
-			class={
-				utils.TwMerge(
-					"peer relative size-4 shrink-0 appearance-none rounded-[4px] border border-input bg-transparent outline-none transition-colors after:absolute after:-inset-x-3 after:-inset-y-2 group-has-disabled/field:opacity-50",
-					"focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
-					"disabled:cursor-not-allowed",
-					"checked:bg-primary checked:text-primary-foreground checked:border-primary",
-					"indeterminate:bg-primary indeterminate:text-primary-foreground indeterminate:border-primary",
-					"aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 aria-invalid:aria-checked:border-primary dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
-					"dark:bg-input/30 dark:checked:bg-primary",
-					p.Class,
-				),
-			}
+			class="peer absolute -inset-x-3 -inset-y-2 size-auto cursor-default appearance-none outline-none"
 			{ p.Attributes... }
 		/>
 		<div
-			class="absolute inset-0 pointer-events-none flex items-center justify-center text-primary-foreground opacity-0 peer-checked:opacity-100"
+			data-slot="checkbox-indicator"
+			class="pointer-events-none grid place-content-center text-current opacity-0 transition-none peer-checked:opacity-100 [&>svg]:size-3.5"
 		>
-			if p.Icon != nil {
-				@p.Icon
-			} else {
-				@icon.Check(icon.Props{Class: "size-3.5"})
-			}
-		</div>
-		<div
-			class="absolute inset-0 pointer-events-none flex items-center justify-center text-primary-foreground opacity-0 peer-indeterminate:opacity-100"
-		>
-			@icon.Minus(icon.Props{Class: "size-3.5"})
+			@icon.Check()
 		</div>
 	</div>
-}
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("checkbox")
-	}
 }

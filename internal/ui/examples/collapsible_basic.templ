@@ -1,0 +1,33 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/collapsible"
+	"github.com/templui/templui/components/icon"
+)
+
+templ CollapsibleBasic() {
+	@card.Card(card.Props{Class: "mx-auto w-full max-w-sm"}) {
+		@card.Content() {
+			@collapsible.Collapsible(collapsible.Props{Class: "rounded-md data-open:bg-muted"}) {
+				@button.Button(button.Props{
+					Variant:    button.VariantGhost,
+					Class:      "w-full",
+					Attributes: collapsible.Trigger(ctx),
+				}) {
+					Product details
+					@icon.ChevronDown(icon.Props{Class: "ml-auto group-data-panel-open/button:rotate-180"})
+				}
+				@collapsible.Content(collapsible.ContentProps{Class: "flex flex-col items-start gap-2 p-2.5 pt-0 text-sm"}) {
+					<div>
+						This panel can be expanded or collapsed to reveal additional content.
+					</div>
+					@button.Button(button.Props{Size: button.SizeXs}) {
+						Learn More
+					}
+				}
+			}
+		}
+	}
+}

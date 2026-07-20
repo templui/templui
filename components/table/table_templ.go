@@ -550,7 +550,7 @@ func Head(props ...HeadProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var22 = []any{utils.TwMerge(
-			"h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0",
+			"h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&:has([data-slot=checkbox])]:pr-0",
 			"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
 			p.Class,
 		),
@@ -645,7 +645,7 @@ func Cell(props ...CellProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var26 = []any{utils.TwMerge(
-			"p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0",
+			"p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&:has([data-slot=checkbox])]:pr-0",
 			"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
 			p.Class,
 		),

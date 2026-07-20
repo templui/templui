@@ -6,7 +6,7 @@ import (
 	"github.com/templui/templui/components/calendar"
 )
 
-templ CalendarDefault() {
+templ CalendarDemo() {
 	{{ now := time.Now() }}
 	@calendar.Calendar(calendar.Props{
 		Value:         now,

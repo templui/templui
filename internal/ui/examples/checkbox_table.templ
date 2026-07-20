@@ -1,0 +1,89 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/checkbox"
+	"github.com/templui/templui/components/table"
+)
+
+type checkboxTableRow struct {
+	ID    string
+	Name  string
+	Email string
+	Role  string
+}
+
+var checkboxTableData = []checkboxTableRow{
+	{ID: "1", Name: "Sarah Chen", Email: "sarah.chen@example.com", Role: "Admin"},
+	{ID: "2", Name: "Marcus Rodriguez", Email: "marcus.rodriguez@example.com", Role: "User"},
+	{ID: "3", Name: "Priya Patel", Email: "priya.patel@example.com", Role: "User"},
+	{ID: "4", Name: "David Kim", Email: "david.kim@example.com", Role: "Editor"},
+}
+
+templ CheckboxTable() {
+	<div data-checkbox-table-demo>
+		@table.Table() {
+			@table.Header() {
+				@table.Row() {
+					@table.Head(table.HeadProps{Class: "w-8"}) {
+						@checkbox.Checkbox(checkbox.Props{
+							ID:         "select-all-checkbox",
+							Name:       "select-all-checkbox",
+							Attributes: templ.Attributes{"data-select-all": true},
+						})
+					}
+					@table.Head() {
+						Name
+					}
+					@table.Head() {
+						Email
+					}
+					@table.Head() {
+						Role
+					}
+				}
+			}
+			@table.Body() {
+				for _, row := range checkboxTableData {
+					@table.Row(table.RowProps{
+						Attributes: templ.Attributes{"data-state": templ.KV("selected", row.ID == "1")},
+					}) {
+						@table.Cell() {
+							@checkbox.Checkbox(checkbox.Props{
+								ID:      "row-" + row.ID + "-checkbox",
+								Name:    "row-" + row.ID + "-checkbox",
+								Checked: row.ID == "1",
+							})
+						}
+						@table.Cell(table.CellProps{Class: "font-medium"}) {
+							{ row.Name }
+						}
+						@table.Cell() {
+							{ row.Email }
+						}
+						@table.Cell() {
+							{ row.Role }
+						}
+					}
+				}
+			}
+		}
+	</div>
+	<script nonce={ templ.GetNonce(ctx) }>
+		// The vanilla pendant of the demo's React selection state.
+		document.addEventListener('change', (e) => {
+			const demo = e.target.closest('[data-checkbox-table-demo]');
+			if (!demo || e.target.type !== 'checkbox') return;
+			const all = demo.querySelector('[data-select-all]');
+			const rows = [...demo.querySelectorAll('tbody input[type="checkbox"]')];
+			if (e.target === all) {
+				rows.forEach((row) => (row.checked = all.checked));
+			} else {
+				all.checked = rows.every((row) => row.checked);
+			}
+			rows.forEach((row) => {
+				row.closest('tr').toggleAttribute('data-state', row.checked);
+				if (row.checked) row.closest('tr').setAttribute('data-state', 'selected');
+			});
+		});
+	</script>
+}

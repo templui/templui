@@ -1,6 +1,7 @@
 package markdown
 
 import (
+	"strconv"
 	"bytes"
 	"context"
 	"regexp"
@@ -115,6 +116,24 @@ func (r *ShikiCodeBlockRenderer) renderFencedCodeBlock(w util.BufWriter, source 
 	if m := fenceTitleRe.FindStringSubmatch(info); m != nil {
 		title = m[1]
 	}
+	var highlightLines []int
+	if m := fenceLinesRe.FindStringSubmatch(info); m != nil {
+		for _, part := range strings.Split(m[1], ",") {
+			if from, to, ok := strings.Cut(part, "-"); ok {
+				a, _ := strconv.Atoi(from)
+				b, _ := strconv.Atoi(to)
+				for i := a; i <= b; i++ {
+					highlightLines = append(highlightLines, i)
+				}
+			} else if n, err := strconv.Atoi(part); err == nil {
+				highlightLines = append(highlightLines, n)
+			}
+		}
+	}
+	var highlightWords []string
+	for _, m := range fenceWordsRe.FindAllStringSubmatch(fenceTitleRe.ReplaceAllString(info, ""), -1) {
+		highlightWords = append(highlightWords, m[1])
+	}
 
 	// Extract code content
 	var code bytes.Buffer
@@ -129,10 +148,16 @@ func (r *ShikiCodeBlockRenderer) renderFencedCodeBlock(w util.BufWriter, source 
 		Title:           title,
 		ShowLineNumbers: strings.Contains(info, "showLineNumbers"),
 		Code:            strings.TrimSuffix(code.String(), "\n"),
+		HighlightLines:  highlightLines,
+		HighlightWords:  highlightWords,
 	})
 }
 
-var fenceTitleRe = regexp.MustCompile(`title="([^"]*)"`)
+var (
+	fenceTitleRe = regexp.MustCompile(`title="([^"]*)"`)
+	fenceLinesRe = regexp.MustCompile(`\{([\d,-]+)\}`)
+	fenceWordsRe = regexp.MustCompile(`/([^/]+)/`)
+)
 
 func writeCodeFigure(w util.BufWriter, props modules.CodeFigureProps) (ast.WalkStatus, error) {
 	html, err := templ.ToGoHTML(context.Background(), modules.CodeFigure(props))

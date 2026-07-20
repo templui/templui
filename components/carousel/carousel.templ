@@ -27,12 +27,23 @@ func orientation(ctx context.Context) Orientation {
 	return OrientationHorizontal
 }
 
+type Align string
+
+const (
+	AlignStart  Align = "start"
+	AlignCenter Align = "center"
+	AlignEnd    Align = "end"
+)
+
 type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
 	// Orientation of the scroll axis. Defaults to horizontal.
 	Orientation Orientation
+	// Align of the snapped slide within the viewport (embla's align
+	// option). Defaults to center, like embla.
+	Align Align
 	// Loop wraps from the last slide back to the first.
 	Loop bool
 	// Autoplay advances the slides automatically (the embla autoplay
@@ -86,6 +97,9 @@ templ Carousel(props ...Props) {
 		data-slot="carousel"
 		data-tui-carousel
 		data-tui-carousel-orientation={ string(p.Orientation) }
+		if p.Align != "" {
+			data-tui-carousel-align={ string(p.Align) }
+		}
 		data-tui-carousel-loop={ strconv.FormatBool(p.Loop) }
 		data-tui-carousel-autoplay={ strconv.FormatBool(p.Autoplay) }
 		data-tui-carousel-interval={ strconv.Itoa(p.Interval) }

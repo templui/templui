@@ -254,7 +254,7 @@
   text-decoration: var(--shiki-dark-text-decoration) !important;
 }
 
-.dark .shiki span {
+.dark .shiki span:not([data-highlighted-chars]) {
   background-color: transparent !important;
 }
 
@@ -294,6 +294,34 @@
 [data-tui-code-line-numbers] .shiki .line {
   padding-inline: calc(var(--spacing) * 4);
   padding-left: 0;
+}
+
+[data-tui-code-line-numbers] .shiki .line[data-highlighted-line]::before {
+  background-color: var(--color-code-highlight);
+}
+
+[data-highlighted-line],
+[data-highlighted-chars] {
+  position: relative;
+  background-color: var(--color-code-highlight);
+}
+
+[data-highlighted-line]:after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  content: "";
+  background-color: color-mix(in oklab, var(--muted-foreground) 50%, transparent);
+}
+
+[data-highlighted-chars] {
+  border-radius: var(--radius-sm);
+  padding-inline: 0.3rem;
+  padding-block: 0.1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
 }
 
 [data-tui-code-line-numbers] .shiki .line::before {

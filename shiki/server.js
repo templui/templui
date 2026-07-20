@@ -44,6 +44,29 @@ app.get("/healthz", (req, res) => {
 });
 
 // Highlight Endpoint
+// Positions of every highlight word occurrence as shiki decorations.
+function wordDecorations(code, words) {
+  if (!words || !words.length) return [];
+  const decorations = [];
+  const lines = code.split("\n");
+  for (const word of words) {
+    lines.forEach((lineText, lineIndex) => {
+      let from = 0;
+      while (true) {
+        const at = lineText.indexOf(word, from);
+        if (at === -1) break;
+        decorations.push({
+          start: { line: lineIndex, character: at },
+          end: { line: lineIndex, character: at + word.length },
+          properties: { "data-highlighted-chars": "" },
+        });
+        from = at + word.length;
+      }
+    });
+  }
+  return decorations;
+}
+
 app.post("/highlight", async (req, res) => {
   if (!isHighlighterReady || !highlighter) {
     console.warn("Highlight request received before highlighter was ready.");
@@ -52,7 +75,7 @@ app.post("/highlight", async (req, res) => {
       .send("Highlighter service starting, please try again shortly.");
   }
 
-  const { code, lang = "templ" } = req.body;
+  const { code, lang = "templ", highlightLines = [], highlightWords = [] } = req.body;
 
   if (typeof code !== "string") {
     return res
@@ -74,6 +97,16 @@ app.post("/highlight", async (req, res) => {
       lang: effectiveLang,
       themes: THEMES,
       defaultColor: "light",
+      // rehype-pretty-code pendant: {4-6} line and /word/ char highlights
+      // from the markdown fence meta.
+      transformers: [
+        {
+          line(node, line) {
+            if (highlightLines.includes(line)) node.properties["data-highlighted-line"] = "";
+          },
+        },
+      ],
+      decorations: wordDecorations(code, highlightWords),
     });
     // Newlines between the line spans break display:grid (anonymous items);
     // rehype-pretty-code strips them the same way.
