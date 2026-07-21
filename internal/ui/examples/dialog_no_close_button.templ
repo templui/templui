@@ -1,0 +1,27 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/dialog"
+)
+
+templ DialogNoCloseButton() {
+	@dialog.Dialog() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: dialog.Trigger(ctx),
+		}) {
+			No Close Button
+		}
+		@dialog.Content(dialog.ContentProps{HideCloseButton: true}) {
+			@dialog.Header() {
+				@dialog.Title() {
+					No Close Button
+				}
+				@dialog.Description() {
+					This dialog doesn't have a close button in the top-right corner.
+				}
+			}
+		}
+	}
+}

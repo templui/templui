@@ -3,6 +3,7 @@ package service
 import (
 	"embed"
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/templui/templui/internal/markdown"
@@ -12,6 +13,16 @@ import (
 
 //go:embed all:content/docs
 var contentFS embed.FS
+
+// readContent prefers the on-disk source in development, so markdown edits
+// show up on reload without recompiling the embedded copy. Falls back to
+// the embed for built binaries.
+func readContent(path string) ([]byte, error) {
+	if b, err := os.ReadFile(filepath.Join("internal/service", path)); err == nil {
+		return b, nil
+	}
+	return contentFS.ReadFile(path)
+}
 
 type DocsService struct {
 	parser *markdown.Parser
@@ -44,13 +55,13 @@ type ComponentDocPage struct {
 
 // HasComponentPage reports whether a markdown source exists for the slug.
 func (s *DocsService) HasComponentPage(slug string) bool {
-	_, err := contentFS.ReadFile(filepath.Join("content/docs/components", slug+".md"))
+	_, err := readContent(filepath.Join("content/docs/components", slug+".md"))
 	return err == nil
 }
 
 // GetComponentPage loads a component doc (markdown + shortcodes) by slug.
 func (s *DocsService) GetComponentPage(slug string) (*ComponentDocPage, error) {
-	source, err := contentFS.ReadFile(filepath.Join("content/docs/components", slug+".md"))
+	source, err := readContent(filepath.Join("content/docs/components", slug+".md"))
 	if err != nil {
 		return nil, fmt.Errorf("failed to read component doc: %w", err)
 	}
@@ -73,8 +84,8 @@ func (s *DocsService) GetPage(slug string) (*DocPage, error) {
 	// Construct file path
 	mdPath := filepath.Join("content/docs", slug+".md")
 
-	// Read markdown file from embedded FS
-	content, err := contentFS.ReadFile(mdPath)
+	// Read markdown file (disk in dev, embed in builds)
+	content, err := readContent(mdPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read markdown file: %w", err)
 	}
@@ -112,7 +123,7 @@ func (s *DocsService) GetPage(slug string) (*DocPage, error) {
 // exported <slug>.md view: like shadcn, ComponentPreview shortcodes are
 // expanded to the demo source as fenced code blocks.
 func (s *DocsService) GetComponentPageSource(slug string) ([]byte, error) {
-	source, err := contentFS.ReadFile(filepath.Join("content/docs/components", slug+".md"))
+	source, err := readContent(filepath.Join("content/docs/components", slug+".md"))
 	if err != nil {
 		return nil, err
 	}

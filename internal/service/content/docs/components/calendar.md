@@ -66,7 +66,7 @@ Use `CaptionLayout: calendar.CaptionLayoutDropdown` to show month and year dropd
 
 ## Custom Cell Size
 
-<ComponentPreview name="calendar-custom-days" previewClassName="h-[560px]" />
+<ComponentPreview name="calendar-custom-days"  />
 
 You can customize the size of calendar cells using the `--cell-size` CSS variable. You can also make it responsive by using breakpoint-specific values:
 

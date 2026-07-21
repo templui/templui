@@ -44,13 +44,23 @@
       delete dialog._tuiCloseTimer;
       dialog.removeAttribute("data-tui-dialog-closing");
       updateState(dialog, false);
+      unlockScroll();
     });
 
-    // A click on the backdrop targets the dialog element itself.
-    dialog.addEventListener("click", (event) => {
+    // A press on the backdrop targets the dialog element itself, but so do
+    // clicks on the panel's own padding and gaps. Only a press whose
+    // coordinates lie outside the panel is a backdrop dismiss (Base UI
+    // closes on outside press, not on click).
+    dialog.addEventListener("pointerdown", (event) => {
       if (event.target !== dialog) return;
       if (dialog.hasAttribute("data-tui-dialog-disable-click-away")) return;
-      closeDialog(dialog);
+      const rect = dialog.getBoundingClientRect();
+      const inPanel =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+      if (!inPanel) closeDialog(dialog);
     });
 
     return dialog;
@@ -61,6 +71,23 @@
     triggersFor(dialog).forEach((trigger) => {
       trigger.setAttribute("aria-expanded", isOpen ? "true" : "false");
     });
+  }
+
+  // Base UI locks the background scroll while a modal is open and pads the
+  // body by the scrollbar width so the page does not shift.
+  function lockScroll() {
+    if (document.body.hasAttribute("data-tui-scroll-locked")) return;
+    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
+    document.body.setAttribute("data-tui-scroll-locked", "");
+    document.body.style.overflow = "hidden";
+    if (scrollbar > 0) document.body.style.paddingRight = scrollbar + "px";
+  }
+
+  function unlockScroll() {
+    if (document.querySelector('dialog[open][data-tui-dialog-show-modal="true"]')) return;
+    document.body.removeAttribute("data-tui-scroll-locked");
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
   }
 
   function openDialog(target) {
@@ -75,6 +102,7 @@
       try {
         if (dialog.getAttribute("data-tui-dialog-show-modal") === "true") {
           dialog.showModal();
+          lockScroll();
         } else {
           dialog.show();
         }
@@ -106,6 +134,7 @@
     dialog._tuiCloseTimer = window.setTimeout(() => {
       if (dialog.open) {
         dialog.close();
+        unlockScroll();
       } else {
         dialog.removeAttribute("data-tui-dialog-closing");
       }
@@ -120,8 +149,23 @@
     isDialogOpen(target) ? closeDialog(target) : openDialog(target);
   }
 
+  // Moves the dialog to <body>, the pendant of shadcn's DialogPortal. This
+  // also detaches the panel from any surrounding <form>, exactly like the
+  // React portal does (a submit button inside the dialog no longer submits
+  // an outer form).
+  function portal(dialog) {
+    if (dialog.parentElement !== document.body) {
+      document.body.appendChild(dialog);
+    }
+  }
+
   function initDialogs(root = document) {
+    // Remove portaled leftovers whose trigger got swapped out of the page.
+    document.querySelectorAll("body > dialog[data-tui-dialog-content]").forEach((dialog) => {
+      if (!dialog.open && !triggersFor(dialog).length) dialog.remove();
+    });
     root.querySelectorAll("dialog[data-tui-dialog-content]").forEach((dialog) => {
+      portal(dialog);
       if (dialog.dataset.tuiDialogInitialized === "true") return;
       ensureDialog(dialog);
 
@@ -156,8 +200,12 @@
   }
 
   // Initialize dialogs added later (e.g. swapped in via htmx), so a
-  // server-rendered dialog with Open true still gets showModal().
-  new MutationObserver(() => initDialogs()).observe(document.body, {
+  // server-rendered dialog with Open true still gets showModal(). Also
+  // release the scroll lock if an open dialog got swapped out of the DOM.
+  new MutationObserver(() => {
+    initDialogs();
+    unlockScroll();
+  }).observe(document.body, {
     childList: true,
     subtree: true,
   });

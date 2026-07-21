@@ -132,7 +132,7 @@ templ SimplePreviewLayout(content templ.Component) {
 			<link rel="preload" href="/assets/fonts/geist/geist-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous"/>
 			<link rel="preload" href="/assets/fonts/geist/geist-mono-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous"/>
 			// CSS
-			<link href="/assets/css/output.css" rel="stylesheet"/>
+			<link href={ utils.ScriptURL("/assets/css/output.css") } rel="stylesheet"/>
 			<link href="/assets/css/themes.css" rel="stylesheet"/>
 			// Component JavaScript files
 			<script defer src={ utils.ScriptURL("/components/js/avatar/avatar.min.js") }></script>

@@ -143,6 +143,16 @@ The carousel exposes its selection state on the root element as `data-tui-carous
 
 <ComponentPreview name="carousel-api" previewClassName="sm:h-[32rem]" />
 
+```html showLineNumbers {2,5-6}
+<script>
+	const carousel = document.getElementById("my-carousel");
+	carousel.addEventListener("carousel-select", (e) => {
+		const current = e.detail.selected + 1;
+		const count = e.detail.count;
+	});
+</script>
+```
+
 ## Events
 
 You can listen to events using the bubbling `carousel-select` event.
@@ -159,6 +169,15 @@ You can listen to events using the bubbling `carousel-select` event.
 ## Plugins
 
 Use the `Autoplay` prop with an optional `Interval` to advance the slides automatically. Autoplay pauses while hovered.
+
+```templ showLineNumbers {2-3}
+@carousel.Carousel(carousel.Props{
+	Autoplay: true,
+	Interval: 2000,
+}) {
+	// ...
+}
+```
 
 <ComponentPreview name="carousel-plugin" previewClassName="sm:h-[32rem]" />
 

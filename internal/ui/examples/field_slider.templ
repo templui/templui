@@ -11,24 +11,28 @@ templ FieldSlider() {
 			Price Range
 		}
 		@field.Description() {
-			Set your budget range ($
-			<span class="font-medium tabular-nums">
-				@slider.Value(slider.ValueProps{For: "price-range-min"})
-			</span>
-			-
-			<span class="font-medium tabular-nums">
-				@slider.Value(slider.ValueProps{For: "price-range-max"})
-			</span>
-			).
+			Set your budget range ($<span id="field-slider-min" class="font-medium tabular-nums">200</span> - <span id="field-slider-max" class="font-medium tabular-nums">800</span>).
 		}
-		@slider.Range(slider.RangeProps{
-			ID:       "price-range",
-			Min:      0,
-			Max:      1000,
-			Step:     10,
-			MinValue: 200,
-			MaxValue: 800,
-			Class:    "mt-2 w-full",
+		@slider.Slider(slider.Props{
+			ID:     "field-slider",
+			Values: []float64{200, 800},
+			Min:    0,
+			Max:    1000,
+			Step:   10,
+			Class:  "mt-2 w-full",
+			Attributes: templ.Attributes{
+				"aria-label": "Price Range",
+			},
 		})
 	}
+	<script>
+		// The vanilla pendant of the demo's React state.
+		(() => {
+			const root = document.getElementById("field-slider");
+			root.addEventListener("slider-change", (e) => {
+				document.getElementById("field-slider-min").textContent = e.detail.values[0];
+				document.getElementById("field-slider-max").textContent = e.detail.values[1];
+			});
+		})();
+	</script>
 }

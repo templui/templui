@@ -190,7 +190,7 @@ func main() {
 		"out/showcase/sheet_external_trigger.html": examples.SheetExternalTrigger(),
 
 		// Dropdown Menu
-		"out/showcase/dropdownmenu_default.html":          examples.DropdownMenuDefault(),
+		"out/showcase/dropdownmenu_demo.html":          examples.DropdownMenuDemo(),
 		"out/showcase/dropdownmenu_basic.html":            examples.DropdownMenuBasic(),
 		"out/showcase/dropdownmenu_submenu.html":          examples.DropdownMenuSubmenu(),
 		"out/showcase/dropdownmenu_shortcuts.html":        examples.DropdownMenuShortcuts(),
@@ -205,7 +205,7 @@ func main() {
 
 		// Icon
 		"out/showcase/icon_colored.html": examples.IconColored(),
-		"out/showcase/icon_default.html": examples.IconDefault(),
+		"out/showcase/icon_demo.html": examples.IconDemo(),
 		"out/showcase/icon_filled.html":  examples.IconFilled(),
 		"out/showcase/icon_sizes.html":   examples.IconSizes(),
 
@@ -228,9 +228,11 @@ func main() {
 		"out/showcase/input_otp_with_label.html":     examples.InputOTPWithLabel(),
 
 		// Dialog
-		"out/showcase/dialog_default.html":          examples.DialogDefault(),
-		"out/showcase/dialog_external_trigger.html": examples.DialogExternalTrigger(),
-		"out/showcase/dialog_no_modal.html":         examples.DialogNoModal(),
+		"out/showcase/dialog_demo.html":               examples.DialogDemo(),
+		"out/showcase/dialog_close_button.html":       examples.DialogCloseButton(),
+		"out/showcase/dialog_no_close_button.html":    examples.DialogNoCloseButton(),
+		"out/showcase/dialog_sticky_footer.html":      examples.DialogStickyFooter(),
+		"out/showcase/dialog_scrollable_content.html": examples.DialogScrollableContent(),
 
 		// Pagination
 		"out/showcase/pagination_default.html":     examples.PaginationDefault(),

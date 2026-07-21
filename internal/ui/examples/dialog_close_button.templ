@@ -1,0 +1,49 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/dialog"
+	"github.com/templui/templui/components/input"
+	"github.com/templui/templui/components/label"
+)
+
+templ DialogCloseButton() {
+	@dialog.Dialog() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: dialog.Trigger(ctx),
+		}) {
+			Share
+		}
+		@dialog.Content(dialog.ContentProps{Class: "sm:max-w-md"}) {
+			@dialog.Header() {
+				@dialog.Title() {
+					Share link
+				}
+				@dialog.Description() {
+					Anyone who has this link will be able to view this.
+				}
+			}
+			<div class="flex items-center gap-2">
+				<div class="grid flex-1 gap-2">
+					@label.Label(label.Props{For: "link", Class: "sr-only"}) {
+						Link
+					}
+					@input.Input(input.Props{
+						ID:         "link",
+						Value:      "https://templui.io/docs/how-to-use",
+						Attributes: templ.Attributes{"readonly": true},
+					})
+				</div>
+			</div>
+			@dialog.Footer(dialog.FooterProps{Class: "sm:justify-start"}) {
+				@button.Button(button.Props{
+					Type:       button.TypeButton,
+					Attributes: dialog.Close(ctx),
+				}) {
+					Close
+				}
+			}
+		}
+	}
+}

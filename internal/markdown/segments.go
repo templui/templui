@@ -54,12 +54,16 @@ func (p *Parser) ParseSegments(source []byte) ([]Segment, map[string]any, []modu
 	var segments []Segment
 	last := 0
 	matches := shortcodeRe.FindAllSubmatchIndex(source, -1)
+	// One shared context so goldmark's auto heading ids deduplicate across
+	// the chunk conversions exactly like in the TOC's single pass (three
+	// "Fieldset" headings become fieldset, fieldset-1, fieldset-2).
+	idContext := parser.NewContext()
 	flush := func(chunk []byte) error {
 		if len(bytes.TrimSpace(chunk)) == 0 {
 			return nil
 		}
 		var buf bytes.Buffer
-		if err := p.md.Convert(chunk, &buf); err != nil {
+		if err := p.md.Convert(chunk, &buf, parser.WithContext(idContext)); err != nil {
 			return err
 		}
 		segments = append(segments, Segment{HTML: buf.String()})
@@ -77,7 +81,7 @@ func (p *Parser) ParseSegments(source []byte) ([]Segment, map[string]any, []modu
 		}
 		if m[6] != -1 { // Callout with inner markdown
 			var buf bytes.Buffer
-			if err := p.md.Convert(source[m[8]:m[9]], &buf); err != nil {
+			if err := p.md.Convert(source[m[8]:m[9]], &buf, parser.WithContext(idContext)); err != nil {
 				return nil, nil, nil, err
 			}
 			segments = append(segments, Segment{Shortcode: "Callout", HTML: buf.String()})

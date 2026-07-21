@@ -1,0 +1,100 @@
+---
+title: Hover Card
+description: For sighted users to preview content available behind a link.
+---
+
+<ComponentPreview name="hover-card-demo" previewClassName="h-80" />
+
+## Installation
+
+<Installation name="hovercard" />
+
+## Usage
+
+```go showLineNumbers
+import "github.com/templui/templui/components/hovercard"
+```
+
+```templ showLineNumbers
+@hovercard.HoverCard() {
+	<span { hovercard.Trigger(ctx)... }>Hover</span>
+	@hovercard.Content() {
+		The Go templating language, created and maintained by @a-h.
+	}
+}
+```
+
+## Composition
+
+Use the following composition to build a `HoverCard`:
+
+```text
+hovercard.HoverCard
+├── hovercard.Trigger
+└── hovercard.Content
+```
+
+## Trigger Delays
+
+Use `OpenDelay` and `CloseDelay` on the root to control when the card opens and closes.
+
+```templ showLineNumbers
+@hovercard.HoverCard(hovercard.Props{OpenDelay: 100, CloseDelay: 200}) {
+	<span { hovercard.Trigger(ctx)... }>Hover</span>
+	@hovercard.Content() {
+		Content
+	}
+}
+```
+
+## Positioning
+
+Use the `Side` and `Align` props on `hovercard.Content` to control placement.
+
+```templ showLineNumbers
+@hovercard.HoverCard() {
+	<span { hovercard.Trigger(ctx)... }>Hover</span>
+	@hovercard.Content(hovercard.ContentProps{Side: hovercard.SideTop, Align: hovercard.AlignStart}) {
+		Content
+	}
+}
+```
+
+## Basic
+
+<ComponentPreview name="hover-card-demo" previewClassName="h-80" />
+
+## Sides
+
+<ComponentPreview name="hover-card-sides" previewClassName="h-[22rem]" />
+
+## API Reference
+
+### HoverCard
+
+The `HoverCard` component is the root that links trigger and content and controls the hover delays.
+
+| Prop         | Type  | Default |
+| ------------ | ----- | ------- |
+| `OpenDelay`  | `int` | `700`   |
+| `CloseDelay` | `int` | `300`   |
+
+### Trigger
+
+`hovercard.Trigger(ctx)` returns the attributes that turn any element into the trigger.
+
+| Prop  | Type              | Default |
+| ----- | ----------------- | ------- |
+| `ctx` | `context.Context` | -       |
+
+### Content
+
+The `hovercard.Content` component is the card, anchored to the trigger.
+
+| Prop          | Type                                                    | Default      |
+| ------------- | ------------------------------------------------------- | ------------ |
+| `Side`        | `SideTop \| SideRight \| SideBottom \| SideLeft`   | `SideBottom` |
+| `Align`       | `AlignStart \| AlignCenter \| AlignEnd`             | `AlignCenter`|
+| `SideOffset`  | `int`                                                   | `4`          |
+| `AlignOffset` | `int`                                                   | `4`          |
+| `Class`       | `string`                                                | -            |
