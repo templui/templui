@@ -16,7 +16,6 @@ templ DatePickerDob() {
 		{{
 			triggerAttrs := popover.Trigger(ctx)
 			triggerAttrs["id"] = "date-picker-dob-trigger"
-			triggerAttrs["data-tui-datepicker-display"] = ""
 		}}
 			@button.Button(button.Props{
 				Variant:    button.VariantOutline,
@@ -37,13 +36,11 @@ templ DatePickerDob() {
 	}
 	<script>
 		(() => {
-			const root = document.getElementById("date-picker-dob");
-			root.addEventListener("calendar-change", (e) => {
-				const display = root.querySelector("[data-tui-datepicker-display] span");
-				display.textContent = e.detail.value ? e.detail.value.toLocaleDateString() : "Select date";
-				if (e.detail.value && window.tui && window.tui.popover) {
-					window.tui.popover.closeNearest(root.querySelector("[data-tui-popover-content]"));
-				}
+			const content = document.getElementById("date-picker-dob");
+			const trigger = document.querySelector('[aria-controls="date-picker-dob"]');
+			content.addEventListener("calendar-change", (e) => {
+				trigger.querySelector("span").textContent = e.detail.value ? e.detail.value.toLocaleDateString() : "Select date";
+				if (e.detail.value) window.tui.popover.close(content);
 			});
 		})();
 	</script>

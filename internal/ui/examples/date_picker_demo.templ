@@ -7,12 +7,11 @@ import (
 	"github.com/templui/templui/components/popover"
 )
 
-templ DatePickerDefault() {
-	@popover.Root(popover.RootProps{ID: "date-picker-default"}) {
+templ DatePickerDemo() {
+	@popover.Root(popover.RootProps{ID: "date-picker-demo"}) {
 		{{
 			triggerAttrs := popover.Trigger(ctx)
 			triggerAttrs["data-empty"] = "true"
-			triggerAttrs["data-tui-datepicker-display"] = ""
 		}}
 		@button.Button(button.Props{
 			Variant:    button.VariantOutline,
@@ -33,22 +32,18 @@ templ DatePickerDefault() {
 	}
 	<script>
 		(() => {
-			const root = document.getElementById("date-picker-default");
+			// The popover content carries the root ID and is portaled to <body>,
+			// the trigger stays in place and points at it via aria-controls.
+			const content = document.getElementById("date-picker-demo");
+			const trigger = document.querySelector('[aria-controls="date-picker-demo"]');
 			const fmt = (d) => {
 				const day = d.getDate();
 				const suf = day % 10 === 1 && day !== 11 ? "st" : day % 10 === 2 && day !== 12 ? "nd" : day % 10 === 3 && day !== 13 ? "rd" : "th";
 				return d.toLocaleDateString("en-US", { month: "long" }) + " " + day + suf + ", " + d.getFullYear();
 			};
-			root.addEventListener("calendar-change", (e) => {
-				const display = root.querySelector("[data-tui-datepicker-display] span");
-				const btn = root.querySelector("[data-tui-datepicker-display]");
-				if (e.detail.value) {
-					display.textContent = fmt(e.detail.value);
-					btn.setAttribute("data-empty", "false");
-				} else {
-					display.textContent = "Pick a date";
-					btn.setAttribute("data-empty", "true");
-				}
+			content.addEventListener("calendar-change", (e) => {
+				trigger.querySelector("span").textContent = e.detail.value ? fmt(e.detail.value) : "Pick a date";
+				trigger.setAttribute("data-empty", e.detail.value ? "false" : "true");
 			});
 		})();
 	</script>

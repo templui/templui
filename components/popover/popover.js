@@ -57,6 +57,24 @@ import "../floatingui/floating_ui_dom.js";
     if (content.parentElement !== document.body) {
       document.body.appendChild(content);
     }
+    wireAria(content);
+  }
+
+  // Base UI links Title/Description to the popup via aria-labelledby and
+  // aria-describedby with generated ids.
+  function wireAria(content) {
+    const popup = popupFor(content);
+    if (!popup) return;
+    const title = popup.querySelector("[data-slot=popover-title]");
+    if (title) {
+      if (!title.id) title.id = content.id + "-title";
+      popup.setAttribute("aria-labelledby", title.id);
+    }
+    const description = popup.querySelector("[data-slot=popover-description]");
+    if (description) {
+      if (!description.id) description.id = content.id + "-description";
+      popup.setAttribute("aria-describedby", description.id);
+    }
   }
 
   function position(content) {
@@ -115,13 +133,24 @@ import "../floatingui/floating_ui_dom.js";
       setState(content, "open");
       const trigger = triggerFor(content);
       if (trigger) trigger.setAttribute("aria-expanded", "true");
+      // Base UI moves focus into the popup when it opens.
+      const popup = popupFor(content);
+      if (popup && !content.contains(document.activeElement)) {
+        popup.focus({ preventScroll: true });
+      }
     };
     position(content).then(finish, finish);
   }
 
-  function close(content) {
+  // returnFocus false skips the focus restore, like Base UI on pointer
+  // dismiss: focus follows the outside press instead of the trigger.
+  function close(content, returnFocus) {
     if (typeof content === "string") content = document.getElementById(content);
     if (!content || !content.matches(":popover-open")) return;
+    if (returnFocus !== false && content.contains(document.activeElement)) {
+      const focusTrigger = triggerFor(content);
+      if (focusTrigger) focusTrigger.focus({ preventScroll: true });
+    }
     content.style.visibility = "";
     setState(content, "closed");
     const trigger = triggerFor(content);
@@ -134,8 +163,8 @@ import "../floatingui/floating_ui_dom.js";
     }, EXIT_MS);
   }
 
-  function closeAll() {
-    allContents().forEach(close);
+  function closeAll(returnFocus) {
+    allContents().forEach((content) => close(content, returnFocus));
   }
 
   function closeNearest(element) {
@@ -170,7 +199,7 @@ import "../floatingui/floating_ui_dom.js";
       if (content) toggle(content);
       return;
     }
-    if (!e.target.closest("[data-tui-popover-content]")) closeAll();
+    if (!e.target.closest("[data-tui-popover-content]")) closeAll(false);
   });
 
   document.addEventListener("click", (e) => {

@@ -103,16 +103,21 @@ import "../floatingui/floating_ui_dom.js";
     if (popup) popup.setAttribute("data-side", side);
   }
 
+  function sideOffsetOf(content) {
+    const v = parseFloat(content.getAttribute("data-tui-combobox-side-offset"));
+    return isNaN(v) ? SIDE_OFFSET : v;
+  }
+
   // Base UI zooms the popup out of the anchor's center point (e.g.
   // "128px -4px"), not out of a placement corner.
-  function anchorOrigin(result, anchorRect) {
+  function anchorOrigin(result, anchorRect, sideOffset) {
     const side = result.placement.split("-")[0];
     const centerX = anchorRect.left + anchorRect.width / 2 - result.x + "px";
     const centerY = anchorRect.top + anchorRect.height / 2 - result.y + "px";
-    if (side === "bottom") return centerX + " " + -SIDE_OFFSET + "px";
-    if (side === "top") return centerX + " calc(100% + " + SIDE_OFFSET + "px)";
-    if (side === "right") return -SIDE_OFFSET + "px " + centerY;
-    return "calc(100% + " + SIDE_OFFSET + "px) " + centerY;
+    if (side === "bottom") return centerX + " " + -sideOffset + "px";
+    if (side === "top") return centerX + " calc(100% + " + sideOffset + "px)";
+    if (side === "right") return -sideOffset + "px " + centerY;
+    return "calc(100% + " + sideOffset + "px) " + centerY;
   }
 
   // Moves the content to <body> (shadcn portals it the same way). Also removes
@@ -133,13 +138,14 @@ import "../floatingui/floating_ui_dom.js";
     const side = content.getAttribute("data-tui-combobox-side") || "bottom";
     const align = content.getAttribute("data-tui-combobox-align") || "start";
     const alignOffset = parseFloat(content.getAttribute("data-tui-combobox-align-offset")) || 0;
+    const sideOffset = sideOffsetOf(content);
     const placement = align === "center" ? side : side + "-" + align;
 
     return computePosition(anchor, content, {
       placement: placement,
       strategy: "fixed",
       middleware: [
-        offset({ mainAxis: SIDE_OFFSET, crossAxis: alignOffset }),
+        offset({ mainAxis: sideOffset, crossAxis: alignOffset }),
         flip({ padding: COLLISION_PADDING }),
         shift({ padding: COLLISION_PADDING }),
         size({
@@ -159,7 +165,7 @@ import "../floatingui/floating_ui_dom.js";
       if (popup) {
         popup.style.setProperty(
           "--tui-combobox-transform-origin",
-          anchorOrigin(result, anchor.getBoundingClientRect()),
+          anchorOrigin(result, anchor.getBoundingClientRect(), sideOffset),
         );
       }
     });

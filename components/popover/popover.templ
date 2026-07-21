@@ -135,6 +135,7 @@ templ Content(props ...ContentProps) {
 			data-tui-popover-popup
 			data-state="closed"
 			role="dialog"
+			tabindex="-1"
 			class={
 				utils.TwMerge(
 					"pointer-events-auto z-50 flex w-72 flex-col gap-2.5 origin-(--tui-popover-transform-origin) rounded-lg bg-popover p-2.5 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden duration-100 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
@@ -170,7 +171,7 @@ templ Title(props ...TitleProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<div
+	<h2
 		if p.ID != "" {
 			id={ p.ID }
 		}
@@ -179,7 +180,7 @@ templ Title(props ...TitleProps) {
 		{ p.Attributes... }
 	>
 		{ children... }
-	</div>
+	</h2>
 }
 
 templ Description(props ...DescriptionProps) {
@@ -187,7 +188,7 @@ templ Description(props ...DescriptionProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<div
+	<p
 		if p.ID != "" {
 			id={ p.ID }
 		}
@@ -196,7 +197,7 @@ templ Description(props ...DescriptionProps) {
 		{ p.Attributes... }
 	>
 		{ children... }
-	</div>
+	</p>
 }
 
 var scriptOnce = templ.NewOnceHandle()

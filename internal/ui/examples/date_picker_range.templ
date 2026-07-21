@@ -23,7 +23,6 @@ templ DatePickerRange() {
 		{{
 			triggerAttrs := popover.Trigger(ctx)
 			triggerAttrs["id"] = "date-picker-range-trigger"
-			triggerAttrs["data-tui-datepicker-display"] = ""
 		}}
 			@button.Button(button.Props{
 				Variant:    button.VariantOutline,
@@ -33,7 +32,7 @@ templ DatePickerRange() {
 				<span data-icon="inline-start" class="contents">
 					@icon.Calendar()
 				</span>
-				<span data-tui-datepicker-label>
+				<span>
 					{ from.Format("Jan 02, 2006") } - { to.Format("Jan 02, 2006") }
 				</span>
 			}
@@ -52,10 +51,11 @@ templ DatePickerRange() {
 	}
 	<script>
 		(() => {
-			const root = document.getElementById("date-picker-range");
+			const content = document.getElementById("date-picker-range");
+			const trigger = document.querySelector('[aria-controls="date-picker-range"]');
 			const fmt = (d) => d.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
-			root.addEventListener("calendar-change", (e) => {
-				const display = root.querySelector("[data-tui-datepicker-label]");
+			content.addEventListener("calendar-change", (e) => {
+				const display = trigger.querySelector("span:not([data-icon])");
 				if (e.detail.value && e.detail.endValue) {
 					display.textContent = fmt(e.detail.value) + " - " + fmt(e.detail.endValue);
 				} else if (e.detail.value) {

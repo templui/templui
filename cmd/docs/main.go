@@ -132,9 +132,7 @@ func main() {
 	mux.Handle("GET /docs/how-to-use", markdownDocsHandler("how-to-use"))
 	// Components
 	mux.Handle("GET /docs/components/{slug}", componentDocHandler(docsService))
-	mux.Handle("GET /docs/components/date-picker", htmxHandler(pages.DatePicker()))
 	mux.Handle("GET /docs/components/charts", htmxHandler(pages.Chart()))
-	mux.Handle("GET /docs/components/combobox", htmxHandler(pages.Combobox()))
 	mux.Handle("GET /docs/components/sheet", htmxHandler(pages.Sheet()))
 	mux.Handle("GET /docs/components/select", htmxHandler(pages.Select()))
 	mux.Handle("GET /docs/components/dropdown-menu", htmxHandler(pages.DropdownMenu()))
@@ -168,7 +166,6 @@ func main() {
 	mux.Handle("GET /docs/components/field", htmxHandler(pages.Field()))
 	mux.Handle("GET /docs/components/toggle", htmxHandler(pages.Toggle()))
 	mux.Handle("GET /docs/components/toggle-group", htmxHandler(pages.ToggleGroup()))
-	mux.Handle("GET /docs/components/context-menu", htmxHandler(pages.ContextMenu()))
 
 	// Showcase API
 	mux.Handle("POST /docs/toast/demo", http.HandlerFunc(toastDemoHandler))

@@ -100,7 +100,7 @@ func main() {
 		"out/showcase/calendar_week_numbers.html": examples.CalendarWeekNumbers(),
 
 		// Date Picker
-		"out/showcase/date_picker_default.html": examples.DatePickerDefault(),
+		"out/showcase/date_picker_demo.html": examples.DatePickerDemo(),
 		"out/showcase/date_picker_basic.html":   examples.DatePickerBasic(),
 		"out/showcase/date_picker_range.html":   examples.DatePickerRange(),
 		"out/showcase/date_picker_dob.html":     examples.DatePickerDob(),
@@ -164,7 +164,8 @@ func main() {
 
 
 		// Combobox
-		"out/showcase/combobox_default.html":        examples.ComboboxDefault(),
+		"out/showcase/combobox_demo.html":        examples.ComboboxDemo(),
+		"out/showcase/combobox_basic.html":          examples.ComboboxBasic(),
 		"out/showcase/combobox_multiple.html":       examples.ComboboxMultiple(),
 		"out/showcase/combobox_clear.html":          examples.ComboboxClear(),
 		"out/showcase/combobox_groups.html":         examples.ComboboxGroups(),

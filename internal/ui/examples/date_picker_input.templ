@@ -29,9 +29,6 @@ templ DatePickerInput() {
 					ID:          "date-picker-input-field",
 					Value:       "June 01, 2025",
 					Placeholder: "June 01, 2025",
-					Attributes: templ.Attributes{
-						"data-tui-datepicker-input": "",
-					},
 				})
 				@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignInlineEnd}) {
 					@inputgroup.Button(inputgroup.ButtonProps{
@@ -44,7 +41,6 @@ templ DatePickerInput() {
 				}
 			}
 			@popover.Content(popover.ContentProps{
-				ID:        "date-picker-input-popover",
 				Class:     "w-auto overflow-hidden p-0",
 				Side: popover.SideBottom, Align: popover.AlignEnd,
 				SideOffset: 10,
@@ -58,15 +54,13 @@ templ DatePickerInput() {
 	}
 	<script>
 		(() => {
-			const root = document.getElementById("date-picker-input");
-			const input = root.querySelector("[data-tui-datepicker-input]");
+			const content = document.getElementById("date-picker-input");
+			const input = document.getElementById("date-picker-input-field");
 			const fmt = (d) => d.toLocaleDateString("en-US", { day: "2-digit", month: "long", year: "numeric" });
-			root.addEventListener("calendar-change", (e) => {
+			content.addEventListener("calendar-change", (e) => {
 				if (!e.detail.value) return;
 				input.value = fmt(e.detail.value);
-				if (window.tui && window.tui.popover) {
-					window.tui.popover.closeNearest(root.querySelector("[data-tui-popover-content]"));
-				}
+				window.tui.popover.close(content);
 			});
 			input.addEventListener("input", () => {
 				const date = new Date(input.value);
@@ -78,9 +72,9 @@ templ DatePickerInput() {
 				}
 			});
 			input.addEventListener("keydown", (e) => {
-				if (e.key === "ArrowDown" && window.tui && window.tui.popover) {
+				if (e.key === "ArrowDown") {
 					e.preventDefault();
-					window.tui.popover.open("date-picker-input-popover");
+					window.tui.popover.open(content);
 				}
 			});
 		})();

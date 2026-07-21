@@ -84,6 +84,8 @@ type ContentProps struct {
 	Side Side
 	// Align along the anchor edge. Defaults to start.
 	Align Align
+	// SideOffset is the gap to the anchor in px. Defaults to 6.
+	SideOffset int
 	// AlignOffset shifts the content along the aligned edge, in px.
 	AlignOffset int
 }
@@ -140,7 +142,23 @@ type ChipsProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	// Placeholder for the inline chips input.
+}
+
+type ChipProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Value is the selected value this chip shows and removes.
+	Value string
+	// HideRemove hides the chip's remove button.
+	HideRemove bool
+}
+
+type ChipsInputProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Placeholder is shown while the chips input is empty.
 	Placeholder string
 	// Invalid marks the chips input aria-invalid for error styling.
 	Invalid bool
@@ -174,21 +192,31 @@ func Trigger(ctx context.Context) templ.Attributes {
 	}
 }
 
-// Value shows the selected item's label inside a button trigger.
+// Value renders the current selection: the selected chips in multiple mode,
+// or the selected item's label inside a button trigger.
 templ Value(props ...ValueProps) {
 	{{ var p ValueProps }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<span
-		data-slot="combobox-value"
-		data-tui-combobox-value-display
-		data-tui-combobox-placeholder={ p.Placeholder }
-		class={ utils.TwMerge("flex flex-1 text-left", p.Class) }
-		{ p.Attributes... }
-	>
-		{ p.Placeholder }
-	</span>
+	{{ s := state(ctx) }}
+	if s.multiple {
+		for _, v := range s.values {
+			@Chip(ChipProps{Value: v})
+		}
+	} else {
+		<span
+			data-slot="combobox-value"
+			data-tui-combobox-value-display
+			data-tui-combobox-placeholder={ p.Placeholder }
+			if p.Class != "" {
+				class={ p.Class }
+			}
+			{ p.Attributes... }
+		>
+			{ p.Placeholder }
+		</span>
+	}
 }
 
 templ Input(props ...InputProps) {
@@ -271,12 +299,16 @@ templ Content(props ...ContentProps) {
 	if p.Align == "" {
 		{{ p.Align = AlignStart }}
 	}
+	if p.SideOffset == 0 {
+		{{ p.SideOffset = 6 }}
+	}
 	{{ s := state(ctx) }}
 	<div
 		id={ s.id }
 		data-tui-combobox-content
 		data-tui-combobox-side={ string(p.Side) }
 		data-tui-combobox-align={ string(p.Align) }
+		data-tui-combobox-side-offset={ strconv.Itoa(p.SideOffset) }
 		if p.AlignOffset != 0 {
 			data-tui-combobox-align-offset={ strconv.Itoa(p.AlignOffset) }
 		}
@@ -453,13 +485,13 @@ templ Separator(props ...SeparatorProps) {
 		}
 		role="separator"
 		data-slot="combobox-separator"
-		class={ utils.TwMerge("pointer-events-none -mx-1 my-1 h-px bg-border", p.Class) }
+		class={ utils.TwMerge("-mx-1 my-1 h-px bg-border", p.Class) }
 		{ p.Attributes... }
 	></div>
 }
 
-// Chips is the anchor for multiple mode: selected values render as removable
-// chips with an inline filter input.
+// Chips is the anchor for multiple mode: a chip container composed by the
+// user with Value (the selected chips) and ChipsInput (the inline filter).
 templ Chips(props ...ChipsProps) {
 	{{ var p ChipsProps }}
 	if len(props) > 0 {
@@ -481,56 +513,82 @@ templ Chips(props ...ChipsProps) {
 		}
 		{ p.Attributes... }
 	>
-		for _, v := range s.values {
-			@Chip(v)
-		}
 		if s.name != "" {
 			for _, v := range s.values {
 				<input type="hidden" name={ s.name } value={ v } data-tui-combobox-hidden aria-hidden="true" tabindex="-1"/>
 			}
 		}
-		<input
-			data-tui-combobox-input
-			data-slot="combobox-chip-input"
-			role="combobox"
-			aria-controls={ s.id }
-			aria-expanded="false"
-			aria-autocomplete="list"
-			autocomplete="off"
-			if p.Placeholder != "" {
-				placeholder={ p.Placeholder }
-			}
-			if p.Invalid {
-				aria-invalid="true"
-			}
-			disabled?={ s.disabled }
-			class="min-w-16 flex-1 outline-none"
-		/>
+		{ children... }
 		<template data-tui-combobox-chip-template>
-			@Chip("")
+			@Chip()
 		</template>
 	</div>
 }
 
-templ Chip(value string) {
+// ChipsInput is the inline filter input rendered after the chips.
+templ ChipsInput(props ...ChipsInputProps) {
+	{{ var p ChipsInputProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ s := state(ctx) }}
+	<input
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-tui-combobox-input
+		data-slot="combobox-chip-input"
+		role="combobox"
+		aria-controls={ s.id }
+		aria-expanded="false"
+		aria-autocomplete="list"
+		autocomplete="off"
+		if p.Placeholder != "" {
+			placeholder={ p.Placeholder }
+		}
+		if p.Invalid {
+			aria-invalid="true"
+		}
+		disabled?={ s.disabled }
+		class={ utils.TwMerge("min-w-16 flex-1 outline-none", p.Class) }
+		{ p.Attributes... }
+	/>
+}
+
+templ Chip(props ...ChipProps) {
+	{{ var p ChipProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
 	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
 		data-slot="combobox-chip"
 		data-tui-combobox-chip
-		data-tui-combobox-value={ value }
-		class="flex h-[calc(--spacing(5.25))] w-fit items-center justify-center gap-1 rounded-sm bg-muted px-1.5 text-xs font-medium whitespace-nowrap text-foreground has-data-[slot=combobox-chip-remove]:pr-0 has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50"
+		data-tui-combobox-value={ p.Value }
+		class={
+			utils.TwMerge(
+				"flex h-[calc(--spacing(5.25))] w-fit items-center justify-center gap-1 rounded-sm bg-muted px-1.5 text-xs font-medium whitespace-nowrap text-foreground has-data-[slot=combobox-chip-remove]:pr-0 has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50",
+				p.Class,
+			),
+		}
+		{ p.Attributes... }
 	>
-		<span data-tui-combobox-chip-label>{ value }</span>
-		@button.Button(button.Props{
-			Variant: button.VariantGhost,
-			Size:    button.SizeIconXs,
-			Class:   "-ml-1 opacity-50 hover:opacity-100",
-			Attributes: templ.Attributes{
-				"data-slot":                     "combobox-chip-remove",
-				"data-tui-combobox-chip-remove": "",
-				"tabindex":                      "-1",
-			},
-		}) {
-			@icon.X(icon.Props{Class: "pointer-events-none"})
+		<span data-tui-combobox-chip-label>{ p.Value }</span>
+		if !p.HideRemove {
+			@button.Button(button.Props{
+				Variant: button.VariantGhost,
+				Size:    button.SizeIconXs,
+				Class:   "-ml-1 opacity-50 hover:opacity-100",
+				Attributes: templ.Attributes{
+					"data-slot":                     "combobox-chip-remove",
+					"data-tui-combobox-chip-remove": "",
+					"tabindex":                      "-1",
+				},
+			}) {
+				@icon.X(icon.Props{Class: "pointer-events-none"})
+			}
 		}
 	</div>
 }
