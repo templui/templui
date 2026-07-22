@@ -215,7 +215,7 @@ templ cardPayoutThreshold() {
 						}
 						<span class="text-2xl font-semibold tabular-nums">$2500.00</span>
 					</div>
-					@slider.Slider(slider.Props{ID: "min-payout", Min: 50, Max: 10000, Step: 50, Value: 2500})
+					@slider.Slider(slider.Props{ID: "min-payout", Min: 50, Max: 10000, Step: 50, Values: []float64{2500}})
 					<div class="flex items-center justify-between">
 						@field.Description() {
 							$50 (MIN)

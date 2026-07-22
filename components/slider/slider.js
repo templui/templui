@@ -1,103 +1,172 @@
 (function () {
-  'use strict';
+  "use strict";
 
-  function pct(val, min, max) {
-    return ((val - min) / (max - min)) * 100;
+  // size-3 in px; Base UI's edge thumb alignment keeps the thumb inside the
+  // track by shifting it up to its own width. Mirrors slider.templ.
+  const THUMB = 12;
+
+  function config(root) {
+    return {
+      min: parseFloat(root.getAttribute("data-min") || "0"),
+      max: parseFloat(root.getAttribute("data-max") || "100"),
+      step: parseFloat(root.getAttribute("data-step") || "1") || 1,
+      vertical: root.hasAttribute("data-vertical"),
+    };
   }
 
-  function clamp(val, min, max) {
-    return Math.min(max, Math.max(min, val));
+  function thumbsOf(root) {
+    return [...root.querySelectorAll("[data-tui-slider-thumb]")];
   }
 
-  function snap(val, step) {
-    return Math.round(val / step) * step;
+  function valuesOf(root) {
+    return thumbsOf(root).map((t) => parseFloat(t.getAttribute("aria-valuenow") || "0"));
   }
 
-  function fromPointer(clientX, track, min, max, step) {
-    const { left, width } = track.getBoundingClientRect();
-    return clamp(snap(min + ((clientX - left) / width) * (max - min), step), min, max);
+  function fraction(v, c) {
+    if (c.max === c.min) return 0;
+    return Math.min(1, Math.max(0, (v - c.min) / (c.max - c.min)));
   }
 
-  function initSlider(root) {
-    const track   = root.querySelector('[data-track]');
-    const fill    = root.querySelector('[data-fill]');
-    const thumbs  = Array.from(root.querySelectorAll('[data-thumb]'));
-    const inputs  = Array.from(root.querySelectorAll('[data-input]'));
-    const min     = +root.dataset.min;
-    const max     = +root.dataset.max;
-    const step    = +root.dataset.step || 1;
-    const isRange = thumbs.length === 2;
+  function decimals(step) {
+    const s = String(step);
+    const i = s.indexOf(".");
+    return i === -1 ? 0 : s.length - i - 1;
+  }
 
-    function update() {
-      thumbs.forEach((thumb, i) => {
-        const val = +inputs[i].value;
-        thumb.style.left = pct(val, min, max) + '%';
-        thumb.setAttribute('aria-valuenow', val);
-
-        const key = isRange ? root.id + (i === 0 ? '-min' : '-max') : root.id;
-        document.querySelectorAll(`[data-tui-slider-value-for="${key}"]`).forEach(el => {
-          el.textContent = val;
-        });
-      });
-
-      if (isRange) {
-        fill.style.left  = pct(+inputs[0].value, min, max) + '%';
-        fill.style.right = (100 - pct(+inputs[1].value, min, max)) + '%';
+  function render(root) {
+    const c = config(root);
+    const values = valuesOf(root);
+    thumbsOf(root).forEach((t, i) => {
+      const f = fraction(values[i], c);
+      if (c.vertical) {
+        const g = 1 - f;
+        t.style.top = "calc(" + (g * 100).toFixed(4) + "% - " + (g * THUMB).toFixed(2) + "px)";
       } else {
-        fill.style.right = (100 - pct(+inputs[0].value, min, max)) + '%';
+        t.style.left = "calc(" + (f * 100).toFixed(4) + "% - " + (f * THUMB).toFixed(2) + "px)";
+      }
+    });
+    const range = root.querySelector("[data-tui-slider-range]");
+    if (range) {
+      const fs = values.map((v) => fraction(v, c));
+      const lo = values.length > 1 ? Math.min(...fs) : 0;
+      const hi = values.length > 0 ? Math.max(...fs) : 0;
+      if (c.vertical) {
+        if (values.length > 1) {
+          range.style.bottom = "calc(" + (lo * 100).toFixed(4) + "% + " + (THUMB / 2 - lo * THUMB).toFixed(2) + "px)";
+          range.style.height = "calc(" + ((hi - lo) * 100).toFixed(4) + "% - " + ((hi - lo) * THUMB).toFixed(2) + "px)";
+        } else {
+          range.style.bottom = "0";
+          range.style.height = "calc(" + (hi * 100).toFixed(4) + "% + " + (THUMB / 2 - hi * THUMB).toFixed(2) + "px)";
+        }
+      } else {
+        if (values.length > 1) {
+          range.style.left = "calc(" + (lo * 100).toFixed(4) + "% + " + (THUMB / 2 - lo * THUMB).toFixed(2) + "px)";
+          range.style.width = "calc(" + ((hi - lo) * 100).toFixed(4) + "% - " + ((hi - lo) * THUMB).toFixed(2) + "px)";
+        } else {
+          range.style.left = "0";
+          range.style.width = "calc(" + (hi * 100).toFixed(4) + "% + " + (THUMB / 2 - hi * THUMB).toFixed(2) + "px)";
+        }
       }
     }
+    root.querySelectorAll("[data-tui-slider-input]").forEach((input, i) => {
+      if (values[i] != null) input.value = String(values[i]);
+    });
+  }
 
-    function setVal(i, val) {
-      if (i === 0 && isRange) val = Math.min(val, +inputs[1].value);
-      if (i === 1)            val = Math.max(val, +inputs[0].value);
-      inputs[i].value = val;
-      update();
-      inputs[i].dispatchEvent(new Event('input', { bubbles: true }));
+  function snap(v, c) {
+    const stepped = Math.round((v - c.min) / c.step) * c.step + c.min;
+    const clamped = Math.min(c.max, Math.max(c.min, stepped));
+    return parseFloat(clamped.toFixed(decimals(c.step)));
+  }
+
+  function setValue(root, index, v) {
+    const c = config(root);
+    const values = valuesOf(root);
+    v = snap(v, c);
+    // Thumbs cannot cross each other (Base UI clamps at the neighbor).
+    if (index > 0) v = Math.max(v, values[index - 1]);
+    if (index < values.length - 1) v = Math.min(v, values[index + 1]);
+    if (values[index] === v) return;
+    thumbsOf(root)[index].setAttribute("aria-valuenow", String(v));
+    render(root);
+    root.dispatchEvent(new CustomEvent("slider-change", { bubbles: true, detail: { values: valuesOf(root) } }));
+  }
+
+  // Inverts the edge alignment: the usable span is the track minus one thumb.
+  function valueFromPointer(root, e) {
+    const c = config(root);
+    const track = root.querySelector("[data-tui-slider-track]");
+    const rect = track.getBoundingClientRect();
+    let f;
+    if (c.vertical) {
+      const usable = rect.height - THUMB;
+      f = usable <= 0 ? 0 : (rect.bottom - THUMB / 2 - e.clientY) / usable;
+    } else {
+      const usable = rect.width - THUMB;
+      f = usable <= 0 ? 0 : (e.clientX - rect.left - THUMB / 2) / usable;
     }
-
-    thumbs.forEach((thumb, i) => {
-      if (thumb.getAttribute('aria-disabled') === 'true') return;
-
-      thumb.addEventListener('pointerdown', e => {
-        e.preventDefault();
-        thumb.setPointerCapture(e.pointerId);
-        thumbs.forEach(t => (t.style.zIndex = '0'));
-        thumb.style.zIndex = '1';
-
-        function onMove(e) {
-          setVal(i, fromPointer(e.clientX, track, min, max, step));
-        }
-        thumb.addEventListener('pointermove', onMove);
-        thumb.addEventListener('pointerup', () => thumb.removeEventListener('pointermove', onMove), { once: true });
-      });
-
-      thumb.addEventListener('keydown', e => {
-        const delta = { ArrowRight: step, ArrowUp: step, ArrowLeft: -step, ArrowDown: -step }[e.key];
-        if (delta === undefined) return;
-        e.preventDefault();
-        setVal(i, clamp(snap(+inputs[i].value + delta, step), min, max));
-      });
-    });
-
-    // click on track to jump to position
-    track.addEventListener('pointerdown', e => {
-      if (e.target.closest('[data-thumb]')) return;
-      if (root.querySelector('[data-thumb][aria-disabled="true"]')) return;
-      const val = fromPointer(e.clientX, track, min, max, step);
-      const i = !isRange ? 0
-        : Math.abs(val - +inputs[0].value) <= Math.abs(val - +inputs[1].value) ? 0 : 1;
-      setVal(i, val);
-    });
-
-    update();
-    root.dataset.tuiSliderInit = '1';
+    return c.min + Math.min(1, Math.max(0, f)) * (c.max - c.min);
   }
 
-  function initAll() {
-    document.querySelectorAll('[data-tui-slider]:not([data-tui-slider-init])').forEach(initSlider);
+  function nearestThumb(root, v) {
+    const values = valuesOf(root);
+    let best = 0;
+    let bestDist = Infinity;
+    values.forEach((val, i) => {
+      const d = Math.abs(val - v);
+      // On a tie the upper thumb moves when pressing above it.
+      if (d < bestDist || (d === bestDist && v > val)) {
+        best = i;
+        bestDist = d;
+      }
+    });
+    return best;
   }
 
-  new MutationObserver(initAll).observe(document.body, { childList: true, subtree: true });
-  initAll();
+  let drag = null; // { root, index }
+
+  document.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 || !(e.target instanceof Element)) return;
+    const control = e.target.closest("[data-tui-slider-control]");
+    if (!control) return;
+    const root = control.closest("[data-tui-slider]");
+    if (!root || root.hasAttribute("data-disabled")) return;
+    e.preventDefault();
+    const v = valueFromPointer(root, e);
+    const pressedThumb = e.target.closest("[data-tui-slider-thumb]");
+    const index = pressedThumb ? thumbsOf(root).indexOf(pressedThumb) : nearestThumb(root, v);
+    drag = { root, index };
+    if (!pressedThumb) setValue(root, index, v);
+    thumbsOf(root)[index].focus({ preventScroll: true });
+  });
+
+  document.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    setValue(drag.root, drag.index, valueFromPointer(drag.root, e));
+  });
+
+  document.addEventListener("pointerup", () => {
+    drag = null;
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const thumb = e.target.closest("[data-tui-slider-thumb]");
+    if (!thumb) return;
+    const root = thumb.closest("[data-tui-slider]");
+    if (!root || root.hasAttribute("data-disabled")) return;
+    const c = config(root);
+    const index = thumbsOf(root).indexOf(thumb);
+    const v = valuesOf(root)[index];
+    let next = null;
+    if (e.key === "ArrowRight" || e.key === "ArrowUp") next = v + c.step;
+    if (e.key === "ArrowLeft" || e.key === "ArrowDown") next = v - c.step;
+    if (e.key === "PageUp") next = v + c.step * 10;
+    if (e.key === "PageDown") next = v - c.step * 10;
+    if (e.key === "Home") next = c.min;
+    if (e.key === "End") next = c.max;
+    if (next === null) return;
+    e.preventDefault();
+    setValue(root, index, next);
+  });
 })();

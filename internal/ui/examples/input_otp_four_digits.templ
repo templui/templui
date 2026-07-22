@@ -1,0 +1,14 @@
+package examples
+
+import "github.com/templui/templui/components/inputotp"
+
+templ InputOTPFourDigits() {
+	@inputotp.InputOTP(inputotp.Props{Pattern: inputotp.PatternDigits}) {
+		@inputotp.Group() {
+			@inputotp.Slot(inputotp.SlotProps{Index: 0})
+			@inputotp.Slot(inputotp.SlotProps{Index: 1})
+			@inputotp.Slot(inputotp.SlotProps{Index: 2})
+			@inputotp.Slot(inputotp.SlotProps{Index: 3})
+		}
+	}
+}

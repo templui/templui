@@ -1,207 +1,207 @@
 (function () {
-  'use strict';
+  "use strict";
 
-  function getEventTargetElement(event) {
-    return event.target instanceof Element ? event.target : null;
+  // Pendant of the input-otp library: one invisible real input over the
+  // container drives everything, the slots only display state.
+
+  function roots() {
+    return document.querySelectorAll("[data-tui-inputotp]");
   }
-  
-  // Utility functions
-  function getSlots(container) {
-    return Array.from(container.querySelectorAll('[data-tui-inputotp-slot]')).sort(
-      (a, b) => parseInt(a.getAttribute('data-tui-inputotp-index')) - parseInt(b.getAttribute('data-tui-inputotp-index'))
+
+  function inputOf(root) {
+    return root.querySelector("[data-tui-inputotp-input]");
+  }
+
+  function slotsOf(root) {
+    return Array.from(root.querySelectorAll("[data-tui-inputotp-slot]")).sort(
+      (a, b) =>
+        parseInt(a.getAttribute("data-tui-inputotp-index")) -
+        parseInt(b.getAttribute("data-tui-inputotp-index")),
     );
   }
-  
-  function focusSlot(slot) {
-    if (!slot) return;
-    slot.focus();
-    setTimeout(() => slot.select(), 0);
+
+  function sanitize(root, value) {
+    const pattern = root.getAttribute("data-tui-inputotp-pattern");
+    let out = "";
+    for (const ch of value) {
+      if (!pattern || new RegExp(pattern).test(ch)) out += ch;
+    }
+    return out.slice(0, slotsOf(root).length);
   }
-  
-  function updateHiddenValue(container) {
-    const hiddenInput = container.querySelector('[data-tui-inputotp-value-target]');
-    const slots = getSlots(container);
-    if (hiddenInput && slots.length) {
-      hiddenInput.value = slots.map(s => s.value).join('');
+
+  // input-otp never places the caret where the pointer landed: focus and
+  // clicks always jump to the first empty slot, or select the last
+  // character when the value is complete.
+  function forceEndSelection(root) {
+    const input = inputOf(root);
+    const max = slotsOf(root).length;
+    const len = input.value.length;
+    if (len === max && max > 0) {
+      input.setSelectionRange(len - 1, len);
+    } else {
+      input.setSelectionRange(len, len);
     }
   }
-  
-  function findFirstEmptySlot(container) {
-    const slots = getSlots(container);
-    for (const slot of slots) {
-      if (!slot.value) return slot;
-    }
-    return null;
-  }
-  
-  function getNextSlot(container, currentSlot) {
-    const slots = getSlots(container);
-    const index = slots.indexOf(currentSlot);
-    return index >= 0 && index < slots.length - 1 ? slots[index + 1] : null;
-  }
-  
-  function getPrevSlot(container, currentSlot) {
-    const slots = getSlots(container);
-    const index = slots.indexOf(currentSlot);
-    return index > 0 ? slots[index - 1] : null;
-  }
-  
-  // Event handlers
-  document.addEventListener('input', (e) => {
-    const target = getEventTargetElement(e);
-    if (!target?.matches('[data-tui-inputotp-slot]')) return;
-    
-    const slot = target;
-    const container = slot.closest('[data-tui-inputotp]');
-    if (!container) return;
-    
-    // Handle space as empty
-    if (slot.value === ' ') {
-      slot.value = '';
+
+  function normalizeSelection(root) {
+    const input = inputOf(root);
+    const max = slotsOf(root).length;
+    const len = input.value.length;
+    if (document.activeElement !== input) return;
+    let start = input.selectionStart;
+    let end = input.selectionEnd;
+    if (len === max && start >= len && end >= len) {
+      input.setSelectionRange(len - 1, len);
       return;
     }
-    
-    // Keep only last character
-    if (slot.value.length > 1) {
-      slot.value = slot.value.slice(-1);
+    if (start > len) start = len;
+    if (end > len) end = len;
+    // Inside the typed region the caret always selects one character for
+    // overwrite, like input-otp.
+    if (start === end && start < len) {
+      end = start + 1;
     }
-    
-    // Move to next slot if filled
-    if (slot.value) {
-      const nextSlot = getNextSlot(container, slot);
-      if (nextSlot) focusSlot(nextSlot);
+    if (start !== input.selectionStart || end !== input.selectionEnd) {
+      input.setSelectionRange(start, end);
     }
-    
-    updateHiddenValue(container);
+  }
+
+  function render(root) {
+    const input = inputOf(root);
+    const slots = slotsOf(root);
+    const value = input.value;
+    const focused = document.activeElement === input;
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    slots.forEach((slot, i) => {
+      const charEl = slot.querySelector("[data-tui-inputotp-char]");
+      if (charEl) charEl.textContent = value[i] || "";
+      const caretEl = slot.querySelector("[data-tui-inputotp-caret]");
+      let active = false;
+      if (focused) {
+        if (start === end) {
+          active = i === Math.min(start, slots.length - 1);
+        } else {
+          active = i >= start && i < end;
+        }
+      }
+      slot.setAttribute("data-active", active ? "true" : "false");
+      const showCaret = focused && active && start === end && i >= value.length;
+      if (caretEl) {
+        caretEl.classList.toggle("hidden", !showCaret);
+        caretEl.classList.toggle("flex", showCaret);
+      }
+      if (showCaret && charEl) charEl.textContent = "";
+    });
+  }
+
+  function initRoot(root) {
+    if (root.dataset.tuiInputotpInit === "true") return;
+    root.dataset.tuiInputotpInit = "true";
+    const input = inputOf(root);
+    if (!input) return;
+    input.maxLength = slotsOf(root).length;
+    input.value = sanitize(root, input.value);
+    render(root);
+  }
+
+  function initAll() {
+    roots().forEach(initRoot);
+  }
+
+  document.addEventListener("input", (e) => {
+    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-inputotp-input")) return;
+    const root = e.target.closest("[data-tui-inputotp]");
+    const clean = sanitize(root, e.target.value);
+    if (clean !== e.target.value) {
+      e.target.value = clean;
+    }
+    normalizeSelection(root);
+    render(root);
   });
-  
-  document.addEventListener('keydown', (e) => {
-    const target = getEventTargetElement(e);
-    if (!target?.matches('[data-tui-inputotp-slot]')) return;
-    
-    const slot = target;
-    const container = slot.closest('[data-tui-inputotp]');
-    if (!container) return;
-    
-    if (e.key === 'Backspace') {
-      e.preventDefault();
-      
-      if (slot.value) {
-        slot.value = '';
-        updateHiddenValue(container);
+
+  document.addEventListener("focusin", (e) => {
+    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-inputotp-input")) return;
+    const input = e.target;
+    const root = input.closest("[data-tui-inputotp]");
+    forceEndSelection(root);
+    render(root);
+    // Chrome restores the previous caret position right after focus,
+    // enforce the end selection once more on the next tick.
+    setTimeout(() => {
+      if (document.activeElement === input) {
+        forceEndSelection(root);
+        render(root);
+      }
+    }, 0);
+  });
+
+  // Arrow navigation moves the single-character selection like input-otp.
+  document.addEventListener("keydown", (e) => {
+    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-inputotp-input")) return;
+    const input = e.target;
+    const root = input.closest("[data-tui-inputotp]");
+    const max = slotsOf(root).length;
+    const len = input.value.length;
+    const start = input.selectionStart || 0;
+    let handled = true;
+    if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      const i = Math.max(0, Math.min(start, len - 1) - (start > 0 && start >= len ? 0 : 1));
+      if (len > 0) input.setSelectionRange(Math.max(0, Math.min(i, len - 1)), Math.max(0, Math.min(i, len - 1)) + 1);
+    } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      const i = start + 1;
+      if (i < len) {
+        input.setSelectionRange(i, i + 1);
+      } else if (len === max && max > 0) {
+        input.setSelectionRange(len - 1, len);
       } else {
-        const prevSlot = getPrevSlot(container, slot);
-        if (prevSlot) {
-          prevSlot.value = '';
-          updateHiddenValue(container);
-          focusSlot(prevSlot);
-        }
+        input.setSelectionRange(len, len);
       }
-    } else if (e.key === 'ArrowLeft') {
+    } else if (e.key === "Home") {
+      if (len > 0) input.setSelectionRange(0, 1);
+      else input.setSelectionRange(0, 0);
+    } else if (e.key === "End") {
+      forceEndSelection(root);
+    } else {
+      handled = false;
+    }
+    if (handled) {
       e.preventDefault();
-      const prevSlot = getPrevSlot(container, slot);
-      if (prevSlot) focusSlot(prevSlot);
-    } else if (e.key === 'ArrowRight') {
-      e.preventDefault();
-      const nextSlot = getNextSlot(container, slot);
-      if (nextSlot) focusSlot(nextSlot);
+      render(root);
     }
   });
-  
-  document.addEventListener('focus', (e) => {
-    const target = getEventTargetElement(e);
-    if (!target?.matches('[data-tui-inputotp-slot]')) return;
-    
-    const slot = target;
-    const container = slot.closest('[data-tui-inputotp]');
-    if (!container) return;
-    
-    // Redirect to first empty slot
-    const firstEmpty = findFirstEmptySlot(container);
-    if (firstEmpty && firstEmpty !== slot) {
-      focusSlot(firstEmpty);
-      return;
-    }
-    
-    setTimeout(() => slot.select(), 0);
-  }, true);
-  
-  document.addEventListener('paste', (e) => {
-    const target = getEventTargetElement(e);
-    const slot = target?.closest('[data-tui-inputotp-slot]');
-    if (!slot) return;
-    
-    e.preventDefault();
-    const container = slot.closest('[data-tui-inputotp]');
-    if (!container) return;
-    
-    const pastedData = (e.clipboardData || window.clipboardData).getData('text');
-    const chars = pastedData.replace(/\s/g, '').split('');
-    const slots = getSlots(container);
-    
-    let startIndex = slots.indexOf(slot);
-    for (let i = 0; i < chars.length && startIndex + i < slots.length; i++) {
-      slots[startIndex + i].value = chars[i];
-    }
-    
-    updateHiddenValue(container);
-    
-    // Focus next empty or last filled slot
-    const nextEmpty = findFirstEmptySlot(container);
-    focusSlot(nextEmpty || slots[Math.min(startIndex + chars.length, slots.length - 1)]);
+
+  document.addEventListener("focusout", (e) => {
+    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-inputotp-input")) return;
+    render(e.target.closest("[data-tui-inputotp]"));
   });
-  
-  // Label click handling
-  document.addEventListener('click', (e) => {
-    const target = getEventTargetElement(e);
-    if (!target?.matches('label[for]')) return;
-    
-    const targetId = target.getAttribute('for');
-    const hiddenInput = document.getElementById(targetId);
-    if (!hiddenInput?.matches('[data-tui-inputotp-value-target]')) return;
-    
-    e.preventDefault();
-    const container = hiddenInput.closest('[data-tui-inputotp]');
-    const slots = getSlots(container);
-    if (slots.length > 0) focusSlot(slots[0]);
-  });
-  
-  // Form reset
-  document.addEventListener('reset', (e) => {
-    const target = getEventTargetElement(e);
-    if (!target?.matches('form')) return;
-    
-    target.querySelectorAll('[data-tui-inputotp]').forEach(container => {
-      getSlots(container).forEach(slot => {
-        slot.value = '';
-      });
-      updateHiddenValue(container);
+
+  // Pointer presses always land on the invisible input; defer so the
+  // browser's own caret placement is overridden.
+  document.addEventListener("pointerup", (e) => {
+    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-inputotp-input")) return;
+    const root = e.target.closest("[data-tui-inputotp]");
+    requestAnimationFrame(() => {
+      forceEndSelection(root);
+      render(root);
     });
   });
-  
-  // MutationObserver for initial setup and autofocus
-  new MutationObserver(() => {
-    document.querySelectorAll('[data-tui-inputotp]').forEach(container => {
-      const slots = getSlots(container);
-      if (slots.length === 0) return;
-      
-      // Set initial value if provided
-      const initialValue = container.getAttribute('data-tui-inputotp-value');
-      if (initialValue && !slots[0].value) {
-        for (let i = 0; i < slots.length && i < initialValue.length; i++) {
-          if (!slots[i].value) slots[i].value = initialValue[i];
-        }
-        updateHiddenValue(container);
-      }
-      
-      // Handle autofocus
-      if (container.hasAttribute('autofocus') && !slots.some(s => s === document.activeElement)) {
-        requestAnimationFrame(() => {
-          if (slots[0] && !slots.some(s => s === document.activeElement)) {
-            focusSlot(slots[0]);
-          }
-        });
-      }
-    });
-  }).observe(document.body, { childList: true, subtree: true });
+
+  document.addEventListener("selectionchange", () => {
+    const el = document.activeElement;
+    if (!(el instanceof Element) || !el.hasAttribute("data-tui-inputotp-input")) return;
+    const root = el.closest("[data-tui-inputotp]");
+    normalizeSelection(root);
+    render(root);
+  });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAll);
+  } else {
+    initAll();
+  }
+  new MutationObserver(() => initAll()).observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+  });
 })();

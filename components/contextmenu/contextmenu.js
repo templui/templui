@@ -148,6 +148,23 @@ import "../floatingui/floating_ui_dom.js";
 
   // ----- open / close --------------------------------------------------------
 
+  // Base UI menus are modal: the background scroll is locked while open,
+  // with the body padded by the scrollbar width so the page does not shift.
+  function lockScroll() {
+    if (document.body.hasAttribute("data-tui-scroll-locked")) return;
+    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
+    document.body.setAttribute("data-tui-scroll-locked", "");
+    document.body.style.overflow = "hidden";
+    if (scrollbar > 0) document.body.style.paddingRight = scrollbar + "px";
+  }
+
+  function unlockScroll() {
+    if (anyOpen()) return;
+    document.body.removeAttribute("data-tui-scroll-locked");
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
+  }
+
   function openAt(content, x, y) {
     const alreadyOpen = content.getAttribute("data-state") === "open";
     allContents().forEach((c) => {
@@ -155,6 +172,7 @@ import "../floatingui/floating_ui_dom.js";
     });
     clearTimeout(content._tuiHide);
     portal(content);
+    lockScroll();
     if (!content.matches(":popover-open")) {
       content.showPopover(); // native top layer
     }
@@ -188,6 +206,7 @@ import "../floatingui/floating_ui_dom.js";
         content.hidePopover();
       }
     }, EXIT_MS);
+    unlockScroll();
   }
 
   function closeAll() {

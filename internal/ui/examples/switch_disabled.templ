@@ -1,0 +1,15 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/field"
+	switchcomp "github.com/templui/templui/components/switch"
+)
+
+templ SwitchDisabled() {
+	@field.Field(field.Props{Orientation: field.OrientationHorizontal, Disabled: true, Class: "w-fit"}) {
+		@switchcomp.Switch(switchcomp.Props{ID: "switch-disabled-unchecked", Disabled: true})
+		@field.Label(field.LabelProps{For: "switch-disabled-unchecked"}) {
+			Disabled
+		}
+	}
+}

@@ -24,7 +24,7 @@ type Props struct {
 	Rows        int
 	Disabled    bool
 	Readonly    bool
-	HasError    bool
+	Invalid     bool
 }
 
 func Textarea(props ...Props) templ.Component {
@@ -187,7 +187,7 @@ func Textarea(props ...Props) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if p.HasError {
+		if p.Invalid {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, " aria-invalid=\"true\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

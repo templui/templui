@@ -210,28 +210,18 @@ func main() {
 		"out/showcase/icon_sizes.html":   examples.IconSizes(),
 
 		// Input
-		"out/showcase/input_default.html":      examples.InputDefault(),
+		"out/showcase/input_demo.html":      examples.InputDemo(),
 		"out/showcase/input_disabled.html":     examples.InputDisabled(),
 		"out/showcase/input_file.html":         examples.InputFile(),
 		"out/showcase/input_form.html":         examples.InputForm(),
-		"out/showcase/input_time_default.html": examples.InputTimeDefault(),
-		"out/showcase/input_time_styled.html":  examples.InputTimeStyled(),
-		"out/showcase/input_with_label.html":   examples.InputWithLabel(),
 
 		// Input OTP
-		"out/showcase/input_otp_custom_length.html":  examples.InputOTPCustomLength(),
-		"out/showcase/input_otp_custom_styling.html": examples.InputOTPCustomStyling(),
-		"out/showcase/input_otp_default.html":        examples.InputOTPDefault(),
-		"out/showcase/input_otp_form.html":           examples.InputOTPForm(),
-		"out/showcase/input_otp_password_type.html":  examples.InputOTPPasswordType(),
-		"out/showcase/input_otp_placeholder.html":    examples.InputOTPPlaceholder(),
-		"out/showcase/input_otp_with_label.html":     examples.InputOTPWithLabel(),
 
 		// Dialog
-		"out/showcase/dialog_demo.html":               examples.DialogDemo(),
-		"out/showcase/dialog_close_button.html":       examples.DialogCloseButton(),
-		"out/showcase/dialog_no_close_button.html":    examples.DialogNoCloseButton(),
-		"out/showcase/dialog_sticky_footer.html":      examples.DialogStickyFooter(),
+		"out/showcase/dialog_demo.html": examples.DialogDemo(),
+		"out/showcase/dialog_close_button.html": examples.DialogCloseButton(),
+		"out/showcase/dialog_no_close_button.html": examples.DialogNoCloseButton(),
+		"out/showcase/dialog_sticky_footer.html": examples.DialogStickyFooter(),
 		"out/showcase/dialog_scrollable_content.html": examples.DialogScrollableContent(),
 
 		// Pagination
@@ -266,12 +256,12 @@ func main() {
 		"out/showcase/skeleton_profile.html":   examples.SkeletonProfile(),
 
 		// Slider
-		"out/showcase/slider_default.html":        examples.SliderDefault(),
-		"out/showcase/slider_disabled.html":       examples.SliderDisabled(),
-		"out/showcase/slider_external_value.html": examples.SliderExternalValue(),
-		"out/showcase/slider_range.html":          examples.SliderRange(),
-		"out/showcase/slider_steps.html":          examples.SliderSteps(),
-		"out/showcase/slider_value.html":          examples.SliderValue(),
+		"out/showcase/slider_demo.html":       examples.SliderDemo(),
+		"out/showcase/slider_range.html":      examples.SliderRange(),
+		"out/showcase/slider_multiple.html":   examples.SliderMultiple(),
+		"out/showcase/slider_vertical.html":   examples.SliderVertical(),
+		"out/showcase/slider_controlled.html": examples.SliderControlled(),
+		"out/showcase/slider_disabled.html":   examples.SliderDisabled(),
 
 		// Table
 		"out/showcase/table.html": examples.Table(),
@@ -296,8 +286,12 @@ func main() {
 		"out/showcase/toast_htmx.html":     examples.ToastHtmx(),
 
 		// Switch
-		"out/showcase/switch_default.html": examples.SwitchDefault(),
-		"out/showcase/switch_form.html":    examples.SwitchForm(),
+		"out/showcase/switch_demo.html":        examples.SwitchDemo(),
+		"out/showcase/switch_description.html": examples.SwitchDescription(),
+		"out/showcase/switch_choice_card.html": examples.SwitchChoiceCard(),
+		"out/showcase/switch_disabled.html":    examples.SwitchDisabled(),
+		"out/showcase/switch_invalid.html":     examples.SwitchInvalid(),
+		"out/showcase/switch_sizes.html":       examples.SwitchSizes(),
 
 		// Tooltip
 		"out/showcase/tooltip_default.html": examples.TooltipDefault(),

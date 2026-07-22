@@ -1,0 +1,24 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/inputotp"
+)
+
+templ InputOTPPattern() {
+	@field.Field(field.Props{Class: "w-fit"}) {
+		@field.Label(field.LabelProps{For: "digits-only"}) {
+			Digits Only
+		}
+		@inputotp.InputOTP(inputotp.Props{ID: "digits-only", Pattern: inputotp.PatternDigits}) {
+			@inputotp.Group() {
+			@inputotp.Slot(inputotp.SlotProps{Index: 0})
+			@inputotp.Slot(inputotp.SlotProps{Index: 1})
+			@inputotp.Slot(inputotp.SlotProps{Index: 2})
+			@inputotp.Slot(inputotp.SlotProps{Index: 3})
+			@inputotp.Slot(inputotp.SlotProps{Index: 4})
+			@inputotp.Slot(inputotp.SlotProps{Index: 5})
+			}
+		}
+	}
+}

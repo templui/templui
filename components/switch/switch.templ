@@ -22,6 +22,10 @@ type Props struct {
 	Size Size
 }
 
+// Switch is the pendant of shadcn's Base UI switch: the root carries the
+// visuals and state pendants (has-[:checked] for data-checked), a hidden
+// native checkbox inside provides state, forms and the extended hit area,
+// and the thumb is a real element like Base UI's Switch.Thumb.
 templ Switch(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
@@ -33,19 +37,35 @@ templ Switch(props ...Props) {
 	if p.Size == "" {
 		{{ p.Size = SizeDefault }}
 	}
-	<label
-		for={ p.ID }
-		class={ utils.TwMerge(
-			"group/switch inline-flex items-center gap-2",
-			utils.If(p.Disabled, "cursor-not-allowed"),
-		) }
+	<div
+		data-slot="switch"
+		data-size={ string(p.Size) }
+		class={
+			utils.TwMerge(
+				// shadcn extends the hit area with after:-inset-*; our pendant is
+				// the hidden input below, a pseudo element would paint over it
+				// and swallow the clicks (same lesson as the checkbox).
+				"peer group/switch relative inline-flex shrink-0 items-center rounded-full border border-transparent transition-all outline-none",
+				// data-checked / data-unchecked pendants, mutually exclusive like
+				// Base UI's state attributes.
+				"not-has-[:checked]:bg-input dark:not-has-[:checked]:bg-input/80 has-[:checked]:bg-primary",
+				"has-[:focus-visible]:border-ring has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
+				"has-[[aria-invalid=true]]:border-destructive has-[[aria-invalid=true]]:ring-3 has-[[aria-invalid=true]]:ring-destructive/20 dark:has-[[aria-invalid=true]]:border-destructive/50 dark:has-[[aria-invalid=true]]:ring-destructive/40",
+				// cursor-not-allowed is inert on shadcn's live site (no native
+				// disabled on the Base UI root), so the pendant stays out too.
+				"has-[:disabled]:opacity-50",
+				"data-[size=default]:h-[18.4px] data-[size=default]:w-[32px] data-[size=sm]:h-[14px] data-[size=sm]:w-[24px]",
+				p.Class,
+			),
+		}
 	>
 		<input
 			id={ p.ID }
+			type="checkbox"
+			role="switch"
 			if p.Name != "" {
 				name={ p.Name }
 			}
-			type="checkbox"
 			if p.Value != "" {
 				value={ p.Value }
 			} else {
@@ -56,23 +76,12 @@ templ Switch(props ...Props) {
 			}
 			checked?={ p.Checked }
 			disabled?={ p.Disabled }
-			class="peer sr-only"
-			role="switch"
+			class="peer absolute -inset-x-3 -inset-y-2 size-auto cursor-default appearance-none outline-none"
 			{ p.Attributes... }
 		/>
-		<div
-			data-slot="switch"
-			data-size={ string(p.Size) }
-			aria-hidden="true"
-			class={
-				utils.TwMerge(
-					"relative inline-flex shrink-0 items-center rounded-full border border-transparent bg-input transition-all outline-none dark:bg-input/80 data-[size=default]:h-[18.4px] data-[size=default]:w-[32px] data-[size=sm]:h-[14px] data-[size=sm]:w-[24px]",
-					"peer-checked:bg-primary peer-focus-visible:border-ring peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-					"peer-aria-invalid:border-destructive peer-aria-invalid:ring-3 peer-aria-invalid:ring-destructive/20 dark:peer-aria-invalid:border-destructive/50 dark:peer-aria-invalid:ring-destructive/40",
-					"before:pointer-events-none before:block before:rounded-full before:bg-background before:ring-0 before:transition-transform before:content-[''] dark:before:bg-foreground dark:peer-checked:before:bg-primary-foreground data-[size=default]:before:size-4 data-[size=sm]:before:size-3 before:translate-x-0 peer-checked:before:translate-x-[calc(100%-2px)]",
-					p.Class,
-				),
-			}
-		></div>
-	</label>
+		<span
+			data-slot="switch-thumb"
+			class="pointer-events-none block rounded-full bg-background ring-0 transition-transform peer-not-checked:translate-x-0 peer-checked:translate-x-[calc(100%-2px)] dark:bg-foreground dark:peer-checked:bg-primary-foreground group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3"
+		></span>
+	</div>
 }

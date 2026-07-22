@@ -156,6 +156,9 @@ import "../floatingui/floating_ui_dom.js";
     const docEl = document.documentElement;
     const triggerRect = trigger.getBoundingClientRect();
     const positionerRect = content.getBoundingClientRect(); // natural size from the popper pass
+    // The list's natural height, measured before the aligned styles stretch
+    // the popup (scrollHeight can never report less than the client height).
+    const naturalScrollHeight = viewport.scrollHeight;
     const popupStyles = window.getComputedStyle(popup);
     const borderBottom = parseFloat(popupStyles.borderBottomWidth) || 0;
     const maxPopupHeight = parseFloat(popupStyles.maxHeight) || Infinity;
@@ -202,7 +205,7 @@ import "../floatingui/floating_ui_dom.js";
     if (
       triggerRect.top < TRIGGER_COLLISION ||
       triggerRect.bottom > viewportHeight - TRIGGER_COLLISION ||
-      Math.ceil(height) + TOL < Math.min(viewport.scrollHeight, MIN_HEIGHT)
+      Math.ceil(height) + TOL < Math.min(naturalScrollHeight, MIN_HEIGHT)
     ) {
       return false;
     }
@@ -421,19 +424,21 @@ import "../floatingui/floating_ui_dom.js";
 
   // ----- open / close -------------------------------------------------------
 
-  // The select is modal (Base UI default): the page must not scroll while open.
-  function blockOutsideScroll(e) {
-    if (!(e.target instanceof Element) || !e.target.closest("[data-tui-select-content]")) {
-      e.preventDefault();
-    }
-  }
+  // The select is modal (Base UI default): the background scroll is locked
+  // while open, with the body padded by the scrollbar width so the page
+  // does not shift.
   function lockScroll() {
-    document.addEventListener("wheel", blockOutsideScroll, { passive: false });
-    document.addEventListener("touchmove", blockOutsideScroll, { passive: false });
+    if (document.body.hasAttribute("data-tui-scroll-locked")) return;
+    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
+    document.body.setAttribute("data-tui-scroll-locked", "");
+    document.body.style.overflow = "hidden";
+    if (scrollbar > 0) document.body.style.paddingRight = scrollbar + "px";
   }
   function unlockScroll() {
-    document.removeEventListener("wheel", blockOutsideScroll);
-    document.removeEventListener("touchmove", blockOutsideScroll);
+    if ([...allContents()].some((c) => c.getAttribute("data-state") === "open")) return;
+    document.body.removeAttribute("data-tui-scroll-locked");
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
   }
 
   function open(content, trigger) {
@@ -465,10 +470,10 @@ import "../floatingui/floating_ui_dom.js";
 
   function close(content) {
     if (!content.matches(":popover-open")) return;
-    unlockScroll();
     stopArrowScroll();
     content.style.visibility = "";
     setState(content, "closed");
+    unlockScroll();
     const trigger = triggerFor(content);
     if (trigger) trigger.setAttribute("aria-expanded", "false");
     clearTimeout(content._tuiHide);

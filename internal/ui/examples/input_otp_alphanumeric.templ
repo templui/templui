@@ -1,0 +1,19 @@
+package examples
+
+import "github.com/templui/templui/components/inputotp"
+
+templ InputOTPAlphanumeric() {
+	@inputotp.InputOTP(inputotp.Props{Pattern: inputotp.PatternDigitsAndChars}) {
+		@inputotp.Group() {
+			@inputotp.Slot(inputotp.SlotProps{Index: 0})
+			@inputotp.Slot(inputotp.SlotProps{Index: 1})
+			@inputotp.Slot(inputotp.SlotProps{Index: 2})
+		}
+		@inputotp.Separator()
+		@inputotp.Group() {
+			@inputotp.Slot(inputotp.SlotProps{Index: 3})
+			@inputotp.Slot(inputotp.SlotProps{Index: 4})
+			@inputotp.Slot(inputotp.SlotProps{Index: 5})
+		}
+	}
+}

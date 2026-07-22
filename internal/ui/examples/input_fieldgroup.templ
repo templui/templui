@@ -1,0 +1,35 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/input"
+)
+
+templ InputFieldgroup() {
+	@field.Group() {
+		@field.Field() {
+			@field.Label(field.LabelProps{For: "fieldgroup-name"}) {
+				Name
+			}
+			@input.Input(input.Props{ID: "fieldgroup-name", Placeholder: "Jordan Lee"})
+		}
+		@field.Field() {
+			@field.Label(field.LabelProps{For: "fieldgroup-email"}) {
+				Email
+			}
+			@input.Input(input.Props{ID: "fieldgroup-email", Type: input.TypeEmail, Placeholder: "name@example.com"})
+			@field.Description() {
+				We'll send updates to this address.
+			}
+		}
+		@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
+			@button.Button(button.Props{Type: button.TypeReset, Variant: button.VariantOutline}) {
+				Reset
+			}
+			@button.Button(button.Props{Type: button.TypeSubmit}) {
+				Submit
+			}
+		}
+	}
+}

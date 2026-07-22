@@ -1,30 +1,92 @@
 package examples
 
 import (
+	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/field"
 	"github.com/templui/templui/components/input"
+	selectcomp "github.com/templui/templui/components/select"
 )
 
 templ InputForm() {
-	<div class="w-full max-w-sm">
-		@field.Field() {
-			@field.Label(field.LabelProps{
-				For: "email-form",
-			}) {
-				Email
+	<form class="w-full max-w-sm">
+		@field.Group() {
+			@field.Field() {
+				@field.Label(field.LabelProps{For: "form-name"}) {
+					Name
+				}
+				@input.Input(input.Props{
+					ID:          "form-name",
+					Type:        input.TypeText,
+					Placeholder: "Axel Adrian",
+					Required:    true,
+				})
 			}
-			@input.Input(input.Props{
-				ID:          "email-form",
-				Type:        input.TypeEmail,
-				Placeholder: "m@example.com",
-				HasError:    true,
-			})
-			@field.Description() {
-				Enter your email address for notifications.
+			@field.Field() {
+				@field.Label(field.LabelProps{For: "form-email"}) {
+					Email
+				}
+				@input.Input(input.Props{
+					ID:          "form-email",
+					Type:        input.TypeEmail,
+					Placeholder: "john@example.com",
+				})
+				@field.Description() {
+					We'll never share your email with anyone.
+				}
 			}
-			@field.Error() {
-				Please enter a valid email address
+			<div class="grid grid-cols-2 gap-4">
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "form-phone"}) {
+						Phone
+					}
+					@input.Input(input.Props{
+						ID:          "form-phone",
+						Type:        "tel",
+						Placeholder: "+1 (555) 123-4567",
+					})
+				}
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "form-country"}) {
+						Country
+					}
+					@selectcomp.Select(selectcomp.Props{Value: "us"}) {
+						@selectcomp.Trigger(selectcomp.TriggerProps{ID: "form-country"}) {
+							@selectcomp.Value()
+						}
+						@selectcomp.Content() {
+							@selectcomp.Group() {
+								@selectcomp.Item(selectcomp.ItemProps{Value: "us"}) {
+									United States
+								}
+								@selectcomp.Item(selectcomp.ItemProps{Value: "uk"}) {
+									United Kingdom
+								}
+								@selectcomp.Item(selectcomp.ItemProps{Value: "ca"}) {
+									Canada
+								}
+							}
+						}
+					}
+				}
+			</div>
+			@field.Field() {
+				@field.Label(field.LabelProps{For: "form-address"}) {
+					Address
+				}
+				@input.Input(input.Props{
+					ID:          "form-address",
+					Type:        input.TypeText,
+					Placeholder: "123 Main St",
+				})
+			}
+			@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
+				@button.Button(button.Props{Type: button.TypeButton, Variant: button.VariantOutline}) {
+					Cancel
+				}
+				@button.Button(button.Props{Type: button.TypeSubmit}) {
+					Submit
+				}
 			}
 		}
-	</div>
+	</form>
 }

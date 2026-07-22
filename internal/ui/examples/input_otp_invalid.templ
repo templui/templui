@@ -1,0 +1,22 @@
+package examples
+
+import "github.com/templui/templui/components/inputotp"
+
+templ InputOTPInvalid() {
+	@inputotp.InputOTP(inputotp.Props{Value: "000000"}) {
+		@inputotp.Group() {
+			@inputotp.Slot(inputotp.SlotProps{Index: 0, Invalid: true})
+			@inputotp.Slot(inputotp.SlotProps{Index: 1, Invalid: true})
+		}
+		@inputotp.Separator()
+		@inputotp.Group() {
+			@inputotp.Slot(inputotp.SlotProps{Index: 2, Invalid: true})
+			@inputotp.Slot(inputotp.SlotProps{Index: 3, Invalid: true})
+		}
+		@inputotp.Separator()
+		@inputotp.Group() {
+			@inputotp.Slot(inputotp.SlotProps{Index: 4, Invalid: true})
+			@inputotp.Slot(inputotp.SlotProps{Index: 5, Invalid: true})
+		}
+	}
+}

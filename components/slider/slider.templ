@@ -2,40 +2,98 @@ package slider
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/templui/templui/utils"
+)
+
+type Orientation string
+
+const (
+	OrientationHorizontal Orientation = "horizontal"
+	OrientationVertical   Orientation = "vertical"
 )
 
 type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	Name       string
-	Min        int
-	Max        int
-	Step       int
-	Value      int
-	Disabled   bool
+	// Values are the initial thumb values, one thumb per value. Nil renders
+	// a thumb at Min and one at Max (Base UI's default).
+	Values []float64
+	Min    float64
+	// Max defaults to 100.
+	Max float64
+	// Step defaults to 1.
+	Step float64
+	// Orientation defaults to horizontal.
+	Orientation Orientation
+	// Name submits the values in forms, one hidden input per thumb.
+	Name     string
+	Disabled bool
 }
 
-type RangeProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-	NameMin    string
-	NameMax    string
-	Min        int
-	Max        int
-	Step       int
-	MinValue   int
-	MaxValue   int
-	Disabled   bool
+// thumbSize is size-3 in px; Base UI's edge thumb alignment keeps the thumb
+// inside the track by shifting it up to its own width.
+const thumbSize = 12
+
+func fmtF(v float64) string {
+	return strconv.FormatFloat(v, 'f', -1, 64)
 }
 
-type ValueProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-	For        string // For single slider: slider ID. For range: slider ID + "-min" or "-max"
+func fraction(v, min, max float64) float64 {
+	if max == min {
+		return 0
+	}
+	f := (v - min) / (max - min)
+	if f < 0 {
+		f = 0
+	}
+	if f > 1 {
+		f = 1
+	}
+	return f
+}
+
+// thumbStyle positions the thumb edge aligned: offset = f * (100% - thumb).
+// Horizontal grows from the left, vertical from the bottom.
+func thumbStyle(f float64, vertical bool) string {
+	if vertical {
+		g := 1 - f
+		return fmt.Sprintf("position:absolute;top:calc(%.4f%% - %.2fpx);left:50%%;transform:translateX(-50%%)", g*100, g*thumbSize)
+	}
+	return fmt.Sprintf("position:absolute;left:calc(%.4f%% - %.2fpx);top:50%%;transform:translateY(-50%%)", f*100, f*thumbSize)
+}
+
+// indicatorStyle spans from the start (one thumb) or between the outer thumb
+// centers (multiple thumbs).
+func indicatorStyle(fs []float64, vertical bool) string {
+	lo, hi := 0.0, 0.0
+	if len(fs) == 1 {
+		hi = fs[0]
+	} else if len(fs) > 1 {
+		lo, hi = fs[0], fs[len(fs)-1]
+		for _, f := range fs {
+			if f < lo {
+				lo = f
+			}
+			if f > hi {
+				hi = f
+			}
+		}
+	}
+	if vertical {
+		if len(fs) > 1 {
+			return fmt.Sprintf("position:absolute;left:0;bottom:calc(%.4f%% + %.2fpx);height:calc(%.4f%% - %.2fpx)",
+				lo*100, thumbSize/2.0-lo*thumbSize, (hi-lo)*100, (hi-lo)*thumbSize)
+		}
+		return fmt.Sprintf("position:absolute;left:0;bottom:0;height:calc(%.4f%% + %.2fpx)", hi*100, thumbSize/2.0-hi*thumbSize)
+	}
+	if len(fs) > 1 {
+		return fmt.Sprintf("position:absolute;top:0;left:calc(%.4f%% + %.2fpx);width:calc(%.4f%% - %.2fpx)",
+			lo*100, thumbSize/2.0-lo*thumbSize, (hi-lo)*100, (hi-lo)*thumbSize)
+	}
+	return fmt.Sprintf("position:absolute;top:0;left:0;width:calc(%.4f%% + %.2fpx)", hi*100, thumbSize/2.0-hi*thumbSize)
 }
 
 templ Slider(props ...Props) {
@@ -52,142 +110,100 @@ templ Slider(props ...Props) {
 	if p.Step == 0 {
 		{{ p.Step = 1 }}
 	}
-	<div
-		id={ p.ID }
-		data-tui-slider
-		data-min={ fmt.Sprintf("%d", p.Min) }
-		data-max={ fmt.Sprintf("%d", p.Max) }
-		data-step={ fmt.Sprintf("%d", p.Step) }
-		class={ utils.TwMerge("relative flex w-full touch-none items-center select-none", utils.If(p.Disabled, "opacity-50"), p.Class) }
-		{ p.Attributes... }
-	>
-		<div data-track data-slot="slider-track" class="relative h-1 w-full grow overflow-hidden rounded-full bg-muted select-none">
-			<div
-				data-fill
-				data-slot="slider-range"
-				class="pointer-events-none absolute inset-y-0 bg-primary select-none"
-				style={ fmt.Sprintf("left:0%%;right:%.2f%%", 100-float64(p.Value-p.Min)/float64(p.Max-p.Min)*100) }
-			></div>
-			<div
-				data-thumb
-				role="slider"
-				tabindex={ utils.IfElse(p.Disabled, "-1", "0") }
-				aria-valuemin={ fmt.Sprintf("%d", p.Min) }
-				aria-valuemax={ fmt.Sprintf("%d", p.Max) }
-				aria-valuenow={ fmt.Sprintf("%d", p.Value) }
-				if p.Disabled {
-					aria-disabled="true"
-				}
-				style={ fmt.Sprintf("left:%.2f%%", float64(p.Value-p.Min)/float64(p.Max-p.Min)*100) }
-				class={
-					utils.TwMerge(
-						"absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-ring bg-white ring-ring/50 transition-[color,box-shadow] touch-none select-none",
-						"after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-hidden active:ring-3",
-						utils.If(p.Disabled, "pointer-events-none opacity-50"),
-					)
-				}
-			></div>
-		</div>
-		<input
-			data-input
-			type="hidden"
-			if p.Name != "" {
-				name={ p.Name }
-			}
-			value={ fmt.Sprintf("%d", p.Value) }
-		/>
-	</div>
-}
-
-templ Range(props ...RangeProps) {
-	{{ var p RangeProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
+	if p.Orientation == "" {
+		{{ p.Orientation = OrientationHorizontal }}
 	}
-	if p.ID == "" {
-		{{ p.ID = utils.RandomID() }}
+	if p.Values == nil {
+		{{ p.Values = []float64{p.Min, p.Max} }}
 	}
-	if p.Max == 0 {
-		{{ p.Max = 100 }}
-	}
-	if p.Step == 0 {
-		{{ p.Step = 1 }}
-	}
-	if p.MaxValue == 0 {
-		{{ p.MaxValue = p.Max }}
-	}
-	{{ sharedThumbClass := utils.TwMerge(
-		"absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-ring bg-white ring-ring/50 transition-[color,box-shadow] touch-none select-none",
-		"after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-hidden active:ring-3",
-		utils.If(p.Disabled, "pointer-events-none opacity-50"),
-	) }}
-	<div
-		id={ p.ID }
-		data-tui-slider
-		data-min={ fmt.Sprintf("%d", p.Min) }
-		data-max={ fmt.Sprintf("%d", p.Max) }
-		data-step={ fmt.Sprintf("%d", p.Step) }
-		class={ utils.TwMerge("relative flex w-full touch-none items-center select-none", utils.If(p.Disabled, "opacity-50"), p.Class) }
-		{ p.Attributes... }
-	>
-		<div data-track data-slot="slider-track" class="relative h-1 w-full grow overflow-hidden rounded-full bg-muted select-none">
-			<div
-				data-fill
-				data-slot="slider-range"
-				class="pointer-events-none absolute inset-y-0 bg-primary select-none"
-				style={ fmt.Sprintf("left:%.2f%%;right:%.2f%%", float64(p.MinValue-p.Min)/float64(p.Max-p.Min)*100, 100-float64(p.MaxValue-p.Min)/float64(p.Max-p.Min)*100) }
-			></div>
-			<div
-				data-thumb
-				role="slider"
-				tabindex={ utils.IfElse(p.Disabled, "-1", "0") }
-				aria-label="Minimum"
-				aria-valuemin={ fmt.Sprintf("%d", p.Min) }
-				aria-valuemax={ fmt.Sprintf("%d", p.Max) }
-				aria-valuenow={ fmt.Sprintf("%d", p.MinValue) }
-				if p.Disabled {
-					aria-disabled="true"
-				}
-				style={ fmt.Sprintf("left:%.2f%%", float64(p.MinValue-p.Min)/float64(p.Max-p.Min)*100) }
-				class={ sharedThumbClass }
-			></div>
-			<div
-				data-thumb
-				role="slider"
-				tabindex={ utils.IfElse(p.Disabled, "-1", "0") }
-				aria-label="Maximum"
-				aria-valuemin={ fmt.Sprintf("%d", p.Min) }
-				aria-valuemax={ fmt.Sprintf("%d", p.Max) }
-				aria-valuenow={ fmt.Sprintf("%d", p.MaxValue) }
-				if p.Disabled {
-					aria-disabled="true"
-				}
-				style={ fmt.Sprintf("left:%.2f%%", float64(p.MaxValue-p.Min)/float64(p.Max-p.Min)*100) }
-				class={ sharedThumbClass }
-			></div>
-		</div>
-		<input data-input type="hidden" if p.NameMin != "" { name={ p.NameMin } } value={ fmt.Sprintf("%d", p.MinValue) }/>
-		<input data-input type="hidden" if p.NameMax != "" { name={ p.NameMax } } value={ fmt.Sprintf("%d", p.MaxValue) }/>
-	</div>
-}
-
-templ Value(props ...ValueProps) {
-	{{ var p ValueProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
-	}
-	if p.For == "" {
-		<span class="text-xs text-destructive">Error: Value missing &#39;For&#39; attribute.</span>
-	}
-	<span
-		if p.ID != "" {
-			id={ p.ID }
+	{{
+		vertical := p.Orientation == OrientationVertical
+		fs := make([]float64, len(p.Values))
+		for i, v := range p.Values {
+			fs[i] = fraction(v, p.Min, p.Max)
 		}
-		data-tui-slider-value
-		data-tui-slider-value-for={ p.For }
-		class={ utils.TwMerge("text-sm text-muted-foreground", p.Class) }
+	}}
+	<div
+		id={ p.ID }
+		data-slot="slider"
+		data-tui-slider
+		if vertical {
+			data-vertical
+		} else {
+			data-horizontal
+		}
+		data-min={ fmtF(p.Min) }
+		data-max={ fmtF(p.Max) }
+		data-step={ fmtF(p.Step) }
+		if p.Disabled {
+			data-disabled
+		}
+		class={ utils.TwMerge("data-horizontal:w-full data-vertical:h-full", p.Class) }
 		{ p.Attributes... }
-	></span>
+	>
+		if p.Name != "" {
+			for _, v := range p.Values {
+				<input type="hidden" name={ p.Name } value={ fmtF(v) } data-tui-slider-input aria-hidden="true" tabindex="-1"/>
+			}
+		}
+		<div
+			data-tui-slider-control
+			if vertical {
+				data-vertical
+			} else {
+				data-horizontal
+			}
+			if p.Disabled {
+				data-disabled
+			}
+			class="relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-vertical:h-full data-vertical:w-auto data-vertical:flex-col data-vertical:min-h-40"
+		>
+			<div
+				data-slot="slider-track"
+				data-tui-slider-track
+				if vertical {
+					data-vertical
+				} else {
+					data-horizontal
+				}
+				class="relative grow overflow-hidden rounded-full bg-muted select-none data-horizontal:h-1 data-horizontal:w-full data-vertical:h-full data-vertical:w-1"
+			>
+				<div
+					data-slot="slider-range"
+					data-tui-slider-range
+					if vertical {
+						data-vertical
+					} else {
+						data-horizontal
+					}
+					class="select-none bg-primary data-horizontal:h-full data-vertical:w-full"
+					style={ indicatorStyle(fs, vertical) }
+				></div>
+			</div>
+			for i, v := range p.Values {
+				// The thumb's disabled:* classes are dead CSS on a div, exactly
+				// like in shadcn's thumb: only the control dims to 50%.
+				<div
+					data-slot="slider-thumb"
+					data-tui-slider-thumb
+					role="slider"
+					tabindex={ utils.IfElse(p.Disabled, "-1", "0") }
+					aria-valuemin={ fmtF(p.Min) }
+					aria-valuemax={ fmtF(p.Max) }
+					aria-valuenow={ fmtF(v) }
+					if vertical {
+						aria-orientation="vertical"
+					}
+					if p.Disabled {
+						data-disabled
+						aria-disabled="true"
+					}
+					style={ thumbStyle(fs[i], vertical) }
+					class="relative block size-3 shrink-0 rounded-full border border-ring bg-white ring-ring/50 transition-[color,box-shadow] select-none after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-hidden active:ring-3 disabled:pointer-events-none disabled:opacity-50"
+				></div>
+			}
+		</div>
+	</div>
 }
 
 var scriptOnce = templ.NewOnceHandle()

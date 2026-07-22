@@ -1,27 +1,13 @@
 package examples
 
-import (
-	"github.com/templui/templui/components/label"
-	"github.com/templui/templui/components/slider"
-)
+import "github.com/templui/templui/components/slider"
 
 templ SliderDisabled() {
-	<div class="w-full max-w-sm">
-		<div class="flex justify-between items-center mb-1">
-			@label.Label() {
-				Volume
-			}
-			@slider.Value(slider.ValueProps{
-				For: "slider-disabled",
-			})
-		</div>
-		@slider.Slider(slider.Props{
-			ID:       "slider-disabled",
-			Value:    20,
-			Min:      -20,
-			Max:      200,
-			Step:     20,
-			Disabled: true,
-		})
-	</div>
+	@slider.Slider(slider.Props{
+		Values:   []float64{50},
+		Max:      100,
+		Step:     1,
+		Disabled: true,
+		Class:    "mx-auto w-full max-w-xs",
+	})
 }

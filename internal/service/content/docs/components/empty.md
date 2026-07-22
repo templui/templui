@@ -96,43 +96,88 @@ The main component of the empty state. Wraps the `empty.Header` and `empty.Conte
 }
 ```
 
-### Header
+### EmptyHeader
 
-The `empty.Header` component holds the media, title and description.
-
-| Prop    | Type     | Default |
-| ------- | -------- | ------- |
-| `Class` | `string` | -       |
-
-### Media
-
-The `empty.Media` component displays an icon, avatar or other media above the title.
-
-| Prop      | Type                                          | Default               |
-| --------- | --------------------------------------------- | --------------------- |
-| `Variant` | `MediaVariantDefault \| MediaVariantIcon`  | `MediaVariantDefault` |
-| `Class`   | `string`                                      | -                     |
-
-### Title
-
-The `empty.Title` component is the empty state title.
+The `empty.Header` component wraps the empty media, title, and description.
 
 | Prop    | Type     | Default |
 | ------- | -------- | ------- |
 | `Class` | `string` | -       |
 
-### Description
+```templ
+@empty.Header() {
+	@empty.Media()
+	@empty.Title()
+	@empty.Description()
+}
+```
 
-The `empty.Description` component is the empty state description.
+### EmptyMedia
+
+Use the `empty.Media` component to display the media of the empty state such as an icon or an image. You can also use it to display other components such as an avatar.
+
+| Prop      | Type                                       | Default               |
+| --------- | ------------------------------------------- | --------------------- |
+| `Variant` | `MediaVariantDefault \| MediaVariantIcon` | `MediaVariantDefault` |
+| `Class`   | `string`                                   | -                     |
+
+```templ
+@empty.Media(empty.MediaProps{Variant: empty.MediaVariantIcon}) {
+	@icon.FolderCode()
+}
+```
+
+```templ
+@empty.Media() {
+	@avatar.Avatar() {
+		@avatar.Image(avatar.ImageProps{Src: "..."})
+		@avatar.Fallback() {
+			AA
+		}
+	}
+}
+```
+
+### EmptyTitle
+
+Use the `empty.Title` component to display the title of the empty state.
 
 | Prop    | Type     | Default |
 | ------- | -------- | ------- |
 | `Class` | `string` | -       |
 
-### Content
+```templ
+@empty.Title() {
+	No data
+}
+```
 
-The `empty.Content` component holds actions or additional content below the header.
+### EmptyDescription
+
+Use the `empty.Description` component to display the description of the empty state.
 
 | Prop    | Type     | Default |
 | ------- | -------- | ------- |
 | `Class` | `string` | -       |
+
+```templ
+@empty.Description() {
+	You do not have any notifications.
+}
+```
+
+### EmptyContent
+
+Use the `empty.Content` component to display the content of the empty state such as a button, input or a link.
+
+| Prop    | Type     | Default |
+| ------- | -------- | ------- |
+| `Class` | `string` | -       |
+
+```templ
+@empty.Content() {
+	@button.Button() {
+		Add Project
+	}
+}
+```

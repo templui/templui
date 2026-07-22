@@ -42,7 +42,7 @@ type Props struct {
 	Readonly    bool
 	Required    bool
 	FileAccept  string
-	HasError    bool
+	Invalid     bool
 }
 
 func Input(props ...Props) templ.Component {
@@ -251,7 +251,7 @@ func Input(props ...Props) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if p.HasError {
+		if p.Invalid {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " aria-invalid=\"true\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

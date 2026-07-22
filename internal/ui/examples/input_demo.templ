@@ -1,0 +1,22 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/input"
+)
+
+templ InputDemo() {
+	@field.Field() {
+		@field.Label(field.LabelProps{For: "input-demo-api-key"}) {
+			API Key
+		}
+		@input.Input(input.Props{
+			ID:          "input-demo-api-key",
+			Type:        input.TypePassword,
+			Placeholder: "sk-...",
+		})
+		@field.Description() {
+			Your API key is encrypted and stored securely.
+		}
+	}
+}

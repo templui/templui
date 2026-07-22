@@ -1611,7 +1611,7 @@ func cardPayoutThreshold() templ.Component {
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = slider.Slider(slider.Props{ID: "min-payout", Min: 50, Max: 10000, Step: 50, Value: 2500}).Render(ctx, templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = slider.Slider(slider.Props{ID: "min-payout", Min: 50, Max: 10000, Step: 50, Values: []float64{2500}}).Render(ctx, templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}

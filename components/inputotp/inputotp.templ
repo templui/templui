@@ -1,10 +1,27 @@
 package inputotp
 
 import (
+	"context"
+	"strconv"
+
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/utils"
-	"strconv"
 )
+
+type ctxKey string
+
+const stateKey ctxKey = "inputotpState"
+
+type ctxState struct {
+	value string
+}
+
+func state(ctx context.Context) ctxState {
+	if s, ok := ctx.Value(stateKey).(ctxState); ok {
+		return s
+	}
+	return ctxState{}
+}
 
 type Props struct {
 	ID         string
@@ -13,8 +30,20 @@ type Props struct {
 	Value      string
 	Name       string
 	Form       string
-	HasError   bool
+	// Pattern restricts input to a regular expression, e.g.
+	// inputotp.PatternDigits (input-otp's REGEXP constants).
+	Pattern  string
+	Disabled bool
+	Invalid  bool
+	Required bool
 }
+
+// The pattern constants of the input-otp library.
+const (
+	PatternDigits         = "^\\d+$"
+	PatternChars          = "^[a-zA-Z]+$"
+	PatternDigitsAndChars = "^[a-zA-Z0-9]+$"
+)
 
 type GroupProps struct {
 	ID         string
@@ -23,14 +52,11 @@ type GroupProps struct {
 }
 
 type SlotProps struct {
-	ID          string
-	Class       string
-	Attributes  templ.Attributes
-	Index       int
-	Type        string
-	Placeholder string
-	Disabled    bool
-	HasError    bool
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Index      int
+	Invalid    bool
 }
 
 type SeparatorProps struct {
@@ -39,44 +65,51 @@ type SeparatorProps struct {
 	Attributes templ.Attributes
 }
 
+// InputOTP is the pendant of the input-otp library shadcn wraps: one real
+// input stretched invisibly over the whole container captures focus, typing
+// and paste, while the slots only render the characters and the fake caret.
 templ InputOTP(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{value: p.Value}) }}
 	<div
-		if p.ID != "" {
-			id={ p.ID + "-container" }
-		}
-		if p.Value != "" {
-			data-tui-inputotp-value={ p.Value }
-		}
-		if p.Form != "" {
-			form={ p.Form }
-		}
-		class={
-			utils.TwMerge(
-				"flex flex-row items-center gap-2 w-fit",
-				p.Class,
-			),
-		}
+		data-slot="input-otp"
 		data-tui-inputotp
+		if p.Pattern != "" {
+			data-tui-inputotp-pattern={ p.Pattern }
+		}
+		class={ utils.TwMerge("relative flex items-center has-disabled:opacity-50", p.Class) }
 		{ p.Attributes... }
 	>
+		{ children... }
 		<input
-			type="hidden"
 			if p.ID != "" {
 				id={ p.ID }
+			}
+			data-tui-inputotp-input
+			type="text"
+			inputmode="numeric"
+			autocomplete="one-time-code"
+			spellcheck="false"
+			if p.Value != "" {
+				value={ p.Value }
 			}
 			if p.Name != "" {
 				name={ p.Name }
 			}
-			if p.HasError {
+			if p.Form != "" {
+				form={ p.Form }
+			}
+			disabled?={ p.Disabled }
+			required?={ p.Required }
+			if p.Invalid {
 				aria-invalid="true"
 			}
-			data-tui-inputotp-value-target
+			class="absolute inset-y-0 left-0 h-full opacity-0 disabled:cursor-not-allowed"
+			style="width:calc(100% + 40px);clip-path:inset(0 40px 0 0)"
 		/>
-		{ children... }
 	</div>
 }
 
@@ -107,42 +140,37 @@ templ Slot(props ...SlotProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	if p.Type == "" {
-		{{ p.Type = "text" }}
-	}
+	{{
+		s := state(ctx)
+		char := ""
+		if p.Index >= 0 && p.Index < len(s.value) {
+			char = string(s.value[p.Index])
+		}
+	}}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class="relative"
+		data-slot="input-otp-slot"
+		data-tui-inputotp-slot
+		data-tui-inputotp-index={ strconv.Itoa(p.Index) }
+		if p.Invalid {
+			aria-invalid="true"
+		}
+		class={
+			utils.TwMerge(
+				"relative flex size-8 items-center justify-center border-y border-r border-input text-sm transition-all outline-none first:rounded-l-lg first:border-l last:rounded-r-lg dark:bg-input/30",
+				"data-[active=true]:z-10 data-[active=true]:border-ring data-[active=true]:ring-3 data-[active=true]:ring-ring/50",
+				"aria-invalid:border-destructive data-[active=true]:aria-invalid:border-destructive data-[active=true]:aria-invalid:ring-destructive/20 dark:data-[active=true]:aria-invalid:ring-destructive/40",
+				p.Class,
+			),
+		}
 		{ p.Attributes... }
 	>
-		<input
-			type={ p.Type }
-			inputmode="numeric"
-			if p.Placeholder != "" {
-				placeholder={ p.Placeholder }
-			}
-			maxlength="1"
-			class={
-				utils.TwMerge(
-					"relative size-8 border-y border-r border-input bg-transparent text-center text-sm transition-all outline-none first:rounded-l-lg first:border-l last:rounded-r-lg dark:bg-input/30",
-					"selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground",
-					"focus:z-10 focus:border-ring focus:ring-3 focus:ring-ring/50",
-					"disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
-					"aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 focus:aria-invalid:border-destructive focus:aria-invalid:ring-destructive/20 dark:focus:aria-invalid:ring-destructive/40",
-					utils.If(p.HasError, "border-destructive ring-destructive/20 dark:ring-destructive/40"),
-					p.Class,
-				),
-			}
-			disabled?={ p.Disabled }
-			if p.HasError {
-				aria-invalid="true"
-			}
-			data-tui-inputotp-index={ strconv.Itoa(p.Index) }
-			data-tui-inputotp-slot
-			{ p.Attributes... }
-		/>
+		<span data-tui-inputotp-char>{ char }</span>
+		<div data-tui-inputotp-caret class="pointer-events-none absolute inset-0 hidden items-center justify-center">
+			<div class="h-4 w-px animate-caret-blink bg-foreground duration-1000"></div>
+		</div>
 	</div>
 }
 
@@ -159,7 +187,7 @@ templ Separator(props ...SeparatorProps) {
 		role="separator"
 		class={
 			utils.TwMerge(
-				"flex items-center text-muted-foreground [&_svg:not([class*='size-'])]:size-4",
+				"flex items-center [&_svg:not([class*='size-'])]:size-4",
 				p.Class,
 			),
 		}

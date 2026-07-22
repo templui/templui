@@ -34,7 +34,7 @@ type Props struct {
 	Readonly    bool
 	Required    bool
 	FileAccept  string
-	HasError    bool
+	Invalid     bool
 }
 
 templ Input(props ...Props) {
@@ -72,7 +72,7 @@ templ Input(props ...Props) {
 		disabled?={ p.Disabled }
 		readonly?={ p.Readonly }
 		required?={ p.Required }
-		if p.HasError {
+		if p.Invalid {
 			aria-invalid="true"
 		}
 		class={

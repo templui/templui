@@ -2,11 +2,11 @@ package examples
 
 import "github.com/templui/templui/components/slider"
 
-templ SliderRange() {
+templ SliderDemo() {
 	@slider.Slider(slider.Props{
-		Values: []float64{25, 50},
+		Values: []float64{75},
 		Max:    100,
-		Step:   5,
+		Step:   1,
 		Class:  "mx-auto w-full max-w-xs",
 	})
 }

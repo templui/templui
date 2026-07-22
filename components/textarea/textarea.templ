@@ -16,7 +16,7 @@ type Props struct {
 	Rows        int
 	Disabled    bool
 	Readonly    bool
-	HasError    bool
+	Invalid     bool
 }
 
 templ Textarea(props ...Props) {
@@ -46,7 +46,7 @@ templ Textarea(props ...Props) {
 		}
 		disabled?={ p.Disabled }
 		readonly?={ p.Readonly }
-		if p.HasError {
+		if p.Invalid {
 			aria-invalid="true"
 		}
 		class={

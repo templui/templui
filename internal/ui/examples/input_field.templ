@@ -7,11 +7,11 @@ import (
 
 templ InputField() {
 	@field.Field() {
-		@field.Label(field.LabelProps{For: "username"}) {
+		@field.Label(field.LabelProps{For: "input-field-username"}) {
 			Username
 		}
 		@input.Input(input.Props{
-			ID:          "username",
+			ID:          "input-field-username",
 			Type:        input.TypeText,
 			Placeholder: "Enter your username",
 		})
