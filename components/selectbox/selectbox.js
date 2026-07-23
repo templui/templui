@@ -217,7 +217,17 @@
   }
   
   function normalizeSearchValue(value) {
-    return (value || '').toLowerCase().trim().replace(/\s+/g, ' ');
+    // Fold accents so search is diacritic-insensitive: "Muenchen" aside,
+    // typing "munchen" matches "München", "cafe" matches "Café", "sarunas"
+    // matches "Šarūnas". NFD splits each accented character into its base
+    // letter plus a combining mark, then the marks (U+0300–U+036F) are
+    // stripped, leaving the plain ASCII base letter.
+    return (value || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .replace(/\s+/g, ' ');
   }
 
   function fuzzyMatch(searchTerm, candidate) {
