@@ -79,6 +79,50 @@
     if (targetId) toggleSidebar(targetId);
   });
 
+  // The useSidebar pendant: the same seven members as the React hook,
+  // addressing the first sidebar unless a sidebarId is given.
+  function anyWrapper(sidebarId) {
+    return sidebarId
+      ? wrapperFor(sidebarId)
+      : document.querySelector("[data-tui-sidebar-wrapper]");
+  }
+
+  window.tui = window.tui || {};
+  window.tui.sidebar = {
+    state(sidebarId) {
+      return anyWrapper(sidebarId)?.getAttribute("data-state") || null;
+    },
+    open(sidebarId) {
+      return this.state(sidebarId) === "expanded";
+    },
+    setOpen(open, sidebarId) {
+      const wrapper = anyWrapper(sidebarId);
+      if (!wrapper) return;
+      if (this.open(sidebarId) !== open) {
+        toggleSidebar(wrapper.getAttribute("data-tui-sidebar-id"));
+      }
+    },
+    openMobile(sidebarId) {
+      const wrapper = anyWrapper(sidebarId);
+      const sheet = wrapper && document.getElementById(wrapper.getAttribute("data-tui-sidebar-id") + "-mobile");
+      return !!(sheet && sheet.open);
+    },
+    setOpenMobile(open, sidebarId) {
+      const wrapper = anyWrapper(sidebarId);
+      if (!wrapper) return;
+      const id = wrapper.getAttribute("data-tui-sidebar-id") + "-mobile";
+      if (open) window.tui?.dialog?.open(id);
+      else window.tui?.dialog?.close(id);
+    },
+    isMobile() {
+      return window.matchMedia(MOBILE_QUERY).matches;
+    },
+    toggleSidebar(sidebarId) {
+      const wrapper = anyWrapper(sidebarId);
+      if (wrapper) toggleSidebar(wrapper.getAttribute("data-tui-sidebar-id"));
+    },
+  };
+
   // Cmd/Ctrl + shortcut key toggles the sidebar.
   document.addEventListener("keydown", (e) => {
     if (!(e.ctrlKey || e.metaKey) || e.key.length !== 1) return;

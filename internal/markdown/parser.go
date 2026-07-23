@@ -41,8 +41,10 @@ func NewParser() *Parser {
 			parser.WithAutoHeadingID(),
 		),
 		goldmark.WithRendererOptions(
-			goldmarkhtml.WithHardWraps(),
 			goldmarkhtml.WithXHTML(),
+			// The docs markdown is repo-authored, raw HTML (e.g. docs images)
+			// renders as written.
+			goldmarkhtml.WithUnsafe(),
 			// Add custom code block renderer
 			renderer.WithNodeRenderers(
 				util.Prioritized(codeBlockRenderer, 100),

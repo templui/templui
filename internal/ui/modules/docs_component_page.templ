@@ -422,3 +422,18 @@ templ CalloutBlock() {
 		{ children... }
 	</div>
 }
+
+// BlockPreview is shadcn's ComponentPreview type="block": the demo renders
+// as a full app page inside an iframe, clipped to a 4/2.5 desktop viewport.
+templ BlockPreview(name string, attrs map[string]string) {
+	<figure class="flex flex-col gap-4" data-not-typeset>
+		<div class="relative mt-6 aspect-[4/2.5] w-full overflow-hidden rounded-2xl border md:-mx-1">
+			<div class="absolute inset-0 w-[1600px] bg-background">
+				<iframe src={ "/preview/" + name } class="size-full" title={ name }></iframe>
+			</div>
+		</div>
+		if attrs["caption"] != "" {
+			<figcaption class="text-center text-sm text-muted-foreground">{ attrs["caption"] }</figcaption>
+		}
+	</figure>
+}

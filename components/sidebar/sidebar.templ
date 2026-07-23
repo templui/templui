@@ -14,6 +14,15 @@ import (
 	"github.com/templui/templui/utils"
 )
 
+// The pendant of shadcn's sidebar.tsx constants: edit these to change the
+// sidebar widths and the toggle key.
+const (
+	sidebarWidth            = "16rem"
+	sidebarWidthMobile      = "18rem"
+	sidebarWidthIcon        = "3rem"
+	sidebarKeyboardShortcut = "b"
+)
+
 type contextKey string
 
 const (
@@ -86,20 +95,21 @@ const (
 )
 
 type Props struct {
-	ID               string
-	Class            string
-	Attributes       templ.Attributes
-	Side             Side        // default: "left"
-	Variant          Variant     // default: "sidebar"
-	Collapsible      Collapsible // default: "offcanvas"
-	Collapsed        bool        // default: false (sidebar open)
-	KeyboardShortcut string      // default: "b"
+	ID          string
+	Class       string
+	Attributes  templ.Attributes
+	Side        Side        // default: "left"
+	Variant     Variant     // default: "sidebar"
+	Collapsible Collapsible // default: "offcanvas"
 }
 
-type LayoutProps struct {
+type ProviderProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
+	// Collapsed renders the sidebar collapsed on page load, the zero-value
+	// inversion of SidebarProvider's defaultOpen (true).
+	Collapsed bool
 }
 
 type TriggerProps struct {
@@ -242,10 +252,10 @@ type MenuSubButtonProps struct {
 	Size       MenuSubButtonSize // default: "md"
 }
 
-// Layout is the SidebarProvider pendant: it hosts the width variables and
+// Provider is the SidebarProvider pendant: it hosts the width variables and
 // the has-data-[variant=inset] background.
-templ Layout(props ...LayoutProps) {
-	{{ var p LayoutProps }}
+templ Provider(props ...ProviderProps) {
+	{{ var p ProviderProps }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
@@ -254,6 +264,7 @@ templ Layout(props ...LayoutProps) {
 		{{ layoutID = utils.RandomID() }}
 	}
 	{{ ctx = context.WithValue(ctx, sidebarIDKey, layoutID) }}
+	{{ ctx = context.WithValue(ctx, sidebarStateKey, ctxState{collapsed: p.Collapsed}) }}
 	<div
 		data-slot="sidebar-wrapper"
 		class={ utils.TwMerge(
@@ -261,7 +272,7 @@ templ Layout(props ...LayoutProps) {
 			p.Class,
 		) }
 		{ utils.MergeAttributes(
-			templ.Attributes{"style": "--sidebar-width: 16rem; --sidebar-width-icon: 3rem;"},
+			templ.Attributes{"style": "--sidebar-width: " + sidebarWidth + "; --sidebar-width-icon: " + sidebarWidthIcon + ";"},
 			p.Attributes,
 		)... }
 	>
@@ -290,11 +301,9 @@ templ Sidebar(props ...Props) {
 	if p.Collapsible == "" {
 		{{ p.Collapsible = CollapsibleOffcanvas }}
 	}
-	if p.KeyboardShortcut == "" {
-		{{ p.KeyboardShortcut = "b" }}
-	}
+	{{ s := sidebarState(ctx) }}
 	{{ ctx = context.WithValue(ctx, sidebarIDKey, p.ID) }}
-	{{ ctx = context.WithValue(ctx, sidebarStateKey, ctxState{collapsed: p.Collapsed, collapsible: p.Collapsible}) }}
+	{{ ctx = context.WithValue(ctx, sidebarStateKey, ctxState{collapsed: s.collapsed, collapsible: p.Collapsible}) }}
 	if p.Collapsible == CollapsibleNone {
 		<div
 			id={ p.ID }
@@ -318,12 +327,11 @@ templ Sidebar(props ...Props) {
 		}) {
 			@sheet.Content(sheet.ContentProps{
 				Side:            sheetSide,
-				Class:           "w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground md:hidden",
-				HideCloseButton: true,
+				Class: "w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden md:hidden",
 				Attributes: templ.Attributes{
 					"data-sidebar": "sidebar",
 					"data-mobile":  "true",
-					"style":        "--sidebar-width: 18rem;",
+					"style":        "--sidebar-width: " + sidebarWidthMobile + ";",
 				},
 			}) {
 				@sheet.Header(sheet.HeaderProps{Class: "sr-only"}) {
@@ -339,17 +347,16 @@ templ Sidebar(props ...Props) {
 		}
 		<!-- Desktop -->
 		<div
-			class={ utils.TwMerge("group peer hidden text-sidebar-foreground md:block", p.Class) }
-			data-state={ utils.IfElse(p.Collapsed, "collapsed", "expanded") }
-			data-collapsible={ utils.If(p.Collapsed, string(p.Collapsible)) }
+			class="group peer hidden text-sidebar-foreground md:block"
+			data-state={ utils.IfElse(s.collapsed, "collapsed", "expanded") }
+			data-collapsible={ utils.If(s.collapsed, string(p.Collapsible)) }
 			data-variant={ string(p.Variant) }
 			data-side={ string(p.Side) }
 			data-slot="sidebar"
 			data-tui-sidebar-wrapper
 			data-tui-sidebar-id={ p.ID }
 			data-tui-sidebar-collapsible-mode={ string(p.Collapsible) }
-			data-tui-sidebar-keyboard-shortcut={ p.KeyboardShortcut }
-			{ p.Attributes... }
+			data-tui-sidebar-keyboard-shortcut={ sidebarKeyboardShortcut }
 		>
 			<!-- Gap element that keeps the sidebar width in the document flow -->
 			<div
@@ -378,7 +385,9 @@ templ Sidebar(props ...Props) {
 						"p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]",
 						"group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l",
 					),
+					p.Class,
 				) }
+				{ p.Attributes... }
 			>
 				<div
 					data-sidebar="sidebar"
@@ -541,6 +550,7 @@ templ Separator(props ...SeparatorProps) {
 		role="separator"
 		data-slot="sidebar-separator"
 		data-sidebar="separator"
+		data-orientation="horizontal"
 		class={ utils.TwMerge("mx-2 h-px w-auto shrink-0 bg-sidebar-border", p.Class) }
 		{ p.Attributes... }
 	></div>

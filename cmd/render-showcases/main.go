@@ -243,7 +243,7 @@ func main() {
 		"out/showcase/separator_vertical.html":  examples.SeparatorVertical(),
 
 		// Sidebar
-		"out/showcase/sidebar_default.html": examples.SidebarDefault(),
+		"out/showcase/sidebar_demo.html": examples.SidebarDemo(),
 
 		// Skeleton
 		"out/showcase/skeleton_card.html":      examples.SkeletonCard(),

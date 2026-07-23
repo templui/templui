@@ -70,7 +70,9 @@ templ Button(props ...Props) {
 			if p.Target != "" {
 				target={ p.Target }
 			}
-			data-slot="button"
+			if _, ok := p.Attributes["data-slot"]; !ok {
+				data-slot="button"
+			}
 			data-variant={ string(p.Variant) }
 			data-size={ string(p.Size) }
 			class={ utils.TwMerge(baseClasses, p.variantClasses(), p.sizeClasses(), p.Class) }
@@ -83,7 +85,9 @@ templ Button(props ...Props) {
 			if p.ID != "" {
 				id={ p.ID }
 			}
-			data-slot="button"
+			if _, ok := p.Attributes["data-slot"]; !ok {
+				data-slot="button"
+			}
 			data-variant={ string(p.Variant) }
 			data-size={ string(p.Size) }
 			class={ utils.TwMerge(baseClasses, p.variantClasses(), p.sizeClasses(), p.Class) }

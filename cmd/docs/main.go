@@ -13,6 +13,7 @@ import (
 	"github.com/templui/templui/components"
 	"github.com/templui/templui/components/toast"
 	"github.com/templui/templui/internal/config"
+	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/internal/middleware"
 	"github.com/templui/templui/internal/service"
 	"github.com/templui/templui/internal/shared"
@@ -133,9 +134,16 @@ func main() {
 	// Components
 	mux.Handle("GET /docs/components/{slug}", componentDocHandler(docsService))
 	mux.Handle("GET /docs/components/charts", htmxHandler(pages.Chart()))
-	mux.Handle("GET /docs/components/sidebar", htmxHandler(pages.Sidebar()))
-	mux.Handle("GET /docs/components/sidebar-fullscreen", htmxHandler(pages.SidebarFullscreen()))
-	mux.Handle("GET /docs/components/sidebar-preview", htmxHandler(pages.SidebarPreview()))
+	mux.Handle("GET /preview/{name}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		entry, ok := examples.Registry[r.PathValue("name")]
+		if !ok {
+			http.NotFound(w, r)
+			return
+		}
+		if err := pages.ExamplePreview(r.PathValue("name"), entry).Render(r.Context(), w); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}))
 	mux.Handle("GET /docs/components/skeleton", htmxHandler(pages.Skeleton()))
 	mux.Handle("GET /docs/components/table", htmxHandler(pages.Table()))
 	mux.Handle("GET /docs/components/tabs", htmxHandler(pages.Tabs()))

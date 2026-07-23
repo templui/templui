@@ -1,0 +1,14 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/ui/examples"
+	"github.com/templui/templui/internal/ui/layouts"
+)
+
+// ExamplePreview serves a registry example as a standalone page, the target
+// of BlockPreview iframes (shadcn's /view/{name} pendant).
+templ ExamplePreview(name string, entry examples.RegistryEntry) {
+	@layouts.BaseLayout("Preview: "+name, "") {
+		@entry.Component
+	}
+}

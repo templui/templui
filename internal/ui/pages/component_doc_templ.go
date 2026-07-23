@@ -131,9 +131,16 @@ func renderSegment(segment markdown.Segment) templ.Component {
 			}
 		case "ComponentPreview":
 			if entry, ok := examples.Registry[segment.Attrs["name"]]; ok {
-				templ_7745c5c3_Err = modules.ComponentPreviewBlock(entry, segment.Attrs).Render(ctx, templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
+				if segment.Attrs["type"] == "block" {
+					templ_7745c5c3_Err = modules.BlockPreview(segment.Attrs["name"], segment.Attrs).Render(ctx, templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				} else {
+					templ_7745c5c3_Err = modules.ComponentPreviewBlock(entry, segment.Attrs).Render(ctx, templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
 				}
 			} else {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"my-6 rounded-lg border border-destructive/50 p-4 text-sm text-destructive\">Unknown preview: ")
@@ -143,7 +150,7 @@ func renderSegment(segment markdown.Segment) templ.Component {
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(segment.Attrs["name"])
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/component_doc.templ`, Line: 46, Col: 45}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/component_doc.templ`, Line: 50, Col: 45}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {

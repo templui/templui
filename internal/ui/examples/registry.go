@@ -12,6 +12,7 @@ type RegistryEntry struct {
 // Registry resolves <ComponentPreview name="..."/> shortcodes in the
 // markdown component docs. Grows page by page during the docs migration.
 var Registry = map[string]RegistryEntry{
+	"sidebar-demo": {Component: SidebarDemo(), File: "sidebar_demo.templ"},
 	"sheet-demo": {Component: SheetDemo(), File: "sheet_demo.templ"},
 	"sheet-side": {Component: SheetSide(), File: "sheet_side.templ"},
 	"sheet-no-close-button": {Component: SheetNoCloseButton(), File: "sheet_no_close_button.templ"},
