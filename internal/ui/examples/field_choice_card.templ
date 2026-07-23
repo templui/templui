@@ -2,7 +2,7 @@ package examples
 
 import (
 	"github.com/templui/templui/components/field"
-	"github.com/templui/templui/components/radio"
+	"github.com/templui/templui/components/radiogroup"
 )
 
 templ FieldChoiceCard() {
@@ -25,7 +25,7 @@ templ FieldChoiceCard() {
 								Run GPU workloads on a K8s cluster.
 							}
 						}
-						@radio.Radio(radio.Props{
+						@radiogroup.Item(radiogroup.ItemProps{
 							Name:    "compute",
 							Value:   "kubernetes",
 							ID:      "kubernetes-r2h",
@@ -43,7 +43,7 @@ templ FieldChoiceCard() {
 								Access a cluster to run GPU workloads.
 							}
 						}
-						@radio.Radio(radio.Props{
+						@radiogroup.Item(radiogroup.ItemProps{
 							Name:  "compute",
 							Value: "vm",
 							ID:    "vm-z4k",

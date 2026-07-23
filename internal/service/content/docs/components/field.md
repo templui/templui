@@ -37,7 +37,7 @@ import "github.com/templui/templui/components/field"
 			@field.Label(field.LabelProps{For: "username"}) {
 				Username
 			}
-			@input.Input(input.Props{ID: "username", Invalid: true})
+			@input.Input(input.Props{ID: "username", Attributes: templ.Attributes{"aria-invalid": "true"}})
 			@field.Error() {
 				Choose another username.
 			}
@@ -192,7 +192,7 @@ Stack `field.Field` components with `field.Group`. Add `field.Separator` to divi
 	@field.Label(field.LabelProps{For: "email"}) {
 		Email
 	}
-	@input.Input(input.Props{ID: "email", Type: input.TypeEmail, Invalid: true})
+	@input.Input(input.Props{ID: "email", Type: input.TypeEmail, Attributes: templ.Attributes{"aria-invalid": "true"}})
 	@field.Error() {
 		Enter a valid email address.
 	}

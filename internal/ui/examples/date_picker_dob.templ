@@ -36,11 +36,13 @@ templ DatePickerDob() {
 	}
 	<script>
 		(() => {
-			const content = document.getElementById("date-picker-dob");
-			const trigger = document.querySelector('[aria-controls="date-picker-dob"]');
-			content.addEventListener("calendar-change", (e) => {
+			// Delegated: the popover content is portaled to <body> at init, so it
+			// is looked up per event instead of captured at parse time.
+			document.addEventListener("calendar-change", (e) => {
+				if (!(e.target instanceof Element) || !e.target.closest("#date-picker-dob")) return;
+				const trigger = document.querySelector('[aria-controls="date-picker-dob"]');
 				trigger.querySelector("span").textContent = e.detail.value ? e.detail.value.toLocaleDateString() : "Select date";
-				if (e.detail.value) window.tui.popover.close(content);
+				if (e.detail.value) window.tui.popover.close(e.target.closest("#date-picker-dob"));
 			});
 		})();
 	</script>

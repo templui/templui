@@ -113,6 +113,9 @@ templ Content(props ...ContentProps) {
 		{{ p.AlignOffset = 4 }}
 	}
 	{{ d, _ := ctx.Value(delaysKey{}).(delays) }}
+	// Inert until the script portals it to <body> at init, so the SSRd
+	// content never participates in layout or sibling CSS.
+	<template data-tui-hovercard-portal>
 	<div
 		id={ cardID(ctx) }
 		data-slot="hover-card-content"
@@ -135,6 +138,7 @@ templ Content(props ...ContentProps) {
 	>
 		{ children... }
 	</div>
+	</template>
 }
 
 var scriptOnce = templ.NewOnceHandle()

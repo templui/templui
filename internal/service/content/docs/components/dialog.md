@@ -82,7 +82,6 @@ The `Dialog` component is the root that links trigger, content and close via con
 | ------------------ | -------- | ------- |
 | `Open`             | `bool`   | `false` |
 | `DisableClickAway` | `bool`   | `false` |
-| `DisableESC`       | `bool`   | `false` |
 
 ### Trigger
 

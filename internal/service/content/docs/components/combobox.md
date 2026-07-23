@@ -169,7 +169,7 @@ You can render a custom component inside `combobox.Item`.
 
 ## Invalid
 
-Use the `Invalid` prop to make the combobox invalid.
+Use `aria-invalid` on `combobox.Input` to make the combobox invalid.
 
 <ComponentPreview name="combobox-invalid" />
 
@@ -219,7 +219,6 @@ The `combobox.Input` component is the text input that filters the list.
 | Prop          | Type     | Default |
 | ------------- | -------- | ------- |
 | `Placeholder` | `string` | -       |
-| `Invalid`     | `bool`   | `false` |
 | `HideTrigger` | `bool`   | `false` |
 | `ShowClear`   | `bool`   | `false` |
 | `Class`       | `string` | -       |
@@ -312,7 +311,6 @@ The `combobox.ChipsInput` component is the inline filter input rendered after th
 | Prop          | Type     | Default |
 | ------------- | -------- | ------- |
 | `Placeholder` | `string` | -       |
-| `Invalid`     | `bool`   | `false` |
 | `Class`       | `string` | -       |
 
 ### Value

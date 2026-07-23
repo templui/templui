@@ -42,7 +42,6 @@ tasks:
         components/hovercard/hovercard.js \
         components/inputgroup/inputgroup.js \
         components/inputotp/inputotp.js \
-        components/label/label.js \
         components/popover/popover.js \
         components/progress/progress.js \
         components/select/select.js \

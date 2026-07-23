@@ -345,6 +345,14 @@ func Link(props ...LinkProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
+			attrs := templ.Attributes{"data-slot": "pagination-link"}
+			if p.IsActive {
+				attrs["aria-current"] = "page"
+				attrs["data-active"] = "true"
+			}
+			for k, v := range p.Attributes {
+				attrs[k] = v
+			}
 			templ_7745c5c3_Var11 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -369,7 +377,7 @@ func Link(props ...LinkProps) templ.Component {
 				Size:       button.SizeIcon,
 				Variant:    button.Variant(buttonVariant(p.IsActive)),
 				Class:      p.Class,
-				Attributes: p.Attributes,
+				Attributes: attrs,
 			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var11), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -404,6 +412,13 @@ func Previous(props ...PreviousProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
+		if p.Label == "" {
+			p.Label = "Previous"
+		}
+		attrs := templ.Attributes{"aria-label": "Go to previous page", "data-slot": "pagination-link"}
+		for k, v := range p.Attributes {
+			attrs[k] = v
+		}
 		templ_7745c5c3_Var13 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -416,32 +431,26 @@ func Previous(props ...PreviousProps) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = icon.ChevronLeft(icon.Props{Class: "size-4"}).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = icon.ChevronLeft(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-start"}}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " <span class=\"hidden sm:block\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if p.Label != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<span>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var14 string
-				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(p.Label)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/pagination/pagination.templ`, Line: 148, Col: 18}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</span>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
+			var templ_7745c5c3_Var14 string
+			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(p.Label)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/pagination/pagination.templ`, Line: 166, Col: 41}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</span>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
 			}
 			return nil
 		})
@@ -451,7 +460,7 @@ func Previous(props ...PreviousProps) templ.Component {
 			Disabled:   p.Disabled,
 			Variant:    button.VariantGhost,
 			Class:      utils.TwMerge("pl-1.5!", p.Class),
-			Attributes: p.Attributes,
+			Attributes: attrs,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var13), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -485,6 +494,13 @@ func Next(props ...NextProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
+		if p.Label == "" {
+			p.Label = "Next"
+		}
+		attrs := templ.Attributes{"aria-label": "Go to next page", "data-slot": "pagination-link"}
+		for k, v := range p.Attributes {
+			attrs[k] = v
+		}
 		templ_7745c5c3_Var16 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -497,30 +513,24 @@ func Next(props ...NextProps) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			if p.Label != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<span>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var17 string
-				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(p.Label)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/pagination/pagination.templ`, Line: 167, Col: 18}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</span>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, " ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<span class=\"hidden sm:block\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = icon.ChevronRight(icon.Props{Class: "size-4"}).Render(ctx, templ_7745c5c3_Buffer)
+			var templ_7745c5c3_Var17 string
+			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(p.Label)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/pagination/pagination.templ`, Line: 192, Col: 41}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</span>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = icon.ChevronRight(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-end"}}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -532,7 +542,7 @@ func Next(props ...NextProps) templ.Component {
 			Disabled:   p.Disabled,
 			Variant:    button.VariantGhost,
 			Class:      utils.TwMerge("pr-1.5!", p.Class),
-			Attributes: p.Attributes,
+			Attributes: attrs,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var16), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -562,7 +572,7 @@ func Ellipsis() templ.Component {
 			templ_7745c5c3_Var18 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<span aria-hidden=\"true\" data-slot=\"pagination-ellipsis\" class=\"flex size-8 items-center justify-center [&_svg:not([class*='size-'])]:size-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<span aria-hidden=\"true\" data-slot=\"pagination-ellipsis\" class=\"flex size-8 items-center justify-center [&_svg:not([class*='size-'])]:size-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -570,78 +580,12 @@ func Ellipsis() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<span class=\"sr-only\">More pages</span></span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<span class=\"sr-only\">More pages</span></span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		return nil
 	})
-}
-
-func CreatePagination(currentPage, totalPages, maxVisible int) struct {
-	CurrentPage int
-	TotalPages  int
-	Pages       []int
-	HasPrevious bool
-	HasNext     bool
-} {
-	if currentPage < 1 {
-		currentPage = 1
-	}
-	if totalPages < 1 {
-		totalPages = 1
-	}
-	if currentPage > totalPages {
-		currentPage = totalPages
-	}
-	if maxVisible < 1 {
-		maxVisible = 5
-	}
-
-	start, end := calculateVisibleRange(currentPage, totalPages, maxVisible)
-	pages := make([]int, 0, end-start+1)
-	for i := start; i <= end; i++ {
-		pages = append(pages, i)
-	}
-
-	return struct {
-		CurrentPage int
-		TotalPages  int
-		Pages       []int
-		HasPrevious bool
-		HasNext     bool
-	}{
-		CurrentPage: currentPage,
-		TotalPages:  totalPages,
-		Pages:       pages,
-		HasPrevious: currentPage > 1,
-		HasNext:     currentPage < totalPages,
-	}
-}
-
-func calculateVisibleRange(currentPage, totalPages, maxVisible int) (int, int) {
-	if totalPages <= maxVisible {
-		return 1, totalPages
-	}
-
-	half := maxVisible / 2
-	start := currentPage - half
-	end := currentPage + half
-
-	if start < 1 {
-		end += (1 - start)
-		start = 1
-	}
-
-	if end > totalPages {
-		start -= (end - totalPages)
-		if start < 1 {
-			start = 1
-		}
-		end = totalPages
-	}
-
-	return start, end
 }
 
 func buttonVariant(isActive bool) button.Variant {

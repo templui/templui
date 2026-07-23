@@ -1,0 +1,171 @@
+---
+title: Select
+description: Displays a list of options for the user to pick from, triggered by a button.
+---
+
+<ComponentPreview name="select-demo" />
+
+## Installation
+
+<Installation name="select" />
+
+## Usage
+
+```go showLineNumbers
+import selectcomp "github.com/templui/templui/components/select"
+```
+
+```templ showLineNumbers
+@selectcomp.Select() {
+	@selectcomp.Trigger(selectcomp.TriggerProps{Class: "w-[180px]"}) {
+		@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Theme"})
+	}
+	@selectcomp.Content() {
+		@selectcomp.Group() {
+			@selectcomp.Item(selectcomp.ItemProps{Value: "light"}) {
+				Light
+			}
+			@selectcomp.Item(selectcomp.ItemProps{Value: "dark"}) {
+				Dark
+			}
+			@selectcomp.Item(selectcomp.ItemProps{Value: "system"}) {
+				System
+			}
+		}
+	}
+}
+```
+
+## Composition
+
+Use the following composition to build a `Select`:
+
+```text
+selectcomp.Select
+├── selectcomp.Trigger
+│   └── selectcomp.Value
+└── selectcomp.Content
+    ├── selectcomp.Group
+    │   ├── selectcomp.Label
+    │   ├── selectcomp.Item
+    │   └── selectcomp.Item
+    ├── selectcomp.Separator
+    └── selectcomp.Group
+        ├── selectcomp.Label
+        ├── selectcomp.Item
+        └── selectcomp.Item
+```
+
+## Align Item With Trigger
+
+Use `Position` on `selectcomp.Content` to control whether the selected item aligns with the trigger. With `PositionItemAligned` (default), the popup positions so the selected item appears over the trigger. With `PositionPopper`, the popup aligns to the trigger edge.
+
+<ComponentPreview name="select-align-item" />
+
+## Groups
+
+Use `selectcomp.Group`, `selectcomp.Label`, and `selectcomp.Separator` to organize items.
+
+<ComponentPreview name="select-groups" />
+
+## Scrollable
+
+A select with many items that scrolls.
+
+<ComponentPreview name="select-scrollable" />
+
+## Disabled
+
+<ComponentPreview name="select-disabled" />
+
+## Invalid
+
+Set the `Invalid` prop on the `field.Field` component and `aria-invalid` on the `selectcomp.Trigger` component to show an error state.
+
+```templ showLineNumbers /aria-invalid/
+@field.Field(field.Props{Invalid: true}) {
+	@field.Label() {
+		Fruit
+	}
+	@selectcomp.Trigger(selectcomp.TriggerProps{Attributes: templ.Attributes{"aria-invalid": "true"}}) {
+		@selectcomp.Value()
+	}
+}
+```
+
+<ComponentPreview name="select-invalid" />
+
+## API Reference
+
+### Select
+
+The `selectcomp.Select` component is the root that carries the selection and the form value.
+
+| Prop       | Type     | Default |
+| ---------- | -------- | ------- |
+| `Name`     | `string` | -       |
+| `Value`    | `string` | -       |
+| `Disabled` | `bool`   | `false` |
+
+### SelectTrigger
+
+The `selectcomp.Trigger` component is the button that opens the listbox.
+
+| Prop      | Type                       | Default       |
+| --------- | -------------------------- | ------------- |
+| `Size`    | `SizeDefault \| SizeSm`    | `SizeDefault` |
+| `Class`   | `string`                   | -             |
+
+### SelectValue
+
+The `selectcomp.Value` component shows the selected label inside the trigger.
+
+| Prop          | Type     | Default |
+| ------------- | -------- | ------- |
+| `Placeholder` | `string` | -       |
+| `Class`       | `string` | -       |
+
+### SelectContent
+
+The `selectcomp.Content` component is the listbox popup.
+
+| Prop       | Type                                       | Default               |
+| ---------- | ------------------------------------------ | --------------------- |
+| `Position` | `PositionItemAligned \| PositionPopper`    | `PositionItemAligned` |
+| `Align`    | `AlignStart \| AlignCenter \| AlignEnd`    | `AlignCenter`         |
+| `Class`    | `string`                                   | -                     |
+
+### SelectGroup
+
+The `selectcomp.Group` component wraps related items.
+
+| Prop    | Type     | Default |
+| ------- | -------- | ------- |
+| `Class` | `string` | -       |
+
+### SelectLabel
+
+The `selectcomp.Label` component titles a group.
+
+| Prop    | Type     | Default |
+| ------- | -------- | ------- |
+| `Class` | `string` | -       |
+
+### SelectItem
+
+The `selectcomp.Item` component is a selectable option.
+
+| Prop       | Type     | Default |
+| ---------- | -------- | ------- |
+| `Value`    | `string` | -       |
+| `Label`    | `string` | -       |
+| `Disabled` | `bool`   | `false` |
+| `Class`    | `string` | -       |
+
+### SelectSeparator
+
+The `selectcomp.Separator` component divides groups.
+
+| Prop    | Type     | Default |
+| ------- | -------- | ------- |
+| `Class` | `string` | -       |

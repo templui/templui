@@ -1,74 +1,32 @@
 package progress
 
 import (
+	"context"
 	"fmt"
+
 	"github.com/templui/templui/utils"
 )
 
+type ctxKey string
 
-type Props struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-	Max        int
-	Value      int
-	Label      string
-	ShowValue  bool
-	BarClass   string
+const stateKey ctxKey = "progressState"
+
+type ctxState struct {
+	value int
+	max   int
 }
 
-templ Progress(props ...Props) {
-	{{ var p Props }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
+func state(ctx context.Context) ctxState {
+	if s, ok := ctx.Value(stateKey).(ctxState); ok {
+		return s
 	}
-	if p.ID == "" {
-		{{ p.ID = utils.RandomID() }}
-	}
-	<div
-		id={ p.ID }
-		class={ utils.TwMerge("w-full", p.Class) }
-		aria-valuemin="0"
-		aria-valuemax={ fmt.Sprintf("%d", maxValue(p.Max)) }
-		aria-valuenow={ fmt.Sprintf("%d", p.Value) }
-		role="progressbar"
-		{ p.Attributes... }
-	>
-		if p.Label != "" || p.ShowValue {
-			<div class="mb-1 flex items-center justify-between">
-				if p.Label != "" {
-					<span class="text-sm font-medium">{ p.Label }</span>
-				}
-				if p.ShowValue {
-					<span class="ml-auto text-sm text-muted-foreground tabular-nums">
-						{ fmt.Sprintf("%d%%", percentage(p.Value, p)) }
-					</span>
-				}
-			</div>
-		}
-		<div data-slot="progress" class="h-1 w-full overflow-hidden rounded-full bg-muted">
-			<div
-				data-tui-progress-indicator
-				class={
-					utils.TwMerge(
-						"h-full w-full flex-1 rounded-full bg-primary transition-all",
-						p.BarClass,
-					),
-				}
-			></div>
-		</div>
-	</div>
+	return ctxState{max: 100}
 }
 
-func maxValue(max int) int {
+func percentage(value, max int) int {
 	if max <= 0 {
-		return 100
+		max = 100
 	}
-	return max
-}
-
-func percentage(value int, props Props) int {
-	max := maxValue(props.Max)
 	if value < 0 {
 		value = 0
 	}
@@ -78,7 +36,128 @@ func percentage(value int, props Props) int {
 	return (value * 100) / max
 }
 
+// statusAttr mirrors Base UI's ProgressStatus data attribute on every part:
+// data-complete once the value reaches max, data-progressing otherwise (a Go
+// int is never indeterminate).
+func statusAttr(value, max int) templ.Attributes {
+	if max <= 0 {
+		max = 100
+	}
+	if value >= max {
+		return templ.Attributes{"data-complete": ""}
+	}
+	return templ.Attributes{"data-progressing": ""}
+}
 
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Value      int
+	// Max defaults to 100.
+	Max int
+}
+
+type LabelProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ValueProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+templ Progress(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Max == 0 {
+		{{ p.Max = 100 }}
+	}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{value: p.Value, max: p.Max}) }}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="progress"
+		data-tui-progress
+		role="progressbar"
+		aria-valuemin="0"
+		aria-valuemax={ fmt.Sprintf("%d", p.Max) }
+		aria-valuenow={ fmt.Sprintf("%d", p.Value) }
+		aria-valuetext={ fmt.Sprintf("%d%%", percentage(p.Value, p.Max)) }
+		class={ utils.TwMerge("flex flex-wrap gap-3", p.Class) }
+		{ statusAttr(p.Value, p.Max)... }
+		{ p.Attributes... }
+	>
+		{ children... }
+		<div
+			data-slot="progress-track"
+			data-tui-progress-part
+			class="relative flex h-1 w-full items-center overflow-x-hidden rounded-full bg-muted"
+			{ statusAttr(p.Value, p.Max)... }
+		>
+			<div
+				data-slot="progress-indicator"
+				data-tui-progress-indicator
+				data-tui-progress-part
+				class="h-full bg-primary transition-all"
+				style={ fmt.Sprintf("inset-inline-start:0;height:inherit;width:%d%%", percentage(p.Value, p.Max)) }
+				{ statusAttr(p.Value, p.Max)... }
+			></div>
+		</div>
+		// Base UI's NVDA workaround span, part of the rendered output.
+		<span role="presentation" style="clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0">x</span>
+	</div>
+}
+
+templ Label(props ...LabelProps) {
+	{{ var p LabelProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	{{ s := state(ctx) }}
+	<span
+		id={ p.ID }
+		data-slot="progress-label"
+		data-tui-progress-part
+		role="presentation"
+		class={ utils.TwMerge("text-sm font-medium", p.Class) }
+		{ statusAttr(s.value, s.max)... }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}
+
+// Value renders the current value as a percentage (Base UI Progress.Value).
+templ Value(props ...ValueProps) {
+	{{ var p ValueProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ s := state(ctx) }}
+	<span
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="progress-value"
+		data-tui-progress-part
+		aria-hidden="true"
+		class={ utils.TwMerge("ml-auto text-sm text-muted-foreground tabular-nums", p.Class) }
+		{ statusAttr(s.value, s.max)... }
+		{ p.Attributes... }
+	>
+		{ fmt.Sprintf("%d%%", percentage(s.value, s.max)) }
+	</span>
+}
 
 var scriptOnce = templ.NewOnceHandle()
 

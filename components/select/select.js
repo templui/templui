@@ -530,7 +530,22 @@ import "../floatingui/floating_ui_dom.js";
   // value, the label lives in the item). Runs on load and whenever new selects
   // appear in the DOM (e.g. content swapped in by a library like htmx) — the
   // MutationObserver keeps this framework-agnostic.
+  // Lift SSR'd contents out of their inert <template> wrappers into <body>,
+  // replacing a stale portaled copy on re-swaps (e.g. htmx).
+  function liftTemplates() {
+    document.querySelectorAll("template[data-tui-select-portal]").forEach((tpl) => {
+      const content = tpl.content.querySelector("[data-tui-select-content]");
+      if (content) {
+        const stale = document.getElementById(content.id);
+        if (stale) stale.remove();
+        document.body.appendChild(content);
+      }
+      tpl.remove();
+    });
+  }
+
   function syncTriggers() {
+    liftTemplates();
     document.querySelectorAll("[data-tui-select-trigger]").forEach((trigger) => {
       const content = contentFor(trigger);
       if (!content) return;
@@ -585,10 +600,17 @@ import "../floatingui/floating_ui_dom.js";
     }
   }
 
+  // Pendant of floating-ui useClick's pointerTypeRef: pointerdown marks the
+  // trigger, the click that follows the same press is skipped. A click
+  // without the mark (a <label for> forward, keyboard activation, or a
+  // programmatic .click()) toggles instead.
+  const pressedTriggers = new WeakSet();
+
   document.addEventListener("pointerdown", (e) => {
     if (e.button !== 0 || !(e.target instanceof Element)) return;
     const trigger = e.target.closest("[data-tui-select-trigger]");
     if (trigger) {
+      pressedTriggers.add(trigger);
       // Keep the browser from focusing the trigger button, focus lives on
       // the selected item while the listbox is open (Base UI focus scope).
       e.preventDefault();
@@ -602,9 +624,11 @@ import "../floatingui/floating_ui_dom.js";
     if (!(e.target instanceof Element)) return;
     const trigger = e.target.closest("[data-tui-select-trigger]");
     if (trigger) {
-      // Keyboard activation only (Enter/Space fire a detail-0 click without
-      // a preceding pointerdown); pointer clicks are handled on pointerdown.
-      if (e.detail === 0 && !trigger.disabled) toggle(trigger);
+      if (pressedTriggers.has(trigger)) {
+        pressedTriggers.delete(trigger);
+        return;
+      }
+      if (!trigger.disabled) toggle(trigger);
       return;
     }
 
@@ -635,6 +659,7 @@ import "../floatingui/floating_ui_dom.js";
     // the native button click path).
     const trigger = e.target.closest("[data-tui-select-trigger]");
     if (trigger && !trigger.disabled) {
+      pressedTriggers.delete(trigger); // like useClick's onKeyDown reset
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
         const content = contentFor(trigger);

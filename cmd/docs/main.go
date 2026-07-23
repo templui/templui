@@ -133,13 +133,6 @@ func main() {
 	// Components
 	mux.Handle("GET /docs/components/{slug}", componentDocHandler(docsService))
 	mux.Handle("GET /docs/components/charts", htmxHandler(pages.Chart()))
-	mux.Handle("GET /docs/components/sheet", htmxHandler(pages.Sheet()))
-	mux.Handle("GET /docs/components/select", htmxHandler(pages.Select()))
-	mux.Handle("GET /docs/components/label", htmxHandler(pages.Label()))
-	mux.Handle("GET /docs/components/pagination", htmxHandler(pages.Pagination()))
-	mux.Handle("GET /docs/components/progress", htmxHandler(pages.Progress()))
-	mux.Handle("GET /docs/components/radio", htmxHandler(pages.Radio()))
-	mux.Handle("GET /docs/components/separator", htmxHandler(pages.Separator()))
 	mux.Handle("GET /docs/components/sidebar", htmxHandler(pages.Sidebar()))
 	mux.Handle("GET /docs/components/sidebar-fullscreen", htmxHandler(pages.SidebarFullscreen()))
 	mux.Handle("GET /docs/components/sidebar-preview", htmxHandler(pages.SidebarPreview()))
@@ -149,9 +142,7 @@ func main() {
 	mux.Handle("GET /docs/components/textarea", htmxHandler(pages.Textarea()))
 	mux.Handle("GET /docs/components/toast", htmxHandler(pages.Toast()))
 	mux.Handle("GET /docs/components/tooltip", htmxHandler(pages.Tooltip()))
-	mux.Handle("GET /docs/components/popover", htmxHandler(pages.Popover()))
 	mux.Handle("GET /docs/components/spinner", htmxHandler(pages.Spinner()))
-	mux.Handle("GET /docs/components/kbd", htmxHandler(pages.Kbd()))
 	mux.Handle("GET /docs/components/toggle", htmxHandler(pages.Toggle()))
 	mux.Handle("GET /docs/components/toggle-group", htmxHandler(pages.ToggleGroup()))
 

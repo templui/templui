@@ -117,13 +117,23 @@ templ Link(props ...LinkProps) {
 			{ children... }
 		}
 	} else {
+		{{
+			attrs := templ.Attributes{"data-slot": "pagination-link"}
+			if p.IsActive {
+				attrs["aria-current"] = "page"
+				attrs["data-active"] = "true"
+			}
+			for k, v := range p.Attributes {
+				attrs[k] = v
+			}
+		}}
 		@button.Button(button.Props{
 			ID:         p.ID,
 			Href:       p.Href,
 			Size:       button.SizeIcon,
 			Variant:    button.Variant(buttonVariant(p.IsActive)),
 			Class:      p.Class,
-			Attributes: p.Attributes,
+			Attributes: attrs,
 		}) {
 			{ children... }
 		}
@@ -135,18 +145,25 @@ templ Previous(props ...PreviousProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	if p.Label == "" {
+		{{ p.Label = "Previous" }}
+	}
+	{{
+		attrs := templ.Attributes{"aria-label": "Go to previous page", "data-slot": "pagination-link"}
+		for k, v := range p.Attributes {
+			attrs[k] = v
+		}
+	}}
 	@button.Button(button.Props{
 		ID:         p.ID,
 		Href:       p.Href,
 		Disabled:   p.Disabled,
 		Variant:    button.VariantGhost,
 		Class:      utils.TwMerge("pl-1.5!", p.Class),
-		Attributes: p.Attributes,
+		Attributes: attrs,
 	}) {
-		@icon.ChevronLeft(icon.Props{Class: "size-4"})
-		if p.Label != "" {
-			<span>{ p.Label }</span>
-		}
+		@icon.ChevronLeft(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-start"}})
+		<span class="hidden sm:block">{ p.Label }</span>
 	}
 }
 
@@ -155,18 +172,25 @@ templ Next(props ...NextProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	if p.Label == "" {
+		{{ p.Label = "Next" }}
+	}
+	{{
+		attrs := templ.Attributes{"aria-label": "Go to next page", "data-slot": "pagination-link"}
+		for k, v := range p.Attributes {
+			attrs[k] = v
+		}
+	}}
 	@button.Button(button.Props{
 		ID:         p.ID,
 		Href:       p.Href,
 		Disabled:   p.Disabled,
 		Variant:    button.VariantGhost,
 		Class:      utils.TwMerge("pr-1.5!", p.Class),
-		Attributes: p.Attributes,
+		Attributes: attrs,
 	}) {
-		if p.Label != "" {
-			<span>{ p.Label }</span>
-		}
-		@icon.ChevronRight(icon.Props{Class: "size-4"})
+		<span class="hidden sm:block">{ p.Label }</span>
+		@icon.ChevronRight(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-end"}})
 	}
 }
 
@@ -175,72 +199,6 @@ templ Ellipsis() {
 		@icon.Ellipsis()
 		<span class="sr-only">More pages</span>
 	</span>
-}
-
-func CreatePagination(currentPage, totalPages, maxVisible int) struct {
-	CurrentPage int
-	TotalPages  int
-	Pages       []int
-	HasPrevious bool
-	HasNext     bool
-} {
-	if currentPage < 1 {
-		currentPage = 1
-	}
-	if totalPages < 1 {
-		totalPages = 1
-	}
-	if currentPage > totalPages {
-		currentPage = totalPages
-	}
-	if maxVisible < 1 {
-		maxVisible = 5
-	}
-
-	start, end := calculateVisibleRange(currentPage, totalPages, maxVisible)
-	pages := make([]int, 0, end-start+1)
-	for i := start; i <= end; i++ {
-		pages = append(pages, i)
-	}
-
-	return struct {
-		CurrentPage int
-		TotalPages  int
-		Pages       []int
-		HasPrevious bool
-		HasNext     bool
-	}{
-		CurrentPage: currentPage,
-		TotalPages:  totalPages,
-		Pages:       pages,
-		HasPrevious: currentPage > 1,
-		HasNext:     currentPage < totalPages,
-	}
-}
-
-func calculateVisibleRange(currentPage, totalPages, maxVisible int) (int, int) {
-	if totalPages <= maxVisible {
-		return 1, totalPages
-	}
-
-	half := maxVisible / 2
-	start := currentPage - half
-	end := currentPage + half
-
-	if start < 1 {
-		end += (1 - start)
-		start = 1
-	}
-
-	if end > totalPages {
-		start -= (end - totalPages)
-		if start < 1 {
-			start = 1
-		}
-		end = totalPages
-	}
-
-	return start, end
 }
 
 func buttonVariant(isActive bool) button.Variant {

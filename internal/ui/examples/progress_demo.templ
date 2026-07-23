@@ -1,0 +1,18 @@
+package examples
+
+import "github.com/templui/templui/components/progress"
+
+// The vanilla pendant of the demo's React state: 13 on load, 66 after 500ms.
+templ ProgressDemo() {
+	@progress.Progress(progress.Props{
+		ID:    "progress-demo",
+		Value: 13,
+		Class: "w-[60%]",
+	})
+	<script nonce={ templ.GetNonce(ctx) }>
+		(() => {
+			const bar = document.getElementById("progress-demo");
+			setTimeout(() => bar.setAttribute("aria-valuenow", "66"), 500);
+		})();
+	</script>
+}

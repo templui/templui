@@ -406,7 +406,22 @@ import "../floatingui/floating_ui_dom.js";
   // value, the label lives in the item). Runs on load and whenever new
   // comboboxes appear in the DOM; the MutationObserver keeps this
   // framework-agnostic.
+  // Lift SSR'd contents out of their inert <template> wrappers into <body>,
+  // replacing a stale portaled copy on re-swaps (e.g. htmx).
+  function liftTemplates() {
+    document.querySelectorAll("template[data-tui-combobox-portal]").forEach((tpl) => {
+      const content = tpl.content.querySelector("[data-tui-combobox-content]");
+      if (content) {
+        const stale = document.getElementById(content.id);
+        if (stale) stale.remove();
+        document.body.appendChild(content);
+      }
+      tpl.remove();
+    });
+  }
+
   function syncInputs() {
+    liftTemplates();
     allContents().forEach((content) => {
       if (anchorFor(content)) portal(content); // portal up front, like React on mount
       if (isMultiple(content)) return;

@@ -11,7 +11,7 @@ templ SelectInvalid() {
 			Fruit
 		}
 		@selectcomp.Select() {
-			@selectcomp.Trigger(selectcomp.TriggerProps{Invalid: true}) {
+			@selectcomp.Trigger(selectcomp.TriggerProps{Attributes: templ.Attributes{"aria-invalid": "true"}}) {
 				@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a fruit"})
 			}
 			@selectcomp.Content() {

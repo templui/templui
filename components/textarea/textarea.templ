@@ -16,7 +16,6 @@ type Props struct {
 	Rows        int
 	Disabled    bool
 	Readonly    bool
-	Invalid     bool
 }
 
 templ Textarea(props ...Props) {
@@ -46,9 +45,6 @@ templ Textarea(props ...Props) {
 		}
 		disabled?={ p.Disabled }
 		readonly?={ p.Readonly }
-		if p.Invalid {
-			aria-invalid="true"
-		}
 		class={
 			utils.TwMerge(
 				// Base styles (shadcn base-nova)

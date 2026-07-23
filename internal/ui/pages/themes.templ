@@ -12,7 +12,7 @@ import (
 	"github.com/templui/templui/components/input"
 	"github.com/templui/templui/components/inputotp"
 	"github.com/templui/templui/components/progress"
-	"github.com/templui/templui/components/radio"
+	"github.com/templui/templui/components/radiogroup"
 	selectcomp "github.com/templui/templui/components/select"
 	"github.com/templui/templui/components/slider"
 	"github.com/templui/templui/components/spinner"
@@ -364,7 +364,6 @@ templ ThemeShowcase() {
 						}
 						@progress.Progress(progress.Props{
 							Value: 66,
-							Class: "h-2",
 						})
 					</div>
 				}
@@ -376,7 +375,7 @@ templ ThemeShowcase() {
 						<h3 class="text-sm font-medium">Select plan</h3>
 						<div class="space-y-2">
 							<div class="flex items-center space-x-2">
-								@radio.Radio(radio.Props{
+								@radiogroup.Item(radiogroup.ItemProps{
 									ID:         "free",
 									Name:       "plan",
 									Attributes: templ.Attributes{"checked": "true"},
@@ -386,7 +385,7 @@ templ ThemeShowcase() {
 								}
 							</div>
 							<div class="flex items-center space-x-2">
-								@radio.Radio(radio.Props{
+								@radiogroup.Item(radiogroup.ItemProps{
 									ID:   "pro",
 									Name: "plan",
 								})
@@ -395,7 +394,7 @@ templ ThemeShowcase() {
 								}
 							</div>
 							<div class="flex items-center space-x-2">
-								@radio.Radio(radio.Props{
+								@radiogroup.Item(radiogroup.ItemProps{
 									ID:   "enterprise",
 									Name: "plan",
 								})

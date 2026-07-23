@@ -6,7 +6,7 @@ templ ComboboxInvalid() {
 	@combobox.Combobox() {
 		@combobox.Input(combobox.InputProps{
 			Placeholder: "Select a framework",
-			Invalid:     true,
+			Attributes:  templ.Attributes{"aria-invalid": "true"},
 		})
 		@combobox.Content() {
 			@combobox.Empty() {

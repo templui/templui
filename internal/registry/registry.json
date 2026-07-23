@@ -805,12 +805,12 @@
       ]
     },
     {
-      "name": "radio",
-      "slug": "radio",
-      "displayName": "Radio",
-      "description": "Radio button group component.",
+      "name": "radiogroup",
+      "slug": "radio-group",
+      "displayName": "Radio Group",
+      "description": "A set of checkable buttons, known as radio buttons, where no more than one of the buttons can be checked at a time.",
       "files": [
-        "components/radio/radio.templ"
+        "components/radiogroup/radiogroup.templ"
       ],
       "dependencies": [],
       "categories": [

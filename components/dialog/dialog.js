@@ -35,7 +35,6 @@
 
     dialog.addEventListener("cancel", (event) => {
       event.preventDefault();
-      if (dialog.hasAttribute("data-tui-dialog-disable-esc")) return;
       closeDialog(dialog);
     });
 
@@ -159,7 +158,22 @@
     }
   }
 
+  // Lift SSR'd contents out of their inert <template> wrappers into <body>,
+  // replacing a stale portaled copy on re-swaps (e.g. htmx).
+  function liftTemplates() {
+    document.querySelectorAll("template[data-tui-dialog-portal]").forEach((tpl) => {
+      const content = tpl.content.querySelector("[data-tui-dialog-content]");
+      if (content) {
+        const stale = document.getElementById(content.id);
+        if (stale) stale.remove();
+        document.body.appendChild(content);
+      }
+      tpl.remove();
+    });
+  }
+
   function initDialogs(root = document) {
+    liftTemplates();
     // Remove portaled leftovers whose trigger got swapped out of the page.
     document.querySelectorAll("body > dialog[data-tui-dialog-content]").forEach((dialog) => {
       if (!dialog.open && !triggersFor(dialog).length) dialog.remove();

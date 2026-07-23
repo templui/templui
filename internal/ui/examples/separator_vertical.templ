@@ -3,14 +3,11 @@ package examples
 import "github.com/templui/templui/components/separator"
 
 templ SeparatorVertical() {
-	<div class="w-full max-w-md">
-		<div class="flex h-24 items-center">
-			<div class="w-1/2 text-center">Left</div>
-			@separator.Separator(separator.Props{
-				Orientation: separator.OrientationVertical,
-				Class:       "mx-4",
-			})
-			<div class="w-1/2 text-center">Right</div>
-		</div>
+	<div class="flex h-5 items-center gap-4 text-sm">
+		<div>Blog</div>
+		@separator.Separator(separator.Props{Orientation: separator.OrientationVertical})
+		<div>Docs</div>
+		@separator.Separator(separator.Props{Orientation: separator.OrientationVertical})
+		<div>Source</div>
 	</div>
 }

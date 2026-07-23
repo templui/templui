@@ -34,7 +34,6 @@ type Props struct {
 	Readonly    bool
 	Required    bool
 	FileAccept  string
-	Invalid     bool
 }
 
 templ Input(props ...Props) {
@@ -72,9 +71,6 @@ templ Input(props ...Props) {
 		disabled?={ p.Disabled }
 		readonly?={ p.Readonly }
 		required?={ p.Required }
-		if p.Invalid {
-			aria-invalid="true"
-		}
 		class={
 			utils.TwMerge(
 				// Base styles (shadcn base-nova)

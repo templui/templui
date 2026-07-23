@@ -177,7 +177,7 @@ func main() {
 		"out/showcase/combobox_input_group.html":    examples.ComboboxInputGroup(),
 
 		// Select
-		"out/showcase/select_default.html":    examples.SelectDefault(),
+		"out/showcase/select_demo.html":        examples.SelectDemo(),
 		"out/showcase/select_align_item.html": examples.SelectAlignItem(),
 		"out/showcase/select_groups.html":     examples.SelectGroupsExample(),
 		"out/showcase/select_scrollable.html": examples.SelectScrollable(),
@@ -185,9 +185,7 @@ func main() {
 		"out/showcase/select_invalid.html":    examples.SelectInvalid(),
 
 		// Sheet
-		"out/showcase/sheet_default.html":          examples.SheetDefault(),
-		"out/showcase/sheet_sides.html":            examples.SheetSides(),
-		"out/showcase/sheet_external_trigger.html": examples.SheetExternalTrigger(),
+		"out/showcase/sheet_demo.html": examples.SheetDemo(),
 
 		// Dropdown Menu
 		"out/showcase/dropdownmenu_demo.html":          examples.DropdownMenuDemo(),
@@ -225,25 +223,23 @@ func main() {
 		"out/showcase/dialog_scrollable_content.html": examples.DialogScrollableContent(),
 
 		// Pagination
-		"out/showcase/pagination_default.html":     examples.PaginationDefault(),
-		"out/showcase/pagination_with_helper.html": examples.PaginationWithHelper(),
+		"out/showcase/pagination_demo.html": examples.PaginationDemo(),
 
 		// Popover
-		"out/showcase/popover_default.html":    examples.PopoverDefault(),
+		"out/showcase/popover_demo.html":       examples.PopoverDemo(),
 		"out/showcase/popover_basic.html":      examples.PopoverBasic(),
 		"out/showcase/popover_alignments.html": examples.PopoverAlignments(),
 		"out/showcase/popover_form.html":       examples.PopoverForm(),
 
 		// Progress
-		"out/showcase/progress_default.html":  examples.ProgressDefault(),
+		"out/showcase/progress_demo.html": examples.ProgressDemo(),
 
 		// Radio
-		"out/showcase/radio_default.html": examples.RadioDefault(),
-		"out/showcase/radio_form.html":    examples.RadioForm(),
+		"out/showcase/radio_group_demo.html": examples.RadioGroupDemo(),
 
 
 		// Separator
-		"out/showcase/separator_default.html":   examples.SeparatorDefault(),
+		"out/showcase/separator_demo.html":   examples.SeparatorDemo(),
 		"out/showcase/separator_vertical.html":  examples.SeparatorVertical(),
 
 		// Sidebar

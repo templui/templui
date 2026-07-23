@@ -343,7 +343,22 @@ import "../floatingui/floating_ui_dom.js";
 
   // ----- init (portal up front, like React does on mount) --------------------
 
+  // Lift SSR'd contents out of their inert <template> wrappers into <body>,
+  // replacing a stale portaled copy on re-swaps (e.g. htmx).
+  function liftTemplates() {
+    document.querySelectorAll("template[data-tui-contextmenu-portal]").forEach((tpl) => {
+      const content = tpl.content.querySelector("[data-tui-contextmenu-content]");
+      if (content) {
+        const stale = document.getElementById(content.id);
+        if (stale) stale.remove();
+        document.body.appendChild(content);
+      }
+      tpl.remove();
+    });
+  }
+
   function initMenus() {
+    liftTemplates();
     document.querySelectorAll("[data-tui-contextmenu-trigger]").forEach((trigger) => {
       const content = contentFor(trigger);
       if (content) portal(content);

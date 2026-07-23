@@ -55,9 +55,11 @@ templ SelectAlignItem() {
 	<script nonce={ templ.GetNonce(ctx) }>
 		(() => {
 			const sw = document.getElementById("align-item-switch");
-			const content = document.getElementById("align-item-select");
-			if (!sw || !content) return;
+			if (!sw) return;
 			sw.addEventListener("change", () => {
+				// Looked up on toggle: the content is portaled to <body> at init.
+				const content = document.getElementById("align-item-select");
+				if (!content) return;
 				content.setAttribute("data-tui-select-position", sw.checked ? "item-aligned" : "popper");
 			});
 		})();

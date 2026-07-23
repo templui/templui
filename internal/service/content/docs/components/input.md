@@ -43,7 +43,7 @@ Use the `Disabled` prop to disable the input. To style the disabled state, set `
 
 ## Invalid
 
-Use the `Invalid` prop to mark the input as invalid. To style the invalid state, set `Invalid` on the `field.Field` component.
+Use `aria-invalid` to mark the input as invalid. To style the invalid state, set `Invalid` on the `field.Field` component.
 
 <ComponentPreview name="input-invalid" previewClassName="*:max-w-xs" />
 
@@ -111,6 +111,5 @@ The `Input` component displays a native input element.
 | `Readonly`    | `bool`                                                                      | `false`    |
 | `Required`    | `bool`                                                                      | `false`    |
 | `FileAccept`  | `string`                                                                    | -          |
-| `Invalid`    | `bool`                                                                      | `false`    |
 | `Form`        | `string`                                                                    | -          |
 | `Class`       | `string`                                                                    | -          |

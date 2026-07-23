@@ -1,0 +1,130 @@
+package radiogroup
+
+import (
+	"context"
+
+	"github.com/templui/templui/utils"
+)
+
+type ctxKey string
+
+const stateKey ctxKey = "radioGroupState"
+
+type ctxState struct {
+	name     string
+	value    string
+	disabled bool
+}
+
+func state(ctx context.Context) ctxState {
+	if s, ok := ctx.Value(stateKey).(ctxState); ok {
+		return s
+	}
+	return ctxState{}
+}
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Name is shared by all items in the group; a random name is generated
+	// when empty so the radios stay mutually exclusive.
+	Name string
+	// Value preselects the item with this value.
+	Value    string
+	Disabled bool
+}
+
+type ItemProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Name       string
+	Value      string
+	Form       string
+	Disabled   bool
+	Checked    bool
+}
+
+// Group is the pendant of shadcn's RadioGroup: it shares the name and the
+// selected value with the items (via ctx).
+templ RadioGroup(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Name == "" {
+		{{ p.Name = utils.RandomID() }}
+	}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{name: p.Name, value: p.Value, disabled: p.Disabled}) }}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="radio-group"
+		role="radiogroup"
+		class={ utils.TwMerge("grid w-full gap-2", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+// Radio is the pendant of shadcn's RadioGroupItem: the root carries the
+// visuals and state pendants, a hidden native radio inside provides state,
+// forms and the extended hit area, and the indicator is a real element.
+templ Item(props ...ItemProps) {
+	{{ var p ItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{
+		s := state(ctx)
+		if p.Name == "" {
+			p.Name = s.name
+		}
+		checked := p.Checked || (s.value != "" && s.value == p.Value)
+		disabled := p.Disabled || s.disabled
+	}}
+	<div
+		data-slot="radio-group-item"
+		class={
+			utils.TwMerge(
+				"group/radio-group-item peer relative flex aspect-square size-4 shrink-0 rounded-full border border-input outline-none dark:bg-input/30",
+				// data-checked / focus / invalid pendants of the Base UI state
+				// attributes, driven by the hidden native radio.
+				"has-[:checked]:border-primary has-[:checked]:bg-primary has-[:checked]:text-primary-foreground dark:has-[:checked]:bg-primary",
+				"has-[:focus-visible]:border-ring has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
+				"has-[[aria-invalid=true]]:border-destructive has-[[aria-invalid=true]]:ring-3 has-[[aria-invalid=true]]:ring-destructive/20 dark:has-[[aria-invalid=true]]:border-destructive/50 dark:has-[[aria-invalid=true]]:ring-destructive/40 has-[[aria-invalid=true]:checked]:border-primary",
+				// cursor-not-allowed is inert on shadcn's live site, only the
+				// opacity pendant is active.
+				"has-[:disabled]:opacity-50",
+				p.Class,
+			),
+		}
+	>
+		<input
+			if p.ID != "" {
+				id={ p.ID }
+			}
+			data-slot="radio"
+			type="radio"
+			if p.Name != "" {
+				name={ p.Name }
+			}
+			if p.Value != "" {
+				value={ p.Value }
+			}
+			if p.Form != "" {
+				form={ p.Form }
+			}
+			checked?={ checked }
+			disabled?={ disabled }
+			class="peer absolute -inset-x-3 -inset-y-2 size-auto cursor-default appearance-none outline-none"
+			{ p.Attributes... }
+		/>
+		<span data-slot="radio-group-indicator" class="hidden size-4 items-center justify-center peer-checked:flex">
+			<span class="absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-foreground"></span>
+		</span>
+	</div>
+}

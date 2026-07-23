@@ -314,10 +314,10 @@ templ Sidebar(props ...Props) {
 		}
 		<!-- Mobile: the sidebar content moves into this sheet below md -->
 		@sheet.Sheet(sheet.Props{
-			ID:   p.ID + "-mobile",
-			Side: sheetSide,
+			ID: p.ID + "-mobile",
 		}) {
 			@sheet.Content(sheet.ContentProps{
+				Side:            sheetSide,
 				Class:           "w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground md:hidden",
 				HideCloseButton: true,
 				Attributes: templ.Attributes{

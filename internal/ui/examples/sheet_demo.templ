@@ -7,7 +7,7 @@ import (
 	"github.com/templui/templui/components/sheet"
 )
 
-templ SheetDefault() {
+templ SheetDemo() {
 	@sheet.Sheet() {
 		@button.Button(button.Props{
 			Variant:    button.VariantOutline,
@@ -26,34 +26,20 @@ templ SheetDefault() {
 			}
 			<div class="grid flex-1 auto-rows-min gap-6 px-4">
 				<div class="grid gap-3">
-					@label.Label(label.Props{
-						For: "sheet-demo-name",
-					}) {
+					@label.Label(label.Props{For: "sheet-demo-name"}) {
 						Name
 					}
-					@input.Input(input.Props{
-						ID:    "sheet-demo-name",
-						Type:  input.TypeText,
-						Value: "Axel Adrian",
-					})
+					@input.Input(input.Props{ID: "sheet-demo-name", Value: "Axel Adrian"})
 				</div>
 				<div class="grid gap-3">
-					@label.Label(label.Props{
-						For: "sheet-demo-username",
-					}) {
+					@label.Label(label.Props{For: "sheet-demo-username"}) {
 						Username
 					}
-					@input.Input(input.Props{
-						ID:    "sheet-demo-username",
-						Type:  input.TypeText,
-						Value: "@axadrn",
-					})
+					@input.Input(input.Props{ID: "sheet-demo-username", Value: "@axadrn"})
 				</div>
 			</div>
 			@sheet.Footer() {
-				@button.Button(button.Props{
-					Type: "submit",
-				}) {
+				@button.Button(button.Props{Type: button.TypeSubmit}) {
 					Save changes
 				}
 				@button.Button(button.Props{

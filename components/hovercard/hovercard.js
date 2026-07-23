@@ -156,6 +156,53 @@ import "../floatingui/floating_ui_dom.js";
     if (e.key === "Escape") allContents().forEach(close);
   });
 
+  // Lift SSR'd contents out of their inert <template> wrappers into <body>,
+  // replacing a stale portaled copy on re-swaps (e.g. htmx).
+  function liftTemplates() {
+    document.querySelectorAll("template[data-tui-hovercard-portal]").forEach((tpl) => {
+      const content = tpl.content.querySelector("[data-tui-hovercard-content]");
+      if (content) {
+        const stale = document.getElementById(content.id);
+        if (stale) stale.remove();
+        document.body.appendChild(content);
+      }
+      tpl.remove();
+    });
+  }
+
+  // Portal all contents up front (React portals on mount too). Runs on load
+  // and whenever new cards appear in the DOM.
+  function initCards() {
+    liftTemplates();
+    allContents().forEach((content) => {
+      if (triggerFor(content)) portal(content);
+    });
+  }
+
+  let initQueued = false;
+  function queueInit() {
+    if (initQueued) return;
+    initQueued = true;
+    requestAnimationFrame(() => {
+      initQueued = false;
+      initCards();
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initCards);
+  } else {
+    initCards();
+  }
+  new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.addedNodes.length) {
+        queueInit();
+        break;
+      }
+    }
+  }).observe(document.documentElement, { childList: true, subtree: true });
+
   // Keep open cards anchored while scrolling or resizing.
   function repositionOpen() {
     allContents().forEach((content) => {

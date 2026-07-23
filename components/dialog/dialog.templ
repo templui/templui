@@ -16,7 +16,6 @@ type ctxState struct {
 	id               string
 	open             bool
 	disableClickAway bool
-	disableESC       bool
 }
 
 func state(ctx context.Context) ctxState {
@@ -32,8 +31,6 @@ type Props struct {
 	Open bool
 	// DisableClickAway keeps the dialog open when clicking the backdrop.
 	DisableClickAway bool
-	// DisableESC keeps the dialog open when pressing Escape.
-	DisableESC bool
 }
 
 type ContentProps struct {
@@ -77,7 +74,7 @@ templ Dialog(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: p.Open, disableClickAway: p.DisableClickAway, disableESC: p.DisableESC}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: p.Open, disableClickAway: p.DisableClickAway}) }}
 	{ children... }
 }
 
@@ -116,6 +113,9 @@ templ Content(props ...ContentProps) {
 		{{ p = props[0] }}
 	}
 	{{ s := state(ctx) }}
+	// Inert until the script portals it to <body> at init, so the SSRd
+	// content never participates in layout or sibling CSS.
+	<template data-tui-dialog-portal>
 	<dialog
 		id={ s.id }
 		data-tui-dialog-content
@@ -124,9 +124,6 @@ templ Content(props ...ContentProps) {
 		data-tui-dialog-show-modal={ utils.IfElse(!p.DisableModal, "true", "false") }
 		if s.disableClickAway {
 			data-tui-dialog-disable-click-away="true"
-		}
-		if s.disableESC {
-			data-tui-dialog-disable-esc="true"
 		}
 		class={
 			utils.TwMerge(
@@ -155,6 +152,7 @@ templ Content(props ...ContentProps) {
 			}
 		}
 	</dialog>
+	</template>
 }
 
 templ Header(props ...HeaderProps) {

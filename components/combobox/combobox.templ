@@ -69,8 +69,6 @@ type InputProps struct {
 	Attributes templ.Attributes
 	// Placeholder is shown while no item is selected.
 	Placeholder string
-	// Invalid marks the input aria-invalid for error styling.
-	Invalid bool
 	// HideTrigger hides the chevron button.
 	HideTrigger bool
 	// ShowClear renders a clear button while a value is selected.
@@ -160,8 +158,6 @@ type ChipsInputProps struct {
 	Attributes templ.Attributes
 	// Placeholder is shown while the chips input is empty.
 	Placeholder string
-	// Invalid marks the chips input aria-invalid for error styling.
-	Invalid bool
 }
 
 // Combobox renders no element: it only carries the id, name and selection that
@@ -241,9 +237,6 @@ templ Input(props ...InputProps) {
 				"aria-autocomplete":       "list",
 				"autocomplete":            "off",
 			}
-			if p.Invalid {
-				attrs["aria-invalid"] = "true"
-			}
 			for k, v := range p.Attributes {
 				attrs[k] = v
 			}
@@ -303,6 +296,9 @@ templ Content(props ...ContentProps) {
 		{{ p.SideOffset = 6 }}
 	}
 	{{ s := state(ctx) }}
+	// Inert until the script portals it to <body> at init, so the SSRd
+	// content never participates in layout or sibling CSS.
+	<template data-tui-combobox-portal>
 	<div
 		id={ s.id }
 		data-tui-combobox-content
@@ -339,6 +335,7 @@ templ Content(props ...ContentProps) {
 			{ children... }
 		</div>
 	</div>
+	</template>
 }
 
 templ List(props ...ListProps) {
@@ -545,9 +542,6 @@ templ ChipsInput(props ...ChipsInputProps) {
 		autocomplete="off"
 		if p.Placeholder != "" {
 			placeholder={ p.Placeholder }
-		}
-		if p.Invalid {
-			aria-invalid="true"
 		}
 		disabled?={ s.disabled }
 		class={ utils.TwMerge("min-w-16 flex-1 outline-none", p.Class) }

@@ -1,6 +1,7 @@
 package sheet
 
 import (
+	"github.com/templui/templui/components/dialog"
 	"context"
 
 	"github.com/templui/templui/components/button"
@@ -23,10 +24,8 @@ const (
 
 type ctxState struct {
 	id               string
-	side             Side
 	open             bool
 	disableClickAway bool
-	disableESC       bool
 }
 
 func state(ctx context.Context) ctxState {
@@ -38,19 +37,17 @@ func state(ctx context.Context) ctxState {
 
 type Props struct {
 	ID string
-	// Side the sheet slides in from. Defaults to right.
-	Side Side
 	// Open renders the sheet already open on page load.
 	Open bool
 	// DisableClickAway keeps the sheet open when clicking the backdrop.
 	DisableClickAway bool
-	// DisableESC keeps the sheet open when pressing Escape.
-	DisableESC bool
 }
 
 type ContentProps struct {
-	Class           string
-	Attributes      templ.Attributes
+	Class      string
+	Attributes templ.Attributes
+	// Side of the screen the sheet slides in from. Defaults to right.
+	Side            Side
 	HideCloseButton bool
 }
 
@@ -89,10 +86,7 @@ templ Sheet(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	if p.Side == "" {
-		{{ p.Side = SideRight }}
-	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, side: p.Side, open: p.Open, disableClickAway: p.DisableClickAway, disableESC: p.DisableESC}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: p.Open, disableClickAway: p.DisableClickAway}) }}
 	{ children... }
 }
 
@@ -130,19 +124,22 @@ templ Content(props ...ContentProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	if p.Side == "" {
+		{{ p.Side = SideRight }}
+	}
 	{{ s := state(ctx) }}
+	// Inert until the script portals it to <body> at init, so the SSRd
+	// content never participates in layout or sibling CSS.
+	<template data-tui-dialog-portal>
 	<dialog
 		id={ s.id }
 		data-tui-dialog-content
-		data-side={ string(s.side) }
+		data-side={ string(p.Side) }
 		data-tui-dialog-open={ utils.IfElse(s.open, "true", "false") }
 		data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
 		data-tui-dialog-show-modal="true"
 		if s.disableClickAway {
 			data-tui-dialog-disable-click-away="true"
-		}
-		if s.disableESC {
-			data-tui-dialog-disable-esc="true"
 		}
 		class={
 			utils.TwMerge(
@@ -177,6 +174,7 @@ templ Content(props ...ContentProps) {
 			}
 		}
 	</dialog>
+	</template>
 }
 
 templ Header(props ...HeaderProps) {
@@ -247,11 +245,9 @@ templ Description(props ...DescriptionProps) {
 	</div>
 }
 
-var scriptOnce = templ.NewOnceHandle()
-
 // Script loads the dialog script: sheets are dialogs with side styling.
+// Delegating to dialog.Script shares its once-handle, so a page rendering
+// both never emits the script twice.
 templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("dialog")
-	}
+	@dialog.Script()
 }

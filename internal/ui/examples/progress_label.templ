@@ -1,0 +1,12 @@
+package examples
+
+import "github.com/templui/templui/components/progress"
+
+templ ProgressWithLabel() {
+	@progress.Progress(progress.Props{Value: 56, Class: "w-full max-w-sm"}) {
+		@progress.Label() {
+			Upload progress
+		}
+		@progress.Value()
+	}
+}

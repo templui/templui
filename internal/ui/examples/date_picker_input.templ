@@ -54,13 +54,15 @@ templ DatePickerInput() {
 	}
 	<script>
 		(() => {
-			const content = document.getElementById("date-picker-input");
 			const input = document.getElementById("date-picker-input-field");
 			const fmt = (d) => d.toLocaleDateString("en-US", { day: "2-digit", month: "long", year: "numeric" });
-			content.addEventListener("calendar-change", (e) => {
+			// Delegated: the popover content is portaled to <body> at init, so it
+			// is looked up per event instead of captured at parse time.
+			document.addEventListener("calendar-change", (e) => {
+				if (!(e.target instanceof Element) || !e.target.closest("#date-picker-input")) return;
 				if (!e.detail.value) return;
 				input.value = fmt(e.detail.value);
-				window.tui.popover.close(content);
+				window.tui.popover.close(e.target.closest("#date-picker-input"));
 			});
 			input.addEventListener("input", () => {
 				const date = new Date(input.value);
@@ -74,7 +76,7 @@ templ DatePickerInput() {
 			input.addEventListener("keydown", (e) => {
 				if (e.key === "ArrowDown") {
 					e.preventDefault();
-					window.tui.popover.open(content);
+					window.tui.popover.open(document.getElementById("date-picker-input"));
 				}
 			});
 		})();

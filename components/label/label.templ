@@ -7,7 +7,6 @@ type Props struct {
 	Class      string
 	Attributes templ.Attributes
 	For        string
-	Error      string
 }
 
 templ Label(props ...Props) {
@@ -22,24 +21,15 @@ templ Label(props ...Props) {
 		if p.For != "" {
 			for={ p.For }
 		}
+		data-slot="label"
 		class={
 			utils.TwMerge(
 				"flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-				utils.If(len(p.Error) > 0, "text-destructive"),
 				p.Class,
 			),
 		}
-		data-tui-label-disabled-style="opacity-50 cursor-not-allowed"
 		{ p.Attributes... }
 	>
 		{ children... }
 	</label>
-}
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("label")
-	}
 }

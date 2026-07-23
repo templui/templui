@@ -240,7 +240,22 @@ import "../floatingui/floating_ui_dom.js";
   // Portal all contents up front (React portals on mount too): popovers must
   // not sit inside layout groups where hidden siblings break :last-child
   // rules. Runs on load and whenever new popovers appear in the DOM.
+  // Lift SSR'd contents out of their inert <template> wrappers into <body>,
+  // replacing a stale portaled copy on re-swaps (e.g. htmx).
+  function liftTemplates() {
+    document.querySelectorAll("template[data-tui-popover-portal]").forEach((tpl) => {
+      const content = tpl.content.querySelector("[data-tui-popover-content]");
+      if (content) {
+        const stale = document.getElementById(content.id);
+        if (stale) stale.remove();
+        document.body.appendChild(content);
+      }
+      tpl.remove();
+    });
+  }
+
   function portalAll() {
+    liftTemplates();
     allContents().forEach((content) => {
       if (triggerFor(content)) portal(content);
     });

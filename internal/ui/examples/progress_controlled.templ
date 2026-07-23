@@ -1,0 +1,31 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/progress"
+	"github.com/templui/templui/components/slider"
+)
+
+// The vanilla pendant of the demo's React state: the slider drives the bar.
+templ ProgressControlled() {
+	<div class="flex w-full max-w-sm flex-col gap-4" data-progress-controlled-demo>
+		@progress.Progress(progress.Props{
+			ID:    "progress-controlled",
+			Value: 50,
+			Class: "w-full",
+		})
+		@slider.Slider(slider.Props{
+			Values: []float64{50},
+			Min:    0,
+			Max:    100,
+			Step:   1,
+		})
+	</div>
+	<script nonce={ templ.GetNonce(ctx) }>
+		(() => {
+			const demo = document.querySelector("[data-progress-controlled-demo]");
+			demo.addEventListener("slider-change", (e) => {
+				document.getElementById("progress-controlled").setAttribute("aria-valuenow", String(e.detail.values[0]));
+			});
+		})();
+	</script>
+}

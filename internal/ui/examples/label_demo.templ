@@ -1,0 +1,15 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/checkbox"
+	"github.com/templui/templui/components/label"
+)
+
+templ LabelDemo() {
+	<div class="flex gap-2">
+		@checkbox.Checkbox(checkbox.Props{ID: "terms"})
+		@label.Label(label.Props{For: "terms"}) {
+			Accept terms and conditions
+		}
+	</div>
+}

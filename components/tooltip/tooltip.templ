@@ -78,9 +78,12 @@ templ Content(props ...ContentProps) {
 	if p.SideOffset == 0 {
 		{{ p.SideOffset = 4 }}
 	}
-	<div
-		id={ tooltipID(ctx) }
-		data-slot="tooltip-content"
+	// Inert until the script portals it to <body>: inline it would count as a
+	// layout sibling (e.g. button group's last-child rounding).
+	<template data-tui-tooltip-portal>
+		<div
+			id={ tooltipID(ctx) }
+			data-slot="tooltip-content"
 		data-tui-tooltip-content
 		data-tui-tooltip-side={ string(p.Side) }
 		data-tui-tooltip-side-offset={ strconv.Itoa(p.SideOffset) }
@@ -100,7 +103,8 @@ templ Content(props ...ContentProps) {
 			data-tui-tooltip-arrow
 			class="absolute z-50 size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-[2px] bg-foreground data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1 data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1 data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5"
 		></span>
-	</div>
+		</div>
+	</template>
 }
 
 var scriptOnce = templ.NewOnceHandle()

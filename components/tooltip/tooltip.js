@@ -152,6 +152,32 @@ import "../floatingui/floating_ui_dom.js";
     if (e.key === "Escape") closeAll();
   });
 
+  // Lift every content out of its inert <template> into <body>, shadcn's
+  // portal renders it there from the start.
+  function portalAll() {
+    document
+      .querySelectorAll("template[data-tui-tooltip-portal]")
+      .forEach((tpl) => {
+        const content = tpl.content.querySelector("[data-tui-tooltip-content]");
+        if (content) {
+          const stale = document.getElementById(content.id);
+          if (stale) stale.remove(); // htmx re-swap of the same id
+          portal(content);
+        }
+        tpl.remove();
+      });
+    allContents().forEach(portal);
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", portalAll);
+  } else {
+    portalAll();
+  }
+  new MutationObserver(portalAll).observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+  });
+
   // Keep open tooltips anchored while scrolling or resizing.
   function repositionOpen() {
     allContents().forEach((content) => {

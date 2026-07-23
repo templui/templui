@@ -90,7 +90,7 @@ Use the `Value` prop and the hidden input's `change` event to control the input 
 
 ## Invalid
 
-Use `Invalid` on the slots to show an error state.
+Use `aria-invalid` on the slots to show an error state.
 
 <ComponentPreview name="input-otp-invalid" />
 
@@ -123,7 +123,6 @@ The `InputOTP` component is the root that manages the slots and submits the comb
 | `Form`     | `string` | -       |
 | `Pattern`  | `string` | -       |
 | `Disabled` | `bool`   | `false` |
-| `Invalid` | `bool`   | `false` |
 | `Class`    | `string` | -       |
 
 ### Group
@@ -143,7 +142,6 @@ The `inputotp.Slot` component is a single character cell.
 | `Index`       | `int`    | -       |
 | `Placeholder` | `string` | -       |
 | `Disabled`    | `bool`   | `false` |
-| `Invalid`    | `bool`   | `false` |
 | `Class`       | `string` | -       |
 
 ### Separator
