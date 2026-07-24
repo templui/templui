@@ -52,7 +52,9 @@ templ chartToolbar(entry ChartEntry) {
 			@chartCopyButton(entry.ID, "[&_svg]:h-3 h-6 w-6 rounded-[6px] bg-transparent text-foreground shadow-none hover:bg-muted dark:text-foreground [&_svg]:w-3")
 			@separator.Separator(separator.Props{
 				Orientation: separator.OrientationVertical,
-				Class:       "mx-0 hidden h-4! md:flex",
+				// self-center neutralizes the base self-stretch, the fixed
+				// h-4 would otherwise pin the line to the flex start.
+				Class:       "mx-0 hidden h-4! self-center! md:flex",
 			})
 			@chartCodeViewer(entry)
 		</div>
@@ -135,7 +137,9 @@ templ chartCodeViewer(entry ChartEntry) {
 			// slide-in from the right (500ms in, 300ms out), no fade. The
 			// important markers beat the base sheet's transition styles
 			// and its data-[side=right]:sm:max-w-sm width.
-			Class: "flex flex-col gap-0 border-l-0 p-0 sm:max-w-sm! md:w-[700px]! md:max-w-[700px]! dark:border-l bg-background ease-in-out transition-none data-[tui-dialog-open=false]:translate-x-0! data-[tui-dialog-open=false]:opacity-100! data-[tui-dialog-open=true]:animate-in data-[tui-dialog-open=true]:slide-in-from-right data-[tui-dialog-open=true]:duration-500 data-[tui-dialog-open=false]:animate-out data-[tui-dialog-open=false]:slide-out-to-right data-[tui-dialog-open=false]:duration-300 data-[tui-dialog-open=false]:fill-mode-forwards",
+			// Below md the viewer comes up from the bottom like shadcn's
+			// Drawer variant, from md on it is the right side sheet.
+			Class: "flex flex-col gap-0 border-l-0 p-0 sm:max-w-sm! md:w-[700px]! md:max-w-[700px]! dark:border-l bg-background ease-in-out transition-none data-[tui-dialog-open=false]:translate-x-0! data-[tui-dialog-open=false]:translate-y-0! data-[tui-dialog-open=false]:opacity-100! data-[tui-dialog-open=true]:animate-in data-[tui-dialog-open=false]:animate-out data-[tui-dialog-open=false]:fill-mode-forwards data-[tui-dialog-open=true]:duration-500 data-[tui-dialog-open=false]:duration-300 max-md:inset-x-0! max-md:bottom-0! max-md:top-auto! max-md:h-auto! max-md:max-h-[80vh]! max-md:w-full! max-md:max-w-none! max-md:rounded-t-2xl max-md:border-t max-md:border-l-0 max-md:data-[tui-dialog-open=true]:slide-in-from-bottom max-md:data-[tui-dialog-open=false]:slide-out-to-bottom md:data-[tui-dialog-open=true]:slide-in-from-right md:data-[tui-dialog-open=false]:slide-out-to-right",
 		}) {
 			<div class="sr-only">
 				@sheet.Title() {

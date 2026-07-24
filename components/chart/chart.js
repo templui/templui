@@ -53,6 +53,25 @@ function linearY(v, dmax, top, height) {
   return top + height - (v / dmax) * height;
 }
 
+/* domainOf computes a model's nice y domain (stacked aware). */
+function domainOf(m) {
+  let max = 0;
+  const n = m.series[0].values.length;
+  if (m.stacked) {
+    for (let i = 0; i < n; i++) {
+      let sum = 0;
+      for (const s of m.series) sum += s.values[i];
+      if (sum > max) max = sum;
+    }
+  } else {
+    for (const s of m.series) {
+      for (const v of s.values) if (v > max) max = v;
+    }
+  }
+  const ticks = niceTicks(max, 5);
+  return ticks[ticks.length - 1];
+}
+
 function barGeometry(band, categoryGap) {
   const offset = categoryGap * band;
   let size = band - 2 * offset;
@@ -160,6 +179,50 @@ function preserveEndTicks(coords, labels, viewEnd, minTickGap, refEl) {
 
 let uid = 0;
 
+/* swapSVG applies a newly built SVG to the panel. While the structure is
+ * unchanged (animation frames) it only syncs attributes and text in
+ * place, like React's reconciliation in Recharts, so frames never churn
+ * DOM nodes. */
+function swapSVG(panel, svgString) {
+  const old = panel.querySelector("svg");
+  if (!old) {
+    panel.insertAdjacentHTML("beforeend", svgString);
+    return;
+  }
+  // Hover overlays (cursor band, active dots) are transient additions,
+  // drop them before comparing so animation frames keep the fast path.
+  old.querySelectorAll(".recharts-tooltip-cursor").forEach((c) => c.parentElement.remove());
+  old.querySelectorAll(".recharts-active-dots").forEach((d) => d.remove());
+  const tpl = document.createElement("template");
+  tpl.innerHTML = svgString;
+  const next = tpl.content.firstElementChild;
+  const a = old.querySelectorAll("*");
+  const b = next.querySelectorAll("*");
+  if (a.length !== b.length) {
+    old.replaceWith(next);
+    return;
+  }
+  syncAttrs(old, next);
+  for (let i = 0; i < a.length; i++) {
+    if (a[i].tagName !== b[i].tagName) {
+      old.replaceWith(next);
+      return;
+    }
+    syncAttrs(a[i], b[i]);
+    if (b[i].childElementCount === 0 && a[i].textContent !== b[i].textContent) {
+      a[i].textContent = b[i].textContent;
+    }
+  }
+}
+
+function syncAttrs(el, src) {
+  for (const attr of src.attributes) {
+    if (el.getAttribute(attr.name) !== attr.value) {
+      el.setAttribute(attr.name, attr.value);
+    }
+  }
+}
+
 /* CSS 'ease' (cubic-bezier(0.25, 0.1, 0.25, 1)), Recharts' default
  * animation easing. */
 function cssEase(t) {
@@ -189,12 +252,71 @@ function animateChart(panel, m, state, render) {
   }
   const duration = m.kind === "bar" ? 400 : 1500;
   const start = performance.now();
+  let started = false;
   const frame = (now) => {
+    started = true;
     const alpha = cssEase(Math.min(1, (now - start) / duration));
     render(alpha);
     if (alpha < 1) requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
+  // Occluded windows freeze rAF entirely, settle on the final frame then.
+  // A running animation is never raced, it finishes on its own.
+  setTimeout(() => {
+    if (!started) render(1);
+  }, duration + 200);
+}
+
+/* The Recharts update animation: on data changes the chart interpolates
+ * every series value from the previous state to the new one (react-smooth
+ * prop interpolation), domain included. */
+function morphChart(panel, m, state, render, prev) {
+  if (reducedMotion.matches) {
+    render(1);
+    return;
+  }
+  const duration = m.kind === "bar" ? 400 : 1500;
+  const start = performance.now();
+  let started = false;
+  // When the point count changes the previous curve is resampled onto the
+  // new x positions, so the old shape transforms into the new one.
+  const resample = (vals, len) => {
+    if (vals.length === len) return vals;
+    const out = new Array(len);
+    for (let i = 0; i < len; i++) {
+      const pos = len === 1 ? 0 : (i / (len - 1)) * (vals.length - 1);
+      const lo = Math.floor(pos);
+      const hi = Math.min(vals.length - 1, lo + 1);
+      out[i] = vals[lo] + (vals[hi] - vals[lo]) * (pos - lo);
+    }
+    return out;
+  };
+  // Pixel-space interpolation on the final scale: the old values are
+  // rescaled into the new domain, so mid-frames never re-quantize the
+  // axis and the chart never re-scales at the end.
+  const dNew = domainOf(m);
+  const dOld = m.kind === "pie" ? 1 : domainOf(prev);
+  const scale = m.kind === "pie" ? 1 : dNew / dOld;
+  const from = m.series.map((s, si) => resample(prev.series[si].values, s.values.length).map((v) => v * scale));
+  const mix = (f) => ({
+    ...m,
+    domainMax: dNew,
+    series: m.series.map((s, si) => ({
+      ...s,
+      values: s.values.map((v, i) => from[si][i] + (v - from[si][i]) * f),
+    })),
+  });
+  const frame = (now) => {
+    started = true;
+    const f = cssEase(Math.min(1, (now - start) / duration));
+    if (m.kind === "pie") renderPie(panel, mix(f), state, 1);
+    else renderCartesian(panel, mix(f), state, 1);
+    if (f < 1) requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+  setTimeout(() => {
+    if (!started) render(1);
+  }, duration + 200);
 }
 
 function renderCartesian(panel, m, state, alpha = 1) {
@@ -209,22 +331,14 @@ function renderCartesian(panel, m, state, alpha = 1) {
   const plotBottom = plotY + plotH;
   const n = m.labels.length;
 
-  let max = 0;
-  if (m.stacked) {
-    for (let i = 0; i < n; i++) {
-      let sum = 0;
-      for (const s of m.series) sum += s.values[i];
-      if (sum > max) max = sum;
-    }
-  } else {
-    for (const s of m.series) {
-      for (const v of s.values) if (v > max) max = v;
-    }
-  }
-  const ticks = niceTicks(max, 5);
-  const domainMax = ticks[ticks.length - 1];
+  // During a morph the scale is pinned to the target domain like
+  // Recharts, which interpolates pixel positions on the new scale.
+  const domainMax = m.domainMax || domainOf(m);
+  const ticks = [0, 1, 2, 3, 4].map((i) => (domainMax * i) / 4);
 
-  let svg = `<svg class="recharts-surface" width="100%" height="100%" viewBox="0 0 ${fmtF(W)} ${fmtF(H)}" style="width:100%;height:100%">`;
+  // Explicit pixel size like Recharts' Surface: the svg never stretches
+  // between resize frames, every frame lays out fresh.
+  let svg = `<svg class="recharts-surface" width="${fmtF(W)}" height="${fmtF(H)}" viewBox="0 0 ${fmtF(W)} ${fmtF(H)}">`;
 
   if (m.gradient) {
     svg += "<defs>";
@@ -261,6 +375,11 @@ function renderCartesian(panel, m, state, alpha = 1) {
     for (let i = 0; i < n; i++) xs.push(plotX + i * band + band / 2);
   } else {
     for (let i = 0; i < n; i++) xs.push(plotX + (i * plotW) / (n - 1));
+    // Recharts' entrance animation reveals areas left to right through a
+    // clipPath rect (AreaRevealShape).
+    svg +=
+      `<defs><clipPath id="${state.uid}-reveal"><rect x="${fmtF(xs[0] - 1)}" y="0" width="${fmtF((xs[n - 1] - xs[0] + 2) * alpha)}" height="${fmtF(plotBottom + 2)}"/></clipPath></defs>` +
+      `<g clip-path="url(#${state.uid}-reveal)">`;
     const baseline = new Array(n).fill(plotBottom);
     let base = baseline;
     state.tops = [];
@@ -279,6 +398,7 @@ function renderCartesian(panel, m, state, alpha = 1) {
       state.tops.push(top);
       if (m.stacked) base = top;
     }
+    svg += "</g>";
   }
 
   svg += `<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis"><g class="recharts-cartesian-axis-ticks">`;
@@ -290,14 +410,78 @@ function renderCartesian(panel, m, state, alpha = 1) {
   }
   svg += "</g></g></svg>";
 
-  const old = panel.querySelector("svg");
-  if (old) {
-    old.outerHTML = svg;
-  } else {
-    panel.insertAdjacentHTML("beforeend", svg);
-  }
+  swapSVG(panel, svg);
 
   state.geom = { W, H, plotX, plotY, plotW, plotH, plotBottom, band, xs, n };
+}
+
+/* Pie sector path, the port of the Go SectorPath (degrees, 0 at three
+ * o'clock, counterclockwise positive). */
+function sectorPath(cx, cy, innerR, outerR, startAngle, endAngle) {
+  const rad = (deg) => (deg * Math.PI) / 180;
+  const sx0 = cx + outerR * Math.cos(rad(startAngle));
+  const sy0 = cy - outerR * Math.sin(rad(startAngle));
+  const ex0 = cx + outerR * Math.cos(rad(endAngle));
+  const ey0 = cy - outerR * Math.sin(rad(endAngle));
+  const sx1 = cx + innerR * Math.cos(rad(endAngle));
+  const sy1 = cy - innerR * Math.sin(rad(endAngle));
+  const ex1 = cx + innerR * Math.cos(rad(startAngle));
+  const ey1 = cy - innerR * Math.sin(rad(startAngle));
+  const large = Math.abs(endAngle - startAngle) > 180 ? 1 : 0;
+  const sweep = endAngle > startAngle ? 0 : 1;
+  return (
+    `M ${fmtF(sx0)},${fmtF(sy0)} A ${fmtF(outerR)},${fmtF(outerR)},0,${large},${sweep},${fmtF(ex0)},${fmtF(ey0)} ` +
+    `L ${fmtF(sx1)},${fmtF(sy1)} A ${fmtF(innerR)},${fmtF(innerR)},0,${large},${1 - sweep},${fmtF(ex1)},${fmtF(ey1)} Z`
+  );
+}
+
+/* renderPie is the client pendant of the Go pieSVG: sectors from the
+ * model, the active ring and the center label. The alpha sweep is the
+ * Recharts pie entrance animation. */
+function renderPie(panel, m, state, alpha = 1) {
+  const W = panel.clientWidth;
+  const H = panel.clientHeight;
+  if (!W || !H) return;
+  const margin = 5;
+  const cx = W / 2;
+  const cy = H / 2;
+  const maxR = (Math.min(W, H) - 2 * margin) / 2;
+  const outerR = maxR * 0.8;
+  const values = m.series[0].values;
+  const total = values.reduce((a, b) => a + b, 0);
+  const strokeWidth = m.strokeWidth ? ` stroke-width="${fmtF(m.strokeWidth)}"` : "";
+
+  let svg = `<svg class="recharts-surface" width="${fmtF(W)}" height="${fmtF(H)}" viewBox="0 0 ${fmtF(W)} ${fmtF(H)}">`;
+  svg += `<g class="recharts-layer recharts-pie">`;
+  let angle = 0;
+  const visible = alpha * 360;
+  for (let i = 0; i < values.length; i++) {
+    const sweep = (values[i] / total) * 360;
+    const shown = Math.max(0, Math.min(sweep, visible - angle));
+    if (shown <= 0) break;
+    const fill = m.sliceColors[i];
+    if (i === m.activeIndex && m.activeRing) {
+      svg +=
+        `<g class="recharts-layer recharts-pie-sector">` +
+        `<path class="recharts-sector" stroke="#fff"${strokeWidth} fill="${fill}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, m.innerRadius, outerR + 10, angle, angle + shown)}"/>` +
+        `<path class="recharts-sector" stroke="#fff"${strokeWidth} fill="${fill}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, outerR + 12, outerR + 25, angle, angle + shown)}"/>` +
+        `</g>`;
+    } else {
+      svg += `<g class="recharts-layer recharts-pie-sector"><path class="recharts-sector" stroke="#fff"${strokeWidth} fill="${fill}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, m.innerRadius, outerR, angle, angle + shown)}"/></g>`;
+    }
+    angle += sweep;
+  }
+  if (m.centerValue) {
+    svg +=
+      `<text x="${fmtF(cx)}" y="${fmtF(cy)}" text-anchor="middle" dominant-baseline="middle">` +
+      `<tspan x="${fmtF(cx)}" y="${fmtF(cy)}" class="fill-foreground text-3xl font-bold">${m.centerValue}</tspan>` +
+      `<tspan x="${fmtF(cx)}" y="${fmtF(cy + 24)}" class="fill-muted-foreground">${m.centerLabel}</tspan>` +
+      `</text>`;
+  }
+  svg += "</g></svg>";
+
+  swapSVG(panel, svg);
+  state.geom = { W, H };
 }
 
 /* ---------------------------------------------------------------- */
@@ -327,9 +511,12 @@ function indicatorHTML(indicator, color) {
 
 function tooltipHTML(m, i) {
   const t = m.tooltip || {};
+  const label = (m.tooltipLabels && m.tooltipLabels[i]) || m.labels[i];
+  // Like ChartTooltipContent: a single non-dot series nests the label
+  // inside the row, so the line indicator spans the full row height.
+  const nestLabel = m.kind !== "pie" && m.series.length === 1 && t.indicator && t.indicator !== "dot";
   let html = `<div class="${TOOLTIP_CLASS}${t.width ? " " + t.width : ""}">`;
-  if (!t.hideLabel) {
-    const label = (m.tooltipLabels && m.tooltipLabels[i]) || m.labels[i];
+  if (!t.hideLabel && !nestLabel) {
     html += `<div class="font-medium">${label}</div>`;
   }
   html += `<div class="grid gap-1.5">`;
@@ -349,11 +536,12 @@ function tooltipHTML(m, i) {
     const rowCls =
       "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground" +
       (t.indicator !== "line" && t.indicator !== "dashed" ? " items-center" : "");
+    const nested = nestLabel && !t.hideLabel ? `<div class="font-medium">${label}</div>` : "";
     html +=
       `<div class="${rowCls}">` +
       indicatorHTML(t.indicator, s.color) +
-      `<div class="flex flex-1 justify-between leading-none items-center">` +
-      `<div class="grid gap-1.5"><span class="text-muted-foreground">${s.label}</span></div>` +
+      `<div class="flex flex-1 justify-between leading-none ${nestLabel ? "items-end" : "items-center"}">` +
+      `<div class="grid gap-1.5">${nested}<span class="text-muted-foreground">${s.label}</span></div>` +
       `<span class="font-mono font-medium text-foreground tabular-nums">${s.values[i].toLocaleString("en-US")}</span>` +
       `</div></div>`;
   }
@@ -437,13 +625,45 @@ function initPanel(script) {
   const m = JSON.parse(script.textContent);
   const state = { uid: "tui-chart-" + uid++ };
 
-  const render = () => {
-    if (m.kind === "pie") return;
-    renderCartesian(panel, m, state);
+  const render = (alpha = 1) => {
+    if (m.kind === "pie") renderPie(panel, m, state, alpha);
+    else renderCartesian(panel, m, state, alpha);
   };
-  if (panel.clientWidth) render();
 
-  const ro = new ResizeObserver(() => render());
+  // On mount the entrance animation plays. When a hidden panel becomes
+  // visible (range/series/month switches) Recharts morphs from the old
+  // to the new values instead, so we interpolate from the previously
+  // visible panel's model when the shapes line up. Plain resizes
+  // re-render without animating.
+  const enter = () => {
+    const prev = container._tuiActive;
+    container._tuiActive = m;
+    if (prev && prev !== m && prev.kind === m.kind && prev.series.length === m.series.length) {
+      morphChart(panel, m, state, render, prev);
+    } else {
+      animateChart(panel, m, state, render);
+    }
+  };
+  if (panel.clientWidth) {
+    state.mounted = true;
+    enter();
+  }
+  const ro = new ResizeObserver(() => {
+    const w = panel.clientWidth;
+    if (!w) {
+      state.mounted = false;
+      return;
+    }
+    if (!state.mounted) {
+      state.mounted = true;
+      enter();
+    } else if (!state.geom || w !== state.geom.W) {
+      // Real container resizes re-render statically. state.geom.W is
+      // updated on every animation frame, so a late observer callback
+      // never stomps into a running animation.
+      render(1);
+    }
+  });
   ro.observe(panel);
 
   const wrapper = tooltipWrapper(container);
