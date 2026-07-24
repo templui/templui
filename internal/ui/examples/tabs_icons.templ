@@ -1,0 +1,21 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/tabs"
+)
+
+templ TabsIcons() {
+	@tabs.Tabs(tabs.Props{DefaultValue: "preview"}) {
+		@tabs.List() {
+			@tabs.Trigger(tabs.TriggerProps{Value: "preview"}) {
+				@icon.AppWindow()
+				Preview
+			}
+			@tabs.Trigger(tabs.TriggerProps{Value: "code"}) {
+				@icon.Code()
+				Code
+			}
+		}
+	}
+}

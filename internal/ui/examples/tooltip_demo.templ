@@ -5,7 +5,7 @@ import (
 	"github.com/templui/templui/components/tooltip"
 )
 
-templ TooltipDefault() {
+templ TooltipDemo() {
 	@tooltip.Tooltip() {
 		@button.Button(button.Props{
 			Variant:    button.VariantOutline,
@@ -14,7 +14,7 @@ templ TooltipDefault() {
 			Hover
 		}
 		@tooltip.Content() {
-			Add to library
+			<p>Add to library</p>
 		}
 	}
 }

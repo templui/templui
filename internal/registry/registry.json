@@ -1030,7 +1030,7 @@
       "name": "toast",
       "slug": "toast",
       "displayName": "Toast",
-      "description": "Toast notification component.",
+      "description": "A succinct message that is displayed temporarily.",
       "files": [
         "components/toast/toast.templ"
       ],

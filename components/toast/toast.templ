@@ -3,151 +3,101 @@ package toast
 import (
 	"strconv"
 
-	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/utils"
 )
 
-type Variant string
+// Type mirrors the toast types the built-in renderer recognizes.
+type Type string
 
 const (
-	VariantDefault Variant = "default"
-	VariantSuccess Variant = "success"
-	VariantInfo    Variant = "info"
-	VariantWarning Variant = "warning"
-	VariantError   Variant = "error"
-	VariantLoading Variant = "loading"
-)
-
-type Position string
-
-const (
-	PositionTopLeft      Position = "top-left"
-	PositionTopCenter    Position = "top-center"
-	PositionTopRight     Position = "top-right"
-	PositionBottomLeft   Position = "bottom-left"
-	PositionBottomCenter Position = "bottom-center"
-	PositionBottomRight  Position = "bottom-right"
+	TypeDefault Type = ""
+	TypeSuccess Type = "success"
+	TypeInfo    Type = "info"
+	TypeWarning Type = "warning"
+	TypeError   Type = "error"
+	TypeLoading Type = "loading"
 )
 
 type ToasterProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	// Position of the stack. Defaults to bottom-right, like sonner.
-	Position Position
-	// RichColors colors success/info/warning/error toasts.
-	RichColors bool
-	// CloseButton shows a close button on every toast.
-	CloseButton bool
-	// Duration in ms before toasts auto-dismiss. Defaults to 4000.
-	Duration int
+	// Timeout in ms before a toast hides. Defaults to 5000 (Base UI).
+	Timeout int
+	// Limit of toasts shown at once. Defaults to 3 (Base UI).
+	Limit int
 }
 
 type Props struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-	Title      string
-	// Description is the secondary line below the title.
+	ID          string
+	Class       string
+	Attributes  templ.Attributes
+	Title       string
 	Description string
-	// Variant: 'default', 'success', 'info', 'warning', 'error' or 'loading'.
-	Variant Variant
-	// Duration in ms before this toast auto-dismisses. 0 uses the toaster
-	// default, -1 disables auto-dismiss.
-	Duration int
+	// Type renders a status icon: success, info, warning, error or loading.
+	Type Type
+	// Timeout in ms overrides the toaster timeout for this toast.
+	Timeout int
 }
 
-// Toaster renders the stack viewport once per page (usually in the layout).
-// Toasts land here: server-rendered via Toast (e.g. swapped in with htmx) or
-// through the JavaScript API (window.tui.toast).
+// Toaster is the pendant of shadcn's Toaster: the fixed viewport that hosts
+// the toasts, mounted once in the layout.
 templ Toaster(props ...ToasterProps) {
 	{{ var p ToasterProps }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	if p.Position == "" {
-		{{ p.Position = PositionBottomRight }}
+	if p.Timeout == 0 {
+		{{ p.Timeout = 5000 }}
 	}
-	if p.Duration == 0 {
-		{{ p.Duration = 4000 }}
+	if p.Limit == 0 {
+		{{ p.Limit = 3 }}
 	}
-	<ol
+	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		data-sonner-toaster
+		data-slot="toast-viewport"
 		data-tui-toaster
-		data-tui-toaster-position={ string(p.Position) }
-		data-tui-toaster-duration={ strconv.Itoa(p.Duration) }
-		if p.CloseButton {
-			data-tui-toaster-close-button
-		}
-		data-rich-colors?={ p.RichColors }
-		data-lifted="false"
-		dir="ltr"
-		tabindex="-1"
-		class={ utils.TwMerge("toaster group", p.Class) }
-		style="--width: 356px; --gap: 14px; --offset-top: 24px; --offset-right: 24px; --offset-bottom: 24px; --offset-left: 24px; --mobile-offset-top: 16px; --mobile-offset-right: 16px; --mobile-offset-bottom: 16px; --mobile-offset-left: 16px; --normal-bg: var(--popover); --normal-text: var(--popover-foreground); --normal-border: var(--border); --border-radius: var(--radius);"
+		data-tui-toaster-timeout={ strconv.Itoa(p.Timeout) }
+		data-tui-toaster-limit={ strconv.Itoa(p.Limit) }
+		class={ utils.TwMerge(
+			"pointer-events-none fixed inset-x-4 bottom-4 z-50 mx-auto w-auto max-w-sm outline-none sm:right-4 sm:left-auto sm:mx-0 sm:w-full",
+			p.Class,
+		) }
 		{ p.Attributes... }
-	></ol>
+	>
+		{ children... }
+	</div>
 }
 
-// Toast renders one toast. Place it inside a Toaster (htmx target) — the
-// script mounts, stacks and dismisses it exactly like sonner.
+// Toast renders a toast server side (e.g. swapped into the Toaster via
+// htmx); the script adopts it, builds the markup, stacks it and starts its
+// timer.
 templ Toast(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	if p.ID == "" {
-		{{ p.ID = utils.RandomID() }}
-	}
-	if p.Variant == "" {
-		{{ p.Variant = VariantDefault }}
-	}
-	<li
-		id={ p.ID }
-		data-sonner-toast
-		data-tui-toast
-		data-styled="true"
-		data-type={ string(p.Variant) }
-		if p.Duration != 0 {
-			data-tui-toast-duration={ strconv.Itoa(p.Duration) }
+	<div
+		if p.ID != "" {
+			id={ p.ID }
 		}
-		data-mounted="false"
-		data-removed="false"
-		data-swiping="false"
-		data-swipe-out="false"
-		data-expanded="false"
-		class={ utils.TwMerge("cn-toast rounded-2xl", p.Class) }
-		{ p.Attributes... }
-	>
-		if p.Variant != VariantDefault {
-			<div data-icon="">
-				switch p.Variant {
-					case VariantSuccess:
-						@icon.CircleCheck(icon.Props{Class: "size-4"})
-					case VariantInfo:
-						@icon.Info(icon.Props{Class: "size-4"})
-					case VariantWarning:
-						@icon.TriangleAlert(icon.Props{Class: "size-4"})
-					case VariantError:
-						@icon.OctagonX(icon.Props{Class: "size-4"})
-					case VariantLoading:
-						@icon.LoaderCircle(icon.Props{Class: "size-4 animate-spin"})
-				}
-			</div>
+		data-tui-toast-ssr
+		if p.Type != "" {
+			data-type={ string(p.Type) }
 		}
-		<div data-content="">
-			if p.Title != "" {
-				<div data-title="">{ p.Title }</div>
-			}
-			if p.Description != "" {
-				<div data-description="">{ p.Description }</div>
-			}
-		</div>
-		{ children... }
-	</li>
+		if p.Timeout > 0 {
+			data-tui-toast-timeout={ strconv.Itoa(p.Timeout) }
+		}
+		if p.Title != "" {
+			data-tui-toast-title={ p.Title }
+		}
+		if p.Description != "" {
+			data-tui-toast-description={ p.Description }
+		}
+		class={ utils.If(p.Class != "", p.Class) }
+	></div>
 }
 
 var scriptOnce = templ.NewOnceHandle()

@@ -17,10 +17,6 @@ type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	// Label is the accessible name announced to screen readers. Defaults to "Loading".
-	Label string
-	// Icon optionally overrides the spinning icon. Defaults to icon.LoaderCircle.
-	Icon func(...icon.Props) templ.Component
 }
 
 func Spinner(props ...Props) templ.Component {
@@ -48,16 +44,10 @@ func Spinner(props ...Props) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		if p.Label == "" {
-			p.Label = "Loading"
-		}
-		if p.Icon == nil {
-			p.Icon = icon.LoaderCircle
-		}
 		attrs := templ.Attributes{
 			"data-slot":  "spinner",
 			"role":       "status",
-			"aria-label": p.Label,
+			"aria-label": "Loading",
 		}
 		if p.ID != "" {
 			attrs["id"] = p.ID
@@ -65,7 +55,7 @@ func Spinner(props ...Props) templ.Component {
 		for k, v := range p.Attributes {
 			attrs[k] = v
 		}
-		templ_7745c5c3_Err = p.Icon(icon.Props{
+		templ_7745c5c3_Err = icon.LoaderCircle(icon.Props{
 			Class:      utils.TwMerge("size-4 animate-spin", p.Class),
 			Attributes: attrs,
 		}).Render(ctx, templ_7745c5c3_Buffer)

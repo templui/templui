@@ -244,9 +244,9 @@ templ cardPayoutThreshold() {
 templ cardFaq() {
 	@card.Card() {
 		@card.Content() {
-			@tabs.Tabs() {
+			@tabs.Tabs(tabs.Props{DefaultValue: "general"}) {
 				@tabs.List(tabs.ListProps{Class: "w-full"}) {
-					@tabs.Trigger(tabs.TriggerProps{Value: "general", IsActive: true, Class: "flex-1"}) {
+					@tabs.Trigger(tabs.TriggerProps{Value: "general", Class: "flex-1"}) {
 						General
 					}
 					@tabs.Trigger(tabs.TriggerProps{Value: "billing", Class: "flex-1"}) {
@@ -256,7 +256,7 @@ templ cardFaq() {
 						Goals
 					}
 				}
-				@tabs.Content(tabs.ContentProps{Value: "general", IsActive: true}) {
+				@tabs.Content(tabs.ContentProps{Value: "general"}) {
 					@faqList([]faqEntry{
 						{"How secure is my financial data with Ledger?", "We use bank-level AES-256 encryption, SOC 2 Type II certified infrastructure, and never store your credentials. All connections use read-only access tokens. We are a SEC registered investment advisor."},
 						{"How do I connect my bank or investment accounts?", "Go to Settings > Linked Accounts and search for your institution. We support over 12,000 banks and brokerages via Plaid and MX."},

@@ -247,9 +247,7 @@ func main() {
 
 		// Skeleton
 		"out/showcase/skeleton_card.html":      examples.SkeletonCard(),
-		"out/showcase/skeleton_dashboard.html": examples.SkeletonDashboard(),
-		"out/showcase/skeleton_default.html":   examples.SkeletonDefault(),
-		"out/showcase/skeleton_profile.html":   examples.SkeletonProfile(),
+		"out/showcase/skeleton_default.html":   examples.SkeletonDemo(),
 
 		// Slider
 		"out/showcase/slider_demo.html":       examples.SliderDemo(),
@@ -263,23 +261,16 @@ func main() {
 		"out/showcase/table.html": examples.Table(),
 
 		// Tabs
-		"out/showcase/tabs_default.html": examples.TabsDefault(),
+		"out/showcase/tabs_default.html": examples.TabsDemo(),
 
 
 		// Textarea
-		"out/showcase/textarea_custom_rows.html": examples.TextareaCustomRows(),
-		"out/showcase/textarea_default.html":     examples.TextareaDefault(),
+		"out/showcase/textarea_default.html":     examples.TextareaDemo(),
 		"out/showcase/textarea_disabled.html":    examples.TextareaDisabled(),
-		"out/showcase/textarea_form.html":        examples.TextareaForm(),
-		"out/showcase/textarea_with_label.html":  examples.TextareaWithLabel(),
 
 
 		// Toast
-		"out/showcase/toast_default.html":  examples.ToastDefault(),
-		"out/showcase/toast_types.html":       examples.ToastTypes(),
-		"out/showcase/toast_description.html": examples.ToastDescription(),
-		"out/showcase/toast_position.html": examples.ToastPosition(),
-		"out/showcase/toast_htmx.html":     examples.ToastHtmx(),
+		"out/showcase/toast_default.html":  examples.ToastDemo(),
 
 		// Switch
 		"out/showcase/switch_demo.html":        examples.SwitchDemo(),
@@ -290,7 +281,7 @@ func main() {
 		"out/showcase/switch_sizes.html":       examples.SwitchSizes(),
 
 		// Tooltip
-		"out/showcase/tooltip_default.html": examples.TooltipDefault(),
+		"out/showcase/tooltip_default.html": examples.TooltipDemo(),
 		"out/showcase/tooltip_sides.html":   examples.TooltipSides(),
 	}
 

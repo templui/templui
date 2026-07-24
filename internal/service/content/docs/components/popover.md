@@ -16,7 +16,7 @@ import "github.com/templui/templui/components/popover"
 ```
 
 ```templ showLineNumbers
-@popover.Root() {
+@popover.Popover() {
 	@button.Button(button.Props{
 		Variant:    button.VariantOutline,
 		Attributes: popover.Trigger(ctx),
@@ -41,7 +41,7 @@ import "github.com/templui/templui/components/popover"
 Use the following composition to build a `Popover`:
 
 ```text
-popover.Root
+popover.Popover
 ├── popover.Trigger
 └── popover.Content
 ```

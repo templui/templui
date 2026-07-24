@@ -46,7 +46,7 @@ func Trigger(ctx context.Context) templ.Attributes {
 	}
 }
 
-type RootProps struct {
+type Props struct {
 	ID string
 }
 
@@ -84,8 +84,8 @@ type DescriptionProps struct {
 
 // Root renders no element: it only carries the id that links Trigger and
 // Content (via ctx).
-templ Root(props ...RootProps) {
-	{{ var p RootProps }}
+templ Popover(props ...Props) {
+	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}

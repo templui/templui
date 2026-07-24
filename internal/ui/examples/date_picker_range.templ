@@ -19,7 +19,7 @@ templ DatePickerRange() {
 		@field.Label(field.LabelProps{For: "date-picker-range-trigger"}) {
 			Date Picker Range
 		}
-		@popover.Root(popover.RootProps{ID: "date-picker-range"}) {
+		@popover.Popover(popover.Props{ID: "date-picker-range"}) {
 		{{
 			triggerAttrs := popover.Trigger(ctx)
 			triggerAttrs["id"] = "date-picker-range-trigger"

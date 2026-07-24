@@ -8,7 +8,7 @@ import (
 )
 
 templ DatePickerDemo() {
-	@popover.Root(popover.RootProps{ID: "date-picker-demo"}) {
+	@popover.Popover(popover.Props{ID: "date-picker-demo"}) {
 		{{
 			triggerAttrs := popover.Trigger(ctx)
 			triggerAttrs["data-empty"] = "true"

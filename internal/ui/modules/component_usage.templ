@@ -65,7 +65,6 @@ templ ComponentUsage(props ComponentUsageProps) {
 		}) {
 			@tabs.Trigger(tabs.TriggerProps{
 				Value:    "cli",
-				IsActive: true,
 			}) {
 				CLI
 			}
@@ -78,7 +77,6 @@ templ ComponentUsage(props ComponentUsageProps) {
 		<div class="mt-4">
 			@tabs.Content(tabs.ContentProps{
 				Value:    "cli",
-				IsActive: true,
 			}) {
 				@Code(CodeProps{
 					CodeContent:    "templui add " + props.ComponentName,

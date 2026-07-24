@@ -6,7 +6,7 @@ import (
 )
 
 templ DropdownMenuSubmenu() {
-	@dropdownmenu.Root() {
+	@dropdownmenu.DropdownMenu() {
 		@button.Button(button.Props{
 			Variant:    button.VariantOutline,
 			Attributes: dropdownmenu.Trigger(ctx),

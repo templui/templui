@@ -12,7 +12,7 @@ templ DatePickerDob() {
 		@field.Label(field.LabelProps{For: "date-picker-dob-trigger"}) {
 			Date of birth
 		}
-		@popover.Root(popover.RootProps{ID: "date-picker-dob"}) {
+		@popover.Popover(popover.Props{ID: "date-picker-dob"}) {
 		{{
 			triggerAttrs := popover.Trigger(ctx)
 			triggerAttrs["id"] = "date-picker-dob-trigger"

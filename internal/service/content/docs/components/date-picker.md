@@ -14,7 +14,7 @@ See installation instructions for the [Popover](/docs/components/popover#install
 ## Usage
 
 ```templ showLineNumbers title="components/example_date_picker.templ"
-@popover.Root(popover.RootProps{ID: "date-picker"}) {
+@popover.Popover(popover.Props{ID: "date-picker"}) {
 	{{
 		triggerAttrs := popover.Trigger(ctx)
 		triggerAttrs["data-empty"] = "true"
@@ -47,7 +47,7 @@ Listen for the calendar's `calendar-change` event to show the selected date in t
 A date picker is built from `Popover` and `Calendar` (there is no DatePicker root component):
 
 ```text
-popover.Root
+popover.Popover
 ├── popover.Trigger
 └── popover.Content
     └── calendar.Calendar

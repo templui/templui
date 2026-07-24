@@ -174,7 +174,7 @@ func checkItemClasses(disabled bool) string {
 
 // Root renders no element: it only generates the id that links Trigger and
 // Content (via ctx), so the trigger stays a direct child of its layout.
-templ Root(props ...Props) {
+templ DropdownMenu(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}

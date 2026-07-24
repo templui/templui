@@ -12,7 +12,7 @@ templ DatePickerBasic() {
 		@field.Label(field.LabelProps{For: "date-picker-simple"}) {
 			Date
 		}
-		@popover.Root(popover.RootProps{ID: "date-picker-basic"}) {
+		@popover.Popover(popover.Props{ID: "date-picker-basic"}) {
 		{{
 			triggerAttrs := popover.Trigger(ctx)
 			triggerAttrs["id"] = "date-picker-simple"

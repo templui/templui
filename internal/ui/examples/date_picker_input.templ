@@ -18,7 +18,7 @@ templ DatePickerInput() {
 		@field.Label(field.LabelProps{For: "date-picker-input-field"}) {
 			Subscription Date
 		}
-		@popover.Root(popover.RootProps{ID: "date-picker-input"}) {
+		@popover.Popover(popover.Props{ID: "date-picker-input"}) {
 		{{
 			triggerAttrs := popover.Trigger(ctx)
 			triggerAttrs["data-slot"] = "input-group-button"

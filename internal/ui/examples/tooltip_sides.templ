@@ -5,26 +5,23 @@ import (
 	"github.com/templui/templui/components/tooltip"
 )
 
+var tooltipSides = []tooltip.Side{tooltip.SideLeft, tooltip.SideTop, tooltip.SideBottom, tooltip.SideRight}
+
 templ TooltipSides() {
 	<div class="flex flex-wrap gap-2">
-		@tooltipSide("Left", tooltip.SideLeft)
-		@tooltipSide("Top", tooltip.SideTop)
-		@tooltipSide("Bottom", tooltip.SideBottom)
-		@tooltipSide("Right", tooltip.SideRight)
+		for _, side := range tooltipSides {
+			@tooltip.Tooltip() {
+				@button.Button(button.Props{
+					Variant:    button.VariantOutline,
+					Class:      "w-fit capitalize",
+					Attributes: tooltip.Trigger(ctx),
+				}) {
+					{ string(side) }
+				}
+				@tooltip.Content(tooltip.ContentProps{Side: side}) {
+					<p>Add to library</p>
+				}
+			}
+		}
 	</div>
-}
-
-templ tooltipSide(label string, side tooltip.Side) {
-	@tooltip.Tooltip() {
-		@button.Button(button.Props{
-			Variant:    button.VariantOutline,
-			Class:      "w-fit",
-			Attributes: tooltip.Trigger(ctx),
-		}) {
-			{ label }
-		}
-		@tooltip.Content(tooltip.ContentProps{Side: side}) {
-			Add to library
-		}
-	}
 }

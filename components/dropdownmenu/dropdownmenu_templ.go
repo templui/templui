@@ -182,7 +182,7 @@ func checkItemClasses(disabled bool) string {
 
 // Root renders no element: it only generates the id that links Trigger and
 // Content (via ctx), so the trigger stays a direct child of its layout.
-func Root(props ...Props) templ.Component {
+func DropdownMenu(props ...Props) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {

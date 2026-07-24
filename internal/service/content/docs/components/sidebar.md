@@ -202,7 +202,7 @@ Use the `sidebar.Header` component to add a sticky header to the sidebar.
 	@sidebar.Header() {
 		@sidebar.Menu() {
 			@sidebar.MenuItem() {
-				@dropdownmenu.Root() {
+				@dropdownmenu.DropdownMenu() {
 					@sidebar.MenuButton(sidebar.MenuButtonProps{
 						Attributes: dropdownmenu.Trigger(ctx),
 					}) {

@@ -6,7 +6,7 @@ import (
 )
 
 templ TextareaButton() {
-	<div class="grid w-full max-w-sm gap-2">
+	<div class="grid w-full gap-2">
 		@textarea.Textarea(textarea.Props{Placeholder: "Type your message here."})
 		@button.Button() {
 			Send message

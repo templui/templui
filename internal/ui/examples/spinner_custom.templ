@@ -1,10 +1,22 @@
 package examples
 
-import (
-	"github.com/templui/templui/components/icon"
-	"github.com/templui/templui/components/spinner"
-)
+import "github.com/templui/templui/components/icon"
+
+// The demo's own Spinner: the default icon swapped for icon.Loader, the
+// pendant of editing the component like the docs describe.
+templ spinnerCustomSpinner() {
+	@icon.Loader(icon.Props{
+		Class: "size-4 animate-spin",
+		Attributes: templ.Attributes{
+			"data-slot":  "spinner",
+			"role":       "status",
+			"aria-label": "Loading",
+		},
+	})
+}
 
 templ SpinnerCustom() {
-	@spinner.Spinner(spinner.Props{Icon: icon.Loader})
+	<div class="flex items-center gap-4">
+		@spinnerCustomSpinner()
+	</div>
 }

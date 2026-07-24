@@ -8,7 +8,7 @@ import (
 )
 
 templ PopoverForm() {
-	@popover.Root() {
+	@popover.Popover() {
 		@button.Button(button.Props{
 			Variant:    button.VariantOutline,
 			Attributes: popover.Trigger(ctx),

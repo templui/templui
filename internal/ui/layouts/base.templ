@@ -97,7 +97,7 @@ templ BaseLayout(title, description string) {
 			<div class="min-h-screen flex flex-col">
 				{ children... }
 			</div>
-			@toast.Toaster(toast.ToasterProps{ID: "toaster", Position: toast.PositionTopCenter})
+			@toast.Toaster(toast.ToasterProps{ID: "toaster"})
 		</body>
 		// HTMX
 		<script nonce={ templ.GetNonce(ctx) }>

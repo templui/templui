@@ -1,377 +1,395 @@
 (function () {
-  // Vanilla port of sonner's core (the library shadcn ships for toasts).
-  // The vendored sonner.css does all styling/animation; this script only
-  // manages the data attributes and CSS variables of its contract.
-  const DEFAULT_DURATION = 4000;
-  const VISIBLE_TOASTS = 3;
-  const TIME_BEFORE_UNMOUNT = 400;
-  const SWIPE_THRESHOLD = 45;
+  "use strict";
 
-  function toasters() {
-    return document.querySelectorAll("[data-tui-toaster]");
-  }
+  // Vanilla port of shadcn's base/toast (Base UI Toast): the class strings,
+  // CSS variables and stacking behavior mirror components/ui/toast.tsx.
 
-  function toastsOf(toaster) {
-    // Newest first, like sonner's internal list.
-    return [...toaster.querySelectorAll("[data-sonner-toast]:not([data-removed='true'])")].reverse();
-  }
+  var ENTER_EXIT_MS = 500;
+  var SWIPE_THRESHOLD = 45;
+  var GAP = 12; // --gap: 0.75rem
 
-  function applyPosition(toaster) {
-    const pos = toaster.getAttribute("data-tui-toaster-position") || "bottom-right";
-    const [y, x] = pos.split("-");
-    toaster.setAttribute("data-y-position", y);
-    toaster.setAttribute("data-x-position", x);
-    toaster.querySelectorAll("[data-sonner-toast]").forEach((t) => {
-      t.setAttribute("data-y-position", y);
-      t.setAttribute("data-x-position", x);
-    });
-  }
+  var TOAST_CLASS = [
+    "rounded-2xl group/toast pointer-events-auto absolute right-0 bottom-0 z-[calc(1000-var(--toast-index))] w-full origin-bottom border bg-popover text-popover-foreground shadow-lg will-change-transform outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+    "[--gap:0.75rem] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--toast-offset-y)*-1+calc(var(--toast-index)*var(--gap)*-1)+var(--toast-swipe-movement-y))] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--shrink:calc(1-var(--scale))]",
+    "h-(--height) [transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--peek))-(var(--shrink)*var(--height))))_scale(var(--scale))] [transition:transform_500ms_cubic-bezier(0.22,1,0.36,1),opacity_500ms,height_150ms]",
+    "after:absolute after:top-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-['']",
+    "data-expanded:h-(--toast-height) data-expanded:[transform:translateX(var(--toast-swipe-movement-x))_translateY(var(--offset-y))]",
+    "data-limited:opacity-0 data-starting-style:[transform:translateY(150%)]",
+    "[&[data-ending-style]:not([data-limited]):not([data-swipe-direction])]:[transform:translateY(150%)]",
+    "data-ending-style:data-[swipe-direction=down]:[transform:translateY(calc(var(--toast-swipe-movement-y)+150%))]",
+    "data-ending-style:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x)-150%))_translateY(var(--offset-y))]",
+    "data-ending-style:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x)+150%))_translateY(var(--offset-y))]",
+    "data-ending-style:data-[swipe-direction=up]:[transform:translateY(calc(var(--toast-swipe-movement-y)-150%))]",
+    "data-expanded:data-ending-style:data-[swipe-direction=down]:[transform:translateY(calc(var(--toast-swipe-movement-y)+150%))]",
+    "data-expanded:data-ending-style:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x)-150%))_translateY(var(--offset-y))]",
+    "data-expanded:data-ending-style:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x)+150%))_translateY(var(--offset-y))]",
+    "data-expanded:data-ending-style:data-[swipe-direction=up]:[transform:translateY(calc(var(--toast-swipe-movement-y)-150%))]",
+  ].join(" ");
 
-  function applyTheme(toaster) {
-    toaster.setAttribute(
-      "data-sonner-theme",
-      document.documentElement.classList.contains("dark") ? "dark" : "light",
-    );
-  }
+  var CONTENT_CLASS =
+    "flex h-full items-center gap-3 overflow-hidden p-4 transition-opacity duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] data-behind:opacity-0 data-expanded:opacity-100";
+  var TITLE_CLASS = "text-sm font-medium";
+  var DESCRIPTION_CLASS = "text-sm text-muted-foreground";
+  var ICON_CLASS =
+    "shrink-0 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4";
 
-  function reindex(toaster) {
-    const toasts = toastsOf(toaster);
-    const expanded = toaster.getAttribute("data-lifted") === "true";
-    let offset = 0;
-    toasts.forEach((t, i) => {
-      const height = parseFloat(t.style.getPropertyValue("--initial-height")) || t.offsetHeight;
-      t.style.setProperty("--index", i);
-      t.style.setProperty("--toasts-before", i);
-      t.style.setProperty("--z-index", toasts.length - i);
-      t.style.setProperty("--offset", offset + "px");
-      t.setAttribute("data-front", i === 0 ? "true" : "false");
-      t.setAttribute("data-visible", i < VISIBLE_TOASTS ? "true" : "false");
-      t.setAttribute("data-expanded", expanded ? "true" : "false");
-      offset += height + 14;
-    });
-    const front = toasts[0];
-    if (front) {
-      toaster.style.setProperty(
-        "--front-toast-height",
-        (parseFloat(front.style.getPropertyValue("--initial-height")) || front.offsetHeight) + "px",
-      );
-    }
-  }
+  // The Button component's classes, resolved for variant outline size sm
+  // (ToastAction) and variant ghost size icon-sm (ToastClose).
+  var BUTTON_BASE =
+    "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+  var ACTION_CLASS =
+    BUTTON_BASE +
+    " border-border bg-background hover:bg-muted hover:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] [&_svg:not([class*='size-'])]:size-3.5";
+  var CLOSE_CLASS =
+    BUTTON_BASE +
+    " hover:bg-muted dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] relative text-muted-foreground after:absolute after:-inset-2 after:content-[''] hover:text-foreground";
 
-  function startTimer(toast) {
-    stopTimer(toast);
-    const toaster = toast.closest("[data-tui-toaster]");
-    if (!toaster) return;
-    let duration = parseInt(toast.getAttribute("data-tui-toast-duration"), 10);
-    if (!duration) {
-      duration = parseInt(toaster.getAttribute("data-tui-toaster-duration"), 10) || DEFAULT_DURATION;
-    }
-    if (duration < 0 || toast.getAttribute("data-type") === "loading") return;
-    if (toast._tuiRemaining == null) toast._tuiRemaining = duration;
-    toast._tuiStarted = performance.now();
-    toast._tuiTimer = setTimeout(() => dismiss(toast), toast._tuiRemaining);
-  }
-
-  function stopTimer(toast) {
-    if (!toast._tuiTimer) return;
-    clearTimeout(toast._tuiTimer);
-    toast._tuiTimer = null;
-    if (toast._tuiStarted && toast._tuiRemaining != null) {
-      toast._tuiRemaining = Math.max(0, toast._tuiRemaining - (performance.now() - toast._tuiStarted));
-    }
-  }
-
-  function mount(toast) {
-    if (toast._tuiMounted) return;
-    toast._tuiMounted = true;
-    const toaster = toast.closest("[data-tui-toaster]");
-    if (!toaster) return;
-
-    if (
-      toaster.hasAttribute("data-tui-toaster-close-button") &&
-      !toast.querySelector("[data-close-button]")
-    ) {
-      const btn = document.createElement("button");
-      btn.setAttribute("data-close-button", "true");
-      btn.setAttribute("aria-label", "Close toast");
-      btn.innerHTML =
-        '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
-      toast.insertBefore(btn, toast.firstChild);
-    }
-    if (!toast.hasAttribute("data-dismissible")) toast.setAttribute("data-dismissible", "true");
-
-    applyPosition(toaster);
-    toast.style.setProperty("--initial-height", toast.offsetHeight + "px");
-    reindex(toaster);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => toast.setAttribute("data-mounted", "true"));
-    });
-    startTimer(toast);
-  }
-
-  function dismiss(toast) {
-    if (!toast || toast.getAttribute("data-removed") === "true") return;
-    stopTimer(toast);
-    const toaster = toast.closest("[data-tui-toaster]");
-    toast.setAttribute("data-removed", "true");
-    if (toaster) reindex(toaster);
-    setTimeout(() => {
-      toast.remove();
-      if (toaster) reindex(toaster);
-    }, TIME_BEFORE_UNMOUNT);
-  }
-
-  // ----- JavaScript API -----------------------------------------------------
-
-  const ICONS = {
+  var ICONS = {
     success:
-      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',
-    info: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',
+    info: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
     warning:
-      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
     error:
-      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H8.828a2 2 0 0 0-1.414.586L2.586 7.414A2 2 0 0 0 2 8.828v6.344a2 2 0 0 0 .586 1.414l4.828 4.828A2 2 0 0 0 8.828 22h6.344a2 2 0 0 0 1.414-.586l4.828-4.828A2 2 0 0 0 22 15.172V8.828a2 2 0 0 0-.586-1.414z"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>',
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-destructive" aria-hidden="true"><path d="M12 16h.01"/><path d="M12 8v4"/><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"/></svg>',
     loading:
-      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
+    close:
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
   };
 
-  function toasterFor(position) {
-    const base = document.querySelector("[data-tui-toaster]");
-    if (!base) return null;
-    const pos = position || base.getAttribute("data-tui-toaster-position") || "bottom-right";
-    let match = null;
-    toasters().forEach((t) => {
-      if ((t.getAttribute("data-tui-toaster-position") || "bottom-right") === pos) match = t;
+  function viewportOf(el) {
+    return el ? el.closest("[data-tui-toaster]") : document.querySelector("[data-tui-toaster]");
+  }
+
+  function toastsOf(vp) {
+    // Newest first, like Base UI's toast list; leaving toasts keep animating
+    // but no longer take part in the layout.
+    return Array.from(vp.querySelectorAll('[data-slot="toast"]:not([data-ending-style])')).reverse();
+  }
+
+  // ----- layout: the Base UI stacking variables -----------------------------
+
+  function layout(vp) {
+    var list = toastsOf(vp);
+    var limit = parseInt(vp.getAttribute("data-tui-toaster-limit"), 10) || 3;
+    var expanded = vp.hasAttribute("data-expanded");
+
+    // Natural heights first: with the per-toast vars cleared, h-(--height)
+    // resolves to auto.
+    list.forEach(function (t) {
+      t.style.removeProperty("--toast-height");
+      t.style.removeProperty("--toast-frontmost-height");
     });
-    if (match) return match;
-    const clone = base.cloneNode(false);
-    clone.removeAttribute("id");
-    clone.setAttribute("data-tui-toaster-position", pos);
-    document.body.appendChild(clone);
-    applyTheme(clone);
-    applyPosition(clone);
-    return clone;
+    var heights = list.map(function (t) {
+      return t.offsetHeight;
+    });
+
+    var offset = 0;
+    list.forEach(function (t, i) {
+      t.style.setProperty("--toast-index", String(i));
+      t.style.setProperty("--toast-height", heights[i] + "px");
+      if (i > 0) {
+        t.style.setProperty("--toast-frontmost-height", heights[0] + "px");
+      }
+      // --toast-offset-y carries only the summed heights, the class formula
+      // adds index*gap on top.
+      t.style.setProperty("--toast-offset-y", offset + "px");
+      offset += heights[i];
+      t.toggleAttribute("data-limited", i >= limit);
+      t.toggleAttribute("data-expanded", expanded);
+      var content = t.querySelector('[data-slot="toast-content"]');
+      if (content) {
+        content.toggleAttribute("data-behind", i > 0 && !expanded);
+        content.toggleAttribute("data-expanded", expanded || i === 0);
+      }
+    });
   }
 
-  function createToast(title, opts) {
-    opts = opts || {};
-    const toaster = toasterFor(opts.position);
-    if (!toaster) return null;
+  // ----- timers -------------------------------------------------------------
 
-    const li = document.createElement("li");
-    li.className = "cn-toast rounded-2xl";
-    li.setAttribute("data-sonner-toast", "");
-    li.setAttribute("data-tui-toast", "");
-    li.setAttribute("data-styled", "true");
-    li.setAttribute("data-type", opts.type || "default");
-    li.setAttribute("data-mounted", "false");
-    li.setAttribute("data-removed", "false");
-    li.setAttribute("data-swiping", "false");
-    li.setAttribute("data-swipe-out", "false");
-    li.setAttribute("data-expanded", "false");
-    if (opts.duration) li.setAttribute("data-tui-toast-duration", String(opts.duration));
+  function startTimer(t) {
+    if (t.getAttribute("data-type") === "loading") return;
+    var vp = viewportOf(t);
+    var timeout = parseInt(t.getAttribute("data-tui-toast-timeout"), 10);
+    if (!timeout) {
+      timeout = parseInt(vp.getAttribute("data-tui-toaster-timeout"), 10) || 5000;
+    }
+    var remaining = t._tuiRemaining != null ? t._tuiRemaining : timeout;
+    t._tuiDeadline = Date.now() + remaining;
+    t._tuiTimer = window.setTimeout(function () {
+      dismiss(t);
+    }, remaining);
+  }
 
+  function stopTimer(t) {
+    if (t._tuiTimer) {
+      window.clearTimeout(t._tuiTimer);
+      t._tuiTimer = null;
+      t._tuiRemaining = Math.max(0, (t._tuiDeadline || 0) - Date.now());
+    }
+  }
+
+  // ----- create / dismiss ---------------------------------------------------
+
+  var seq = 0;
+
+  function build(opts) {
+    var t = document.createElement("div");
+    t.className = TOAST_CLASS;
+    t.setAttribute("data-slot", "toast");
+    t.setAttribute("role", "status");
+    t.setAttribute("aria-atomic", "true");
+    t.id = opts.id || "tui-toast-" + ++seq;
+    if (opts.type) t.setAttribute("data-type", opts.type);
+    if (opts.timeout) t.setAttribute("data-tui-toast-timeout", String(opts.timeout));
+    t.style.setProperty("--toast-swipe-movement-x", "0px");
+    t.style.setProperty("--toast-swipe-movement-y", "0px");
+
+    var content = document.createElement("div");
+    content.className = CONTENT_CLASS;
+    content.setAttribute("data-slot", "toast-content");
+
+    var iconEl = document.createElement("span");
+    iconEl.className = ICON_CLASS;
+    iconEl.setAttribute("data-slot", "toast-icon");
     if (opts.type && ICONS[opts.type]) {
-      const iconEl = document.createElement("div");
-      iconEl.setAttribute("data-icon", "");
       iconEl.innerHTML = ICONS[opts.type];
-      li.appendChild(iconEl);
+    } else {
+      iconEl.hidden = true;
+    }
+    content.appendChild(iconEl);
+
+    var textWrap = document.createElement("div");
+    textWrap.className = "flex min-w-0 flex-1 flex-col gap-1";
+    var titleEl = document.createElement("div");
+    titleEl.className = TITLE_CLASS;
+    titleEl.setAttribute("data-slot", "toast-title");
+    if (opts.title) titleEl.textContent = opts.title;
+    else titleEl.hidden = true;
+    var descEl = document.createElement("div");
+    descEl.className = DESCRIPTION_CLASS;
+    descEl.setAttribute("data-slot", "toast-description");
+    if (opts.description) descEl.textContent = opts.description;
+    else descEl.hidden = true;
+    textWrap.appendChild(titleEl);
+    textWrap.appendChild(descEl);
+    content.appendChild(textWrap);
+
+    if (opts.action) {
+      var actionEl = document.createElement("button");
+      actionEl.type = "button";
+      actionEl.className = ACTION_CLASS;
+      actionEl.setAttribute("data-slot", "toast-action");
+      actionEl.textContent = opts.action.label || "";
+      if (typeof opts.action.onClick === "function") {
+        actionEl.addEventListener("click", opts.action.onClick);
+      }
+      content.appendChild(actionEl);
     }
 
-    const content = document.createElement("div");
-    content.setAttribute("data-content", "");
-    const titleEl = document.createElement("div");
-    titleEl.setAttribute("data-title", "");
-    titleEl.textContent = title;
-    content.appendChild(titleEl);
-    if (opts.description) {
-      const desc = document.createElement("div");
-      desc.setAttribute("data-description", "");
-      desc.textContent = opts.description;
-      content.appendChild(desc);
-    }
-    li.appendChild(content);
+    var closeEl = document.createElement("button");
+    closeEl.type = "button";
+    closeEl.className = CLOSE_CLASS;
+    closeEl.setAttribute("data-slot", "toast-close");
+    closeEl.setAttribute("aria-label", "Close toast");
+    closeEl.innerHTML = ICONS.close;
+    content.appendChild(closeEl);
 
-    if (opts.action && opts.action.label) {
-      const action = document.createElement("button");
-      action.setAttribute("data-button", "");
-      action.setAttribute("data-action", "");
-      action.textContent = opts.action.label;
-      action.addEventListener("click", (e) => {
-        if (typeof opts.action.onClick === "function") opts.action.onClick(e);
-        dismiss(li);
-      });
-      li.appendChild(action);
-    }
-    if (opts.cancel && opts.cancel.label) {
-      const cancel = document.createElement("button");
-      cancel.setAttribute("data-button", "");
-      cancel.setAttribute("data-cancel", "");
-      cancel.textContent = opts.cancel.label;
-      cancel.addEventListener("click", (e) => {
-        if (typeof opts.cancel.onClick === "function") opts.cancel.onClick(e);
-        dismiss(li);
-      });
-      li.appendChild(cancel);
-    }
-
-    toaster.appendChild(li);
-    mount(li);
-    return li;
+    t.appendChild(content);
+    return t;
   }
 
-  const api = (title, opts) => createToast(title, opts);
-  ["success", "info", "warning", "error", "loading"].forEach((type) => {
-    api[type] = (title, opts) => createToast(title, Object.assign({}, opts, { type: type }));
-  });
-  // toast.promise: shows a loading toast, then morphs it into success/error.
-  api.promise = (promise, opts) => {
-    opts = opts || {};
-    const li = createToast(opts.loading || "Loading...", Object.assign({}, opts, { type: "loading" }));
-    if (!li) return null;
-    const p = typeof promise === "function" ? promise() : promise;
-    const morph = (type, title) => {
-      if (!li.isConnected) return;
-      li.setAttribute("data-type", type);
-      const iconEl = li.querySelector("[data-icon]");
-      if (iconEl) iconEl.innerHTML = ICONS[type] || "";
-      const titleEl = li.querySelector("[data-title]");
-      if (titleEl) titleEl.textContent = title;
-      li.style.setProperty("--initial-height", li.offsetHeight + "px");
-      const toaster = li.closest("[data-tui-toaster]");
-      if (toaster) reindex(toaster);
-      li._tuiRemaining = null;
-      startTimer(li);
-    };
-    Promise.resolve(p)
-      .then((data) => {
-        const title = typeof opts.success === "function" ? opts.success(data) : opts.success || "Done";
-        morph("success", title);
-      })
-      .catch((err) => {
-        const title = typeof opts.error === "function" ? opts.error(err) : opts.error || "Error";
-        morph("error", title);
-      });
-    return li;
-  };
+  function createToast(opts) {
+    var vp = viewportOf(null);
+    if (!vp) return null;
+    var t = build(opts);
+    t.setAttribute("data-starting-style", "");
+    vp.appendChild(t);
+    layout(vp);
+    // Enter: flush the starting transform, then transition into place
+    // (setTimeout instead of rAF so background tabs still settle).
+    void t.offsetHeight;
+    window.setTimeout(function () {
+      t.removeAttribute("data-starting-style");
+    }, 20);
+    startTimer(t);
+    return t;
+  }
 
-  api.dismiss = (toast) => {
-    if (toast) {
-      dismiss(typeof toast === "string" ? document.getElementById(toast) : toast);
+  function dismiss(t, direction) {
+    if (!t || t.hasAttribute("data-ending-style")) return;
+    stopTimer(t);
+    var vp = viewportOf(t);
+    t.setAttribute("data-ending-style", "");
+    if (direction) t.setAttribute("data-swipe-direction", direction);
+    window.setTimeout(function () {
+      t.remove();
+      if (vp) layout(vp);
+    }, ENTER_EXIT_MS);
+    if (vp) layout(vp);
+  }
+
+  // ----- expand on hover ----------------------------------------------------
+
+  function setExpanded(vp, expanded) {
+    if (vp.hasAttribute("data-expanded") === expanded) return;
+    vp.toggleAttribute("data-expanded", expanded);
+    toastsOf(vp).forEach(expanded ? stopTimer : startTimer);
+    layout(vp);
+  }
+
+  document.addEventListener("pointerover", function (e) {
+    if (!(e.target instanceof Element)) return;
+    var vp = e.target.closest("[data-tui-toaster]");
+    if (vp) setExpanded(vp, true);
+  });
+
+  document.addEventListener("pointerout", function (e) {
+    if (!(e.target instanceof Element)) return;
+    var vp = e.target.closest("[data-tui-toaster]");
+    if (!vp) return;
+    if (e.relatedTarget instanceof Element && e.relatedTarget.closest("[data-tui-toaster]") === vp) return;
+    setExpanded(vp, false);
+  });
+
+  // ----- close button -------------------------------------------------------
+
+  document.addEventListener("click", function (e) {
+    if (!(e.target instanceof Element)) return;
+    var close = e.target.closest('[data-slot="toast-close"]');
+    if (close) dismiss(close.closest('[data-slot="toast"]'));
+  });
+
+  // ----- swipe to dismiss (down and right, the bottom-right defaults) -------
+
+  document.addEventListener("pointerdown", function (e) {
+    if (!(e.target instanceof Element)) return;
+    var t = e.target.closest('[data-slot="toast"]');
+    if (!t || e.target.closest("button")) return;
+    t._tuiSwipe = { x: e.clientX, y: e.clientY };
+  });
+
+  document.addEventListener("pointermove", function (e) {
+    if (!(e.target instanceof Element)) return;
+    var t = e.target.closest('[data-slot="toast"]');
+    if (!t || !t._tuiSwipe) return;
+    var dx = Math.max(0, e.clientX - t._tuiSwipe.x);
+    var dy = Math.max(0, e.clientY - t._tuiSwipe.y);
+    t.style.setProperty("--toast-swipe-movement-x", dx + "px");
+    t.style.setProperty("--toast-swipe-movement-y", dy + "px");
+  });
+
+  document.addEventListener("pointerup", function (e) {
+    if (!(e.target instanceof Element)) return;
+    var t = e.target.closest('[data-slot="toast"]');
+    if (!t || !t._tuiSwipe) return;
+    var dx = Math.max(0, e.clientX - t._tuiSwipe.x);
+    var dy = Math.max(0, e.clientY - t._tuiSwipe.y);
+    t._tuiSwipe = null;
+    if (dy >= SWIPE_THRESHOLD && dy >= dx) {
+      dismiss(t, "down");
+    } else if (dx >= SWIPE_THRESHOLD) {
+      dismiss(t, "right");
     } else {
-      document.querySelectorAll("[data-sonner-toast]").forEach(dismiss);
+      t.style.setProperty("--toast-swipe-movement-x", "0px");
+      t.style.setProperty("--toast-swipe-movement-y", "0px");
     }
+  });
+
+  // ----- the toast manager pendant: add, close, promise ---------------------
+
+  function normalize(opts) {
+    opts = Object.assign({}, opts);
+    if (opts.actionProps) {
+      opts.action = {
+        label: opts.actionProps.children,
+        onClick: opts.actionProps.onClick,
+      };
+    }
+    return opts;
+  }
+
+  var api = {
+    add: function (opts) {
+      var t = createToast(normalize(opts || {}));
+      return t ? t.id : null;
+    },
+    close: function (id) {
+      if (id === undefined) {
+        document.querySelectorAll('[data-slot="toast"]').forEach(function (t) {
+          dismiss(t);
+        });
+        return;
+      }
+      var el = typeof id === "string" ? document.getElementById(id) : id;
+      if (el) dismiss(el);
+    },
+    // toast.promise: a loading toast that morphs with the promise.
+    promise: function (promise, opts) {
+      opts = opts || {};
+      var t = createToast(Object.assign({}, normalize(opts), { type: "loading", title: opts.loading || "Loading..." }));
+      if (!t) return null;
+      var p = typeof promise === "function" ? promise() : promise;
+      function morph(type, title) {
+        if (!t.isConnected) return;
+        t.setAttribute("data-type", type);
+        var iconEl = t.querySelector('[data-slot="toast-icon"]');
+        if (iconEl) {
+          iconEl.hidden = false;
+          iconEl.innerHTML = ICONS[type] || "";
+        }
+        var titleEl = t.querySelector('[data-slot="toast-title"]');
+        if (titleEl) {
+          titleEl.hidden = false;
+          titleEl.textContent = title;
+        }
+        var vp = viewportOf(t);
+        if (vp) layout(vp);
+        t._tuiRemaining = null;
+        startTimer(t);
+      }
+      Promise.resolve(p)
+        .then(function (data) {
+          morph("success", typeof opts.success === "function" ? opts.success(data) : opts.success || "Done");
+        })
+        .catch(function (err) {
+          morph("error", typeof opts.error === "function" ? opts.error(err) : opts.error || "Error");
+        });
+      return t.id;
+    },
   };
 
   window.tui = window.tui || {};
   window.tui.toast = api;
 
-  // ----- interactions -------------------------------------------------------
+  // ----- SSR/htmx adoption --------------------------------------------------
 
-  document.addEventListener("click", (e) => {
-    if (!(e.target instanceof Element)) return;
-    const closeBtn = e.target.closest("[data-close-button]");
-    if (closeBtn) dismiss(closeBtn.closest("[data-sonner-toast]"));
-  });
-
-  // Hovering the stack lifts and expands it; leaving collapses it.
-  document.addEventListener(
-    "pointerenter",
-    (e) => {
-      if (!(e.target instanceof Element) || !e.target.closest) return;
-      const toaster = e.target.closest("[data-tui-toaster]");
-      if (!toaster || toaster.getAttribute("data-lifted") === "true") return;
-      toaster.setAttribute("data-lifted", "true");
-      reindex(toaster);
-      toaster.querySelectorAll("[data-sonner-toast]").forEach(stopTimer);
-    },
-    true,
-  );
-
-  document.addEventListener(
-    "pointerleave",
-    (e) => {
-      if (!(e.target instanceof Element) || !e.target.hasAttribute) return;
-      if (!e.target.hasAttribute("data-tui-toaster")) return;
-      const toaster = e.target;
-      toaster.setAttribute("data-lifted", "false");
-      reindex(toaster);
-      toastsOf(toaster).forEach(startTimer);
-    },
-    true,
-  );
-
-  // Swipe to dismiss, toward the edge the stack sits on.
-  document.addEventListener("pointerdown", (e) => {
-    if (!(e.target instanceof Element)) return;
-    const toast = e.target.closest("[data-sonner-toast]");
-    if (!toast || e.target.closest("[data-button],[data-close-button]")) return;
-    toast._tuiSwipeStart = { x: e.clientX, y: e.clientY };
-    toast.setAttribute("data-swiping", "true");
-  });
-
-  document.addEventListener("pointermove", (e) => {
-    const toast = document.querySelector('[data-sonner-toast][data-swiping="true"]');
-    if (!toast || !toast._tuiSwipeStart) return;
-    const dy = e.clientY - toast._tuiSwipeStart.y;
-    const allowed = toast.getAttribute("data-y-position") === "top" ? Math.min(0, dy) : Math.max(0, dy);
-    toast.style.setProperty("--swipe-amount-y", allowed + "px");
-  });
-
-  document.addEventListener("pointerup", () => {
-    const toast = document.querySelector('[data-sonner-toast][data-swiping="true"]');
-    if (!toast) return;
-    const amount = Math.abs(parseFloat(toast.style.getPropertyValue("--swipe-amount-y")) || 0);
-    if (amount >= SWIPE_THRESHOLD) {
-      toast.setAttribute("data-swipe-out", "true");
-      toast.setAttribute(
-        "data-swipe-direction",
-        toast.getAttribute("data-y-position") === "top" ? "up" : "down",
-      );
-      dismiss(toast);
-    } else {
-      toast.style.setProperty("--swipe-amount-y", "0px");
-      toast.setAttribute("data-swiping", "false");
-    }
-    toast._tuiSwipeStart = null;
-  });
-
-  // ----- init ---------------------------------------------------------------
-
-  function init() {
-    toasters().forEach((toaster) => {
-      applyTheme(toaster);
-      applyPosition(toaster);
-      toaster.querySelectorAll("[data-sonner-toast]").forEach(mount);
-    });
-  }
-
-  let queued = false;
-  function queueInit() {
-    if (queued) return;
-    queued = true;
-    requestAnimationFrame(() => {
-      queued = false;
-      init();
+  function adopt() {
+    document.querySelectorAll("[data-tui-toast-ssr]").forEach(function (stub) {
+      var opts = {
+        id: stub.id || undefined,
+        title: stub.getAttribute("data-tui-toast-title") || "",
+        description: stub.getAttribute("data-tui-toast-description") || "",
+        type: stub.getAttribute("data-type") || "",
+        timeout: parseInt(stub.getAttribute("data-tui-toast-timeout"), 10) || 0,
+      };
+      stub.remove();
+      createToast(opts);
     });
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", adopt);
   } else {
-    init();
+    adopt();
   }
-  new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      if (m.addedNodes.length) {
-        queueInit();
-        break;
+  new MutationObserver(function (mutations) {
+    for (var i = 0; i < mutations.length; i++) {
+      if (mutations[i].addedNodes.length) {
+        adopt();
+        return;
       }
     }
   }).observe(document.documentElement, { childList: true, subtree: true });
-
-  // Keep toasts in sync with the light/dark toggle.
-  new MutationObserver(() => {
-    toasters().forEach(applyTheme);
-  }).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 })();

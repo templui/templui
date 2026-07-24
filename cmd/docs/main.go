@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/a-h/templ"
 
 	"github.com/templui/templui/assets"
 	"github.com/templui/templui/components"
-	"github.com/templui/templui/components/toast"
 	"github.com/templui/templui/internal/config"
 	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/internal/middleware"
@@ -20,22 +18,6 @@ import (
 	"github.com/templui/templui/internal/ui/pages"
 	"github.com/templui/templui/static"
 )
-
-func toastDemoHandler(w http.ResponseWriter, r *http.Request) {
-	duration, err := strconv.Atoi(r.FormValue("duration"))
-	if err != nil {
-		duration = 0
-	}
-
-	toastProps := toast.Props{
-		Title:       r.FormValue("title"),
-		Description: r.FormValue("description"),
-		Variant:     toast.Variant(r.FormValue("type")),
-		Duration:    duration,
-	}
-
-	toast.Toast(toastProps).Render(r.Context(), w)
-}
 
 // htmxHandler wraps a templ component to support HTMX fragment requests
 func htmxHandler(component templ.Component) http.Handler {
@@ -144,18 +126,8 @@ func main() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}))
-	mux.Handle("GET /docs/components/skeleton", htmxHandler(pages.Skeleton()))
-	mux.Handle("GET /docs/components/table", htmxHandler(pages.Table()))
-	mux.Handle("GET /docs/components/tabs", htmxHandler(pages.Tabs()))
-	mux.Handle("GET /docs/components/textarea", htmxHandler(pages.Textarea()))
-	mux.Handle("GET /docs/components/toast", htmxHandler(pages.Toast()))
-	mux.Handle("GET /docs/components/tooltip", htmxHandler(pages.Tooltip()))
-	mux.Handle("GET /docs/components/spinner", htmxHandler(pages.Spinner()))
-	mux.Handle("GET /docs/components/toggle", htmxHandler(pages.Toggle()))
-	mux.Handle("GET /docs/components/toggle-group", htmxHandler(pages.ToggleGroup()))
 
 	// Showcase API
-	mux.Handle("POST /docs/toast/demo", http.HandlerFunc(toastDemoHandler))
 
 	// Test Form Items Handler
 	mux.Handle("GET /docs/test-form-items", htmxHandler(pages.TestFormItems()))

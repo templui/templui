@@ -16,7 +16,7 @@ import "github.com/templui/templui/components/contextmenu"
 ```
 
 ```templ showLineNumbers
-@contextmenu.Root() {
+@contextmenu.ContextMenu() {
 	@contextmenu.Trigger() {
 		Right click here
 	}
@@ -42,7 +42,7 @@ import "github.com/templui/templui/components/contextmenu"
 Use the following composition to build a `ContextMenu`:
 
 ```text
-contextmenu.Root
+contextmenu.ContextMenu
 ├── contextmenu.Trigger
 └── contextmenu.Content
     ├── contextmenu.Group

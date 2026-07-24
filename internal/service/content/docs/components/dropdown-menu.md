@@ -16,7 +16,7 @@ import "github.com/templui/templui/components/dropdownmenu"
 ```
 
 ```templ showLineNumbers
-@dropdownmenu.Root() {
+@dropdownmenu.DropdownMenu() {
 	@button.Button(button.Props{
 		Variant:    button.VariantOutline,
 		Attributes: dropdownmenu.Trigger(ctx),
@@ -53,7 +53,7 @@ import "github.com/templui/templui/components/dropdownmenu"
 Use the following composition to build a `DropdownMenu`:
 
 ```text
-dropdownmenu.Root
+dropdownmenu.DropdownMenu
 ├── dropdownmenu.Trigger
 └── dropdownmenu.Content
     ├── dropdownmenu.Group

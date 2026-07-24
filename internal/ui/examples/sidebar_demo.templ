@@ -98,7 +98,7 @@ var sidebarDemoProjects = []sidebarDemoProject{
 templ sidebarDemoTeamSwitcher() {
 	@sidebar.Menu() {
 		@sidebar.MenuItem() {
-			@dropdownmenu.Root(dropdownmenu.Props{ID: "sidebar-demo-team-menu"}) {
+			@dropdownmenu.DropdownMenu(dropdownmenu.Props{ID: "sidebar-demo-team-menu"}) {
 				@sidebar.MenuButton(sidebar.MenuButtonProps{
 					Size:       sidebar.MenuButtonSizeLg,
 					Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
@@ -218,7 +218,7 @@ templ sidebarDemoNavProjects() {
 						@item.Icon()
 						<span>{ item.Name }</span>
 					}
-					@dropdownmenu.Root() {
+					@dropdownmenu.DropdownMenu() {
 						@sidebar.MenuAction(sidebar.MenuActionProps{
 							ShowOnHover: true,
 							Attributes:  dropdownmenu.Trigger(ctx),
@@ -262,7 +262,7 @@ templ sidebarDemoNavProjects() {
 templ sidebarDemoNavUser() {
 	@sidebar.Menu() {
 		@sidebar.MenuItem() {
-			@dropdownmenu.Root() {
+			@dropdownmenu.DropdownMenu() {
 				@sidebar.MenuButton(sidebar.MenuButtonProps{
 					Size:       sidebar.MenuButtonSizeLg,
 					Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",

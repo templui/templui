@@ -315,16 +315,16 @@ templ createPreviewMember(name, email, role string) {
 
 templ createPreviewTwo() {
 	<div class="mx-auto flex max-w-xl flex-col gap-6">
-		@tabs.Tabs() {
+		@tabs.Tabs(tabs.Props{DefaultValue: "account"}) {
 			@tabs.List(tabs.ListProps{Class: "w-full"}) {
-				@tabs.Trigger(tabs.TriggerProps{Value: "account", IsActive: true, Class: "flex-1"}) {
+				@tabs.Trigger(tabs.TriggerProps{Value: "account", Class: "flex-1"}) {
 					Account
 				}
 				@tabs.Trigger(tabs.TriggerProps{Value: "password", Class: "flex-1"}) {
 					Password
 				}
 			}
-			@tabs.Content(tabs.ContentProps{Value: "account", IsActive: true}) {
+			@tabs.Content(tabs.ContentProps{Value: "account"}) {
 				@card.Card() {
 					@card.Header() {
 						@card.Title() {

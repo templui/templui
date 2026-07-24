@@ -17,6 +17,7 @@ templ Skeleton(props ...Props) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="skeleton"
 		class={
 			utils.TwMerge(
 				"animate-pulse rounded-md bg-muted",

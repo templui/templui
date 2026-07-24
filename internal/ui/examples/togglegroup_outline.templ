@@ -1,23 +1,22 @@
 package examples
 
 import (
-	"github.com/templui/templui/components/toggle"
 	"github.com/templui/templui/components/togglegroup"
 )
 
 templ ToggleGroupOutline() {
-	@togglegroup.Group(togglegroup.Props{
+	@togglegroup.ToggleGroup(togglegroup.Props{
 		Variant: togglegroup.VariantOutline,
 		Type:    togglegroup.TypeSingle,
 	}) {
-		@toggle.Toggle(toggle.Props{
+		@togglegroup.Item(togglegroup.ItemProps{
 			Value:      "all",
 			Pressed:    true,
 			Attributes: templ.Attributes{"aria-label": "Toggle all"},
 		}) {
 			All
 		}
-		@toggle.Toggle(toggle.Props{
+		@togglegroup.Item(togglegroup.ItemProps{
 			Value:      "missed",
 			Attributes: templ.Attributes{"aria-label": "Toggle missed"},
 		}) {

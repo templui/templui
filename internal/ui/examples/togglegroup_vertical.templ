@@ -2,32 +2,31 @@ package examples
 
 import (
 	"github.com/templui/templui/components/icon"
-	"github.com/templui/templui/components/toggle"
 	"github.com/templui/templui/components/togglegroup"
 	"github.com/templui/templui/utils"
 )
 
 templ ToggleGroupVertical() {
-	@togglegroup.Group(togglegroup.Props{
+	@togglegroup.ToggleGroup(togglegroup.Props{
 		Type:        togglegroup.TypeMultiple,
 		Orientation: togglegroup.OrientationVertical,
 		Spacing:     utils.Ptr(1),
 	}) {
-		@toggle.Toggle(toggle.Props{
+		@togglegroup.Item(togglegroup.ItemProps{
 			Value:      "bold",
 			Pressed:    true,
 			Attributes: templ.Attributes{"aria-label": "Toggle bold"},
 		}) {
 			@icon.Bold()
 		}
-		@toggle.Toggle(toggle.Props{
+		@togglegroup.Item(togglegroup.ItemProps{
 			Value:      "italic",
 			Pressed:    true,
 			Attributes: templ.Attributes{"aria-label": "Toggle italic"},
 		}) {
 			@icon.Italic()
 		}
-		@toggle.Toggle(toggle.Props{
+		@togglegroup.Item(togglegroup.ItemProps{
 			Value:      "underline",
 			Attributes: templ.Attributes{"aria-label": "Toggle underline"},
 		}) {

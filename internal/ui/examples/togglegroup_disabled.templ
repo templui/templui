@@ -2,27 +2,26 @@ package examples
 
 import (
 	"github.com/templui/templui/components/icon"
-	"github.com/templui/templui/components/toggle"
 	"github.com/templui/templui/components/togglegroup"
 )
 
 templ ToggleGroupDisabled() {
-	@togglegroup.Group(togglegroup.Props{Type: togglegroup.TypeMultiple}) {
-		@toggle.Toggle(toggle.Props{
+	@togglegroup.ToggleGroup(togglegroup.Props{Type: togglegroup.TypeMultiple}) {
+		@togglegroup.Item(togglegroup.ItemProps{
 			Value:      "bold",
 			Disabled:   true,
 			Attributes: templ.Attributes{"aria-label": "Toggle bold"},
 		}) {
 			@icon.Bold()
 		}
-		@toggle.Toggle(toggle.Props{
+		@togglegroup.Item(togglegroup.ItemProps{
 			Value:      "italic",
 			Disabled:   true,
 			Attributes: templ.Attributes{"aria-label": "Toggle italic"},
 		}) {
 			@icon.Italic()
 		}
-		@toggle.Toggle(toggle.Props{
+		@togglegroup.Item(togglegroup.ItemProps{
 			Value:      "strikethrough",
 			Disabled:   true,
 			Attributes: templ.Attributes{"aria-label": "Toggle strikethrough"},

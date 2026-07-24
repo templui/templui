@@ -448,9 +448,9 @@ templ ThemeShowcase() {
 			<!-- Tabs Navigation Card -->
 			@card.Card() {
 				@card.Content(card.ContentProps{Class: "p-6"}) {
-					@tabs.Tabs() {
+					@tabs.Tabs(tabs.Props{DefaultValue: "account"}) {
 						@tabs.List() {
-							@tabs.Trigger(tabs.TriggerProps{Value: "account", IsActive: true}) {
+							@tabs.Trigger(tabs.TriggerProps{Value: "account"}) {
 								Account
 							}
 							@tabs.Trigger(tabs.TriggerProps{Value: "security"}) {
@@ -460,7 +460,7 @@ templ ThemeShowcase() {
 								Billing
 							}
 						}
-						@tabs.Content(tabs.ContentProps{Value: "account", IsActive: true}) {
+						@tabs.Content(tabs.ContentProps{Value: "account"}) {
 							<div class="space-y-2 mt-4">
 								<h4 class="text-sm font-medium">Account Settings</h4>
 								<p class="text-sm text-muted-foreground">Manage your account preferences and profile information.</p>

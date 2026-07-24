@@ -158,7 +158,7 @@ func checkItemClasses(disabled bool) string {
 
 // Root renders no element: it only generates the id that links Trigger and
 // Content (via ctx).
-templ Root(props ...Props) {
+templ ContextMenu(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}

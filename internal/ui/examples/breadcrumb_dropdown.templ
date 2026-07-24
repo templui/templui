@@ -18,7 +18,7 @@ templ BreadcrumbDropdown() {
 				@icon.Dot()
 			}
 			@breadcrumb.Item() {
-				@dropdownmenu.Root() {
+				@dropdownmenu.DropdownMenu() {
 					<button class="flex items-center gap-1" { dropdownmenu.Trigger(ctx)... }>
 						Components
 						@icon.ChevronDown(icon.Props{Class: "size-3.5", Attributes: templ.Attributes{"data-icon": "inline-end"}})

@@ -15,7 +15,7 @@ templ DatePickerTime() {
 			@field.Label(field.LabelProps{For: "date-picker-optional"}) {
 				Date
 			}
-			@popover.Root(popover.RootProps{ID: "date-picker-time"}) {
+			@popover.Popover(popover.Props{ID: "date-picker-time"}) {
 		{{
 			triggerAttrs := popover.Trigger(ctx)
 			triggerAttrs["id"] = "date-picker-optional"

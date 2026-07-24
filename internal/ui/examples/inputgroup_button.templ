@@ -25,7 +25,7 @@ templ InputGroupButton() {
 			}
 		}
 		@inputgroup.InputGroup(inputgroup.Props{Class: "[--radius:9999px]"}) {
-			@popover.Root() {
+			@popover.Popover() {
 				@inputgroup.Addon(inputgroup.AddonProps{Attributes: popover.Trigger(ctx)}) {
 					@inputgroup.Button(inputgroup.ButtonProps{
 						Variant: "secondary",

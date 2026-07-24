@@ -185,18 +185,18 @@ const installTabTriggerClass = "rounded-none border-0 border-b-2 border-transpar
 templ InstallationBlock(component string) {
 	{{ hasScript := hasComponentScript(component) }}
 	{{ alias := componentAlias(component) }}
-	@tabs.Tabs(tabs.Props{ID: "installation-" + component, Class: "relative mt-6 w-full"}) {
+	@tabs.Tabs(tabs.Props{DefaultValue: "cli", ID: "installation-" + component, Class: "relative mt-6 w-full"}) {
 		@tabs.List(tabs.ListProps{
 			Class: "w-fit justify-start gap-6 rounded-none bg-transparent px-0 group-data-horizontal/tabs:h-9",
 		}) {
-			@tabs.Trigger(tabs.TriggerProps{Value: "cli", IsActive: true, Class: installTabTriggerClass}) {
+			@tabs.Trigger(tabs.TriggerProps{Value: "cli", Class: installTabTriggerClass}) {
 				Command
 			}
 			@tabs.Trigger(tabs.TriggerProps{Value: "manual", Class: installTabTriggerClass}) {
 				Manual
 			}
 		}
-		@tabs.Content(tabs.ContentProps{Value: "cli", IsActive: true}) {
+		@tabs.Content(tabs.ContentProps{Value: "cli"}) {
 			@CodeFigure(CodeFigureProps{Language: "bash", Code: "templui add " + component})
 			if hasScript {
 				<p>Load the script once in your layout:</p>
@@ -279,7 +279,7 @@ templ CopyPageMenu() {
 			</span>
 			Copy Page
 		}
-		@dropdownmenu.Root() {
+		@dropdownmenu.DropdownMenu() {
 			@button.Button(button.Props{
 				Variant:    button.VariantSecondary,
 				Size:       button.SizeSm,

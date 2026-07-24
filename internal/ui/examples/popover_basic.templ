@@ -6,7 +6,7 @@ import (
 )
 
 templ PopoverBasic() {
-	@popover.Root() {
+	@popover.Popover() {
 		@button.Button(button.Props{
 			Variant:    button.VariantOutline,
 			Attributes: popover.Trigger(ctx),

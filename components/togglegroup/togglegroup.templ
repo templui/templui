@@ -45,7 +45,7 @@ type Props struct {
 	Spacing *int
 }
 
-templ Group(props ...Props) {
+templ ToggleGroup(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
@@ -90,6 +90,21 @@ templ Group(props ...Props) {
 	>
 		{ children... }
 	</div>
+}
+
+// ItemProps mirror toggle.Props, ToggleGroupItem's pendant.
+type ItemProps = toggle.Props
+
+// Item is the ToggleGroupItem pendant: a toggle that picks up the group's
+// variant, size and spacing from context.
+templ Item(props ...ItemProps) {
+	{{ var p ItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@toggle.Toggle(p) {
+		{ children... }
+	}
 }
 
 templ Script() {

@@ -34,7 +34,7 @@ templ ExampleWrapper(p ExampleWrapperProps) {
 		}
 	>
 		<p class="mb-2 font-semibold">{ p.SectionName }</p>
-		@tabs.Tabs(tabs.Props{
+		@tabs.Tabs(tabs.Props{DefaultValue: "preview", 
 			ID: "example-" + p.ID,
 		}) {
 			<div class="flex items-center justify-between">
@@ -42,8 +42,7 @@ templ ExampleWrapper(p ExampleWrapperProps) {
 					Class: "md:w-1/2",
 				}) {
 					@tabs.Trigger(tabs.TriggerProps{
-						Value:    "preview",
-						IsActive: true,
+						Value: "preview",
 					}) {
 						Preview
 					}
@@ -67,8 +66,7 @@ templ ExampleWrapper(p ExampleWrapperProps) {
 			</div>
 			<div class="w-full relative mt-2">
 				@tabs.Content(tabs.ContentProps{
-					Value:    "preview",
-					IsActive: true,
+					Value: "preview",
 				}) {
 					if p.UseIframe && p.PreviewURL != "" {
 						<div class="border rounded-md overflow-hidden">

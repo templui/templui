@@ -54,7 +54,7 @@ func Trigger(ctx context.Context) templ.Attributes {
 	}
 }
 
-type RootProps struct {
+type Props struct {
 	ID string
 }
 
@@ -92,7 +92,7 @@ type DescriptionProps struct {
 
 // Root renders no element: it only carries the id that links Trigger and
 // Content (via ctx).
-func Root(props ...RootProps) templ.Component {
+func Popover(props ...Props) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -113,7 +113,7 @@ func Root(props ...RootProps) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var p RootProps
+		var p Props
 		if len(props) > 0 {
 			p = props[0]
 		}

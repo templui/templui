@@ -5,7 +5,6 @@ import (
 	"github.com/templui/templui/components/card"
 	"github.com/templui/templui/components/input"
 	"github.com/templui/templui/components/label"
-	"github.com/templui/templui/components/toggle"
 	"github.com/templui/templui/components/togglegroup"
 )
 
@@ -24,13 +23,13 @@ var spacingOptions = []spacingOption{
 
 templ CardSpacing() {
 	<div class="mx-auto grid w-full max-w-sm gap-4" data-card-spacing-demo>
-		@togglegroup.Group(togglegroup.Props{
+		@togglegroup.ToggleGroup(togglegroup.Props{
 			Variant: togglegroup.VariantOutline,
 			Size:    togglegroup.SizeSm,
 			Class:   "justify-center",
 		}) {
 			for i, option := range spacingOptions {
-				@toggle.Toggle(toggle.Props{
+				@togglegroup.Item(togglegroup.ItemProps{
 					Value:      option.Value,
 					Pressed:    i == 0,
 					Attributes: templ.Attributes{"data-spacing-class": option.Class},

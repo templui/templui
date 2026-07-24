@@ -2,7 +2,6 @@ package examples
 
 import (
 	"github.com/templui/templui/components/field"
-	"github.com/templui/templui/components/toggle"
 	"github.com/templui/templui/components/togglegroup"
 	"github.com/templui/templui/utils"
 )
@@ -12,14 +11,14 @@ templ ToggleGroupCustom() {
 		@field.Label() {
 			Font Weight
 		}
-		@togglegroup.Group(togglegroup.Props{
+		@togglegroup.ToggleGroup(togglegroup.Props{
 			ID:      "font-weight-group",
 			Type:    togglegroup.TypeSingle,
 			Variant: togglegroup.VariantOutline,
 			Size:    togglegroup.SizeLg,
 			Spacing: utils.Ptr(2),
 		}) {
-			@toggle.Toggle(toggle.Props{
+			@togglegroup.Item(togglegroup.ItemProps{
 				Value:      "light",
 				Class:      "flex size-16 flex-col items-center justify-center rounded-xl",
 				Attributes: templ.Attributes{"aria-label": "Light"},
@@ -27,7 +26,7 @@ templ ToggleGroupCustom() {
 				<span class="text-2xl leading-none font-light">Aa</span>
 				<span class="text-xs text-muted-foreground">Light</span>
 			}
-			@toggle.Toggle(toggle.Props{
+			@togglegroup.Item(togglegroup.ItemProps{
 				Value:      "normal",
 				Pressed:    true,
 				Class:      "flex size-16 flex-col items-center justify-center rounded-xl",
@@ -36,7 +35,7 @@ templ ToggleGroupCustom() {
 				<span class="text-2xl leading-none font-normal">Aa</span>
 				<span class="text-xs text-muted-foreground">Normal</span>
 			}
-			@toggle.Toggle(toggle.Props{
+			@togglegroup.Item(togglegroup.ItemProps{
 				Value:      "medium",
 				Class:      "flex size-16 flex-col items-center justify-center rounded-xl",
 				Attributes: templ.Attributes{"aria-label": "Medium"},
@@ -44,7 +43,7 @@ templ ToggleGroupCustom() {
 				<span class="text-2xl leading-none font-medium">Aa</span>
 				<span class="text-xs text-muted-foreground">Medium</span>
 			}
-			@toggle.Toggle(toggle.Props{
+			@togglegroup.Item(togglegroup.ItemProps{
 				Value:      "bold",
 				Class:      "flex size-16 flex-col items-center justify-center rounded-xl",
 				Attributes: templ.Attributes{"aria-label": "Bold"},
