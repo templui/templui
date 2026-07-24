@@ -220,6 +220,21 @@
   @apply border-border/50 dark:border-border;
 }
 
+/* shadcn's v4 site layout utilities: the container caps at 1400px (2xl
+   screens go wider), the wrapper centers it, theme-container scopes the
+   font. */
+@utility theme-container {
+  @apply font-sans;
+}
+
+@utility container-wrapper {
+  @apply mx-auto w-full px-2;
+}
+
+@utility container {
+  @apply mx-auto max-w-[1400px] px-4 3xl:max-w-screen-2xl lg:px-8;
+}
+
 @utility section-soft {
   @apply bg-linear-to-b from-background to-surface/40 dark:bg-background;
 }

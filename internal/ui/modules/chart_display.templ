@@ -1,0 +1,166 @@
+package modules
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/separator"
+	"github.com/templui/templui/components/sheet"
+	"github.com/templui/templui/components/tooltip"
+	"github.com/templui/templui/utils"
+	"strings"
+)
+
+// ChartEntry is one gallery chart, the pendant of chart-display.tsx's
+// Chart shape: registry id, source code and the rendered component.
+type ChartEntry struct {
+	ID        string
+	FullWidth bool
+	Code      string
+	Component templ.Component
+}
+
+// ChartDisplay is the ChartDisplay pendant: toolbar plus chart, fullWidth
+// entries span the grid.
+templ ChartDisplay(entry ChartEntry) {
+	<div
+		class={ utils.TwMerge(
+			"themes-wrapper group relative flex flex-col overflow-hidden rounded-xl transition-all duration-200 ease-in-out hover:z-30",
+			utils.IfElse(entry.FullWidth, "md:col-span-2 lg:col-span-3", ""),
+		) }
+	>
+		@chartToolbar(entry)
+		<div class="relative z-10 overflow-hidden rounded-xl bg-background">
+			@entry.Component
+		</div>
+	</div>
+}
+
+// chartToolbar is the ChartToolbar pendant: chart type title on the left,
+// copy button, separator and the code viewer trigger on the right.
+templ chartToolbar(entry ChartEntry) {
+	<div class="relative z-20 flex items-center gap-2 justify-end px-3 py-2.5">
+		<div class="flex items-center gap-1.5 pl-1 text-[13px] text-muted-foreground [&>svg]:h-[0.9rem] [&>svg]:w-[0.9rem]">
+			@chartTitle(entry.ID)
+		</div>
+		<div class="ml-auto flex items-center gap-2 [&>form]:flex">
+			@chartCopyButton(entry.ID, "[&_svg]:h-3 h-6 w-6 rounded-[6px] bg-transparent text-foreground shadow-none hover:bg-muted dark:text-foreground [&_svg]:w-3")
+			@separator.Separator(separator.Props{
+				Orientation: separator.OrientationVertical,
+				Class:       "mx-0 hidden h-4! md:flex",
+			})
+			@chartCodeViewer(entry)
+		</div>
+	</div>
+	<textarea hidden readonly data-tui-chart-code={ entry.ID }>{ entry.Code }</textarea>
+}
+
+// chartTitle mirrors ChartToolbar's ChartTitle switch on the chart name.
+templ chartTitle(name string) {
+	if strings.Contains(name, "chart-line") {
+		@icon.ChartLine()
+		Line Chart
+	} else if strings.Contains(name, "chart-bar") {
+		@icon.ChartColumnBig()
+		Bar Chart
+	} else if strings.Contains(name, "chart-pie") {
+		@icon.ChartPie()
+		Pie Chart
+	} else if strings.Contains(name, "chart-area") {
+		@icon.ChartArea()
+		Area Chart
+	} else if strings.Contains(name, "chart-radar") {
+		@icon.Hexagon()
+		Radar Chart
+	} else if strings.Contains(name, "chart-radial") {
+		@icon.Radar()
+		Radial Chart
+	} else if strings.Contains(name, "chart-tooltip") {
+		@icon.MousePointer2()
+		Tooltip
+	} else {
+		{ name }
+	}
+}
+
+// chartCopyButton is the ChartCopyButton pendant: ghost icon button with a
+// "Copy code" tooltip that copies the chart source and swaps to a check
+// for two seconds.
+templ chartCopyButton(name, class string) {
+	@tooltip.Tooltip() {
+		@button.Button(button.Props{
+			Size:    button.SizeIcon,
+			Variant: button.VariantGhost,
+			Class:   utils.TwMerge("h-7 w-7 rounded-[6px] [&_svg]:h-3.5 [&_svg]:w-3.5", class),
+			Attributes: utils.MergeAttributes(tooltip.Trigger(ctx), templ.Attributes{
+				"data-tui-chart-copy": name,
+				"aria-label":          "Copy code",
+			}),
+		}) {
+			<span class="sr-only">Copy</span>
+			<span data-tui-chart-copy-idle>
+				@icon.Copy()
+			</span>
+			<span data-tui-chart-copy-done class="hidden">
+				@icon.Check()
+			</span>
+		}
+		@tooltip.Content(tooltip.ContentProps{Class: "bg-black text-white"}) {
+			Copy code
+		}
+	}
+}
+
+// chartCodeViewer is the ChartCodeViewer pendant: the View Code button
+// opens a right side sheet with the chart preview on top and the
+// highlighted source below.
+templ chartCodeViewer(entry ChartEntry) {
+	@sheet.Sheet() {
+		@button.Button(button.Props{
+			Size:       button.SizeSm,
+			Variant:    button.VariantOutline,
+			Class:      "h-6 rounded-[6px] border bg-transparent px-2 text-xs text-foreground shadow-none hover:bg-muted dark:text-foreground",
+			Attributes: sheet.Trigger(ctx),
+		}) {
+			View Code
+		}
+		@sheet.Content(sheet.ContentProps{
+			Side: sheet.SideRight,
+			// The charts app uses shadcn's app-level sheet: full slide-in
+			// from the right (500ms in, 300ms out), no fade. The width
+			// needs the important marker to beat the base sheet's
+			// data-[side=right]:sm:max-w-sm.
+			Class: "flex flex-col gap-0 border-l-0 p-0 sm:max-w-sm! md:w-[700px]! md:max-w-[700px]! dark:border-l bg-background data-[tui-dialog-open=false]:translate-x-full data-[tui-dialog-open=false]:opacity-100 data-[tui-dialog-open=true]:duration-500 data-[tui-dialog-open=false]:duration-300",
+		}) {
+			<div class="sr-only">
+				@sheet.Title() {
+					Code
+				}
+				@sheet.Description() {
+					View the code for the chart.
+				}
+			</div>
+			<div class="flex min-h-0 flex-1 flex-col gap-0">
+				// Like shadcn's ChartCodeViewer usage: the preview slot
+				// stays empty, the sheet shows the code only.
+				<div class="chart-wrapper hidden theme-container sm:block [&_[data-chart]]:mx-auto [&_[data-chart]]:max-h-[35vh] [&>div]:rounded-none [&>div]:border-0 [&>div]:border-b [&>div]:shadow-none"></div>
+				<div class="flex min-w-0 flex-1 flex-col overflow-hidden p-4">
+					<figure data-rehype-pretty-code-figure="" class="mt-0 flex h-auto min-w-0 flex-1 flex-col overflow-hidden rounded-2xl bg-code text-sm text-code-foreground outline-none">
+						<figcaption
+							class="flex h-12 shrink-0 items-center gap-2 border-b border-border/30 py-2 pr-2 pl-4 font-mono text-code-foreground [&>svg]:size-4 [&>svg]:text-code-foreground [&>svg]:opacity-70"
+							data-language="templ"
+						>
+							@icon.FileCode()
+							{ entry.ID }
+							<div class="ml-auto flex items-center gap-2">
+								@chartCopyButton(entry.ID, "text-code-foreground hover:bg-white/10 hover:text-code-foreground")
+							</div>
+						</figcaption>
+						<div class="no-scrollbar min-h-0 flex-1 overflow-y-auto [&_pre]:px-4 [&_pre]:py-3.5">
+							@templ.Raw(GetHighlightedHTML(ctx, entry.Code, "go"))
+						</div>
+					</figure>
+				</div>
+			</div>
+		}
+	}
+}

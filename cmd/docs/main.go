@@ -115,7 +115,19 @@ func main() {
 	mux.Handle("GET /docs/how-to-use", markdownDocsHandler("how-to-use"))
 	// Components
 	mux.Handle("GET /docs/components/{slug}", componentDocHandler(docsService))
-	mux.Handle("GET /docs/components/charts", htmxHandler(pages.Chart()))
+	mux.Handle("GET /charts", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/charts/area", http.StatusMovedPermanently)
+	}))
+	mux.Handle("GET /charts/{type}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		chartType := r.PathValue("type")
+		if !pages.ChartTypes[chartType] {
+			http.NotFound(w, r)
+			return
+		}
+		if err := pages.Charts(chartType).Render(r.Context(), w); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}))
 	mux.Handle("GET /preview/{name}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		entry, ok := examples.Registry[r.PathValue("name")]
 		if !ok {

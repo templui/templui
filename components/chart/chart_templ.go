@@ -8,85 +8,38 @@ package chart
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/templui/templui/utils"
+import (
+	"fmt"
+	"strings"
 
-type Variant string
-
-const (
-	VariantBar      Variant = "bar"
-	VariantLine     Variant = "line"
-	VariantPie      Variant = "pie"
-	VariantDoughnut Variant = "doughnut"
-	VariantRadar    Variant = "radar"
+	"github.com/templui/templui/utils"
 )
 
-type Dataset struct {
-	Label           string      `json:"label"`
-	Data            []float64   `json:"data"`
-	BorderWidth     int         `json:"borderWidth,omitempty"`
-	BorderColor     interface{} `json:"borderColor,omitempty"`
-	BackgroundColor interface{} `json:"backgroundColor,omitempty"`
-	Tension         float64     `json:"tension,omitempty"`
-	Fill            bool        `json:"fill,omitempty"`
-	Stepped         bool        `json:"stepped,omitempty"`
+// Config is the pendant of shadcn's ChartConfig: label and color per
+// series key. The container turns it into --color-<key> variables.
+type Config []Series
+
+type Series struct {
+	Key   string
+	Label string
+	Color string
 }
 
-type Options struct {
-	Responsive bool `json:"responsive,omitempty"`
-	Legend     bool `json:"legend,omitempty"`
+func (c Config) styleBlock(id string) string {
+	var sb strings.Builder
+	fmt.Fprintf(&sb, "[data-chart=%s] {\n", id)
+	for _, s := range c {
+		if s.Color != "" {
+			fmt.Fprintf(&sb, "  --color-%s: %s;\n", s.Key, s.Color)
+		}
+	}
+	sb.WriteString("}\n")
+	return sb.String()
 }
 
-type Data struct {
-	Labels   []string  `json:"labels"`
-	Datasets []Dataset `json:"datasets"`
-}
-
-type Config struct {
-	Type        Variant  `json:"type"`
-	Data        Data     `json:"data"`
-	Options     Options  `json:"options,omitempty"`
-	ShowLegend  bool     `json:"showLegend,omitempty"`
-	ShowXAxis   bool     `json:"showXAxis"`
-	ShowYAxis   bool     `json:"showYAxis"`
-	ShowXLabels bool     `json:"showXLabels"`
-	ShowYLabels bool     `json:"showYLabels"`
-	ShowXGrid   bool     `json:"showXGrid"`
-	ShowYGrid   bool     `json:"showYGrid"`
-	Horizontal  bool     `json:"horizontal"`
-	Stacked     bool     `json:"stacked"`
-	YMin        *float64 `json:"yMin,omitempty"`
-	YMax        *float64 `json:"yMax,omitempty"`
-	BeginAtZero *bool    `json:"beginAtZero,omitempty"`
-}
-
-type ScriptConfig struct {
-	RawConfig       map[string]any `json:"rawConfig,omitempty"`
-	GeneratedConfig *Config        `json:"generatedConfig,omitempty"`
-}
-
-type Props struct {
-	ID          string
-	Variant     Variant
-	Data        Data
-	Options     Options
-	RawConfig   map[string]any
-	ShowLegend  bool
-	ShowXAxis   bool
-	ShowYAxis   bool
-	ShowXLabels bool
-	ShowYLabels bool
-	ShowXGrid   bool
-	ShowYGrid   bool
-	Horizontal  bool
-	Stacked     bool
-	YMin        *float64
-	YMax        *float64
-	BeginAtZero *bool
-	Class       string
-	Attributes  templ.Attributes
-}
-
-func Chart(props ...Props) templ.Component {
+// Container is the ChartContainer pendant: aspect-video flex box with the
+// Recharts-compat CSS and the generated color variables.
+func Container(id string, config Config, class string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -107,37 +60,32 @@ func Chart(props ...Props) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var p Props
-		if len(props) > 0 {
-			p = props[0]
+		templ_7745c5c3_Err = templ.Raw("<style>"+config.styleBlock(id)+"</style>").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
-		if p.ID == "" {
-			p.ID = "chart-" + utils.RandomID()
-		}
-		canvasId := p.ID + "-canvas"
-		dataId := p.ID + "-data"
 		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
-			"chart-container relative",
-			p.Class),
-		}
+			"flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+			class,
+		)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div data-chart=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 92, Col: 11}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 37, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" data-tui-chart class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -150,68 +98,15 @@ func Chart(props ...Props) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templ.RenderAttributes(ctx, templ_7745c5c3_Buffer, p.Attributes)
+		templ_7745c5c3_Err = templ_7745c5c3_Var1.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "><canvas id=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(canvasId)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 100, Col: 23}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" data-tui-chart-id=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(dataId)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 100, Col: 52}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"></canvas></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		scriptConfig := ScriptConfig{
-			RawConfig: p.RawConfig,
-		}
-		if p.RawConfig == nil {
-			generatedConfig := Config{
-				Type:        p.Variant,
-				Data:        p.Data,
-				Options:     p.Options,
-				ShowLegend:  p.ShowLegend,
-				ShowXAxis:   p.ShowXAxis,
-				ShowYAxis:   p.ShowYAxis,
-				ShowXLabels: p.ShowXLabels,
-				ShowYLabels: p.ShowYLabels,
-				ShowXGrid:   p.ShowXGrid,
-				ShowYGrid:   p.ShowYGrid,
-				Horizontal:  p.Horizontal,
-				Stacked:     p.Stacked,
-				YMin:        p.YMin,
-				YMax:        p.YMax,
-				BeginAtZero: p.BeginAtZero,
-			}
-			scriptConfig.GeneratedConfig = &generatedConfig
-		}
-		templ_7745c5c3_Err = templ.JSONScript(dataId, scriptConfig).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -219,8 +114,8 @@ func Chart(props ...Props) templ.Component {
 	})
 }
 
-var scriptOnce = templ.NewOnceHandle()
-
+// Script loads the chart component JS (tooltips, cursors, responsive
+// re-rendering).
 func Script() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -237,12 +132,12 @@ func Script() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var7 == nil {
-			templ_7745c5c3_Var7 = templ.NopComponent
+		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var5 == nil {
+			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Var8 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var6 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 			if !templ_7745c5c3_IsBuffer {
@@ -260,12 +155,14 @@ func Script() templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = scriptOnce.Once().Render(templ.WithChildren(ctx, templ_7745c5c3_Var8), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = scriptOnce.Once().Render(templ.WithChildren(ctx, templ_7745c5c3_Var6), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		return nil
 	})
 }
+
+var scriptOnce = templ.NewOnceHandle()
 
 var _ = templruntime.GeneratedTemplate

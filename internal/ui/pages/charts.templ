@@ -1,0 +1,198 @@
+package pages
+
+import (
+	"github.com/templui/templui/components/badge"
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/internal/ui/charts"
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/utils"
+)
+
+// The charts gallery, the pendant of shadcn's /charts pages: page header
+// with announcement, the category nav and a card grid per chart type.
+
+type chartsNavLink struct {
+	Name string
+	Type string
+}
+
+var chartsNavLinks = []chartsNavLink{
+	{"Area Charts", "area"},
+	{"Bar Charts", "bar"},
+	{"Line Charts", "line"},
+	{"Pie Charts", "pie"},
+	{"Radar Charts", "radar"},
+	{"Radial Charts", "radial"},
+	{"Tooltips", "tooltip"},
+}
+
+// ChartTypes are the valid gallery categories.
+var ChartTypes = map[string]bool{
+	"area": true, "bar": true, "line": true, "pie": true,
+	"radar": true, "radial": true, "tooltip": true,
+}
+
+// chartsFor lists the ported charts per category, in charts.tsx order.
+func chartsFor(chartType string) []modules.ChartEntry {
+	entry := func(id string, fullWidth bool, component templ.Component) modules.ChartEntry {
+		return modules.ChartEntry{ID: id, FullWidth: fullWidth, Code: charts.Source(id), Component: component}
+	}
+	switch chartType {
+	case "area":
+		return []modules.ChartEntry{
+			entry("chart-area-interactive", true, charts.ChartAreaInteractive()),
+			entry("chart-area-default", false, charts.ChartAreaDefault()),
+		}
+	case "bar":
+		return []modules.ChartEntry{
+			entry("chart-bar-interactive", true, charts.ChartBarInteractive()),
+			entry("chart-bar-default", false, charts.ChartBarDefault()),
+		}
+	case "pie":
+		return []modules.ChartEntry{
+			entry("chart-pie-donut", false, charts.ChartPieDonut()),
+			entry("chart-pie-interactive", false, charts.ChartPieInteractive()),
+		}
+	}
+	return nil
+}
+
+templ Charts(chartType string) {
+	@layouts.BaseLayout(
+		"Beautiful Charts & Graphs - templUI",
+		"A collection of ready-to-use chart components built with templUI. From basic charts to rich data displays, copy and paste into your apps.",
+	) {
+		@modules.AnnouncementBar()
+		<div class="sticky top-0 z-40 bg-background">
+			@modules.Navbar()
+		</div>
+		<section class="border-grid">
+			<div class="container-wrapper">
+				<div class="container mx-auto flex flex-col items-center gap-2 px-6 py-8 text-center md:py-16 lg:py-20 xl:gap-4">
+					@badge.Badge(badge.Props{Variant: badge.VariantSecondary, Class: "bg-muted", Href: "/docs/components/chart"}) {
+						@icon.ChartArea(icon.Props{Class: "size-3", Attributes: templ.Attributes{"data-icon": "inline-start"}})
+						Charts are now available
+						@icon.ArrowRight()
+					}
+					<h1 class="leading-tighter max-w-3xl text-3xl font-semibold tracking-tight text-balance text-primary lg:leading-[1.1] lg:font-semibold xl:text-5xl xl:tracking-tighter">
+						Beautiful Charts & Graphs
+					</h1>
+					<p class="max-w-4xl text-base text-balance text-foreground sm:text-lg">
+						A collection of ready-to-use chart components built with templUI. From basic charts to rich data displays, copy and paste into your apps.
+					</p>
+					<div class="flex w-full items-center justify-center gap-2 pt-2 **:data-[slot=button]:shadow-none">
+						@button.Button(button.Props{Class: "px-3", Href: "#charts"}) {
+							Browse Charts
+						}
+						@button.Button(button.Props{Variant: button.VariantGhost, Class: "px-3", Href: "/docs/components/chart"}) {
+							Documentation
+						}
+					</div>
+				</div>
+			</div>
+		</section>
+		<div id="charts" class="container-wrapper scroll-mt-24">
+			<div class="container mx-auto flex items-center justify-between gap-4 px-4 py-4">
+				<div class="relative overflow-hidden">
+					<div class="max-w-[600px] overflow-x-auto no-scrollbar lg:max-w-none">
+						<div class="flex items-center">
+							for _, link := range chartsNavLinks {
+								<a
+									href={ templ.SafeURL("/charts/" + link.Type + "#charts") }
+									data-active={ utils.IfElse(link.Type == chartType, "true", "false") }
+									class="flex h-7 shrink-0 items-center justify-center px-4 text-center text-base font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:text-primary"
+								>
+									{ link.Name }
+								</a>
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container-wrapper flex-1">
+			<div class="container mx-auto px-4 pb-6">
+				<section class="theme-container">
+					<div class="grid flex-1 gap-12 lg:gap-24">
+						<h2 class="sr-only">{ chartType } Charts</h2>
+						<div class="grid flex-1 scroll-mt-20 items-stretch gap-10 md:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:gap-10">
+							for _, entry := range chartsFor(chartType) {
+								@modules.ChartDisplay(entry)
+							}
+							for range 12 - len(chartsFor(chartType)) {
+								<div class="hidden aspect-square w-full rounded-lg border border-dashed xl:block"></div>
+							}
+						</div>
+					</div>
+				</section>
+			</div>
+		</div>
+		@modules.Footer()
+		@chart.Script()
+		@chartsPageScript()
+	}
+}
+
+// chartsPageScript wires the gallery interactions that live outside the
+// chart component: the copy buttons and the interactive demo toggles.
+templ chartsPageScript() {
+	<script nonce={ templ.GetNonce(ctx) }>
+		(() => {
+			// Copy buttons: write the chart source, swap to the check icon
+			// for two seconds.
+			document.addEventListener("click", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const btn = e.target.closest("[data-tui-chart-copy]");
+				if (!btn) return;
+				const name = btn.getAttribute("data-tui-chart-copy");
+				const code = document.querySelector(`[data-tui-chart-code="${name}"]`);
+				if (!code) return;
+				navigator.clipboard.writeText(code.value);
+				btn.querySelector("[data-tui-chart-copy-idle]").classList.add("hidden");
+				btn.querySelector("[data-tui-chart-copy-done]").classList.remove("hidden");
+				setTimeout(() => {
+					btn.querySelector("[data-tui-chart-copy-idle]").classList.remove("hidden");
+					btn.querySelector("[data-tui-chart-copy-done]").classList.add("hidden");
+				}, 2000);
+			});
+
+			// Interactive demos: the selects toggle the SSR variants.
+			document.addEventListener("select-change", (e) => {
+				const trigger = e.target instanceof Element && e.target.closest("[data-tui-chart-range-select], [data-tui-chart-month-select]");
+				if (!trigger) return;
+				const value = e.detail && e.detail.value;
+				if (!value) return;
+				const chart = trigger.closest("[data-slot=card]");
+				if (!chart) return;
+				if (trigger.hasAttribute("data-tui-chart-range-select")) {
+					chart.querySelectorAll("[data-tui-chart-range]").forEach((el) => {
+						el.hidden = el.getAttribute("data-tui-chart-range") !== value;
+					});
+				} else {
+					chart.querySelectorAll("[data-tui-chart-month]").forEach((el) => {
+						el.hidden = el.getAttribute("data-tui-chart-month") !== value;
+					});
+				}
+			});
+
+			// Bar interactive: header buttons toggle the series.
+			document.addEventListener("click", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const btn = e.target.closest("[data-tui-chart-series]");
+				if (!btn) return;
+				const series = btn.getAttribute("data-tui-chart-series");
+				const chart = btn.closest("[data-slot=card]");
+				if (!chart) return;
+				chart.querySelectorAll("[data-tui-chart-series]").forEach((b) => {
+					b.setAttribute("data-active", b === btn ? "true" : "false");
+				});
+				chart.querySelectorAll("[data-tui-chart-series-panel]").forEach((el) => {
+					el.hidden = el.getAttribute("data-tui-chart-series-panel") !== series;
+				});
+			});
+		})();
+	</script>
+}

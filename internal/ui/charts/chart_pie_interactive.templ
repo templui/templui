@@ -1,0 +1,144 @@
+package charts
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	selectcomp "github.com/templui/templui/components/select"
+)
+
+// The pendant of chart-pie-interactive.tsx.
+
+type pieMonth struct {
+	Month   string
+	Label   string
+	Desktop float64
+}
+
+var chartPieInteractiveData = []pieMonth{
+	{"january", "January", 186},
+	{"february", "February", 305},
+	{"march", "March", 237},
+	{"april", "April", 173},
+	{"may", "May", 209},
+}
+
+var chartPieInteractiveConfig = chart.Config{
+	{Key: "visitors", Label: "Visitors"},
+	{Key: "desktop", Label: "Desktop"},
+	{Key: "mobile", Label: "Mobile"},
+	{Key: "january", Label: "January", Color: "var(--chart-1)"},
+	{Key: "february", Label: "February", Color: "var(--chart-2)"},
+	{Key: "march", Label: "March", Color: "var(--chart-3)"},
+	{Key: "april", Label: "April", Color: "var(--chart-4)"},
+	{Key: "may", Label: "May", Color: "var(--chart-5)"},
+}
+
+// chartPieInteractiveSVG renders the donut with one active month: the
+// active sector grows by 10 and gets the detached outer ring, and the
+// center label shows its value.
+func chartPieInteractiveSVG(activeIdx int) string {
+	const W, H = 300.0, 300.0
+	const margin = 5.0
+	cx, cy := W/2, H/2
+	maxR := (min(W, H) - 2*margin) / 2
+	outerR := maxR * 0.8
+	innerR := 60.0
+
+	total := 0.0
+	for _, d := range chartPieInteractiveData {
+		total += d.Desktop
+	}
+
+	var sb strings.Builder
+	fmt.Fprintf(&sb, `<svg class="recharts-surface" width="100%%" height="100%%" viewBox="0 0 %s %s" style="width:100%%;height:100%%">`, chart.FmtF(W), chart.FmtF(H))
+	sb.WriteString(`<g class="recharts-layer recharts-pie">`)
+	angle := 0.0
+	for i, d := range chartPieInteractiveData {
+		sweep := d.Desktop / total * 360
+		if i == activeIdx {
+			fmt.Fprintf(&sb,
+				`<g class="recharts-layer recharts-pie-sector"><path class="recharts-sector" stroke="#fff" stroke-width="5" fill="var(--color-%s)" d="%s"/><path class="recharts-sector" stroke="#fff" stroke-width="5" fill="var(--color-%s)" d="%s"/></g>`,
+				d.Month, chart.SectorPath(cx, cy, innerR, outerR+10, angle, angle+sweep),
+				d.Month, chart.SectorPath(cx, cy, outerR+12, outerR+25, angle, angle+sweep))
+		} else {
+			fmt.Fprintf(&sb,
+				`<g class="recharts-layer recharts-pie-sector"><path class="recharts-sector" stroke="#fff" stroke-width="5" fill="var(--color-%s)" d="%s"/></g>`,
+				d.Month, chart.SectorPath(cx, cy, innerR, outerR, angle, angle+sweep))
+		}
+		angle += sweep
+	}
+	active := chartPieInteractiveData[activeIdx]
+	fmt.Fprintf(&sb,
+		`<text x="%s" y="%s" text-anchor="middle" dominant-baseline="middle"><tspan x="%s" y="%s" class="fill-foreground text-3xl font-bold">%s</tspan><tspan x="%s" y="%s" class="fill-muted-foreground">Visitors</tspan></text>`,
+		chart.FmtF(cx), chart.FmtF(cy), chart.FmtF(cx), chart.FmtF(cy), groupThousands(int(active.Desktop)), chart.FmtF(cx), chart.FmtF(cy+24))
+	sb.WriteString(`</g></svg>`)
+	return sb.String()
+}
+
+// chartPieInteractiveModel is the client runtime payload (tooltip only).
+func chartPieInteractiveModel() chart.Model {
+	labels := make([]string, len(chartPieInteractiveData))
+	colors := make([]string, len(chartPieInteractiveData))
+	values := make([]float64, len(chartPieInteractiveData))
+	for i, d := range chartPieInteractiveData {
+		labels[i] = d.Label
+		colors[i] = "var(--color-" + d.Month + ")"
+		values[i] = d.Desktop
+	}
+	return chart.Model{
+		Kind:        "pie",
+		Cursor:      false,
+		Labels:      labels,
+		SliceColors: colors,
+		Series:      []chart.ModelSeries{{Key: "desktop", Label: "Desktop", Values: values}},
+		Tooltip:     chart.TooltipModel{HideLabel: true},
+	}
+}
+
+templ ChartPieInteractive() {
+	@card.Card(card.Props{Class: "flex flex-col"}) {
+		@card.Header(card.HeaderProps{Class: "flex-row items-start space-y-0 pb-0"}) {
+			<div class="grid gap-1">
+				@card.Title() {
+					Pie Chart - Interactive
+				}
+				@card.Description() {
+					January - June 2024
+				}
+			</div>
+			@selectcomp.Select(selectcomp.Props{Value: "january"}) {
+				@selectcomp.Trigger(selectcomp.TriggerProps{
+					Class:      "ml-auto h-7 w-[130px] rounded-lg pl-2.5",
+					Attributes: templ.Attributes{"aria-label": "Select a value", "data-tui-chart-month-select": "pie-interactive"},
+				}) {
+					@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select month"})
+				}
+				@selectcomp.Content(selectcomp.ContentProps{Align: selectcomp.AlignEnd, Class: "rounded-xl"}) {
+					for _, d := range chartPieInteractiveData {
+						@selectcomp.Item(selectcomp.ItemProps{Value: d.Month, Label: d.Label, Class: "rounded-lg [&_span]:flex"}) {
+							<div class="flex items-center gap-2 text-xs">
+								<span
+									class="flex h-3 w-3 shrink-0 rounded-xs"
+									style={ "background-color:var(--color-" + d.Month + ")" }
+								></span>
+								{ d.Label }
+							</div>
+						}
+					}
+				}
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-1 justify-center pb-0"}) {
+			@chart.Container("pie-interactive", chartPieInteractiveConfig, "mx-auto aspect-square w-full max-w-[300px]") {
+				for i, d := range chartPieInteractiveData {
+					<div data-tui-chart-month={ d.Month } hidden?={ i != 0 } style="position:relative;width:100%;height:100%">
+						@templ.Raw(chart.ModelScript(chartPieInteractiveModel()) + chartPieInteractiveSVG(i))
+					</div>
+				}
+			}
+		}
+	}
+}

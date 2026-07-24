@@ -1,0 +1,138 @@
+package charts
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/components/icon"
+)
+
+// The pendant of chart-area-default.tsx.
+
+var chartAreaDefaultData = []barMonth{
+	{"January", 186},
+	{"February", 305},
+	{"March", 237},
+	{"April", 73},
+	{"May", 209},
+	{"June", 214},
+}
+
+var chartAreaDefaultConfig = chart.Config{
+	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
+}
+
+// chartAreaDefaultSVG renders the AreaChart: natural curve, fillOpacity
+// 0.4, grid without verticals, XAxis without tick/axis lines.
+func chartAreaDefaultSVG() string {
+	// Recharts' margin prop replaces the default entirely: the demo sets
+	// only left/right 12, so top and bottom are 0.
+	const W, H = 369.0, 207.0
+	const marginTop, marginRight, marginBottom, marginLeft = 0.0, 12.0, 0.0, 12.0
+	const xAxisHeight, tickMargin = 30.0, 8.0
+
+	plotX, plotY := marginLeft, marginTop
+	plotW := W - marginLeft - marginRight
+	plotH := H - marginTop - marginBottom - xAxisHeight
+	plotBottom := plotY + plotH
+
+	maxV := 0.0
+	for _, d := range chartAreaDefaultData {
+		if d.Desktop > maxV {
+			maxV = d.Desktop
+		}
+	}
+	ticks := chart.NiceTicks(maxV, 5)
+	domainMax := ticks[len(ticks)-1]
+
+	n := len(chartAreaDefaultData)
+	xs := make([]float64, n)
+	ys := make([]float64, n)
+	for i, d := range chartAreaDefaultData {
+		xs[i] = plotX + float64(i)*(plotW/float64(n-1))
+		ys[i] = chart.LinearY(d.Desktop, domainMax, plotY, plotH)
+	}
+
+	var sb strings.Builder
+	fmt.Fprintf(&sb, `<svg class="recharts-surface" width="100%%" height="100%%" viewBox="0 0 %s %s" style="width:100%%;height:100%%">`, chart.FmtF(W), chart.FmtF(H))
+
+	sb.WriteString(`<g class="recharts-layer recharts-cartesian-grid"><g class="recharts-cartesian-grid-horizontal">`)
+	for _, tv := range ticks {
+		y := chart.LinearY(tv, domainMax, plotY, plotH)
+		fmt.Fprintf(&sb, `<line stroke="#ccc" fill="none" x1="%s" y1="%s" x2="%s" y2="%s"/>`, chart.FmtF(plotX), chart.FmtF(y), chart.FmtF(plotX+plotW), chart.FmtF(y))
+	}
+	sb.WriteString(`</g></g>`)
+
+	sb.WriteString(`<g class="recharts-layer recharts-area">`)
+	fmt.Fprintf(&sb, `<path class="recharts-curve recharts-area-area" fill="var(--color-desktop)" fill-opacity="0.4" stroke="none" d="%s"/>`, chart.AreaPath(xs, ys, plotBottom))
+	fmt.Fprintf(&sb, `<path class="recharts-curve recharts-area-curve" stroke="var(--color-desktop)" fill="none" stroke-width="1" d="%s"/>`, chart.NaturalPath(xs, ys))
+	sb.WriteString(`</g>`)
+
+	sb.WriteString(`<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis"><g class="recharts-cartesian-axis-ticks">`)
+	for i, d := range chartAreaDefaultData {
+		fmt.Fprintf(&sb,
+			`<g class="recharts-layer recharts-cartesian-axis-tick"><text orientation="bottom" height="%s" x="%s" y="%s" stroke="none" fill="#666" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" data-tui-chart-point="%d"><tspan dy="0.71em">%s</tspan></text></g>`,
+			chart.FmtF(xAxisHeight), chart.FmtF(xs[i]), chart.FmtF(plotBottom+tickMargin), i, d.Month[:3])
+	}
+	sb.WriteString(`</g></g>`)
+
+	sb.WriteString(`</svg>`)
+	return sb.String()
+}
+
+// chartAreaDefaultModel is the client runtime payload.
+func chartAreaDefaultModel() chart.Model {
+	labels := make([]string, len(chartAreaDefaultData))
+	tooltipLabels := make([]string, len(chartAreaDefaultData))
+	values := make([]float64, len(chartAreaDefaultData))
+	for i, d := range chartAreaDefaultData {
+		labels[i] = d.Month[:3]
+		tooltipLabels[i] = d.Month
+		values[i] = d.Desktop
+	}
+	return chart.Model{
+		Kind:      "area",
+		MarginTop: 0, MarginRight: 12, MarginBottom: 0, MarginLeft: 12,
+		XAxisHeight: 30, TickMargin: 8, MinTickGap: 5,
+		Cursor:        false,
+		Labels:        labels,
+		TooltipLabels: tooltipLabels,
+		Series:        []chart.ModelSeries{{Key: "desktop", Label: "Desktop", Color: "var(--color-desktop)", Values: values}},
+		Tooltip:       chart.TooltipModel{Indicator: "line"},
+	}
+}
+
+templ ChartAreaDefault() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Area Chart
+			}
+			@card.Description() {
+				Showing total visitors for the last 6 months
+			}
+		}
+		@card.Content() {
+			@chart.Container("area-default", chartAreaDefaultConfig, "") {
+				<div style="position:relative;width:100%;height:100%">
+					@templ.Raw(chart.ModelScript(chartAreaDefaultModel()) + chartAreaDefaultSVG())
+				</div>
+			}
+		}
+		@card.Footer() {
+			<div class="flex w-full items-start gap-2 text-sm">
+				<div class="grid gap-2">
+					<div class="flex items-center gap-2 leading-none font-medium">
+						Trending up by 5.2% this month
+						@icon.TrendingUp(icon.Props{Class: "h-4 w-4"})
+					</div>
+					<div class="flex items-center gap-2 leading-none text-muted-foreground">
+						January - June 2024
+					</div>
+				</div>
+			</div>
+		}
+	}
+}

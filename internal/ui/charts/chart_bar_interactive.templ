@@ -1,0 +1,196 @@
+package charts
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/utils"
+)
+
+// The pendant of chart-bar-interactive.tsx.
+
+var chartBarInteractiveConfig = chart.Config{
+	{Key: "views", Label: "Page Views"},
+	{Key: "desktop", Label: "Desktop", Color: "var(--chart-2)"},
+	{Key: "mobile", Label: "Mobile", Color: "var(--chart-1)"},
+}
+
+// interactiveTotal sums one series over the whole dataset for the header
+// toggle buttons.
+func interactiveTotal(series string) string {
+	sum := 0
+	for _, d := range chartInteractiveData {
+		if series == "desktop" {
+			sum += int(d.Desktop)
+		} else {
+			sum += int(d.Mobile)
+		}
+	}
+	return groupThousands(sum)
+}
+
+// groupThousands formats like toLocaleString: 446760 -> "446,760".
+func groupThousands(v int) string {
+	s := fmt.Sprintf("%d", v)
+	var sb strings.Builder
+	for i, r := range s {
+		if i > 0 && (len(s)-i)%3 == 0 {
+			sb.WriteRune(',')
+		}
+		sb.WriteRune(r)
+	}
+	return sb.String()
+}
+
+// chartBarInteractiveSVG renders one series of the daily BarChart: margin
+// 12 left/right, culled date ticks, square bars.
+func chartBarInteractiveSVG(series string) string {
+	const W, H = 1286.0, 250.0
+	// The demo margin prop only sets left/right 12, so top and bottom
+	// are 0.
+	const marginLeft, marginRight = 12.0, 12.0
+	const xAxisHeight, tickMargin = 30.0, 8.0
+	const minTickGap = 32.0
+	const categoryGap = 0.1
+
+	data := chartInteractiveData
+	n := len(data)
+
+	plotX, plotY := marginLeft, 0.0
+	plotW := W - marginLeft - marginRight
+	plotH := H - xAxisHeight
+	plotBottom := plotY + plotH
+
+	value := func(d interactiveDay) float64 {
+		if series == "desktop" {
+			return d.Desktop
+		}
+		return d.Mobile
+	}
+
+	maxV := 0.0
+	for _, d := range data {
+		if v := value(d); v > maxV {
+			maxV = v
+		}
+	}
+	ticks := chart.NiceTicks(maxV, 5)
+	domainMax := ticks[len(ticks)-1]
+
+	var sb strings.Builder
+	fmt.Fprintf(&sb, `<svg class="recharts-surface" width="100%%" height="100%%" viewBox="0 0 %s %s" style="width:100%%;height:100%%">`, chart.FmtF(W), chart.FmtF(H))
+
+	sb.WriteString(`<g class="recharts-layer recharts-cartesian-grid"><g class="recharts-cartesian-grid-horizontal">`)
+	for _, tv := range ticks {
+		y := chart.LinearY(tv, domainMax, plotY, plotH)
+		fmt.Fprintf(&sb, `<line stroke="#ccc" fill="none" x1="%s" y1="%s" x2="%s" y2="%s"/>`, chart.FmtF(plotX), chart.FmtF(y), chart.FmtF(plotX+plotW), chart.FmtF(y))
+	}
+	sb.WriteString(`</g></g>`)
+
+	band := plotW / float64(n)
+	gapOffset, barW := chart.BarGeometry(band, categoryGap)
+	sb.WriteString(`<g class="recharts-layer recharts-bar"><g class="recharts-layer recharts-bar-rectangles">`)
+	for i, d := range data {
+		x := plotX + float64(i)*band + gapOffset
+		y := chart.LinearY(value(d), domainMax, plotY, plotH)
+		fmt.Fprintf(&sb,
+			`<g class="recharts-layer recharts-bar-rectangle"><path fill="var(--color-%s)" d="%s"/></g>`,
+			series, chart.RoundedBarPath(x, y, barW, plotBottom-y, 0))
+	}
+	sb.WriteString(`</g></g>`)
+
+	sb.WriteString(`<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis"><g class="recharts-cartesian-axis-ticks">`)
+	xs := make([]float64, n)
+	labels := make([]string, n)
+	for i, d := range data {
+		xs[i] = plotX + float64(i)*band + band/2
+		labels[i] = shortDay(d.Date)
+	}
+	for _, tk := range chart.PreserveEndTicks(xs, labels, W, minTickGap) {
+		fmt.Fprintf(&sb,
+			`<g class="recharts-layer recharts-cartesian-axis-tick"><text orientation="bottom" height="%s" x="%s" y="%s" stroke="none" fill="#666" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle"><tspan dy="0.71em">%s</tspan></text></g>`,
+			chart.FmtF(xAxisHeight), chart.FmtF(tk.Coord), chart.FmtF(plotBottom+tickMargin), labels[tk.Index])
+	}
+	sb.WriteString(`</g></g>`)
+
+	sb.WriteString(`</svg>`)
+	return sb.String()
+}
+
+// chartBarInteractiveModel is the client runtime payload for one series.
+func chartBarInteractiveModel(series string) chart.Model {
+	labels := make([]string, len(chartInteractiveData))
+	tooltipLabels := make([]string, len(chartInteractiveData))
+	values := make([]float64, len(chartInteractiveData))
+	label := "Desktop"
+	if series == "mobile" {
+		label = "Mobile"
+	}
+	for i, d := range chartInteractiveData {
+		labels[i] = shortDay(d.Date)
+		tooltipLabels[i] = longDay(d.Date)
+		if series == "desktop" {
+			values[i] = d.Desktop
+		} else {
+			values[i] = d.Mobile
+		}
+	}
+	return chart.Model{
+		Kind:      "bar",
+		MarginTop: 0, MarginRight: 12, MarginBottom: 0, MarginLeft: 12,
+		XAxisHeight: 30, TickMargin: 8, MinTickGap: 32,
+		CategoryGap: 0.1,
+		Cursor:      true,
+		Labels:      labels,
+		TooltipLabels: tooltipLabels,
+		Series: []chart.ModelSeries{{Key: series, Label: label, Color: "var(--color-" + series + ")", Values: values}},
+		Tooltip: chart.TooltipModel{Width: "w-[150px]"},
+	}
+}
+
+templ ChartBarInteractive() {
+	@card.Card(card.Props{Class: "py-0"}) {
+		@card.Header(card.HeaderProps{Class: "flex flex-col items-stretch border-b p-0! sm:flex-row"}) {
+			<div class="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:py-0!">
+				@card.Title() {
+					Bar Chart - Interactive
+				}
+				@card.Description() {
+					Showing total visitors for the last 3 months
+				}
+			</div>
+			<div class="flex">
+				for _, series := range []string{"desktop", "mobile"} {
+					<button
+						data-active={ utils.IfElse(series == "desktop", "true", "false") }
+						data-tui-chart-series={ series }
+						class="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-6"
+					>
+						<span class="text-xs text-muted-foreground">
+							if series == "desktop" {
+								Desktop
+							} else {
+								Mobile
+							}
+						</span>
+						<span class="text-lg leading-none font-bold sm:text-3xl">
+							{ interactiveTotal(series) }
+						</span>
+					</button>
+				}
+			</div>
+		}
+		@card.Content(card.ContentProps{Class: "px-2 sm:p-6"}) {
+			@chart.Container("bar-interactive", chartBarInteractiveConfig, "aspect-auto h-[250px] w-full") {
+				<div data-tui-chart-series-panel="desktop" style="position:relative;width:100%;height:100%">
+					@templ.Raw(chart.ModelScript(chartBarInteractiveModel("desktop")) + chartBarInteractiveSVG("desktop"))
+				</div>
+				<div data-tui-chart-series-panel="mobile" hidden style="position:relative;width:100%;height:100%">
+					@templ.Raw(chart.ModelScript(chartBarInteractiveModel("mobile")) + chartBarInteractiveSVG("mobile"))
+				</div>
+			}
+		}
+	}
+}
