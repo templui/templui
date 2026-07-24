@@ -59,20 +59,22 @@ templ ChartAreaInteractive() {
 			</div>
 			@selectcomp.Select(selectcomp.Props{Value: "90d"}) {
 				@selectcomp.Trigger(selectcomp.TriggerProps{
-					Class:      "hidden w-[160px] rounded-lg sm:ml-auto sm:flex",
+					Class:      "hidden w-[160px] sm:ml-auto sm:flex",
 					Attributes: templ.Attributes{"aria-label": "Select a value", "data-tui-chart-range-select": "area-interactive"},
 				}) {
 					@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Last 3 months"})
 				}
-				@selectcomp.Content(selectcomp.ContentProps{Class: "rounded-xl"}) {
-					@selectcomp.Item(selectcomp.ItemProps{Value: "90d", Class: "rounded-lg"}) {
-						Last 3 months
-					}
-					@selectcomp.Item(selectcomp.ItemProps{Value: "30d", Class: "rounded-lg"}) {
-						Last 30 days
-					}
-					@selectcomp.Item(selectcomp.ItemProps{Value: "7d", Class: "rounded-lg"}) {
-						Last 7 days
+				@selectcomp.Content() {
+					@selectcomp.Group() {
+						@selectcomp.Item(selectcomp.ItemProps{Value: "90d"}) {
+							Last 3 months
+						}
+						@selectcomp.Item(selectcomp.ItemProps{Value: "30d"}) {
+							Last 30 days
+						}
+						@selectcomp.Item(selectcomp.ItemProps{Value: "7d"}) {
+							Last 7 days
+						}
 					}
 				}
 			}

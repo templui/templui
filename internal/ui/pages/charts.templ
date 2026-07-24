@@ -93,25 +93,31 @@ templ Charts(chartType string) {
 				</div>
 			</div>
 		</section>
-		<div id="charts" class="container-wrapper scroll-mt-24">
-			<div class="container mx-auto flex items-center justify-between gap-4 px-4 py-4">
-				<div class="relative overflow-hidden">
-					<div class="max-w-[600px] overflow-x-auto no-scrollbar lg:max-w-none">
-						<div class="flex items-center">
-							for _, link := range chartsNavLinks {
-								<a
-									href={ templ.SafeURL("/charts/" + link.Type + "#charts") }
-									data-active={ utils.IfElse(link.Type == chartType, "true", "false") }
-									class="flex h-7 shrink-0 items-center justify-center px-4 text-center text-base font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:text-primary"
-								>
-									{ link.Name }
-								</a>
-							}
+		<div id="charts-page">
+			<div id="charts" class="container-wrapper scroll-mt-24">
+				<div class="container mx-auto flex items-center justify-between gap-4 px-4 py-4">
+					<div class="relative overflow-hidden">
+						<div class="max-w-[600px] overflow-x-auto no-scrollbar lg:max-w-none">
+							<div class="flex items-center">
+								for _, link := range chartsNavLinks {
+									<a
+										href={ templ.SafeURL("/charts/" + link.Type + "#charts") }
+										hx-get={ "/charts/" + link.Type }
+										hx-select="#charts-page"
+										hx-target="#charts-page"
+										hx-swap="outerHTML"
+										hx-push-url={ "/charts/" + link.Type }
+										data-active={ utils.IfElse(link.Type == chartType, "true", "false") }
+										class="flex h-7 shrink-0 items-center justify-center px-4 text-center text-base font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:text-primary"
+									>
+										{ link.Name }
+									</a>
+								}
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 		<div class="container-wrapper flex-1">
 			<div class="container mx-auto px-4 pb-6">
 				<section class="theme-container">
@@ -128,6 +134,7 @@ templ Charts(chartType string) {
 					</div>
 				</section>
 			</div>
+		</div>
 		</div>
 		@modules.Footer()
 		@chartsPageScript()
