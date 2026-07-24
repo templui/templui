@@ -88,6 +88,19 @@ templ BaseLayout(title, description string) {
 					if (isDark) {
 						document.documentElement.classList.add('dark');
 					}
+
+					// Keep same-origin frames in sync like next-themes: the
+					// storage event fires in every other window (including
+					// the chart and block preview iframes) when the
+					// preference changes.
+					window.addEventListener('storage', function(e) {
+						if (e.key !== 'themePreference') return;
+						const p = e.newValue || 'system';
+						const dark = p === 'system'
+							? window.matchMedia('(prefers-color-scheme: dark)').matches
+							: p === 'dark';
+						document.documentElement.classList.toggle('dark', dark);
+					});
 				})();
 			</script>
 		</head>

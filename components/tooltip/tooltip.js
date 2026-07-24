@@ -135,10 +135,12 @@ import "../floatingui/floating_ui_dom.js";
     if (content) close(content);
   });
 
-  // Keyboard: show on focus, hide on blur.
+  // Keyboard: show on focus, hide on blur. Like Base UI, only visible
+  // focus opens the tooltip, so programmatic focus (e.g. a dialog's
+  // autofocus) does not pop it.
   document.addEventListener("focusin", (e) => {
     const trigger = e.target.closest("[data-tui-tooltip-trigger]");
-    if (trigger) open(trigger);
+    if (trigger && trigger.matches(":focus-visible")) open(trigger);
   });
 
   document.addEventListener("focusout", (e) => {

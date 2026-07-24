@@ -160,7 +160,44 @@ function preserveEndTicks(coords, labels, viewEnd, minTickGap, refEl) {
 
 let uid = 0;
 
-function renderCartesian(panel, m, state) {
+/* CSS 'ease' (cubic-bezier(0.25, 0.1, 0.25, 1)), Recharts' default
+ * animation easing. */
+function cssEase(t) {
+  if (t <= 0) return 0;
+  if (t >= 1) return 1;
+  let lo = 0;
+  let hi = 1;
+  // Solve x(u) = t for u, then return y(u).
+  const bx = (u) => 3 * u * (1 - u) * (1 - u) * 0.25 + 3 * u * u * (1 - u) * 0.25 + u * u * u;
+  const by = (u) => 3 * u * (1 - u) * (1 - u) * 0.1 + 3 * u * u * (1 - u) * 1 + u * u * u;
+  for (let i = 0; i < 20; i++) {
+    const mid = (lo + hi) / 2;
+    if (bx(mid) < t) lo = mid;
+    else hi = mid;
+  }
+  return by((lo + hi) / 2);
+}
+
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+/* The Recharts entrance animation: bars grow from the baseline over
+ * 400ms, areas reveal left to right and pies sweep over 1500ms. */
+function animateChart(panel, m, state, render) {
+  if (reducedMotion.matches) {
+    render(1);
+    return;
+  }
+  const duration = m.kind === "bar" ? 400 : 1500;
+  const start = performance.now();
+  const frame = (now) => {
+    const alpha = cssEase(Math.min(1, (now - start) / duration));
+    render(alpha);
+    if (alpha < 1) requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+}
+
+function renderCartesian(panel, m, state, alpha = 1) {
   const W = panel.clientWidth;
   const H = panel.clientHeight;
   if (!W || !H) return;
@@ -217,7 +254,7 @@ function renderCartesian(panel, m, state) {
     svg += `<g class="recharts-layer recharts-bar"><g class="recharts-layer recharts-bar-rectangles">`;
     for (let i = 0; i < n; i++) {
       const x = plotX + i * band + gapOffset;
-      const y = linearY(series.values[i], domainMax, plotY, plotH);
+      const y = linearY(series.values[i] * alpha, domainMax, plotY, plotH);
       svg += `<g class="recharts-layer recharts-bar-rectangle"><path fill="${series.color}" d="${roundedBarPath(x, y, barW, plotBottom - y, m.radius || 0)}"/></g>`;
     }
     svg += "</g></g>";
@@ -232,7 +269,7 @@ function renderCartesian(panel, m, state) {
         ? base.map((b, i) => b - ((s.values[i] / domainMax) * plotH || 0))
         : s.values.map((v) => linearY(v, domainMax, plotY, plotH));
       const fill = m.gradient ? `url(#${state.uid}-fill-${s.key})` : s.color;
-      const fillOpacity = m.gradient ? 0.6 : 0.4;
+      const fillOpacity = s.fillOpacity || 0.6;
       const areaD = m.stacked ? areaPathBetween(xs, top, base) : areaPathBetween(xs, top, baseline);
       svg +=
         `<g class="recharts-layer recharts-area">` +
@@ -329,12 +366,15 @@ function showCursor(panel, m, state, i) {
   if (!svg || m.cursor === false) return;
   let cursor = svg.querySelector(".recharts-tooltip-cursor");
   const g = state.geom;
+  // Recharts draws the cursor between the grid and the series, so bars
+  // and areas render on top of the hover band.
+  const seriesLayer = svg.querySelector(".recharts-bar, .recharts-area");
   if (m.kind === "bar") {
     const x = g.plotX + i * g.band;
     const d = `M ${fmtF(x)},${fmtF(g.plotY)} h ${fmtF(g.band)} v ${fmtF(g.plotH)} h ${fmtF(-g.band)} Z`;
     if (!cursor) {
-      svg.insertAdjacentHTML(
-        "beforeend",
+      seriesLayer.insertAdjacentHTML(
+        "beforebegin",
         `<g class="recharts-layer"><path class="recharts-rectangle recharts-tooltip-cursor" fill="#ccc" d="${d}"/></g>`
       );
     } else {
@@ -344,8 +384,8 @@ function showCursor(panel, m, state, i) {
     const x = g.xs[i];
     const d = `M${fmtF(x)},${fmtF(g.plotY)}L${fmtF(x)},${fmtF(g.plotBottom)}`;
     if (!cursor) {
-      svg.insertAdjacentHTML(
-        "beforeend",
+      seriesLayer.insertAdjacentHTML(
+        "beforebegin",
         `<g class="recharts-layer"><path class="recharts-curve recharts-tooltip-cursor" stroke="#ccc" fill="none" stroke-width="1" d="${d}"/></g>`
       );
     } else {
@@ -408,10 +448,13 @@ function initPanel(script) {
 
   const wrapper = tooltipWrapper(container);
 
-  const activeIndexAt = (chartX) => {
+  // Like Recharts' inRange: the tooltip only activates while the pointer
+  // is inside the plot rectangle, not over the axis labels below.
+  const activeIndexAt = (chartX, chartY) => {
     const g = state.geom;
     if (!g) return -1;
-    if (chartX < g.plotX - OFFSET || chartX > g.plotX + g.plotW + OFFSET) return -1;
+    if (chartX < g.plotX || chartX > g.plotX + g.plotW) return -1;
+    if (chartY < g.plotY || chartY > g.plotBottom) return -1;
     if (m.kind === "bar") {
       return Math.max(0, Math.min(g.n - 1, Math.floor((chartX - g.plotX) / g.band)));
     }
@@ -432,7 +475,8 @@ function initPanel(script) {
     }
     const rect = panel.getBoundingClientRect();
     const chartX = e.clientX - rect.left;
-    const i = activeIndexAt(chartX);
+    const chartY = e.clientY - rect.top;
+    const i = activeIndexAt(chartX, chartY);
     if (i < 0) {
       wrapper.style.visibility = "hidden";
       hideCursor(panel);
@@ -444,6 +488,7 @@ function initPanel(script) {
   });
 
   function positionTooltip(e, snapX, i) {
+    const wasHidden = wrapper.style.visibility !== "visible";
     wrapper.innerHTML = tooltipHTML(m, i);
     wrapper.style.visibility = "visible";
     const crect = container.getBoundingClientRect();
@@ -455,6 +500,15 @@ function initPanel(script) {
     if (tx + tw > crect.width) tx = px - tw - OFFSET;
     let ty = py + OFFSET;
     if (ty + th > crect.height) ty = py - th - OFFSET;
+    if (wasHidden) {
+      // Appear in place like Recharts, the transition only trails while
+      // the tooltip is already visible.
+      wrapper.style.transition = "none";
+      wrapper.style.transform = `translate(${tx}px, ${ty}px)`;
+      void wrapper.offsetHeight;
+      wrapper.style.transition = "transform 400ms ease";
+      return;
+    }
     wrapper.style.transform = `translate(${tx}px, ${ty}px)`;
   }
 

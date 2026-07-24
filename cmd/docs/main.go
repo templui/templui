@@ -11,6 +11,7 @@ import (
 	"github.com/templui/templui/assets"
 	"github.com/templui/templui/components"
 	"github.com/templui/templui/internal/config"
+	"github.com/templui/templui/internal/ui/charts"
 	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/internal/middleware"
 	"github.com/templui/templui/internal/service"
@@ -125,6 +126,16 @@ func main() {
 			return
 		}
 		if err := pages.Charts(chartType).Render(r.Context(), w); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}))
+	mux.Handle("GET /view/{name}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		name := r.PathValue("name")
+		if charts.Component(name) == nil {
+			http.NotFound(w, r)
+			return
+		}
+		if err := pages.ChartView(name).Render(r.Context(), w); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}))

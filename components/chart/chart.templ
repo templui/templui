@@ -34,6 +34,7 @@ func (c Config) styleBlock(id string) string {
 templ Container(id string, config Config, class string) {
 	@templ.Raw("<style>" + config.styleBlock(id) + "</style>")
 	<div
+		data-slot="chart"
 		data-chart={ id }
 		data-tui-chart
 		class={ utils.TwMerge(

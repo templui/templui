@@ -1,0 +1,19 @@
+package pages
+
+import (
+	"github.com/templui/templui/internal/ui/charts"
+	"github.com/templui/templui/internal/ui/layouts"
+)
+
+// ChartView is the /view/{name} iframe page, the pendant of shadcn's
+// (view)/view route: just the chart component on a bare background.
+templ ChartView(name string) {
+	@layouts.BaseLayout(name, "") {
+		// p-px keeps the card's ring visible: unlike a border it sits
+		// outside the box and would be clipped at the iframe edge.
+		<div class="bg-background p-px *:data-[slot=card]:has-[[data-slot=chart]]:shadow-none">
+			@charts.Component(name)
+		</div>
+		@chartsPageScript()
+	}
+}

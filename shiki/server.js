@@ -102,6 +102,11 @@ app.post("/highlight", async (req, res) => {
       transformers: [
         {
           line(node, line) {
+            // rehype-pretty-code keeps empty lines visible by giving them
+            // a single space child.
+            if (node.children.length === 0) {
+              node.children = [{ type: "text", value: " " }];
+            }
             if (highlightLines.includes(line)) node.properties["data-highlighted-line"] = "";
           },
         },

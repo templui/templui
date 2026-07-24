@@ -25,14 +25,22 @@ type Model struct {
 	SliceColors   []string      `json:"sliceColors,omitempty"` // pie: color per slice
 	Series        []ModelSeries `json:"series"`
 	Tooltip       TooltipModel  `json:"tooltip"`
+	// Pie geometry for the client renderer.
+	InnerRadius float64 `json:"innerRadius,omitempty"`
+	StrokeWidth float64 `json:"strokeWidth,omitempty"`
+	ActiveIndex int     `json:"activeIndex,omitempty"`
+	ActiveRing  bool    `json:"activeRing,omitempty"`
+	CenterValue string  `json:"centerValue,omitempty"`
+	CenterLabel string  `json:"centerLabel,omitempty"`
 }
 
 // ModelSeries is one data series with its resolved color variable.
 type ModelSeries struct {
-	Key    string    `json:"key"`
-	Label  string    `json:"label"`
-	Color  string    `json:"color"`
-	Values []float64 `json:"values"`
+	Key         string    `json:"key"`
+	Label       string    `json:"label"`
+	Color       string    `json:"color"`
+	Values      []float64 `json:"values"`
+	FillOpacity float64   `json:"fillOpacity,omitempty"` // areas: 0 uses Recharts' 0.6
 }
 
 // TooltipModel mirrors ChartTooltipContent's props.

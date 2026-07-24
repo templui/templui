@@ -3,7 +3,6 @@ package pages
 import (
 	"github.com/templui/templui/components/badge"
 	"github.com/templui/templui/components/button"
-	"github.com/templui/templui/components/chart"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/internal/ui/charts"
 	"github.com/templui/templui/internal/ui/layouts"
@@ -37,24 +36,24 @@ var ChartTypes = map[string]bool{
 
 // chartsFor lists the ported charts per category, in charts.tsx order.
 func chartsFor(chartType string) []modules.ChartEntry {
-	entry := func(id string, fullWidth bool, component templ.Component) modules.ChartEntry {
-		return modules.ChartEntry{ID: id, FullWidth: fullWidth, Code: charts.Source(id), Component: component}
+	entry := func(id string, fullWidth bool) modules.ChartEntry {
+		return modules.ChartEntry{ID: id, FullWidth: fullWidth, Code: charts.Source(id)}
 	}
 	switch chartType {
 	case "area":
 		return []modules.ChartEntry{
-			entry("chart-area-interactive", true, charts.ChartAreaInteractive()),
-			entry("chart-area-default", false, charts.ChartAreaDefault()),
+			entry("chart-area-interactive", true),
+			entry("chart-area-default", false),
 		}
 	case "bar":
 		return []modules.ChartEntry{
-			entry("chart-bar-interactive", true, charts.ChartBarInteractive()),
-			entry("chart-bar-default", false, charts.ChartBarDefault()),
+			entry("chart-bar-interactive", true),
+			entry("chart-bar-default", false),
 		}
 	case "pie":
 		return []modules.ChartEntry{
-			entry("chart-pie-donut", false, charts.ChartPieDonut()),
-			entry("chart-pie-interactive", false, charts.ChartPieInteractive()),
+			entry("chart-pie-donut", false),
+			entry("chart-pie-interactive", false),
 		}
 	}
 	return nil
@@ -131,7 +130,6 @@ templ Charts(chartType string) {
 			</div>
 		</div>
 		@modules.Footer()
-		@chart.Script()
 		@chartsPageScript()
 	}
 }
@@ -141,6 +139,14 @@ templ Charts(chartType string) {
 templ chartsPageScript() {
 	<script nonce={ templ.GetNonce(ctx) }>
 		(() => {
+			// ChartIframe: fade the chart iframes in once loaded.
+			document.addEventListener("load", (e) => {
+				if (e.target instanceof Element && e.target.matches("[data-tui-chart-iframe]")) {
+					e.target.classList.remove("opacity-0");
+					e.target.classList.add("opacity-100");
+				}
+			}, true);
+
 			// Copy buttons: write the chart source, swap to the check icon
 			// for two seconds.
 			document.addEventListener("click", (e) => {

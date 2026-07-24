@@ -1,9 +1,6 @@
 package charts
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/templui/templui/components/card"
 	"github.com/templui/templui/components/chart"
 	"github.com/templui/templui/components/icon"
@@ -11,17 +8,12 @@ import (
 
 // The pendant of chart-pie-donut.tsx.
 
-type pieBrowser struct {
-	Browser  string
-	Visitors float64
-}
-
-var chartPieDonutData = []pieBrowser{
-	{"chrome", 275},
-	{"safari", 200},
-	{"firefox", 187},
-	{"edge", 173},
-	{"other", 90},
+var chartPieDonutData = []chart.Datum{
+	{"browser": "chrome", "visitors": 275, "fill": "var(--color-chrome)"},
+	{"browser": "safari", "visitors": 200, "fill": "var(--color-safari)"},
+	{"browser": "firefox", "visitors": 187, "fill": "var(--color-firefox)"},
+	{"browser": "edge", "visitors": 173, "fill": "var(--color-edge)"},
+	{"browser": "other", "visitors": 90, "fill": "var(--color-other)"},
 }
 
 var chartPieDonutConfig = chart.Config{
@@ -31,56 +23,6 @@ var chartPieDonutConfig = chart.Config{
 	{Key: "firefox", Label: "Firefox", Color: "var(--chart-3)"},
 	{Key: "edge", Label: "Edge", Color: "var(--chart-4)"},
 	{Key: "other", Label: "Other", Color: "var(--chart-5)"},
-}
-
-// chartPieDonutSVG renders the PieChart: innerRadius 60, Recharts' default
-// outer radius (80% of the max radius), counterclockwise from 3 o'clock.
-func chartPieDonutSVG() string {
-	const W, H = 250.0, 250.0
-	const margin = 5.0
-	cx, cy := W/2, H/2
-	maxR := (min(W, H) - 2*margin) / 2
-	outerR := maxR * 0.8
-	innerR := 60.0
-
-	total := 0.0
-	for _, d := range chartPieDonutData {
-		total += d.Visitors
-	}
-
-	var sb strings.Builder
-	fmt.Fprintf(&sb, `<svg class="recharts-surface" width="100%%" height="100%%" viewBox="0 0 %s %s" style="width:100%%;height:100%%">`, chart.FmtF(W), chart.FmtF(H))
-	sb.WriteString(`<g class="recharts-layer recharts-pie">`)
-	angle := 0.0
-	for i, d := range chartPieDonutData {
-		sweep := d.Visitors / total * 360
-		fmt.Fprintf(&sb,
-			`<g class="recharts-layer recharts-pie-sector"><path class="recharts-sector" stroke="#fff" fill="var(--color-%s)" data-tui-chart-sector="%d" d="%s"/></g>`,
-			d.Browser, i, chart.SectorPath(cx, cy, innerR, outerR, angle, angle+sweep))
-		angle += sweep
-	}
-	sb.WriteString(`</g></svg>`)
-	return sb.String()
-}
-
-// chartPieDonutModel is the client runtime payload (tooltip only).
-func chartPieDonutModel() chart.Model {
-	labels := make([]string, len(chartPieDonutData))
-	colors := make([]string, len(chartPieDonutData))
-	values := make([]float64, len(chartPieDonutData))
-	for i, d := range chartPieDonutData {
-		labels[i] = chartPieDonutConfig[i+1].Label
-		colors[i] = "var(--color-" + d.Browser + ")"
-		values[i] = d.Visitors
-	}
-	return chart.Model{
-		Kind:        "pie",
-		Cursor:      false,
-		Labels:      labels,
-		SliceColors: colors,
-		Series:      []chart.ModelSeries{{Key: "visitors", Label: "Visitors", Values: values}},
-		Tooltip:     chart.TooltipModel{HideLabel: true},
-	}
 }
 
 templ ChartPieDonut() {
@@ -95,9 +37,17 @@ templ ChartPieDonut() {
 		}
 		@card.Content(card.ContentProps{Class: "flex-1 pb-0"}) {
 			@chart.Container("pie-donut", chartPieDonutConfig, "mx-auto aspect-square max-h-[250px]") {
-				<div style="position:relative;width:100%;height:100%">
-					@templ.Raw(chart.ModelScript(chartPieDonutModel()) + chartPieDonutSVG())
-				</div>
+				@chart.PieChart(chart.PieChartProps{
+					Data:        chartPieDonutData,
+					Config:      chartPieDonutConfig,
+					DataKey:     "visitors",
+					NameKey:     "browser",
+					InnerRadius: 60,
+					Tooltip: &chart.TooltipProps{
+						Cursor:    false,
+						HideLabel: true,
+					},
+				})
 			}
 		}
 		@card.Footer(card.FooterProps{Class: "flex-col gap-2 text-sm"}) {

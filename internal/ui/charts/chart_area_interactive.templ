@@ -1,8 +1,6 @@
 package charts
 
 import (
-	"fmt"
-	"strings"
 	"time"
 
 	"github.com/templui/templui/components/card"
@@ -18,14 +16,14 @@ var chartAreaInteractiveConfig = chart.Config{
 	{Key: "mobile", Label: "Mobile", Color: "var(--chart-2)"},
 }
 
-// interactiveRange filters the dataset like the React useState filter: the
-// last n days counted back from 2024-06-30.
-func interactiveRange(days int) []interactiveDay {
+// filteredData is the time range filter: the last n days counted back
+// from 2024-06-30.
+func filteredData(days int) []chart.Datum {
 	ref, _ := time.Parse("2006-01-02", "2024-06-30")
 	start := ref.AddDate(0, 0, -days)
-	var out []interactiveDay
+	var out []chart.Datum
 	for _, d := range chartInteractiveData {
-		t, _ := time.Parse("2006-01-02", d.Date)
+		t, _ := time.Parse("2006-01-02", d["date"].(string))
 		if !t.Before(start) {
 			out = append(out, d)
 		}
@@ -33,139 +31,19 @@ func interactiveRange(days int) []interactiveDay {
 	return out
 }
 
-// shortDay formats a date like the demo's tickFormatter: "Apr 1".
-func shortDay(date string) string {
-	t, _ := time.Parse("2006-01-02", date)
+// shortDate formats like the demo's tickFormatter: "Apr 1".
+func shortDate(v any) string {
+	t, _ := time.Parse("2006-01-02", v.(string))
 	return t.Format("Jan 2")
 }
 
-// longDay formats a date like the tooltip labelFormatter: "Apr 1, 2024".
-func longDay(date string) string {
-	t, _ := time.Parse("2006-01-02", date)
-	return t.Format("Jan 2, 2006")
-}
-
-// chartAreaInteractiveSVG renders one time range of the stacked AreaChart:
-// gradient fills, natural curves, culled date ticks, legend space at the
-// bottom.
-func chartAreaInteractiveSVG(rangeKey string, days int) string {
-	const W, H = 1286.0, 250.0
-	const margin = 5.0
-	const xAxisHeight, tickMargin, legendHeight = 30.0, 8.0, 28.0
-	const minTickGap = 32.0
-
-	data := interactiveRange(days)
-	n := len(data)
-
-	plotX, plotY := margin, margin
-	plotW := W - 2*margin
-	plotH := H - 2*margin - xAxisHeight - legendHeight
-	plotBottom := plotY + plotH
-
-	maxSum := 0.0
-	for _, d := range data {
-		if s := d.Desktop + d.Mobile; s > maxSum {
-			maxSum = s
-		}
-	}
-	ticks := chart.NiceTicks(maxSum, 5)
-	domainMax := ticks[len(ticks)-1]
-
-	xs := make([]float64, n)
-	mobileTop := make([]float64, n)
-	stackTop := make([]float64, n)
-	labels := make([]string, n)
-	for i, d := range data {
-		xs[i] = plotX + float64(i)*(plotW/float64(n-1))
-		mobileTop[i] = chart.LinearY(d.Mobile, domainMax, plotY, plotH)
-		stackTop[i] = chart.LinearY(d.Mobile+d.Desktop, domainMax, plotY, plotH)
-		labels[i] = shortDay(d.Date)
-	}
-	baseline := make([]float64, n)
-	for i := range baseline {
-		baseline[i] = plotBottom
-	}
-
-	var sb strings.Builder
-	fmt.Fprintf(&sb, `<svg class="recharts-surface" width="100%%" height="100%%" viewBox="0 0 %s %s" style="width:100%%;height:100%%">`, chart.FmtF(W), chart.FmtF(H))
-
-	// Gradient defs, ids suffixed per range so the hidden variants do not
-	// hijack the url() lookups.
-	fmt.Fprintf(&sb, `<defs>`)
-	for _, g := range []string{"desktop", "mobile"} {
-		fmt.Fprintf(&sb,
-			`<linearGradient id="fill-%s-%s" x1="0" y1="0" x2="0" y2="1"><stop offset="5%%" stop-color="var(--color-%s)" stop-opacity="0.8"/><stop offset="95%%" stop-color="var(--color-%s)" stop-opacity="0.1"/></linearGradient>`,
-			g, rangeKey, g, g)
-	}
-	sb.WriteString(`</defs>`)
-
-	sb.WriteString(`<g class="recharts-layer recharts-cartesian-grid"><g class="recharts-cartesian-grid-horizontal">`)
-	for _, tv := range ticks {
-		y := chart.LinearY(tv, domainMax, plotY, plotH)
-		fmt.Fprintf(&sb, `<line stroke="#ccc" fill="none" x1="%s" y1="%s" x2="%s" y2="%s"/>`, chart.FmtF(plotX), chart.FmtF(y), chart.FmtF(plotX+plotW), chart.FmtF(y))
-	}
-	sb.WriteString(`</g></g>`)
-
-	// Mobile stacks from the baseline, desktop rides on top of it.
-	fmt.Fprintf(&sb, `<g class="recharts-layer recharts-area"><path class="recharts-curve recharts-area-area" fill="url(#fill-mobile-%s)" fill-opacity="0.6" stroke="none" d="%s"/><path class="recharts-curve recharts-area-curve" stroke="var(--color-mobile)" fill="none" stroke-width="1" d="%s"/></g>`,
-		rangeKey, chart.AreaPathBetween(xs, mobileTop, baseline), chart.NaturalPath(xs, mobileTop))
-	fmt.Fprintf(&sb, `<g class="recharts-layer recharts-area"><path class="recharts-curve recharts-area-area" fill="url(#fill-desktop-%s)" fill-opacity="0.6" stroke="none" d="%s"/><path class="recharts-curve recharts-area-curve" stroke="var(--color-desktop)" fill="none" stroke-width="1" d="%s"/></g>`,
-		rangeKey, chart.AreaPathBetween(xs, stackTop, mobileTop), chart.NaturalPath(xs, stackTop))
-
-	sb.WriteString(`<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis"><g class="recharts-cartesian-axis-ticks">`)
-	for _, tk := range chart.PreserveEndTicks(xs, labels, W, minTickGap) {
-		fmt.Fprintf(&sb,
-			`<g class="recharts-layer recharts-cartesian-axis-tick"><text orientation="bottom" height="%s" x="%s" y="%s" stroke="none" fill="#666" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle"><tspan dy="0.71em">%s</tspan></text></g>`,
-			chart.FmtF(xAxisHeight), chart.FmtF(tk.Coord), chart.FmtF(plotBottom+tickMargin), labels[tk.Index])
-	}
-	sb.WriteString(`</g></g>`)
-
-	sb.WriteString(`</svg>`)
-	return sb.String()
-}
-
-// chartAreaInteractiveModel is the client runtime payload for one range.
-func chartAreaInteractiveModel(days int) chart.Model {
-	data := interactiveRange(days)
-	labels := make([]string, len(data))
-	tooltipLabels := make([]string, len(data))
-	desktop := make([]float64, len(data))
-	mobile := make([]float64, len(data))
-	for i, d := range data {
-		labels[i] = shortDay(d.Date)
-		tooltipLabels[i] = longDay(d.Date)
-		desktop[i] = d.Desktop
-		mobile[i] = d.Mobile
-	}
-	return chart.Model{
-		Kind:      "area",
-		MarginTop: 5, MarginRight: 5, MarginBottom: 5, MarginLeft: 5,
-		XAxisHeight: 30, TickMargin: 8, MinTickGap: 32, LegendHeight: 28,
-		Stacked: true, Gradient: true,
-		Cursor:        false,
-		Labels:        labels,
-		TooltipLabels: tooltipLabels,
-		Series: []chart.ModelSeries{
-			{Key: "mobile", Label: "Mobile", Color: "var(--color-mobile)", Values: mobile},
-			{Key: "desktop", Label: "Desktop", Color: "var(--color-desktop)", Values: desktop},
-		},
-		Tooltip: chart.TooltipModel{Indicator: "dot"},
-	}
-}
-
-// legendContent is the ChartLegendContent pendant rendered as plain HTML
-// under the plot, absolutely positioned like recharts' legend wrapper.
-templ legendContent(series []chart.Series) {
-	<div class="recharts-legend-wrapper" style="position:absolute;left:0;right:0;bottom:5px">
-		<div class="flex items-center justify-center gap-4 pt-3">
-			for _, s := range series {
-				<div class="flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground">
-					<div class="h-2 w-2 shrink-0 rounded-[2px]" style={ "background-color:" + s.Color }></div>
-					{ s.Label }
-				</div>
-			}
-		</div>
-	</div>
+var chartAreaInteractiveRanges = []struct {
+	Key  string
+	Days int
+}{
+	{"90d", 90},
+	{"30d", 30},
+	{"7d", 7},
 }
 
 templ ChartAreaInteractive() {
@@ -201,18 +79,31 @@ templ ChartAreaInteractive() {
 		}
 		@card.Content(card.ContentProps{Class: "px-2 pt-4 sm:px-6 sm:pt-6"}) {
 			@chart.Container("area-interactive", chartAreaInteractiveConfig, "aspect-auto h-[250px] w-full") {
-				<div data-tui-chart-range="90d" style="position:relative;width:100%;height:100%">
-					@templ.Raw(chart.ModelScript(chartAreaInteractiveModel(90)) + chartAreaInteractiveSVG("90d", 90))
-					@legendContent(chartAreaInteractiveConfig[1:3])
-				</div>
-				<div data-tui-chart-range="30d" hidden style="position:relative;width:100%;height:100%">
-					@templ.Raw(chart.ModelScript(chartAreaInteractiveModel(30)) + chartAreaInteractiveSVG("30d", 30))
-					@legendContent(chartAreaInteractiveConfig[1:3])
-				</div>
-				<div data-tui-chart-range="7d" hidden style="position:relative;width:100%;height:100%">
-					@templ.Raw(chart.ModelScript(chartAreaInteractiveModel(7)) + chartAreaInteractiveSVG("7d", 7))
-					@legendContent(chartAreaInteractiveConfig[1:3])
-				</div>
+				for _, rng := range chartAreaInteractiveRanges {
+					<div data-tui-chart-range={ rng.Key } hidden?={ rng.Key != "90d" } style="width:100%;height:100%">
+						@chart.AreaChart(chart.AreaChartProps{
+							Data:   filteredData(rng.Days),
+							Config: chartAreaInteractiveConfig,
+							Width:  1286, Height: 250,
+							XAxis: &chart.XAxisProps{
+								DataKey:       "date",
+								TickMargin:    8,
+								MinTickGap:    32,
+								TickFormatter: shortDate,
+							},
+							Tooltip: &chart.TooltipProps{
+								Cursor:         false,
+								Indicator:      "dot",
+								LabelFormatter: shortDate,
+							},
+							Areas: []chart.AreaProps{
+								{DataKey: "mobile", Type: chart.CurveNatural, Fill: "gradient", StackID: "a"},
+								{DataKey: "desktop", Type: chart.CurveNatural, Fill: "gradient", StackID: "a"},
+							},
+							Legend: true,
+						})
+					</div>
+				}
 			}
 		}
 	}

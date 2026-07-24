@@ -1,9 +1,6 @@
 package charts
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/templui/templui/components/card"
 	"github.com/templui/templui/components/chart"
 	"github.com/templui/templui/components/icon"
@@ -11,102 +8,17 @@ import (
 
 // The pendant of chart-bar-default.tsx.
 
-type barMonth struct {
-	Month   string
-	Desktop float64
-}
-
-var chartBarDefaultData = []barMonth{
-	{"January", 186},
-	{"February", 305},
-	{"March", 237},
-	{"April", 73},
-	{"May", 209},
-	{"June", 214},
+var chartBarDefaultData = []chart.Datum{
+	{"month": "January", "desktop": 186},
+	{"month": "February", "desktop": 305},
+	{"month": "March", "desktop": 237},
+	{"month": "April", "desktop": 73},
+	{"month": "May", "desktop": 209},
+	{"month": "June", "desktop": 214},
 }
 
 var chartBarDefaultConfig = chart.Config{
 	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
-}
-
-// chartBarDefaultSVG renders the BarChart: CartesianGrid without verticals,
-// XAxis without tick/axis lines, bars with radius 8.
-func chartBarDefaultSVG() string {
-	const W, H = 369.0, 207.0
-	const marginTop, marginRight, marginBottom, marginLeft = 5.0, 5.0, 5.0, 5.0
-	const xAxisHeight, tickMargin = 30.0, 10.0
-	const categoryGap = 0.1 // Recharts barCategoryGap "10%"
-
-	plotX, plotY := marginLeft, marginTop
-	plotW := W - marginLeft - marginRight
-	plotH := H - marginTop - marginBottom - xAxisHeight
-	plotBottom := plotY + plotH
-
-	maxV := 0.0
-	for _, d := range chartBarDefaultData {
-		if d.Desktop > maxV {
-			maxV = d.Desktop
-		}
-	}
-	ticks := chart.NiceTicks(maxV, 5)
-	domainMax := ticks[len(ticks)-1]
-
-	var sb strings.Builder
-	fmt.Fprintf(&sb, `<svg class="recharts-surface" width="100%%" height="100%%" viewBox="0 0 %s %s" style="width:100%%;height:100%%">`, chart.FmtF(W), chart.FmtF(H))
-
-	// CartesianGrid, horizontal lines only.
-	sb.WriteString(`<g class="recharts-layer recharts-cartesian-grid"><g class="recharts-cartesian-grid-horizontal">`)
-	for _, tv := range ticks {
-		y := chart.LinearY(tv, domainMax, plotY, plotH)
-		fmt.Fprintf(&sb, `<line stroke="#ccc" fill="none" x1="%s" y1="%s" x2="%s" y2="%s"/>`, chart.FmtF(plotX), chart.FmtF(y), chart.FmtF(plotX+plotW), chart.FmtF(y))
-	}
-	sb.WriteString(`</g></g>`)
-
-	// Bars.
-	band := plotW / float64(len(chartBarDefaultData))
-	gapOffset, barW := chart.BarGeometry(band, categoryGap)
-	sb.WriteString(`<g class="recharts-layer recharts-bar"><g class="recharts-layer recharts-bar-rectangles">`)
-	for i, d := range chartBarDefaultData {
-		x := plotX + float64(i)*band + gapOffset
-		y := chart.LinearY(d.Desktop, domainMax, plotY, plotH)
-		fmt.Fprintf(&sb,
-			`<g class="recharts-layer recharts-bar-rectangle"><path fill="var(--color-desktop)" d="%s"/></g>`,
-			chart.RoundedBarPath(x, y, barW, plotBottom-y, 8))
-	}
-	sb.WriteString(`</g></g>`)
-
-	// XAxis ticks, no tick line, no axis line.
-	sb.WriteString(`<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis"><g class="recharts-cartesian-axis-ticks">`)
-	for i, d := range chartBarDefaultData {
-		cx := plotX + float64(i)*band + band/2
-		fmt.Fprintf(&sb,
-			`<g class="recharts-layer recharts-cartesian-axis-tick"><text orientation="bottom" width="%s" height="%s" x="%s" y="%s" stroke="none" fill="#666" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle"><tspan dy="0.71em">%s</tspan></text></g>`,
-			chart.FmtF(band), chart.FmtF(xAxisHeight), chart.FmtF(cx), chart.FmtF(plotBottom+tickMargin), d.Month[:3])
-	}
-	sb.WriteString(`</g></g>`)
-
-	sb.WriteString(`</svg>`)
-	return sb.String()
-}
-
-// chartBarDefaultModel is the client runtime payload.
-func chartBarDefaultModel() chart.Model {
-	labels := make([]string, len(chartBarDefaultData))
-	values := make([]float64, len(chartBarDefaultData))
-	for i, d := range chartBarDefaultData {
-		labels[i] = d.Month[:3]
-		values[i] = d.Desktop
-	}
-	return chart.Model{
-		Kind:      "bar",
-		MarginTop: 5, MarginRight: 5, MarginBottom: 5, MarginLeft: 5,
-		XAxisHeight: 30, TickMargin: 10, MinTickGap: 5,
-		CategoryGap: 0.1, Radius: 8,
-		Cursor: false,
-		Labels: labels,
-		Series: []chart.ModelSeries{{Key: "desktop", Label: "Desktop", Color: "var(--color-desktop)", Values: values}},
-		Tooltip: chart.TooltipModel{HideLabel: true},
-	}
 }
 
 templ ChartBarDefault() {
@@ -121,9 +33,22 @@ templ ChartBarDefault() {
 		}
 		@card.Content() {
 			@chart.Container("bar-default", chartBarDefaultConfig, "") {
-				<div style="position:relative;width:100%;height:100%">
-					@templ.Raw(chart.ModelScript(chartBarDefaultModel()) + chartBarDefaultSVG())
-				</div>
+				@chart.BarChart(chart.BarChartProps{
+					Data:   chartBarDefaultData,
+					Config: chartBarDefaultConfig,
+					XAxis: &chart.XAxisProps{
+						DataKey:       "month",
+						TickMargin:    10,
+						TickFormatter: monthShort,
+					},
+					Tooltip: &chart.TooltipProps{
+						Cursor:    false,
+						HideLabel: true,
+					},
+					Bars: []chart.BarProps{
+						{DataKey: "desktop", Radius: 8},
+					},
+				})
 			}
 		}
 		@card.Footer(card.FooterProps{Class: "flex-col items-start gap-2 text-sm"}) {

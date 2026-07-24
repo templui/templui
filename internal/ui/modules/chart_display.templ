@@ -11,16 +11,15 @@ import (
 )
 
 // ChartEntry is one gallery chart, the pendant of chart-display.tsx's
-// Chart shape: registry id, source code and the rendered component.
+// Chart shape: registry id and source code, rendered via the /view iframe.
 type ChartEntry struct {
 	ID        string
 	FullWidth bool
 	Code      string
-	Component templ.Component
 }
 
-// ChartDisplay is the ChartDisplay pendant: toolbar plus chart, fullWidth
-// entries span the grid.
+// ChartDisplay is the ChartDisplay pendant: toolbar plus the chart in a
+// lazy iframe (ChartIframe), fullWidth entries span the grid.
 templ ChartDisplay(entry ChartEntry) {
 	<div
 		class={ utils.TwMerge(
@@ -30,7 +29,14 @@ templ ChartDisplay(entry ChartEntry) {
 	>
 		@chartToolbar(entry)
 		<div class="relative z-10 overflow-hidden rounded-xl bg-background">
-			@entry.Component
+			<iframe
+				src={ templ.SafeURL("/view/" + entry.ID) }
+				class="w-full border-none opacity-0 transition-opacity duration-300"
+				height="460"
+				loading="lazy"
+				title={ entry.ID }
+				data-tui-chart-iframe
+			></iframe>
 		</div>
 	</div>
 }
@@ -104,7 +110,7 @@ templ chartCopyButton(name, class string) {
 				@icon.Check()
 			</span>
 		}
-		@tooltip.Content(tooltip.ContentProps{Class: "bg-black text-white"}) {
+		@tooltip.Content() {
 			Copy code
 		}
 	}
@@ -125,11 +131,11 @@ templ chartCodeViewer(entry ChartEntry) {
 		}
 		@sheet.Content(sheet.ContentProps{
 			Side: sheet.SideRight,
-			// The charts app uses shadcn's app-level sheet: full slide-in
-			// from the right (500ms in, 300ms out), no fade. The width
-			// needs the important marker to beat the base sheet's
-			// data-[side=right]:sm:max-w-sm.
-			Class: "flex flex-col gap-0 border-l-0 p-0 sm:max-w-sm! md:w-[700px]! md:max-w-[700px]! dark:border-l bg-background data-[tui-dialog-open=false]:translate-x-full data-[tui-dialog-open=false]:opacity-100 data-[tui-dialog-open=true]:duration-500 data-[tui-dialog-open=false]:duration-300",
+			// The charts app uses shadcn's app-level sheet: keyframe
+			// slide-in from the right (500ms in, 300ms out), no fade. The
+			// important markers beat the base sheet's transition styles
+			// and its data-[side=right]:sm:max-w-sm width.
+			Class: "flex flex-col gap-0 border-l-0 p-0 sm:max-w-sm! md:w-[700px]! md:max-w-[700px]! dark:border-l bg-background ease-in-out transition-none data-[tui-dialog-open=false]:translate-x-0! data-[tui-dialog-open=false]:opacity-100! data-[tui-dialog-open=true]:animate-in data-[tui-dialog-open=true]:slide-in-from-right data-[tui-dialog-open=true]:duration-500 data-[tui-dialog-open=false]:animate-out data-[tui-dialog-open=false]:slide-out-to-right data-[tui-dialog-open=false]:duration-300 data-[tui-dialog-open=false]:fill-mode-forwards",
 		}) {
 			<div class="sr-only">
 				@sheet.Title() {
@@ -146,16 +152,16 @@ templ chartCodeViewer(entry ChartEntry) {
 				<div class="flex min-w-0 flex-1 flex-col overflow-hidden p-4">
 					<figure data-rehype-pretty-code-figure="" class="mt-0 flex h-auto min-w-0 flex-1 flex-col overflow-hidden rounded-2xl bg-code text-sm text-code-foreground outline-none">
 						<figcaption
-							class="flex h-12 shrink-0 items-center gap-2 border-b border-border/30 py-2 pr-2 pl-4 font-mono text-code-foreground [&>svg]:size-4 [&>svg]:text-code-foreground [&>svg]:opacity-70"
+							class="flex h-12 shrink-0 items-center gap-2 border-b py-2 pr-2 pl-4 text-foreground [&>svg]:size-4 [&>svg]:text-foreground [&>svg]:opacity-70"
 							data-language="templ"
 						>
 							@icon.FileCode()
 							{ entry.ID }
 							<div class="ml-auto flex items-center gap-2">
-								@chartCopyButton(entry.ID, "text-code-foreground hover:bg-white/10 hover:text-code-foreground")
+								@chartCopyButton(entry.ID, "")
 							</div>
 						</figcaption>
-						<div class="no-scrollbar min-h-0 flex-1 overflow-y-auto [&_pre]:px-4 [&_pre]:py-3.5">
+						<div class="no-scrollbar min-h-0 flex-1 overflow-y-auto [&_pre]:px-0 [&_pre]:py-3.5" data-tui-code-line-numbers>
 							@templ.Raw(GetHighlightedHTML(ctx, entry.Code, "go"))
 						</div>
 					</figure>
