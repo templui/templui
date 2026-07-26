@@ -536,7 +536,7 @@ templ chartOutput(st *chartState) {
 	{{ m := buildModel(ctx, st) }}
 	@templ.Raw(ModelScript(m))
 	if st.legend {
-		@legendContent(m.Series)
+		@legendContent(legendSeries(configFrom(ctx), m.Series))
 	}
 }
 
@@ -1019,19 +1019,36 @@ func modelSeries(config Config, key, fill string, fillOpacity float64, data []Da
 	return ModelSeries{Key: key, Label: config.Label(key), Color: color, Values: values, FillOpacity: fillOpacity}
 }
 
+// legendSeries orders the drawn series like the chart config, the order
+// the legend entries appear in.
+func legendSeries(config Config, series []ModelSeries) []ModelSeries {
+	var out []ModelSeries
+	for _, c := range config {
+		for _, s := range series {
+			if s.Key == c.Key {
+				out = append(out, s)
+			}
+		}
+	}
+	if len(out) == 0 {
+		return series
+	}
+	return out
+}
+
 // legendContent is the ChartLegendContent pendant, absolutely positioned
 // like Recharts' legend wrapper.
 templ legendContent(series []ModelSeries) {
 	<div class="recharts-legend-wrapper" style="position:absolute;left:0;right:0;bottom:5px">
 		<div class="flex items-center justify-center gap-4 pt-3">
-			for i := len(series) - 1; i >= 0; i-- {
+			for _, s := range series {
 				<div class="flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground">
-					if series[i].Icon != "" {
-						@templ.Raw(series[i].Icon)
+					if s.Icon != "" {
+						@templ.Raw(s.Icon)
 					} else {
-						<div class="h-2 w-2 shrink-0 rounded-[2px]" style={ "background-color:" + series[i].Color }></div>
+						<div class="h-2 w-2 shrink-0 rounded-[2px]" style={ "background-color:" + s.Color }></div>
 					}
-					{ series[i].Label }
+					{ s.Label }
 				</div>
 			}
 		</div>
