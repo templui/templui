@@ -696,7 +696,10 @@ function renderCartesian(panel, m, state, alpha = 1) {
               anchor = "middle";
             }
             const fo = ll.fillOpacity ? ` fill-opacity="${fmtF(ll.fillOpacity)}"` : "";
-            svg += `<text x="${fmtF(x)}" y="${fmtF(y)}" class="recharts-text recharts-label ${ll.class || ""}" text-anchor="${anchor}" font-size="${fmtF(ll.fontSize || 12)}"${fo}><tspan dy="${vertical ? "0.355em" : "0"}">${ll.labels[i]}</tspan></text>`;
+            // LabelList inherits the entry's presentation props, so a label
+            // without its own class takes the bar's fill.
+            const fill = ll.class ? "" : ` fill="${(s.cells && s.cells[i]) || s.color}"`;
+            svg += `<text x="${fmtF(x)}" y="${fmtF(y)}" class="recharts-text recharts-label ${ll.class || ""}" text-anchor="${anchor}" font-size="${fmtF(ll.fontSize || 12)}"${fill}${fo}><tspan dy="${vertical ? "0.355em" : "0"}">${ll.labels[i]}</tspan></text>`;
           }
           svg += `</g>`;
         }
@@ -742,7 +745,8 @@ function renderCartesian(panel, m, state, alpha = 1) {
         const ll = s.labelList;
         svg += `<g class="recharts-layer recharts-label-list">`;
         for (let i = 0; i < n; i++) {
-          svg += `<text x="${fmtF(xs[i])}" y="${fmtF(top[i] - (ll.offset || 5))}" class="recharts-text recharts-label ${ll.class || ""}" text-anchor="middle" font-size="${fmtF(ll.fontSize || 12)}"><tspan>${ll.labels[i]}</tspan></text>`;
+          const fill = ll.class ? "" : ` fill="${s.stroke || s.color}"`;
+          svg += `<text x="${fmtF(xs[i])}" y="${fmtF(top[i] - (ll.offset || 5))}" class="recharts-text recharts-label ${ll.class || ""}" text-anchor="middle" font-size="${fmtF(ll.fontSize || 12)}"${fill}><tspan>${ll.labels[i]}</tspan></text>`;
         }
         svg += `</g>`;
       }
