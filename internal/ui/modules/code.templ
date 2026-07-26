@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -115,6 +116,9 @@ func GetHighlightedHTMLMeta(ctx context.Context, codeContent string, language st
 	if codeContent == "" {
 		return ""
 	}
+	// A file's trailing newline would render as an extra empty line with
+	// its own line number, so it is trimmed like rehype-pretty-code does.
+	codeContent = strings.TrimRight(codeContent, "\n")
 	if language == "" {
 		language = "templ" // Default
 	}

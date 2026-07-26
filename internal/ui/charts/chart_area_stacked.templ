@@ -6,50 +6,59 @@ import (
 	"github.com/templui/templui/components/icon"
 )
 
-// The pendant of chart-area-default.tsx.
+// The pendant of chart-area-stacked.tsx.
 
-var chartAreaDefaultData = []chart.Datum{
-	{"month": "January", "desktop": 186},
-	{"month": "February", "desktop": 305},
-	{"month": "March", "desktop": 237},
-	{"month": "April", "desktop": 73},
-	{"month": "May", "desktop": 209},
-	{"month": "June", "desktop": 214},
+var chartAreaStackedData = []chart.Datum{
+	{"month": "January", "desktop": 186, "mobile": 80},
+	{"month": "February", "desktop": 305, "mobile": 200},
+	{"month": "March", "desktop": 237, "mobile": 120},
+	{"month": "April", "desktop": 73, "mobile": 190},
+	{"month": "May", "desktop": 209, "mobile": 130},
+	{"month": "June", "desktop": 214, "mobile": 140},
 }
 
-var chartAreaDefaultConfig = chart.Config{
+var chartAreaStackedConfig = chart.Config{
 	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
+	{Key: "mobile", Label: "Mobile", Color: "var(--chart-2)"},
 }
 
-func areaDefaultMonthShort(v any) string {
+func areaStackedMonthShort(v any) string {
 	return v.(string)[:3]
 }
 
-templ ChartAreaDefault() {
+templ ChartAreaStacked() {
 	@card.Card() {
 		@card.Header() {
 			@card.Title() {
-				Area Chart
+				Area Chart - Stacked
 			}
 			@card.Description() {
 				Showing total visitors for the last 6 months
 			}
 		}
 		@card.Content() {
-			@chart.Container(chart.ContainerProps{ID: "area-default", Config: chartAreaDefaultConfig}) {
+			@chart.Container(chart.ContainerProps{ID: "area-stacked", Config: chartAreaStackedConfig}) {
 				@chart.AreaChart(chart.AreaChartProps{
-					Data:   chartAreaDefaultData,
+					Data:   chartAreaStackedData,
 					Margin: &chart.Margin{Left: 12, Right: 12},
 				}) {
 					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
 					@chart.XAxis(chart.XAxisProps{
 						DataKey:       "month",
 						TickMargin:    8,
-						TickFormatter: areaDefaultMonthShort,
+						TickFormatter: areaStackedMonthShort,
 					})
 					@chart.Tooltip(chart.TooltipProps{
 						Cursor:  false,
-						Content: chart.TooltipContentProps{Indicator: "line"},
+						Content: chart.TooltipContentProps{Indicator: "dot"},
+					})
+					@chart.Area(chart.AreaProps{
+						DataKey:     "mobile",
+						Type:        chart.CurveNatural,
+						Fill:        "var(--color-mobile)",
+						FillOpacity: 0.4,
+						Stroke:      "var(--color-mobile)",
+						StackID:     "a",
 					})
 					@chart.Area(chart.AreaProps{
 						DataKey:     "desktop",
@@ -57,6 +66,7 @@ templ ChartAreaDefault() {
 						Fill:        "var(--color-desktop)",
 						FillOpacity: 0.4,
 						Stroke:      "var(--color-desktop)",
+						StackID:     "a",
 					})
 				}
 			}

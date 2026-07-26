@@ -3,6 +3,7 @@ package markdown
 import (
 	"bytes"
 	"regexp"
+	"strings"
 
 	"github.com/templui/templui/internal/ui/modules"
 	"github.com/yuin/goldmark/parser"
@@ -19,11 +20,13 @@ type Segment struct {
 }
 
 // Shortcode tags mirror shadcn's mdx components, so their docs sources can
-// be adopted nearly verbatim. Callout carries inner markdown, the others are
-// self closing.
-var shortcodeRe = regexp.MustCompile(`(?ms)^(?:<(ComponentPreview|ComponentSource|Installation)\b(.*?)/>|<(Callout)>(.*?)</Callout>)\s*$`)
+// be adopted nearly verbatim. Callout carries inner markdown, Steps wraps
+// the segments between its tags and Step is a numbered heading; the others
+// are self closing.
+var shortcodeRe = regexp.MustCompile(`(?ms)^(?:<(ComponentPreview|ComponentSource|Installation)\b(.*?)/>|<(Callout)\b([^>\n]*)>(.*?)</Callout>|<(Steps)([^>\n]*)>|(</Steps>)|<(Step)>(.*?)</Step>)\s*$`)
 
-var attrRe = regexp.MustCompile(`([a-zA-Z-]+)="([^"]*)"`)
+// attrRe matches key="value" pairs and bare boolean attributes (hideCode).
+var attrRe = regexp.MustCompile(`([a-zA-Z-]+)(?:="([^"]*)")?`)
 
 func parseAttrs(raw string) map[string]string {
 	attrs := map[string]string{}
@@ -79,13 +82,26 @@ func (p *Parser) ParseSegments(source []byte) ([]Segment, map[string]any, []modu
 		if err := flush(chunk); err != nil {
 			return nil, nil, nil, err
 		}
-		if m[6] != -1 { // Callout with inner markdown
+		switch {
+		case m[6] != -1: // Callout with attrs and inner markdown
 			var buf bytes.Buffer
-			if err := p.md.Convert(source[m[8]:m[9]], &buf, parser.WithContext(idContext)); err != nil {
+			if err := p.md.Convert(source[m[10]:m[11]], &buf, parser.WithContext(idContext)); err != nil {
 				return nil, nil, nil, err
 			}
-			segments = append(segments, Segment{Shortcode: "Callout", HTML: buf.String()})
-		} else {
+			segments = append(segments, Segment{Shortcode: "Callout", Attrs: parseAttrs(string(source[m[8]:m[9]])), HTML: buf.String()})
+		case m[12] != -1: // Steps opening tag
+			segments = append(segments, Segment{Shortcode: "Steps", Attrs: parseAttrs(string(source[m[14]:m[15]]))})
+		case m[16] != -1: // Steps closing tag
+			segments = append(segments, Segment{Shortcode: "StepsEnd"})
+		case m[18] != -1: // Step heading with inline markdown
+			var buf bytes.Buffer
+			if err := p.md.Convert(source[m[20]:m[21]], &buf, parser.WithContext(idContext)); err != nil {
+				return nil, nil, nil, err
+			}
+			title := strings.TrimSpace(buf.String())
+			title = strings.TrimSuffix(strings.TrimPrefix(title, "<p>"), "</p>")
+			segments = append(segments, Segment{Shortcode: "Step", HTML: title})
+		default:
 			segments = append(segments, Segment{
 				Shortcode: string(source[m[2]:m[3]]),
 				Attrs:     parseAttrs(string(source[m[4]:m[5]])),

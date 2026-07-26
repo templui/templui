@@ -1,6 +1,7 @@
 package chart
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -15,32 +16,98 @@ type Series struct {
 	Key   string
 	Label string
 	Color string
+	// Theme sets a color per color scheme, like the theme field in
+	// shadcn's ChartConfig. It takes precedence over Color.
+	Theme *SeriesTheme
+	// Icon replaces the color swatch in legend and tooltip, like the icon
+	// field in shadcn's ChartConfig.
+	Icon templ.Component
 }
 
+// SeriesTheme is a color pair for the light and the dark scheme.
+type SeriesTheme struct {
+	Light string
+	Dark  string
+}
+
+// styleBlock is the ChartStyle pendant: one rule per color scheme, the
+// theme color wins over the plain color.
 func (c Config) styleBlock(id string) string {
 	var sb strings.Builder
-	fmt.Fprintf(&sb, "[data-chart=%s] {\n", id)
-	for _, s := range c {
-		if s.Color != "" {
-			fmt.Fprintf(&sb, "  --color-%s: %s;\n", s.Key, s.Color)
+	for _, theme := range []struct{ Name, Prefix string }{{"light", ""}, {"dark", ".dark "}} {
+		fmt.Fprintf(&sb, "%s[data-chart=%s] {\n", theme.Prefix, id)
+		for _, s := range c {
+			color := s.Color
+			if s.Theme != nil {
+				if theme.Name == "dark" {
+					color = s.Theme.Dark
+				} else {
+					color = s.Theme.Light
+				}
+			}
+			if color != "" {
+				fmt.Fprintf(&sb, "  --color-%s: %s;\n", s.Key, color)
+			}
 		}
+		sb.WriteString("}\n")
 	}
-	sb.WriteString("}\n")
 	return sb.String()
+}
+
+// ContainerProps is the pendant of ChartContainer's props.
+type ContainerProps struct {
+	// ID names the chart, a generated one is used when empty. It ends up
+	// as data-chart="chart-<id>" like in shadcn.
+	ID         string
+	Config     Config
+	Class      string
+	Attributes templ.Attributes
+}
+
+// StyleProps is the pendant of ChartStyle's props.
+type StyleProps struct {
+	ID     string
+	Config Config
+}
+
+// Style is the ChartStyle pendant: the color variables for an id without
+// a container, for markup that needs them outside the chart (like the
+// select swatches in the interactive pie demo).
+templ Style(props ...StyleProps) {
+	{{ var p StyleProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@templ.Raw("<style>" + p.Config.styleBlock(p.ID) + "</style>")
 }
 
 // Container is the ChartContainer pendant: aspect-video flex box with the
 // Recharts-compat CSS and the generated color variables.
-templ Container(id string, config Config, class string) {
-	@templ.Raw("<style>" + config.styleBlock(id) + "</style>")
+templ Container(props ...ContainerProps) {
+	{{ var p ContainerProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{
+	id := p.ID
+	if id == "" {
+		id = utils.RandomID()
+	}
+	chartID := "chart-" + id
+	// The config travels to the chart root and its children through ctx,
+	// the pendant of shadcn's ChartContext.
+	ctx = context.WithValue(ctx, configCtxKey, p.Config)
+	}}
+	@templ.Raw("<style>" + p.Config.styleBlock(chartID) + "</style>")
 	<div
 		data-slot="chart"
-		data-chart={ id }
+		data-chart={ chartID }
 		data-tui-chart
 		class={ utils.TwMerge(
 			"flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
-			class,
+			p.Class,
 		) }
+		{ p.Attributes... }
 	>
 		{ children... }
 	</div>

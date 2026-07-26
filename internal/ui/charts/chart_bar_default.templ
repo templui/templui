@@ -21,6 +21,10 @@ var chartBarDefaultConfig = chart.Config{
 	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
 }
 
+func barDefaultMonthShort(v any) string {
+	return v.(string)[:3]
+}
+
 templ ChartBarDefault() {
 	@card.Card() {
 		@card.Header() {
@@ -32,23 +36,22 @@ templ ChartBarDefault() {
 			}
 		}
 		@card.Content() {
-			@chart.Container("bar-default", chartBarDefaultConfig, "") {
+			@chart.Container(chart.ContainerProps{ID: "bar-default", Config: chartBarDefaultConfig}) {
 				@chart.BarChart(chart.BarChartProps{
-					Data:   chartBarDefaultData,
-					Config: chartBarDefaultConfig,
-					XAxis: &chart.XAxisProps{
+					Data: chartBarDefaultData,
+				}) {
+					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+					@chart.XAxis(chart.XAxisProps{
 						DataKey:       "month",
 						TickMargin:    10,
-						TickFormatter: monthShort,
-					},
-					Tooltip: &chart.TooltipProps{
-						Cursor:    false,
-						HideLabel: true,
-					},
-					Bars: []chart.BarProps{
-						{DataKey: "desktop", Radius: 8},
-					},
-				})
+						TickFormatter: barDefaultMonthShort,
+					})
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  false,
+						Content: chart.TooltipContentProps{HideLabel: true},
+					})
+					@chart.Bar(chart.BarProps{DataKey: "desktop", Fill: "var(--color-desktop)", Radius: 8})
+				}
 			}
 		}
 		@card.Footer(card.FooterProps{Class: "flex-col items-start gap-2 text-sm"}) {

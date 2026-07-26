@@ -28,7 +28,15 @@ templ ComponentPreviewBlock(entry examples.RegistryEntry, attrs map[string]strin
 	if align == "" {
 		{{ align = "center" }}
 	}
-	<div data-slot="component-preview" data-not-typeset class="group relative mt-4 mb-12 flex flex-col overflow-hidden rounded-2xl border">
+	{{ _, hideCode := attrs["hideCode"] }}
+	<div
+		data-slot="component-preview"
+		data-not-typeset
+		class={ utils.TwMerge(
+			"group relative mt-4 mb-12 flex flex-col overflow-hidden rounded-2xl border",
+			attrs["className"],
+		) }
+	>
 		<div data-slot="preview">
 			<div
 				data-align={ align }
@@ -40,7 +48,9 @@ templ ComponentPreviewBlock(entry examples.RegistryEntry, attrs map[string]strin
 				@entry.Component
 			</div>
 		</div>
-		@CollapsibleCodeBlock(entry.File)
+		if !hideCode {
+			@CollapsibleCodeBlock(entry.File)
+		}
 	</div>
 }
 
@@ -417,8 +427,12 @@ templ MarkdownProse() {
 
 // CalloutBlock renders shadcn's Callout (surface alert box) around inner
 // markdown.
-templ CalloutBlock() {
-	<div data-not-typeset class="mt-6 w-auto rounded-2xl border border-surface bg-surface p-4 text-sm text-surface-foreground md:-mx-1 [&_code]:border [&_p]:text-card-foreground/80 [&_p:not(:first-child)]:mt-2">
+templ CalloutBlock(class ...string) {
+	{{ extra := "" }}
+	if len(class) > 0 {
+		{{ extra = class[0] }}
+	}
+	<div data-not-typeset class={ utils.TwMerge("mt-6 w-auto rounded-2xl border border-surface bg-surface p-4 text-sm text-surface-foreground md:-mx-1 [&_code]:border [&_p]:text-card-foreground/80 [&_p:not(:first-child)]:mt-2", extra) }>
 		{ children... }
 	</div>
 }

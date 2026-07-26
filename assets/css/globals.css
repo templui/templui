@@ -347,6 +347,10 @@
   padding-right: calc(var(--spacing) * 6);
   text-align: right;
   color: var(--color-code-number);
+  /* The gutter stays put while the code scrolls sideways. */
+  background-color: var(--color-code);
+  position: sticky;
+  left: 0;
 }
 
 @utility step {

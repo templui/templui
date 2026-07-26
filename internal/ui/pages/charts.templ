@@ -44,6 +44,14 @@ func chartsFor(chartType string) []modules.ChartEntry {
 		return []modules.ChartEntry{
 			entry("chart-area-interactive", true),
 			entry("chart-area-default", false),
+			entry("chart-area-linear", false),
+			entry("chart-area-step", false),
+			entry("chart-area-legend", false),
+			entry("chart-area-stacked", false),
+			entry("chart-area-stacked-expand", false),
+			entry("chart-area-icons", false),
+			entry("chart-area-gradient", false),
+			entry("chart-area-axes", false),
 		}
 	case "bar":
 		return []modules.ChartEntry{
@@ -146,13 +154,25 @@ templ Charts(chartType string) {
 templ chartsPageScript() {
 	<script nonce={ templ.GetNonce(ctx) }>
 		(() => {
-			// ChartIframe: fade the chart iframes in once loaded.
+			// ChartIframe: fade the chart iframes in once loaded, the pendant
+			// of shadcn's onLoad state. On a fast host the iframes can finish
+			// before this script runs, so frames that are already complete
+			// reveal immediately (the img.complete pattern for iframes).
+			const revealIframe = (f) => {
+				f.classList.remove("opacity-0");
+				f.classList.add("opacity-100");
+			};
 			document.addEventListener("load", (e) => {
 				if (e.target instanceof Element && e.target.matches("[data-tui-chart-iframe]")) {
-					e.target.classList.remove("opacity-0");
-					e.target.classList.add("opacity-100");
+					revealIframe(e.target);
 				}
 			}, true);
+			document.querySelectorAll("[data-tui-chart-iframe]").forEach((f) => {
+				const d = f.contentDocument;
+				if (d && d.readyState === "complete" && d.URL !== "about:blank") {
+					revealIframe(f);
+				}
+			});
 
 			// Copy buttons: write the chart source, swap to the check icon
 			// for two seconds.
@@ -172,40 +192,6 @@ templ chartsPageScript() {
 				}, 2000);
 			});
 
-			// Interactive demos: the selects toggle the SSR variants.
-			document.addEventListener("select-change", (e) => {
-				const trigger = e.target instanceof Element && e.target.closest("[data-tui-chart-range-select], [data-tui-chart-month-select]");
-				if (!trigger) return;
-				const value = e.detail && e.detail.value;
-				if (!value) return;
-				const chart = trigger.closest("[data-slot=card]");
-				if (!chart) return;
-				if (trigger.hasAttribute("data-tui-chart-range-select")) {
-					chart.querySelectorAll("[data-tui-chart-range]").forEach((el) => {
-						el.hidden = el.getAttribute("data-tui-chart-range") !== value;
-					});
-				} else {
-					chart.querySelectorAll("[data-tui-chart-month]").forEach((el) => {
-						el.hidden = el.getAttribute("data-tui-chart-month") !== value;
-					});
-				}
-			});
-
-			// Bar interactive: header buttons toggle the series.
-			document.addEventListener("click", (e) => {
-				if (!(e.target instanceof Element)) return;
-				const btn = e.target.closest("[data-tui-chart-series]");
-				if (!btn) return;
-				const series = btn.getAttribute("data-tui-chart-series");
-				const chart = btn.closest("[data-slot=card]");
-				if (!chart) return;
-				chart.querySelectorAll("[data-tui-chart-series]").forEach((b) => {
-					b.setAttribute("data-active", b === btn ? "true" : "false");
-				});
-				chart.querySelectorAll("[data-tui-chart-series-panel]").forEach((el) => {
-					el.hidden = el.getAttribute("data-tui-chart-series-panel") !== series;
-				});
-			});
 		})();
 	</script>
 }

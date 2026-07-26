@@ -14,6 +14,7 @@ import (
 	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/utils"
 )
 
 // PagerLink points to the previous/next component page.
@@ -150,7 +151,7 @@ func renderSegment(segment markdown.Segment) templ.Component {
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(segment.Attrs["name"])
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/component_doc.templ`, Line: 50, Col: 45}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/component_doc.templ`, Line: 51, Col: 45}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -190,7 +191,26 @@ func renderSegment(segment markdown.Segment) templ.Component {
 				}
 				return nil
 			})
-			templ_7745c5c3_Err = modules.CalloutBlock().Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = modules.CalloutBlock(segment.Attrs["className"]).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		case "Steps":
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "  ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templ.Raw(`<div class="`+utils.TwMerge("steps mb-12 [counter-reset:step] md:ml-4 md:border-l md:pl-8 [&>h3]:step", segment.Attrs["className"])+`">`).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		case "StepsEnd":
+			templ_7745c5c3_Err = templ.Raw("</div>").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		case "Step":
+			templ_7745c5c3_Err = templ.Raw("<h3>"+segment.HTML+"</h3>").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

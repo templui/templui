@@ -240,16 +240,17 @@
     },
     {
       "name": "chart",
-      "slug": "charts",
-      "displayName": "Charts",
-      "description": "Chart components for data visualization.",
+      "slug": "chart",
+      "displayName": "Chart",
+      "description": "Beautiful charts. Composable chart elements with a Recharts compatible client renderer.",
       "files": [
-        "components/chart/chart.templ"
+        "components/chart/chart.templ",
+        "components/chart/charts.templ",
+        "components/chart/model.go"
       ],
       "jsFiles": [
         "components/chart/chart.js",
-        "components/chart/chart.min.js",
-        "components/chart/chartjs.js"
+        "components/chart/chart.min.js"
       ],
       "dependencies": [],
       "categories": [

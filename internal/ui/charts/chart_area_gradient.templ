@@ -1,0 +1,98 @@
+package charts
+
+import (
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/components/icon"
+)
+
+// The pendant of chart-area-gradient.tsx.
+
+var chartAreaGradientData = []chart.Datum{
+	{"month": "January", "desktop": 186, "mobile": 80},
+	{"month": "February", "desktop": 305, "mobile": 200},
+	{"month": "March", "desktop": 237, "mobile": 120},
+	{"month": "April", "desktop": 73, "mobile": 190},
+	{"month": "May", "desktop": 209, "mobile": 130},
+	{"month": "June", "desktop": 214, "mobile": 140},
+}
+
+var chartAreaGradientConfig = chart.Config{
+	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
+	{Key: "mobile", Label: "Mobile", Color: "var(--chart-2)"},
+}
+
+func areaGradientMonthShort(v any) string {
+	return v.(string)[:3]
+}
+
+templ ChartAreaGradient() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Area Chart - Gradient
+			}
+			@card.Description() {
+				Showing total visitors for the last 6 months
+			}
+		}
+		@card.Content() {
+			@chart.Container(chart.ContainerProps{ID: "area-gradient", Config: chartAreaGradientConfig}) {
+				@chart.AreaChart(chart.AreaChartProps{
+					Data:   chartAreaGradientData,
+					Margin: &chart.Margin{Left: 12, Right: 12},
+				}) {
+					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+					@chart.XAxis(chart.XAxisProps{
+						DataKey:       "month",
+						TickMargin:    8,
+						TickFormatter: areaGradientMonthShort,
+					})
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  false,
+						Content: chart.TooltipContentProps{},
+					})
+					@chart.Defs() {
+						@chart.LinearGradient(chart.LinearGradientProps{ID: "fillDesktop", X1: "0", Y1: "0", X2: "0", Y2: "1"}) {
+							<stop offset="5%" stop-color="var(--color-desktop)" stop-opacity="0.8"></stop>
+							<stop offset="95%" stop-color="var(--color-desktop)" stop-opacity="0.1"></stop>
+						}
+						@chart.LinearGradient(chart.LinearGradientProps{ID: "fillMobile", X1: "0", Y1: "0", X2: "0", Y2: "1"}) {
+							<stop offset="5%" stop-color="var(--color-mobile)" stop-opacity="0.8"></stop>
+							<stop offset="95%" stop-color="var(--color-mobile)" stop-opacity="0.1"></stop>
+						}
+					}
+					@chart.Area(chart.AreaProps{
+						DataKey:     "mobile",
+						Type:        chart.CurveNatural,
+						Fill:        "url(#fillMobile)",
+						FillOpacity: 0.4,
+						Stroke:      "var(--color-mobile)",
+						StackID:     "a",
+					})
+					@chart.Area(chart.AreaProps{
+						DataKey:     "desktop",
+						Type:        chart.CurveNatural,
+						Fill:        "url(#fillDesktop)",
+						FillOpacity: 0.4,
+						Stroke:      "var(--color-desktop)",
+						StackID:     "a",
+					})
+				}
+			}
+		}
+		@card.Footer() {
+			<div class="flex w-full items-start gap-2 text-sm">
+				<div class="grid gap-2">
+					<div class="flex items-center gap-2 leading-none font-medium">
+						Trending up by 5.2% this month
+						@icon.TrendingUp(icon.Props{Class: "h-4 w-4"})
+					</div>
+					<div class="flex items-center gap-2 leading-none text-muted-foreground">
+						January - June 2024
+					</div>
+				</div>
+			</div>
+		}
+	}
+}

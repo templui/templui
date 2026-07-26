@@ -12,29 +12,129 @@ import (
 
 // The pendant of chart-bar-interactive.tsx.
 
+var chartBarInteractiveData = []chart.Datum{
+	{"date": "2024-04-01", "desktop": 222, "mobile": 150},
+	{"date": "2024-04-02", "desktop": 97, "mobile": 180},
+	{"date": "2024-04-03", "desktop": 167, "mobile": 120},
+	{"date": "2024-04-04", "desktop": 242, "mobile": 260},
+	{"date": "2024-04-05", "desktop": 373, "mobile": 290},
+	{"date": "2024-04-06", "desktop": 301, "mobile": 340},
+	{"date": "2024-04-07", "desktop": 245, "mobile": 180},
+	{"date": "2024-04-08", "desktop": 409, "mobile": 320},
+	{"date": "2024-04-09", "desktop": 59, "mobile": 110},
+	{"date": "2024-04-10", "desktop": 261, "mobile": 190},
+	{"date": "2024-04-11", "desktop": 327, "mobile": 350},
+	{"date": "2024-04-12", "desktop": 292, "mobile": 210},
+	{"date": "2024-04-13", "desktop": 342, "mobile": 380},
+	{"date": "2024-04-14", "desktop": 137, "mobile": 220},
+	{"date": "2024-04-15", "desktop": 120, "mobile": 170},
+	{"date": "2024-04-16", "desktop": 138, "mobile": 190},
+	{"date": "2024-04-17", "desktop": 446, "mobile": 360},
+	{"date": "2024-04-18", "desktop": 364, "mobile": 410},
+	{"date": "2024-04-19", "desktop": 243, "mobile": 180},
+	{"date": "2024-04-20", "desktop": 89, "mobile": 150},
+	{"date": "2024-04-21", "desktop": 137, "mobile": 200},
+	{"date": "2024-04-22", "desktop": 224, "mobile": 170},
+	{"date": "2024-04-23", "desktop": 138, "mobile": 230},
+	{"date": "2024-04-24", "desktop": 387, "mobile": 290},
+	{"date": "2024-04-25", "desktop": 215, "mobile": 250},
+	{"date": "2024-04-26", "desktop": 75, "mobile": 130},
+	{"date": "2024-04-27", "desktop": 383, "mobile": 420},
+	{"date": "2024-04-28", "desktop": 122, "mobile": 180},
+	{"date": "2024-04-29", "desktop": 315, "mobile": 240},
+	{"date": "2024-04-30", "desktop": 454, "mobile": 380},
+	{"date": "2024-05-01", "desktop": 165, "mobile": 220},
+	{"date": "2024-05-02", "desktop": 293, "mobile": 310},
+	{"date": "2024-05-03", "desktop": 247, "mobile": 190},
+	{"date": "2024-05-04", "desktop": 385, "mobile": 420},
+	{"date": "2024-05-05", "desktop": 481, "mobile": 390},
+	{"date": "2024-05-06", "desktop": 498, "mobile": 520},
+	{"date": "2024-05-07", "desktop": 388, "mobile": 300},
+	{"date": "2024-05-08", "desktop": 149, "mobile": 210},
+	{"date": "2024-05-09", "desktop": 227, "mobile": 180},
+	{"date": "2024-05-10", "desktop": 293, "mobile": 330},
+	{"date": "2024-05-11", "desktop": 335, "mobile": 270},
+	{"date": "2024-05-12", "desktop": 197, "mobile": 240},
+	{"date": "2024-05-13", "desktop": 197, "mobile": 160},
+	{"date": "2024-05-14", "desktop": 448, "mobile": 490},
+	{"date": "2024-05-15", "desktop": 473, "mobile": 380},
+	{"date": "2024-05-16", "desktop": 338, "mobile": 400},
+	{"date": "2024-05-17", "desktop": 499, "mobile": 420},
+	{"date": "2024-05-18", "desktop": 315, "mobile": 350},
+	{"date": "2024-05-19", "desktop": 235, "mobile": 180},
+	{"date": "2024-05-20", "desktop": 177, "mobile": 230},
+	{"date": "2024-05-21", "desktop": 82, "mobile": 140},
+	{"date": "2024-05-22", "desktop": 81, "mobile": 120},
+	{"date": "2024-05-23", "desktop": 252, "mobile": 290},
+	{"date": "2024-05-24", "desktop": 294, "mobile": 220},
+	{"date": "2024-05-25", "desktop": 201, "mobile": 250},
+	{"date": "2024-05-26", "desktop": 213, "mobile": 170},
+	{"date": "2024-05-27", "desktop": 420, "mobile": 460},
+	{"date": "2024-05-28", "desktop": 233, "mobile": 190},
+	{"date": "2024-05-29", "desktop": 78, "mobile": 130},
+	{"date": "2024-05-30", "desktop": 340, "mobile": 280},
+	{"date": "2024-05-31", "desktop": 178, "mobile": 230},
+	{"date": "2024-06-01", "desktop": 178, "mobile": 200},
+	{"date": "2024-06-02", "desktop": 470, "mobile": 410},
+	{"date": "2024-06-03", "desktop": 103, "mobile": 160},
+	{"date": "2024-06-04", "desktop": 439, "mobile": 380},
+	{"date": "2024-06-05", "desktop": 88, "mobile": 140},
+	{"date": "2024-06-06", "desktop": 294, "mobile": 250},
+	{"date": "2024-06-07", "desktop": 323, "mobile": 370},
+	{"date": "2024-06-08", "desktop": 385, "mobile": 320},
+	{"date": "2024-06-09", "desktop": 438, "mobile": 480},
+	{"date": "2024-06-10", "desktop": 155, "mobile": 200},
+	{"date": "2024-06-11", "desktop": 92, "mobile": 150},
+	{"date": "2024-06-12", "desktop": 492, "mobile": 420},
+	{"date": "2024-06-13", "desktop": 81, "mobile": 130},
+	{"date": "2024-06-14", "desktop": 426, "mobile": 380},
+	{"date": "2024-06-15", "desktop": 307, "mobile": 350},
+	{"date": "2024-06-16", "desktop": 371, "mobile": 310},
+	{"date": "2024-06-17", "desktop": 475, "mobile": 520},
+	{"date": "2024-06-18", "desktop": 107, "mobile": 170},
+	{"date": "2024-06-19", "desktop": 341, "mobile": 290},
+	{"date": "2024-06-20", "desktop": 408, "mobile": 450},
+	{"date": "2024-06-21", "desktop": 169, "mobile": 210},
+	{"date": "2024-06-22", "desktop": 317, "mobile": 270},
+	{"date": "2024-06-23", "desktop": 480, "mobile": 530},
+	{"date": "2024-06-24", "desktop": 132, "mobile": 180},
+	{"date": "2024-06-25", "desktop": 141, "mobile": 190},
+	{"date": "2024-06-26", "desktop": 434, "mobile": 380},
+	{"date": "2024-06-27", "desktop": 448, "mobile": 490},
+	{"date": "2024-06-28", "desktop": 149, "mobile": 200},
+	{"date": "2024-06-29", "desktop": 103, "mobile": 160},
+	{"date": "2024-06-30", "desktop": 446, "mobile": 400},
+}
+
 var chartBarInteractiveConfig = chart.Config{
 	{Key: "views", Label: "Page Views"},
 	{Key: "desktop", Label: "Desktop", Color: "var(--chart-2)"},
 	{Key: "mobile", Label: "Mobile", Color: "var(--chart-1)"},
 }
 
+// shortDate formats like the demo's tickFormatter: "Apr 1".
+func barInteractiveShortDate(v any) string {
+	t, _ := time.Parse("2006-01-02", v.(string))
+	return t.Format("Jan 2")
+}
+
 // longDate formats like the tooltip labelFormatter: "Apr 1, 2024".
-func longDate(v any) string {
+func barInteractiveLongDate(v any) string {
 	t, _ := time.Parse("2006-01-02", v.(string))
 	return t.Format("Jan 2, 2006")
 }
 
 // total sums one series for the header toggle buttons.
-func total(series string) string {
+func barInteractiveTotal(series string) string {
 	sum := 0
-	for _, d := range chartInteractiveData {
+	for _, d := range chartBarInteractiveData {
 		sum += d[series].(int)
 	}
-	return groupThousands(sum)
+	return barInteractiveGroupThousands(sum)
 }
 
 // groupThousands formats like toLocaleString: 446760 -> "446,760".
-func groupThousands(v int) string {
+func barInteractiveGroupThousands(v int) string {
 	s := fmt.Sprintf("%d", v)
 	var sb strings.Builder
 	for i, r := range s {
@@ -68,36 +168,37 @@ templ ChartBarInteractive() {
 							{ chartBarInteractiveConfig.Label(series) }
 						</span>
 						<span class="text-lg leading-none font-bold sm:text-3xl">
-							{ total(series) }
+							{ barInteractiveTotal(series) }
 						</span>
 					</button>
 				}
 			</div>
 		}
 		@card.Content(card.ContentProps{Class: "px-2 sm:p-6"}) {
-			@chart.Container("bar-interactive", chartBarInteractiveConfig, "aspect-auto h-[250px] w-full") {
+			@chart.Container(chart.ContainerProps{ID: "bar-interactive", Config: chartBarInteractiveConfig, Class: "aspect-auto h-[250px] w-full"}) {
 				for _, series := range []string{"desktop", "mobile"} {
 					<div data-tui-chart-series-panel={ series } hidden?={ series != "desktop" } style="width:100%;height:100%">
-						@chart.BarChart(chart.BarChartProps{
-							Data:   chartInteractiveData,
-							Config: chartBarInteractiveConfig,
-							Width:  1286, Height: 250,
+								@chart.BarChart(chart.BarChartProps{
+							Data:   chartBarInteractiveData,
 							Margin: &chart.Margin{Left: 12, Right: 12},
-							XAxis: &chart.XAxisProps{
+						}) {
+							@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+							@chart.XAxis(chart.XAxisProps{
 								DataKey:       "date",
 								TickMargin:    8,
 								MinTickGap:    32,
-								TickFormatter: shortDate,
-							},
-							Tooltip: &chart.TooltipProps{
-								Cursor:         true,
-								Class:          "w-[150px]",
-								LabelFormatter: longDate,
-							},
-							Bars: []chart.BarProps{
-								{DataKey: series},
-							},
-						})
+								TickFormatter: barInteractiveShortDate,
+							})
+							@chart.Tooltip(chart.TooltipProps{
+								Cursor: true,
+								Content: chart.TooltipContentProps{
+									Class:          "w-[150px]",
+									NameKey:        "views",
+									LabelFormatter: barInteractiveLongDate,
+								},
+							})
+							@chart.Bar(chart.BarProps{DataKey: series, Fill: "var(--color-" + series + ")"})
+						}
 					</div>
 				}
 			}

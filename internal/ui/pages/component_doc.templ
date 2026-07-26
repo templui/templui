@@ -6,6 +6,7 @@ import (
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
 	"github.com/templui/templui/internal/ui/examples"
+	"github.com/templui/templui/utils"
 )
 
 // PagerLink points to the previous/next component page.
@@ -55,8 +56,16 @@ templ renderSegment(segment markdown.Segment) {
 		case "Installation":
 			@modules.InstallationBlock(segment.Attrs["name"])
 		case "Callout":
-			@modules.CalloutBlock() {
+			@modules.CalloutBlock(segment.Attrs["className"]) {
 				@templ.Raw(segment.HTML)
 			}
+		case "Steps":
+			// The shadcn Steps wrapper: a numbered timeline; the div stays
+			// open across the following segments until StepsEnd closes it.
+			@templ.Raw(`<div class="` + utils.TwMerge("steps mb-12 [counter-reset:step] md:ml-4 md:border-l md:pl-8 [&>h3]:step", segment.Attrs["className"]) + `">`)
+		case "StepsEnd":
+			@templ.Raw("</div>")
+		case "Step":
+			@templ.Raw("<h3>" + segment.HTML + "</h3>")
 	}
 }

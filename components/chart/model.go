@@ -6,25 +6,34 @@ import "encoding/json"
 // re-renders the SVG at real container pixels (Recharts'
 // ResponsiveContainer behavior) and drives tooltip and cursor from it.
 type Model struct {
-	Kind          string        `json:"kind"` // "bar" | "area" | "pie"
-	MarginTop     float64       `json:"marginTop"`
-	MarginRight   float64       `json:"marginRight"`
-	MarginBottom  float64       `json:"marginBottom"`
-	MarginLeft    float64       `json:"marginLeft"`
-	XAxisHeight   float64       `json:"xAxisHeight,omitempty"`
-	TickMargin    float64       `json:"tickMargin,omitempty"`
-	MinTickGap    float64       `json:"minTickGap,omitempty"`
-	LegendHeight  float64       `json:"legendHeight,omitempty"`
-	CategoryGap   float64       `json:"categoryGap,omitempty"`
-	Radius        float64       `json:"radius,omitempty"`
-	Stacked       bool          `json:"stacked,omitempty"`
-	Gradient      bool          `json:"gradient,omitempty"`
-	Cursor        bool          `json:"cursor"`
-	Labels        []string      `json:"labels"`
-	TooltipLabels []string      `json:"tooltipLabels,omitempty"`
-	SliceColors   []string      `json:"sliceColors,omitempty"` // pie: color per slice
-	Series        []ModelSeries `json:"series"`
-	Tooltip       TooltipModel  `json:"tooltip"`
+	Kind          string                `json:"kind"` // "bar" | "area" | "pie"
+	MarginTop     float64               `json:"marginTop"`
+	MarginRight   float64               `json:"marginRight"`
+	MarginBottom  float64               `json:"marginBottom"`
+	MarginLeft    float64               `json:"marginLeft"`
+	XAxisHeight   float64               `json:"xAxisHeight,omitempty"`
+	TickMargin    float64               `json:"tickMargin,omitempty"`
+	MinTickGap    float64               `json:"minTickGap,omitempty"`
+	YAxisWidth    float64               `json:"yAxisWidth,omitempty"`
+	YAxisMargin   float64               `json:"yAxisMargin,omitempty"` // tickMargin of the y axis
+	TickCount     int                   `json:"tickCount,omitempty"`   // y ticks, Recharts default 5
+	XTickLine     bool                  `json:"xTickLine,omitempty"`
+	XAxisLine     bool                  `json:"xAxisLine,omitempty"`
+	YTickLine     bool                  `json:"yTickLine,omitempty"`
+	YAxisLine     bool                  `json:"yAxisLine,omitempty"`
+	LegendHeight  float64               `json:"legendHeight,omitempty"`
+	CategoryGap   float64               `json:"categoryGap,omitempty"`
+	Radius        float64               `json:"radius,omitempty"`
+	Grid          bool                  `json:"grid,omitempty"`
+	Stacked       bool                  `json:"stacked,omitempty"`
+	StackOffset   string                `json:"stackOffset,omitempty"` // "expand" normalizes each stack to 1
+	Defs          []LinearGradientProps `json:"defs,omitempty"`
+	Cursor        bool                  `json:"cursor"`
+	Labels        []string              `json:"labels"`
+	TooltipLabels []string              `json:"tooltipLabels,omitempty"`
+	SliceColors   []string              `json:"sliceColors,omitempty"` // pie: color per slice
+	Series        []ModelSeries         `json:"series"`
+	Tooltip       TooltipModel          `json:"tooltip"`
 	// Pie geometry for the client renderer.
 	InnerRadius float64 `json:"innerRadius,omitempty"`
 	StrokeWidth float64 `json:"strokeWidth,omitempty"`
@@ -41,6 +50,11 @@ type ModelSeries struct {
 	Color       string    `json:"color"`
 	Values      []float64 `json:"values"`
 	FillOpacity float64   `json:"fillOpacity,omitempty"` // areas: 0 uses Recharts' 0.6
+	Curve       string    `json:"curve,omitempty"`       // "natural" (default), "linear", "step"
+	Icon        string    `json:"icon,omitempty"`        // rendered svg, replaces the tooltip indicator
+	Fill        string    `json:"fill,omitempty"`        // verbatim fill, e.g. url(#fillDesktop)
+	Stroke      string    `json:"stroke,omitempty"`      // verbatim stroke for the area line
+	Radius      float64   `json:"radius,omitempty"`      // bars: corner radius
 }
 
 // TooltipModel mirrors ChartTooltipContent's props.

@@ -1,16 +1,22 @@
 /**
- * templUI chart - client runtime.
+ * templUI chart - client renderer.
  *
- * The server renders Recharts-compatible SVG for the first paint; this
- * module is the pendant of Recharts' client behavior on top of it:
- * - ResponsiveContainer: re-render the chart at the container's real pixel
- *   size (ResizeObserver), so bars, radii and text keep their pixel sizes.
- * - Tooltip: absolutely positioned wrapper that trails the cursor with the
- *   400ms ease transform transition, content like ChartTooltipContent.
- * - Cursor: the hover band rectangle (bars) or vertical line (areas).
- *
- * Geometry ports the same algorithms as the Go engine (recharts-scale
- * getNiceTickValues, d3-shape natural spline, preserveEnd tick culling).
+ * The server emits the chart model as JSON; this module is the pendant of
+ * Recharts in the browser and draws everything. It is a literal port of
+ * the parts of the reference libraries the chart components need:
+ * - recharts ResponsiveContainer: render at the container's real pixel
+ *   size via ResizeObserver, so bars, radii and text keep their sizes.
+ * - recharts-scale getNiceTickValues: the y domain and tick values.
+ * - recharts CartesianAxis preserveEnd: tick culling with measured label
+ *   sizes and minTickGap.
+ * - d3-shape: curveNatural, curveLinear, curveStep and stackOffsetExpand.
+ * - react-smooth: entrance and update animations with the CSS ease bezier,
+ *   the from state paints synchronously on mount and the clock starts on
+ *   the first real frame.
+ * - shadcn ChartTooltipContent and ChartStyle: tooltip markup, classes and
+ *   the per chart color variables.
+ * Optional model fields carry Recharts' prop defaults at the JSON boundary
+ * (xAxisHeight 0, minTickGap 5, tickCount 5, innerRadius 0).
  */
 
 const TOOLTIP_CLASS =
@@ -53,8 +59,26 @@ function linearY(v, dmax, top, height) {
   return top + height - (v / dmax) * height;
 }
 
+/* expandValues normalizes stacked values per index to a total of 1
+ * (d3-shape stackOffsetExpand behind Recharts' "expand"). */
+function expandValues(series) {
+  const n = series[0].values.length;
+  const vals = series.map(() => new Array(n).fill(0));
+  for (let i = 0; i < n; i++) {
+    let sum = 0;
+    for (const s of series) sum += s.values[i];
+    if (sum > 0) {
+      series.forEach((s, si) => {
+        vals[si][i] = s.values[i] / sum;
+      });
+    }
+  }
+  return vals;
+}
+
 /* domainOf computes a model's nice y domain (stacked aware). */
 function domainOf(m) {
+  if (m.stackOffset === "expand") return 1;
   let max = 0;
   const n = m.series[0].values.length;
   if (m.stacked) {
@@ -72,11 +96,15 @@ function domainOf(m) {
   return ticks[ticks.length - 1];
 }
 
-function barGeometry(band, categoryGap) {
-  const offset = categoryGap * band;
-  let size = band - 2 * offset;
+function barPositions(band, categoryGap, count) {
+  const gap = categoryGap * band;
+  let realBarGap = 4;
+  if (band - 2 * gap - (count - 1) * realBarGap <= 0) realBarGap = 0;
+  let size = (band - 2 * gap - (count - 1) * realBarGap) / count;
   if (size > 1) size = Math.round(size);
-  return [offset, size];
+  const offsets = [];
+  for (let i = 0; i < count; i++) offsets.push(gap + (size + realBarGap) * i);
+  return [offsets, size];
 }
 
 function roundedBarPath(x, y, w, h, r) {
@@ -135,11 +163,40 @@ function naturalPath(xs, ys) {
   return d;
 }
 
-function areaPathBetween(xs, ysTop, ysBase) {
+/* d3-shape curveLinear. */
+function linearPath(xs, ys) {
+  if (xs.length < 2) return "";
+  let d = `M${fmtF(xs[0])},${fmtF(ys[0])}`;
+  for (let i = 1; i < xs.length; i++) {
+    d += `L${fmtF(xs[i])},${fmtF(ys[i])}`;
+  }
+  return d;
+}
+
+/* d3-shape curveStep (t = 0.5): y switches at the midpoint, ends on the
+ * last point. */
+function stepPath(xs, ys) {
+  if (xs.length < 2) return "";
+  let d = `M${fmtF(xs[0])},${fmtF(ys[0])}`;
+  for (let i = 1; i < xs.length; i++) {
+    const x1 = (xs[i - 1] + xs[i]) / 2;
+    d += `L${fmtF(x1)},${fmtF(ys[i - 1])}L${fmtF(x1)},${fmtF(ys[i])}`;
+  }
+  d += `L${fmtF(xs[xs.length - 1])},${fmtF(ys[ys.length - 1])}`;
+  return d;
+}
+
+function curvePath(curve, xs, ys) {
+  if (curve === "linear") return linearPath(xs, ys);
+  if (curve === "step") return stepPath(xs, ys);
+  return naturalPath(xs, ys);
+}
+
+function areaPathBetween(curve, xs, ysTop, ysBase) {
   const rx = [...xs].reverse();
   const rb = [...ysBase].reverse();
-  const base = naturalPath(rx, rb);
-  return naturalPath(xs, ysTop) + "L" + base.slice(1) + "Z";
+  const base = curvePath(curve, rx, rb);
+  return curvePath(curve, xs, ysTop) + "L" + base.slice(1) + "Z";
 }
 
 /* preserveEnd tick culling with real text measurement, like Recharts. */
@@ -153,25 +210,35 @@ function measureLabel(label, refEl) {
   return measureCtx.measureText(label).width;
 }
 
-function preserveEndTicks(coords, labels, viewEnd, minTickGap, refEl) {
-  const start = 0;
-  let end = viewEnd;
+/* The label height Recharts reads from the DOM: 1.5 times the font size,
+ * matching the measured 18px at 12px text. */
+function measureLabelHeight(refEl) {
+  return parseFloat(getComputedStyle(refEl).fontSize) * 1.5;
+}
+
+function preserveEndTicks(coords, sizes, start, end, minTickGap) {
+  let sign = 1;
+  if (coords.length >= 2 && coords[1] < coords[0]) sign = -1;
   const kept = [];
   for (let i = coords.length - 1; i >= 0; i--) {
-    const size = measureLabel(labels[i], refEl);
+    const size = sizes[i];
     let tickCoord = coords[i];
     if (i === coords.length - 1) {
-      const gap = tickCoord + size / 2 - end;
-      if (gap > 0) tickCoord -= gap;
+      const gap = sign * (tickCoord + (sign * size) / 2 - end);
+      if (gap > 0) tickCoord -= gap * sign;
     }
-    if (tickCoord < start || tickCoord > end) continue;
-    if (tickCoord - size / 2 - start >= 0 && tickCoord + size / 2 - end <= 0) {
-      end = tickCoord - (size / 2 + minTickGap);
+    if (sign * tickCoord < sign * start || sign * tickCoord > sign * end) continue;
+    if (sign * (tickCoord - (sign * size) / 2 - start) >= 0 && sign * (tickCoord + (sign * size) / 2 - end) <= 0) {
+      end = tickCoord - sign * (size / 2 + minTickGap);
       kept.push({ index: i, coord: tickCoord });
     }
   }
   return kept.reverse();
 }
+
+/* Recharts' CartesianAxis tickSize: the tick line length, and part of the
+ * label offset even when the line is hidden. */
+const TICK_SIZE = 6;
 
 /* ---------------------------------------------------------------- */
 /* Rendering                                                        */
@@ -184,7 +251,7 @@ let uid = 0;
  * place, like React's reconciliation in Recharts, so frames never churn
  * DOM nodes. */
 function swapSVG(panel, svgString) {
-  const old = panel.querySelector("svg");
+  const old = panel.querySelector("svg.recharts-surface");
   if (!old) {
     panel.insertAdjacentHTML("beforeend", svgString);
     return;
@@ -244,27 +311,26 @@ function cssEase(t) {
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 /* The Recharts entrance animation: bars grow from the baseline over
- * 400ms, areas reveal left to right and pies sweep over 1500ms. */
+ * 400ms, areas reveal left to right and pies sweep over 1500ms.
+ * Like react-smooth, the from state paints synchronously on mount (axes
+ * and grid are visible immediately) and the clock starts on the first
+ * real frame, so charts in throttled frames play the full entrance the
+ * moment frames arrive instead of getting stuck blank. */
 function animateChart(panel, m, state, render) {
   if (reducedMotion.matches) {
     render(1);
     return;
   }
   const duration = m.kind === "bar" ? 400 : 1500;
-  const start = performance.now();
-  let started = false;
+  render(0);
+  let beginTime;
   const frame = (now) => {
-    started = true;
-    const alpha = cssEase(Math.min(1, (now - start) / duration));
+    if (!beginTime) beginTime = now;
+    const alpha = cssEase(Math.min(1, (now - beginTime) / duration));
     render(alpha);
     if (alpha < 1) requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
-  // Occluded windows freeze rAF entirely, settle on the final frame then.
-  // A running animation is never raced, it finishes on its own.
-  setTimeout(() => {
-    if (!started) render(1);
-  }, duration + 200);
 }
 
 /* The Recharts update animation: on data changes the chart interpolates
@@ -276,8 +342,6 @@ function morphChart(panel, m, state, render, prev) {
     return;
   }
   const duration = m.kind === "bar" ? 400 : 1500;
-  const start = performance.now();
-  let started = false;
   // When the point count changes the previous curve is resampled onto the
   // new x positions, so the old shape transforms into the new one.
   const resample = (vals, len) => {
@@ -306,17 +370,21 @@ function morphChart(panel, m, state, render, prev) {
       values: s.values.map((v, i) => from[si][i] + (v - from[si][i]) * f),
     })),
   });
-  const frame = (now) => {
-    started = true;
-    const f = cssEase(Math.min(1, (now - start) / duration));
+  const paint = (f) => {
     if (m.kind === "pie") renderPie(panel, mix(f), state, 1);
     else renderCartesian(panel, mix(f), state, 1);
+  };
+  // Like the entrance: the previous state paints synchronously, the
+  // clock starts on the first real frame.
+  paint(0);
+  let beginTime;
+  const frame = (now) => {
+    if (!beginTime) beginTime = now;
+    const f = cssEase(Math.min(1, (now - beginTime) / duration));
+    paint(f);
     if (f < 1) requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
-  setTimeout(() => {
-    if (!started) render(1);
-  }, duration + 200);
 }
 
 function renderCartesian(panel, m, state, alpha = 1) {
@@ -324,54 +392,78 @@ function renderCartesian(panel, m, state, alpha = 1) {
   const H = panel.clientHeight;
   if (!W || !H) return;
 
-  const plotX = m.marginLeft;
+  const yAxisW = m.yAxisWidth || 0;
+  const plotX = m.marginLeft + yAxisW;
   const plotY = m.marginTop;
-  const plotW = W - m.marginLeft - m.marginRight;
-  const plotH = H - m.marginTop - m.marginBottom - m.xAxisHeight - (m.legendHeight || 0);
+  const plotW = W - m.marginLeft - m.marginRight - yAxisW;
+  const plotH = H - m.marginTop - m.marginBottom - (m.xAxisHeight || 0) - (m.legendHeight || 0);
   const plotBottom = plotY + plotH;
   const n = m.labels.length;
 
   // During a morph the scale is pinned to the target domain like
   // Recharts, which interpolates pixel positions on the new scale.
+  const tickCount = m.tickCount || 5;
   const domainMax = m.domainMax || domainOf(m);
-  const ticks = [0, 1, 2, 3, 4].map((i) => (domainMax * i) / 4);
+  const ticks = Array.from({ length: tickCount }, (_, i) => (domainMax * i) / (tickCount - 1));
 
   // Explicit pixel size like Recharts' Surface: the svg never stretches
   // between resize frames, every frame lays out fresh.
   let svg = `<svg class="recharts-surface" width="${fmtF(W)}" height="${fmtF(H)}" viewBox="0 0 ${fmtF(W)} ${fmtF(H)}">`;
 
-  if (m.gradient) {
+  if (m.defs && m.defs.length) {
     svg += "<defs>";
-    for (const s of m.series) {
-      svg +=
-        `<linearGradient id="${state.uid}-fill-${s.key}" x1="0" y1="0" x2="0" y2="1">` +
-        `<stop offset="5%" stop-color="${s.color}" stop-opacity="0.8"/>` +
-        `<stop offset="95%" stop-color="${s.color}" stop-opacity="0.1"/>` +
-        `</linearGradient>`;
+    for (const g of m.defs) {
+      // The stops are raw markup from the demo, passed through verbatim
+      // like Recharts passes defs children through.
+      svg += `<linearGradient id="${state.uid}-${g.ID}" x1="${g.X1}" y1="${g.Y1}" x2="${g.X2}" y2="${g.Y2}">${g.Stops || ""}</linearGradient>`;
     }
     svg += "</defs>";
   }
 
-  svg += `<g class="recharts-layer recharts-cartesian-grid"><g class="recharts-cartesian-grid-horizontal">`;
-  for (const tv of ticks) {
-    const y = linearY(tv, domainMax, plotY, plotH);
-    svg += `<line stroke="#ccc" fill="none" x1="${fmtF(plotX)}" y1="${fmtF(y)}" x2="${fmtF(plotX + plotW)}" y2="${fmtF(y)}"/>`;
+  if (yAxisW > 0) {
+    const yCoords = ticks.map((tv) => linearY(tv, domainMax, plotY, plotH));
+    const ySizes = ticks.map(() => measureLabelHeight(panel));
+    const labelX = plotX - TICK_SIZE - (m.yAxisMargin || 0);
+    svg += `<g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis">`;
+    if (m.yAxisLine) {
+      svg += `<line orientation="left" class="recharts-cartesian-axis-line" stroke="#666" fill="none" x1="${fmtF(plotX)}" y1="${fmtF(plotY)}" x2="${fmtF(plotX)}" y2="${fmtF(plotBottom)}"/>`;
+    }
+    svg += `<g class="recharts-cartesian-axis-ticks">`;
+    for (const tk of preserveEndTicks(yCoords, ySizes, H, 0, m.minTickGap || 5)) {
+      svg += `<g class="recharts-layer recharts-cartesian-axis-tick">`;
+      if (m.yTickLine) {
+        svg += `<line orientation="left" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="${fmtF(plotX - TICK_SIZE)}" y1="${fmtF(yCoords[tk.index])}" x2="${fmtF(plotX)}" y2="${fmtF(yCoords[tk.index])}"/>`;
+      }
+      svg += `<text orientation="left" width="${fmtF(yAxisW)}" x="${fmtF(labelX)}" y="${fmtF(tk.coord)}" stroke="none" fill="#666" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end"><tspan dy="0.355em">${fmtF(ticks[tk.index])}</tspan></text></g>`;
+    }
+    svg += "</g></g>";
   }
-  svg += "</g></g>";
+
+  if (m.grid) {
+    svg += `<g class="recharts-layer recharts-cartesian-grid"><g class="recharts-cartesian-grid-horizontal">`;
+    for (const tv of ticks) {
+      const y = linearY(tv, domainMax, plotY, plotH);
+      svg += `<line stroke="#ccc" fill="none" x1="${fmtF(plotX)}" y1="${fmtF(y)}" x2="${fmtF(plotX + plotW)}" y2="${fmtF(y)}"/>`;
+    }
+    svg += "</g></g>";
+  }
 
   let xs = [];
   let band = 0;
+  const vals = m.stackOffset === "expand" ? expandValues(m.series) : m.series.map((s) => s.values);
+
   if (m.kind === "bar") {
-    const series = m.series[0];
     band = plotW / n;
-    const [gapOffset, barW] = barGeometry(band, m.categoryGap);
-    svg += `<g class="recharts-layer recharts-bar"><g class="recharts-layer recharts-bar-rectangles">`;
-    for (let i = 0; i < n; i++) {
-      const x = plotX + i * band + gapOffset;
-      const y = linearY(series.values[i] * alpha, domainMax, plotY, plotH);
-      svg += `<g class="recharts-layer recharts-bar-rectangle"><path fill="${series.color}" d="${roundedBarPath(x, y, barW, plotBottom - y, m.radius || 0)}"/></g>`;
+    const [offsets, barW] = barPositions(band, m.categoryGap, m.series.length);
+    for (let si = 0; si < m.series.length; si++) {
+      svg += `<g class="recharts-layer recharts-bar"><g class="recharts-layer recharts-bar-rectangles">`;
+      for (let i = 0; i < n; i++) {
+        const x = plotX + i * band + offsets[si];
+        const y = linearY(vals[si][i] * alpha, domainMax, plotY, plotH);
+        svg += `<g class="recharts-layer recharts-bar-rectangle"><path fill="${m.series[si].color}" d="${roundedBarPath(x, y, barW, plotBottom - y, m.series[si].radius || 0)}"/></g>`;
+      }
+      svg += "</g></g>";
     }
-    svg += "</g></g>";
     for (let i = 0; i < n; i++) xs.push(plotX + i * band + band / 2);
   } else {
     for (let i = 0; i < n; i++) xs.push(plotX + (i * plotW) / (n - 1));
@@ -383,17 +475,18 @@ function renderCartesian(panel, m, state, alpha = 1) {
     const baseline = new Array(n).fill(plotBottom);
     let base = baseline;
     state.tops = [];
-    for (const s of m.series) {
+    for (let si = 0; si < m.series.length; si++) {
+      const s = m.series[si];
       const top = m.stacked
-        ? base.map((b, i) => b - ((s.values[i] / domainMax) * plotH || 0))
-        : s.values.map((v) => linearY(v, domainMax, plotY, plotH));
-      const fill = m.gradient ? `url(#${state.uid}-fill-${s.key})` : s.color;
+        ? base.map((b, i) => b - ((vals[si][i] / domainMax) * plotH || 0))
+        : vals[si].map((v) => linearY(v, domainMax, plotY, plotH));
+      const fill = (s.fill || "").replace("url(#", `url(#${state.uid}-`) || s.color;
       const fillOpacity = s.fillOpacity || 0.6;
-      const areaD = m.stacked ? areaPathBetween(xs, top, base) : areaPathBetween(xs, top, baseline);
+      const areaD = m.stacked ? areaPathBetween(s.curve, xs, top, base) : areaPathBetween(s.curve, xs, top, baseline);
       svg +=
         `<g class="recharts-layer recharts-area">` +
         `<path class="recharts-curve recharts-area-area" fill="${fill}" fill-opacity="${fillOpacity}" stroke="none" d="${areaD}"/>` +
-        `<path class="recharts-curve recharts-area-curve" stroke="${s.color}" fill="none" stroke-width="1" d="${naturalPath(xs, top)}"/>` +
+        `<path class="recharts-curve recharts-area-curve" stroke="${s.stroke || s.color}" fill="none" stroke-width="1" d="${curvePath(s.curve, xs, top)}"/>` +
         `</g>`;
       state.tops.push(top);
       if (m.stacked) base = top;
@@ -401,12 +494,19 @@ function renderCartesian(panel, m, state, alpha = 1) {
     svg += "</g>";
   }
 
-  svg += `<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis"><g class="recharts-cartesian-axis-ticks">`;
-  for (const tk of preserveEndTicks(xs, m.labels, W, m.minTickGap, panel)) {
-    svg +=
-      `<g class="recharts-layer recharts-cartesian-axis-tick">` +
-      `<text orientation="bottom" height="${fmtF(m.xAxisHeight)}" x="${fmtF(tk.coord)}" y="${fmtF(plotBottom + m.tickMargin)}" stroke="none" fill="#666" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle"><tspan dy="0.71em">${m.labels[tk.index]}</tspan></text>` +
-      `</g>`;
+  const widths = m.labels.map((l) => measureLabel(l, panel));
+  const labelY = plotBottom + TICK_SIZE + (m.tickMargin || 0);
+  svg += `<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis">`;
+  if (m.xAxisLine) {
+    svg += `<line orientation="bottom" class="recharts-cartesian-axis-line" stroke="#666" fill="none" x1="${fmtF(plotX)}" y1="${fmtF(plotBottom)}" x2="${fmtF(plotX + plotW)}" y2="${fmtF(plotBottom)}"/>`;
+  }
+  svg += `<g class="recharts-cartesian-axis-ticks">`;
+  for (const tk of preserveEndTicks(xs, widths, 0, W, m.minTickGap || 5)) {
+    svg += `<g class="recharts-layer recharts-cartesian-axis-tick">`;
+    if (m.xTickLine) {
+      svg += `<line orientation="bottom" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="${fmtF(xs[tk.index])}" y1="${fmtF(plotBottom + TICK_SIZE)}" x2="${fmtF(xs[tk.index])}" y2="${fmtF(plotBottom)}"/>`;
+    }
+    svg += `<text orientation="bottom" height="${fmtF(m.xAxisHeight)}" x="${fmtF(tk.coord)}" y="${fmtF(labelY)}" stroke="none" fill="#666" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle"><tspan dy="0.71em">${m.labels[tk.index]}</tspan></text></g>`;
   }
   svg += "</g></g></svg>";
 
@@ -463,11 +563,11 @@ function renderPie(panel, m, state, alpha = 1) {
     if (i === m.activeIndex && m.activeRing) {
       svg +=
         `<g class="recharts-layer recharts-pie-sector">` +
-        `<path class="recharts-sector" stroke="#fff"${strokeWidth} fill="${fill}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, m.innerRadius, outerR + 10, angle, angle + shown)}"/>` +
+        `<path class="recharts-sector" stroke="#fff"${strokeWidth} fill="${fill}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, (m.innerRadius || 0), outerR + 10, angle, angle + shown)}"/>` +
         `<path class="recharts-sector" stroke="#fff"${strokeWidth} fill="${fill}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, outerR + 12, outerR + 25, angle, angle + shown)}"/>` +
         `</g>`;
     } else {
-      svg += `<g class="recharts-layer recharts-pie-sector"><path class="recharts-sector" stroke="#fff"${strokeWidth} fill="${fill}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, m.innerRadius, outerR, angle, angle + shown)}"/></g>`;
+      svg += `<g class="recharts-layer recharts-pie-sector"><path class="recharts-sector" stroke="#fff"${strokeWidth} fill="${fill}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, (m.innerRadius || 0), outerR, angle, angle + shown)}"/></g>`;
     }
     angle += sweep;
   }
@@ -539,7 +639,7 @@ function tooltipHTML(m, i) {
     const nested = nestLabel && !t.hideLabel ? `<div class="font-medium">${label}</div>` : "";
     html +=
       `<div class="${rowCls}">` +
-      indicatorHTML(t.indicator, s.color) +
+      (s.icon || indicatorHTML(t.indicator, s.color)) +
       `<div class="flex flex-1 justify-between leading-none ${nestLabel ? "items-end" : "items-center"}">` +
       `<div class="grid gap-1.5">${nested}<span class="text-muted-foreground">${s.label}</span></div>` +
       `<span class="font-mono font-medium text-foreground tabular-nums">${s.values[i].toLocaleString("en-US")}</span>` +
@@ -550,7 +650,7 @@ function tooltipHTML(m, i) {
 }
 
 function showCursor(panel, m, state, i) {
-  const svg = panel.querySelector("svg");
+  const svg = panel.querySelector("svg.recharts-surface");
   if (!svg || m.cursor === false) return;
   let cursor = svg.querySelector(".recharts-tooltip-cursor");
   const g = state.geom;
@@ -591,7 +691,7 @@ function hideCursor(panel) {
 // showActiveDots is Recharts' Area/Line activeDot: a dot per series on the
 // active data point while the tooltip is up.
 function showActiveDots(panel, m, state, i) {
-  const svg = panel.querySelector("svg");
+  const svg = panel.querySelector("svg.recharts-surface");
   if (!svg || m.kind !== "area" || !state.tops) return;
   let layer = svg.querySelector(".recharts-active-dots");
   if (!layer) {
@@ -742,13 +842,41 @@ function init(root = document) {
   root.querySelectorAll("script[data-tui-chart-model]").forEach(initPanel);
 }
 
+/* Interactive demo wiring: selects and header buttons toggle the SSR
+ * rendered variants of a chart. */
+document.addEventListener("select-change", (e) => {
+  const trigger = e.target instanceof Element && e.target.closest("[data-tui-chart-range-select], [data-tui-chart-month-select]");
+  if (!trigger) return;
+  const value = e.detail && e.detail.value;
+  if (!value) return;
+  const chart = trigger.closest("[data-slot=card]");
+  if (!chart) return;
+  const attr = trigger.hasAttribute("data-tui-chart-range-select") ? "data-tui-chart-range" : "data-tui-chart-month";
+  chart.querySelectorAll(`[${attr}]`).forEach((el) => {
+    el.hidden = el.getAttribute(attr) !== value;
+  });
+});
+
+document.addEventListener("click", (e) => {
+  if (!(e.target instanceof Element)) return;
+  const btn = e.target.closest("[data-tui-chart-series]");
+  if (!btn) return;
+  const chart = btn.closest("[data-slot=card]");
+  if (!chart) return;
+  const series = btn.getAttribute("data-tui-chart-series");
+  chart.querySelectorAll("[data-tui-chart-series]").forEach((b) => {
+    b.setAttribute("data-active", b === btn ? "true" : "false");
+  });
+  chart.querySelectorAll("[data-tui-chart-series-panel]").forEach((el) => {
+    el.hidden = el.getAttribute("data-tui-chart-series-panel") !== series;
+  });
+});
+
 init();
 document.addEventListener("DOMContentLoaded", () => init());
-document.body.addEventListener("htmx:afterSwap", (e) => init(e.target));
-if (window.Datastar) {
-  document.addEventListener("datastar-fetch", () => setTimeout(() => init(), 0));
-}
 
+// Framework agnostic swap handling: the observer picks up any charts
+// that arrive later, no matter what put them into the DOM.
 const observer = new MutationObserver((mutations) => {
   for (const mu of mutations) {
     if (mu.type === "childList") {

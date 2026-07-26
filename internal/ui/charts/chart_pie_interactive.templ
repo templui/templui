@@ -1,6 +1,9 @@
 package charts
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/templui/templui/components/card"
 	"github.com/templui/templui/components/chart"
 	selectcomp "github.com/templui/templui/components/select"
@@ -27,8 +30,24 @@ var chartPieInteractiveConfig = chart.Config{
 	{Key: "may", Label: "May", Color: "var(--chart-5)"},
 }
 
+// pieInteractiveFormat formats like toLocaleString.
+func pieInteractiveFormat(v int) string {
+	s := fmt.Sprintf("%d", v)
+	var sb strings.Builder
+	for i, r := range s {
+		if i > 0 && (len(s)-i)%3 == 0 {
+			sb.WriteRune(',')
+		}
+		sb.WriteRune(r)
+	}
+	return sb.String()
+}
+
 templ ChartPieInteractive() {
-	@card.Card(card.Props{Class: "flex flex-col"}) {
+	// Like shadcn, the card carries the chart id and its own style block
+	// so the select swatches can use the --color variables too.
+	@card.Card(card.Props{Class: "flex flex-col", Attributes: templ.Attributes{"data-chart": "pie-interactive"}}) {
+		@chart.Style(chart.StyleProps{ID: "pie-interactive", Config: chartPieInteractiveConfig})
 		@card.Header(card.HeaderProps{Class: "flex-row items-start space-y-0 pb-0"}) {
 			<div class="grid gap-1">
 				@card.Title() {
@@ -47,44 +66,45 @@ templ ChartPieInteractive() {
 					@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select month"})
 				}
 				@selectcomp.Content(selectcomp.ContentProps{Align: selectcomp.AlignEnd}) {
-					@selectcomp.Group() {
-						for _, d := range chartPieInteractiveData {
-							{{ month := d["month"].(string) }}
-							@selectcomp.Item(selectcomp.ItemProps{Value: month, Label: chartPieInteractiveConfig.Label(month)}) {
-								<div class="flex items-center gap-2 text-xs">
-									<span
-										class="flex h-3 w-3 shrink-0 rounded-xs"
-										style={ "background-color:var(--color-" + month + ")" }
-									></span>
-									{ chartPieInteractiveConfig.Label(month) }
-								</div>
-							}
+					for _, d := range chartPieInteractiveData {
+						{{ month := d["month"].(string) }}
+						@selectcomp.Item(selectcomp.ItemProps{Value: month, Label: chartPieInteractiveConfig.Label(month)}) {
+							<div class="flex items-center gap-2 text-xs">
+								<span
+									class="flex h-3 w-3 shrink-0 rounded-xs"
+									style={ "background-color:var(--color-" + month + ")" }
+								></span>
+								{ chartPieInteractiveConfig.Label(month) }
+							</div>
 						}
 					}
 				}
 			}
 		}
 		@card.Content(card.ContentProps{Class: "flex flex-1 justify-center pb-0"}) {
-			@chart.Container("pie-interactive", chartPieInteractiveConfig, "mx-auto aspect-square w-full max-w-[300px]") {
+			@chart.Container(chart.ContainerProps{ID: "pie-interactive", Config: chartPieInteractiveConfig, Class: "mx-auto aspect-square w-full max-w-[300px]"}) {
 				for i, d := range chartPieInteractiveData {
 					<div data-tui-chart-month={ d["month"].(string) } hidden?={ i != 0 } style="width:100%;height:100%">
-						@chart.PieChart(chart.PieChartProps{
-							Data:        chartPieInteractiveData,
-							Config:      chartPieInteractiveConfig,
-							DataKey:     "desktop",
-							NameKey:     "month",
-							InnerRadius: 60,
-							StrokeWidth: 5,
-							Width:       300, Height: 300,
-							ActiveIndex: i,
-							ActiveRing:  true,
-							CenterValue: groupThousands(d["desktop"].(int)),
-							CenterLabel: "Visitors",
-							Tooltip: &chart.TooltipProps{
-								Cursor:    false,
-								HideLabel: true,
-							},
-						})
+								@chart.PieChart() {
+							@chart.Tooltip(chart.TooltipProps{
+								Cursor:  false,
+								Content: chart.TooltipContentProps{HideLabel: true},
+							})
+							@chart.Pie(chart.PieProps{
+								Data:        chartPieInteractiveData,
+								DataKey:     "desktop",
+								NameKey:     "month",
+								InnerRadius: 60,
+								StrokeWidth: 5,
+								ActiveIndex: i,
+								ActiveRing:  true,
+							}) {
+								@chart.Label(chart.LabelProps{
+									Value: pieInteractiveFormat(d["desktop"].(int)),
+									Text:  "Visitors",
+								})
+							}
+						}
 					</div>
 				}
 			}
