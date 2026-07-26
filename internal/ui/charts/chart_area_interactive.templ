@@ -178,7 +178,7 @@ templ ChartAreaInteractive() {
 						@chart.AreaChart(chart.AreaChartProps{
 							Data: areaInteractiveFilteredData(rng.Days),
 						}) {
-							@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+							@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 							@chart.XAxis(chart.XAxisProps{
 								DataKey:       "date",
 								TickMargin:    8,

@@ -30,6 +30,22 @@ func Component(name string) templ.Component {
 		return ChartBarInteractive()
 	case "chart-bar-default":
 		return ChartBarDefault()
+	case "chart-bar-horizontal":
+		return ChartBarHorizontal()
+	case "chart-bar-multiple":
+		return ChartBarMultiple()
+	case "chart-bar-stacked":
+		return ChartBarStacked()
+	case "chart-bar-label":
+		return ChartBarLabel()
+	case "chart-bar-label-custom":
+		return ChartBarLabelCustom()
+	case "chart-bar-mixed":
+		return ChartBarMixed()
+	case "chart-bar-active":
+		return ChartBarActive()
+	case "chart-bar-negative":
+		return ChartBarNegative()
 	case "chart-line-interactive":
 		return ChartLineInteractive()
 	case "chart-line-default":

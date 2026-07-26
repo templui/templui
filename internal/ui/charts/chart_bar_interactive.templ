@@ -182,7 +182,7 @@ templ ChartBarInteractive() {
 							Data:   chartBarInteractiveData,
 							Margin: &chart.Margin{Left: 12, Right: 12},
 						}) {
-							@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+							@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 							@chart.XAxis(chart.XAxisProps{
 								DataKey:       "date",
 								TickMargin:    8,

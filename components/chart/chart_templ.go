@@ -278,14 +278,40 @@ type CurveType string
 
 const CurveNatural CurveType = "natural"
 
-// CartesianGridProps is the pendant of Recharts' CartesianGrid.
+// CartesianGridProps is the pendant of Recharts' CartesianGrid. Both
+// directions default to Recharts' true, so they are pointers: pass
+// Bool(false) to turn one off, like vertical={false} in the tsx.
 type CartesianGridProps struct {
-	Vertical bool
+	Horizontal *bool
+	Vertical   *bool
+}
+
+// Bool returns a pointer to v, for the props whose Recharts default is
+// true.
+func Bool(v bool) *bool {
+	return &v
+}
+
+// Index returns a pointer to i, for the optional index props.
+func Index(i int) *int {
+	return &i
+}
+
+// boolOr resolves an optional prop against its Recharts default.
+func boolOr(v *bool, def bool) bool {
+	if v == nil {
+		return def
+	}
+	return *v
 }
 
 // XAxisProps is the pendant of Recharts' XAxis.
 type XAxisProps struct {
-	DataKey       string
+	DataKey string
+	// Type is "category" (default) or "number", the value axis in a
+	// vertical layout.
+	Type          string
+	Hide          bool
 	TickLine      bool
 	AxisLine      bool
 	TickMargin    float64
@@ -295,11 +321,17 @@ type XAxisProps struct {
 
 // YAxisProps is the pendant of Recharts' YAxis.
 type YAxisProps struct {
-	TickLine   bool
-	AxisLine   bool
-	TickMargin float64
-	TickCount  int     // defaults to Recharts 5
-	Width      float64 // defaults to Recharts 60
+	DataKey string
+	// Type is "number" (default) or "category", the label axis in a
+	// vertical layout.
+	Type          string
+	Hide          bool
+	TickLine      bool
+	AxisLine      bool
+	TickMargin    float64
+	TickCount     int     // defaults to Recharts 5
+	Width         float64 // defaults to Recharts 60
+	TickFormatter func(any) string
 }
 
 // TooltipProps is the pendant of ChartTooltip: the cursor flag and the
@@ -313,6 +345,7 @@ type TooltipProps struct {
 type TooltipContentProps struct {
 	Indicator      string // "dot" (default), "line", "dashed"
 	HideLabel      bool
+	HideIndicator  bool
 	NameKey        string
 	Class          string // extra content class, e.g. "w-[150px]"
 	LabelFormatter func(any) string
@@ -343,7 +376,29 @@ type AreaProps struct {
 type BarProps struct {
 	DataKey string
 	Fill    string
-	Radius  float64
+	StackID string
+	// Radius is Recharts' radius union: a float64 for all corners or a
+	// []float64 of four corners, e.g. []float64{0, 0, 4, 4}.
+	Radius      any
+	StrokeWidth float64
+	// ActiveIndex and ActiveBar are Recharts' active bar props: the bar at
+	// that index renders with the ActiveBar styling.
+	ActiveIndex *int
+	ActiveBar   *RectangleProps
+}
+
+// RectangleProps is the pendant of the Recharts Rectangle used as the
+// active bar shape.
+type RectangleProps struct {
+	FillOpacity      float64
+	Stroke           string
+	StrokeDasharray  float64
+	StrokeDashoffset float64
+}
+
+// CellProps is the pendant of Recharts' Cell: the fill of one data row.
+type CellProps struct {
+	Fill string
 }
 
 // LineProps is the pendant of one Recharts Line.
@@ -376,12 +431,14 @@ type ActiveDotProps struct {
 
 // LabelListProps is the pendant of Recharts' LabelList.
 type LabelListProps struct {
-	Position  string // "top"
-	Offset    float64
-	FontSize  float64
-	Class     string
-	DataKey   string
-	Formatter func(any) string
+	// Position is "top", "insideLeft" or "right".
+	Position    string
+	Offset      float64
+	FontSize    float64
+	FillOpacity float64
+	Class       string
+	DataKey     string
+	Formatter   func(any) string
 }
 
 // LineChartProps is the pendant of the Recharts LineChart root.
@@ -420,7 +477,10 @@ type AreaChartProps struct {
 
 // BarChartProps is the pendant of the Recharts BarChart root.
 type BarChartProps struct {
-	Data   []Datum
+	Data []Datum
+	// Layout "vertical" draws the bars horizontally, like the Recharts
+	// layout prop.
+	Layout string
 	Margin *Margin
 }
 
@@ -441,14 +501,15 @@ type chartState struct {
 	data        []Datum
 	margin      *Margin
 	stackOffset string
-	grid        bool
+	grid        *CartesianGridProps
+	layout      string
 	x           *XAxisProps
 	y           *YAxisProps
 	tooltip     *TooltipProps
 	legend      bool
 	defs        []LinearGradientProps
 	areas       []AreaProps
-	bars        []BarProps
+	bars        []*barState
 	lines       []*lineState
 	pie         *PieProps
 	label       *LabelProps
@@ -458,6 +519,13 @@ type chartState struct {
 type lineState struct {
 	props     LineProps
 	labelList *LabelListProps
+}
+
+// barState pairs a bar with the LabelList and Cell children it collected.
+type barState struct {
+	props      BarProps
+	labelLists []LabelListProps
+	cells      []CellProps
 }
 
 type ctxKey int
@@ -614,7 +682,7 @@ func BarChart(props ...BarChartProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		st := &chartState{kind: "bar", data: p.Data, margin: p.Margin}
+		st := &chartState{kind: "bar", data: p.Data, margin: p.Margin, layout: p.Layout}
 		ctx = context.WithValue(ctx, stateCtxKey, st)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div style=\"position:relative;width:100%;height:100%\">")
 		if templ_7745c5c3_Err != nil {
@@ -789,8 +857,12 @@ func CartesianGrid(props ...CartesianGridProps) templ.Component {
 			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		var p CartesianGridProps
+		if len(props) > 0 {
+			p = props[0]
+		}
 		if st := stateFrom(ctx); st != nil {
-			st.grid = true
+			st.grid = &p
 		}
 		return nil
 	})
@@ -1040,7 +1112,46 @@ func Bar(props ...BarProps) templ.Component {
 			p = props[0]
 		}
 		if st := stateFrom(ctx); st != nil {
-			st.bars = append(st.bars, p)
+			st.bars = append(st.bars, &barState{props: p})
+		}
+		templ_7745c5c3_Err = templ_7745c5c3_Var20.Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// Cell is the pendant of Recharts' Cell: the fill of one data row of the
+// enclosing bar.
+func Cell(props ...CellProps) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var21 == nil {
+			templ_7745c5c3_Var21 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		var p CellProps
+		if len(props) > 0 {
+			p = props[0]
+		}
+		if st := stateFrom(ctx); st != nil && len(st.bars) > 0 {
+			b := st.bars[len(st.bars)-1]
+			b.cells = append(b.cells, p)
 		}
 		return nil
 	})
@@ -1063,9 +1174,9 @@ func Line(props ...LineProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var21 == nil {
-			templ_7745c5c3_Var21 = templ.NopComponent
+		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var22 == nil {
+			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p LineProps
@@ -1075,7 +1186,7 @@ func Line(props ...LineProps) templ.Component {
 		if st := stateFrom(ctx); st != nil {
 			st.lines = append(st.lines, &lineState{props: p})
 		}
-		templ_7745c5c3_Err = templ_7745c5c3_Var21.Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templ_7745c5c3_Var22.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1100,17 +1211,22 @@ func LabelList(props ...LabelListProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var22 == nil {
-			templ_7745c5c3_Var22 = templ.NopComponent
+		templ_7745c5c3_Var23 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var23 == nil {
+			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p LabelListProps
 		if len(props) > 0 {
 			p = props[0]
 		}
-		if st := stateFrom(ctx); st != nil && len(st.lines) > 0 {
-			st.lines[len(st.lines)-1].labelList = &p
+		if st := stateFrom(ctx); st != nil {
+			if len(st.bars) > 0 {
+				b := st.bars[len(st.bars)-1]
+				b.labelLists = append(b.labelLists, p)
+			} else if len(st.lines) > 0 {
+				st.lines[len(st.lines)-1].labelList = &p
+			}
 		}
 		return nil
 	})
@@ -1133,9 +1249,9 @@ func Pie(props ...PieProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var23 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var23 == nil {
-			templ_7745c5c3_Var23 = templ.NopComponent
+		templ_7745c5c3_Var24 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var24 == nil {
+			templ_7745c5c3_Var24 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p PieProps
@@ -1145,7 +1261,7 @@ func Pie(props ...PieProps) templ.Component {
 		if st := stateFrom(ctx); st != nil {
 			st.pie = &p
 		}
-		templ_7745c5c3_Err = templ_7745c5c3_Var23.Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templ_7745c5c3_Var24.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1170,9 +1286,9 @@ func Label(props ...LabelProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var24 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var24 == nil {
-			templ_7745c5c3_Var24 = templ.NopComponent
+		templ_7745c5c3_Var25 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var25 == nil {
+			templ_7745c5c3_Var25 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p LabelProps
@@ -1186,6 +1302,72 @@ func Label(props ...LabelProps) templ.Component {
 	})
 }
 
+// radiusCorners normalizes Recharts' radius union into corner radii:
+// a number applies to all four corners, a slice is used as given.
+func radiusCorners(v any) []float64 {
+	switch r := v.(type) {
+	case nil:
+		return nil
+	case float64:
+		return []float64{r}
+	case int:
+		return []float64{float64(r)}
+	case []float64:
+		return r
+	}
+	return nil
+}
+
+// hasFillColumn reports whether the rows carry their own fill, which
+// Recharts uses as the bar fill of that row.
+func hasFillColumn(data []Datum) bool {
+	for _, row := range data {
+		if _, ok := row["fill"]; ok {
+			return true
+		}
+	}
+	return false
+}
+
+// seriesMin is the lowest value across all series, so a negative domain
+// keeps its zero baseline.
+func seriesMin(series []ModelSeries) float64 {
+	min := 0.0
+	for _, s := range series {
+		for _, v := range s.Values {
+			if v < min {
+				min = v
+			}
+		}
+	}
+	return min
+}
+
+// labelListModel precomputes the labels of a LabelList, defaulting to the
+// series data key like Recharts does.
+func labelListModel(ll LabelListProps, seriesKey string, data []Datum) LabelListModel {
+	key := ll.DataKey
+	if key == "" {
+		key = seriesKey
+	}
+	lm := LabelListModel{
+		Position:    ll.Position,
+		Offset:      ll.Offset,
+		FontSize:    ll.FontSize,
+		FillOpacity: ll.FillOpacity,
+		Class:       ll.Class,
+		Labels:      make([]string, len(data)),
+	}
+	for i, row := range data {
+		if ll.Formatter != nil {
+			lm.Labels[i] = ll.Formatter(row[key])
+		} else {
+			lm.Labels[i] = str(row[key])
+		}
+	}
+	return lm
+}
+
 // buildModel normalizes the collected chart tree into the model the
 // chart.js renderer consumes.
 func buildModel(ctx context.Context, st *chartState) Model {
@@ -1194,7 +1376,12 @@ func buildModel(ctx context.Context, st *chartState) Model {
 		return buildPieModel(config, st)
 	}
 
-	m := Model{Kind: st.kind, Grid: st.grid, StackOffset: st.stackOffset, Defs: st.defs}
+	m := Model{Kind: st.kind, StackOffset: st.stackOffset, Defs: st.defs, Layout: st.layout}
+	if g := st.grid; g != nil {
+		m.Grid = true
+		m.GridHorizontal = boolOr(g.Horizontal, true)
+		m.GridVertical = boolOr(g.Vertical, true)
+	}
 	if y := st.y; y != nil {
 		m.YAxisWidth = y.Width
 		if m.YAxisWidth == 0 {
@@ -1204,6 +1391,10 @@ func buildModel(ctx context.Context, st *chartState) Model {
 		m.TickCount = y.TickCount
 		m.YTickLine = y.TickLine
 		m.YAxisLine = y.AxisLine
+		m.YAxisHide = y.Hide
+		if y.Hide {
+			m.YAxisWidth = 0
+		}
 	}
 	if st.margin != nil {
 		m.MarginTop, m.MarginRight, m.MarginBottom, m.MarginLeft = st.margin.Top, st.margin.Right, st.margin.Bottom, st.margin.Left
@@ -1219,6 +1410,10 @@ func buildModel(ctx context.Context, st *chartState) Model {
 		}
 		m.XTickLine = x.TickLine
 		m.XAxisLine = x.AxisLine
+		m.XAxisHide = x.Hide
+		if x.Hide {
+			m.XAxisHeight = 0
+		}
 	}
 	if st.legend {
 		m.LegendHeight = defaultLegendHeight
@@ -1226,16 +1421,26 @@ func buildModel(ctx context.Context, st *chartState) Model {
 	tt := st.tooltip
 	if tt != nil {
 		m.Cursor = tt.Cursor
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, Width: tt.Content.Class}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
 	}
 
+	// The category axis carries the labels: XAxis in the default layout,
+	// YAxis when the layout is vertical.
+	dataKey, formatter := "", (func(any) string)(nil)
+	if st.layout == "vertical" {
+		if y := st.y; y != nil {
+			dataKey, formatter = y.DataKey, y.TickFormatter
+		}
+	} else if x := st.x; x != nil {
+		dataKey, formatter = x.DataKey, x.TickFormatter
+	}
 	m.Labels = make([]string, len(st.data))
 	m.TooltipLabels = make([]string, len(st.data))
-	if x := st.x; x != nil {
+	if dataKey != "" {
 		for i, d := range st.data {
-			raw := d[x.DataKey]
-			if x.TickFormatter != nil {
-				m.Labels[i] = x.TickFormatter(raw)
+			raw := d[dataKey]
+			if formatter != nil {
+				m.Labels[i] = formatter(raw)
 			} else {
 				m.Labels[i] = str(raw)
 			}
@@ -1249,11 +1454,39 @@ func buildModel(ctx context.Context, st *chartState) Model {
 
 	if st.kind == "bar" {
 		m.CategoryGap = 0.1
-		for _, b := range st.bars {
+		stacked := false
+		for _, bs := range st.bars {
+			b := bs.props
 			s := modelSeries(config, b.DataKey, b.Fill, 0, st.data)
-			s.Radius = b.Radius
+			s.Radius = radiusCorners(b.Radius)
+			s.StackID = b.StackID
+			s.StrokeWidth = b.StrokeWidth
+			s.ActiveIndex = b.ActiveIndex
+			s.ActiveBar = b.ActiveBar
+			if b.StackID != "" {
+				stacked = true
+			}
+			// Cells set the fill per data row, like the Cell children; a
+			// fill column in the data does the same, Recharts reads it as
+			// the row's own fill.
+			if len(bs.cells) > 0 {
+				s.Cells = make([]string, len(bs.cells))
+				for i, c := range bs.cells {
+					s.Cells[i] = c.Fill
+				}
+			} else if hasFillColumn(st.data) {
+				s.Cells = make([]string, len(st.data))
+				for i, row := range st.data {
+					s.Cells[i] = str(row["fill"])
+				}
+			}
+			for _, ll := range bs.labelLists {
+				s.LabelLists = append(s.LabelLists, labelListModel(ll, b.DataKey, st.data))
+			}
 			m.Series = append(m.Series, s)
 		}
+		m.Stacked = stacked
+		m.DomainMin = seriesMin(m.Series)
 	} else if st.kind == "line" {
 		for _, l := range st.lines {
 			s := modelSeries(config, l.props.DataKey, "", 0, st.data)
@@ -1277,20 +1510,8 @@ func buildModel(ctx context.Context, st *chartState) Model {
 				s.Dot = dm
 			}
 			if ll := l.labelList; ll != nil {
-				lm := &LabelListModel{Offset: ll.Offset, FontSize: ll.FontSize, Class: ll.Class}
-				key := ll.DataKey
-				if key == "" {
-					key = l.props.DataKey
-				}
-				lm.Labels = make([]string, len(st.data))
-				for i, row := range st.data {
-					if ll.Formatter != nil {
-						lm.Labels[i] = ll.Formatter(row[key])
-					} else {
-						lm.Labels[i] = str(row[key])
-					}
-				}
-				s.LabelList = lm
+				lm := labelListModel(*ll, l.props.DataKey, st.data)
+				s.LabelList = &lm
 			}
 			m.Series = append(m.Series, s)
 		}
@@ -1348,7 +1569,7 @@ func buildPieModel(config Config, st *chartState) Model {
 		m.CenterLabel = st.label.Text
 	}
 	if tt := st.tooltip; tt != nil {
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, Width: tt.Content.Class}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
 	}
 	return m
 }
@@ -1383,9 +1604,9 @@ func legendContent(series []ModelSeries) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var25 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var25 == nil {
-			templ_7745c5c3_Var25 = templ.NopComponent
+		templ_7745c5c3_Var26 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var26 == nil {
+			templ_7745c5c3_Var26 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"recharts-legend-wrapper\" style=\"position:absolute;left:0;right:0;bottom:5px\"><div class=\"flex items-center justify-center gap-4 pt-3\">")
@@ -1407,12 +1628,12 @@ func legendContent(series []ModelSeries) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var26 string
-				templ_7745c5c3_Var26, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + series[i].Color)
+				var templ_7745c5c3_Var27 string
+				templ_7745c5c3_Var27, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + series[i].Color)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 830, Col: 95}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1030, Col: 95}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1421,12 +1642,12 @@ func legendContent(series []ModelSeries) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			var templ_7745c5c3_Var27 string
-			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(series[i].Label)
+			var templ_7745c5c3_Var28 string
+			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(series[i].Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 832, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1032, Col: 22}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1447,25 +1668,32 @@ func legendContent(series []ModelSeries) templ.Component {
 // re-renders the SVG at real container pixels (Recharts'
 // ResponsiveContainer behavior) and drives tooltip and cursor from it.
 type Model struct {
-	Kind          string                `json:"kind"` // "bar" | "area" | "pie"
-	MarginTop     float64               `json:"marginTop"`
-	MarginRight   float64               `json:"marginRight"`
-	MarginBottom  float64               `json:"marginBottom"`
-	MarginLeft    float64               `json:"marginLeft"`
-	XAxisHeight   float64               `json:"xAxisHeight,omitempty"`
-	TickMargin    float64               `json:"tickMargin,omitempty"`
-	MinTickGap    float64               `json:"minTickGap,omitempty"`
-	YAxisWidth    float64               `json:"yAxisWidth,omitempty"`
-	YAxisMargin   float64               `json:"yAxisMargin,omitempty"` // tickMargin of the y axis
-	TickCount     int                   `json:"tickCount,omitempty"`   // y ticks, Recharts default 5
-	XTickLine     bool                  `json:"xTickLine,omitempty"`
-	XAxisLine     bool                  `json:"xAxisLine,omitempty"`
-	YTickLine     bool                  `json:"yTickLine,omitempty"`
-	YAxisLine     bool                  `json:"yAxisLine,omitempty"`
-	LegendHeight  float64               `json:"legendHeight,omitempty"`
-	CategoryGap   float64               `json:"categoryGap,omitempty"`
-	Radius        float64               `json:"radius,omitempty"`
-	Grid          bool                  `json:"grid,omitempty"`
+	Kind           string  `json:"kind"` // "bar" | "area" | "pie"
+	MarginTop      float64 `json:"marginTop"`
+	MarginRight    float64 `json:"marginRight"`
+	MarginBottom   float64 `json:"marginBottom"`
+	MarginLeft     float64 `json:"marginLeft"`
+	XAxisHeight    float64 `json:"xAxisHeight,omitempty"`
+	TickMargin     float64 `json:"tickMargin,omitempty"`
+	MinTickGap     float64 `json:"minTickGap,omitempty"`
+	YAxisWidth     float64 `json:"yAxisWidth,omitempty"`
+	YAxisMargin    float64 `json:"yAxisMargin,omitempty"` // tickMargin of the y axis
+	TickCount      int     `json:"tickCount,omitempty"`   // y ticks, Recharts default 5
+	XTickLine      bool    `json:"xTickLine,omitempty"`
+	XAxisLine      bool    `json:"xAxisLine,omitempty"`
+	YTickLine      bool    `json:"yTickLine,omitempty"`
+	YAxisLine      bool    `json:"yAxisLine,omitempty"`
+	LegendHeight   float64 `json:"legendHeight,omitempty"`
+	CategoryGap    float64 `json:"categoryGap,omitempty"`
+	Radius         float64 `json:"radius,omitempty"`
+	Grid           bool    `json:"grid,omitempty"`
+	GridHorizontal bool    `json:"gridHorizontal,omitempty"`
+	GridVertical   bool    `json:"gridVertical,omitempty"`
+	// Layout "vertical" swaps the axes and draws the bars horizontally.
+	Layout        string                `json:"layout,omitempty"`
+	XAxisHide     bool                  `json:"xAxisHide,omitempty"`
+	YAxisHide     bool                  `json:"yAxisHide,omitempty"`
+	DomainMin     float64               `json:"domainMin,omitempty"` // negative values extend the domain
 	Stacked       bool                  `json:"stacked,omitempty"`
 	StackOffset   string                `json:"stackOffset,omitempty"` // "expand" normalizes each stack to 1
 	Defs          []LinearGradientProps `json:"defs,omitempty"`
@@ -1486,20 +1714,25 @@ type Model struct {
 
 // ModelSeries is one data series with its resolved color variable.
 type ModelSeries struct {
-	Key         string          `json:"key"`
-	Label       string          `json:"label"`
-	Color       string          `json:"color"`
-	Values      []float64       `json:"values"`
-	FillOpacity float64         `json:"fillOpacity,omitempty"` // areas: 0 uses Recharts' 0.6
-	Curve       string          `json:"curve,omitempty"`       // "natural" (default), "linear", "step", "monotone"
-	Icon        string          `json:"icon,omitempty"`        // rendered svg, replaces the tooltip indicator
-	Fill        string          `json:"fill,omitempty"`        // verbatim fill, e.g. url(#fillDesktop)
-	Stroke      string          `json:"stroke,omitempty"`      // verbatim stroke for the area line
-	Radius      float64         `json:"radius,omitempty"`      // bars: corner radius
-	StrokeWidth float64         `json:"strokeWidth,omitempty"` // lines: stroke width
-	Dot         *DotModel       `json:"dot,omitempty"`         // lines: per point dots
-	ActiveDotR  float64         `json:"activeDotR,omitempty"`  // lines: hover dot radius
-	LabelList   *LabelListModel `json:"labelList,omitempty"`   // lines: value labels
+	Key         string           `json:"key"`
+	Label       string           `json:"label"`
+	Color       string           `json:"color"`
+	Values      []float64        `json:"values"`
+	FillOpacity float64          `json:"fillOpacity,omitempty"` // areas: 0 uses Recharts' 0.6
+	Curve       string           `json:"curve,omitempty"`       // "natural" (default), "linear", "step", "monotone"
+	Icon        string           `json:"icon,omitempty"`        // rendered svg, replaces the tooltip indicator
+	Fill        string           `json:"fill,omitempty"`        // verbatim fill, e.g. url(#fillDesktop)
+	Stroke      string           `json:"stroke,omitempty"`      // verbatim stroke for the area line
+	Radius      []float64        `json:"radius,omitempty"`      // bars: corner radii, one or four
+	StackID     string           `json:"stackId,omitempty"`
+	Cells       []string         `json:"cells,omitempty"` // bars: fill per data row
+	ActiveIndex *int             `json:"activeIndex,omitempty"`
+	ActiveBar   *RectangleProps  `json:"activeBar,omitempty"`
+	LabelLists  []LabelListModel `json:"labelLists,omitempty"`  // bars: one or more label lists
+	StrokeWidth float64          `json:"strokeWidth,omitempty"` // lines: stroke width
+	Dot         *DotModel        `json:"dot,omitempty"`         // lines: per point dots
+	ActiveDotR  float64          `json:"activeDotR,omitempty"`  // lines: hover dot radius
+	LabelList   *LabelListModel  `json:"labelList,omitempty"`   // lines: value labels
 }
 
 // DotModel describes the per point dots of a line.
@@ -1513,17 +1746,20 @@ type DotModel struct {
 
 // LabelListModel carries the precomputed labels of a LabelList.
 type LabelListModel struct {
-	Offset   float64  `json:"offset,omitempty"`
-	FontSize float64  `json:"fontSize,omitempty"`
-	Class    string   `json:"class,omitempty"`
-	Labels   []string `json:"labels"`
+	Position    string   `json:"position,omitempty"`
+	Offset      float64  `json:"offset,omitempty"`
+	FontSize    float64  `json:"fontSize,omitempty"`
+	FillOpacity float64  `json:"fillOpacity,omitempty"`
+	Class       string   `json:"class,omitempty"`
+	Labels      []string `json:"labels"`
 }
 
 // TooltipModel mirrors ChartTooltipContent's props.
 type TooltipModel struct {
-	Indicator string `json:"indicator,omitempty"` // "dot" (default) | "line" | "dashed"
-	HideLabel bool   `json:"hideLabel,omitempty"`
-	Width     string `json:"width,omitempty"` // extra class, e.g. "w-[150px]"
+	Indicator     string `json:"indicator,omitempty"` // "dot" (default) | "line" | "dashed"
+	HideLabel     bool   `json:"hideLabel,omitempty"`
+	HideIndicator bool   `json:"hideIndicator,omitempty"`
+	Width         string `json:"width,omitempty"` // extra class, e.g. "w-[150px]"
 }
 
 // ModelScript renders the embedded JSON payload chart.js reads.

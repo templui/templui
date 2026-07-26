@@ -57,6 +57,14 @@ func chartsFor(chartType string) []modules.ChartEntry {
 		return []modules.ChartEntry{
 			entry("chart-bar-interactive", true),
 			entry("chart-bar-default", false),
+			entry("chart-bar-horizontal", false),
+			entry("chart-bar-multiple", false),
+			entry("chart-bar-stacked", false),
+			entry("chart-bar-label", false),
+			entry("chart-bar-label-custom", false),
+			entry("chart-bar-mixed", false),
+			entry("chart-bar-active", false),
+			entry("chart-bar-negative", false),
 		}
 	case "line":
 		return []modules.ChartEntry{

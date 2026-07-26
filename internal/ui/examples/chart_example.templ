@@ -35,7 +35,7 @@ templ ChartExample() {
 templ ChartExampleGrid() {
 	@chart.Container(chart.ContainerProps{ID: "chart-example-grid", Config: chartExampleConfig, Class: "min-h-[200px] w-full"}) {
 		@chart.BarChart(chart.BarChartProps{Data: chartExampleData}) {
-			@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+			@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 			@chart.Bar(chart.BarProps{DataKey: "desktop", Fill: "var(--color-desktop)", Radius: 4})
 			@chart.Bar(chart.BarProps{DataKey: "mobile", Fill: "var(--color-mobile)", Radius: 4})
 		}
@@ -45,7 +45,7 @@ templ ChartExampleGrid() {
 templ ChartExampleAxis() {
 	@chart.Container(chart.ContainerProps{ID: "chart-example-axis", Config: chartExampleConfig, Class: "min-h-[200px] w-full"}) {
 		@chart.BarChart(chart.BarChartProps{Data: chartExampleData}) {
-			@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+			@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 			@chart.XAxis(chart.XAxisProps{
 				DataKey:       "month",
 				TickMargin:    10,
@@ -60,7 +60,7 @@ templ ChartExampleAxis() {
 templ ChartExampleTooltip() {
 	@chart.Container(chart.ContainerProps{ID: "chart-example-tooltip", Config: chartExampleConfig, Class: "min-h-[200px] w-full"}) {
 		@chart.BarChart(chart.BarChartProps{Data: chartExampleData}) {
-			@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+			@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 			@chart.XAxis(chart.XAxisProps{
 				DataKey:       "month",
 				TickMargin:    10,
@@ -76,7 +76,7 @@ templ ChartExampleTooltip() {
 templ ChartExampleLegend() {
 	@chart.Container(chart.ContainerProps{ID: "chart-example-legend", Config: chartExampleConfig, Class: "min-h-[200px] w-full"}) {
 		@chart.BarChart(chart.BarChartProps{Data: chartExampleData}) {
-			@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+			@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 			@chart.XAxis(chart.XAxisProps{
 				DataKey:       "month",
 				TickMargin:    10,

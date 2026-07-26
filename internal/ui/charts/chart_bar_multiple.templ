@@ -6,9 +6,9 @@ import (
 	"github.com/templui/templui/components/icon"
 )
 
-// The pendant of chart-line-dots.tsx.
+// The pendant of chart-bar-multiple.tsx.
 
-var chartLineDotsData = []chart.Datum{
+var chartBarMultipleData = []chart.Datum{
 	{"month": "January", "desktop": 186, "mobile": 80},
 	{"month": "February", "desktop": 305, "mobile": 200},
 	{"month": "March", "desktop": 237, "mobile": 120},
@@ -17,49 +17,40 @@ var chartLineDotsData = []chart.Datum{
 	{"month": "June", "desktop": 214, "mobile": 140},
 }
 
-var chartLineDotsConfig = chart.Config{
+var chartBarMultipleConfig = chart.Config{
 	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
 	{Key: "mobile", Label: "Mobile", Color: "var(--chart-2)"},
 }
 
-func lineDotsMonthShort(v any) string {
+func barMultipleMonthShort(v any) string {
 	return v.(string)[:3]
 }
 
-templ ChartLineDots() {
+templ ChartBarMultiple() {
 	@card.Card() {
 		@card.Header() {
 			@card.Title() {
-				Line Chart - Dots
+				Bar Chart - Multiple
 			}
 			@card.Description() {
 				January - June 2024
 			}
 		}
 		@card.Content() {
-			@chart.Container(chart.ContainerProps{ID: "line-dots", Config: chartLineDotsConfig}) {
-				@chart.LineChart(chart.LineChartProps{
-					Data:   chartLineDotsData,
-					Margin: &chart.Margin{Left: 12, Right: 12},
-				}) {
+			@chart.Container(chart.ContainerProps{ID: "bar-multiple", Config: chartBarMultipleConfig}) {
+				@chart.BarChart(chart.BarChartProps{Data: chartBarMultipleData}) {
 					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 					@chart.XAxis(chart.XAxisProps{
 						DataKey:       "month",
-						TickMargin:    8,
-						TickFormatter: lineDotsMonthShort,
+						TickMargin:    10,
+						TickFormatter: barMultipleMonthShort,
 					})
 					@chart.Tooltip(chart.TooltipProps{
 						Cursor:  false,
-						Content: chart.TooltipContentProps{HideLabel: true},
+						Content: chart.TooltipContentProps{Indicator: "dashed"},
 					})
-					@chart.Line(chart.LineProps{
-						DataKey:     "desktop",
-						Type:        chart.CurveNatural,
-						Stroke:      "var(--color-desktop)",
-						StrokeWidth: 2,
-						Dot:         &chart.DotProps{Fill: "var(--color-desktop)"},
-						ActiveDot:   &chart.ActiveDotProps{R: 6},
-					})
+					@chart.Bar(chart.BarProps{DataKey: "desktop", Fill: "var(--color-desktop)", Radius: 4})
+					@chart.Bar(chart.BarProps{DataKey: "mobile", Fill: "var(--color-mobile)", Radius: 4})
 				}
 			}
 		}

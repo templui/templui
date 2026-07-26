@@ -1,0 +1,68 @@
+package charts
+
+import (
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/utils"
+)
+
+// The pendant of chart-bar-negative.tsx.
+
+var chartBarNegativeData = []chart.Datum{
+	{"month": "January", "visitors": 186},
+	{"month": "February", "visitors": 205},
+	{"month": "March", "visitors": -207},
+	{"month": "April", "visitors": 173},
+	{"month": "May", "visitors": -209},
+	{"month": "June", "visitors": 214},
+}
+
+var chartBarNegativeConfig = chart.Config{
+	{Key: "visitors", Label: "Visitors"},
+}
+
+templ ChartBarNegative() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Bar Chart - Negative
+			}
+			@card.Description() {
+				January - June 2024
+			}
+		}
+		@card.Content() {
+			@chart.Container(chart.ContainerProps{ID: "bar-negative", Config: chartBarNegativeConfig}) {
+				@chart.BarChart(chart.BarChartProps{Data: chartBarNegativeData}) {
+					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  false,
+						Content: chart.TooltipContentProps{HideLabel: true, HideIndicator: true},
+					})
+					@chart.Bar(chart.BarProps{DataKey: "visitors"}) {
+						@chart.LabelList(chart.LabelListProps{
+							Position:    "top",
+							DataKey:     "month",
+							FillOpacity: 1,
+						})
+						for _, d := range chartBarNegativeData {
+							@chart.Cell(chart.CellProps{
+								Fill: utils.IfElse(d["visitors"].(int) > 0, "var(--chart-1)", "var(--chart-2)"),
+							})
+						}
+					}
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col items-start gap-2 text-sm"}) {
+			<div class="flex gap-2 leading-none font-medium">
+				Trending up by 5.2% this month
+				@icon.TrendingUp(icon.Props{Class: "h-4 w-4"})
+			</div>
+			<div class="leading-none text-muted-foreground">
+				Showing total visitors for the last 6 months
+			</div>
+		}
+	}
+}

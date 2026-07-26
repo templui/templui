@@ -6,9 +6,9 @@ import (
 	"github.com/templui/templui/components/icon"
 )
 
-// The pendant of chart-line-label.tsx.
+// The pendant of chart-bar-label-custom.tsx.
 
-var chartLineLabelData = []chart.Datum{
+var chartBarLabelCustomData = []chart.Datum{
 	{"month": "January", "desktop": 186, "mobile": 80},
 	{"month": "February", "desktop": 305, "mobile": 200},
 	{"month": "March", "desktop": 237, "mobile": 120},
@@ -17,52 +17,58 @@ var chartLineLabelData = []chart.Datum{
 	{"month": "June", "desktop": 214, "mobile": 140},
 }
 
-var chartLineLabelConfig = chart.Config{
-	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
+var chartBarLabelCustomConfig = chart.Config{
+	{Key: "desktop", Label: "Desktop", Color: "var(--chart-2)"},
 	{Key: "mobile", Label: "Mobile", Color: "var(--chart-2)"},
+	{Key: "label", Color: "var(--background)"},
 }
 
-func lineLabelMonthShort(v any) string {
+func barLabelCustomMonthShort(v any) string {
 	return v.(string)[:3]
 }
 
-templ ChartLineLabel() {
+templ ChartBarLabelCustom() {
 	@card.Card() {
 		@card.Header() {
 			@card.Title() {
-				Line Chart - Label
+				Bar Chart - Custom Label
 			}
 			@card.Description() {
 				January - June 2024
 			}
 		}
 		@card.Content() {
-			@chart.Container(chart.ContainerProps{ID: "line-label", Config: chartLineLabelConfig}) {
-				@chart.LineChart(chart.LineChartProps{
-					Data:   chartLineLabelData,
-					Margin: &chart.Margin{Top: 20, Left: 12, Right: 12},
+			@chart.Container(chart.ContainerProps{ID: "bar-label-custom", Config: chartBarLabelCustomConfig}) {
+				@chart.BarChart(chart.BarChartProps{
+					Data:   chartBarLabelCustomData,
+					Layout: "vertical",
+					Margin: &chart.Margin{Right: 16},
 				}) {
-					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
-					@chart.XAxis(chart.XAxisProps{
+					@chart.CartesianGrid(chart.CartesianGridProps{Horizontal: chart.Bool(false)})
+					@chart.YAxis(chart.YAxisProps{
 						DataKey:       "month",
-						TickMargin:    8,
-						TickFormatter: lineLabelMonthShort,
+						Type:          "category",
+						TickMargin:    10,
+						TickFormatter: barLabelCustomMonthShort,
+						Hide:          true,
 					})
+					@chart.XAxis(chart.XAxisProps{DataKey: "desktop", Type: "number", Hide: true})
 					@chart.Tooltip(chart.TooltipProps{
 						Cursor:  false,
 						Content: chart.TooltipContentProps{Indicator: "line"},
 					})
-					@chart.Line(chart.LineProps{
-						DataKey:     "desktop",
-						Type:        chart.CurveNatural,
-						Stroke:      "var(--color-desktop)",
-						StrokeWidth: 2,
-						Dot:         &chart.DotProps{Fill: "var(--color-desktop)"},
-						ActiveDot:   &chart.ActiveDotProps{R: 6},
-					}) {
+					@chart.Bar(chart.BarProps{DataKey: "desktop", Fill: "var(--color-desktop)", Radius: 4}) {
 						@chart.LabelList(chart.LabelListProps{
-							Position: "top",
-							Offset:   12,
+							DataKey:  "month",
+							Position: "insideLeft",
+							Offset:   8,
+							Class:    "fill-(--color-label)",
+							FontSize: 12,
+						})
+						@chart.LabelList(chart.LabelListProps{
+							DataKey:  "desktop",
+							Position: "right",
+							Offset:   8,
 							Class:    "fill-foreground",
 							FontSize: 12,
 						})

@@ -44,14 +44,56 @@ function adaptiveStep(rough, correction) {
   return (Math.ceil(stepRatio / scale) + correction) * scale * digitCountValue;
 }
 
-function niceTicks(max, count) {
-  if (count < 2) count = 2;
-  for (let correction = 0; ; correction++) {
-    const step = adaptiveStep(max / (count - 1), correction);
-    if (step <= 0) return [0];
-    if (Math.ceil(max / step) + 1 > count) continue;
-    return Array.from({ length: count }, (_, i) => step * i);
+/* recharts-scale getFormatStep: the step between two ticks that reads
+ * well (10, 20, 25). */
+function getFormatStep(roughStep, allowDecimals, correctionFactor) {
+  if (roughStep <= 0) return 0;
+  const digitCount = getDigitCount(roughStep);
+  const digitCountValue = Math.pow(10, digitCount);
+  const stepRatio = roughStep / digitCountValue;
+  const stepRatioScale = digitCount !== 1 ? 0.05 : 0.1;
+  const amendStepRatio = (Math.ceil(stepRatio / stepRatioScale) + correctionFactor) * stepRatioScale;
+  const formatStep = amendStepRatio * digitCountValue;
+  return allowDecimals ? formatStep : Math.ceil(formatStep);
+}
+
+/* recharts-scale calculateStep: zero is always a tick when the interval
+ * contains it, and the step grows until the ticks cover the interval. */
+function calculateStep(min, max, tickCount, allowDecimals, correctionFactor = 0) {
+  if (!Number.isFinite((max - min) / (tickCount - 1))) {
+    return { step: 0, tickMin: 0, tickMax: 0 };
   }
+  const step = getFormatStep((max - min) / (tickCount - 1), allowDecimals, correctionFactor);
+  let middle;
+  if (min <= 0 && max >= 0) {
+    middle = 0;
+  } else {
+    middle = (min + max) / 2;
+    middle = middle - (middle % step);
+  }
+  let belowCount = Math.ceil((middle - min) / step);
+  let upCount = Math.ceil((max - middle) / step);
+  const scaleCount = belowCount + upCount + 1;
+  if (scaleCount > tickCount) {
+    return calculateStep(min, max, tickCount, allowDecimals, correctionFactor + 1);
+  }
+  if (scaleCount < tickCount) {
+    upCount = max > 0 ? upCount + (tickCount - scaleCount) : upCount;
+    belowCount = max > 0 ? belowCount : belowCount + (tickCount - scaleCount);
+  }
+  return { step, tickMin: middle - belowCount * step, tickMax: middle + upCount * step };
+}
+
+/* recharts-scale getNiceTickValues: the tick values of an interval, with
+ * the count guaranteed. */
+function niceTickValues(min, max, tickCount = 6, allowDecimals = true) {
+  const count = Math.max(tickCount, 2);
+  if (min === max) return [min];
+  const { step, tickMin, tickMax } = calculateStep(min, max, count, allowDecimals);
+  if (step <= 0) return [0];
+  const values = [];
+  for (let v = tickMin; v <= tickMax + 0.1 * step; v += step) values.push(v);
+  return values;
 }
 
 function linearY(v, dmax, top, height) {
@@ -76,24 +118,54 @@ function expandValues(series) {
   return vals;
 }
 
-/* domainOf computes a model's nice y domain (stacked aware). */
-function domainOf(m) {
-  if (m.stackOffset === "expand") return 1;
+/* domainTicks computes a model's nice tick values (stacked aware); the
+ * domain spans from the first to the last tick, like Recharts. */
+function domainTicks(m, tickCount = 5) {
+  if (m.stackOffset === "expand") {
+    return Array.from({ length: tickCount }, (_, i) => i / (tickCount - 1));
+  }
   let max = 0;
+  let min = 0;
   const n = m.series[0].values.length;
   if (m.stacked) {
     for (let i = 0; i < n; i++) {
       let sum = 0;
       for (const s of m.series) sum += s.values[i];
       if (sum > max) max = sum;
+      if (sum < min) min = sum;
     }
   } else {
     for (const s of m.series) {
-      for (const v of s.values) if (v > max) max = v;
+      for (const v of s.values) {
+        if (v > max) max = v;
+        if (v < min) min = v;
+      }
     }
   }
-  const ticks = niceTicks(max, 5);
-  return ticks[ticks.length - 1];
+  return niceTickValues(min, max, tickCount);
+}
+
+/* domainOf is the top of the value domain, used to pin the scale during a
+ * morph. */
+function domainOf(m) {
+  const t = domainTicks(m);
+  return t[t.length - 1];
+}
+
+/* valueScale maps a value onto its pixel position. With negative values
+ * the domain spans [min, max] and the zero baseline sits inside the plot,
+ * like Recharts' linear scale. */
+function valueScale(m, start, length, ticks) {
+  const max = ticks[ticks.length - 1];
+  const min = ticks[0];
+  const span = max - min || 1;
+  return {
+    max,
+    min,
+    // pos returns the pixel of a value along the axis from start.
+    pos: (v) => start + length - ((v - min) / span) * length,
+    zero: start + length - ((0 - min) / span) * length,
+  };
 }
 
 function barPositions(band, categoryGap, count) {
@@ -107,16 +179,22 @@ function barPositions(band, categoryGap, count) {
   return [offsets, size];
 }
 
-function roundedBarPath(x, y, w, h, r) {
-  r = Math.min(r, Math.min(w / 2, h / 2));
-  if (r <= 0) {
+/* getRectanglePath from Recharts' Rectangle: the radius is one value for
+ * all corners or four values starting at the top left, clamped to half the
+ * rectangle. */
+function roundedBarPath(x, y, w, h, radius) {
+  const corners = Array.isArray(radius) ? radius : [radius || 0];
+  const [tl, tr, br, bl] = corners.length === 4 ? corners : [corners[0] || 0, corners[0] || 0, corners[0] || 0, corners[0] || 0];
+  const max = Math.min(Math.abs(w) / 2, Math.abs(h) / 2);
+  const c = [tl, tr, br, bl].map((v) => Math.max(0, Math.min(v, max)));
+  if (c.every((v) => v === 0)) {
     return `M ${fmtF(x)},${fmtF(y)} h ${fmtF(w)} v ${fmtF(h)} h ${fmtF(-w)} Z`;
   }
   return (
-    `M ${fmtF(x)},${fmtF(y + r)} a ${fmtF(r)},${fmtF(r)} 0 0 1 ${fmtF(r)},${fmtF(-r)} ` +
-    `h ${fmtF(w - 2 * r)} a ${fmtF(r)},${fmtF(r)} 0 0 1 ${fmtF(r)},${fmtF(r)} ` +
-    `v ${fmtF(h - 2 * r)} a ${fmtF(r)},${fmtF(r)} 0 0 1 ${fmtF(-r)},${fmtF(r)} ` +
-    `h ${fmtF(-(w - 2 * r))} a ${fmtF(r)},${fmtF(r)} 0 0 1 ${fmtF(-r)},${fmtF(-r)} Z`
+    `M ${fmtF(x)},${fmtF(y + c[0])} a ${fmtF(c[0])},${fmtF(c[0])} 0 0 1 ${fmtF(c[0])},${fmtF(-c[0])} ` +
+    `h ${fmtF(w - c[0] - c[1])} a ${fmtF(c[1])},${fmtF(c[1])} 0 0 1 ${fmtF(c[1])},${fmtF(c[1])} ` +
+    `v ${fmtF(h - c[1] - c[2])} a ${fmtF(c[2])},${fmtF(c[2])} 0 0 1 ${fmtF(-c[2])},${fmtF(c[2])} ` +
+    `h ${fmtF(-(w - c[2] - c[3]))} a ${fmtF(c[3])},${fmtF(c[3])} 0 0 1 ${fmtF(-c[3])},${fmtF(-c[3])} Z`
   );
 }
 
@@ -441,6 +519,7 @@ function renderCartesian(panel, m, state, alpha = 1) {
   const H = panel.clientHeight;
   if (!W || !H) return;
 
+  const vertical = m.layout === "vertical";
   const yAxisW = m.yAxisWidth || 0;
   const plotX = m.marginLeft + yAxisW;
   const plotY = m.marginTop;
@@ -452,8 +531,21 @@ function renderCartesian(panel, m, state, alpha = 1) {
   // During a morph the scale is pinned to the target domain like
   // Recharts, which interpolates pixel positions on the new scale.
   const tickCount = m.tickCount || 5;
-  const domainMax = m.domainMax || domainOf(m);
-  const ticks = Array.from({ length: tickCount }, (_, i) => (domainMax * i) / (tickCount - 1));
+  const ticks = m.domainMax
+    ? Array.from({ length: tickCount }, (_, i) => (m.domainMax * i) / (tickCount - 1))
+    : domainTicks(m, tickCount);
+  const domainMin = ticks[0];
+  const domainMax = ticks[ticks.length - 1];
+
+  // Category positions: band centers for bars, evenly spaced points for
+  // lines and areas.
+  const catStart = vertical ? plotY : plotX;
+  const catLength = vertical ? plotH : plotW;
+  const bandSize = m.kind === "bar" ? catLength / n : 0;
+  const cats = [];
+  for (let i = 0; i < n; i++) {
+    cats.push(m.kind === "bar" ? catStart + i * bandSize + bandSize / 2 : plotX + (i * plotW) / (n - 1));
+  }
 
   // Explicit pixel size like Recharts' Surface: the svg never stretches
   // between resize frames, every frame lays out fresh.
@@ -469,8 +561,19 @@ function renderCartesian(panel, m, state, alpha = 1) {
     svg += "</defs>";
   }
 
-  if (yAxisW > 0) {
-    const yCoords = ticks.map((tv) => linearY(tv, domainMax, plotY, plotH));
+  if (yAxisW > 0 && vertical) {
+    // Vertical layout: the y axis carries the category labels.
+    const ySizes = cats.map(() => measureLabelHeight(panel));
+    const labelX = plotX - TICK_SIZE - (m.yAxisMargin || 0);
+    svg += `<g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis"><g class="recharts-cartesian-axis-ticks">`;
+    // The category coordinates ascend downwards, so the bounds run from
+    // the top of the surface to its bottom.
+    for (const tk of preserveEndTicks(cats, ySizes, 0, H, m.minTickGap || 5)) {
+      svg += `<g class="recharts-layer recharts-cartesian-axis-tick"><text orientation="left" width="${fmtF(yAxisW)}" x="${fmtF(labelX)}" y="${fmtF(tk.coord)}" stroke="none" fill="#666" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end"><tspan dy="0.355em">${m.labels[tk.index]}</tspan></text></g>`;
+    }
+    svg += "</g></g>";
+  } else if (yAxisW > 0) {
+    const yCoords = ticks.map((tv) => linearY(tv - domainMin, domainMax - domainMin, plotY, plotH));
     const ySizes = ticks.map(() => measureLabelHeight(panel));
     const labelX = plotX - TICK_SIZE - (m.yAxisMargin || 0);
     svg += `<g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis">`;
@@ -489,12 +592,28 @@ function renderCartesian(panel, m, state, alpha = 1) {
   }
 
   if (m.grid) {
-    svg += `<g class="recharts-layer recharts-cartesian-grid"><g class="recharts-cartesian-grid-horizontal">`;
-    for (const tv of ticks) {
-      const y = linearY(tv, domainMax, plotY, plotH);
-      svg += `<line stroke="#ccc" fill="none" x1="${fmtF(plotX)}" y1="${fmtF(y)}" x2="${fmtF(plotX + plotW)}" y2="${fmtF(y)}"/>`;
+    // Recharts draws a line per tick of the value axis and per category of
+    // the other one; both directions default to on.
+    const valueCoords = ticks.map((tv) => {
+      const p = linearY(tv - domainMin, domainMax - domainMin, vertical ? plotX : plotY, vertical ? plotW : plotH);
+      return vertical ? plotX + plotW - (p - plotX) : p;
+    });
+    svg += `<g class="recharts-layer recharts-cartesian-grid">`;
+    if (m.gridHorizontal) {
+      svg += `<g class="recharts-cartesian-grid-horizontal">`;
+      for (const y of vertical ? cats : valueCoords) {
+        svg += `<line stroke="#ccc" fill="none" x1="${fmtF(plotX)}" y1="${fmtF(y)}" x2="${fmtF(plotX + plotW)}" y2="${fmtF(y)}"/>`;
+      }
+      svg += "</g>";
     }
-    svg += "</g></g>";
+    if (m.gridVertical) {
+      svg += `<g class="recharts-cartesian-grid-vertical">`;
+      for (const x of vertical ? valueCoords : cats) {
+        svg += `<line stroke="#ccc" fill="none" x1="${fmtF(x)}" y1="${fmtF(plotY)}" x2="${fmtF(x)}" y2="${fmtF(plotBottom)}"/>`;
+      }
+      svg += "</g>";
+    }
+    svg += "</g>";
   }
 
   let xs = [];
@@ -502,20 +621,92 @@ function renderCartesian(panel, m, state, alpha = 1) {
   const vals = m.stackOffset === "expand" ? expandValues(m.series) : m.series.map((s) => s.values);
 
   if (m.kind === "bar") {
-    band = plotW / n;
-    const [offsets, barW] = barPositions(band, m.categoryGap, m.series.length);
+    // The category axis runs along x, or along y when the layout is
+    // vertical and the bars grow to the right.
+    band = bandSize;
+    // Stacked bars share one slot per category, like Recharts' stackId.
+    const slots = m.stacked ? 1 : m.series.length;
+    const [offsets, barSize] = barPositions(band, m.categoryGap, slots);
+    const scale = valueScale(m, vertical ? plotX : plotY, vertical ? plotW : plotH, ticks);
+    // In a vertical layout the value axis grows from left to right, so the
+    // scale is mirrored around the plot.
+    const valuePos = (v) => (vertical ? plotX + plotW - (scale.pos(v) - plotX) : scale.pos(v));
+    const zero = vertical ? plotX + plotW - (scale.zero - plotX) : scale.zero;
+
+    const stackBase = new Array(n).fill(0);
+    state.tops = [];
     for (let si = 0; si < m.series.length; si++) {
+      const s = m.series[si];
+      const slot = m.stacked ? 0 : si;
+      const tops = [];
+      // The label anchors follow the rectangle edges like Recharts, so a
+      // negative bar labels at the zero line, not at its tip.
+      const rectStart = [];
+      const rectEnd = [];
       svg += `<g class="recharts-layer recharts-bar"><g class="recharts-layer recharts-bar-rectangles">`;
       for (let i = 0; i < n; i++) {
-        const x = plotX + i * band + offsets[si];
-        const y = linearY(vals[si][i] * alpha, domainMax, plotY, plotH);
-        svg += `<g class="recharts-layer recharts-bar-rectangle"><path fill="${m.series[si].color}" d="${roundedBarPath(x, y, barW, plotBottom - y, m.series[si].radius || 0)}"/></g>`;
+        const raw = vals[si][i];
+        const from = m.stacked ? stackBase[i] : 0;
+        const to = m.stacked ? stackBase[i] + raw : raw;
+        const a = valuePos(from * alpha + (m.stacked ? 0 : 0));
+        const b = valuePos(m.stacked ? from + (to - from) * alpha : to * alpha);
+        const fill = (s.cells && s.cells[i]) || s.color;
+        const active = s.activeIndex != null && s.activeIndex === i && s.activeBar;
+        let attrs = `fill="${fill}"`;
+        if (active) {
+          const ab = s.activeBar;
+          attrs += ` fill-opacity="${fmtF(ab.FillOpacity || 1)}" stroke="${ab.Stroke || fill}"`;
+          if (ab.StrokeDasharray) attrs += ` stroke-dasharray="${fmtF(ab.StrokeDasharray)}"`;
+          if (ab.StrokeDashoffset) attrs += ` stroke-dashoffset="${fmtF(ab.StrokeDashoffset)}"`;
+          if (s.strokeWidth) attrs += ` stroke-width="${fmtF(s.strokeWidth)}"`;
+        }
+        let d;
+        if (vertical) {
+          const y = catStart + i * band + offsets[slot];
+          const x = Math.min(a, b);
+          d = roundedBarPath(x, y, Math.abs(b - a), barSize, s.radius);
+        } else {
+          const x = catStart + i * band + offsets[slot];
+          const y = Math.min(a, b);
+          d = roundedBarPath(x, y, barSize, Math.abs(b - a), s.radius);
+        }
+        tops.push(b);
+        rectStart.push(Math.min(a, b));
+        rectEnd.push(Math.max(a, b));
+        svg += `<g class="recharts-layer recharts-bar-rectangle"><path ${attrs} d="${d}"/></g>`;
+        if (m.stacked) stackBase[i] = to;
       }
-      svg += "</g></g>";
+      svg += "</g>";
+      // Label lists paint after the entrance, like Recharts gates them on
+      // isAnimationFinished.
+      if (alpha >= 1 && s.labelLists) {
+        for (const ll of s.labelLists) {
+          svg += `<g class="recharts-layer recharts-label-list">`;
+          for (let i = 0; i < n; i++) {
+            const catCenter = catStart + i * band + offsets[slot] + barSize / 2;
+            const offset = ll.offset || 5;
+            let x, y, anchor;
+            if (vertical) {
+              y = catCenter;
+              anchor = "start";
+              x = ll.position === "right" ? rectEnd[i] + offset : rectStart[i] + offset;
+            } else {
+              x = catCenter;
+              y = rectStart[i] - offset;
+              anchor = "middle";
+            }
+            const fo = ll.fillOpacity ? ` fill-opacity="${fmtF(ll.fillOpacity)}"` : "";
+            svg += `<text x="${fmtF(x)}" y="${fmtF(y)}" class="recharts-text recharts-label ${ll.class || ""}" text-anchor="${anchor}" font-size="${fmtF(ll.fontSize || 12)}"${fo}><tspan dy="${vertical ? "0.355em" : "0"}">${ll.labels[i]}</tspan></text>`;
+          }
+          svg += `</g>`;
+        }
+      }
+      svg += "</g>";
+      state.tops.push(tops);
     }
-    for (let i = 0; i < n; i++) xs.push(plotX + i * band + band / 2);
+    xs = cats;
   } else if (m.kind === "line") {
-    for (let i = 0; i < n; i++) xs.push(plotX + (i * plotW) / (n - 1));
+    xs = cats;
     state.tops = [];
     for (let si = 0; si < m.series.length; si++) {
       const s = m.series[si];
@@ -559,7 +750,7 @@ function renderCartesian(panel, m, state, alpha = 1) {
       state.tops.push(top);
     }
   } else {
-    for (let i = 0; i < n; i++) xs.push(plotX + (i * plotW) / (n - 1));
+    xs = cats;
     // Recharts' entrance animation reveals areas left to right through a
     // clipPath rect (AreaRevealShape).
     svg +=
@@ -587,6 +778,8 @@ function renderCartesian(panel, m, state, alpha = 1) {
     svg += "</g>";
   }
 
+  // The x axis only renders when the chart declared a visible one.
+  if (m.xAxisHeight && !vertical) {
   const widths = m.labels.map((l) => measureLabel(l, panel));
   const labelY = plotBottom + TICK_SIZE + (m.tickMargin || 0);
   svg += `<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis">`;
@@ -601,11 +794,13 @@ function renderCartesian(panel, m, state, alpha = 1) {
     }
     svg += `<text orientation="bottom" height="${fmtF(m.xAxisHeight)}" x="${fmtF(tk.coord)}" y="${fmtF(labelY)}" stroke="none" fill="#666" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle"><tspan dy="0.71em">${m.labels[tk.index]}</tspan></text></g>`;
   }
-  svg += "</g></g></svg>";
+  svg += "</g></g>";
+  }
+  svg += "</svg>";
 
   swapSVG(panel, svg);
 
-  state.geom = { W, H, plotX, plotY, plotW, plotH, plotBottom, band, xs, n };
+  state.geom = { W, H, plotX, plotY, plotW, plotH, plotBottom, band, xs, cats, n, vertical };
 }
 
 /* Pie sector path, the port of the Go SectorPath (degrees, 0 at three
@@ -751,8 +946,9 @@ function showCursor(panel, m, state, i) {
   // and areas render on top of the hover band.
   const seriesLayer = svg.querySelector(".recharts-bar, .recharts-area, .recharts-line");
   if (m.kind === "bar") {
-    const x = g.plotX + i * g.band;
-    const d = `M ${fmtF(x)},${fmtF(g.plotY)} h ${fmtF(g.band)} v ${fmtF(g.plotH)} h ${fmtF(-g.band)} Z`;
+    const d = g.vertical
+      ? `M ${fmtF(g.plotX)},${fmtF(g.plotY + i * g.band)} h ${fmtF(g.plotW)} v ${fmtF(g.band)} h ${fmtF(-g.plotW)} Z`
+      : `M ${fmtF(g.plotX + i * g.band)},${fmtF(g.plotY)} h ${fmtF(g.band)} v ${fmtF(g.plotH)} h ${fmtF(-g.band)} Z`;
     if (!cursor) {
       seriesLayer.insertAdjacentHTML(
         "beforebegin",
@@ -870,7 +1066,9 @@ function initPanel(script) {
     if (chartX < g.plotX || chartX > g.plotX + g.plotW) return -1;
     if (chartY < g.plotY || chartY > g.plotBottom) return -1;
     if (m.kind === "bar") {
-      return Math.max(0, Math.min(g.n - 1, Math.floor((chartX - g.plotX) / g.band)));
+      // The category runs down the y axis in a vertical layout.
+      const along = g.vertical ? chartY - g.plotY : chartX - g.plotX;
+      return Math.max(0, Math.min(g.n - 1, Math.floor(along / g.band)));
     }
     const step = g.plotW / (g.n - 1);
     return Math.max(0, Math.min(g.n - 1, Math.round((chartX - g.plotX) / step)));

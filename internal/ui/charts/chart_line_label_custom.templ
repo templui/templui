@@ -47,7 +47,7 @@ templ ChartLineLabelCustom() {
 					Data:   chartLineLabelCustomData,
 					Margin: &chart.Margin{Top: 24, Left: 24, Right: 24},
 				}) {
-					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 					@chart.Tooltip(chart.TooltipProps{
 						Cursor:  false,
 						Content: chart.TooltipContentProps{Indicator: "line", NameKey: "visitors", HideLabel: true},

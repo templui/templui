@@ -6,18 +6,18 @@ import (
 	"github.com/templui/templui/components/icon"
 )
 
-// The pendant of chart-line-dots-colors.tsx.
+// The pendant of chart-bar-active.tsx.
 
-var chartLineDotsColorsData = []chart.Datum{
-	{"browser": "chrome", "visitors": 275, "fill": "var(--color-chrome)"},
+var chartBarActiveData = []chart.Datum{
+	{"browser": "chrome", "visitors": 187, "fill": "var(--color-chrome)"},
 	{"browser": "safari", "visitors": 200, "fill": "var(--color-safari)"},
-	{"browser": "firefox", "visitors": 187, "fill": "var(--color-firefox)"},
+	{"browser": "firefox", "visitors": 275, "fill": "var(--color-firefox)"},
 	{"browser": "edge", "visitors": 173, "fill": "var(--color-edge)"},
 	{"browser": "other", "visitors": 90, "fill": "var(--color-other)"},
 }
 
-var chartLineDotsColorsConfig = chart.Config{
-	{Key: "visitors", Label: "Visitors", Color: "var(--chart-2)"},
+var chartBarActiveConfig = chart.Config{
+	{Key: "visitors", Label: "Visitors"},
 	{Key: "chrome", Label: "Chrome", Color: "var(--chart-1)"},
 	{Key: "safari", Label: "Safari", Color: "var(--chart-2)"},
 	{Key: "firefox", Label: "Firefox", Color: "var(--chart-3)"},
@@ -25,33 +25,45 @@ var chartLineDotsColorsConfig = chart.Config{
 	{Key: "other", Label: "Other", Color: "var(--chart-5)"},
 }
 
-templ ChartLineDotsColors() {
+// barActiveLabel resolves the config label, the pendant of the demo's
+// tickFormatter reading chartConfig[value].label.
+func barActiveLabel(v any) string {
+	return chartBarActiveConfig.Label(v.(string))
+}
+
+templ ChartBarActive() {
 	@card.Card() {
 		@card.Header() {
 			@card.Title() {
-				Line Chart - Dots Colors
+				Bar Chart - Active
 			}
 			@card.Description() {
 				January - June 2024
 			}
 		}
 		@card.Content() {
-			@chart.Container(chart.ContainerProps{ID: "line-dots-colors", Config: chartLineDotsColorsConfig}) {
-				@chart.LineChart(chart.LineChartProps{
-					Data:   chartLineDotsColorsData,
-					Margin: &chart.Margin{Top: 24, Left: 24, Right: 24},
-				}) {
+			@chart.Container(chart.ContainerProps{ID: "bar-active", Config: chartBarActiveConfig}) {
+				@chart.BarChart(chart.BarChartProps{Data: chartBarActiveData}) {
 					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
+					@chart.XAxis(chart.XAxisProps{
+						DataKey:       "browser",
+						TickMargin:    10,
+						TickFormatter: barActiveLabel,
+					})
 					@chart.Tooltip(chart.TooltipProps{
 						Cursor:  false,
-						Content: chart.TooltipContentProps{Indicator: "line", NameKey: "visitors", HideLabel: true},
+						Content: chart.TooltipContentProps{HideLabel: true},
 					})
-					@chart.Line(chart.LineProps{
+					@chart.Bar(chart.BarProps{
 						DataKey:     "visitors",
-						Type:        chart.CurveNatural,
-						Stroke:      "var(--color-visitors)",
 						StrokeWidth: 2,
-						Dot:         &chart.DotProps{R: 5, DataFill: true},
+						Radius:      8,
+						ActiveIndex: chart.Index(2),
+						ActiveBar: &chart.RectangleProps{
+							FillOpacity:      0.8,
+							StrokeDasharray:  4,
+							StrokeDashoffset: 4,
+						},
 					})
 				}
 			}

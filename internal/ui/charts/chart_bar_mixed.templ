@@ -6,9 +6,9 @@ import (
 	"github.com/templui/templui/components/icon"
 )
 
-// The pendant of chart-line-dots-colors.tsx.
+// The pendant of chart-bar-mixed.tsx.
 
-var chartLineDotsColorsData = []chart.Datum{
+var chartBarMixedData = []chart.Datum{
 	{"browser": "chrome", "visitors": 275, "fill": "var(--color-chrome)"},
 	{"browser": "safari", "visitors": 200, "fill": "var(--color-safari)"},
 	{"browser": "firefox", "visitors": 187, "fill": "var(--color-firefox)"},
@@ -16,8 +16,8 @@ var chartLineDotsColorsData = []chart.Datum{
 	{"browser": "other", "visitors": 90, "fill": "var(--color-other)"},
 }
 
-var chartLineDotsColorsConfig = chart.Config{
-	{Key: "visitors", Label: "Visitors", Color: "var(--chart-2)"},
+var chartBarMixedConfig = chart.Config{
+	{Key: "visitors", Label: "Visitors"},
 	{Key: "chrome", Label: "Chrome", Color: "var(--chart-1)"},
 	{Key: "safari", Label: "Safari", Color: "var(--chart-2)"},
 	{Key: "firefox", Label: "Firefox", Color: "var(--chart-3)"},
@@ -25,34 +25,41 @@ var chartLineDotsColorsConfig = chart.Config{
 	{Key: "other", Label: "Other", Color: "var(--chart-5)"},
 }
 
-templ ChartLineDotsColors() {
+// barMixedLabel resolves the config label, the pendant of the demo's
+// tickFormatter reading chartConfig[value].label.
+func barMixedLabel(v any) string {
+	return chartBarMixedConfig.Label(v.(string))
+}
+
+templ ChartBarMixed() {
 	@card.Card() {
 		@card.Header() {
 			@card.Title() {
-				Line Chart - Dots Colors
+				Bar Chart - Mixed
 			}
 			@card.Description() {
 				January - June 2024
 			}
 		}
 		@card.Content() {
-			@chart.Container(chart.ContainerProps{ID: "line-dots-colors", Config: chartLineDotsColorsConfig}) {
-				@chart.LineChart(chart.LineChartProps{
-					Data:   chartLineDotsColorsData,
-					Margin: &chart.Margin{Top: 24, Left: 24, Right: 24},
+			@chart.Container(chart.ContainerProps{ID: "bar-mixed", Config: chartBarMixedConfig}) {
+				@chart.BarChart(chart.BarChartProps{
+					Data:   chartBarMixedData,
+					Layout: "vertical",
+					Margin: &chart.Margin{Left: 0},
 				}) {
-					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
+					@chart.YAxis(chart.YAxisProps{
+						DataKey:       "browser",
+						Type:          "category",
+						TickMargin:    10,
+						TickFormatter: barMixedLabel,
+					})
+					@chart.XAxis(chart.XAxisProps{DataKey: "visitors", Type: "number", Hide: true})
 					@chart.Tooltip(chart.TooltipProps{
 						Cursor:  false,
-						Content: chart.TooltipContentProps{Indicator: "line", NameKey: "visitors", HideLabel: true},
+						Content: chart.TooltipContentProps{HideLabel: true},
 					})
-					@chart.Line(chart.LineProps{
-						DataKey:     "visitors",
-						Type:        chart.CurveNatural,
-						Stroke:      "var(--color-visitors)",
-						StrokeWidth: 2,
-						Dot:         &chart.DotProps{R: 5, DataFill: true},
-					})
+					@chart.Bar(chart.BarProps{DataKey: "visitors", Radius: 5})
 				}
 			}
 		}

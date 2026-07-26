@@ -6,9 +6,9 @@ import (
 	"github.com/templui/templui/components/icon"
 )
 
-// The pendant of chart-bar-default.tsx.
+// The pendant of chart-bar-label.tsx.
 
-var chartBarDefaultData = []chart.Datum{
+var chartBarLabelData = []chart.Datum{
 	{"month": "January", "desktop": 186},
 	{"month": "February", "desktop": 305},
 	{"month": "March", "desktop": 237},
@@ -17,40 +17,48 @@ var chartBarDefaultData = []chart.Datum{
 	{"month": "June", "desktop": 214},
 }
 
-var chartBarDefaultConfig = chart.Config{
+var chartBarLabelConfig = chart.Config{
 	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
 }
 
-func barDefaultMonthShort(v any) string {
+func barLabelMonthShort(v any) string {
 	return v.(string)[:3]
 }
 
-templ ChartBarDefault() {
+templ ChartBarLabel() {
 	@card.Card() {
 		@card.Header() {
 			@card.Title() {
-				Bar Chart
+				Bar Chart - Label
 			}
 			@card.Description() {
 				January - June 2024
 			}
 		}
 		@card.Content() {
-			@chart.Container(chart.ContainerProps{ID: "bar-default", Config: chartBarDefaultConfig}) {
+			@chart.Container(chart.ContainerProps{ID: "bar-label", Config: chartBarLabelConfig}) {
 				@chart.BarChart(chart.BarChartProps{
-					Data: chartBarDefaultData,
+					Data:   chartBarLabelData,
+					Margin: &chart.Margin{Top: 20},
 				}) {
 					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 					@chart.XAxis(chart.XAxisProps{
 						DataKey:       "month",
 						TickMargin:    10,
-						TickFormatter: barDefaultMonthShort,
+						TickFormatter: barLabelMonthShort,
 					})
 					@chart.Tooltip(chart.TooltipProps{
 						Cursor:  false,
 						Content: chart.TooltipContentProps{HideLabel: true},
 					})
-					@chart.Bar(chart.BarProps{DataKey: "desktop", Fill: "var(--color-desktop)", Radius: 8})
+					@chart.Bar(chart.BarProps{DataKey: "desktop", Fill: "var(--color-desktop)", Radius: 8}) {
+						@chart.LabelList(chart.LabelListProps{
+							Position: "top",
+							Offset:   12,
+							Class:    "fill-foreground",
+							FontSize: 12,
+						})
+					}
 				}
 			}
 		}
