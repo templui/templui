@@ -199,7 +199,9 @@ type YAxisProps struct {
 // TooltipProps is the pendant of ChartTooltip: the cursor flag and the
 // ChartTooltipContent it renders.
 type TooltipProps struct {
-	Cursor  bool
+	// Cursor defaults to Recharts' true, so it is a pointer: pass
+	// Bool(false) to turn it off, like cursor={false} in the tsx.
+	Cursor  *bool
 	Content TooltipContentProps
 }
 
@@ -851,7 +853,7 @@ func buildModel(ctx context.Context, st *chartState) Model {
 	}
 	tt := st.tooltip
 	if tt != nil {
-		m.Cursor = tt.Cursor
+		m.Cursor = boolOr(tt.Cursor, true)
 		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
 	}
 

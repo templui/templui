@@ -56,7 +56,7 @@ templ ChartBarMixed() {
 					})
 					@chart.XAxis(chart.XAxisProps{DataKey: "visitors", Type: "number", Hide: true})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{HideLabel: true},
 					})
 					@chart.Bar(chart.BarProps{DataKey: "visitors", Radius: 5})

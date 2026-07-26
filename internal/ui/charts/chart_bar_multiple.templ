@@ -46,7 +46,7 @@ templ ChartBarMultiple() {
 						TickFormatter: barMultipleMonthShort,
 					})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{Indicator: "dashed"},
 					})
 					@chart.Bar(chart.BarProps{DataKey: "desktop", Fill: "var(--color-desktop)", Radius: 4})

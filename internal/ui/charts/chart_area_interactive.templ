@@ -186,7 +186,7 @@ templ ChartAreaInteractive() {
 								TickFormatter: areaInteractiveShortDate,
 							})
 							@chart.Tooltip(chart.TooltipProps{
-								Cursor: false,
+								Cursor: chart.Bool(false),
 								Content: chart.TooltipContentProps{
 									Indicator:      "dot",
 									LabelFormatter: areaInteractiveShortDate,

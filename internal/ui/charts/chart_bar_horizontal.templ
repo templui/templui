@@ -50,7 +50,7 @@ templ ChartBarHorizontal() {
 						TickFormatter: barHorizontalMonthShort,
 					})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{HideLabel: true},
 					})
 					@chart.Bar(chart.BarProps{DataKey: "desktop", Fill: "var(--color-desktop)", Radius: 5})

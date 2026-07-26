@@ -37,7 +37,7 @@ templ ChartBarNegative() {
 				@chart.BarChart(chart.BarChartProps{Data: chartBarNegativeData}) {
 					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{HideLabel: true, HideIndicator: true},
 					})
 					@chart.Bar(chart.BarProps{DataKey: "visitors"}) {

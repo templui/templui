@@ -337,7 +337,9 @@ type YAxisProps struct {
 // TooltipProps is the pendant of ChartTooltip: the cursor flag and the
 // ChartTooltipContent it renders.
 type TooltipProps struct {
-	Cursor  bool
+	// Cursor defaults to Recharts' true, so it is a pointer: pass
+	// Bool(false) to turn it off, like cursor={false} in the tsx.
+	Cursor  *bool
 	Content TooltipContentProps
 }
 
@@ -1420,7 +1422,7 @@ func buildModel(ctx context.Context, st *chartState) Model {
 	}
 	tt := st.tooltip
 	if tt != nil {
-		m.Cursor = tt.Cursor
+		m.Cursor = boolOr(tt.Cursor, true)
 		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
 	}
 
@@ -1631,7 +1633,7 @@ func legendContent(series []ModelSeries) templ.Component {
 				var templ_7745c5c3_Var27 string
 				templ_7745c5c3_Var27, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + series[i].Color)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1030, Col: 95}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1032, Col: 95}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 				if templ_7745c5c3_Err != nil {
@@ -1645,7 +1647,7 @@ func legendContent(series []ModelSeries) templ.Component {
 			var templ_7745c5c3_Var28 string
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(series[i].Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1032, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1034, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 			if templ_7745c5c3_Err != nil {

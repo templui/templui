@@ -87,7 +87,7 @@ templ ChartPieInteractive() {
 					<div data-tui-chart-month={ d["month"].(string) } hidden?={ i != 0 } style="width:100%;height:100%">
 								@chart.PieChart() {
 							@chart.Tooltip(chart.TooltipProps{
-								Cursor:  false,
+								Cursor:  chart.Bool(false),
 								Content: chart.TooltipContentProps{HideLabel: true},
 							})
 							@chart.Pie(chart.PieProps{

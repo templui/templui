@@ -43,7 +43,7 @@ templ ChartLineDotsColors() {
 				}) {
 					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{Indicator: "line", NameKey: "visitors", HideLabel: true},
 					})
 					@chart.Line(chart.LineProps{

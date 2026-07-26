@@ -182,7 +182,7 @@ Let's add a grid to the chart.
 ```templ showLineNumbers {3}
 @chart.Container(chart.ContainerProps{ID: "chart-example", Config: chartConfig, Class: "min-h-[200px] w-full"}) {
 	@chart.BarChart(chart.BarChartProps{Data: chartData}) {
-		@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+		@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 		@chart.Bar(chart.BarProps{DataKey: "desktop", Fill: "var(--color-desktop)", Radius: 4})
 		@chart.Bar(chart.BarProps{DataKey: "mobile", Fill: "var(--color-mobile)", Radius: 4})
 	}
@@ -204,7 +204,7 @@ To add an x-axis to the chart, we'll use the `XAxis` component.
 ```templ showLineNumbers {4-8}
 @chart.Container(chart.ContainerProps{ID: "chart-example", Config: chartConfig, Class: "min-h-[200px] w-full"}) {
 	@chart.BarChart(chart.BarChartProps{Data: chartData}) {
-		@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+		@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 		@chart.XAxis(chart.XAxisProps{
 			DataKey:       "month",
 			TickMargin:    10,
@@ -233,13 +233,13 @@ To add a tooltip, we'll use the custom `Tooltip` component from `chart`.
 ```templ showLineNumbers {9}
 @chart.Container(chart.ContainerProps{ID: "chart-example", Config: chartConfig, Class: "min-h-[200px] w-full"}) {
 	@chart.BarChart(chart.BarChartProps{Data: chartData}) {
-		@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+		@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 		@chart.XAxis(chart.XAxisProps{
 			DataKey:       "month",
 			TickMargin:    10,
 			TickFormatter: monthShort,
 		})
-		@chart.Tooltip(chart.TooltipProps{Cursor: true})
+		@chart.Tooltip()
 		@chart.Bar(chart.BarProps{DataKey: "desktop", Fill: "var(--color-desktop)", Radius: 4})
 		@chart.Bar(chart.BarProps{DataKey: "mobile", Fill: "var(--color-mobile)", Radius: 4})
 	}
@@ -263,13 +263,13 @@ We'll do the same for the legend. We'll use the `Legend` component from `chart`.
 ```templ showLineNumbers {10}
 @chart.Container(chart.ContainerProps{ID: "chart-example", Config: chartConfig, Class: "min-h-[200px] w-full"}) {
 	@chart.BarChart(chart.BarChartProps{Data: chartData}) {
-		@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+		@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 		@chart.XAxis(chart.XAxisProps{
 			DataKey:       "month",
 			TickMargin:    10,
 			TickFormatter: monthShort,
 		})
-		@chart.Tooltip(chart.TooltipProps{Cursor: true})
+		@chart.Tooltip()
 		@chart.Legend()
 		@chart.Bar(chart.BarProps{DataKey: "desktop", Fill: "var(--color-desktop)", Radius: 4})
 		@chart.Bar(chart.BarProps{DataKey: "mobile", Fill: "var(--color-mobile)", Radius: 4})
@@ -393,7 +393,7 @@ Chart comes with the `Tooltip` component and its `TooltipContentProps`, the pend
 
 ```templ
 @chart.Tooltip(chart.TooltipProps{
-	Cursor:  false,
+	Cursor:  chart.Bool(false),
 	Content: chart.TooltipContentProps{Indicator: "line"},
 })
 ```
@@ -404,7 +404,7 @@ Chart comes with the `Tooltip` component and its `TooltipContentProps`, the pend
 
 | Prop      | Type                | Description                            |
 | :-------- | :------------------ | :------------------------------------- |
-| `Cursor`  | bool                | Show the hover cursor (band or line).  |
+| `Cursor`  | *bool               | Hover cursor, defaults to on.          |
 | `Content` | TooltipContentProps | The rendered tooltip content.          |
 
 `chart.TooltipContentProps`

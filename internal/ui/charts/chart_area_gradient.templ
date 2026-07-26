@@ -49,7 +49,7 @@ templ ChartAreaGradient() {
 						TickFormatter: areaGradientMonthShort,
 					})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{},
 					})
 					@chart.Defs() {

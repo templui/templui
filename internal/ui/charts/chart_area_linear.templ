@@ -48,7 +48,7 @@ templ ChartAreaLinear() {
 						TickFormatter: areaLinearMonthShort,
 					})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{Indicator: "dot", HideLabel: true},
 					})
 					@chart.Area(chart.AreaProps{

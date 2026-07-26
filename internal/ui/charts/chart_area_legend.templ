@@ -49,7 +49,7 @@ templ ChartAreaLegend() {
 						TickFormatter: areaLegendMonthShort,
 					})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{Indicator: "line"},
 					})
 					@chart.Area(chart.AreaProps{

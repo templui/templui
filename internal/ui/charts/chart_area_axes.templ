@@ -52,7 +52,7 @@ templ ChartAreaAxes() {
 						TickMargin: 8,
 						TickCount:  3,
 					})
-					@chart.Tooltip(chart.TooltipProps{Cursor: false})
+					@chart.Tooltip(chart.TooltipProps{Cursor: chart.Bool(false)})
 					@chart.Area(chart.AreaProps{
 						DataKey:     "mobile",
 						Type:        chart.CurveNatural,

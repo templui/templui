@@ -48,7 +48,7 @@ templ ChartAreaDefault() {
 						TickFormatter: areaDefaultMonthShort,
 					})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{Indicator: "line"},
 					})
 					@chart.Area(chart.AreaProps{

@@ -51,7 +51,7 @@ templ ChartBarActive() {
 						TickFormatter: barActiveLabel,
 					})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{HideLabel: true},
 					})
 					@chart.Bar(chart.BarProps{

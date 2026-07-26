@@ -48,7 +48,7 @@ templ ChartAreaStep() {
 						TickFormatter: areaStepMonthShort,
 					})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{HideLabel: true},
 					})
 					@chart.Area(chart.AreaProps{

@@ -39,7 +39,7 @@ templ ChartPieDonut() {
 			@chart.Container(chart.ContainerProps{ID: "pie-donut", Config: chartPieDonutConfig, Class: "mx-auto aspect-square max-h-[250px]"}) {
 				@chart.PieChart() {
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{HideLabel: true},
 					})
 					@chart.Pie(chart.PieProps{

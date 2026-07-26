@@ -49,7 +49,7 @@ templ ChartLineLabel() {
 						TickFormatter: lineLabelMonthShort,
 					})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{Indicator: "line"},
 					})
 					@chart.Line(chart.LineProps{

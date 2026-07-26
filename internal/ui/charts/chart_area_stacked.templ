@@ -49,7 +49,7 @@ templ ChartAreaStacked() {
 						TickFormatter: areaStackedMonthShort,
 					})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{Indicator: "dot"},
 					})
 					@chart.Area(chart.AreaProps{

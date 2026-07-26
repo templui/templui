@@ -49,7 +49,7 @@ templ ChartLineDotsCustom() {
 						TickFormatter: lineDotsCustomMonthShort,
 					})
 					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  false,
+						Cursor:  chart.Bool(false),
 						Content: chart.TooltipContentProps{HideLabel: true},
 					})
 					@chart.Line(chart.LineProps{
