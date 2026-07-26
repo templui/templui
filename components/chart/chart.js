@@ -1085,7 +1085,7 @@ function initPanel(script) {
         wrapper.style.visibility = "hidden";
         return;
       }
-      positionTooltip(e, null, idx);
+      positionTooltip(e, null, null, idx);
       return;
     }
     const rect = panel.getBoundingClientRect();
@@ -1099,18 +1099,23 @@ function initPanel(script) {
     }
     showCursor(panel, m, state, i);
     showActiveDots(panel, m, state, i);
-    positionTooltip(e, state.geom ? state.geom.xs[i] : chartX, i);
+    // getActiveCoordinate: the category axis snaps to its tick and the
+    // other one follows the pointer, so a vertical layout snaps y.
+    const g = state.geom;
+    const snap = g ? g.cats[i] : null;
+    positionTooltip(e, g && g.vertical ? null : snap, g && g.vertical ? snap : null, i);
   });
 
-  function positionTooltip(e, snapX, i) {
+  function positionTooltip(e, snapX, snapY, i) {
     const wasHidden = wrapper.style.visibility !== "visible";
     wrapper.innerHTML = tooltipHTML(m, i);
     wrapper.style.visibility = "visible";
     const crect = container.getBoundingClientRect();
     const tw = wrapper.offsetWidth;
     const th = wrapper.offsetHeight;
-    const px = snapX != null ? snapX + (panel.getBoundingClientRect().left - crect.left) : e.clientX - crect.left;
-    const py = e.clientY - crect.top;
+    const prect = panel.getBoundingClientRect();
+    const px = snapX != null ? snapX + (prect.left - crect.left) : e.clientX - crect.left;
+    const py = snapY != null ? snapY + (prect.top - crect.top) : e.clientY - crect.top;
     let tx = px + OFFSET;
     if (tx + tw > crect.width) tx = px - tw - OFFSET;
     let ty = py + OFFSET;
