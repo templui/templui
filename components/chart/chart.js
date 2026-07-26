@@ -308,6 +308,14 @@ function curvePath(curve, xs, ys) {
   return naturalPath(xs, ys);
 }
 
+/* Recharts' Text verticalAnchor as an SVG dy: the anchor names where the
+ * text box sits relative to y. */
+function verticalAnchorDy(anchor) {
+  if (anchor === "start") return "0.71em";
+  if (anchor === "middle") return "0.355em";
+  return "0";
+}
+
 /* pathLength measures a path string like Recharts measures the rendered
  * curve for the line entrance (strokeDasharray animation). */
 let lengthPath = null;
@@ -639,10 +647,11 @@ function renderCartesian(panel, m, state, alpha = 1) {
       const s = m.series[si];
       const slot = m.stacked ? 0 : si;
       const tops = [];
-      // The label anchors follow the rectangle edges like Recharts, so a
-      // negative bar labels at the zero line, not at its tip.
-      const rectStart = [];
-      const rectEnd = [];
+      // Recharts' Bar geometry keeps the rectangle signed: the origin is
+      // the value end and the size runs back to the baseline, so negative
+      // bars carry a negative size. Label positions read those signs.
+      const rectPos = [];
+      const rectSize = [];
       svg += `<g class="recharts-layer recharts-bar"><g class="recharts-layer recharts-bar-rectangles">`;
       for (let i = 0; i < n; i++) {
         const raw = vals[si][i];
@@ -671,8 +680,11 @@ function renderCartesian(panel, m, state, alpha = 1) {
           d = roundedBarPath(x, y, barSize, Math.abs(b - a), s.radius);
         }
         tops.push(b);
-        rectStart.push(Math.min(a, b));
-        rectEnd.push(Math.max(a, b));
+        // Recharts anchors the rectangle at the value in the default
+        // layout and at the baseline in a vertical one, so the size keeps
+        // the sign of the value in both.
+        rectPos.push(vertical ? a : b);
+        rectSize.push(vertical ? b - a : a - b);
         svg += `<g class="recharts-layer recharts-bar-rectangle"><path ${attrs} d="${d}"/></g>`;
         if (m.stacked) stackBase[i] = to;
       }
@@ -685,21 +697,29 @@ function renderCartesian(panel, m, state, alpha = 1) {
           for (let i = 0; i < n; i++) {
             const catCenter = catStart + i * band + offsets[slot] + barSize / 2;
             const offset = ll.offset || 5;
-            let x, y, anchor;
+            // getAttrsOfCartesianLabel: the sign of the rectangle flips the
+            // offset and the anchor, so a negative bar labels below its end.
+            let x, y, anchor, vAnchor;
             if (vertical) {
+              const width = rectSize[i];
+              const sign = width >= 0 ? 1 : -1;
               y = catCenter;
-              anchor = "start";
-              x = ll.position === "right" ? rectEnd[i] + offset : rectStart[i] + offset;
+              vAnchor = "middle";
+              anchor = sign > 0 ? "start" : "end";
+              x = ll.position === "right" ? rectPos[i] + width + sign * offset : rectPos[i] + sign * offset;
             } else {
+              const height = rectSize[i];
+              const sign = height >= 0 ? 1 : -1;
               x = catCenter;
-              y = rectStart[i] - offset;
+              y = rectPos[i] - sign * offset;
               anchor = "middle";
+              vAnchor = sign > 0 ? "end" : "start";
             }
             const fo = ll.fillOpacity ? ` fill-opacity="${fmtF(ll.fillOpacity)}"` : "";
             // LabelList inherits the entry's presentation props, so a label
             // without its own class takes the bar's fill.
             const fill = ll.class ? "" : ` fill="${(s.cells && s.cells[i]) || s.color}"`;
-            svg += `<text x="${fmtF(x)}" y="${fmtF(y)}" class="recharts-text recharts-label ${ll.class || ""}" text-anchor="${anchor}" font-size="${fmtF(ll.fontSize || 12)}"${fill}${fo}><tspan dy="${vertical ? "0.355em" : "0"}">${ll.labels[i]}</tspan></text>`;
+            svg += `<text x="${fmtF(x)}" y="${fmtF(y)}" class="recharts-text recharts-label ${ll.class || ""}" text-anchor="${anchor}" font-size="${fmtF(ll.fontSize || 12)}"${fill}${fo}><tspan dy="${verticalAnchorDy(vAnchor)}">${ll.labels[i]}</tspan></text>`;
           }
           svg += `</g>`;
         }
