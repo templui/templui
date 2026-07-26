@@ -468,58 +468,48 @@ function animateChart(panel, m, state, render) {
   requestAnimationFrame(frame);
 }
 
-/* The Recharts update animation: on data changes the chart interpolates
- * every series value from the previous state to the new one (react-smooth
- * prop interpolation), domain included. */
-function morphChart(panel, m, state, render, prev) {
+/* The Recharts update animation: every graphical item interpolates its
+ * previous points into the new ones in pixel space, index mapped by
+ * prevPointsDiffFactor when the point count changed. */
+function morphChart(panel, m, state, render, prevPoints) {
   if (reducedMotion.matches) {
     render(1);
     return;
   }
   const duration = m.kind === "bar" ? 400 : 1500;
-  // When the point count changes the previous curve is resampled onto the
-  // new x positions, so the old shape transforms into the new one.
-  const resample = (vals, len) => {
-    if (vals.length === len) return vals;
-    const out = new Array(len);
-    for (let i = 0; i < len; i++) {
-      const pos = len === 1 ? 0 : (i / (len - 1)) * (vals.length - 1);
-      const lo = Math.floor(pos);
-      const hi = Math.min(vals.length - 1, lo + 1);
-      out[i] = vals[lo] + (vals[hi] - vals[lo]) * (pos - lo);
-    }
-    return out;
+  const paint = (t) => {
+    state.morph = t < 1 ? { prev: prevPoints, t } : null;
+    render(1);
   };
-  // Pixel-space interpolation on the final scale: the old values are
-  // rescaled into the new domain, so mid-frames never re-quantize the
-  // axis and the chart never re-scales at the end.
-  const dNew = domainOf(m);
-  const dOld = m.kind === "pie" ? 1 : domainOf(prev);
-  const scale = m.kind === "pie" ? 1 : dNew / dOld;
-  const from = m.series.map((s, si) => resample(prev.series[si].values, s.values.length).map((v) => v * scale));
-  const mix = (f) => ({
-    ...m,
-    domainMax: dNew,
-    series: m.series.map((s, si) => ({
-      ...s,
-      values: s.values.map((v, i) => from[si][i] + (v - from[si][i]) * f),
-    })),
-  });
-  const paint = (f) => {
-    if (m.kind === "pie") renderPie(panel, mix(f), state, 1);
-    else renderCartesian(panel, mix(f), state, 1);
-  };
-  // Like the entrance: the previous state paints synchronously, the
-  // clock starts on the first real frame.
+  // Like the entrance: the previous state paints synchronously, the clock
+  // starts on the first real frame.
   paint(0);
   let beginTime;
   const frame = (now) => {
     if (!beginTime) beginTime = now;
-    const f = cssEase(Math.min(1, (now - beginTime) / duration));
-    paint(f);
-    if (f < 1) requestAnimationFrame(frame);
+    const t = cssEase(Math.min(1, (now - beginTime) / duration));
+    paint(t);
+    if (t < 1) requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
+}
+
+/* interpolate of Recharts' DataUtils. */
+function interpolate(start, end, t) {
+  if (start == null) return end;
+  return start + (end - start) * t;
+}
+
+/* morphPoints maps a series' points onto the previous ones the way
+ * Recharts does: prevPointsDiffFactor picks the previous index. */
+function morphPoints(morph, si, coords, key) {
+  if (!morph || !morph.prev || !morph.prev[key] || !morph.prev[key][si]) return coords;
+  const prev = morph.prev[key][si];
+  const factor = prev.length / coords.length;
+  return coords.map((v, i) => {
+    const p = prev[Math.floor(i * factor)];
+    return p == null ? v : interpolate(p, v, morph.t);
+  });
 }
 
 function renderCartesian(panel, m, state, alpha = 1) {
@@ -628,6 +618,7 @@ function renderCartesian(panel, m, state, alpha = 1) {
 
   let xs = [];
   let band = 0;
+  state.points = { tops: [], a: [], b: [] };
   const vals = m.stackOffset === "expand" ? expandValues(m.series) : m.series.map((s) => s.values);
 
   if (m.kind === "bar") {
@@ -649,6 +640,8 @@ function renderCartesian(panel, m, state, alpha = 1) {
       const s = m.series[si];
       const slot = m.stacked ? 0 : si;
       const tops = [];
+      const rectA = [];
+      const rectB = [];
       // Recharts' Bar geometry keeps the rectangle signed: the origin is
       // the value end and the size runs back to the baseline, so negative
       // bars carry a negative size. Label positions read those signs.
@@ -665,6 +658,10 @@ function renderCartesian(panel, m, state, alpha = 1) {
         const end = valuePos(to);
         let a = base;
         let b = end;
+        if (state.morph) {
+          a = morphPoints(state.morph, si, [a], "a")[0];
+          b = morphPoints(state.morph, si, [b], "b")[0];
+        }
         if (alpha < 1) {
           if (vertical) {
             b = base + (end - base) * alpha;
@@ -701,6 +698,8 @@ function renderCartesian(panel, m, state, alpha = 1) {
         // the sign of the value in both.
         rectPos.push(vertical ? a : b);
         rectSize.push(vertical ? b - a : a - b);
+        rectA.push(a);
+        rectB.push(b);
         svg += `<g class="recharts-layer recharts-bar-rectangle"><path ${attrs} d="${d}"/></g>`;
         if (m.stacked) stackBase[i] = to;
       }
@@ -742,6 +741,8 @@ function renderCartesian(panel, m, state, alpha = 1) {
       }
       svg += "</g>";
       state.tops.push(tops);
+      state.points.a.push(rectA);
+      state.points.b.push(rectB);
     }
     xs = cats;
   } else if (m.kind === "line") {
@@ -749,7 +750,7 @@ function renderCartesian(panel, m, state, alpha = 1) {
     state.tops = [];
     for (let si = 0; si < m.series.length; si++) {
       const s = m.series[si];
-      const top = vals[si].map((v) => linearY(v, domainMax, plotY, plotH));
+      const top = morphPoints(state.morph, si, vals[si].map((v) => linearY(v - domainMin, domainMax - domainMin, plotY, plotH)), "tops");
       const d = curvePath(s.curve, xs, top);
       // The Recharts line entrance: strokeDasharray sweeps the measured
       // curve length from 0 to totalLength.
@@ -798,9 +799,14 @@ function renderCartesian(panel, m, state, alpha = 1) {
     state.tops = [];
     for (let si = 0; si < m.series.length; si++) {
       const s = m.series[si];
-      const top = m.stacked
-        ? base.map((b, i) => b - ((vals[si][i] / domainMax) * plotH || 0))
-        : vals[si].map((v) => linearY(v, domainMax, plotY, plotH));
+      const top = morphPoints(
+        state.morph,
+        si,
+        m.stacked
+          ? base.map((b, i) => b - ((vals[si][i] / (domainMax - domainMin)) * plotH || 0))
+          : vals[si].map((v) => linearY(v - domainMin, domainMax - domainMin, plotY, plotH)),
+        "tops"
+      );
       const fill = (s.fill || "").replace("url(#", `url(#${state.uid}-`) || s.color;
       const fillOpacity = s.fillOpacity || 0.6;
       const areaD = m.stacked ? areaPathBetween(s.curve, xs, top, base) : areaPathBetween(s.curve, xs, top, baseline);
@@ -848,6 +854,7 @@ function renderCartesian(panel, m, state, alpha = 1) {
 
   swapSVG(panel, svg);
 
+  state.points.tops = state.tops || [];
   state.geom = { W, H, plotX, plotY, plotW, plotH, plotBottom, band, xs, cats, n, vertical };
 }
 
@@ -1086,6 +1093,9 @@ function initPanel(script) {
   const render = (alpha = 1) => {
     if (m.kind === "pie") renderPie(panel, m, state, alpha);
     else renderCartesian(panel, m, state, alpha);
+    // The points this panel drew are what the next visible panel morphs
+    // from, Recharts' previousPointsRef.
+    if (state.points) container._tuiActivePoints = state.points;
   };
 
   // On mount the entrance animation plays. When a hidden panel becomes
@@ -1095,9 +1105,10 @@ function initPanel(script) {
   // re-render without animating.
   const enter = () => {
     const prev = container._tuiActive;
+    const prevPoints = container._tuiActivePoints;
     container._tuiActive = m;
-    if (prev && prev !== m && prev.kind === m.kind && prev.series.length === m.series.length) {
-      morphChart(panel, m, state, render, prev);
+    if (prev && prev !== m && prevPoints && prev.kind === m.kind && prev.series.length === m.series.length) {
+      morphChart(panel, m, state, render, prevPoints);
     } else {
       animateChart(panel, m, state, render);
     }
