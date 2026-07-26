@@ -346,6 +346,50 @@ type BarProps struct {
 	Radius  float64
 }
 
+// LineProps is the pendant of one Recharts Line.
+type LineProps struct {
+	DataKey     string
+	Type        CurveType
+	Stroke      string
+	StrokeWidth float64
+	// Dot draws the per point dots; nil is the demos' dot={false}.
+	Dot *DotProps
+	// ActiveDot sizes the hover dot, like Recharts' activeDot prop.
+	ActiveDot *ActiveDotProps
+}
+
+// DotProps is the pendant of Recharts' dot prop: the object form sets
+// radius and fill, DataFill is the custom dot reading payload.fill and
+// Icon is the custom dot rendering a component.
+type DotProps struct {
+	R        float64
+	Fill     string
+	DataFill bool
+	Icon     templ.Component
+	Size     float64 // icon box, like the custom dot's width/height
+}
+
+// ActiveDotProps is the pendant of Recharts' activeDot object.
+type ActiveDotProps struct {
+	R float64
+}
+
+// LabelListProps is the pendant of Recharts' LabelList.
+type LabelListProps struct {
+	Position  string // "top"
+	Offset    float64
+	FontSize  float64
+	Class     string
+	DataKey   string
+	Formatter func(any) string
+}
+
+// LineChartProps is the pendant of the Recharts LineChart root.
+type LineChartProps struct {
+	Data   []Datum
+	Margin *Margin
+}
+
 // PieProps is the pendant of one Recharts Pie.
 type PieProps struct {
 	Data        []Datum
@@ -405,8 +449,15 @@ type chartState struct {
 	defs        []LinearGradientProps
 	areas       []AreaProps
 	bars        []BarProps
+	lines       []*lineState
 	pie         *PieProps
 	label       *LabelProps
+}
+
+// lineState pairs a line with the LabelList its children registered.
+type lineState struct {
+	props     LineProps
+	labelList *LabelListProps
 }
 
 type ctxKey int
@@ -585,8 +636,8 @@ func BarChart(props ...BarChartProps) templ.Component {
 	})
 }
 
-// PieChart is the Recharts PieChart root.
-func PieChart(props ...PieChartProps) templ.Component {
+// LineChart is the Recharts LineChart root.
+func LineChart(props ...LineChartProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -607,7 +658,11 @@ func PieChart(props ...PieChartProps) templ.Component {
 			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		st := &chartState{kind: "pie"}
+		var p LineChartProps
+		if len(props) > 0 {
+			p = props[0]
+		}
+		st := &chartState{kind: "line", data: p.Data, margin: p.Margin}
 		ctx = context.WithValue(ctx, stateCtxKey, st)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div style=\"position:relative;width:100%;height:100%\">")
 		if templ_7745c5c3_Err != nil {
@@ -622,6 +677,50 @@ func PieChart(props ...PieChartProps) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// PieChart is the Recharts PieChart root.
+func PieChart(props ...PieChartProps) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var11 == nil {
+			templ_7745c5c3_Var11 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		st := &chartState{kind: "pie"}
+		ctx = context.WithValue(ctx, stateCtxKey, st)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div style=\"position:relative;width:100%;height:100%\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templ_7745c5c3_Var11.Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = chartOutput(st).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -647,9 +746,9 @@ func chartOutput(st *chartState) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var11 == nil {
-			templ_7745c5c3_Var11 = templ.NopComponent
+		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var12 == nil {
+			templ_7745c5c3_Var12 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		m := buildModel(ctx, st)
@@ -685,9 +784,9 @@ func CartesianGrid(props ...CartesianGridProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var12 == nil {
-			templ_7745c5c3_Var12 = templ.NopComponent
+		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var13 == nil {
+			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if st := stateFrom(ctx); st != nil {
@@ -714,9 +813,9 @@ func XAxis(props ...XAxisProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var13 == nil {
-			templ_7745c5c3_Var13 = templ.NopComponent
+		templ_7745c5c3_Var14 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var14 == nil {
+			templ_7745c5c3_Var14 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p XAxisProps
@@ -747,9 +846,9 @@ func YAxis(props ...YAxisProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var14 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var14 == nil {
-			templ_7745c5c3_Var14 = templ.NopComponent
+		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var15 == nil {
+			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p YAxisProps
@@ -780,9 +879,9 @@ func Tooltip(props ...TooltipProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var15 == nil {
-			templ_7745c5c3_Var15 = templ.NopComponent
+		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var16 == nil {
+			templ_7745c5c3_Var16 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p TooltipProps
@@ -813,9 +912,9 @@ func Legend() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var16 == nil {
-			templ_7745c5c3_Var16 = templ.NopComponent
+		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var17 == nil {
+			templ_7745c5c3_Var17 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if st := stateFrom(ctx); st != nil {
@@ -842,12 +941,12 @@ func Defs() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var17 == nil {
-			templ_7745c5c3_Var17 = templ.NopComponent
+		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var18 == nil {
+			templ_7745c5c3_Var18 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templ_7745c5c3_Var17.Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templ_7745c5c3_Var18.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -898,9 +997,9 @@ func Area(props ...AreaProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var18 == nil {
-			templ_7745c5c3_Var18 = templ.NopComponent
+		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var19 == nil {
+			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p AreaProps
@@ -931,9 +1030,9 @@ func Bar(props ...BarProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var19 == nil {
-			templ_7745c5c3_Var19 = templ.NopComponent
+		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var20 == nil {
+			templ_7745c5c3_Var20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p BarProps
@@ -942,6 +1041,76 @@ func Bar(props ...BarProps) templ.Component {
 		}
 		if st := stateFrom(ctx); st != nil {
 			st.bars = append(st.bars, p)
+		}
+		return nil
+	})
+}
+
+// Line registers one line series. The LabelList child attaches to it.
+func Line(props ...LineProps) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var21 == nil {
+			templ_7745c5c3_Var21 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		var p LineProps
+		if len(props) > 0 {
+			p = props[0]
+		}
+		if st := stateFrom(ctx); st != nil {
+			st.lines = append(st.lines, &lineState{props: p})
+		}
+		templ_7745c5c3_Err = templ_7745c5c3_Var21.Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// LabelList registers the value labels of its enclosing line.
+func LabelList(props ...LabelListProps) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var22 == nil {
+			templ_7745c5c3_Var22 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		var p LabelListProps
+		if len(props) > 0 {
+			p = props[0]
+		}
+		if st := stateFrom(ctx); st != nil && len(st.lines) > 0 {
+			st.lines[len(st.lines)-1].labelList = &p
 		}
 		return nil
 	})
@@ -964,9 +1133,9 @@ func Pie(props ...PieProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var20 == nil {
-			templ_7745c5c3_Var20 = templ.NopComponent
+		templ_7745c5c3_Var23 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var23 == nil {
+			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p PieProps
@@ -976,7 +1145,7 @@ func Pie(props ...PieProps) templ.Component {
 		if st := stateFrom(ctx); st != nil {
 			st.pie = &p
 		}
-		templ_7745c5c3_Err = templ_7745c5c3_Var20.Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templ_7745c5c3_Var23.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1001,9 +1170,9 @@ func Label(props ...LabelProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var21 == nil {
-			templ_7745c5c3_Var21 = templ.NopComponent
+		templ_7745c5c3_Var24 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var24 == nil {
+			templ_7745c5c3_Var24 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p LabelProps
@@ -1083,6 +1252,46 @@ func buildModel(ctx context.Context, st *chartState) Model {
 		for _, b := range st.bars {
 			s := modelSeries(config, b.DataKey, b.Fill, 0, st.data)
 			s.Radius = b.Radius
+			m.Series = append(m.Series, s)
+		}
+	} else if st.kind == "line" {
+		for _, l := range st.lines {
+			s := modelSeries(config, l.props.DataKey, "", 0, st.data)
+			s.Curve = string(l.props.Type)
+			s.Stroke = l.props.Stroke
+			s.StrokeWidth = l.props.StrokeWidth
+			if l.props.ActiveDot != nil {
+				s.ActiveDotR = l.props.ActiveDot.R
+			}
+			if d := l.props.Dot; d != nil {
+				dm := &DotModel{R: d.R, Fill: d.Fill, Size: d.Size}
+				if d.DataFill {
+					dm.Fills = make([]string, len(st.data))
+					for i, row := range st.data {
+						dm.Fills[i] = str(row["fill"])
+					}
+				}
+				if d.Icon != nil {
+					dm.Icon = renderHTML(ctx, d.Icon)
+				}
+				s.Dot = dm
+			}
+			if ll := l.labelList; ll != nil {
+				lm := &LabelListModel{Offset: ll.Offset, FontSize: ll.FontSize, Class: ll.Class}
+				key := ll.DataKey
+				if key == "" {
+					key = l.props.DataKey
+				}
+				lm.Labels = make([]string, len(st.data))
+				for i, row := range st.data {
+					if ll.Formatter != nil {
+						lm.Labels[i] = ll.Formatter(row[key])
+					} else {
+						lm.Labels[i] = str(row[key])
+					}
+				}
+				s.LabelList = lm
+			}
 			m.Series = append(m.Series, s)
 		}
 	} else {
@@ -1174,17 +1383,17 @@ func legendContent(series []ModelSeries) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var22 == nil {
-			templ_7745c5c3_Var22 = templ.NopComponent
+		templ_7745c5c3_Var25 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var25 == nil {
+			templ_7745c5c3_Var25 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"recharts-legend-wrapper\" style=\"position:absolute;left:0;right:0;bottom:5px\"><div class=\"flex items-center justify-center gap-4 pt-3\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"recharts-legend-wrapper\" style=\"position:absolute;left:0;right:0;bottom:5px\"><div class=\"flex items-center justify-center gap-4 pt-3\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for i := len(series) - 1; i >= 0; i-- {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1194,39 +1403,39 @@ func legendContent(series []ModelSeries) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"h-2 w-2 shrink-0 rounded-[2px]\" style=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"h-2 w-2 shrink-0 rounded-[2px]\" style=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var23 string
-				templ_7745c5c3_Var23, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + series[i].Color)
+				var templ_7745c5c3_Var26 string
+				templ_7745c5c3_Var26, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + series[i].Color)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 696, Col: 95}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 830, Col: 95}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\"></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\"></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			var templ_7745c5c3_Var24 string
-			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(series[i].Label)
+			var templ_7745c5c3_Var27 string
+			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(series[i].Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 698, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 832, Col: 22}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1277,16 +1486,37 @@ type Model struct {
 
 // ModelSeries is one data series with its resolved color variable.
 type ModelSeries struct {
-	Key         string    `json:"key"`
-	Label       string    `json:"label"`
-	Color       string    `json:"color"`
-	Values      []float64 `json:"values"`
-	FillOpacity float64   `json:"fillOpacity,omitempty"` // areas: 0 uses Recharts' 0.6
-	Curve       string    `json:"curve,omitempty"`       // "natural" (default), "linear", "step"
-	Icon        string    `json:"icon,omitempty"`        // rendered svg, replaces the tooltip indicator
-	Fill        string    `json:"fill,omitempty"`        // verbatim fill, e.g. url(#fillDesktop)
-	Stroke      string    `json:"stroke,omitempty"`      // verbatim stroke for the area line
-	Radius      float64   `json:"radius,omitempty"`      // bars: corner radius
+	Key         string          `json:"key"`
+	Label       string          `json:"label"`
+	Color       string          `json:"color"`
+	Values      []float64       `json:"values"`
+	FillOpacity float64         `json:"fillOpacity,omitempty"` // areas: 0 uses Recharts' 0.6
+	Curve       string          `json:"curve,omitempty"`       // "natural" (default), "linear", "step", "monotone"
+	Icon        string          `json:"icon,omitempty"`        // rendered svg, replaces the tooltip indicator
+	Fill        string          `json:"fill,omitempty"`        // verbatim fill, e.g. url(#fillDesktop)
+	Stroke      string          `json:"stroke,omitempty"`      // verbatim stroke for the area line
+	Radius      float64         `json:"radius,omitempty"`      // bars: corner radius
+	StrokeWidth float64         `json:"strokeWidth,omitempty"` // lines: stroke width
+	Dot         *DotModel       `json:"dot,omitempty"`         // lines: per point dots
+	ActiveDotR  float64         `json:"activeDotR,omitempty"`  // lines: hover dot radius
+	LabelList   *LabelListModel `json:"labelList,omitempty"`   // lines: value labels
+}
+
+// DotModel describes the per point dots of a line.
+type DotModel struct {
+	R     float64  `json:"r,omitempty"`
+	Fill  string   `json:"fill,omitempty"`
+	Fills []string `json:"fills,omitempty"` // per point fills from the data rows
+	Icon  string   `json:"icon,omitempty"`  // rendered svg replacing the dot
+	Size  float64  `json:"size,omitempty"`  // icon box size
+}
+
+// LabelListModel carries the precomputed labels of a LabelList.
+type LabelListModel struct {
+	Offset   float64  `json:"offset,omitempty"`
+	FontSize float64  `json:"fontSize,omitempty"`
+	Class    string   `json:"class,omitempty"`
+	Labels   []string `json:"labels"`
 }
 
 // TooltipModel mirrors ChartTooltipContent's props.

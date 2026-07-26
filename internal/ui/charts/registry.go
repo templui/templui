@@ -30,6 +30,26 @@ func Component(name string) templ.Component {
 		return ChartBarInteractive()
 	case "chart-bar-default":
 		return ChartBarDefault()
+	case "chart-line-interactive":
+		return ChartLineInteractive()
+	case "chart-line-default":
+		return ChartLineDefault()
+	case "chart-line-linear":
+		return ChartLineLinear()
+	case "chart-line-step":
+		return ChartLineStep()
+	case "chart-line-multiple":
+		return ChartLineMultiple()
+	case "chart-line-dots":
+		return ChartLineDots()
+	case "chart-line-dots-custom":
+		return ChartLineDotsCustom()
+	case "chart-line-dots-colors":
+		return ChartLineDotsColors()
+	case "chart-line-label":
+		return ChartLineLabel()
+	case "chart-line-label-custom":
+		return ChartLineLabelCustom()
 	case "chart-pie-donut":
 		return ChartPieDonut()
 	case "chart-pie-interactive":

@@ -207,6 +207,50 @@ type BarProps struct {
 	Radius  float64
 }
 
+// LineProps is the pendant of one Recharts Line.
+type LineProps struct {
+	DataKey     string
+	Type        CurveType
+	Stroke      string
+	StrokeWidth float64
+	// Dot draws the per point dots; nil is the demos' dot={false}.
+	Dot *DotProps
+	// ActiveDot sizes the hover dot, like Recharts' activeDot prop.
+	ActiveDot *ActiveDotProps
+}
+
+// DotProps is the pendant of Recharts' dot prop: the object form sets
+// radius and fill, DataFill is the custom dot reading payload.fill and
+// Icon is the custom dot rendering a component.
+type DotProps struct {
+	R        float64
+	Fill     string
+	DataFill bool
+	Icon     templ.Component
+	Size     float64 // icon box, like the custom dot's width/height
+}
+
+// ActiveDotProps is the pendant of Recharts' activeDot object.
+type ActiveDotProps struct {
+	R float64
+}
+
+// LabelListProps is the pendant of Recharts' LabelList.
+type LabelListProps struct {
+	Position  string // "top"
+	Offset    float64
+	FontSize  float64
+	Class     string
+	DataKey   string
+	Formatter func(any) string
+}
+
+// LineChartProps is the pendant of the Recharts LineChart root.
+type LineChartProps struct {
+	Data   []Datum
+	Margin *Margin
+}
+
 // PieProps is the pendant of one Recharts Pie.
 type PieProps struct {
 	Data        []Datum
@@ -266,8 +310,15 @@ type chartState struct {
 	defs        []LinearGradientProps
 	areas       []AreaProps
 	bars        []BarProps
+	lines       []*lineState
 	pie         *PieProps
 	label       *LabelProps
+}
+
+// lineState pairs a line with the LabelList its children registered.
+type lineState struct {
+	props     LineProps
+	labelList *LabelListProps
 }
 
 type ctxKey int
@@ -374,6 +425,22 @@ templ BarChart(props ...BarChartProps) {
 	}
 	{{
 	st := &chartState{kind: "bar", data: p.Data, margin: p.Margin}
+	ctx = context.WithValue(ctx, stateCtxKey, st)
+	}}
+	<div style="position:relative;width:100%;height:100%">
+		{ children... }
+		@chartOutput(st)
+	</div>
+}
+
+// LineChart is the Recharts LineChart root.
+templ LineChart(props ...LineChartProps) {
+	{{ var p LineChartProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{
+	st := &chartState{kind: "line", data: p.Data, margin: p.Margin}
 	ctx = context.WithValue(ctx, stateCtxKey, st)
 	}}
 	<div style="position:relative;width:100%;height:100%">
@@ -517,6 +584,33 @@ templ Bar(props ...BarProps) {
 	}}
 }
 
+// Line registers one line series. The LabelList child attaches to it.
+templ Line(props ...LineProps) {
+	{{ var p LineProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{
+	if st := stateFrom(ctx); st != nil {
+		st.lines = append(st.lines, &lineState{props: p})
+	}
+	}}
+	{ children... }
+}
+
+// LabelList registers the value labels of its enclosing line.
+templ LabelList(props ...LabelListProps) {
+	{{ var p LabelListProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{
+	if st := stateFrom(ctx); st != nil && len(st.lines) > 0 {
+		st.lines[len(st.lines)-1].labelList = &p
+	}
+	}}
+}
+
 // Pie registers the pie with its data and geometry.
 templ Pie(props ...PieProps) {
 	{{ var p PieProps }}
@@ -610,6 +704,46 @@ func buildModel(ctx context.Context, st *chartState) Model {
 		for _, b := range st.bars {
 			s := modelSeries(config, b.DataKey, b.Fill, 0, st.data)
 			s.Radius = b.Radius
+			m.Series = append(m.Series, s)
+		}
+	} else if st.kind == "line" {
+		for _, l := range st.lines {
+			s := modelSeries(config, l.props.DataKey, "", 0, st.data)
+			s.Curve = string(l.props.Type)
+			s.Stroke = l.props.Stroke
+			s.StrokeWidth = l.props.StrokeWidth
+			if l.props.ActiveDot != nil {
+				s.ActiveDotR = l.props.ActiveDot.R
+			}
+			if d := l.props.Dot; d != nil {
+				dm := &DotModel{R: d.R, Fill: d.Fill, Size: d.Size}
+				if d.DataFill {
+					dm.Fills = make([]string, len(st.data))
+					for i, row := range st.data {
+						dm.Fills[i] = str(row["fill"])
+					}
+				}
+				if d.Icon != nil {
+					dm.Icon = renderHTML(ctx, d.Icon)
+				}
+				s.Dot = dm
+			}
+			if ll := l.labelList; ll != nil {
+				lm := &LabelListModel{Offset: ll.Offset, FontSize: ll.FontSize, Class: ll.Class}
+				key := ll.DataKey
+				if key == "" {
+					key = l.props.DataKey
+				}
+				lm.Labels = make([]string, len(st.data))
+				for i, row := range st.data {
+					if ll.Formatter != nil {
+						lm.Labels[i] = ll.Formatter(row[key])
+					} else {
+						lm.Labels[i] = str(row[key])
+					}
+				}
+				s.LabelList = lm
+			}
 			m.Series = append(m.Series, s)
 		}
 	} else {
@@ -745,16 +879,37 @@ type Model struct {
 
 // ModelSeries is one data series with its resolved color variable.
 type ModelSeries struct {
-	Key         string    `json:"key"`
-	Label       string    `json:"label"`
-	Color       string    `json:"color"`
-	Values      []float64 `json:"values"`
-	FillOpacity float64   `json:"fillOpacity,omitempty"` // areas: 0 uses Recharts' 0.6
-	Curve       string    `json:"curve,omitempty"`       // "natural" (default), "linear", "step"
-	Icon        string    `json:"icon,omitempty"`        // rendered svg, replaces the tooltip indicator
-	Fill        string    `json:"fill,omitempty"`        // verbatim fill, e.g. url(#fillDesktop)
-	Stroke      string    `json:"stroke,omitempty"`      // verbatim stroke for the area line
-	Radius      float64   `json:"radius,omitempty"`      // bars: corner radius
+	Key         string          `json:"key"`
+	Label       string          `json:"label"`
+	Color       string          `json:"color"`
+	Values      []float64       `json:"values"`
+	FillOpacity float64         `json:"fillOpacity,omitempty"` // areas: 0 uses Recharts' 0.6
+	Curve       string          `json:"curve,omitempty"`       // "natural" (default), "linear", "step", "monotone"
+	Icon        string          `json:"icon,omitempty"`        // rendered svg, replaces the tooltip indicator
+	Fill        string          `json:"fill,omitempty"`        // verbatim fill, e.g. url(#fillDesktop)
+	Stroke      string          `json:"stroke,omitempty"`      // verbatim stroke for the area line
+	Radius      float64         `json:"radius,omitempty"`      // bars: corner radius
+	StrokeWidth float64         `json:"strokeWidth,omitempty"` // lines: stroke width
+	Dot         *DotModel       `json:"dot,omitempty"`         // lines: per point dots
+	ActiveDotR  float64         `json:"activeDotR,omitempty"`  // lines: hover dot radius
+	LabelList   *LabelListModel `json:"labelList,omitempty"`   // lines: value labels
+}
+
+// DotModel describes the per point dots of a line.
+type DotModel struct {
+	R     float64  `json:"r,omitempty"`
+	Fill  string   `json:"fill,omitempty"`
+	Fills []string `json:"fills,omitempty"` // per point fills from the data rows
+	Icon  string   `json:"icon,omitempty"`  // rendered svg replacing the dot
+	Size  float64  `json:"size,omitempty"`  // icon box size
+}
+
+// LabelListModel carries the precomputed labels of a LabelList.
+type LabelListModel struct {
+	Offset   float64  `json:"offset,omitempty"`
+	FontSize float64  `json:"fontSize,omitempty"`
+	Class    string   `json:"class,omitempty"`
+	Labels   []string `json:"labels"`
 }
 
 // TooltipModel mirrors ChartTooltipContent's props.

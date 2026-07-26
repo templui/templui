@@ -1,0 +1,73 @@
+package charts
+
+import (
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/components/icon"
+)
+
+// The pendant of chart-line-step.tsx.
+
+var chartLineStepData = []chart.Datum{
+	{"month": "January", "desktop": 186},
+	{"month": "February", "desktop": 305},
+	{"month": "March", "desktop": 237},
+	{"month": "April", "desktop": 73},
+	{"month": "May", "desktop": 209},
+	{"month": "June", "desktop": 214},
+}
+
+var chartLineStepConfig = chart.Config{
+	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
+}
+
+func lineStepMonthShort(v any) string {
+	return v.(string)[:3]
+}
+
+templ ChartLineStep() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Line Chart - Step
+			}
+			@card.Description() {
+				January - June 2024
+			}
+		}
+		@card.Content() {
+			@chart.Container(chart.ContainerProps{ID: "line-step", Config: chartLineStepConfig}) {
+				@chart.LineChart(chart.LineChartProps{
+					Data:   chartLineStepData,
+					Margin: &chart.Margin{Left: 12, Right: 12},
+				}) {
+					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+					@chart.XAxis(chart.XAxisProps{
+						DataKey:       "month",
+						TickMargin:    8,
+						TickFormatter: lineStepMonthShort,
+					})
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  false,
+						Content: chart.TooltipContentProps{HideLabel: true},
+					})
+					@chart.Line(chart.LineProps{
+						DataKey:     "desktop",
+						Type:        "step",
+						Stroke:      "var(--color-desktop)",
+						StrokeWidth: 2,
+					})
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col items-start gap-2 text-sm"}) {
+			<div class="flex gap-2 leading-none font-medium">
+				Trending up by 5.2% this month
+				@icon.TrendingUp(icon.Props{Class: "h-4 w-4"})
+			</div>
+			<div class="leading-none text-muted-foreground">
+				Showing total visitors for the last 6 months
+			</div>
+		}
+	}
+}

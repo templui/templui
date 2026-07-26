@@ -186,10 +186,59 @@ function stepPath(xs, ys) {
   return d;
 }
 
+/* d3-shape curveMonotoneX (Steffen 1990 monotone Hermite interpolation),
+ * Recharts' type="monotone". */
+function monotonePath(xs, ys) {
+  if (xs.length < 2) return "";
+  const sign = (x) => (x < 0 ? -1 : 1);
+  const slope3 = (x0, y0, x1, y1, x2, y2) => {
+    const h0 = x1 - x0;
+    const h1 = x2 - x1;
+    const s0 = (y1 - y0) / (h0 || (h1 < 0 && -0));
+    const s1 = (y2 - y1) / (h1 || (h0 < 0 && -0));
+    const p = (s0 * h1 + s1 * h0) / (h0 + h1);
+    return (sign(s0) + sign(s1)) * Math.min(Math.abs(s0), Math.abs(s1), 0.5 * Math.abs(p)) || 0;
+  };
+  const slope2 = (x0, y0, x1, y1, t) => {
+    const h = x1 - x0;
+    return h ? (3 * (y1 - y0) / h - t) / 2 : t;
+  };
+  const bezier = (x0, y0, x1, y1, t0, t1) => {
+    const dx = (x1 - x0) / 3;
+    return `C${fmtF(x0 + dx)},${fmtF(y0 + dx * t0)},${fmtF(x1 - dx)},${fmtF(y1 - dx * t1)},${fmtF(x1)},${fmtF(y1)}`;
+  };
+  let d = `M${fmtF(xs[0])},${fmtF(ys[0])}`;
+  let t0 = NaN;
+  for (let i = 1; i < xs.length; i++) {
+    let t1;
+    if (i < xs.length - 1) {
+      t1 = slope3(xs[i - 1], ys[i - 1], xs[i], ys[i], xs[i + 1], ys[i + 1]);
+    } else {
+      t1 = slope2(xs[i - 1], ys[i - 1], xs[i], ys[i], t0);
+    }
+    if (i === 1) t0 = slope2(xs[0], ys[0], xs[1], ys[1], t1);
+    d += bezier(xs[i - 1], ys[i - 1], xs[i], ys[i], t0, t1);
+    t0 = t1;
+  }
+  return d;
+}
+
 function curvePath(curve, xs, ys) {
   if (curve === "linear") return linearPath(xs, ys);
   if (curve === "step") return stepPath(xs, ys);
+  if (curve === "monotone") return monotonePath(xs, ys);
   return naturalPath(xs, ys);
+}
+
+/* pathLength measures a path string like Recharts measures the rendered
+ * curve for the line entrance (strokeDasharray animation). */
+let lengthPath = null;
+function pathLength(d) {
+  if (!lengthPath) {
+    lengthPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  }
+  lengthPath.setAttribute("d", d);
+  return lengthPath.getTotalLength();
 }
 
 function areaPathBetween(curve, xs, ysTop, ysBase) {
@@ -465,6 +514,50 @@ function renderCartesian(panel, m, state, alpha = 1) {
       svg += "</g></g>";
     }
     for (let i = 0; i < n; i++) xs.push(plotX + i * band + band / 2);
+  } else if (m.kind === "line") {
+    for (let i = 0; i < n; i++) xs.push(plotX + (i * plotW) / (n - 1));
+    state.tops = [];
+    for (let si = 0; si < m.series.length; si++) {
+      const s = m.series[si];
+      const top = vals[si].map((v) => linearY(v, domainMax, plotY, plotH));
+      const d = curvePath(s.curve, xs, top);
+      // The Recharts line entrance: strokeDasharray sweeps the measured
+      // curve length from 0 to totalLength.
+      let dash = "";
+      if (alpha < 1) {
+        const total = pathLength(d);
+        dash = ` stroke-dasharray="${fmtF(total * alpha)}px ${fmtF(total - total * alpha)}px"`;
+      }
+      svg +=
+        `<g class="recharts-layer recharts-line">` +
+        `<path class="recharts-curve recharts-line-curve" stroke="${s.stroke || s.color}" stroke-width="${s.strokeWidth || 1}" fill="none"${dash} d="${d}"/>`;
+      // Dots and labels appear when the entrance finished, like Recharts'
+      // isAnimationFinished gate on renderDots and LabelList.
+      if (alpha >= 1 && s.dot) {
+        svg += `<g class="recharts-layer recharts-line-dots">`;
+        for (let i = 0; i < n; i++) {
+          if (s.dot.icon) {
+            const size = s.dot.size || 24;
+            svg += `<g transform="translate(${fmtF(xs[i] - size / 2)},${fmtF(top[i] - size / 2)})">${s.dot.icon}</g>`;
+          } else {
+            const fill = (s.dot.fills && s.dot.fills[i]) || s.dot.fill || "#fff";
+            const stroke = (s.dot.fills && s.dot.fills[i]) || s.stroke || s.color;
+            svg += `<circle r="${fmtF(s.dot.r || 3)}" stroke="${stroke}" stroke-width="${s.strokeWidth || 1}" fill="${fill}" class="recharts-dot recharts-line-dot" cx="${fmtF(xs[i])}" cy="${fmtF(top[i])}"/>`;
+          }
+        }
+        svg += `</g>`;
+      }
+      if (alpha >= 1 && s.labelList) {
+        const ll = s.labelList;
+        svg += `<g class="recharts-layer recharts-label-list">`;
+        for (let i = 0; i < n; i++) {
+          svg += `<text x="${fmtF(xs[i])}" y="${fmtF(top[i] - (ll.offset || 5))}" class="recharts-text recharts-label ${ll.class || ""}" text-anchor="middle" font-size="${fmtF(ll.fontSize || 12)}"><tspan>${ll.labels[i]}</tspan></text>`;
+        }
+        svg += `</g>`;
+      }
+      svg += `</g>`;
+      state.tops.push(top);
+    }
   } else {
     for (let i = 0; i < n; i++) xs.push(plotX + (i * plotW) / (n - 1));
     // Recharts' entrance animation reveals areas left to right through a
@@ -656,7 +749,7 @@ function showCursor(panel, m, state, i) {
   const g = state.geom;
   // Recharts draws the cursor between the grid and the series, so bars
   // and areas render on top of the hover band.
-  const seriesLayer = svg.querySelector(".recharts-bar, .recharts-area");
+  const seriesLayer = svg.querySelector(".recharts-bar, .recharts-area, .recharts-line");
   if (m.kind === "bar") {
     const x = g.plotX + i * g.band;
     const d = `M ${fmtF(x)},${fmtF(g.plotY)} h ${fmtF(g.band)} v ${fmtF(g.plotH)} h ${fmtF(-g.band)} Z`;
@@ -692,7 +785,7 @@ function hideCursor(panel) {
 // active data point while the tooltip is up.
 function showActiveDots(panel, m, state, i) {
   const svg = panel.querySelector("svg.recharts-surface");
-  if (!svg || m.kind !== "area" || !state.tops) return;
+  if (!svg || (m.kind !== "area" && m.kind !== "line") || !state.tops) return;
   let layer = svg.querySelector(".recharts-active-dots");
   if (!layer) {
     svg.insertAdjacentHTML("beforeend", `<g class="recharts-layer recharts-active-dots"></g>`);
@@ -700,7 +793,8 @@ function showActiveDots(panel, m, state, i) {
   }
   let html = "";
   for (let s = 0; s < m.series.length; s++) {
-    html += `<circle class="recharts-dot" r="4" stroke="#fff" stroke-width="2" fill="${m.series[s].color}" cx="${fmtF(state.geom.xs[i])}" cy="${fmtF(state.tops[s][i])}"/>`;
+    const r = m.series[s].activeDotR || 4;
+    html += `<circle class="recharts-dot" r="${fmtF(r)}" stroke="#fff" stroke-width="2" fill="${m.series[s].color}" cx="${fmtF(state.geom.xs[i])}" cy="${fmtF(state.tops[s][i])}"/>`;
   }
   layer.innerHTML = html;
 }
@@ -838,8 +932,8 @@ function initPanel(script) {
   });
 }
 
-function init(root = document) {
-  root.querySelectorAll("script[data-tui-chart-model]").forEach(initPanel);
+function init() {
+  document.querySelectorAll("script[data-tui-chart-model]").forEach(initPanel);
 }
 
 /* Interactive demo wiring: selects and header buttons toggle the SSR
@@ -872,18 +966,19 @@ document.addEventListener("click", (e) => {
   });
 });
 
-init();
-document.addEventListener("DOMContentLoaded", () => init());
-
-// Framework agnostic swap handling: the observer picks up any charts
-// that arrive later, no matter what put them into the DOM.
-const observer = new MutationObserver((mutations) => {
-  for (const mu of mutations) {
-    if (mu.type === "childList") {
-      for (const node of mu.addedNodes) {
-        if (node.nodeType === 1) init(node);
-      }
+// Setup on load and on mutations, the templUI convention: init is
+// idempotent (every panel carries its own init flag), so any inserted
+// node just re-runs the full scan, no matter what put it into the DOM.
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
+new MutationObserver((mutations) => {
+  for (const m of mutations) {
+    if (m.addedNodes.length) {
+      init();
+      return;
     }
   }
-});
-observer.observe(document.body, { childList: true, subtree: true });
+}).observe(document.documentElement, { childList: true, subtree: true });

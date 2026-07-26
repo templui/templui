@@ -58,6 +58,19 @@ func chartsFor(chartType string) []modules.ChartEntry {
 			entry("chart-bar-interactive", true),
 			entry("chart-bar-default", false),
 		}
+	case "line":
+		return []modules.ChartEntry{
+			entry("chart-line-interactive", true),
+			entry("chart-line-default", false),
+			entry("chart-line-linear", false),
+			entry("chart-line-step", false),
+			entry("chart-line-multiple", false),
+			entry("chart-line-dots", false),
+			entry("chart-line-dots-custom", false),
+			entry("chart-line-dots-colors", false),
+			entry("chart-line-label", false),
+			entry("chart-line-label-custom", false),
+		}
 	case "pie":
 		return []modules.ChartEntry{
 			entry("chart-pie-donut", false),

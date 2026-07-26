@@ -1,0 +1,80 @@
+package charts
+
+import (
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/components/icon"
+)
+
+// The pendant of chart-line-multiple.tsx.
+
+var chartLineMultipleData = []chart.Datum{
+	{"month": "January", "desktop": 186, "mobile": 80},
+	{"month": "February", "desktop": 305, "mobile": 200},
+	{"month": "March", "desktop": 237, "mobile": 120},
+	{"month": "April", "desktop": 73, "mobile": 190},
+	{"month": "May", "desktop": 209, "mobile": 130},
+	{"month": "June", "desktop": 214, "mobile": 140},
+}
+
+var chartLineMultipleConfig = chart.Config{
+	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
+	{Key: "mobile", Label: "Mobile", Color: "var(--chart-2)"},
+}
+
+func lineMultipleMonthShort(v any) string {
+	return v.(string)[:3]
+}
+
+templ ChartLineMultiple() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Line Chart - Multiple
+			}
+			@card.Description() {
+				January - June 2024
+			}
+		}
+		@card.Content() {
+			@chart.Container(chart.ContainerProps{ID: "line-multiple", Config: chartLineMultipleConfig}) {
+				@chart.LineChart(chart.LineChartProps{
+					Data:   chartLineMultipleData,
+					Margin: &chart.Margin{Left: 12, Right: 12},
+				}) {
+					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: false})
+					@chart.XAxis(chart.XAxisProps{
+						DataKey:       "month",
+						TickMargin:    8,
+						TickFormatter: lineMultipleMonthShort,
+					})
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  false,
+						Content: chart.TooltipContentProps{HideLabel: true},
+					})
+					@chart.Line(chart.LineProps{
+						DataKey:     "desktop",
+						Type:        "monotone",
+						Stroke:      "var(--color-desktop)",
+						StrokeWidth: 2,
+					})
+					@chart.Line(chart.LineProps{
+						DataKey:     "mobile",
+						Type:        "monotone",
+						Stroke:      "var(--color-mobile)",
+						StrokeWidth: 2,
+					})
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col items-start gap-2 text-sm"}) {
+			<div class="flex gap-2 leading-none font-medium">
+				Trending up by 5.2% this month
+				@icon.TrendingUp(icon.Props{Class: "h-4 w-4"})
+			</div>
+			<div class="leading-none text-muted-foreground">
+				Showing total visitors for the last 6 months
+			</div>
+		}
+	}
+}
