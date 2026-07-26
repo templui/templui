@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"github.com/templui/templui/utils"
@@ -536,7 +537,7 @@ templ chartOutput(st *chartState) {
 	{{ m := buildModel(ctx, st) }}
 	@templ.Raw(ModelScript(m))
 	if st.legend {
-		@legendContent(legendSeries(configFrom(ctx), m.Series))
+		@legendContent(legendSeries(m.Series))
 	}
 }
 
@@ -1019,20 +1020,11 @@ func modelSeries(config Config, key, fill string, fillOpacity float64, data []Da
 	return ModelSeries{Key: key, Label: config.Label(key), Color: color, Values: values, FillOpacity: fillOpacity}
 }
 
-// legendSeries orders the drawn series like the chart config, the order
-// the legend entries appear in.
-func legendSeries(config Config, series []ModelSeries) []ModelSeries {
-	var out []ModelSeries
-	for _, c := range config {
-		for _, s := range series {
-			if s.Key == c.Key {
-				out = append(out, s)
-			}
-		}
-	}
-	if len(out) == 0 {
-		return series
-	}
+// legendSeries sorts the drawn series by their data key, Recharts'
+// itemSorter default of "value" on the Legend.
+func legendSeries(series []ModelSeries) []ModelSeries {
+	out := append([]ModelSeries(nil), series...)
+	sort.SliceStable(out, func(i, j int) bool { return out[i].Key < out[j].Key })
 	return out
 }
 

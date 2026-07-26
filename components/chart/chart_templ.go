@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"github.com/templui/templui/utils"
@@ -170,7 +171,7 @@ func Container(props ...ContainerProps) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(chartID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 106, Col: 22}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 107, Col: 22}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -827,7 +828,7 @@ func chartOutput(st *chartState) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if st.legend {
-			templ_7745c5c3_Err = legendContent(legendSeries(configFrom(ctx), m.Series)).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = legendContent(legendSeries(m.Series)).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1588,20 +1589,11 @@ func modelSeries(config Config, key, fill string, fillOpacity float64, data []Da
 	return ModelSeries{Key: key, Label: config.Label(key), Color: color, Values: values, FillOpacity: fillOpacity}
 }
 
-// legendSeries orders the drawn series like the chart config, the order
-// the legend entries appear in.
-func legendSeries(config Config, series []ModelSeries) []ModelSeries {
-	var out []ModelSeries
-	for _, c := range config {
-		for _, s := range series {
-			if s.Key == c.Key {
-				out = append(out, s)
-			}
-		}
-	}
-	if len(out) == 0 {
-		return series
-	}
+// legendSeries sorts the drawn series by their data key, Recharts'
+// itemSorter default of "value" on the Legend.
+func legendSeries(series []ModelSeries) []ModelSeries {
+	out := append([]ModelSeries(nil), series...)
+	sort.SliceStable(out, func(i, j int) bool { return out[i].Key < out[j].Key })
 	return out
 }
 
@@ -1650,7 +1642,7 @@ func legendContent(series []ModelSeries) templ.Component {
 				var templ_7745c5c3_Var27 string
 				templ_7745c5c3_Var27, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + s.Color)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1049, Col: 87}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1041, Col: 87}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 				if templ_7745c5c3_Err != nil {
@@ -1664,7 +1656,7 @@ func legendContent(series []ModelSeries) templ.Component {
 			var templ_7745c5c3_Var28 string
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(s.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1051, Col: 14}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1043, Col: 14}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 			if templ_7745c5c3_Err != nil {
