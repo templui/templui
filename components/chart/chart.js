@@ -528,11 +528,13 @@ function renderCartesian(panel, m, state, alpha = 1) {
   if (!W || !H) return;
 
   const vertical = m.layout === "vertical";
+  // selectChartOffsetInternal: the axes add to the margins, the legend box
+  // adds to the bottom, and the plot never goes negative.
   const yAxisW = m.yAxisWidth || 0;
   const plotX = m.marginLeft + yAxisW;
   const plotY = m.marginTop;
-  const plotW = W - m.marginLeft - m.marginRight - yAxisW;
-  const plotH = H - m.marginTop - m.marginBottom - (m.xAxisHeight || 0) - (m.legendHeight || 0);
+  const plotW = Math.max(W - m.marginLeft - m.marginRight - yAxisW, 0);
+  const plotH = Math.max(H - m.marginTop - m.marginBottom - (m.xAxisHeight || 0) - (m.legendHeight || 0), 0);
   const plotBottom = plotY + plotH;
   const n = m.labels.length;
 
@@ -657,8 +659,22 @@ function renderCartesian(panel, m, state, alpha = 1) {
         const raw = vals[si][i];
         const from = m.stacked ? stackBase[i] : 0;
         const to = m.stacked ? stackBase[i] + raw : raw;
-        const a = valuePos(from * alpha + (m.stacked ? 0 : 0));
-        const b = valuePos(m.stacked ? from + (to - from) * alpha : to * alpha);
+        // The final rectangle, then Recharts' entrance on top of it:
+        // horizontal grows the height from the baseline, vertical the width.
+        const base = valuePos(from);
+        const end = valuePos(to);
+        let a = base;
+        let b = end;
+        if (alpha < 1) {
+          if (vertical) {
+            b = base + (end - base) * alpha;
+          } else {
+            const size = base - end;
+            const h = size * alpha;
+            b = end + size - h;
+            a = b + h;
+          }
+        }
         const fill = (s.cells && s.cells[i]) || s.color;
         const active = s.activeIndex != null && s.activeIndex === i && s.activeBar;
         let attrs = `fill="${fill}"`;
@@ -777,9 +793,6 @@ function renderCartesian(panel, m, state, alpha = 1) {
     xs = cats;
     // Recharts' entrance animation reveals areas left to right through a
     // clipPath rect (AreaRevealShape).
-    svg +=
-      `<defs><clipPath id="${state.uid}-reveal"><rect x="${fmtF(xs[0] - 1)}" y="0" width="${fmtF((xs[n - 1] - xs[0] + 2) * alpha)}" height="${fmtF(plotBottom + 2)}"/></clipPath></defs>` +
-      `<g clip-path="url(#${state.uid}-reveal)">`;
     const baseline = new Array(n).fill(plotBottom);
     let base = baseline;
     state.tops = [];
@@ -791,15 +804,26 @@ function renderCartesian(panel, m, state, alpha = 1) {
       const fill = (s.fill || "").replace("url(#", `url(#${state.uid}-`) || s.color;
       const fillOpacity = s.fillOpacity || 0.6;
       const areaD = m.stacked ? areaPathBetween(s.curve, xs, top, base) : areaPathBetween(s.curve, xs, top, baseline);
+      // HorizontalRect: the reveal spans the point range and reaches the
+      // lowest painted y plus the stroke width.
+      let clip = "";
+      let clipOpen = "";
+      if (alpha < 1) {
+        const width = alpha * Math.abs(xs[0] - xs[n - 1]);
+        const maxY = Math.max(...top, ...(m.stacked ? base : baseline));
+        const id = `${state.uid}-reveal-${si}`;
+        clip = `<defs><clipPath id="${id}"><rect x="${fmtF(xs[0] < xs[n - 1] ? xs[0] : xs[0] - width)}" y="0" width="${fmtF(width)}" height="${fmtF(Math.floor(maxY + 1))}"/></clipPath></defs>`;
+        clipOpen = ` clip-path="url(#${id})"`;
+      }
       svg +=
-        `<g class="recharts-layer recharts-area">` +
+        clip +
+        `<g class="recharts-layer recharts-area"${clipOpen}>` +
         `<path class="recharts-curve recharts-area-area" fill="${fill}" fill-opacity="${fillOpacity}" stroke="none" d="${areaD}"/>` +
         `<path class="recharts-curve recharts-area-curve" stroke="${s.stroke || s.color}" fill="none" stroke-width="1" d="${curvePath(s.curve, xs, top)}"/>` +
         `</g>`;
       state.tops.push(top);
       if (m.stacked) base = top;
     }
-    svg += "</g>";
   }
 
   // The x axis only renders when the chart declared a visible one.
@@ -865,12 +889,12 @@ function renderPie(panel, m, state, alpha = 1) {
 
   let svg = `<svg class="recharts-surface" width="${fmtF(W)}" height="${fmtF(H)}" viewBox="0 0 ${fmtF(W)} ${fmtF(H)}">`;
   svg += `<g class="recharts-layer recharts-pie">`;
+  // The Recharts Pie entrance: every sector interpolates its own angle
+  // and they chain, so the whole pie opens up instead of drawing sector
+  // by sector.
   let angle = 0;
-  const visible = alpha * 360;
   for (let i = 0; i < values.length; i++) {
-    const sweep = (values[i] / total) * 360;
-    const shown = Math.max(0, Math.min(sweep, visible - angle));
-    if (shown <= 0) break;
+    const shown = (values[i] / total) * 360 * alpha;
     const fill = m.sliceColors[i];
     if (i === m.activeIndex && m.activeRing) {
       svg +=
@@ -881,7 +905,7 @@ function renderPie(panel, m, state, alpha = 1) {
     } else {
       svg += `<g class="recharts-layer recharts-pie-sector"><path class="recharts-sector" stroke="#fff"${strokeWidth} fill="${fill}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, (m.innerRadius || 0), outerR, angle, angle + shown)}"/></g>`;
     }
-    angle += sweep;
+    angle += shown;
   }
   if (m.centerValue) {
     svg +=
@@ -1016,8 +1040,12 @@ function showActiveDots(panel, m, state, i) {
   }
   let html = "";
   for (let s = 0; s < m.series.length; s++) {
-    const r = m.series[s].activeDotR || 4;
-    html += `<circle class="recharts-dot" r="${fmtF(r)}" stroke="#fff" stroke-width="2" fill="${m.series[s].color}" cx="${fmtF(state.geom.xs[i])}" cy="${fmtF(state.tops[s][i])}"/>`;
+    // renderActivePoint's defaults: r 4, white stroke of 2, filled with the
+    // item's main color, which is its stroke.
+    const series = m.series[s];
+    const r = series.activeDotR || 4;
+    const mainColor = series.stroke || series.color || "none";
+    html += `<circle class="recharts-dot" r="${fmtF(r)}" stroke="#fff" stroke-width="2" fill="${mainColor}" cx="${fmtF(state.geom.xs[i])}" cy="${fmtF(state.tops[s][i])}"/>`;
   }
   layer.innerHTML = html;
 }
@@ -1032,6 +1060,19 @@ function hideActiveDots(panel) {
 /* ---------------------------------------------------------------- */
 
 const OFFSET = 10;
+
+/* getTooltipTranslateXY: the tooltip sits after the coordinate, and flips
+ * before it once it would leave the view box, clamped to the view box. */
+function tooltipTranslate(coordinate, tooltipDimension, viewBoxKey, viewBoxDimension) {
+  const negative = coordinate - tooltipDimension - (OFFSET > 0 ? OFFSET : 0);
+  const positive = coordinate + OFFSET;
+  const tooltipBoundary = positive + tooltipDimension;
+  const viewBoxBoundary = viewBoxKey + viewBoxDimension;
+  if (tooltipBoundary > viewBoxBoundary) {
+    return Math.max(negative, viewBoxKey);
+  }
+  return Math.max(positive, viewBoxKey);
+}
 
 function initPanel(script) {
   if (script.dataset.tuiChartInit) return;
@@ -1140,10 +1181,8 @@ function initPanel(script) {
     const prect = panel.getBoundingClientRect();
     const px = snapX != null ? snapX + (prect.left - crect.left) : e.clientX - crect.left;
     const py = snapY != null ? snapY + (prect.top - crect.top) : e.clientY - crect.top;
-    let tx = px + OFFSET;
-    if (tx + tw > crect.width) tx = px - tw - OFFSET;
-    let ty = py + OFFSET;
-    if (ty + th > crect.height) ty = py - th - OFFSET;
+    const tx = tooltipTranslate(px, tw, 0, crect.width);
+    const ty = tooltipTranslate(py, th, 0, crect.height);
     if (wasHidden) {
       // Appear in place like Recharts, the transition only trails while
       // the tooltip is already visible.
