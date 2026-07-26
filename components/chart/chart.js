@@ -913,7 +913,7 @@ function tooltipHTML(m, i) {
     const color = (m.sliceColors && m.sliceColors[i]) || s.color;
     html +=
       `<div class="flex w-full flex-wrap items-stretch gap-2 items-center [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground">` +
-      indicatorHTML(t.indicator, color) +
+      (t.hideIndicator ? "" : indicatorHTML(t.indicator, color)) +
       `<div class="flex flex-1 justify-between leading-none items-center">` +
       `<div class="grid gap-1.5"><span class="text-muted-foreground">${m.labels[i]}</span></div>` +
       `<span class="font-mono font-medium text-foreground tabular-nums">${s.values[i].toLocaleString("en-US")}</span>` +
@@ -925,9 +925,12 @@ function tooltipHTML(m, i) {
       "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground" +
       (t.indicator !== "line" && t.indicator !== "dashed" ? " items-center" : "");
     const nested = nestLabel && !t.hideLabel ? `<div class="font-medium">${label}</div>` : "";
+    // ChartTooltipContent's indicatorColor: the row's own fill wins over
+    // the series color, so per row colored bars keep their swatch.
+    const indicatorColor = (s.cells && s.cells[i]) || s.color;
     html +=
       `<div class="${rowCls}">` +
-      (s.icon || indicatorHTML(t.indicator, s.color)) +
+      (t.hideIndicator ? "" : s.icon || indicatorHTML(t.indicator, indicatorColor)) +
       `<div class="flex flex-1 justify-between leading-none ${nestLabel ? "items-end" : "items-center"}">` +
       `<div class="grid gap-1.5">${nested}<span class="text-muted-foreground">${s.label}</span></div>` +
       `<span class="font-mono font-medium text-foreground tabular-nums">${s.values[i].toLocaleString("en-US")}</span>` +
