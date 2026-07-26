@@ -7,7 +7,59 @@ description: Displays a menu located at the pointer, triggered by a right click 
 
 ## Installation
 
-<Installation name="contextmenu" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add contextmenu
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @contextmenu.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="contextmenu" title="components/contextmenu/contextmenu.templ" />
+
+<ComponentSource name="contextmenu" title="components/contextmenu/contextmenu.js" />
+
+<ComponentSource name="contextmenu" title="components/floatingui/floating_ui_core.js" />
+
+<ComponentSource name="contextmenu" title="components/floatingui/floating_ui_dom.js" />
+
+Copy `contextmenu.min.js` as well, or minify `contextmenu.js` yourself. `contextmenu.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @contextmenu.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Usage
 

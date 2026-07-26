@@ -7,7 +7,53 @@ description: Displays a form input field or a component that looks like an input
 
 ## Installation
 
-<Installation name="input" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add input
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @input.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="input" title="components/input/input.templ" />
+
+Copy `input.min.js` as well, or minify `input.js` yourself. `input.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @input.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Usage
 

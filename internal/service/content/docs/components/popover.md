@@ -7,7 +7,59 @@ description: Displays rich content in a portal, triggered by a button.
 
 ## Installation
 
-<Installation name="popover" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add popover
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @popover.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="popover" title="components/popover/popover.templ" />
+
+<ComponentSource name="popover" title="components/popover/popover.js" />
+
+<ComponentSource name="popover" title="components/floatingui/floating_ui_core.js" />
+
+<ComponentSource name="popover" title="components/floatingui/floating_ui_dom.js" />
+
+Copy `popover.min.js` as well, or minify `popover.js` yourself. `popover.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @popover.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Usage
 

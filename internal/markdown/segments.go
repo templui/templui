@@ -2,6 +2,7 @@ package markdown
 
 import (
 	"bytes"
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -11,19 +12,35 @@ import (
 )
 
 // Segment is one slice of a component doc page: either rendered markdown
-// HTML or a shortcode (ComponentPreview, ComponentSource, Installation) the
-// page template resolves against the examples registry.
+// HTML or a shortcode (ComponentPreview, ComponentSource, CodeTabs, ...)
+// the page template resolves.
 type Segment struct {
 	HTML      string
 	Shortcode string
 	Attrs     map[string]string
+	// Tabs carries the parsed CodeTabs structure.
+	Tabs []SegmentTab
+	// ID is a page unique id for shortcodes that need one (CodeTabs).
+	ID string
+}
+
+// SegmentTab is one tab of a CodeTabs block with its own segments.
+type SegmentTab struct {
+	Value    string
+	Label    string
+	Segments []Segment
 }
 
 // Shortcode tags mirror shadcn's mdx components, so their docs sources can
-// be adopted nearly verbatim. Callout carries inner markdown, Steps wraps
-// the segments between its tags and Step is a numbered heading; the others
-// are self closing.
-var shortcodeRe = regexp.MustCompile(`(?ms)^(?:<(ComponentPreview|ComponentSource|Installation)\b(.*?)/>|<(Callout)\b([^>\n]*)>(.*?)</Callout>|<(Steps)([^>\n]*)>|(</Steps>)|<(Step)>(.*?)</Step>)\s*$`)
+// be adopted nearly verbatim. Callout and CodeTabs carry inner markdown,
+// Steps wraps the segments between its tags and Step is a numbered
+// heading; the others are self closing.
+var shortcodeRe = regexp.MustCompile(`(?ms)^(?:<(ComponentPreview|ComponentSource)\b(.*?)/>|<(Callout)\b([^>\n]*)>(.*?)</Callout>|<(Steps)([^>\n]*)>|(</Steps>)|<(Step)>(.*?)</Step>|<(CodeTabs)>(.*?)</CodeTabs>)\s*$`)
+
+var (
+	tabsTriggerRe = regexp.MustCompile(`(?s)<TabsTrigger value="([^"]+)">\s*(.*?)\s*</TabsTrigger>`)
+	tabsContentRe = regexp.MustCompile(`(?s)<TabsContent value="([^"]+)">\n(.*?)\n</TabsContent>`)
+)
 
 // attrRe matches key="value" pairs and bare boolean attributes (hideCode).
 var attrRe = regexp.MustCompile(`([a-zA-Z-]+)(?:="([^"]*)")?`)
@@ -54,13 +71,22 @@ func (p *Parser) ParseSegments(source []byte) ([]Segment, map[string]any, []modu
 	}
 	toc := p.ExtractTableOfContents(shortcodeRe.ReplaceAll(source, nil))
 
-	var segments []Segment
-	last := 0
-	matches := shortcodeRe.FindAllSubmatchIndex(source, -1)
 	// One shared context so goldmark's auto heading ids deduplicate across
 	// the chunk conversions exactly like in the TOC's single pass (three
 	// "Fieldset" headings become fieldset, fieldset-1, fieldset-2).
 	idContext := parser.NewContext()
+	counter := 0
+	segments, err := p.parseChunks(stripFrontmatter(source), idContext, &counter)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return segments, meta, toc, nil
+}
+
+// parseChunks splits a source slice into markdown and shortcode segments.
+// CodeTabs bodies recurse through the same function.
+func (p *Parser) parseChunks(source []byte, idContext parser.Context, counter *int) ([]Segment, error) {
+	var segments []Segment
 	flush := func(chunk []byte) error {
 		if len(bytes.TrimSpace(chunk)) == 0 {
 			return nil
@@ -72,21 +98,16 @@ func (p *Parser) ParseSegments(source []byte) ([]Segment, map[string]any, []modu
 		segments = append(segments, Segment{HTML: buf.String()})
 		return nil
 	}
-	for i, m := range matches {
-		chunk := source[last:m[0]]
-		// Frontmatter only parses at the very start; strip it from the first
-		// chunk manually so it never renders as a table/thematic break.
-		if i == 0 {
-			chunk = stripFrontmatter(chunk)
-		}
-		if err := flush(chunk); err != nil {
-			return nil, nil, nil, err
+	last := 0
+	for _, m := range shortcodeRe.FindAllSubmatchIndex(source, -1) {
+		if err := flush(source[last:m[0]]); err != nil {
+			return nil, err
 		}
 		switch {
 		case m[6] != -1: // Callout with attrs and inner markdown
 			var buf bytes.Buffer
 			if err := p.md.Convert(source[m[10]:m[11]], &buf, parser.WithContext(idContext)); err != nil {
-				return nil, nil, nil, err
+				return nil, err
 			}
 			segments = append(segments, Segment{Shortcode: "Callout", Attrs: parseAttrs(string(source[m[8]:m[9]])), HTML: buf.String()})
 		case m[12] != -1: // Steps opening tag
@@ -96,11 +117,17 @@ func (p *Parser) ParseSegments(source []byte) ([]Segment, map[string]any, []modu
 		case m[18] != -1: // Step heading with inline markdown
 			var buf bytes.Buffer
 			if err := p.md.Convert(source[m[20]:m[21]], &buf, parser.WithContext(idContext)); err != nil {
-				return nil, nil, nil, err
+				return nil, err
 			}
 			title := strings.TrimSpace(buf.String())
 			title = strings.TrimSuffix(strings.TrimPrefix(title, "<p>"), "</p>")
 			segments = append(segments, Segment{Shortcode: "Step", HTML: title})
+		case m[22] != -1: // CodeTabs with nested tab contents
+			seg, err := p.parseCodeTabs(source[m[24]:m[25]], idContext, counter)
+			if err != nil {
+				return nil, err
+			}
+			segments = append(segments, seg)
 		default:
 			segments = append(segments, Segment{
 				Shortcode: string(source[m[2]:m[3]]),
@@ -109,14 +136,34 @@ func (p *Parser) ParseSegments(source []byte) ([]Segment, map[string]any, []modu
 		}
 		last = m[1]
 	}
-	tail := source[last:]
-	if len(matches) == 0 {
-		tail = stripFrontmatter(tail)
+	if err := flush(source[last:]); err != nil {
+		return nil, err
 	}
-	if err := flush(tail); err != nil {
-		return nil, nil, nil, err
+	return segments, nil
+}
+
+// parseCodeTabs parses the body of a CodeTabs block: the trigger labels
+// from TabsList and one recursive segment list per TabsContent.
+func (p *Parser) parseCodeTabs(body []byte, idContext parser.Context, counter *int) (Segment, error) {
+	labels := map[string]string{}
+	for _, m := range tabsTriggerRe.FindAllSubmatch(body, -1) {
+		labels[string(m[1])] = string(m[2])
 	}
-	return segments, meta, toc, nil
+	var tabs []SegmentTab
+	for _, m := range tabsContentRe.FindAllSubmatch(body, -1) {
+		value := string(m[1])
+		segs, err := p.parseChunks(m[2], idContext, counter)
+		if err != nil {
+			return Segment{}, err
+		}
+		label := labels[value]
+		if label == "" {
+			label = value
+		}
+		tabs = append(tabs, SegmentTab{Value: value, Label: label, Segments: segs})
+	}
+	*counter++
+	return Segment{Shortcode: "CodeTabs", Tabs: tabs, ID: fmt.Sprintf("codetabs-%d", *counter)}, nil
 }
 
 var frontmatterRe = regexp.MustCompile(`(?s)\A---\n.*?\n---\n`)

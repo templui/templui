@@ -7,7 +7,55 @@ description: An image element with a fallback for representing the user.
 
 ## Installation
 
-<Installation name="avatar" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add avatar
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @avatar.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="avatar" title="components/avatar/avatar.templ" />
+
+<ComponentSource name="avatar" title="components/avatar/avatar.js" />
+
+Copy `avatar.min.js` as well, or minify `avatar.js` yourself. `avatar.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @avatar.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Usage
 

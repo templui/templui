@@ -7,7 +7,55 @@ description: A set of layered sections of content—known as tab panels—that a
 
 ## Installation
 
-<Installation name="tabs" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add tabs
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @tabs.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="tabs" title="components/tabs/tabs.templ" />
+
+<ComponentSource name="tabs" title="components/tabs/tabs.js" />
+
+Copy `tabs.min.js` as well, or minify `tabs.js` yourself. `tabs.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @tabs.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Usage
 

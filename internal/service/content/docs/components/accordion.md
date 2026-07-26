@@ -7,7 +7,55 @@ description: A vertically stacked set of interactive headings that each reveal a
 
 ## Installation
 
-<Installation name="accordion" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add accordion
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @accordion.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="accordion" title="components/accordion/accordion.templ" />
+
+<ComponentSource name="accordion" title="components/accordion/accordion.js" />
+
+Copy `accordion.min.js` as well, or minify `accordion.js` yourself. `accordion.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @accordion.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Usage
 

@@ -7,7 +7,59 @@ description: For sighted users to preview content available behind a link.
 
 ## Installation
 
-<Installation name="hovercard" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add hovercard
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @hovercard.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="hovercard" title="components/hovercard/hovercard.templ" />
+
+<ComponentSource name="hovercard" title="components/hovercard/hovercard.js" />
+
+<ComponentSource name="hovercard" title="components/floatingui/floating_ui_core.js" />
+
+<ComponentSource name="hovercard" title="components/floatingui/floating_ui_dom.js" />
+
+Copy `hovercard.min.js` as well, or minify `hovercard.js` yourself. `hovercard.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @hovercard.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Usage
 

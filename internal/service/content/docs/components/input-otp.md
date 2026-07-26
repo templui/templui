@@ -11,7 +11,55 @@ The `InputOTP` component is a native templ and vanilla JavaScript implementation
 
 ## Installation
 
-<Installation name="inputotp" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add inputotp
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @inputotp.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="inputotp" title="components/inputotp/inputotp.templ" />
+
+<ComponentSource name="inputotp" title="components/inputotp/inputotp.js" />
+
+Copy `inputotp.min.js` as well, or minify `inputotp.js` yourself. `inputotp.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @inputotp.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Usage
 

@@ -7,7 +7,59 @@ description: A popup that displays information related to an element when the el
 
 ## Installation
 
-<Installation name="tooltip" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add tooltip
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @tooltip.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="tooltip" title="components/tooltip/tooltip.templ" />
+
+<ComponentSource name="tooltip" title="components/tooltip/tooltip.js" />
+
+<ComponentSource name="tooltip" title="components/floatingui/floating_ui_core.js" />
+
+<ComponentSource name="tooltip" title="components/floatingui/floating_ui_dom.js" />
+
+Copy `tooltip.min.js` as well, or minify `tooltip.js` yourself. `tooltip.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @tooltip.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Usage
 

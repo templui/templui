@@ -17,7 +17,7 @@ We use a small client runtime under the hood that draws Recharts compatible SVG 
 
 We designed the chart component with composition in mind. **You build your charts using chart components and only bring in custom components, such as the tooltip, when and where you need it**.
 
-```templ showLineNumbers
+```templ showLineNumbers /chart.Container/ /chart.Tooltip/
 import "github.com/templui/templui/components/chart"
 
 templ MyChart() {
@@ -38,7 +38,77 @@ The runtime watches the DOM, so charts arriving through htmx or Datastar swaps r
 
 ## Installation
 
-<Installation name="chart" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add chart
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @chart.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="chart" title="components/chart/chart.templ" />
+
+<ComponentSource name="chart" title="components/chart/chart.js" />
+
+<Step>Add the following colors to your CSS file</Step>
+
+```css title="assets/css/input.css" showLineNumbers
+@layer base {
+  :root {
+    --chart-1: oklch(0.646 0.222 41.116);
+    --chart-2: oklch(0.6 0.118 184.704);
+    --chart-3: oklch(0.398 0.07 227.392);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.769 0.188 70.08);
+  }
+
+  .dark {
+    --chart-1: oklch(0.488 0.243 264.376);
+    --chart-2: oklch(0.696 0.17 162.48);
+    --chart-3: oklch(0.769 0.188 70.08);
+    --chart-4: oklch(0.627 0.265 303.9);
+    --chart-5: oklch(0.645 0.246 16.439);
+  }
+}
+```
+
+Copy `chart.min.js` as well, or minify `chart.js` yourself. `chart.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @chart.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Your First Chart
 
@@ -225,7 +295,7 @@ It is intentionally decoupled from chart data.
 
 This allows you to share config and color tokens between charts. It can also work independently for cases where your data or color tokens live remotely or in a different format.
 
-```go showLineNumbers
+```go showLineNumbers /chart.Config/
 import "github.com/templui/templui/components/icon"
 
 var chartConfig = chart.Config{
@@ -351,7 +421,7 @@ Chart comes with the `Tooltip` component and its `TooltipContentProps`, the pend
 
 To use a custom key for the tooltip names, use the `NameKey` prop.
 
-```go showLineNumbers
+```go showLineNumbers /views/
 var chartData = []chart.Datum{
 	{"date": "2024-06-29", "views": 103},
 	{"date": "2024-06-30", "views": 446},

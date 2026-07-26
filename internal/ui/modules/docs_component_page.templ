@@ -9,7 +9,6 @@ import (
 	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/dropdownmenu"
 	"github.com/templui/templui/components/icon"
-	"github.com/templui/templui/components/tabs"
 	"github.com/templui/templui/internal/ctxkeys"
 	"github.com/templui/templui/internal/registry"
 	"github.com/templui/templui/internal/ui/examples"
@@ -54,18 +53,21 @@ templ ComponentPreviewBlock(entry examples.RegistryEntry, attrs map[string]strin
 	</div>
 }
 
-// ComponentSourceBlock is shadcn's ComponentSource: the component's source
-// files (templ, and the js for scripted components) as collapsible code
-// figures titled with their file path.
-templ ComponentSourceBlock(name string) {
+// ComponentSourceBlock is shadcn's ComponentSource: one source file as a
+// collapsible code figure. The hand written title picks the file, like
+// shadcn's title attribute; without a title every file of the component
+// renders (the fallback for pages that predate per file tags).
+templ ComponentSourceBlock(name, title string) {
 	for _, file := range componentSourceFiles(name) {
-		@CodeCollapsibleWrapper() {
-			@CodeFigure(CodeFigureProps{
-				Language:        sourceLanguage(file),
-				Title:           file,
-				ShowLineNumbers: true,
-				Code:            componentSourceCode(file),
-			})
+		if title == "" || title == file {
+			@CodeCollapsibleWrapper() {
+				@CodeFigure(CodeFigureProps{
+					Language:        sourceLanguage(file),
+					Title:           file,
+					ShowLineNumbers: true,
+					Code:            componentSourceCode(file),
+				})
+			}
 		}
 	}
 }
@@ -184,56 +186,10 @@ func sourcePreviewLines(file string, maxLines int) string {
 	return strings.Join(lines, "\n")
 }
 
-// installTabTriggerClass restyles our tabs trigger to shadcn's docs mdx
+// InstallTabTriggerClass restyles our tabs trigger to shadcn's docs mdx
 // TabsTrigger (default variant, underline via border-b-2; the list height
 // clamps the trigger so the underline sits tight under the text).
-const installTabTriggerClass = "rounded-none border-0 border-b-2 border-transparent bg-transparent px-0 pt-1 pb-3 text-base text-muted-foreground hover:text-primary data-[tui-tabs-state=active]:border-primary data-[tui-tabs-state=active]:bg-transparent data-[tui-tabs-state=active]:!shadow-none data-[tui-tabs-state=active]:text-foreground dark:data-[tui-tabs-state=active]:border-primary dark:data-[tui-tabs-state=active]:bg-transparent"
-
-// InstallationBlock is shadcn's installation section: CodeTabs with a
-// Command tab (the CLI call) and a Manual tab (numbered steps copying the
-// component source).
-templ InstallationBlock(component string) {
-	{{ hasScript := hasComponentScript(component) }}
-	{{ alias := componentAlias(component) }}
-	@tabs.Tabs(tabs.Props{DefaultValue: "cli", ID: "installation-" + component, Class: "relative mt-6 w-full"}) {
-		@tabs.List(tabs.ListProps{
-			Class: "w-fit justify-start gap-6 rounded-none bg-transparent px-0 group-data-horizontal/tabs:h-9",
-		}) {
-			@tabs.Trigger(tabs.TriggerProps{Value: "cli", Class: installTabTriggerClass}) {
-				Command
-			}
-			@tabs.Trigger(tabs.TriggerProps{Value: "manual", Class: installTabTriggerClass}) {
-				Manual
-			}
-		}
-		@tabs.Content(tabs.ContentProps{Value: "cli"}) {
-			@CodeFigure(CodeFigureProps{Language: "bash", Code: "templui add " + component})
-			if hasScript {
-				<p>Load the script once in your layout:</p>
-				@CodeFigure(CodeFigureProps{Language: "templ", Code: "<head>\n  @" + alias + ".Script()\n</head>"})
-			}
-		}
-		@tabs.Content(tabs.ContentProps{Value: "manual"}) {
-			<div class="steps mb-0 [counter-reset:step] pt-2 md:ml-4 md:border-l md:pl-8 [&>h3]:step">
-				<h3>Copy and paste the following code into your project.</h3>
-				@ComponentSourceBlock(component)
-				if hasScript {
-					<p>Copy <code>{ component }.min.js</code> as well, or minify <code>{ component }.js</code> yourself. <code>{ alias }.Script()</code> loads the minified file.</p>
-					<h3>Add the script once to your layout.</h3>
-					@CodeFigure(CodeFigureProps{Language: "templ", Code: "<head>\n  @" + alias + ".Script()\n</head>"})
-				}
-				<h3>Update the import paths to match your project setup.</h3>
-			</div>
-		}
-	}
-}
-
-func componentAlias(name string) string {
-	if name == "switch" {
-		return "switchcomp"
-	}
-	return name
-}
+const InstallTabTriggerClass = "rounded-none border-0 border-b-2 border-transparent bg-transparent px-0 pt-1 pb-3 text-base text-muted-foreground hover:text-primary data-[tui-tabs-state=active]:border-primary data-[tui-tabs-state=active]:bg-transparent data-[tui-tabs-state=active]:!shadow-none data-[tui-tabs-state=active]:text-foreground dark:data-[tui-tabs-state=active]:border-primary dark:data-[tui-tabs-state=active]:bg-transparent"
 
 // DocsPageHeader: title, description and the copy-page/prev-next controls
 // (no breadcrumbs, like shadcn).

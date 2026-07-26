@@ -7,7 +7,59 @@ description: Displays a menu to the user, such as a set of actions or functions,
 
 ## Installation
 
-<Installation name="dropdownmenu" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add dropdownmenu
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @dropdownmenu.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="dropdownmenu" title="components/dropdownmenu/dropdownmenu.templ" />
+
+<ComponentSource name="dropdownmenu" title="components/dropdownmenu/dropdownmenu.js" />
+
+<ComponentSource name="dropdownmenu" title="components/floatingui/floating_ui_core.js" />
+
+<ComponentSource name="dropdownmenu" title="components/floatingui/floating_ui_dom.js" />
+
+Copy `dropdownmenu.min.js` as well, or minify `dropdownmenu.js` yourself. `dropdownmenu.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @dropdownmenu.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Usage
 

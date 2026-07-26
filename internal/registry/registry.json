@@ -244,9 +244,7 @@
       "displayName": "Chart",
       "description": "Beautiful charts. Composable chart elements with a Recharts compatible client renderer.",
       "files": [
-        "components/chart/chart.templ",
-        "components/chart/charts.templ",
-        "components/chart/model.go"
+        "components/chart/chart.templ"
       ],
       "jsFiles": [
         "components/chart/chart.js",

@@ -7,7 +7,53 @@ description: A set of two-state buttons that can be toggled on or off.
 
 ## Installation
 
-<Installation name="togglegroup" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add togglegroup
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @togglegroup.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="togglegroup" title="components/togglegroup/togglegroup.templ" />
+
+Copy `togglegroup.min.js` as well, or minify `togglegroup.js` yourself. `togglegroup.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @togglegroup.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Usage
 

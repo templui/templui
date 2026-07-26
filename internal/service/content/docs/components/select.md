@@ -7,7 +7,59 @@ description: Displays a list of options for the user to pick from, triggered by 
 
 ## Installation
 
-<Installation name="select" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add select
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @select.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="select" title="components/select/select.templ" />
+
+<ComponentSource name="select" title="components/select/select.js" />
+
+<ComponentSource name="select" title="components/floatingui/floating_ui_core.js" />
+
+<ComponentSource name="select" title="components/floatingui/floating_ui_dom.js" />
+
+Copy `select.min.js` as well, or minify `select.js` yourself. `select.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @select.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Usage
 

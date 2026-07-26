@@ -7,7 +7,53 @@ description: Displays a form textarea or a component that looks like a textarea.
 
 ## Installation
 
-<Installation name="textarea" />
+<CodeTabs>
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+templui add textarea
+```
+
+Load the script once in your layout:
+
+```templ
+<head>
+  @textarea.Script()
+</head>
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps className="mb-0 pt-2">
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="textarea" title="components/textarea/textarea.templ" />
+
+Copy `textarea.min.js` as well, or minify `textarea.js` yourself. `textarea.Script()` loads the minified file.
+
+<Step>Add the script once to your layout.</Step>
+
+```templ
+<head>
+  @textarea.Script()
+</head>
+```
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</CodeTabs>
 
 ## Usage
 
