@@ -154,6 +154,12 @@ func Bool(v bool) *bool {
 	return &v
 }
 
+// Float returns a pointer to v, for the numeric props that carry a
+// meaningful zero.
+func Float(v float64) *float64 {
+	return &v
+}
+
 
 // Index returns a pointer to i, for the optional index props.
 func Index(i int) *int {
@@ -283,8 +289,9 @@ type LineProps struct {
 // radius and fill, DataFill is the custom dot reading payload.fill and
 // Icon is the custom dot rendering a component.
 type DotProps struct {
-	R        float64
-	Fill     string
+	R           float64
+	FillOpacity float64
+	Fill        string
 	DataFill bool
 	Icon     templ.Component
 	Size     float64 // icon box, like the custom dot's width/height
@@ -380,6 +387,63 @@ type BarChartProps struct {
 	Margin *Margin
 }
 
+// RadarChartProps is the pendant of the Recharts RadarChart root.
+type RadarChartProps struct {
+	Data   []Datum
+	Margin *Margin
+}
+
+// PolarGridProps is the pendant of Recharts' PolarGrid.
+type PolarGridProps struct {
+	// GridType is "polygon" (default) or "circle".
+	GridType string
+	// RadialLines defaults to Recharts' true.
+	RadialLines *bool
+	// PolarRadius replaces the radius axis ticks with fixed radii.
+	PolarRadius []float64
+	StrokeWidth float64
+	Class       string
+}
+
+// PolarAngleAxisProps is the pendant of Recharts' PolarAngleAxis.
+type PolarAngleAxisProps struct {
+	DataKey string
+	// Tick is the pendant of the tick render prop: it builds the tick
+	// content per data row, the axis still places it.
+	Tick func(Datum, int) TickContent
+}
+
+// TickContent is the text of one custom axis tick.
+type TickContent struct {
+	Spans      []TickSpan
+	FontSize   float64
+	FontWeight string
+	// OffsetY shifts this tick, like the demos nudging the top one.
+	OffsetY float64
+}
+
+// TickSpan is one tspan of a custom tick.
+type TickSpan struct {
+	Text     string
+	Class    string
+	FontSize float64
+	// Dy starts a new line, ResetX puts it back at the tick's x.
+	Dy     string
+	ResetX bool
+}
+
+// RadarProps is the pendant of one Recharts Radar.
+type RadarProps struct {
+	DataKey string
+	Fill    string
+	// FillOpacity is a pointer because zero is a meaningful value: an
+	// unset prop leaves the SVG default of 1 in place.
+	FillOpacity *float64
+	Stroke      string
+	StrokeWidth float64
+	Dot         *DotProps
+}
+
 // PieChartProps is the pendant of the Recharts PieChart root.
 type PieChartProps struct{}
 
@@ -408,6 +472,9 @@ type chartState struct {
 	bars        []*barState
 	lines       []*lineState
 	pies        []*pieState
+	polarGrid   *PolarGridProps
+	angleAxis   *PolarAngleAxisProps
+	radars      []RadarProps
 }
 
 // lineState pairs a line with the LabelList its children registered.
@@ -556,6 +623,61 @@ templ LineChart(props ...LineChartProps) {
 		{ children... }
 		@chartOutput(st)
 	</div>
+}
+
+// RadarChart is the Recharts RadarChart root.
+templ RadarChart(props ...RadarChartProps) {
+	{{ var p RadarChartProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{
+	st := &chartState{kind: "radar", data: p.Data, margin: p.Margin}
+	ctx = context.WithValue(ctx, stateCtxKey, st)
+	}}
+	<div style="position:relative;width:100%;height:100%">
+		{ children... }
+		@chartOutput(st)
+	</div>
+}
+
+// PolarGrid registers the polar grid.
+templ PolarGrid(props ...PolarGridProps) {
+	{{ var p PolarGridProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{
+	if st := stateFrom(ctx); st != nil {
+		st.polarGrid = &p
+	}
+	}}
+}
+
+// PolarAngleAxis registers the angle axis, the labels around the chart.
+templ PolarAngleAxis(props ...PolarAngleAxisProps) {
+	{{ var p PolarAngleAxisProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{
+	if st := stateFrom(ctx); st != nil {
+		st.angleAxis = &p
+	}
+	}}
+}
+
+// Radar registers one radar series.
+templ Radar(props ...RadarProps) {
+	{{ var p RadarProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{
+	if st := stateFrom(ctx); st != nil {
+		st.radars = append(st.radars, p)
+	}
+	}}
 }
 
 // PieChart is the Recharts PieChart root.
@@ -852,6 +974,9 @@ func buildModel(ctx context.Context, st *chartState) Model {
 	if st.kind == "pie" {
 		return buildPieModel(ctx, config, st)
 	}
+	if st.kind == "radar" {
+		return buildRadarModel(ctx, config, st)
+	}
 
 	m := Model{Kind: st.kind, StackOffset: st.stackOffset, Defs: st.defs, Layout: st.layout}
 	if g := st.grid; g != nil {
@@ -1015,6 +1140,61 @@ func buildModel(ctx context.Context, st *chartState) Model {
 		}
 	}
 	applyIcons(ctx, &m, config)
+	return m
+}
+
+// buildRadarModel normalizes a RadarChart into the model.
+func buildRadarModel(ctx context.Context, config Config, st *chartState) Model {
+	m := Model{Kind: "radar"}
+	if st.margin != nil {
+		m.MarginTop, m.MarginRight, m.MarginBottom, m.MarginLeft = st.margin.Top, st.margin.Right, st.margin.Bottom, st.margin.Left
+	} else {
+		m.MarginTop, m.MarginRight, m.MarginBottom, m.MarginLeft = 5, 5, 5, 5
+	}
+	polar := PolarModel{RadialLines: true}
+	if g := st.polarGrid; g != nil {
+		polar.HasGrid = true
+		polar.GridType = g.GridType
+		polar.RadialLines = boolOr(g.RadialLines, true)
+		polar.PolarRadius = g.PolarRadius
+		polar.StrokeWidth = g.StrokeWidth
+		polar.GridClass = g.Class
+	}
+	m.Labels = make([]string, len(st.data))
+	m.TooltipLabels = make([]string, len(st.data))
+	if a := st.angleAxis; a != nil {
+		polar.HasAngleAxis = true
+		for i, d := range st.data {
+			m.Labels[i] = str(d[a.DataKey])
+			m.TooltipLabels[i] = m.Labels[i]
+			if a.Tick != nil {
+				tc := a.Tick(d, i)
+				tm := TickContentModel{FontSize: tc.FontSize, FontWeight: tc.FontWeight, OffsetY: tc.OffsetY}
+				for _, sp := range tc.Spans {
+					tm.Spans = append(tm.Spans, TickSpanModel{Text: sp.Text, Class: sp.Class, FontSize: sp.FontSize, Dy: sp.Dy, ResetX: sp.ResetX})
+				}
+				polar.Ticks = append(polar.Ticks, tm)
+			}
+		}
+	}
+	m.Polar = &polar
+	for _, r := range st.radars {
+		s := modelSeries(config, r.DataKey, r.Fill, 0, st.data)
+		s.FillOpacityPtr = r.FillOpacity
+		s.Stroke = r.Stroke
+		s.StrokeWidth = r.StrokeWidth
+		if d := r.Dot; d != nil {
+			s.Dot = &DotModel{R: d.R, Fill: d.Fill, FillOpacity: d.FillOpacity}
+		}
+		m.Series = append(m.Series, s)
+	}
+	if st.legend != nil {
+		m.LegendHeight = defaultLegendHeight
+	}
+	if tt := st.tooltip; tt != nil {
+		m.Cursor = boolOr(tt.Cursor, true)
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
+	}
 	return m
 }
 
@@ -1221,6 +1401,37 @@ type Model struct {
 	Tooltip       TooltipModel          `json:"tooltip"`
 	// Pies carries the pie geometry for the client renderer.
 	Pies []PieModel `json:"pies,omitempty"`
+	// Polar carries the radar geometry.
+	Polar *PolarModel `json:"polar,omitempty"`
+}
+
+// TickContentModel is a custom axis tick for the client renderer.
+type TickContentModel struct {
+	Spans      []TickSpanModel `json:"spans"`
+	FontSize   float64         `json:"fontSize,omitempty"`
+	FontWeight string          `json:"fontWeight,omitempty"`
+	OffsetY    float64         `json:"offsetY,omitempty"`
+}
+
+// TickSpanModel is one tspan of a custom tick.
+type TickSpanModel struct {
+	Text     string  `json:"text"`
+	Class    string  `json:"class,omitempty"`
+	FontSize float64 `json:"fontSize,omitempty"`
+	Dy       string  `json:"dy,omitempty"`
+	ResetX   bool    `json:"resetX,omitempty"`
+}
+
+// PolarModel is the grid and axis setup of a polar chart.
+type PolarModel struct {
+	GridType    string    `json:"gridType,omitempty"`
+	RadialLines bool      `json:"radialLines"`
+	PolarRadius []float64 `json:"polarRadius,omitempty"`
+	StrokeWidth float64   `json:"strokeWidth,omitempty"`
+	GridClass   string    `json:"gridClass,omitempty"`
+	Ticks       []TickContentModel `json:"ticks,omitempty"`
+	HasGrid     bool      `json:"hasGrid,omitempty"`
+	HasAngleAxis bool     `json:"hasAngleAxis,omitempty"`
 }
 
 // PieModel is one rendered Pie with its sectors.
@@ -1259,6 +1470,7 @@ type ModelSeries struct {
 	Values      []float64       `json:"values"`
 	FillOpacity float64         `json:"fillOpacity,omitempty"` // areas: 0 uses Recharts' 0.6
 	Curve       string          `json:"curve,omitempty"`       // "natural" (default), "linear", "step", "monotone"
+	FillOpacityPtr *float64     `json:"fillOpacityPtr,omitempty"` // radar: an explicit zero stays
 	Icon        string          `json:"icon,omitempty"`        // rendered svg, replaces the tooltip indicator
 	Fill        string          `json:"fill,omitempty"`        // verbatim fill, e.g. url(#fillDesktop)
 	Stroke      string          `json:"stroke,omitempty"`      // verbatim stroke for the area line
@@ -1276,7 +1488,8 @@ type ModelSeries struct {
 
 // DotModel describes the per point dots of a line.
 type DotModel struct {
-	R     float64  `json:"r,omitempty"`
+	R           float64 `json:"r,omitempty"`
+	FillOpacity float64 `json:"fillOpacity,omitempty"`
 	Fill  string   `json:"fill,omitempty"`
 	Fills []string `json:"fills,omitempty"` // per point fills from the data rows
 	Icon  string   `json:"icon,omitempty"`  // rendered svg replacing the dot

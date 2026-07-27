@@ -1,0 +1,58 @@
+package charts
+
+import (
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/components/icon"
+)
+
+// The pendant of chart-radar-default.tsx.
+
+var chartRadarDefaultData = []chart.Datum{
+	{"month": "January", "desktop": 186},
+	{"month": "February", "desktop": 305},
+	{"month": "March", "desktop": 237},
+	{"month": "April", "desktop": 273},
+	{"month": "May", "desktop": 209},
+	{"month": "June", "desktop": 214},
+}
+
+var chartRadarDefaultConfig = chart.Config{
+	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
+}
+
+templ ChartRadarDefault() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "items-center pb-4"}) {
+			@card.Title() {
+				Radar Chart
+			}
+			@card.Description() {
+				Showing total visitors for the last 6 months
+			}
+		}
+		@card.Content(card.ContentProps{Class: "pb-0"}) {
+			@chart.Container(chart.ContainerProps{ID: "radar-default", Config: chartRadarDefaultConfig, Class: "mx-auto aspect-square max-h-[250px]"}) {
+				@chart.RadarChart(chart.RadarChartProps{Data: chartRadarDefaultData}) {
+					@chart.Tooltip(chart.TooltipProps{Cursor: chart.Bool(false)})
+					@chart.PolarAngleAxis(chart.PolarAngleAxisProps{DataKey: "month"})
+					@chart.PolarGrid(chart.PolarGridProps{})
+					@chart.Radar(chart.RadarProps{
+						DataKey:     "desktop",
+						Fill:        "var(--color-desktop)",
+						FillOpacity: chart.Float(0.6),
+					})
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-2 text-sm"}) {
+			<div class="flex items-center gap-2 leading-none font-medium">
+			Trending up by 5.2% this month
+			@icon.TrendingUp(icon.Props{Class: "h-4 w-4"})
+			</div>
+			<div class="flex items-center gap-2 leading-none text-muted-foreground">
+			January - June 2024
+			</div>
+		}
+	}
+}

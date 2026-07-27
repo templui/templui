@@ -79,6 +79,21 @@ func chartsFor(chartType string) []modules.ChartEntry {
 			entry("chart-line-label", false),
 			entry("chart-line-label-custom", false),
 		}
+	case "radar":
+		return []modules.ChartEntry{
+			entry("chart-radar-default", false),
+			entry("chart-radar-dots", false),
+			entry("chart-radar-lines-only", false),
+			entry("chart-radar-label-custom", false),
+			entry("chart-radar-grid-custom", false),
+			entry("chart-radar-grid-none", false),
+			entry("chart-radar-grid-circle", false),
+			entry("chart-radar-grid-circle-no-lines", false),
+			entry("chart-radar-grid-circle-fill", false),
+			entry("chart-radar-grid-fill", false),
+			entry("chart-radar-multiple", false),
+			entry("chart-radar-legend", false),
+		}
 	case "pie":
 		return []modules.ChartEntry{
 			entry("chart-pie-simple", false),

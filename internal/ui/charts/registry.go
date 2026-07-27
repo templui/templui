@@ -66,6 +66,30 @@ func Component(name string) templ.Component {
 		return ChartLineLabel()
 	case "chart-line-label-custom":
 		return ChartLineLabelCustom()
+	case "chart-radar-default":
+		return ChartRadarDefault()
+	case "chart-radar-dots":
+		return ChartRadarDots()
+	case "chart-radar-lines-only":
+		return ChartRadarLinesOnly()
+	case "chart-radar-label-custom":
+		return ChartRadarLabelCustom()
+	case "chart-radar-grid-custom":
+		return ChartRadarGridCustom()
+	case "chart-radar-grid-none":
+		return ChartRadarGridNone()
+	case "chart-radar-grid-circle":
+		return ChartRadarGridCircle()
+	case "chart-radar-grid-circle-no-lines":
+		return ChartRadarGridCircleNoLines()
+	case "chart-radar-grid-circle-fill":
+		return ChartRadarGridCircleFill()
+	case "chart-radar-grid-fill":
+		return ChartRadarGridFill()
+	case "chart-radar-multiple":
+		return ChartRadarMultiple()
+	case "chart-radar-legend":
+		return ChartRadarLegend()
 	case "chart-pie-simple":
 		return ChartPieSimple()
 	case "chart-pie-separator-none":

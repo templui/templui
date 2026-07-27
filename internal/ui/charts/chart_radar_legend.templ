@@ -1,0 +1,70 @@
+package charts
+
+import (
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/components/icon"
+)
+
+// The pendant of chart-radar-legend.tsx.
+
+var chartRadarLegendData = []chart.Datum{
+	{"month": "January", "desktop": 186, "mobile": 80},
+	{"month": "February", "desktop": 305, "mobile": 200},
+	{"month": "March", "desktop": 237, "mobile": 120},
+	{"month": "April", "desktop": 73, "mobile": 190},
+	{"month": "May", "desktop": 209, "mobile": 130},
+	{"month": "June", "desktop": 214, "mobile": 140},
+}
+
+var chartRadarLegendConfig = chart.Config{
+	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
+	{Key: "mobile", Label: "Mobile", Color: "var(--chart-2)"},
+}
+
+templ ChartRadarLegend() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "items-center"}) {
+			@card.Title() {
+				Radar Chart - Legend
+			}
+			@card.Description() {
+				Showing total visitors for the last 6 months
+			}
+		}
+		@card.Content() {
+			@chart.Container(chart.ContainerProps{ID: "radar-legend", Config: chartRadarLegendConfig, Class: "mx-auto aspect-square max-h-[250px]"}) {
+				@chart.RadarChart(chart.RadarChartProps{
+					Data: chartRadarLegendData,
+					Margin: &chart.Margin{Top: -40, Bottom: -10, Left: 0, Right: 0},
+				}) {
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  chart.Bool(false),
+						Content: chart.TooltipContentProps{Indicator: "line"},
+					})
+					@chart.PolarAngleAxis(chart.PolarAngleAxisProps{DataKey: "month"})
+					@chart.PolarGrid(chart.PolarGridProps{})
+					@chart.Radar(chart.RadarProps{
+						DataKey:     "desktop",
+						Fill:        "var(--color-desktop)",
+						FillOpacity: chart.Float(0.6),
+					})
+					@chart.Radar(chart.RadarProps{
+						DataKey:     "mobile",
+						Fill:        "var(--color-mobile)",
+					})
+					@chart.Legend()
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-2 pt-4 text-sm"}) {
+			<div class="flex items-center gap-2 leading-none font-medium">
+			Trending up by 5.2% this month
+			@icon.TrendingUp(icon.Props{Class: "h-4 w-4"})
+			</div>
+			<div class="flex items-center gap-2 leading-none text-muted-foreground">
+			January - June 2024
+			</div>
+		}
+	}
+}

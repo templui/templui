@@ -881,6 +881,210 @@ function polarToCartesian(cx, cy, radius, angle) {
   return { x: cx + Math.cos(rad) * radius, y: cy - Math.sin(rad) * radius };
 }
 
+/* getAngleOfPoint of Recharts' PolarUtils: the polar coordinates of a
+ * point around the chart center. */
+function angleOfPoint(x, y, cx, cy) {
+  const radius = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
+  if (radius <= 0) return { radius, angle: 0 };
+  let angleInRadian = Math.acos((x - cx) / radius);
+  if (y > cy) angleInRadian = 2 * Math.PI - angleInRadian;
+  return { radius, angle: (angleInRadian * 180) / Math.PI };
+}
+
+/* calculateActiveTickIndex for an angle axis that spans a full circle:
+ * the pointer belongs to the tick whose half intervals contain it. */
+function activeAngleIndex(coordinate, ticks) {
+  const len = ticks.length;
+  if (len <= 1) return 0;
+  const range = [90, -270];
+  for (let i = 0; i < len; i++) {
+    const before = i > 0 ? ticks[i - 1] : ticks[len - 1];
+    const cur = ticks[i];
+    const after = i >= len - 1 ? ticks[0] : ticks[i + 1];
+    const sign = (v) => (v > 0 ? 1 : v < 0 ? -1 : 0);
+    let sameDirectionCoord;
+    if (sign(cur - before) !== sign(after - cur)) {
+      const diffInterval = [];
+      if (sign(after - cur) === sign(range[1] - range[0])) {
+        sameDirectionCoord = after;
+        const curInRange = cur + range[1] - range[0];
+        diffInterval[0] = Math.min(curInRange, (curInRange + before) / 2);
+        diffInterval[1] = Math.max(curInRange, (curInRange + before) / 2);
+      } else {
+        sameDirectionCoord = before;
+        const afterInRange = after + range[1] - range[0];
+        diffInterval[0] = Math.min(cur, (afterInRange + cur) / 2);
+        diffInterval[1] = Math.max(cur, (afterInRange + cur) / 2);
+      }
+      const sameInterval = [Math.min(cur, (sameDirectionCoord + cur) / 2), Math.max(cur, (sameDirectionCoord + cur) / 2)];
+      if ((coordinate > sameInterval[0] && coordinate <= sameInterval[1]) || (coordinate >= diffInterval[0] && coordinate <= diffInterval[1])) {
+        return i;
+      }
+    } else {
+      const minValue = Math.min(before, after);
+      const maxValue = Math.max(before, after);
+      if (coordinate > (minValue + cur) / 2 && coordinate <= (maxValue + cur) / 2) {
+        return i;
+      }
+    }
+  }
+  return -1;
+}
+
+/* getPolygonPath of Recharts' PolarGrid. */
+function polarPolygonPath(radius, cx, cy, angles) {
+  let path = "";
+  angles.forEach((angle, i) => {
+    const p = polarToCartesian(cx, cy, radius, angle);
+    path += (i ? "L " : "M ") + fmtF(p.x) + "," + fmtF(p.y);
+  });
+  return path + "Z";
+}
+
+/* renderRadar draws a RadarChart: the polar grid, the angle axis labels and
+ * one polygon per series. The geometry follows RadarChart's defaults, a
+ * start angle of 90 running to -270 and an outer radius of 80%. */
+function renderRadar(panel, m, state, alpha = 1) {
+  const W = panel.clientWidth;
+  const H = panel.clientHeight;
+  if (!W || !H) return;
+  const legendHeight = legendSize(panel, m);
+  const offsetW = Math.max(W - m.marginLeft - m.marginRight, 0);
+  const offsetH = Math.max(H - m.marginTop - m.marginBottom - legendHeight, 0);
+  const cx = m.marginLeft + offsetW / 2;
+  const cy = m.marginTop + offsetH / 2;
+  const maxRadius = Math.min(offsetW, offsetH) / 2;
+  const outerRadius = maxRadius * 0.8;
+  const n = m.series.length ? m.series[0].values.length : 0;
+  if (!n) return;
+
+  // The angle axis is a band scale from 90 to -270, one tick per row.
+  const step = -360 / n;
+  const angles = Array.from({ length: n }, (_, i) => 90 + step * i);
+  const ticks = domainTicks(m, m.tickCount || 5);
+  const domainMax = ticks[ticks.length - 1];
+  const polar = m.polar || {};
+  const radii = polar.polarRadius && polar.polarRadius.length ? polar.polarRadius : ticks.map((t) => (t / domainMax) * outerRadius);
+
+  let svg = `<svg class="recharts-surface" width="${fmtF(W)}" height="${fmtF(H)}" viewBox="0 0 ${fmtF(W)} ${fmtF(H)}">`;
+
+  if (polar.hasGrid) {
+    const strokeWidth = polar.strokeWidth ? ` stroke-width="${fmtF(polar.strokeWidth)}"` : "";
+    const cls = polar.gridClass ? " " + polar.gridClass : "";
+    svg += `<g class="recharts-polar-grid"><g class="recharts-polar-grid-concentric">`;
+    for (const r of radii) {
+      if (polar.gridType === "circle") {
+        svg += `<circle class="recharts-polar-grid-concentric-circle${cls}" stroke="#ccc" fill="none"${strokeWidth} cx="${fmtF(cx)}" cy="${fmtF(cy)}" r="${fmtF(r)}"/>`;
+      } else {
+        svg += `<path class="recharts-polar-grid-concentric-polygon${cls}" stroke="#ccc" fill="none"${strokeWidth} d="${polarPolygonPath(r, cx, cy, angles)}"/>`;
+      }
+    }
+    svg += `</g>`;
+    if (polar.radialLines) {
+      svg += `<g class="recharts-polar-grid-angle">`;
+      for (const a of angles) {
+        const start = polarToCartesian(cx, cy, 0, a);
+        const end = polarToCartesian(cx, cy, outerRadius, a);
+        svg += `<line stroke="#ccc"${strokeWidth} x1="${fmtF(start.x)}" y1="${fmtF(start.y)}" x2="${fmtF(end.x)}" y2="${fmtF(end.y)}"/>`;
+      }
+      svg += `</g>`;
+    }
+    svg += `</g>`;
+  }
+
+  if (polar.hasAngleAxis) {
+    // getTickLineCoord with the default tickSize of 8 and the outer
+    // orientation, plus getTickTextAnchor and getTickTextVerticalAnchor.
+    const eps = 1e-5;
+    const COS_45 = Math.cos((45 * Math.PI) / 180);
+    svg += `<g class="recharts-polar-angle-axis recharts-axis">`;
+    // AxisLine: a polygon through the ticks at the outer radius, the
+    // default axisLineType of "polygon".
+    svg += `<path class="recharts-polygon recharts-polar-angle-axis-line" fill="none" d="${polarPolygonPath(outerRadius, cx, cy, angles)}"/>`;
+    svg += `<g class="recharts-polar-angle-axis-ticks">`;
+    for (let i = 0; i < n; i++) {
+      const coord = angles[i];
+      const p = polarToCartesian(cx, cy, outerRadius + 8, coord);
+      const cos = Math.cos((-coord * Math.PI) / 180);
+      const sin = Math.sin((-coord * Math.PI) / 180);
+      const anchor = cos > eps ? "start" : cos < -eps ? "end" : "middle";
+      const vAnchor = Math.abs(cos) <= COS_45 ? (sin > 0 ? "start" : "end") : "middle";
+      // getTickLineCoord: from the axis out by the default tickSize of 8.
+      const p1 = polarToCartesian(cx, cy, outerRadius, coord);
+      svg += `<line class="recharts-polar-angle-axis-tick-line" fill="none" x1="${fmtF(p1.x)}" y1="${fmtF(p1.y)}" x2="${fmtF(p.x)}" y2="${fmtF(p.y)}"/>`;
+      const custom = polar.ticks && polar.ticks[i];
+      if (custom) {
+        const y = p.y + (custom.offsetY || 0);
+        const fs = custom.fontSize ? ` font-size="${fmtF(custom.fontSize)}"` : "";
+        const fw = custom.fontWeight ? ` font-weight="${custom.fontWeight}"` : "";
+        svg += `<text class="recharts-text recharts-polar-angle-axis-tick-value" x="${fmtF(p.x)}" y="${fmtF(y)}" text-anchor="${anchor}"${fs}${fw} fill="currentColor">`;
+        for (const span of custom.spans) {
+          const attrs =
+            (span.resetX ? ` x="${fmtF(p.x)}"` : "") +
+            (span.dy ? ` dy="${span.dy}"` : "") +
+            (span.fontSize ? ` font-size="${fmtF(span.fontSize)}"` : "") +
+            (span.class ? ` class="${span.class}"` : "");
+          svg += `<tspan${attrs}>${span.text}</tspan>`;
+        }
+        svg += `</text>`;
+      } else {
+        svg += `<text class="recharts-text recharts-polar-angle-axis-tick-value" x="${fmtF(p.x)}" y="${fmtF(p.y)}" text-anchor="${anchor}" fill="#666"><tspan dy="${verticalAnchorDy(vAnchor)}">${m.labels[i]}</tspan></text>`;
+      }
+    }
+    svg += `</g></g>`;
+  }
+
+  state.tops = [];
+  state.points = { radar: [] };
+  const morph = state.morph;
+  for (let si = 0; si < m.series.length; si++) {
+    const s = m.series[si];
+    // interpolatePolarPoint: the points grow out of the center on mount and
+    // interpolate from the previous points on an update.
+    const prev = morph && morph.prev && morph.prev.radar ? morph.prev.radar[si] : null;
+    const factor = prev ? prev.length / s.values.length : 0;
+    const pts = s.values.map((v, i) => {
+      const target = polarToCartesian(cx, cy, (v / domainMax) * outerRadius, angles[i]);
+      if (morph) {
+        const p = prev && prev[Math.floor(i * factor)];
+        if (p) return { x: interpolate(p.x, target.x, morph.t), y: interpolate(p.y, target.y, morph.t) };
+        return { x: interpolate(cx, target.x, morph.t), y: interpolate(cy, target.y, morph.t) };
+      }
+      if (alpha < 1) {
+        return { x: interpolate(cx, target.x, alpha), y: interpolate(cy, target.y, alpha) };
+      }
+      return target;
+    });
+    const d = pts.map((p, i) => (i ? "L" : "M") + fmtF(p.x) + "," + fmtF(p.y)).join("") + "Z";
+    // filterProps only forwards the props that are set, so an unset fill
+    // opacity leaves the SVG default of 1 in place.
+    const fillOpacity = s.fillOpacityPtr != null ? ` fill-opacity="${fmtF(s.fillOpacityPtr)}"` : "";
+    const stroke = s.stroke ? ` stroke="${s.stroke}"` : "";
+    const strokeWidth = s.strokeWidth ? ` stroke-width="${fmtF(s.strokeWidth)}"` : "";
+    svg +=
+      `<g class="recharts-layer recharts-radar">` +
+      `<g class="recharts-radar-polygon">` +
+      `<path class="recharts-polygon" fill="${s.fill || s.color}"${fillOpacity}${stroke}${strokeWidth} d="${d}"/>`;
+    // StaticPolygon renders the dots together with the polygon, so they
+    // travel with it during the animation.
+    if (s.dot) {
+      svg += `<g class="recharts-radar-dots">`;
+      for (const p of pts) {
+        const dotOpacity = s.dot.fillOpacity ? ` fill-opacity="${fmtF(s.dot.fillOpacity)}"` : "";
+        svg += `<circle class="recharts-dot recharts-radar-dot" r="${fmtF(s.dot.r || 3)}" fill="${s.dot.fill || s.fill || s.color}"${dotOpacity}${stroke} cx="${fmtF(p.x)}" cy="${fmtF(p.y)}"/>`;
+      }
+      svg += `</g>`;
+    }
+    svg += `</g></g>`;
+    state.tops.push(pts.map((p) => p.y));
+    state.points.radar.push(pts);
+  }
+
+  svg += "</svg>";
+  swapSVG(panel, svg);
+  state.geom = { W, H, cx, cy, outerRadius, angles, n };
+}
+
 /* getSectorPath of Recharts' Sector. */
 function sectorPath(cx, cy, innerR, outerR, startAngle, endAngle) {
   // getDeltaAngle clamps a sector to a full turn.
@@ -1098,7 +1302,17 @@ function showCursor(panel, m, state, i) {
   const g = state.geom;
   // Recharts draws the cursor between the grid and the series, so bars
   // and areas render on top of the hover band.
-  const seriesLayer = svg.querySelector(".recharts-bar, .recharts-area, .recharts-line");
+  const seriesLayer = svg.querySelector(".recharts-bar, .recharts-area, .recharts-line, .recharts-radar");
+  if (m.kind === "radar") {
+    const end = polarToCartesian(g.cx, g.cy, g.outerRadius, g.angles[i]);
+    const d = `M${fmtF(g.cx)},${fmtF(g.cy)}L${fmtF(end.x)},${fmtF(end.y)}`;
+    if (!cursor) {
+      seriesLayer.insertAdjacentHTML("beforebegin", `<g class="recharts-layer"><path class="recharts-curve recharts-tooltip-cursor" stroke="#ccc" fill="none" d="${d}"/></g>`);
+    } else {
+      cursor.setAttribute("d", d);
+    }
+    return;
+  }
   if (m.kind === "bar") {
     const d = g.vertical
       ? `M ${fmtF(g.plotX)},${fmtF(g.plotY + i * g.band)} h ${fmtF(g.plotW)} v ${fmtF(g.band)} h ${fmtF(-g.plotW)} Z`
@@ -1135,7 +1349,7 @@ function hideCursor(panel) {
 // active data point while the tooltip is up.
 function showActiveDots(panel, m, state, i) {
   const svg = panel.querySelector("svg.recharts-surface");
-  if (!svg || (m.kind !== "area" && m.kind !== "line") || !state.tops) return;
+  if (!svg || (m.kind !== "area" && m.kind !== "line" && m.kind !== "radar") || !state.tops) return;
   let layer = svg.querySelector(".recharts-active-dots");
   if (!layer) {
     svg.insertAdjacentHTML("beforeend", `<g class="recharts-layer recharts-active-dots"></g>`);
@@ -1144,11 +1358,14 @@ function showActiveDots(panel, m, state, i) {
   let html = "";
   for (let s = 0; s < m.series.length; s++) {
     // renderActivePoint's defaults: r 4, white stroke of 2, filled with the
-    // item's main color, which is its stroke.
+    // item's main color. getLegendItemColor prefers the stroke over the fill.
     const series = m.series[s];
     const r = series.activeDotR || 4;
-    const mainColor = series.stroke || series.color || "none";
-    html += `<circle class="recharts-dot" r="${fmtF(r)}" stroke="#fff" stroke-width="2" fill="${mainColor}" cx="${fmtF(state.geom.xs[i])}" cy="${fmtF(state.tops[s][i])}"/>`;
+    const mainColor = series.stroke && series.stroke !== "none" ? series.stroke : series.fill || series.color || "none";
+    // A radar point carries its own x, the cartesian charts share the
+    // category positions.
+    const point = m.kind === "radar" ? state.points.radar[s][i] : { x: state.geom.xs[i], y: state.tops[s][i] };
+    html += `<circle class="recharts-dot" r="${fmtF(r)}" stroke="#fff" stroke-width="2" fill="${mainColor}" cx="${fmtF(point.x)}" cy="${fmtF(point.y)}"/>`;
   }
   layer.innerHTML = html;
 }
@@ -1188,6 +1405,7 @@ function initPanel(script) {
 
   const render = (alpha = 1) => {
     if (m.kind === "pie") renderPie(panel, m, state, alpha);
+    else if (m.kind === "radar") renderRadar(panel, m, state, alpha);
     else renderCartesian(panel, m, state, alpha);
     // The points this panel drew are what the next visible panel morphs
     // from, Recharts' previousPointsRef.
@@ -1242,6 +1460,15 @@ function initPanel(script) {
   const activeIndexAt = (chartX, chartY) => {
     const g = state.geom;
     if (!g) return -1;
+    if (m.kind === "radar") {
+      // inRangeOfSector: only inside the outer radius, then the angle
+      // decides which tick is active.
+      const p = angleOfPoint(chartX, chartY, g.cx, g.cy);
+      if (p.radius > g.outerRadius) return -1;
+      // The angles run from 90 downwards, the point angle from 0 to 360.
+      const angle = p.angle > 90 ? p.angle - 360 : p.angle;
+      return activeAngleIndex(angle, g.angles);
+    }
     if (chartX < g.plotX || chartX > g.plotX + g.plotW) return -1;
     if (chartY < g.plotY || chartY > g.plotBottom) return -1;
     if (m.kind === "bar") {
@@ -1278,6 +1505,10 @@ function initPanel(script) {
     // getActiveCoordinate: the category axis snaps to its tick and the
     // other one follows the pointer, so a vertical layout snaps y.
     const g = state.geom;
+    if (m.kind === "radar") {
+      positionTooltip(e, null, null, i);
+      return;
+    }
     const snap = g ? g.cats[i] : null;
     positionTooltip(e, g && g.vertical ? null : snap, g && g.vertical ? snap : null, i);
   });

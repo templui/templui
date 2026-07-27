@@ -1,0 +1,71 @@
+package charts
+
+import (
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/components/icon"
+)
+
+// The pendant of chart-radar-lines-only.tsx.
+
+var chartRadarLinesOnlyData = []chart.Datum{
+	{"month": "January", "desktop": 186, "mobile": 160},
+	{"month": "February", "desktop": 185, "mobile": 170},
+	{"month": "March", "desktop": 207, "mobile": 180},
+	{"month": "April", "desktop": 173, "mobile": 160},
+	{"month": "May", "desktop": 160, "mobile": 190},
+	{"month": "June", "desktop": 174, "mobile": 204},
+}
+
+var chartRadarLinesOnlyConfig = chart.Config{
+	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
+	{Key: "mobile", Label: "Mobile", Color: "var(--chart-2)"},
+}
+
+templ ChartRadarLinesOnly() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "items-center pb-4"}) {
+			@card.Title() {
+				Radar Chart - Lines Only
+			}
+			@card.Description() {
+				Showing total visitors for the last 6 months
+			}
+		}
+		@card.Content(card.ContentProps{Class: "pb-0"}) {
+			@chart.Container(chart.ContainerProps{ID: "radar-lines-only", Config: chartRadarLinesOnlyConfig, Class: "mx-auto aspect-square max-h-[250px]"}) {
+				@chart.RadarChart(chart.RadarChartProps{Data: chartRadarLinesOnlyData}) {
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  chart.Bool(false),
+						Content: chart.TooltipContentProps{Indicator: "line"},
+					})
+					@chart.PolarAngleAxis(chart.PolarAngleAxisProps{DataKey: "month"})
+					@chart.PolarGrid(chart.PolarGridProps{RadialLines: chart.Bool(false)})
+					@chart.Radar(chart.RadarProps{
+						DataKey:     "desktop",
+						Fill:        "var(--color-desktop)",
+						FillOpacity: chart.Float(0),
+						Stroke:      "var(--color-desktop)",
+						StrokeWidth: 2,
+					})
+					@chart.Radar(chart.RadarProps{
+						DataKey:     "mobile",
+						Fill:        "var(--color-mobile)",
+						FillOpacity: chart.Float(0),
+						Stroke:      "var(--color-mobile)",
+						StrokeWidth: 2,
+					})
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-2 text-sm"}) {
+			<div class="flex items-center gap-2 leading-none font-medium">
+			Trending up by 5.2% this month
+			@icon.TrendingUp(icon.Props{Class: "h-4 w-4"})
+			</div>
+			<div class="flex items-center gap-2 leading-none text-muted-foreground">
+			January - June 2024
+			</div>
+		}
+	}
+}
