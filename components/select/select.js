@@ -495,13 +495,26 @@ import "../floatingui/floating_ui_dom.js";
     allContents().forEach(close);
   }
 
+  // The value mirrors the selected item like Select.ItemText does: an
+  // explicit label wins, otherwise the item's own markup is shown.
+  function itemLabel(item) {
+    const explicit = item.getAttribute("data-tui-select-label");
+    if (explicit) return { text: explicit, html: null };
+    const text = item.querySelector("[data-tui-select-item-text]");
+    if (text) return { text: text.textContent.trim(), html: text.innerHTML };
+    return { text: item.textContent.trim(), html: null };
+  }
+
+  function setValue(span, label) {
+    if (label.html != null) span.innerHTML = label.html;
+    else span.textContent = label.text;
+  }
+
   function selectItem(content, item) {
     const trigger = triggerFor(content);
     if (!trigger) return;
     const value = item.getAttribute("data-tui-select-value") || "";
-    const label =
-      item.getAttribute("data-tui-select-label") ||
-      (item.querySelector("[data-tui-select-item-text]") || item).textContent.trim();
+    const label = itemLabel(item);
 
     content.querySelectorAll("[data-tui-select-item]").forEach((i) => {
       i.setAttribute("data-state", "unchecked");
@@ -511,7 +524,7 @@ import "../floatingui/floating_ui_dom.js";
     item.setAttribute("aria-selected", "true");
 
     const span = valueSpanFor(trigger);
-    if (span) span.textContent = label;
+    if (span) setValue(span, label);
     trigger.removeAttribute("data-placeholder");
 
     const input = inputFor(trigger);
@@ -552,11 +565,9 @@ import "../floatingui/floating_ui_dom.js";
       portal(content); // portal up front, like React does on mount
       const checked = content.querySelector('[data-tui-select-item][data-state="checked"]');
       if (!checked) return;
-      const label =
-        checked.getAttribute("data-tui-select-label") ||
-        (checked.querySelector("[data-tui-select-item-text]") || checked).textContent.trim();
+      const label = itemLabel(checked);
       const span = valueSpanFor(trigger);
-      if (span && span.textContent.trim() !== label) span.textContent = label;
+      if (span && span.innerHTML !== label.html) setValue(span, label);
       if (trigger.hasAttribute("data-placeholder")) trigger.removeAttribute("data-placeholder");
     });
   }
