@@ -904,14 +904,18 @@ function renderPie(panel, m, state, alpha = 1) {
   const W = panel.clientWidth;
   const H = panel.clientHeight;
   if (!W || !H) return;
-  // The Pie defaults: centered, 80% of the radius the margin leaves.
+  // The Pie defaults: centered in the offset box, 80% of its radius. The
+  // legend adds to the bottom offset, so it shrinks the pie instead of
+  // covering it.
   const margin = 5;
-  const cx = W / 2;
-  const cy = H / 2;
-  const maxR = (Math.min(W, H) - 2 * margin) / 2;
+  const offsetW = Math.max(W - 2 * margin, 0);
+  const offsetH = Math.max(H - 2 * margin - (m.legendHeight || 0), 0);
+  const cx = margin + offsetW / 2;
+  const cy = margin + offsetH / 2;
+  const maxR = Math.min(offsetW, offsetH) / 2;
 
   let svg = `<svg class="recharts-surface" width="${fmtF(W)}" height="${fmtF(H)}" viewBox="0 0 ${fmtF(W)} ${fmtF(H)}">`;
-  state.sectors = [];
+  state.points = { sectors: [] };
 
   (m.pies || []).forEach((pie, pi) => {
     const outerR = pie.outerRadius || maxR * 0.8;
@@ -920,11 +924,18 @@ function renderPie(panel, m, state, alpha = 1) {
     const stroke = pie.stroke === "0" ? "" : ` stroke="${pie.stroke || "#fff"}"`;
     const strokeWidth = pie.strokeWidth ? ` stroke-width="${fmtF(pie.strokeWidth)}"` : "";
     const sectors = [];
-    // The Pie entrance: every sector interpolates its own angle and they
-    // chain, so the whole pie opens up.
+    // The Pie animation: every sector interpolates its own angle and they
+    // chain. On mount it starts at zero, on an update it starts at the
+    // previous sector's angle.
+    const morph = state.morph;
+    const prevSectors = morph && morph.prev && morph.prev.sectors ? morph.prev.sectors[pi] : null;
     let angle = 0;
     for (let i = 0; i < pie.values.length; i++) {
-      const sweep = (pie.values[i] / total) * 360 * alpha;
+      const target = (pie.values[i] / total) * 360 * alpha;
+      let sweep = target;
+      if (prevSectors && prevSectors[i]) {
+        sweep = interpolate(prevSectors[i].end - prevSectors[i].start, target, morph.t);
+      }
       sectors.push({ start: angle, end: angle + sweep, mid: angle + sweep / 2 });
       angle += sweep;
     }
@@ -982,7 +993,7 @@ function renderPie(panel, m, state, alpha = 1) {
         `</text>`;
     }
     svg += "</g>";
-    state.sectors.push(sectors);
+    state.points.sectors.push(sectors);
   });
 
   svg += "</svg>";
@@ -1178,7 +1189,11 @@ function initPanel(script) {
     const prev = container._tuiActive;
     const prevPoints = container._tuiActivePoints;
     container._tuiActive = m;
-    if (prev && prev !== m && prevPoints && prev.kind === m.kind && prev.series.length === m.series.length) {
+    const sameShape =
+      m.kind === "pie"
+        ? prev && prev.pies && m.pies && prev.pies.length === m.pies.length
+        : prev && prev.series && m.series && prev.series.length === m.series.length;
+    if (prev && prev !== m && prevPoints && prev.kind === m.kind && sameShape) {
       morphChart(panel, m, state, render, prevPoints);
     } else {
       animateChart(panel, m, state, render);
