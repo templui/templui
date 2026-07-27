@@ -516,6 +516,7 @@ function renderCartesian(panel, m, state, alpha = 1) {
   const W = panel.clientWidth;
   const H = panel.clientHeight;
   if (!W || !H) return;
+  const legendHeight = legendSize(panel, m);
 
   const vertical = m.layout === "vertical";
   // selectChartOffsetInternal: the axes add to the margins, the legend box
@@ -524,7 +525,7 @@ function renderCartesian(panel, m, state, alpha = 1) {
   const plotX = m.marginLeft + yAxisW;
   const plotY = m.marginTop;
   const plotW = Math.max(W - m.marginLeft - m.marginRight - yAxisW, 0);
-  const plotH = Math.max(H - m.marginTop - m.marginBottom - (m.xAxisHeight || 0) - (m.legendHeight || 0), 0);
+  const plotH = Math.max(H - m.marginTop - m.marginBottom - (m.xAxisHeight || 0) - legendHeight, 0);
   const plotBottom = plotY + plotH;
   const n = m.labels.length;
 
@@ -860,6 +861,19 @@ function renderCartesian(panel, m, state, alpha = 1) {
 
 /* Pie sector path, the port of the Go SectorPath (degrees, 0 at three
  * o'clock, counterclockwise positive). */
+/* useElementOffset and setLegendSize: the legend reports its rendered
+ * bounding box, and appendOffsetOfLegend takes that height off the chart.
+ * The model height is the fallback until the legend has been laid out. */
+function legendSize(panel, m) {
+  if (!m.legendHeight) return 0;
+  const el = panel.querySelector(".recharts-legend-wrapper");
+  if (el) {
+    const h = el.getBoundingClientRect().height;
+    if (h > 0) return h;
+  }
+  return m.legendHeight;
+}
+
 /* polarToCartesian of Recharts: degrees, zero at three o'clock, positive
  * counterclockwise. */
 function polarToCartesian(cx, cy, radius, angle) {
@@ -909,7 +923,7 @@ function renderPie(panel, m, state, alpha = 1) {
   // covering it.
   const margin = 5;
   const offsetW = Math.max(W - 2 * margin, 0);
-  const offsetH = Math.max(H - 2 * margin - (m.legendHeight || 0), 0);
+  const offsetH = Math.max(H - 2 * margin - legendSize(panel, m), 0);
   const cx = margin + offsetW / 2;
   const cy = margin + offsetH / 2;
   const maxR = Math.min(offsetW, offsetH) / 2;

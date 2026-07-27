@@ -1020,6 +1020,9 @@ func buildModel(ctx context.Context, st *chartState) Model {
 
 func buildPieModel(ctx context.Context, config Config, st *chartState) Model {
 	m := Model{Kind: "pie", Cursor: false}
+	if st.legend != nil {
+		m.LegendHeight = defaultLegendHeight
+	}
 	for _, ps := range st.pies {
 		p := ps.props
 		pm := PieModel{

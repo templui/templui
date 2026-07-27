@@ -59,16 +59,15 @@ templ ChartPieInteractive() {
 			</div>
 			@selectcomp.Select(selectcomp.Props{Value: "january"}) {
 				@selectcomp.Trigger(selectcomp.TriggerProps{
-					Size:       selectcomp.SizeSm,
-					Class:      "ml-auto w-[130px]",
+					Class:      "ml-auto h-7 w-[130px] rounded-lg pl-2.5",
 					Attributes: templ.Attributes{"aria-label": "Select a value", "data-tui-chart-month-select": "pie-interactive"},
 				}) {
 					@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select month"})
 				}
-				@selectcomp.Content(selectcomp.ContentProps{Align: selectcomp.AlignEnd}) {
+				@selectcomp.Content(selectcomp.ContentProps{Align: selectcomp.AlignEnd, Class: "rounded-xl"}) {
 					for _, d := range chartPieInteractiveData {
 						{{ month := d["month"].(string) }}
-						@selectcomp.Item(selectcomp.ItemProps{Value: month, Label: chartPieInteractiveConfig.Label(month)}) {
+						@selectcomp.Item(selectcomp.ItemProps{Value: month, Label: chartPieInteractiveConfig.Label(month), Class: "rounded-lg [&_span]:flex"}) {
 							<div class="flex items-center gap-2 text-xs">
 								<span
 									class="flex h-3 w-3 shrink-0 rounded-xs"
