@@ -48,10 +48,7 @@ templ ChartLineMultiple() {
 						TickMargin:    8,
 						TickFormatter: lineMultipleMonthShort,
 					})
-					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  chart.Bool(false),
-						Content: chart.TooltipContentProps{HideLabel: true},
-					})
+					@chart.Tooltip(chart.TooltipProps{Cursor: chart.Bool(false)})
 					@chart.Line(chart.LineProps{
 						DataKey:     "desktop",
 						Type:        "monotone",
@@ -67,13 +64,17 @@ templ ChartLineMultiple() {
 				}
 			}
 		}
-		@card.Footer(card.FooterProps{Class: "flex-col items-start gap-2 text-sm"}) {
-			<div class="flex gap-2 leading-none font-medium">
-				Trending up by 5.2% this month
-				@icon.TrendingUp(icon.Props{Class: "h-4 w-4"})
-			</div>
-			<div class="leading-none text-muted-foreground">
-				Showing total visitors for the last 6 months
+		@card.Footer() {
+			<div class="flex w-full items-start gap-2 text-sm">
+				<div class="grid gap-2">
+					<div class="flex items-center gap-2 leading-none font-medium">
+						Trending up by 5.2% this month
+						@icon.TrendingUp(icon.Props{Class: "h-4 w-4"})
+					</div>
+					<div class="flex items-center gap-2 leading-none text-muted-foreground">
+						Showing total visitors for the last 6 months
+					</div>
+				</div>
 			</div>
 		}
 	}
