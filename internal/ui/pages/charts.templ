@@ -81,7 +81,16 @@ func chartsFor(chartType string) []modules.ChartEntry {
 		}
 	case "pie":
 		return []modules.ChartEntry{
+			entry("chart-pie-simple", false),
+			entry("chart-pie-separator-none", false),
+			entry("chart-pie-label", false),
+			entry("chart-pie-label-custom", false),
+			entry("chart-pie-label-list", false),
+			entry("chart-pie-legend", false),
 			entry("chart-pie-donut", false),
+			entry("chart-pie-donut-active", false),
+			entry("chart-pie-donut-text", false),
+			entry("chart-pie-stacked", false),
 			entry("chart-pie-interactive", false),
 		}
 	}

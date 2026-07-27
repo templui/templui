@@ -347,6 +347,7 @@ type TooltipProps struct {
 // TooltipContentProps is the pendant of ChartTooltipContent.
 type TooltipContentProps struct {
 	Indicator      string // "dot" (default), "line", "dashed"
+	LabelKey       string
 	HideLabel      bool
 	HideIndicator  bool
 	NameKey        string
@@ -444,6 +445,14 @@ type LabelListProps struct {
 	Formatter   func(any) string
 }
 
+// LegendProps is the pendant of ChartLegend plus ChartLegendContent.
+type LegendProps struct {
+	// NameKey picks the config entry for the label, like the nameKey of
+	// ChartLegendContent.
+	NameKey string
+	Class   string
+}
+
 // LineChartProps is the pendant of the Recharts LineChart root.
 type LineChartProps struct {
 	Data   []Datum
@@ -456,11 +465,33 @@ type PieProps struct {
 	DataKey     string
 	NameKey     string
 	InnerRadius float64
+	// OuterRadius defaults to Recharts' 80% of the available radius.
+	OuterRadius float64
 	StrokeWidth float64
-	// ActiveIndex grows the sector like the interactive demo's custom
-	// active shape, ActiveRing adds the detached outer ring.
-	ActiveIndex int
-	ActiveRing  bool
+	// Stroke is the separator between the sectors, Recharts' "#fff"; the
+	// demos pass "0" to drop it.
+	Stroke string
+	// Label renders the value labels outside the sectors, LabelLine the
+	// connecting line, on by default like Recharts.
+	Label     *PieLabelProps
+	LabelLine *bool
+	// ActiveIndex and ActiveShape are Recharts' active sector props: the
+	// sector at that index renders as the given shapes instead.
+	ActiveIndex *int
+	ActiveShape []SectorProps
+}
+
+// PieLabelProps is the pendant of the label prop of a Pie.
+type PieLabelProps struct {
+	// Fill overrides the sector color the labels inherit.
+	Fill string
+}
+
+// SectorProps is the pendant of a Recharts Sector, the offsets it applies
+// to the sector radii.
+type SectorProps struct {
+	InnerRadius float64
+	OuterRadius float64
 }
 
 // LabelProps is the pendant of the Label content in the donut hole.
@@ -509,18 +540,24 @@ type chartState struct {
 	x           *XAxisProps
 	y           *YAxisProps
 	tooltip     *TooltipProps
-	legend      bool
+	legend      *LegendProps
 	defs        []LinearGradientProps
 	areas       []AreaProps
 	bars        []*barState
 	lines       []*lineState
-	pie         *PieProps
-	label       *LabelProps
+	pies        []*pieState
 }
 
 // lineState pairs a line with the LabelList its children registered.
 type lineState struct {
 	props     LineProps
+	labelList *LabelListProps
+}
+
+// pieState pairs a pie with the Label and LabelList children it collected.
+type pieState struct {
+	props     PieProps
+	label     *LabelProps
 	labelList *LabelListProps
 }
 
@@ -827,8 +864,8 @@ func chartOutput(st *chartState) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if st.legend {
-			templ_7745c5c3_Err = legendContent(legendSeries(m.Series)).Render(ctx, templ_7745c5c3_Buffer)
+		if st.legend != nil {
+			templ_7745c5c3_Err = legendContent(legendItems(configFrom(ctx), m, st, st.legend), st.legend.Class).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -971,7 +1008,7 @@ func Tooltip(props ...TooltipProps) templ.Component {
 }
 
 // Legend registers the ChartLegend, rendered by the chart root.
-func Legend() templ.Component {
+func Legend(props ...LegendProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -992,8 +1029,12 @@ func Legend() templ.Component {
 			templ_7745c5c3_Var17 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		var p LegendProps
+		if len(props) > 0 {
+			p = props[0]
+		}
 		if st := stateFrom(ctx); st != nil {
-			st.legend = true
+			st.legend = &p
 		}
 		return nil
 	})
@@ -1224,7 +1265,9 @@ func LabelList(props ...LabelListProps) templ.Component {
 			p = props[0]
 		}
 		if st := stateFrom(ctx); st != nil {
-			if len(st.bars) > 0 {
+			if len(st.pies) > 0 {
+				st.pies[len(st.pies)-1].labelList = &p
+			} else if len(st.bars) > 0 {
 				b := st.bars[len(st.bars)-1]
 				b.labelLists = append(b.labelLists, p)
 			} else if len(st.lines) > 0 {
@@ -1262,7 +1305,7 @@ func Pie(props ...PieProps) templ.Component {
 			p = props[0]
 		}
 		if st := stateFrom(ctx); st != nil {
-			st.pie = &p
+			st.pies = append(st.pies, &pieState{props: p})
 		}
 		templ_7745c5c3_Err = templ_7745c5c3_Var24.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -1298,8 +1341,8 @@ func Label(props ...LabelProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		if st := stateFrom(ctx); st != nil {
-			st.label = &p
+		if st := stateFrom(ctx); st != nil && len(st.pies) > 0 {
+			st.pies[len(st.pies)-1].label = &p
 		}
 		return nil
 	})
@@ -1376,7 +1419,7 @@ func labelListModel(ll LabelListProps, seriesKey string, data []Datum) LabelList
 func buildModel(ctx context.Context, st *chartState) Model {
 	config := configFrom(ctx)
 	if st.kind == "pie" {
-		return buildPieModel(config, st)
+		return buildPieModel(ctx, config, st)
 	}
 
 	m := Model{Kind: st.kind, StackOffset: st.stackOffset, Defs: st.defs, Layout: st.layout}
@@ -1418,7 +1461,7 @@ func buildModel(ctx context.Context, st *chartState) Model {
 			m.XAxisHeight = 0
 		}
 	}
-	if st.legend {
+	if st.legend != nil {
 		m.LegendHeight = defaultLegendHeight
 	}
 	tt := st.tooltip
@@ -1544,35 +1587,65 @@ func buildModel(ctx context.Context, st *chartState) Model {
 	return m
 }
 
-func buildPieModel(config Config, st *chartState) Model {
+func buildPieModel(ctx context.Context, config Config, st *chartState) Model {
 	m := Model{Kind: "pie", Cursor: false}
-	if p := st.pie; p != nil {
-		m.InnerRadius = p.InnerRadius
-		m.StrokeWidth = p.StrokeWidth
-		m.ActiveIndex = p.ActiveIndex
-		m.ActiveRing = p.ActiveRing
-
-		values := make([]float64, len(p.Data))
-		m.Labels = make([]string, len(p.Data))
-		m.SliceColors = make([]string, len(p.Data))
+	for _, ps := range st.pies {
+		p := ps.props
+		pm := PieModel{
+			Key:         p.DataKey,
+			SeriesLabel: config.Label(p.DataKey),
+			NameKey:     p.NameKey,
+			InnerRadius: p.InnerRadius,
+			OuterRadius: p.OuterRadius,
+			StrokeWidth: p.StrokeWidth,
+			Stroke:      p.Stroke,
+			ActiveIndex: p.ActiveIndex,
+			ActiveShape: p.ActiveShape,
+			LabelLine:   boolOr(p.LabelLine, true),
+		}
+		if p.Label != nil {
+			pm.Label = &PieLabelModel{Fill: p.Label.Fill}
+		}
+		pm.Values = make([]float64, len(p.Data))
+		pm.Labels = make([]string, len(p.Data))
+		pm.NameValues = make([]string, len(p.Data))
+		pm.Colors = make([]string, len(p.Data))
 		for i, d := range p.Data {
-			values[i] = num(d[p.DataKey])
-			key := str(d[p.NameKey])
-			m.Labels[i] = config.Label(key)
+			pm.Values[i] = num(d[p.DataKey])
+			// getTooltipNameProp: the name key value names the slice, the
+			// data key stands in when the row has none.
+			key := p.DataKey
+			if p.NameKey != "" {
+				if v, ok := d[p.NameKey]; ok && v != nil {
+					key = str(v)
+				}
+			}
+			pm.NameValues[i] = key
+			pm.Labels[i] = config.Label(key)
 			if f, ok := d["fill"]; ok {
-				m.SliceColors[i] = str(f)
+				pm.Colors[i] = str(f)
 			} else {
-				m.SliceColors[i] = seriesColor(key)
+				pm.Colors[i] = seriesColor(key)
 			}
 		}
-		m.Series = []ModelSeries{{Key: p.DataKey, Label: config.Label(p.DataKey), Values: values}}
-	}
-	if st.label != nil {
-		m.CenterValue = st.label.Value
-		m.CenterLabel = st.label.Text
+		if l := ps.label; l != nil {
+			pm.CenterValue = l.Value
+			pm.CenterLabel = l.Text
+		}
+		if ll := ps.labelList; ll != nil {
+			// A pie label list reads the name key by default, the slice it
+			// sits on.
+			lm := labelListModel(*ll, p.NameKey, p.Data)
+			pm.LabelList = &lm
+		}
+		m.Pies = append(m.Pies, pm)
 	}
 	if tt := st.tooltip; tt != nil {
+		m.Cursor = boolOr(tt.Cursor, true)
 		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
+		if tt.Content.LabelKey != "" {
+			m.Tooltip.Label = config.Label(tt.Content.LabelKey)
+		}
 	}
 	return m
 }
@@ -1589,17 +1662,52 @@ func modelSeries(config Config, key, fill string, fillOpacity float64, data []Da
 	return ModelSeries{Key: key, Label: config.Label(key), Color: color, Values: values, FillOpacity: fillOpacity}
 }
 
-// legendSeries sorts the drawn series by their data key, Recharts'
-// itemSorter default of "value" on the Legend.
-func legendSeries(series []ModelSeries) []ModelSeries {
-	out := append([]ModelSeries(nil), series...)
-	sort.SliceStable(out, func(i, j int) bool { return out[i].Key < out[j].Key })
+// LegendItem is one rendered legend entry.
+type LegendItem struct {
+	Label string
+	Color string
+	Icon  string
+	// Value is the payload value the legend sorts by.
+	Value string
+}
+
+// legendItems builds the legend payload: one entry per series, or one per
+// slice for a pie, then sorts by the payload value like Recharts'
+// itemSorter default of "value". A pie without a name key gives every
+// entry the same value, so the data order survives the stable sort.
+func legendItems(config Config, m Model, st *chartState, p *LegendProps) []LegendItem {
+	var out []LegendItem
+	if m.Kind == "pie" {
+		for pi, pie := range m.Pies {
+			rows := st.pies[pi].props.Data
+			for i := range pie.Labels {
+				// The label comes from the legend's name key on the data
+				// row, like getPayloadConfigFromPayload does.
+				name := pie.Labels[i]
+				if p.NameKey != "" && i < len(rows) {
+					if v, ok := rows[i][p.NameKey]; ok && v != nil {
+						name = config.Label(str(v))
+					}
+				}
+				out = append(out, LegendItem{Label: name, Color: pie.Colors[i], Value: pie.NameValues[i]})
+			}
+		}
+	} else {
+		for _, s := range m.Series {
+			label := s.Label
+			if p.NameKey != "" {
+				label = config.Label(p.NameKey)
+			}
+			out = append(out, LegendItem{Label: label, Color: s.Color, Icon: s.Icon, Value: s.Key})
+		}
+	}
+	sort.SliceStable(out, func(i, j int) bool { return out[i].Value < out[j].Value })
 	return out
 }
 
 // legendContent is the ChartLegendContent pendant, absolutely positioned
 // like Recharts' legend wrapper.
-func legendContent(series []ModelSeries) templ.Component {
+func legendContent(items []LegendItem, class string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -1620,54 +1728,76 @@ func legendContent(series []ModelSeries) templ.Component {
 			templ_7745c5c3_Var26 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"recharts-legend-wrapper\" style=\"position:absolute;left:0;right:0;bottom:5px\"><div class=\"flex items-center justify-center gap-4 pt-3\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"recharts-legend-wrapper\" style=\"position:absolute;left:0;right:0;bottom:5px\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, s := range series {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground\">")
+		var templ_7745c5c3_Var27 = []any{utils.TwMerge("flex items-center justify-center gap-4 pt-3", class)}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var27...)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var28 string
+		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var27).String())
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1, Col: 0}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, it := range items {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if s.Icon != "" {
-				templ_7745c5c3_Err = templ.Raw(s.Icon).Render(ctx, templ_7745c5c3_Buffer)
+			if it.Icon != "" {
+				templ_7745c5c3_Err = templ.Raw(it.Icon).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"h-2 w-2 shrink-0 rounded-[2px]\" style=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"h-2 w-2 shrink-0 rounded-[2px]\" style=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var27 string
-				templ_7745c5c3_Var27, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + s.Color)
+				var templ_7745c5c3_Var29 string
+				templ_7745c5c3_Var29, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + it.Color)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1041, Col: 87}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1149, Col: 88}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\"></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\"></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			var templ_7745c5c3_Var28 string
-			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(s.Label)
+			var templ_7745c5c3_Var30 string
+			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(it.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1043, Col: 14}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1151, Col: 15}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1714,13 +1844,35 @@ type Model struct {
 	SliceColors   []string              `json:"sliceColors,omitempty"` // pie: color per slice
 	Series        []ModelSeries         `json:"series"`
 	Tooltip       TooltipModel          `json:"tooltip"`
-	// Pie geometry for the client renderer.
-	InnerRadius float64 `json:"innerRadius,omitempty"`
-	StrokeWidth float64 `json:"strokeWidth,omitempty"`
-	ActiveIndex int     `json:"activeIndex,omitempty"`
-	ActiveRing  bool    `json:"activeRing,omitempty"`
-	CenterValue string  `json:"centerValue,omitempty"`
-	CenterLabel string  `json:"centerLabel,omitempty"`
+	// Pies carries the pie geometry for the client renderer.
+	Pies []PieModel `json:"pies,omitempty"`
+}
+
+// PieModel is one rendered Pie with its sectors.
+type PieModel struct {
+	Key         string          `json:"key"`
+	SeriesLabel string          `json:"seriesLabel,omitempty"`
+	Values      []float64       `json:"values"`
+	Labels      []string        `json:"labels"`
+	NameKey     string          `json:"nameKey,omitempty"`
+	NameValues  []string        `json:"nameValues,omitempty"`
+	Colors      []string        `json:"colors"`
+	InnerRadius float64         `json:"innerRadius,omitempty"`
+	OuterRadius float64         `json:"outerRadius,omitempty"`
+	StrokeWidth float64         `json:"strokeWidth,omitempty"`
+	Stroke      string          `json:"stroke,omitempty"`
+	Label       *PieLabelModel  `json:"label,omitempty"`
+	LabelLine   bool            `json:"labelLine,omitempty"`
+	LabelList   *LabelListModel `json:"labelList,omitempty"`
+	ActiveIndex *int            `json:"activeIndex,omitempty"`
+	ActiveShape []SectorProps   `json:"activeShape,omitempty"`
+	CenterValue string          `json:"centerValue,omitempty"`
+	CenterLabel string          `json:"centerLabel,omitempty"`
+}
+
+// PieLabelModel is the resolved label prop of a Pie.
+type PieLabelModel struct {
+	Fill string `json:"fill,omitempty"`
 }
 
 // ModelSeries is one data series with its resolved color variable.
@@ -1767,7 +1919,8 @@ type LabelListModel struct {
 
 // TooltipModel mirrors ChartTooltipContent's props.
 type TooltipModel struct {
-	Indicator     string `json:"indicator,omitempty"` // "dot" (default) | "line" | "dashed"
+	Indicator     string `json:"indicator,omitempty"`
+	Label         string `json:"label,omitempty"` // labelKey resolved through the config // "dot" (default) | "line" | "dashed"
 	HideLabel     bool   `json:"hideLabel,omitempty"`
 	HideIndicator bool   `json:"hideIndicator,omitempty"`
 	Width         string `json:"width,omitempty"` // extra class, e.g. "w-[150px]"

@@ -96,8 +96,11 @@ templ ChartPieInteractive() {
 								NameKey:     "month",
 								InnerRadius: 60,
 								StrokeWidth: 5,
-								ActiveIndex: i,
-								ActiveRing:  true,
+								ActiveIndex: chart.Index(i),
+								ActiveShape: []chart.SectorProps{
+									{OuterRadius: 10},
+									{InnerRadius: 12, OuterRadius: 25},
+								},
 							}) {
 								@chart.Label(chart.LabelProps{
 									Value: pieInteractiveFormat(d["desktop"].(int)),

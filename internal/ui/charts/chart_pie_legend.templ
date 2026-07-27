@@ -1,0 +1,50 @@
+package charts
+
+import (
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+)
+
+// The pendant of chart-pie-legend.tsx.
+
+var chartPieLegendData = []chart.Datum{
+	{"browser": "chrome", "visitors": 275, "fill": "var(--color-chrome)"},
+	{"browser": "safari", "visitors": 200, "fill": "var(--color-safari)"},
+	{"browser": "firefox", "visitors": 287, "fill": "var(--color-firefox)"},
+	{"browser": "edge", "visitors": 173, "fill": "var(--color-edge)"},
+	{"browser": "other", "visitors": 190, "fill": "var(--color-other)"},
+}
+
+var chartPieLegendConfig = chart.Config{
+	{Key: "visitors", Label: "Visitors"},
+	{Key: "chrome", Label: "Chrome", Color: "var(--chart-1)"},
+	{Key: "safari", Label: "Safari", Color: "var(--chart-2)"},
+	{Key: "firefox", Label: "Firefox", Color: "var(--chart-3)"},
+	{Key: "edge", Label: "Edge", Color: "var(--chart-4)"},
+	{Key: "other", Label: "Other", Color: "var(--chart-5)"},
+}
+
+templ ChartPieLegend() {
+	@card.Card(card.Props{Class: "flex flex-col"}) {
+		@card.Header(card.HeaderProps{Class: "items-center pb-0"}) {
+			@card.Title() {
+				Pie Chart - Legend
+			}
+			@card.Description() {
+				January - June 2024
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex-1 pb-0"}) {
+			@chart.Container(chart.ContainerProps{ID: "pie-legend", Config: chartPieLegendConfig, Class: "mx-auto aspect-square max-h-[300px]"}) {
+				@chart.PieChart() {
+					@chart.Pie(chart.PieProps{Data: chartPieLegendData, DataKey: "visitors"})
+					@chart.Legend(chart.LegendProps{
+						NameKey: "browser",
+						Class:   "-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center",
+					})
+				}
+			}
+		}
+
+	}
+}

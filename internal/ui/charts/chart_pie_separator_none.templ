@@ -1,0 +1,64 @@
+package charts
+
+import (
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/components/icon"
+)
+
+// The pendant of chart-pie-separator-none.tsx.
+
+var chartPieSeparatorNoneData = []chart.Datum{
+	{"browser": "chrome", "visitors": 275, "fill": "var(--color-chrome)"},
+	{"browser": "safari", "visitors": 200, "fill": "var(--color-safari)"},
+	{"browser": "firefox", "visitors": 287, "fill": "var(--color-firefox)"},
+	{"browser": "edge", "visitors": 173, "fill": "var(--color-edge)"},
+	{"browser": "other", "visitors": 190, "fill": "var(--color-other)"},
+}
+
+var chartPieSeparatorNoneConfig = chart.Config{
+	{Key: "visitors", Label: "Visitors"},
+	{Key: "chrome", Label: "Chrome", Color: "var(--chart-1)"},
+	{Key: "safari", Label: "Safari", Color: "var(--chart-2)"},
+	{Key: "firefox", Label: "Firefox", Color: "var(--chart-3)"},
+	{Key: "edge", Label: "Edge", Color: "var(--chart-4)"},
+	{Key: "other", Label: "Other", Color: "var(--chart-5)"},
+}
+
+templ ChartPieSeparatorNone() {
+	@card.Card(card.Props{Class: "flex flex-col"}) {
+		@card.Header(card.HeaderProps{Class: "items-center pb-0"}) {
+			@card.Title() {
+				Pie Chart - Separator None
+			}
+			@card.Description() {
+				January - June 2024
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex-1 pb-0"}) {
+			@chart.Container(chart.ContainerProps{ID: "pie-separator-none", Config: chartPieSeparatorNoneConfig, Class: "mx-auto aspect-square max-h-[250px]"}) {
+				@chart.PieChart() {
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  chart.Bool(false),
+						Content: chart.TooltipContentProps{HideLabel: true},
+					})
+					@chart.Pie(chart.PieProps{
+						Data:    chartPieSeparatorNoneData,
+						DataKey: "visitors",
+						NameKey: "browser",
+						Stroke:  "0",
+					})
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-2 text-sm"}) {
+			<div class="flex items-center gap-2 leading-none font-medium">
+				Trending up by 5.2% this month
+				@icon.TrendingUp(icon.Props{Class: "h-4 w-4"})
+			</div>
+			<div class="leading-none text-muted-foreground">
+				Showing total visitors for the last 6 months
+			</div>
+		}
+	}
+}

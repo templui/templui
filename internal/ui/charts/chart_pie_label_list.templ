@@ -1,0 +1,71 @@
+package charts
+
+import (
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/components/icon"
+)
+
+// The pendant of chart-pie-label-list.tsx.
+
+var chartPieLabelListData = []chart.Datum{
+	{"browser": "chrome", "visitors": 275, "fill": "var(--color-chrome)"},
+	{"browser": "safari", "visitors": 200, "fill": "var(--color-safari)"},
+	{"browser": "firefox", "visitors": 287, "fill": "var(--color-firefox)"},
+	{"browser": "edge", "visitors": 173, "fill": "var(--color-edge)"},
+	{"browser": "other", "visitors": 190, "fill": "var(--color-other)"},
+}
+
+var chartPieLabelListConfig = chart.Config{
+	{Key: "visitors", Label: "Visitors"},
+	{Key: "chrome", Label: "Chrome", Color: "var(--chart-1)"},
+	{Key: "safari", Label: "Safari", Color: "var(--chart-2)"},
+	{Key: "firefox", Label: "Firefox", Color: "var(--chart-3)"},
+	{Key: "edge", Label: "Edge", Color: "var(--chart-4)"},
+	{Key: "other", Label: "Other", Color: "var(--chart-5)"},
+}
+
+// pieLabelListName resolves the config label, the pendant of the demo's
+// formatter reading chartConfig[value].label.
+func pieLabelListName(v any) string {
+	return chartPieLabelListConfig.Label(v.(string))
+}
+
+templ ChartPieLabelList() {
+	@card.Card(card.Props{Class: "flex flex-col"}) {
+		@card.Header(card.HeaderProps{Class: "items-center pb-0"}) {
+			@card.Title() {
+				Pie Chart - Label List
+			}
+			@card.Description() {
+				January - June 2024
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex-1 pb-0"}) {
+			@chart.Container(chart.ContainerProps{ID: "pie-label-list", Config: chartPieLabelListConfig, Class: "mx-auto aspect-square max-h-[250px] [&_.recharts-text]:fill-background"}) {
+				@chart.PieChart() {
+					@chart.Tooltip(chart.TooltipProps{
+						Content: chart.TooltipContentProps{NameKey: "visitors", HideLabel: true},
+					})
+					@chart.Pie(chart.PieProps{Data: chartPieLabelListData, DataKey: "visitors"}) {
+						@chart.LabelList(chart.LabelListProps{
+							DataKey:   "browser",
+							Class:     "fill-background",
+							FontSize:  12,
+							Formatter: pieLabelListName,
+						})
+					}
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-2 text-sm"}) {
+			<div class="flex items-center gap-2 leading-none font-medium">
+				Trending up by 5.2% this month
+				@icon.TrendingUp(icon.Props{Class: "h-4 w-4"})
+			</div>
+			<div class="leading-none text-muted-foreground">
+				Showing total visitors for the last 6 months
+			</div>
+		}
+	}
+}

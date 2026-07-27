@@ -881,48 +881,108 @@ function sectorPath(cx, cy, innerR, outerR, startAngle, endAngle) {
 /* renderPie is the client pendant of the Go pieSVG: sectors from the
  * model, the active ring and the center label. The alpha sweep is the
  * Recharts pie entrance animation. */
+/* polarToCartesian of Recharts: degrees, zero at three o'clock, positive
+ * counterclockwise. */
+function polarToCartesian(cx, cy, radius, angle) {
+  const rad = (angle * Math.PI) / 180;
+  return { x: cx + Math.cos(rad) * radius, y: cy - Math.sin(rad) * radius };
+}
+
+/* getTextAnchor of Pie's labels. */
+function pieTextAnchor(x, cx) {
+  if (x > cx) return "start";
+  if (x < cx) return "end";
+  return "middle";
+}
+
+const PIE_LABEL_OFFSET = 20;
+
 function renderPie(panel, m, state, alpha = 1) {
   const W = panel.clientWidth;
   const H = panel.clientHeight;
   if (!W || !H) return;
+  // The Pie defaults: centered, 80% of the radius the margin leaves.
   const margin = 5;
   const cx = W / 2;
   const cy = H / 2;
   const maxR = (Math.min(W, H) - 2 * margin) / 2;
-  const outerR = maxR * 0.8;
-  const values = m.series[0].values;
-  const total = values.reduce((a, b) => a + b, 0);
-  const strokeWidth = m.strokeWidth ? ` stroke-width="${fmtF(m.strokeWidth)}"` : "";
 
   let svg = `<svg class="recharts-surface" width="${fmtF(W)}" height="${fmtF(H)}" viewBox="0 0 ${fmtF(W)} ${fmtF(H)}">`;
-  svg += `<g class="recharts-layer recharts-pie">`;
-  // The Recharts Pie entrance: every sector interpolates its own angle
-  // and they chain, so the whole pie opens up instead of drawing sector
-  // by sector.
-  let angle = 0;
-  for (let i = 0; i < values.length; i++) {
-    const shown = (values[i] / total) * 360 * alpha;
-    const fill = m.sliceColors[i];
-    if (i === m.activeIndex && m.activeRing) {
-      svg +=
-        `<g class="recharts-layer recharts-pie-sector">` +
-        `<path class="recharts-sector" stroke="#fff"${strokeWidth} fill="${fill}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, (m.innerRadius || 0), outerR + 10, angle, angle + shown)}"/>` +
-        `<path class="recharts-sector" stroke="#fff"${strokeWidth} fill="${fill}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, outerR + 12, outerR + 25, angle, angle + shown)}"/>` +
-        `</g>`;
-    } else {
-      svg += `<g class="recharts-layer recharts-pie-sector"><path class="recharts-sector" stroke="#fff"${strokeWidth} fill="${fill}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, (m.innerRadius || 0), outerR, angle, angle + shown)}"/></g>`;
-    }
-    angle += shown;
-  }
-  if (m.centerValue) {
-    svg +=
-      `<text x="${fmtF(cx)}" y="${fmtF(cy)}" text-anchor="middle" dominant-baseline="middle">` +
-      `<tspan x="${fmtF(cx)}" y="${fmtF(cy)}" class="fill-foreground text-3xl font-bold">${m.centerValue}</tspan>` +
-      `<tspan x="${fmtF(cx)}" y="${fmtF(cy + 24)}" class="fill-muted-foreground">${m.centerLabel}</tspan>` +
-      `</text>`;
-  }
-  svg += "</g></svg>";
+  state.sectors = [];
 
+  (m.pies || []).forEach((pie, pi) => {
+    const outerR = pie.outerRadius || maxR * 0.8;
+    const innerR = pie.innerRadius || 0;
+    const total = pie.values.reduce((a, b) => a + b, 0);
+    const stroke = pie.stroke === "0" ? "" : ` stroke="${pie.stroke || "#fff"}"`;
+    const strokeWidth = pie.strokeWidth ? ` stroke-width="${fmtF(pie.strokeWidth)}"` : "";
+    const sectors = [];
+    // The Pie entrance: every sector interpolates its own angle and they
+    // chain, so the whole pie opens up.
+    let angle = 0;
+    for (let i = 0; i < pie.values.length; i++) {
+      const sweep = (pie.values[i] / total) * 360 * alpha;
+      sectors.push({ start: angle, end: angle + sweep, mid: angle + sweep / 2 });
+      angle += sweep;
+    }
+
+    svg += `<g class="recharts-layer recharts-pie">`;
+    for (let i = 0; i < sectors.length; i++) {
+      const sc = sectors[i];
+      const fill = pie.colors[i];
+      const active = pie.activeIndex != null && pie.activeIndex === i && pie.activeShape && pie.activeShape.length;
+      const shapes = active
+        ? pie.activeShape.map((sp) => ({ inner: sp.InnerRadius ? outerR + sp.InnerRadius : innerR, outer: outerR + (sp.OuterRadius || 0) }))
+        : [{ inner: innerR, outer: outerR }];
+      svg += `<g class="recharts-layer recharts-pie-sector">`;
+      for (const sh of shapes) {
+        svg += `<path class="recharts-sector"${stroke}${strokeWidth} fill="${fill}" data-tui-chart-pie="${pi}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, sh.inner, sh.outer, sc.start, sc.end)}"/>`;
+      }
+      svg += `</g>`;
+    }
+
+    // PieLabels: the label sits offsetRadius past the sector, the line
+    // runs from the sector edge to it.
+    if (alpha >= 1 && pie.label) {
+      svg += `<g class="recharts-layer recharts-pie-labels">`;
+      for (let i = 0; i < sectors.length; i++) {
+        const mid = sectors[i].mid;
+        const endPoint = polarToCartesian(cx, cy, outerR + PIE_LABEL_OFFSET, mid);
+        const fill = pie.label.fill || pie.colors[i];
+        if (pie.labelLine) {
+          const startPoint = polarToCartesian(cx, cy, outerR, mid);
+          svg += `<path class="recharts-curve recharts-pie-label-line" stroke="${pie.colors[i]}" fill="none" d="M${fmtF(startPoint.x)},${fmtF(startPoint.y)}L${fmtF(endPoint.x)},${fmtF(endPoint.y)}"/>`;
+        }
+        svg += `<text class="recharts-text recharts-pie-label-text" x="${fmtF(endPoint.x)}" y="${fmtF(endPoint.y)}" fill="${fill}" text-anchor="${pieTextAnchor(endPoint.x, cx)}" alignment-baseline="middle">${fmtF(pie.values[i])}</text>`;
+      }
+      svg += `</g>`;
+    }
+
+    // A LabelList on a Pie is a polar label: it sits at the middle radius
+    // of its sector.
+    if (alpha >= 1 && pie.labelList) {
+      const ll = pie.labelList;
+      svg += `<g class="recharts-layer recharts-label-list">`;
+      for (let i = 0; i < sectors.length; i++) {
+        const r = (innerR + outerR) / 2;
+        const pt = polarToCartesian(cx, cy, r, sectors[i].mid);
+        svg += `<text class="recharts-text recharts-label ${ll.class || ""}" x="${fmtF(pt.x)}" y="${fmtF(pt.y)}" text-anchor="middle" font-size="${fmtF(ll.fontSize || 12)}"><tspan dy="0.355em">${ll.labels[i]}</tspan></text>`;
+      }
+      svg += `</g>`;
+    }
+
+    if (pie.centerValue) {
+      svg +=
+        `<text x="${fmtF(cx)}" y="${fmtF(cy)}" text-anchor="middle" dominant-baseline="middle">` +
+        `<tspan x="${fmtF(cx)}" y="${fmtF(cy)}" class="fill-foreground text-3xl font-bold">${pie.centerValue}</tspan>` +
+        `<tspan x="${fmtF(cx)}" y="${fmtF(cy + 24)}" class="fill-muted-foreground">${pie.centerLabel}</tspan>` +
+        `</text>`;
+    }
+    svg += "</g>";
+    state.sectors.push(sectors);
+  });
+
+  svg += "</svg>";
   swapSVG(panel, svg);
   state.geom = { W, H };
 }
@@ -952,9 +1012,11 @@ function indicatorHTML(indicator, color) {
   return `<div class="${cls}" style="--color-bg:${color};--color-border:${color}"></div>`;
 }
 
-function tooltipHTML(m, i) {
+function tooltipHTML(m, i, pieIndex = 0) {
   const t = m.tooltip || {};
-  const label = (m.tooltipLabels && m.tooltipLabels[i]) || m.labels[i];
+  // labelKey resolves the label through the config, otherwise the row's
+  // own label is used.
+  const label = t.label || (m.kind === "pie" ? "" : (m.tooltipLabels && m.tooltipLabels[i]) || m.labels[i]);
   // Like ChartTooltipContent: a single non-dot series nests the label
   // inside the row, so the line indicator spans the full row height.
   const nestLabel = m.kind !== "pie" && m.series.length === 1 && t.indicator && t.indicator !== "dot";
@@ -964,14 +1026,20 @@ function tooltipHTML(m, i) {
   }
   html += `<div class="grid gap-1.5">`;
   if (m.kind === "pie") {
-    const s = m.series[0];
-    const color = (m.sliceColors && m.sliceColors[i]) || s.color;
+    const pie = m.pies[pieIndex];
+    if (t.label && !t.hideLabel) {
+      html = html.replace('<div class="grid gap-1.5">', `<div class="font-medium">${pie.seriesLabel || t.label}</div><div class="grid gap-1.5">`);
+    }
+    const color = pie.colors[i];
+    const rowCls =
+      "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground" +
+      (t.indicator !== "line" && t.indicator !== "dashed" ? " items-center" : "");
     html +=
-      `<div class="flex w-full flex-wrap items-stretch gap-2 items-center [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground">` +
+      `<div class="${rowCls}">` +
       (t.hideIndicator ? "" : indicatorHTML(t.indicator, color)) +
       `<div class="flex flex-1 justify-between leading-none items-center">` +
-      `<div class="grid gap-1.5"><span class="text-muted-foreground">${m.labels[i]}</span></div>` +
-      `<span class="font-mono font-medium text-foreground tabular-nums">${s.values[i].toLocaleString("en-US")}</span>` +
+      `<div class="grid gap-1.5"><span class="text-muted-foreground">${pie.labels[i]}</span></div>` +
+      `<span class="font-mono font-medium text-foreground tabular-nums">${pie.values[i].toLocaleString("en-US")}</span>` +
       `</div></div></div></div>`;
     return html;
   }
@@ -1161,7 +1229,7 @@ function initPanel(script) {
         wrapper.style.visibility = "hidden";
         return;
       }
-      positionTooltip(e, null, null, idx);
+      positionTooltip(e, null, null, idx, parseInt(sector.getAttribute("data-tui-chart-pie") || "0", 10));
       return;
     }
     const rect = panel.getBoundingClientRect();
@@ -1182,9 +1250,9 @@ function initPanel(script) {
     positionTooltip(e, g && g.vertical ? null : snap, g && g.vertical ? snap : null, i);
   });
 
-  function positionTooltip(e, snapX, snapY, i) {
+  function positionTooltip(e, snapX, snapY, i, pieIndex = 0) {
     const wasHidden = wrapper.style.visibility !== "visible";
-    wrapper.innerHTML = tooltipHTML(m, i);
+    wrapper.innerHTML = tooltipHTML(m, i, pieIndex);
     wrapper.style.visibility = "visible";
     const crect = container.getBoundingClientRect();
     const tw = wrapper.offsetWidth;

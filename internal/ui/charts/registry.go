@@ -66,6 +66,24 @@ func Component(name string) templ.Component {
 		return ChartLineLabel()
 	case "chart-line-label-custom":
 		return ChartLineLabelCustom()
+	case "chart-pie-simple":
+		return ChartPieSimple()
+	case "chart-pie-separator-none":
+		return ChartPieSeparatorNone()
+	case "chart-pie-label":
+		return ChartPieLabel()
+	case "chart-pie-label-custom":
+		return ChartPieLabelCustom()
+	case "chart-pie-label-list":
+		return ChartPieLabelList()
+	case "chart-pie-legend":
+		return ChartPieLegend()
+	case "chart-pie-donut-active":
+		return ChartPieDonutActive()
+	case "chart-pie-donut-text":
+		return ChartPieDonutText()
+	case "chart-pie-stacked":
+		return ChartPieStacked()
 	case "chart-pie-donut":
 		return ChartPieDonut()
 	case "chart-pie-interactive":
