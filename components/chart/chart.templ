@@ -1039,6 +1039,7 @@ func buildPieModel(ctx context.Context, config Config, st *chartState) Model {
 		}
 		pm.Values = make([]float64, len(p.Data))
 		pm.Labels = make([]string, len(p.Data))
+		pm.TooltipNames = make([]string, len(p.Data))
 		pm.NameValues = make([]string, len(p.Data))
 		pm.Colors = make([]string, len(p.Data))
 		for i, d := range p.Data {
@@ -1053,6 +1054,13 @@ func buildPieModel(ctx context.Context, config Config, st *chartState) Model {
 			}
 			pm.NameValues[i] = key
 			pm.Labels[i] = config.Label(key)
+			// ChartTooltipContent names the row through nameKey when it is
+			// set, otherwise through the slice name.
+			nameKey := key
+			if st.tooltip != nil && st.tooltip.Content.NameKey != "" {
+				nameKey = st.tooltip.Content.NameKey
+			}
+			pm.TooltipNames[i] = config.Label(payloadConfigKey(d, nameKey))
 			if f, ok := d["fill"]; ok {
 				pm.Colors[i] = str(f)
 			} else {
@@ -1100,6 +1108,20 @@ type LegendItem struct {
 	Icon  string
 	// Value is the payload value the legend sorts by.
 	Value string
+}
+
+// payloadConfigKey is getPayloadConfigFromPayload: the key names the
+// config entry, unless the data row carries a string under that key, then
+// its value names it.
+func payloadConfigKey(row Datum, key string) string {
+	if row != nil {
+		if v, ok := row[key]; ok {
+			if sv, isString := v.(string); isString {
+				return sv
+			}
+		}
+	}
+	return key
 }
 
 // legendItems builds the legend payload: one entry per series, or one per
@@ -1203,7 +1225,8 @@ type PieModel struct {
 	Key         string           `json:"key"`
 	SeriesLabel string           `json:"seriesLabel,omitempty"`
 	Values      []float64        `json:"values"`
-	Labels      []string         `json:"labels"`
+	Labels       []string        `json:"labels"`
+	TooltipNames []string        `json:"tooltipNames,omitempty"`
 	NameKey     string           `json:"nameKey,omitempty"`
 	NameValues  []string         `json:"nameValues,omitempty"`
 	Colors      []string         `json:"colors"`

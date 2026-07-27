@@ -860,32 +860,35 @@ function renderCartesian(panel, m, state, alpha = 1) {
 
 /* Pie sector path, the port of the Go SectorPath (degrees, 0 at three
  * o'clock, counterclockwise positive). */
-function sectorPath(cx, cy, innerR, outerR, startAngle, endAngle) {
-  const rad = (deg) => (deg * Math.PI) / 180;
-  const sx0 = cx + outerR * Math.cos(rad(startAngle));
-  const sy0 = cy - outerR * Math.sin(rad(startAngle));
-  const ex0 = cx + outerR * Math.cos(rad(endAngle));
-  const ey0 = cy - outerR * Math.sin(rad(endAngle));
-  const sx1 = cx + innerR * Math.cos(rad(endAngle));
-  const sy1 = cy - innerR * Math.sin(rad(endAngle));
-  const ex1 = cx + innerR * Math.cos(rad(startAngle));
-  const ey1 = cy - innerR * Math.sin(rad(startAngle));
-  const large = Math.abs(endAngle - startAngle) > 180 ? 1 : 0;
-  const sweep = endAngle > startAngle ? 0 : 1;
-  return (
-    `M ${fmtF(sx0)},${fmtF(sy0)} A ${fmtF(outerR)},${fmtF(outerR)},0,${large},${sweep},${fmtF(ex0)},${fmtF(ey0)} ` +
-    `L ${fmtF(sx1)},${fmtF(sy1)} A ${fmtF(innerR)},${fmtF(innerR)},0,${large},${1 - sweep},${fmtF(ex1)},${fmtF(ey1)} Z`
-  );
-}
-
-/* renderPie is the client pendant of the Go pieSVG: sectors from the
- * model, the active ring and the center label. The alpha sweep is the
- * Recharts pie entrance animation. */
 /* polarToCartesian of Recharts: degrees, zero at three o'clock, positive
  * counterclockwise. */
 function polarToCartesian(cx, cy, radius, angle) {
   const rad = (angle * Math.PI) / 180;
   return { x: cx + Math.cos(rad) * radius, y: cy - Math.sin(rad) * radius };
+}
+
+/* getSectorPath of Recharts' Sector. */
+function sectorPath(cx, cy, innerR, outerR, startAngle, endAngle) {
+  // getDeltaAngle clamps a sector to a full turn.
+  const sign = endAngle - startAngle < 0 ? -1 : 1;
+  const angle = Math.min(Math.abs(endAngle - startAngle), 360) * sign;
+  const tempEndAngle = startAngle + angle;
+  const outerStart = polarToCartesian(cx, cy, outerR, startAngle);
+  const outerEnd = polarToCartesian(cx, cy, outerR, tempEndAngle);
+  const large = Math.abs(angle) > 180 ? 1 : 0;
+  let path =
+    `M ${fmtF(outerStart.x)},${fmtF(outerStart.y)} A ${fmtF(outerR)},${fmtF(outerR)},0,${large},` +
+    `${startAngle > tempEndAngle ? 1 : 0},${fmtF(outerEnd.x)},${fmtF(outerEnd.y)}`;
+  if (innerR > 0) {
+    const innerStart = polarToCartesian(cx, cy, innerR, startAngle);
+    const innerEnd = polarToCartesian(cx, cy, innerR, tempEndAngle);
+    path +=
+      `L ${fmtF(innerEnd.x)},${fmtF(innerEnd.y)} A ${fmtF(innerR)},${fmtF(innerR)},0,${large},` +
+      `${startAngle <= tempEndAngle ? 1 : 0},${fmtF(innerStart.x)},${fmtF(innerStart.y)} Z`;
+  } else {
+    path += `L ${fmtF(cx)},${fmtF(cy)} Z`;
+  }
+  return path;
 }
 
 /* getTextAnchor of Pie's labels. */
@@ -1038,7 +1041,7 @@ function tooltipHTML(m, i, pieIndex = 0) {
       `<div class="${rowCls}">` +
       (t.hideIndicator ? "" : indicatorHTML(t.indicator, color)) +
       `<div class="flex flex-1 justify-between leading-none items-center">` +
-      `<div class="grid gap-1.5"><span class="text-muted-foreground">${pie.labels[i]}</span></div>` +
+      `<div class="grid gap-1.5"><span class="text-muted-foreground">${(pie.tooltipNames && pie.tooltipNames[i]) || pie.labels[i]}</span></div>` +
       `<span class="font-mono font-medium text-foreground tabular-nums">${pie.values[i].toLocaleString("en-US")}</span>` +
       `</div></div></div></div>`;
     return html;

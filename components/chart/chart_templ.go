@@ -1608,6 +1608,7 @@ func buildPieModel(ctx context.Context, config Config, st *chartState) Model {
 		}
 		pm.Values = make([]float64, len(p.Data))
 		pm.Labels = make([]string, len(p.Data))
+		pm.TooltipNames = make([]string, len(p.Data))
 		pm.NameValues = make([]string, len(p.Data))
 		pm.Colors = make([]string, len(p.Data))
 		for i, d := range p.Data {
@@ -1622,6 +1623,13 @@ func buildPieModel(ctx context.Context, config Config, st *chartState) Model {
 			}
 			pm.NameValues[i] = key
 			pm.Labels[i] = config.Label(key)
+			// ChartTooltipContent names the row through nameKey when it is
+			// set, otherwise through the slice name.
+			nameKey := key
+			if st.tooltip != nil && st.tooltip.Content.NameKey != "" {
+				nameKey = st.tooltip.Content.NameKey
+			}
+			pm.TooltipNames[i] = config.Label(payloadConfigKey(d, nameKey))
 			if f, ok := d["fill"]; ok {
 				pm.Colors[i] = str(f)
 			} else {
@@ -1669,6 +1677,20 @@ type LegendItem struct {
 	Icon  string
 	// Value is the payload value the legend sorts by.
 	Value string
+}
+
+// payloadConfigKey is getPayloadConfigFromPayload: the key names the
+// config entry, unless the data row carries a string under that key, then
+// its value names it.
+func payloadConfigKey(row Datum, key string) string {
+	if row != nil {
+		if v, ok := row[key]; ok {
+			if sv, isString := v.(string); isString {
+				return sv
+			}
+		}
+	}
+	return key
 }
 
 // legendItems builds the legend payload: one entry per series, or one per
@@ -1772,7 +1794,7 @@ func legendContent(items []LegendItem, class string) templ.Component {
 				var templ_7745c5c3_Var29 string
 				templ_7745c5c3_Var29, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + it.Color)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1149, Col: 88}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1171, Col: 88}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 				if templ_7745c5c3_Err != nil {
@@ -1786,7 +1808,7 @@ func legendContent(items []LegendItem, class string) templ.Component {
 			var templ_7745c5c3_Var30 string
 			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(it.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1151, Col: 15}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1173, Col: 15}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 			if templ_7745c5c3_Err != nil {
@@ -1850,24 +1872,25 @@ type Model struct {
 
 // PieModel is one rendered Pie with its sectors.
 type PieModel struct {
-	Key         string          `json:"key"`
-	SeriesLabel string          `json:"seriesLabel,omitempty"`
-	Values      []float64       `json:"values"`
-	Labels      []string        `json:"labels"`
-	NameKey     string          `json:"nameKey,omitempty"`
-	NameValues  []string        `json:"nameValues,omitempty"`
-	Colors      []string        `json:"colors"`
-	InnerRadius float64         `json:"innerRadius,omitempty"`
-	OuterRadius float64         `json:"outerRadius,omitempty"`
-	StrokeWidth float64         `json:"strokeWidth,omitempty"`
-	Stroke      string          `json:"stroke,omitempty"`
-	Label       *PieLabelModel  `json:"label,omitempty"`
-	LabelLine   bool            `json:"labelLine,omitempty"`
-	LabelList   *LabelListModel `json:"labelList,omitempty"`
-	ActiveIndex *int            `json:"activeIndex,omitempty"`
-	ActiveShape []SectorProps   `json:"activeShape,omitempty"`
-	CenterValue string          `json:"centerValue,omitempty"`
-	CenterLabel string          `json:"centerLabel,omitempty"`
+	Key          string          `json:"key"`
+	SeriesLabel  string          `json:"seriesLabel,omitempty"`
+	Values       []float64       `json:"values"`
+	Labels       []string        `json:"labels"`
+	TooltipNames []string        `json:"tooltipNames,omitempty"`
+	NameKey      string          `json:"nameKey,omitempty"`
+	NameValues   []string        `json:"nameValues,omitempty"`
+	Colors       []string        `json:"colors"`
+	InnerRadius  float64         `json:"innerRadius,omitempty"`
+	OuterRadius  float64         `json:"outerRadius,omitempty"`
+	StrokeWidth  float64         `json:"strokeWidth,omitempty"`
+	Stroke       string          `json:"stroke,omitempty"`
+	Label        *PieLabelModel  `json:"label,omitempty"`
+	LabelLine    bool            `json:"labelLine,omitempty"`
+	LabelList    *LabelListModel `json:"labelList,omitempty"`
+	ActiveIndex  *int            `json:"activeIndex,omitempty"`
+	ActiveShape  []SectorProps   `json:"activeShape,omitempty"`
+	CenterValue  string          `json:"centerValue,omitempty"`
+	CenterLabel  string          `json:"centerLabel,omitempty"`
 }
 
 // PieLabelModel is the resolved label prop of a Pie.
