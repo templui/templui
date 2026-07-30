@@ -1,0 +1,85 @@
+package charts
+
+import (
+	"time"
+
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+)
+
+// The pendant of chart-tooltip-label-formatter.tsx.
+
+var chartTooltipLabelFormatterData = []chart.Datum{
+	{"date": "2024-07-15", "running": 450, "swimming": 300},
+	{"date": "2024-07-16", "running": 380, "swimming": 420},
+	{"date": "2024-07-17", "running": 520, "swimming": 120},
+	{"date": "2024-07-18", "running": 140, "swimming": 550},
+	{"date": "2024-07-19", "running": 600, "swimming": 350},
+	{"date": "2024-07-20", "running": 480, "swimming": 400},
+}
+
+var chartTooltipLabelFormatterConfig = chart.Config{
+	{Key: "running", Label: "Running", Color: "var(--chart-1)"},
+	{Key: "swimming", Label: "Swimming", Color: "var(--chart-2)"},
+}
+
+// tooltipLabelFormatterWeekday shortens the date to the weekday, like the
+// source printing it with toLocaleDateString and the short weekday.
+func tooltipLabelFormatterWeekday(v any) string {
+	t, err := time.Parse("2006-01-02", v.(string))
+	if err != nil {
+		return v.(string)
+	}
+	return t.Format("Mon")
+}
+
+// tooltipLabelFormatterDate spells the date out, like the source's
+// labelFormatter with the long month, numeric day and year.
+func tooltipLabelFormatterDate(v any) string {
+	t, err := time.Parse("2006-01-02", v.(string))
+	if err != nil {
+		return v.(string)
+	}
+	return t.Format("January 2, 2006")
+}
+
+templ ChartTooltipLabelFormatter() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Tooltip - Label Formatter
+			}
+			@card.Description() {
+				Tooltip with label formatter.
+			}
+		}
+		@card.Content() {
+			@chart.Container(chart.ContainerProps{ID: "tooltip-label-formatter", Config: chartTooltipLabelFormatterConfig}) {
+				@chart.BarChart(chart.BarChartProps{Data: chartTooltipLabelFormatterData}) {
+					@chart.XAxis(chart.XAxisProps{
+						DataKey:       "date",
+						TickMargin:    10,
+						TickFormatter: tooltipLabelFormatterWeekday,
+					})
+					@chart.Bar(chart.BarProps{
+						DataKey: "running",
+						StackID: "a",
+						Fill:    "var(--color-running)",
+						Radius:  []float64{0, 0, 4, 4},
+					})
+					@chart.Bar(chart.BarProps{
+						DataKey: "swimming",
+						StackID: "a",
+						Fill:    "var(--color-swimming)",
+						Radius:  []float64{4, 4, 0, 0},
+					})
+					@chart.Tooltip(chart.TooltipProps{
+						Content:      chart.TooltipContentProps{LabelFormatter: tooltipLabelFormatterDate},
+						Cursor:       chart.Bool(false),
+						DefaultIndex: chart.Index(1),
+					})
+				}
+			}
+		}
+	}
+}

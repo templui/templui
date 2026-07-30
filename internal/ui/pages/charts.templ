@@ -117,6 +117,18 @@ func chartsFor(chartType string) []modules.ChartEntry {
 			entry("chart-radial-shape", false),
 			entry("chart-radial-stacked", false),
 		}
+	case "tooltip":
+		return []modules.ChartEntry{
+			entry("chart-tooltip-default", false),
+			entry("chart-tooltip-indicator-line", false),
+			entry("chart-tooltip-indicator-none", false),
+			entry("chart-tooltip-label-custom", false),
+			entry("chart-tooltip-label-formatter", false),
+			entry("chart-tooltip-label-none", false),
+			entry("chart-tooltip-formatter", false),
+			entry("chart-tooltip-icons", false),
+			entry("chart-tooltip-advanced", false),
+		}
 	}
 	return nil
 }

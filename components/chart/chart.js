@@ -1614,10 +1614,16 @@ function tooltipHTML(m, i, pieIndex = 0) {
       `</div></div></div></div>`;
     return html;
   }
-  for (const s of m.series) {
+  m.series.forEach((s, si) => {
     const rowCls =
       "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground" +
       (t.indicator !== "line" && t.indicator !== "dashed" ? " items-center" : "");
+    // The formatter markup replaces the row's default indicator, name and
+    // value, like ChartTooltipContent calling the formatter render prop.
+    if (t.rows && t.rows[si]) {
+      html += `<div class="${rowCls}">${t.rows[si][i]}</div>`;
+      return;
+    }
     const nested = nestLabel && !t.hideLabel ? `<div class="font-medium">${label}</div>` : "";
     // ChartTooltipContent's indicatorColor: the row's own fill wins over
     // the series color, so per row colored bars keep their swatch.
@@ -1627,12 +1633,12 @@ function tooltipHTML(m, i, pieIndex = 0) {
     const name = (s.tooltipNames && s.tooltipNames[i]) || s.label;
     html +=
       `<div class="${rowCls}">` +
-      (t.hideIndicator ? "" : s.icon || indicatorHTML(t.indicator, indicatorColor)) +
+      (s.icon || (t.hideIndicator ? "" : indicatorHTML(t.indicator, indicatorColor))) +
       `<div class="flex flex-1 justify-between leading-none ${nestLabel ? "items-end" : "items-center"}">` +
       `<div class="grid gap-1.5">${nested}<span class="text-muted-foreground">${name}</span></div>` +
       `<span class="font-mono font-medium text-foreground tabular-nums">${s.values[i].toLocaleString("en-US")}</span>` +
       `</div></div>`;
-  }
+  });
   html += "</div></div>";
   return html;
 }
@@ -1764,6 +1770,13 @@ function initPanel(script) {
     // The points this panel drew are what the next visible panel morphs
     // from, Recharts' previousPointsRef.
     if (state.points) container._tuiActivePoints = state.points;
+    // The default tooltip waits for the first real layout of a panel that
+    // mounted hidden.
+    if (state.onFirstRender && state.geom) {
+      const f = state.onFirstRender;
+      state.onFirstRender = null;
+      f();
+    }
   };
 
   // On mount the entrance animation plays. When a hidden panel becomes
@@ -1904,6 +1917,23 @@ function initPanel(script) {
     wrapper.style.visibility = "hidden";
     hideCursor(panel);
   });
+
+  // displayDefaultTooltip: a Tooltip with a defaultIndex shows once on
+  // mount, at the category's tick coordinate and halfway between the plot
+  // top and the chart height, Recharts' (offset.top + height) / 2.
+  const di = m.tooltip && m.tooltip.defaultIndex;
+  if (typeof di === "number") {
+    const show = () => {
+      const g = state.geom;
+      if (!g || !g.cats || di < 0 || di > g.cats.length - 1) return;
+      const dep = (g.plotY + g.H) / 2;
+      showCursor(panel, m, state, di);
+      showActiveDots(panel, m, state, di);
+      positionTooltip(null, g.vertical ? dep : g.cats[di], g.vertical ? g.cats[di] : dep, di);
+    };
+    if (state.geom) show();
+    else state.onFirstRender = show;
+  }
 }
 
 function init() {

@@ -124,6 +124,24 @@ func Component(name string) templ.Component {
 		return ChartRadialShape()
 	case "chart-radial-stacked":
 		return ChartRadialStacked()
+	case "chart-tooltip-default":
+		return ChartTooltipDefault()
+	case "chart-tooltip-indicator-line":
+		return ChartTooltipIndicatorLine()
+	case "chart-tooltip-indicator-none":
+		return ChartTooltipIndicatorNone()
+	case "chart-tooltip-label-none":
+		return ChartTooltipLabelNone()
+	case "chart-tooltip-label-custom":
+		return ChartTooltipLabelCustom()
+	case "chart-tooltip-label-formatter":
+		return ChartTooltipLabelFormatter()
+	case "chart-tooltip-formatter":
+		return ChartTooltipFormatter()
+	case "chart-tooltip-icons":
+		return ChartTooltipIcons()
+	case "chart-tooltip-advanced":
+		return ChartTooltipAdvanced()
 	}
 	return nil
 }

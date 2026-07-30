@@ -348,6 +348,9 @@ type TooltipProps struct {
 	// Bool(false) to turn it off, like cursor={false} in the tsx.
 	Cursor  *bool
 	Content TooltipContentProps
+	// DefaultIndex shows the tooltip on mount at that category, the
+	// pendant of defaultIndex={1} in the tsx.
+	DefaultIndex *int
 }
 
 // TooltipContentProps is the pendant of ChartTooltipContent.
@@ -359,6 +362,11 @@ type TooltipContentProps struct {
 	NameKey        string
 	Class          string // extra content class, e.g. "w-[150px]"
 	LabelFormatter func(any) string
+	// Formatter is the pendant of the formatter render prop: it replaces a
+	// row's default indicator, name and value markup. It runs on the server
+	// for every data row and series, the tooltip shows the prerendered
+	// result. item is the data row, index the series position.
+	Formatter func(value any, name string, item Datum, index int) templ.Component
 }
 
 // LinearGradientProps is the pendant of a linearGradient element in the
@@ -1884,7 +1892,10 @@ func buildModel(ctx context.Context, st *chartState) Model {
 	tt := st.tooltip
 	if tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, DefaultIndex: tt.DefaultIndex}
+		if tt.Content.LabelKey != "" {
+			m.Tooltip.Label = config.Label(tt.Content.LabelKey)
+		}
 	}
 
 	// The category axis carries the labels: XAxis in the default layout,
@@ -1998,6 +2009,18 @@ func buildModel(ctx context.Context, st *chartState) Model {
 	if tt != nil && tt.Content.NameKey != "" {
 		for i := range m.Series {
 			m.Series[i].Label = config.Label(tt.Content.NameKey)
+		}
+	}
+	// The formatter renders every row of every series up front, the
+	// pendant of the render prop running per tooltip item.
+	if tt != nil && tt.Content.Formatter != nil {
+		f := tt.Content.Formatter
+		m.Tooltip.Rows = make([][]string, len(m.Series))
+		for si, s := range m.Series {
+			m.Tooltip.Rows[si] = make([]string, len(st.data))
+			for i, d := range st.data {
+				m.Tooltip.Rows[si][i] = renderHTML(ctx, f(d[s.Key], s.Key, d, si))
+			}
 		}
 	}
 	applyIcons(ctx, &m, config)
@@ -2353,7 +2376,7 @@ func legendContent(items []LegendItem, class string) templ.Component {
 				var templ_7745c5c3_Var36 string
 				templ_7745c5c3_Var36, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + it.Color)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1560, Col: 88}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1583, Col: 88}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 				if templ_7745c5c3_Err != nil {
@@ -2367,7 +2390,7 @@ func legendContent(items []LegendItem, class string) templ.Component {
 			var templ_7745c5c3_Var37 string
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(it.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1562, Col: 15}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1585, Col: 15}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 			if templ_7745c5c3_Err != nil {
@@ -2564,11 +2587,15 @@ type LabelListModel struct {
 
 // TooltipModel mirrors ChartTooltipContent's props.
 type TooltipModel struct {
-	Indicator     string `json:"indicator,omitempty"`
-	Label         string `json:"label,omitempty"` // labelKey resolved through the config // "dot" (default) | "line" | "dashed"
+	Indicator     string `json:"indicator,omitempty"` // "dot" (default) | "line" | "dashed"
+	Label         string `json:"label,omitempty"`     // labelKey resolved through the config
 	HideLabel     bool   `json:"hideLabel,omitempty"`
 	HideIndicator bool   `json:"hideIndicator,omitempty"`
 	Width         string `json:"width,omitempty"` // extra class, e.g. "w-[150px]"
+	// DefaultIndex shows the tooltip on mount at that category.
+	DefaultIndex *int `json:"defaultIndex,omitempty"`
+	// Rows is the formatter markup per series and data row.
+	Rows [][]string `json:"rows,omitempty"`
 }
 
 // ModelScript renders the embedded JSON payload chart.js reads.
