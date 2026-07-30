@@ -403,7 +403,9 @@ Every `Class` prop takes Tailwind utility classes, so you can also color chart p
 
 A chart tooltip contains a label, name, indicator and value. You can use a combination of these to customize your tooltip.
 
-The tooltip trails the cursor inside the plot area and snaps to the active data point, and the colors are automatically referenced from the chart config.
+<ComponentPreview name="chart-tooltip" hideCode />
+
+The tooltip trails the cursor inside the plot area and snaps to the active data point.
 
 You can turn the label and the indicator on and off using the `HideLabel` and `HideIndicator` props and customize the indicator style using the `Indicator` prop. Use `LabelKey` and `NameKey` to use a custom key for the tooltip label and name.
 
@@ -441,28 +443,34 @@ Chart comes with the `Tooltip` component and its `TooltipContentProps`, the pend
 | `LabelClass`     | string                   | Extra classes for the tooltip label.                           |
 | `Color`          | string                   | Overrides the indicator color for every row.                   |
 
+### Colors
+
+Colors are automatically referenced from the chart config.
+
 ### Custom
 
-To use a custom key for the tooltip names, use the `NameKey` prop.
+To use a custom key for tooltip label and names, use the `LabelKey` and `NameKey` props.
 
-```go showLineNumbers /views/
+```go showLineNumbers /browser/
 var chartData = []chart.Datum{
-	{"date": "2024-06-29", "views": 103},
-	{"date": "2024-06-30", "views": 446},
+	{"browser": "chrome", "visitors": 187, "fill": "var(--color-chrome)"},
+	{"browser": "safari", "visitors": 200, "fill": "var(--color-safari)"},
 }
 
 var chartConfig = chart.Config{
-	{Key: "views", Label: "Page Views"},
+	{Key: "visitors", Label: "Total Visitors"},
+	{Key: "chrome", Label: "Chrome", Color: "var(--chart-1)"},
+	{Key: "safari", Label: "Safari", Color: "var(--chart-2)"},
 }
 ```
 
 ```templ
 @chart.Tooltip(chart.TooltipProps{
-	Content: chart.TooltipContentProps{NameKey: "views"},
+	Content: chart.TooltipContentProps{LabelKey: "visitors", NameKey: "browser"},
 })
 ```
 
-This will use `Page Views` for the tooltip name.
+This will use `Total Visitors` for label and `Chrome` and `Safari` for the tooltip names.
 
 ## Legend
 

@@ -45,6 +45,7 @@ var Registry = map[string]RegistryEntry{
 	"chart-example-axis":                {Component: ChartExampleAxis(), File: "chart_example.templ"},
 	"chart-example-tooltip":             {Component: ChartExampleTooltip(), File: "chart_example.templ"},
 	"chart-example-legend":              {Component: ChartExampleLegend(), File: "chart_example.templ"},
+	"chart-tooltip":                     {Component: ChartTooltipExample(), File: "chart_tooltip.templ"},
 	"skeleton-demo":                     {Component: SkeletonDemo(), File: "skeleton_demo.templ"},
 	"skeleton-avatar":                   {Component: SkeletonAvatar(), File: "skeleton_avatar.templ"},
 	"skeleton-card":                     {Component: SkeletonCard(), File: "skeleton_card.templ"},
