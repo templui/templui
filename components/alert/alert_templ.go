@@ -68,7 +68,7 @@ func Alert(props ...Props) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
-			"group/alert relative grid w-full gap-0.5 rounded-lg border px-2.5 py-2 text-left text-sm has-data-[slot=alert-action]:relative has-data-[slot=alert-action]:pr-18 has-[>svg]:grid-cols-[auto_1fr] has-[>svg]:gap-x-2 *:[svg]:row-span-2 *:[svg]:translate-y-0.5 *:[svg]:text-current *:[svg:not([class*='size-'])]:size-4",
+			"cn-alert group/alert relative w-full",
 			variantClasses(p.Variant),
 			p.Class,
 		),
@@ -163,7 +163,7 @@ func Title(props ...TitleProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var6 = []any{utils.TwMerge(
-			"font-medium group-has-[>svg]/alert:col-start-2 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground",
+			"cn-alert-title [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground",
 			p.Class,
 		),
 		}
@@ -257,7 +257,7 @@ func Description(props ...DescriptionProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var10 = []any{utils.TwMerge(
-			"text-sm text-balance text-muted-foreground md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4",
+			"cn-alert-description [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground",
 			p.Class,
 		),
 		}
@@ -351,7 +351,7 @@ func Action(props ...ActionProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var14 = []any{utils.TwMerge("absolute top-2 right-2", p.Class)}
+		var templ_7745c5c3_Var14 = []any{utils.TwMerge("cn-alert-action", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var14...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -417,12 +417,10 @@ func Action(props ...ActionProps) templ.Component {
 }
 
 func variantClasses(variant Variant) string {
-	switch variant {
-	case VariantDestructive:
-		return "bg-card text-destructive *:data-[slot=alert-description]:text-destructive/90 *:[svg]:text-current"
-	default:
-		return "bg-card text-card-foreground"
+	if variant == "" {
+		variant = VariantDefault
 	}
+	return "cn-alert-variant-" + string(variant)
 }
 
 var _ = templruntime.GeneratedTemplate

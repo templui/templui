@@ -107,7 +107,7 @@ func Progress(props ...Props) templ.Component {
 			p.Max = 100
 		}
 		ctx = context.WithValue(ctx, stateKey, ctxState{value: p.Value, max: p.Max})
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("flex flex-wrap gap-3", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.TwMerge("cn-progress-root flex flex-wrap gap-3", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -207,7 +207,7 @@ func Progress(props ...Props) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div data-slot=\"progress-track\" data-tui-progress-part class=\"relative flex h-1 w-full items-center overflow-x-hidden rounded-full bg-muted\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div data-slot=\"progress-track\" data-tui-progress-part class=\"cn-progress-track relative flex w-full items-center overflow-x-hidden\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -215,7 +215,7 @@ func Progress(props ...Props) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "><div data-slot=\"progress-indicator\" data-tui-progress-indicator data-tui-progress-part class=\"h-full bg-primary transition-all\" style=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "><div data-slot=\"progress-indicator\" data-tui-progress-indicator data-tui-progress-part class=\"cn-progress-indicator h-full transition-all\" style=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -273,7 +273,7 @@ func Label(props ...LabelProps) templ.Component {
 			p.ID = utils.RandomID()
 		}
 		s := state(ctx)
-		var templ_7745c5c3_Var10 = []any{utils.TwMerge("text-sm font-medium", p.Class)}
+		var templ_7745c5c3_Var10 = []any{utils.TwMerge("cn-progress-label", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var10...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -359,7 +359,7 @@ func Value(props ...ValueProps) templ.Component {
 			p = props[0]
 		}
 		s := state(ctx)
-		var templ_7745c5c3_Var14 = []any{utils.TwMerge("ml-auto text-sm text-muted-foreground tabular-nums", p.Class)}
+		var templ_7745c5c3_Var14 = []any{utils.TwMerge("cn-progress-value", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var14...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

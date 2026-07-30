@@ -67,12 +67,7 @@ templ Card(props ...Props) {
 		}
 		data-slot="card"
 		data-size={ string(p.Size) }
-		class={
-			utils.TwMerge(
-				"group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
-				p.Class,
-			),
-		}
+		class={ utils.TwMerge("cn-card group/card flex flex-col", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -91,7 +86,7 @@ templ Header(props ...HeaderProps) {
 		data-slot="card-header"
 		class={
 			utils.TwMerge(
-				"group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-(--card-spacing) has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-(--card-spacing)",
+				"cn-card-header group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]",
 				p.Class,
 			),
 		}
@@ -111,12 +106,7 @@ templ Title(props ...TitleProps) {
 			id={ p.ID }
 		}
 		data-slot="card-title"
-		class={
-			utils.TwMerge(
-				"text-base leading-snug font-medium group-data-[size=sm]/card:text-sm",
-				p.Class,
-			),
-		}
+		class={ utils.TwMerge("cn-card-title cn-font-heading", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -133,12 +123,7 @@ templ Description(props ...DescriptionProps) {
 			id={ p.ID }
 		}
 		data-slot="card-description"
-		class={
-			utils.TwMerge(
-				"text-sm text-muted-foreground",
-				p.Class,
-			),
-		}
+		class={ utils.TwMerge("cn-card-description", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -158,7 +143,7 @@ templ Action(props ...ActionProps) {
 		data-slot="card-action"
 		class={
 			utils.TwMerge(
-				"col-start-2 row-span-2 row-start-1 self-start justify-self-end",
+				"cn-card-action col-start-2 row-span-2 row-start-1 self-start justify-self-end",
 				p.Class,
 			),
 		}
@@ -178,12 +163,7 @@ templ Content(props ...ContentProps) {
 			id={ p.ID }
 		}
 		data-slot="card-content"
-		class={
-			utils.TwMerge(
-				"px-(--card-spacing)",
-				p.Class,
-			),
-		}
+		class={ utils.TwMerge("cn-card-content", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -200,12 +180,7 @@ templ Footer(props ...FooterProps) {
 			id={ p.ID }
 		}
 		data-slot="card-footer"
-		class={
-			utils.TwMerge(
-				"flex items-center rounded-b-xl border-t bg-muted/50 p-(--card-spacing)",
-				p.Class,
-			),
-		}
+		class={ utils.TwMerge("cn-card-footer flex items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

@@ -56,13 +56,13 @@ templ Table(props ...Props) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<div data-slot="table-container" class="relative w-full overflow-x-auto">
+	<div data-slot="table-container" class="cn-table-container">
 		<table
 			if p.ID != "" {
 				id={ p.ID }
 			}
 			data-slot="table"
-			class={ utils.TwMerge("w-full caption-bottom text-sm", p.Class) }
+			class={ utils.TwMerge("cn-table", p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -79,7 +79,8 @@ templ Header(props ...HeaderProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("[&_tr]:border-b", p.Class) }
+		data-slot="table-header"
+		class={ utils.TwMerge("cn-table-header", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -95,7 +96,8 @@ templ Body(props ...BodyProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("[&_tr:last-child]:border-0", p.Class) }
+		data-slot="table-body"
+		class={ utils.TwMerge("cn-table-body", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -111,7 +113,8 @@ templ Footer(props ...FooterProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", p.Class) }
+		data-slot="table-footer"
+		class={ utils.TwMerge("cn-table-footer", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -127,9 +130,10 @@ templ Row(props ...RowProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
+		data-slot="table-row"
 		class={
 			utils.TwMerge(
-				"border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted has-aria-expanded:bg-muted/50",
+				"cn-table-row has-aria-expanded:bg-muted/50",
 				utils.If(p.Selected, "data-[tui-table-state-selected]:bg-muted"),
 				p.Class,
 			),
@@ -148,17 +152,14 @@ templ Head(props ...HeadProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	// cn-table-head-aria adds the checkbox padding for our
+	// data-slot=checkbox markup (our checkbox has no role attribute).
 	<th
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={
-			utils.TwMerge(
-				"h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&:has([data-slot=checkbox])]:pr-0",
-				"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-				p.Class,
-			),
-		}
+		data-slot="table-head"
+		class={ utils.TwMerge("cn-table-head cn-table-head-aria", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -170,17 +171,14 @@ templ Cell(props ...CellProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	// cn-table-cell-aria adds the checkbox padding for our
+	// data-slot=checkbox markup (our checkbox has no role attribute).
 	<td
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={
-			utils.TwMerge(
-				"p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&:has([data-slot=checkbox])]:pr-0",
-				"[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-				p.Class,
-			),
-		}
+		data-slot="table-cell"
+		class={ utils.TwMerge("cn-table-cell cn-table-cell-aria", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -196,7 +194,8 @@ templ Caption(props ...CaptionProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("mt-4 text-sm text-muted-foreground", p.Class) }
+		data-slot="table-caption"
+		class={ utils.TwMerge("cn-table-caption", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

@@ -90,36 +90,16 @@ type SeparatorProps struct {
 	Attributes templ.Attributes
 }
 
+// 1:1 base/ui/item.tsx: structure lives here, the look comes from the
+// active style-*.css via the cn-item-* classes.
 func itemClasses(variant Variant, size Size) string {
-	base := "group/item flex w-full flex-wrap items-center rounded-lg border text-sm transition-colors duration-100 outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-
-	variantClass := "border-transparent"
-	switch variant {
-	case VariantOutline:
-		variantClass = "border-border"
-	case VariantMuted:
-		variantClass = "border-transparent bg-muted/50"
-	}
-
-	sizeClass := "gap-2.5 px-3 py-2.5"
-	if size == SizeXs {
-		sizeClass = "gap-2 px-2.5 py-2 in-data-[slot=dropdown-menu-content]:p-0"
-	}
-
-	return utils.TwMerge(base, variantClass, sizeClass)
+	base := "cn-item group/item flex w-full flex-wrap items-center transition-colors duration-100 outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 [a]:transition-colors"
+	return utils.TwMerge(base, "cn-item-variant-"+string(variant), "cn-item-size-"+string(size))
 }
 
 func mediaClasses(variant MediaVariant) string {
-	// Named-group variants are kept out of TwMerge to avoid its parser choking.
-	base := "flex shrink-0 items-center justify-center gap-2 [&_svg]:pointer-events-none group-has-data-[slot=item-description]/item:translate-y-0.5 group-has-data-[slot=item-description]/item:self-start"
-	switch variant {
-	case MediaVariantIcon:
-		return base + " [&_svg:not([class*='size-'])]:size-4"
-	case MediaVariantImage:
-		return base + " size-10 overflow-hidden rounded-sm group-data-[size=sm]/item:size-8 group-data-[size=xs]/item:size-6 [&_img]:size-full [&_img]:object-cover"
-	default:
-		return base + " bg-transparent"
-	}
+	base := "cn-item-media flex shrink-0 items-center justify-center [&_svg]:pointer-events-none"
+	return base + " cn-item-media-variant-" + string(variant)
 }
 
 templ Group(props ...GroupProps) {
@@ -127,7 +107,7 @@ templ Group(props ...GroupProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	{{ class := "group/item-group flex w-full flex-col gap-4 has-data-[size=sm]:gap-2.5 has-data-[size=xs]:gap-2" }}
+	{{ class := "cn-item-group group/item-group flex w-full flex-col" }}
 	if p.Class != "" {
 		{{ class = class + " " + p.Class }}
 	}
@@ -167,7 +147,7 @@ templ Item(props ...Props) {
 			data-slot="item"
 			data-variant={ string(p.Variant) }
 			data-size={ string(p.Size) }
-			class={ utils.TwMerge(itemClasses(p.Variant, p.Size), "transition-colors hover:bg-muted", p.Class) }
+			class={ utils.TwMerge(itemClasses(p.Variant, p.Size), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -218,7 +198,7 @@ templ Content(props ...ContentProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	{{ class := "flex flex-1 flex-col gap-1 group-data-[size=xs]/item:gap-0 [&+[data-slot=item-content]]:flex-none" }}
+	{{ class := "cn-item-content flex flex-1 flex-col [&+[data-slot=item-content]]:flex-none" }}
 	if p.Class != "" {
 		{{ class = class + " " + p.Class }}
 	}
@@ -244,7 +224,7 @@ templ Title(props ...TitleProps) {
 			id={ p.ID }
 		}
 		data-slot="item-title"
-		class={ utils.TwMerge("line-clamp-1 flex w-fit items-center gap-2 text-sm leading-snug font-medium underline-offset-4", p.Class) }
+		class={ utils.TwMerge("cn-item-title line-clamp-1 flex w-fit items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -256,7 +236,7 @@ templ Description(props ...DescriptionProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	{{ class := "line-clamp-2 text-left text-sm leading-normal font-normal text-muted-foreground group-data-[size=xs]/item:text-xs [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary" }}
+	{{ class := "cn-item-description line-clamp-2 font-normal [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary" }}
 	if p.Class != "" {
 		{{ class = class + " " + p.Class }}
 	}
@@ -282,7 +262,7 @@ templ Actions(props ...ActionsProps) {
 			id={ p.ID }
 		}
 		data-slot="item-actions"
-		class={ utils.TwMerge("flex items-center gap-2", p.Class) }
+		class={ utils.TwMerge("cn-item-actions flex items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -299,7 +279,7 @@ templ Header(props ...HeaderProps) {
 			id={ p.ID }
 		}
 		data-slot="item-header"
-		class={ utils.TwMerge("flex basis-full items-center justify-between gap-2", p.Class) }
+		class={ utils.TwMerge("cn-item-header flex basis-full items-center justify-between", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -316,7 +296,7 @@ templ Footer(props ...FooterProps) {
 			id={ p.ID }
 		}
 		data-slot="item-footer"
-		class={ utils.TwMerge("flex basis-full items-center justify-between gap-2", p.Class) }
+		class={ utils.TwMerge("cn-item-footer flex basis-full items-center justify-between", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -333,8 +313,10 @@ templ Separator(props ...SeparatorProps) {
 			id={ p.ID }
 		}
 		data-slot="item-separator"
+		data-horizontal
 		role="separator"
-		class={ utils.TwMerge("my-2 h-px w-full shrink-0 bg-border", p.Class) }
+		aria-orientation="horizontal"
+		class={ utils.TwMerge("shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch", "cn-item-separator", p.Class) }
 		{ p.Attributes... }
 	></div>
 }

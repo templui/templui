@@ -64,13 +64,15 @@ templ Avatar(props ...Props) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("group/avatar relative flex size-8 shrink-0 rounded-full select-none after:absolute after:inset-0 after:rounded-full after:border after:border-border after:mix-blend-darken data-[size=lg]:size-10 data-[size=sm]:size-6 dark:after:mix-blend-lighten", p.Class) }
+		class={ utils.TwMerge("cn-avatar group/avatar relative flex shrink-0 select-none after:absolute after:inset-0 after:border after:border-border after:mix-blend-darken dark:after:mix-blend-lighten", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
 	</div>
 }
 
+// Image keeps the absolute/opacity classes as templui infra: the image sits
+// above the fallback and fades in once avatar.js flags it loaded.
 templ Image(props ...ImageProps) {
 	{{ var p ImageProps }}
 	if len(props) > 0 {
@@ -86,7 +88,7 @@ templ Image(props ...ImageProps) {
 			src={ p.Src }
 		}
 		alt={ p.Alt }
-		class={ utils.TwMerge("absolute inset-0 aspect-square size-full rounded-full object-cover transition-opacity duration-300 [@media(scripting:enabled)]:not-data-[loaded=true]:opacity-0", p.Class) }
+		class={ utils.TwMerge("cn-avatar-image aspect-square size-full object-cover", "absolute inset-0 transition-opacity duration-300 [@media(scripting:enabled)]:not-data-[loaded=true]:opacity-0", p.Class) }
 		{ p.Attributes... }
 	/>
 }
@@ -101,7 +103,7 @@ templ Fallback(props ...FallbackProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("flex size-full items-center justify-center rounded-full bg-muted text-sm text-muted-foreground group-data-[size=sm]/avatar:text-xs", p.Class) }
+		class={ utils.TwMerge("cn-avatar-fallback flex size-full items-center justify-center text-sm group-data-[size=sm]/avatar:text-xs", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -118,7 +120,7 @@ templ Badge(props ...BadgeProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("absolute right-0 bottom-0 z-10 inline-flex items-center justify-center rounded-full bg-blend-color bg-primary text-primary-foreground ring-2 ring-background select-none group-data-[size=sm]/avatar:size-2 group-data-[size=sm]/avatar:[&>svg]:hidden group-data-[size=default]/avatar:size-2.5 group-data-[size=default]/avatar:[&>svg]:size-2 group-data-[size=lg]/avatar:size-3 group-data-[size=lg]/avatar:[&>svg]:size-2", p.Class) }
+		class={ utils.TwMerge("cn-avatar-badge absolute right-0 bottom-0 z-10 inline-flex items-center justify-center rounded-full bg-blend-color ring-2 select-none", "group-data-[size=sm]/avatar:size-2 group-data-[size=sm]/avatar:[&>svg]:hidden", "group-data-[size=default]/avatar:size-2.5 group-data-[size=default]/avatar:[&>svg]:size-2", "group-data-[size=lg]/avatar:size-3 group-data-[size=lg]/avatar:[&>svg]:size-2", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -135,7 +137,7 @@ templ Group(props ...GroupProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("group/avatar-group flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-background", p.Class) }
+		class={ utils.TwMerge("cn-avatar-group group/avatar-group flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-background", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -152,7 +154,7 @@ templ GroupCount(props ...GroupCountProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("relative flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-sm text-muted-foreground ring-2 ring-background group-has-data-[size=lg]/avatar-group:size-10 group-has-data-[size=sm]/avatar-group:size-6 [&>svg]:size-4 group-has-data-[size=lg]/avatar-group:[&>svg]:size-5 group-has-data-[size=sm]/avatar-group:[&>svg]:size-3", p.Class) }
+		class={ utils.TwMerge("cn-avatar-group-count relative flex shrink-0 items-center justify-center ring-2 ring-background", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

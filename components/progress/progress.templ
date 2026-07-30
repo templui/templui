@@ -90,7 +90,7 @@ templ Progress(props ...Props) {
 		aria-valuemax={ fmt.Sprintf("%d", p.Max) }
 		aria-valuenow={ fmt.Sprintf("%d", p.Value) }
 		aria-valuetext={ fmt.Sprintf("%d%%", percentage(p.Value, p.Max)) }
-		class={ utils.TwMerge("flex flex-wrap gap-3", p.Class) }
+		class={ utils.TwMerge("cn-progress-root flex flex-wrap gap-3", p.Class) }
 		{ statusAttr(p.Value, p.Max)... }
 		{ p.Attributes... }
 	>
@@ -98,14 +98,14 @@ templ Progress(props ...Props) {
 		<div
 			data-slot="progress-track"
 			data-tui-progress-part
-			class="relative flex h-1 w-full items-center overflow-x-hidden rounded-full bg-muted"
+			class="cn-progress-track relative flex w-full items-center overflow-x-hidden"
 			{ statusAttr(p.Value, p.Max)... }
 		>
 			<div
 				data-slot="progress-indicator"
 				data-tui-progress-indicator
 				data-tui-progress-part
-				class="h-full bg-primary transition-all"
+				class="cn-progress-indicator h-full transition-all"
 				style={ fmt.Sprintf("inset-inline-start:0;height:inherit;width:%d%%", percentage(p.Value, p.Max)) }
 				{ statusAttr(p.Value, p.Max)... }
 			></div>
@@ -129,7 +129,7 @@ templ Label(props ...LabelProps) {
 		data-slot="progress-label"
 		data-tui-progress-part
 		role="presentation"
-		class={ utils.TwMerge("text-sm font-medium", p.Class) }
+		class={ utils.TwMerge("cn-progress-label", p.Class) }
 		{ statusAttr(s.value, s.max)... }
 		{ p.Attributes... }
 	>
@@ -151,7 +151,7 @@ templ Value(props ...ValueProps) {
 		data-slot="progress-value"
 		data-tui-progress-part
 		aria-hidden="true"
-		class={ utils.TwMerge("ml-auto text-sm text-muted-foreground tabular-nums", p.Class) }
+		class={ utils.TwMerge("cn-progress-value", p.Class) }
 		{ statusAttr(s.value, s.max)... }
 		{ p.Attributes... }
 	>
