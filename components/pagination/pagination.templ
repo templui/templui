@@ -62,7 +62,8 @@ templ Pagination(props ...Props) {
 		}
 		role="navigation"
 		aria-label="pagination"
-		class={ utils.TwMerge("mx-auto flex w-full justify-center", p.Class) }
+		data-slot="pagination"
+		class={ utils.TwMerge("cn-pagination mx-auto flex w-full justify-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -78,7 +79,8 @@ templ Content(props ...ContentProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class="flex items-center gap-0.5"
+		data-slot="pagination-content"
+		class={ utils.TwMerge("cn-pagination-content flex items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -93,6 +95,10 @@ templ Item(props ...ItemProps) {
 	<li
 		if p.ID != "" {
 			id={ p.ID }
+		}
+		data-slot="pagination-item"
+		if p.Class != "" {
+			class={ p.Class }
 		}
 		{ p.Attributes... }
 	>
@@ -111,7 +117,7 @@ templ Link(props ...LinkProps) {
 			Disabled:   true,
 			Size:       button.SizeIcon,
 			Variant:    button.VariantGhost,
-			Class:      p.Class,
+			Class:      utils.TwMerge("cn-pagination-link", p.Class),
 			Attributes: p.Attributes,
 		}) {
 			{ children... }
@@ -132,7 +138,7 @@ templ Link(props ...LinkProps) {
 			Href:       p.Href,
 			Size:       button.SizeIcon,
 			Variant:    button.Variant(buttonVariant(p.IsActive)),
-			Class:      p.Class,
+			Class:      utils.TwMerge("cn-pagination-link", p.Class),
 			Attributes: attrs,
 		}) {
 			{ children... }
@@ -159,11 +165,11 @@ templ Previous(props ...PreviousProps) {
 		Href:       p.Href,
 		Disabled:   p.Disabled,
 		Variant:    button.VariantGhost,
-		Class:      utils.TwMerge("pl-1.5!", p.Class),
+		Class:      utils.TwMerge("cn-pagination-previous", p.Class),
 		Attributes: attrs,
 	}) {
-		@icon.ChevronLeft(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-start"}})
-		<span class="hidden sm:block">{ p.Label }</span>
+		@icon.ChevronLeft(icon.Props{Class: "cn-rtl-flip", Attributes: templ.Attributes{"data-icon": "inline-start"}})
+		<span class="cn-pagination-previous-text hidden sm:block">{ p.Label }</span>
 	}
 }
 
@@ -186,16 +192,16 @@ templ Next(props ...NextProps) {
 		Href:       p.Href,
 		Disabled:   p.Disabled,
 		Variant:    button.VariantGhost,
-		Class:      utils.TwMerge("pr-1.5!", p.Class),
+		Class:      utils.TwMerge("cn-pagination-next", p.Class),
 		Attributes: attrs,
 	}) {
-		<span class="hidden sm:block">{ p.Label }</span>
-		@icon.ChevronRight(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-end"}})
+		<span class="cn-pagination-next-text hidden sm:block">{ p.Label }</span>
+		@icon.ChevronRight(icon.Props{Class: "cn-rtl-flip", Attributes: templ.Attributes{"data-icon": "inline-end"}})
 	}
 }
 
 templ Ellipsis() {
-	<span aria-hidden="true" data-slot="pagination-ellipsis" class="flex size-8 items-center justify-center [&_svg:not([class*='size-'])]:size-4">
+	<span aria-hidden="true" data-slot="pagination-ellipsis" class="cn-pagination-ellipsis flex items-center justify-center">
 		@icon.Ellipsis()
 		<span class="sr-only">More pages</span>
 	</span>

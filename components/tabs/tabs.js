@@ -12,6 +12,9 @@
           "data-tui-tabs-state",
           isActive ? "active" : "inactive",
         );
+        // Base UI marks the selected tab with a bare data-active attribute;
+        // the cn-tabs-trigger styles select on it.
+        trigger.toggleAttribute("data-active", isActive);
       });
 
     // Update all contents with this tabs-id

@@ -464,7 +464,7 @@ func Previous(props ...PreviousProps) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = icon.ChevronLeft().Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = icon.ChevronLeft(icon.Props{Class: "cn-rtl-flip"}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -479,7 +479,7 @@ func Previous(props ...PreviousProps) templ.Component {
 			Variant: button.VariantOutline,
 			Size:    button.SizeIconSm,
 			Class: utils.TwMerge(
-				"absolute touch-manipulation rounded-full",
+				"cn-carousel-previous absolute touch-manipulation",
 				utils.IfElse(
 					orientation(ctx) == OrientationHorizontal,
 					"inset-y-0 -left-12 my-auto",
@@ -536,7 +536,7 @@ func Next(props ...NextProps) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = icon.ChevronRight().Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = icon.ChevronRight(icon.Props{Class: "cn-rtl-flip"}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -551,7 +551,7 @@ func Next(props ...NextProps) templ.Component {
 			Variant: button.VariantOutline,
 			Size:    button.SizeIconSm,
 			Class: utils.TwMerge(
-				"absolute touch-manipulation rounded-full",
+				"cn-carousel-next absolute touch-manipulation",
 				utils.IfElse(
 					orientation(ctx) == OrientationHorizontal,
 					"inset-y-0 -right-12 my-auto",

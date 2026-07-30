@@ -168,7 +168,7 @@ templ Previous(props ...PreviousProps) {
 		Variant: button.VariantOutline,
 		Size:    button.SizeIconSm,
 		Class: utils.TwMerge(
-			"absolute touch-manipulation rounded-full",
+			"cn-carousel-previous absolute touch-manipulation",
 			utils.IfElse(
 				orientation(ctx) == OrientationHorizontal,
 				"inset-y-0 -left-12 my-auto",
@@ -181,7 +181,7 @@ templ Previous(props ...PreviousProps) {
 			"data-tui-carousel-prev": true,
 		}, p.Attributes),
 	}) {
-		@icon.ChevronLeft()
+		@icon.ChevronLeft(icon.Props{Class: "cn-rtl-flip"})
 		<span class="sr-only">Previous slide</span>
 	}
 }
@@ -196,7 +196,7 @@ templ Next(props ...NextProps) {
 		Variant: button.VariantOutline,
 		Size:    button.SizeIconSm,
 		Class: utils.TwMerge(
-			"absolute touch-manipulation rounded-full",
+			"cn-carousel-next absolute touch-manipulation",
 			utils.IfElse(
 				orientation(ctx) == OrientationHorizontal,
 				"inset-y-0 -right-12 my-auto",
@@ -209,7 +209,7 @@ templ Next(props ...NextProps) {
 			"data-tui-carousel-next": true,
 		}, p.Attributes),
 	}) {
-		@icon.ChevronRight()
+		@icon.ChevronRight(icon.Props{Class: "cn-rtl-flip"})
 		<span class="sr-only">Next slide</span>
 	}
 }

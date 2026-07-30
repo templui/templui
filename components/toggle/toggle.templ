@@ -72,33 +72,22 @@ type Props struct {
 	Value string
 }
 
-func toggleClasses(variant Variant, size Size) string {
-	base := "group/toggle inline-flex items-center justify-center gap-1 rounded-lg text-sm font-medium whitespace-nowrap transition-all outline-none hover:bg-muted hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 aria-pressed:bg-muted data-[state=on]:bg-muted dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+// 1:1 base/ui/toggle.tsx: structure lives here, the look comes from the
+// active style-*.css via the cn-toggle-* classes.
+const baseClasses = "cn-toggle group/toggle inline-flex items-center justify-center whitespace-nowrap outline-none hover:bg-muted focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0"
 
-	variantClass := "bg-transparent"
-	if variant == VariantOutline {
-		variantClass = "border border-input bg-transparent hover:bg-muted"
-	}
-
-	sizeClass := "h-8 min-w-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"
-	switch size {
-	case SizeSm:
-		sizeClass = "h-7 min-w-7 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5"
-	case SizeLg:
-		sizeClass = "h-9 min-w-9 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"
-	}
-
-	return utils.TwMerge(base, variantClass, sizeClass)
+func variantClasses(v Variant) string {
+	return "cn-toggle-variant-" + string(v)
 }
 
-// groupItemClasses are the cn-toggle-group-item rules: with spacing 0 the
-// items join into one bar (no inner rounding, collapsed outline borders,
-// outer first/last rounding per orientation).
+func sizeClasses(s Size) string {
+	return "cn-toggle-size-" + string(s)
+}
+
+// groupItemClasses is the verbatim ToggleGroupItem class string from
+// base/ui/toggle-group.tsx.
 func groupItemClasses() string {
-	return "shrink-0 focus:z-10 focus-visible:z-10 " +
-		"group-data-[spacing=0]/toggle-group:rounded-none group-data-[spacing=0]/toggle-group:px-2 group-data-[spacing=0]/toggle-group:has-data-[icon=inline-end]:pr-1.5 group-data-[spacing=0]/toggle-group:has-data-[icon=inline-start]:pl-1.5 " +
-		"group-data-horizontal/toggle-group:data-[spacing=0]:first:rounded-l-lg group-data-vertical/toggle-group:data-[spacing=0]:first:rounded-t-lg group-data-horizontal/toggle-group:data-[spacing=0]:last:rounded-r-lg group-data-vertical/toggle-group:data-[spacing=0]:last:rounded-b-lg " +
-		"group-data-horizontal/toggle-group:data-[spacing=0]:data-[variant=outline]:border-l-0 group-data-vertical/toggle-group:data-[spacing=0]:data-[variant=outline]:border-t-0 group-data-horizontal/toggle-group:data-[spacing=0]:data-[variant=outline]:first:border-l group-data-vertical/toggle-group:data-[spacing=0]:data-[variant=outline]:first:border-t"
+	return "cn-toggle-group-item shrink-0 focus:z-10 focus-visible:z-10 group-data-horizontal/toggle-group:data-[spacing=0]:data-[variant=outline]:border-l-0 group-data-vertical/toggle-group:data-[spacing=0]:data-[variant=outline]:border-t-0 group-data-horizontal/toggle-group:data-[spacing=0]:data-[variant=outline]:first:border-l group-data-vertical/toggle-group:data-[spacing=0]:data-[variant=outline]:first:border-t"
 }
 
 templ Toggle(props ...Props) {
@@ -118,6 +107,7 @@ templ Toggle(props ...Props) {
 		if inGroup {
 			data-slot="toggle-group-item"
 			data-variant={ string(p.Variant) }
+			data-size={ string(p.Size) }
 			data-spacing={ strconv.Itoa(spacing) }
 		} else {
 			data-slot="toggle"
@@ -136,7 +126,7 @@ templ Toggle(props ...Props) {
 			data-state="off"
 		}
 		disabled?={ p.Disabled }
-		class={ utils.TwMerge(toggleClasses(p.Variant, p.Size), utils.If(inGroup, groupItemClasses()), p.Class) }
+		class={ utils.TwMerge(utils.If(inGroup, groupItemClasses()), baseClasses, variantClasses(p.Variant), sizeClasses(p.Size), p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

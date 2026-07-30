@@ -29,16 +29,15 @@ type SeparatorProps struct {
 	Orientation Orientation
 }
 
-// Rounding is data-slot based like base-nova: hidden elements without a
-// data-slot (e.g. a select's form input) never break the first/last rounding.
-func variantClasses(o Orientation) string {
-	base := "group/button-group flex w-fit items-stretch *:focus-visible:relative *:focus-visible:z-10 has-[>[data-slot=button-group]]:gap-2 has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-lg [&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1"
-	switch o {
-	case OrientationVertical:
-		return base + " flex-col *:data-slot:rounded-b-none [&>[data-slot]~[data-slot]]:rounded-t-none [&>[data-slot]~[data-slot]]:border-t-0 [&>[data-slot]:not(:has(~[data-slot]))]:rounded-b-lg!"
-	default:
-		return base + " *:data-slot:rounded-r-none [&>[data-slot]~[data-slot]]:rounded-l-none [&>[data-slot]~[data-slot]]:border-l-0 [&>[data-slot]:not(:has(~[data-slot]))]:rounded-r-lg!"
+// 1:1 base/ui/button-group.tsx: structure lives here, the look comes from the
+// active style-*.css via the cn-button-group-* classes.
+const baseClasses = "cn-button-group flex w-fit items-stretch *:focus-visible:relative *:focus-visible:z-10 [&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1"
+
+func orientationClasses(o Orientation) string {
+	if o == OrientationVertical {
+		return "cn-button-group-orientation-vertical flex-col *:data-slot:rounded-b-none [&>[data-slot]~[data-slot]]:rounded-t-none [&>[data-slot]~[data-slot]]:border-t-0"
 	}
+	return "cn-button-group-orientation-horizontal *:data-slot:rounded-r-none [&>[data-slot]~[data-slot]]:rounded-l-none [&>[data-slot]~[data-slot]]:border-l-0"
 }
 
 templ ButtonGroup(props ...Props) {
@@ -56,7 +55,7 @@ templ ButtonGroup(props ...Props) {
 		role="group"
 		data-slot="button-group"
 		data-orientation={ string(p.Orientation) }
-		class={ utils.TwMerge(variantClasses(p.Orientation), p.Class) }
+		class={ utils.TwMerge(baseClasses, orientationClasses(p.Orientation), p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -73,7 +72,7 @@ templ Text(props ...TextProps) {
 			id={ p.ID }
 		}
 		data-slot="button-group-text"
-		class={ utils.TwMerge("flex items-center gap-2 rounded-lg border bg-muted px-2.5 text-sm font-medium [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4", p.Class) }
+		class={ utils.TwMerge("cn-button-group-text flex items-center [&_svg]:pointer-events-none", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -95,7 +94,10 @@ templ Separator(props ...SeparatorProps) {
 		role="separator"
 		data-slot="button-group-separator"
 		data-orientation={ string(p.Orientation) }
-		class={ utils.TwMerge("relative self-stretch bg-input shrink-0 data-[orientation=vertical]:my-px data-[orientation=vertical]:h-auto data-[orientation=vertical]:w-px data-[orientation=horizontal]:mx-px data-[orientation=horizontal]:w-auto data-[orientation=horizontal]:h-px", p.Class) }
+		data-horizontal?={ p.Orientation == OrientationHorizontal }
+		data-vertical?={ p.Orientation == OrientationVertical }
+		aria-orientation={ string(p.Orientation) }
+		class={ utils.TwMerge("shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch", "cn-button-group-separator relative self-stretch data-horizontal:mx-px data-horizontal:w-auto data-vertical:my-px data-vertical:h-auto", p.Class) }
 		{ p.Attributes... }
 	></div>
 }

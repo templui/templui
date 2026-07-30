@@ -71,7 +71,7 @@ func Breadcrumb(props ...Props) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
-			"flex",
+			"cn-breadcrumb",
 			p.Class,
 		),
 		}
@@ -102,7 +102,7 @@ func Breadcrumb(props ...Props) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " data-slot=\"breadcrumb\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -165,7 +165,7 @@ func List(props ...ListProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var6 = []any{utils.TwMerge(
-			"flex flex-wrap items-center gap-1.5 text-sm break-words text-muted-foreground",
+			"cn-breadcrumb-list flex flex-wrap items-center wrap-break-word",
 			p.Class,
 		),
 		}
@@ -185,7 +185,7 @@ func List(props ...ListProps) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/breadcrumb/breadcrumb.templ`, Line: 69, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/breadcrumb/breadcrumb.templ`, Line: 70, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -196,7 +196,7 @@ func List(props ...ListProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, " class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, " data-slot=\"breadcrumb-list\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -259,7 +259,7 @@ func Item(props ...ItemProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var10 = []any{utils.TwMerge(
-			"inline-flex items-center gap-1",
+			"cn-breadcrumb-item inline-flex items-center",
 			p.Class,
 		),
 		}
@@ -279,7 +279,7 @@ func Item(props ...ItemProps) templ.Component {
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/breadcrumb/breadcrumb.templ`, Line: 90, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/breadcrumb/breadcrumb.templ`, Line: 92, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -290,7 +290,7 @@ func Item(props ...ItemProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, " class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, " data-slot=\"breadcrumb-item\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -353,7 +353,7 @@ func Link(props ...LinkProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var14 = []any{utils.TwMerge(
-			"transition-colors hover:text-foreground",
+			"cn-breadcrumb-link",
 			p.Class,
 		),
 		}
@@ -373,7 +373,7 @@ func Link(props ...LinkProps) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/breadcrumb/breadcrumb.templ`, Line: 111, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/breadcrumb/breadcrumb.templ`, Line: 114, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -392,7 +392,7 @@ func Link(props ...LinkProps) templ.Component {
 			var templ_7745c5c3_Var16 templ.SafeURL
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(p.Href))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/breadcrumb/breadcrumb.templ`, Line: 114, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/breadcrumb/breadcrumb.templ`, Line: 117, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -403,7 +403,7 @@ func Link(props ...LinkProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, " class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, " data-slot=\"breadcrumb-link\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -466,7 +466,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var19 = []any{utils.TwMerge(
-			"[&>svg]:size-3.5",
+			"cn-breadcrumb-separator",
 			p.Class,
 		),
 		}
@@ -486,7 +486,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 			var templ_7745c5c3_Var20 string
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/breadcrumb/breadcrumb.templ`, Line: 135, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/breadcrumb/breadcrumb.templ`, Line: 139, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
@@ -528,7 +528,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = icon.ChevronRight().Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = icon.ChevronRight(icon.Props{Class: "cn-rtl-flip"}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -567,7 +567,7 @@ func Page(props ...ItemProps) templ.Component {
 			p = props[0]
 		}
 		var templ_7745c5c3_Var23 = []any{utils.TwMerge(
-			"font-normal text-foreground",
+			"cn-breadcrumb-page",
 			p.Class,
 		),
 		}
@@ -587,7 +587,7 @@ func Page(props ...ItemProps) templ.Component {
 			var templ_7745c5c3_Var24 string
 			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/breadcrumb/breadcrumb.templ`, Line: 163, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/breadcrumb/breadcrumb.templ`, Line: 167, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 			if templ_7745c5c3_Err != nil {
@@ -657,7 +657,7 @@ func Ellipsis() templ.Component {
 			templ_7745c5c3_Var26 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<span aria-hidden=\"true\" data-slot=\"breadcrumb-ellipsis\" role=\"presentation\" class=\"flex size-5 items-center justify-center [&>svg]:size-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<span aria-hidden=\"true\" data-slot=\"breadcrumb-ellipsis\" role=\"presentation\" class=\"cn-breadcrumb-ellipsis flex items-center justify-center\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
