@@ -10,6 +10,10 @@
  * - recharts CartesianAxis preserveEnd: tick culling with measured label
  *   sizes and minTickGap.
  * - d3-shape: curveNatural, curveLinear, curveStep and stackOffsetExpand.
+ * - d3-array ticks: the grid angles of a radial chart, whose angle axis
+ *   has no tick count and so falls back to d3's default ten.
+ * - recharts Sector: the sector path and its rounded corners, plus
+ *   getBarPosition and computeRadialBarDataItems for the radial rings.
  * - react-smooth: entrance and update animations with the CSS ease bezier,
  *   the from state paints synchronously on mount and the clock starts on
  *   the first real frame.
@@ -931,6 +935,38 @@ function activeAngleIndex(coordinate, ticks) {
   return -1;
 }
 
+/* formatAngleOfSector plus the angle test of inRangeOfSector. */
+function inAngleRangeOfSector(angle, startAngle, endAngle) {
+  const min = Math.min(Math.floor(startAngle / 360), Math.floor(endAngle / 360));
+  const start = startAngle - min * 360;
+  const end = endAngle - min * 360;
+  let formatAngle = angle;
+  if (start <= end) {
+    while (formatAngle > end) formatAngle -= 360;
+    while (formatAngle < start) formatAngle += 360;
+    return formatAngle >= start && formatAngle <= end;
+  }
+  while (formatAngle > start) formatAngle -= 360;
+  while (formatAngle < end) formatAngle += 360;
+  return formatAngle >= end && formatAngle <= start;
+}
+
+/* calculateActiveTickIndex for ticks that run in a single direction. */
+function activeTickIndex(coordinate, ticks) {
+  const len = ticks.length;
+  if (len <= 1) return 0;
+  for (let i = 0; i < len; i++) {
+    if (
+      (i === 0 && coordinate <= (ticks[i] + ticks[i + 1]) / 2) ||
+      (i > 0 && i < len - 1 && coordinate > (ticks[i] + ticks[i - 1]) / 2 && coordinate <= (ticks[i] + ticks[i + 1]) / 2) ||
+      (i === len - 1 && coordinate > (ticks[i] + ticks[i - 1]) / 2)
+    ) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 /* getPolygonPath of Recharts' PolarGrid. */
 function polarPolygonPath(radius, cx, cy, angles) {
   let path = "";
@@ -939,6 +975,47 @@ function polarPolygonPath(radius, cx, cy, angles) {
     path += (i ? "L " : "M ") + fmtF(p.x) + "," + fmtF(p.y);
   });
   return path + "Z";
+}
+
+/* PolarGrid: ConcentricCircle and ConcentricPolygon carry the radius twice
+ * like Recharts does, PolarAngles runs the radial lines from the inner to
+ * the outer radius. The stroke defaults to Recharts' "#ccc", the demos
+ * that paint their rings through a class pass "none" instead. */
+function polarGridSVG(polar, cx, cy, innerRadius, outerRadius, radii, angles) {
+  const stroke = polar.stroke || "#ccc";
+  const strokeWidth = polar.strokeWidth ? ` stroke-width="${fmtF(polar.strokeWidth)}"` : "";
+  const cls = polar.gridClass ? " " + polar.gridClass : "";
+  let svg = `<g class="recharts-polar-grid"><g class="recharts-polar-grid-concentric">`;
+  for (const r of radii) {
+    if (polar.gridType === "circle") {
+      svg += `<circle class="recharts-polar-grid-concentric-circle${cls}" stroke="${stroke}" fill="none"${strokeWidth} cx="${fmtF(cx)}" cy="${fmtF(cy)}" radius="${fmtF(r)}" r="${fmtF(r)}"/>`;
+    } else {
+      svg += `<path class="recharts-polar-grid-concentric-polygon${cls}" stroke="${stroke}" fill="none"${strokeWidth} d="${polarPolygonPath(r, cx, cy, angles)}"/>`;
+    }
+  }
+  svg += `</g>`;
+  if (polar.radialLines) {
+    svg += `<g class="recharts-polar-grid-angle">`;
+    for (const a of angles) {
+      const start = polarToCartesian(cx, cy, innerRadius, a);
+      const end = polarToCartesian(cx, cy, outerRadius, a);
+      svg += `<line stroke="${stroke}"${strokeWidth} x1="${fmtF(start.x)}" y1="${fmtF(start.y)}" x2="${fmtF(end.x)}" y2="${fmtF(end.y)}"/>`;
+    }
+    svg += `</g>`;
+  }
+  return svg + `</g>`;
+}
+
+/* The Label content of the demos: a text in the middle of the chart with
+ * one tspan per line, each at its own offset off the center. */
+function centerLabelSVG(cx, cy, label) {
+  const baseline = label.dominantBaseline ? ` dominant-baseline="${label.dominantBaseline}"` : "";
+  let svg = `<text x="${fmtF(cx)}" y="${fmtF(cy)}" text-anchor="middle"${baseline}>`;
+  for (const span of label.spans || []) {
+    const cls = span.class ? ` class="${span.class}"` : "";
+    svg += `<tspan x="${fmtF(cx)}" y="${fmtF(cy + (span.offsetY || 0))}"${cls}>${span.text}</tspan>`;
+  }
+  return svg + `</text>`;
 }
 
 /* renderRadar draws a RadarChart: the polar grid, the angle axis labels and
@@ -969,27 +1046,7 @@ function renderRadar(panel, m, state, alpha = 1) {
   let svg = `<svg class="recharts-surface" width="${fmtF(W)}" height="${fmtF(H)}" viewBox="0 0 ${fmtF(W)} ${fmtF(H)}">`;
 
   if (polar.hasGrid) {
-    const strokeWidth = polar.strokeWidth ? ` stroke-width="${fmtF(polar.strokeWidth)}"` : "";
-    const cls = polar.gridClass ? " " + polar.gridClass : "";
-    svg += `<g class="recharts-polar-grid"><g class="recharts-polar-grid-concentric">`;
-    for (const r of radii) {
-      if (polar.gridType === "circle") {
-        svg += `<circle class="recharts-polar-grid-concentric-circle${cls}" stroke="#ccc" fill="none"${strokeWidth} cx="${fmtF(cx)}" cy="${fmtF(cy)}" r="${fmtF(r)}"/>`;
-      } else {
-        svg += `<path class="recharts-polar-grid-concentric-polygon${cls}" stroke="#ccc" fill="none"${strokeWidth} d="${polarPolygonPath(r, cx, cy, angles)}"/>`;
-      }
-    }
-    svg += `</g>`;
-    if (polar.radialLines) {
-      svg += `<g class="recharts-polar-grid-angle">`;
-      for (const a of angles) {
-        const start = polarToCartesian(cx, cy, 0, a);
-        const end = polarToCartesian(cx, cy, outerRadius, a);
-        svg += `<line stroke="#ccc"${strokeWidth} x1="${fmtF(start.x)}" y1="${fmtF(start.y)}" x2="${fmtF(end.x)}" y2="${fmtF(end.y)}"/>`;
-      }
-      svg += `</g>`;
-    }
-    svg += `</g>`;
+    svg += polarGridSVG(polar, cx, cy, 0, outerRadius, radii, angles);
   }
 
   if (polar.hasAngleAxis) {
@@ -1085,11 +1142,140 @@ function renderRadar(panel, m, state, alpha = 1) {
   state.geom = { W, H, cx, cy, outerRadius, angles, n };
 }
 
+/* tickSpec and ticks of d3-array: the angle axis of a radial chart has no
+ * tick count of its own, so its grid angles are d3's default ten. */
+function d3TickSpec(start, stop, count) {
+  const e10 = Math.sqrt(50);
+  const e5 = Math.sqrt(10);
+  const e2 = Math.sqrt(2);
+  const step = (stop - start) / Math.max(0, count);
+  const power = Math.floor(Math.log10(step));
+  const error = step / Math.pow(10, power);
+  const factor = error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1;
+  let i1, i2, inc;
+  if (power < 0) {
+    inc = Math.pow(10, -power) / factor;
+    i1 = Math.round(start * inc);
+    i2 = Math.round(stop * inc);
+    if (i1 / inc < start) ++i1;
+    if (i2 / inc > stop) --i2;
+    inc = -inc;
+  } else {
+    inc = Math.pow(10, power) * factor;
+    i1 = Math.round(start / inc);
+    i2 = Math.round(stop / inc);
+    if (i1 * inc < start) ++i1;
+    if (i2 * inc > stop) --i2;
+  }
+  if (i2 < i1 && 0.5 <= count && count < 2) return d3TickSpec(start, stop, count * 2);
+  return [i1, i2, inc];
+}
+
+function d3Ticks(start, stop, count) {
+  if (!(count > 0)) return [];
+  if (start === stop) return [start];
+  const reverse = stop < start;
+  const [i1, i2, inc] = reverse ? d3TickSpec(stop, start, count) : d3TickSpec(start, stop, count);
+  if (!(i2 >= i1)) return [];
+  const n = i2 - i1 + 1;
+  const out = new Array(n);
+  if (reverse) {
+    if (inc < 0) for (let i = 0; i < n; ++i) out[i] = (i2 - i) / -inc;
+    else for (let i = 0; i < n; ++i) out[i] = (i2 - i) * inc;
+  } else {
+    if (inc < 0) for (let i = 0; i < n; ++i) out[i] = (i1 + i) / -inc;
+    else for (let i = 0; i < n; ++i) out[i] = (i1 + i) * inc;
+  }
+  return out;
+}
+
+/* getBarPosition of Recharts for the chart defaults, a bar gap of 4 and a
+ * bar category gap of 10% of the band. The size is truncated to whole
+ * pixels, which is Recharts' own ">>= 0". */
+function barPosition(bandSize, len) {
+  let realBarGap = 4;
+  const offset = 0.1 * bandSize;
+  if (bandSize - 2 * offset - (len - 1) * realBarGap <= 0) realBarGap = 0;
+  let originalSize = (bandSize - 2 * offset - (len - 1) * realBarGap) / len;
+  if (originalSize > 1) originalSize = Math.trunc(originalSize);
+  return { offset, size: originalSize, gap: realBarGap };
+}
+
+/* truncateByDomain of Recharts: a stacked range is clamped into the number
+ * axis domain on both ends. */
+function truncateByDomain(value, domainMin, domainMax) {
+  const minValue = Math.min(domainMin, domainMax);
+  const maxValue = Math.max(domainMin, domainMax);
+  const result = [value[0], value[1]];
+  if (value[0] < minValue) result[0] = minValue;
+  if (value[1] > maxValue) result[1] = maxValue;
+  if (result[0] > maxValue) result[0] = maxValue;
+  if (result[1] < minValue) result[1] = minValue;
+  return result;
+}
+
+/* getTangentCircle of Recharts' Sector: the circle a rounded corner runs
+ * on, with the two points it is tangent to. */
+function tangentCircle({ cx, cy, radius, angle, sign, isExternal, cornerRadius, cornerIsExternal }) {
+  const RADIAN = Math.PI / 180;
+  const centerRadius = cornerRadius * (isExternal ? 1 : -1) + radius;
+  const theta = Math.asin(cornerRadius / centerRadius) / RADIAN;
+  const centerAngle = cornerIsExternal ? angle : angle + sign * theta;
+  const center = polarToCartesian(cx, cy, centerRadius, centerAngle);
+  const circleTangency = polarToCartesian(cx, cy, radius, centerAngle);
+  const lineTangencyAngle = cornerIsExternal ? angle - sign * theta : angle;
+  const lineTangency = polarToCartesian(cx, cy, centerRadius * Math.cos(theta * RADIAN), lineTangencyAngle);
+  return { center, circleTangency, lineTangency, theta };
+}
+
+/* getSectorWithCorner of Recharts' Sector. */
+function sectorWithCornerPath(cx, cy, innerR, outerR, cornerRadius, startAngle, endAngle) {
+  const sign = endAngle - startAngle < 0 ? -1 : endAngle - startAngle > 0 ? 1 : 0;
+  const { circleTangency: soct, lineTangency: solt, theta: sot } = tangentCircle({ cx, cy, radius: outerR, angle: startAngle, sign, cornerRadius });
+  const { circleTangency: eoct, lineTangency: eolt, theta: eot } = tangentCircle({ cx, cy, radius: outerR, angle: endAngle, sign: -sign, cornerRadius });
+  const outerArcAngle = Math.abs(startAngle - endAngle) - sot - eot;
+  if (outerArcAngle < 0) {
+    return sectorPath(cx, cy, innerR, outerR, startAngle, endAngle);
+  }
+  let path =
+    `M ${fmtF(solt.x)},${fmtF(solt.y)} A${fmtF(cornerRadius)},${fmtF(cornerRadius)},0,0,${sign < 0 ? 1 : 0},${fmtF(soct.x)},${fmtF(soct.y)}` +
+    ` A${fmtF(outerR)},${fmtF(outerR)},0,${outerArcAngle > 180 ? 1 : 0},${sign < 0 ? 1 : 0},${fmtF(eoct.x)},${fmtF(eoct.y)}` +
+    ` A${fmtF(cornerRadius)},${fmtF(cornerRadius)},0,0,${sign < 0 ? 1 : 0},${fmtF(eolt.x)},${fmtF(eolt.y)}`;
+  if (innerR > 0) {
+    const { circleTangency: sict, lineTangency: silt, theta: sit } = tangentCircle({ cx, cy, radius: innerR, angle: startAngle, sign, isExternal: true, cornerRadius });
+    const { circleTangency: eict, lineTangency: eilt, theta: eit } = tangentCircle({ cx, cy, radius: innerR, angle: endAngle, sign: -sign, isExternal: true, cornerRadius });
+    const innerArcAngle = Math.abs(startAngle - endAngle) - sit - eit;
+    if (innerArcAngle < 0 && cornerRadius === 0) {
+      return `${path}L${fmtF(cx)},${fmtF(cy)}Z`;
+    }
+    path +=
+      `L${fmtF(eilt.x)},${fmtF(eilt.y)} A${fmtF(cornerRadius)},${fmtF(cornerRadius)},0,0,${sign < 0 ? 1 : 0},${fmtF(eict.x)},${fmtF(eict.y)}` +
+      ` A${fmtF(innerR)},${fmtF(innerR)},0,${innerArcAngle > 180 ? 1 : 0},${sign > 0 ? 1 : 0},${fmtF(sict.x)},${fmtF(sict.y)}` +
+      ` A${fmtF(cornerRadius)},${fmtF(cornerRadius)},0,0,${sign < 0 ? 1 : 0},${fmtF(silt.x)},${fmtF(silt.y)}Z`;
+  } else {
+    path += `L${fmtF(cx)},${fmtF(cy)}Z`;
+  }
+  return path;
+}
+
+/* Sector of Recharts: a corner radius bends the ends, and it is capped at
+ * half the ring width. */
+function sector(cx, cy, innerR, outerR, startAngle, endAngle, cornerRadius) {
+  if (outerR < innerR || startAngle === endAngle) return "";
+  const deltaRadius = outerR - innerR;
+  const cr = cornerRadius || 0;
+  if (cr > 0 && Math.abs(startAngle - endAngle) < 360) {
+    return sectorWithCornerPath(cx, cy, innerR, outerR, Math.min(cr, deltaRadius / 2), startAngle, endAngle);
+  }
+  return sectorPath(cx, cy, innerR, outerR, startAngle, endAngle);
+}
+
 /* getSectorPath of Recharts' Sector. */
 function sectorPath(cx, cy, innerR, outerR, startAngle, endAngle) {
-  // getDeltaAngle clamps a sector to a full turn.
+  // getDeltaAngle stops just short of a full turn, so a sector that goes
+  // all the way around still has two distinct arc ends and paints.
   const sign = endAngle - startAngle < 0 ? -1 : 1;
-  const angle = Math.min(Math.abs(endAngle - startAngle), 360) * sign;
+  const angle = Math.min(Math.abs(endAngle - startAngle), 359.999) * sign;
   const tempEndAngle = startAngle + angle;
   const outerStart = polarToCartesian(cx, cy, outerR, startAngle);
   const outerEnd = polarToCartesian(cx, cy, outerR, tempEndAngle);
@@ -1203,12 +1389,8 @@ function renderPie(panel, m, state, alpha = 1) {
       svg += `</g>`;
     }
 
-    if (pie.centerValue) {
-      svg +=
-        `<text x="${fmtF(cx)}" y="${fmtF(cy)}" text-anchor="middle" dominant-baseline="middle">` +
-        `<tspan x="${fmtF(cx)}" y="${fmtF(cy)}" class="fill-foreground text-3xl font-bold">${pie.centerValue}</tspan>` +
-        `<tspan x="${fmtF(cx)}" y="${fmtF(cy + 24)}" class="fill-muted-foreground">${pie.centerLabel}</tspan>` +
-        `</text>`;
+    if (pie.center) {
+      svg += centerLabelSVG(cx, cy, pie.center);
     }
     svg += "</g>";
     state.points.sectors.push(sectors);
@@ -1217,6 +1399,163 @@ function renderPie(panel, m, state, alpha = 1) {
   svg += "</svg>";
   swapSVG(panel, svg);
   state.geom = { W, H };
+}
+
+/* renderRadialLabel of Recharts' Label: an insideStart label runs along an
+ * arc through the middle of its own sector. */
+function radialLabelSVG(id, text, ll, fill, cx, cy, sc) {
+  const radius = (sc.inner + sc.outer) / 2;
+  // getDeltaAngle, then the insideStart branch with the default offset of 5.
+  const delta = (sc.end - sc.start < 0 ? -1 : 1) * Math.min(Math.abs(sc.end - sc.start), 360);
+  const sign = delta >= 0 ? 1 : -1;
+  const labelAngle = sc.start + sign * (ll.offset || 5);
+  // clockWise is false on a radial bar's view box, and a positive sweep
+  // flips it.
+  const direction = delta <= 0 ? false : true;
+  const startPoint = polarToCartesian(cx, cy, radius, labelAngle);
+  const endPoint = polarToCartesian(cx, cy, radius, labelAngle + (direction ? 1 : -1) * 359);
+  const path = `M${fmtF(startPoint.x)},${fmtF(startPoint.y)} A${fmtF(radius)},${fmtF(radius)},0,1,${direction ? 0 : 1}, ${fmtF(endPoint.x)},${fmtF(endPoint.y)}`;
+  const fontSize = ll.fontSize ? ` font-size="${fmtF(ll.fontSize)}"` : "";
+  return (
+    `<text fill="${fill}"${fontSize} dominant-baseline="central" class="recharts-radial-bar-label${ll.class ? " " + ll.class : ""}">` +
+    `<defs><path id="${id}" d="${path}"/></defs><textPath xlink:href="#${id}">${text}</textPath></text>`
+  );
+}
+
+/* renderRadial draws a RadialBarChart: the radius axis is a band scale over
+ * the rings, the angle axis a linear scale over the values. */
+function renderRadial(panel, m, state, alpha = 1) {
+  const W = panel.clientWidth;
+  const H = panel.clientHeight;
+  if (!W || !H) return;
+  const legendHeight = legendSize(panel, m);
+  const offsetW = Math.max(W - m.marginLeft - m.marginRight, 0);
+  const offsetH = Math.max(H - m.marginTop - m.marginBottom - legendHeight, 0);
+  const cx = m.marginLeft + offsetW / 2;
+  const cy = m.marginTop + offsetH / 2;
+  // getMaxRadius, then the RadialBarChart defaults: no inner radius and an
+  // outer radius of 80%.
+  const maxRadius = Math.min(offsetW, offsetH) / 2;
+  const rad = m.radial || {};
+  const innerRadius = rad.innerRadius || 0;
+  const outerRadius = rad.outerRadius || maxRadius * 0.8;
+  const startAngle = rad.startAngle || 0;
+  const endAngle = rad.endAngle;
+  const n = m.series.length ? m.series[0].values.length : 0;
+  if (!n) return;
+
+  // The angle axis is a number axis with the [0, 'auto'] default domain, so
+  // it spans zero to the largest raw value.
+  let domainMin = 0;
+  let domainMax = 0;
+  for (const s of m.series) {
+    for (const v of s.values) {
+      if (v > domainMax) domainMax = v;
+      if (v < domainMin) domainMin = v;
+    }
+  }
+  const span = domainMax - domainMin || 1;
+  const angleOf = (v) => startAngle + ((v - domainMin) / span) * (endAngle - startAngle);
+
+  // The radius axis is a band scale, one band per row, and getBarPosition
+  // places the bars inside it. Bars of one stack share their position.
+  const bandSize = (outerRadius - innerRadius) / n;
+  const groupKeys = [];
+  const groupOf = m.series.map((s, si) => {
+    const key = s.stackId ? "stack:" + s.stackId : "bar:" + si;
+    let gi = groupKeys.indexOf(key);
+    if (gi < 0) {
+      gi = groupKeys.length;
+      groupKeys.push(key);
+    }
+    return gi;
+  });
+  const pos = barPosition(bandSize, groupKeys.length);
+
+  // A stack chains its ranges and truncateByDomain clamps each one into
+  // the angle domain, so a stacked bar never runs past the chart's end
+  // angle. An unstacked bar starts at the base value of the number axis,
+  // zero.
+  const totals = {};
+  const ranges = m.series.map((s) => {
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const v = s.values[i];
+      if (s.stackId) {
+        const key = s.stackId + "|" + i;
+        const base = totals[key] || 0;
+        out.push(truncateByDomain([base, base + v], domainMin, domainMax));
+        totals[key] = base + v;
+      } else {
+        out.push([0, v]);
+      }
+    }
+    return out;
+  });
+
+  let svg = `<svg class="recharts-surface" width="${fmtF(W)}" height="${fmtF(H)}" viewBox="0 0 ${fmtF(W)} ${fmtF(H)}">`;
+
+  const polar = m.polar || {};
+  if (polar.hasGrid) {
+    // getTicksOfAxis for the grid: a band scale puts its ticks in the
+    // middle of the band, the angle axis has no tick count of its own.
+    const radii = polar.polarRadius && polar.polarRadius.length ? polar.polarRadius : Array.from({ length: n }, (_, i) => innerRadius + i * bandSize + bandSize / 2);
+    const angles = d3Ticks(domainMin, domainMax, 10).map(angleOf);
+    svg += polarGridSVG(polar, cx, cy, innerRadius, outerRadius, radii, angles);
+  }
+
+  const sectors = [];
+  m.series.forEach((s, si) => {
+    const barOffset = pos.offset + (pos.size + pos.gap) * groupOf[si];
+    let background = "";
+    let shapes = "";
+    let labels = "";
+    const bar = [];
+    for (let i = 0; i < n; i++) {
+      const inner = innerRadius + i * bandSize + barOffset;
+      const outer = inner + pos.size;
+      const from = angleOf(ranges[si][i][0]);
+      const to = angleOf(ranges[si][i][1]);
+      // The mount animation interpolates the end angle out of the start
+      // angle, so a sector opens up.
+      const end = alpha < 1 ? from + (to - from) * alpha : to;
+      if (s.background) {
+        background +=
+          `<g class="recharts-layer recharts-shape">` +
+          `<path class="recharts-sector recharts-radial-bar-background-sector" fill="#eee" d="${sector(cx, cy, inner, outer, startAngle, endAngle, s.cornerRadius)}"/>` +
+          `</g>`;
+      }
+      // The entry's own fill wins over the bar's, like Recharts spreading
+      // the data row over the sector props.
+      const fill = (s.cells && s.cells[i]) || s.fill || s.color;
+      shapes +=
+        `<g class="recharts-layer recharts-shape">` +
+        `<path class="recharts-sector recharts-radial-bar-sector" fill="${fill}" d="${sector(cx, cy, inner, outer, from, end, s.cornerRadius)}"/>` +
+        `</g>`;
+      bar.push({ inner, outer, start: from, end });
+      // The label list only shows once the animation is done, Recharts'
+      // showLabels={!isAnimating}.
+      if (s.labelList && alpha >= 1) {
+        labels += radialLabelSVG(`${state.uid}-${si}-${i}`, s.labelList.labels[i], s.labelList, fill, cx, cy, { inner, outer, start: from, end });
+      }
+    }
+    sectors.push(bar);
+    svg +=
+      `<g class="recharts-layer recharts-area${s.class ? " " + s.class : ""}">` +
+      (s.background ? `<g class="recharts-layer recharts-radial-bar-background">${background}</g>` : "") +
+      `<g class="recharts-layer recharts-radial-bar-sectors">${shapes}${labels}</g>` +
+      `</g>`;
+  });
+
+  if (rad.center) {
+    svg += centerLabelSVG(cx, cy, rad.center);
+  }
+
+  svg += "</svg>";
+  swapSVG(panel, svg);
+  // The tooltip picks its row by the radius, so it needs the band centers.
+  const tickCoords = Array.from({ length: n }, (_, i) => innerRadius + i * bandSize + bandSize / 2);
+  state.geom = { W, H, cx, cy, innerRadius, outerRadius, startAngle, endAngle, tickCoords, sectors };
 }
 
 /* ---------------------------------------------------------------- */
@@ -1283,11 +1622,14 @@ function tooltipHTML(m, i, pieIndex = 0) {
     // ChartTooltipContent's indicatorColor: the row's own fill wins over
     // the series color, so per row colored bars keep their swatch.
     const indicatorColor = (s.cells && s.cells[i]) || s.color;
+    // getPayloadConfigFromPayload: a name key that the rows answer names
+    // every row on its own, otherwise the series carries the name.
+    const name = (s.tooltipNames && s.tooltipNames[i]) || s.label;
     html +=
       `<div class="${rowCls}">` +
       (t.hideIndicator ? "" : s.icon || indicatorHTML(t.indicator, indicatorColor)) +
       `<div class="flex flex-1 justify-between leading-none ${nestLabel ? "items-end" : "items-center"}">` +
-      `<div class="grid gap-1.5">${nested}<span class="text-muted-foreground">${s.label}</span></div>` +
+      `<div class="grid gap-1.5">${nested}<span class="text-muted-foreground">${name}</span></div>` +
       `<span class="font-mono font-medium text-foreground tabular-nums">${s.values[i].toLocaleString("en-US")}</span>` +
       `</div></div>`;
   }
@@ -1303,6 +1645,17 @@ function showCursor(panel, m, state, i) {
   // Recharts draws the cursor between the grid and the series, so bars
   // and areas render on top of the hover band.
   const seriesLayer = svg.querySelector(".recharts-bar, .recharts-area, .recharts-line, .recharts-radar");
+  if (m.kind === "radial") {
+    // getRadialCursorPoints: the cursor is a sector of zero width, an arc
+    // at the radius the pointer sits on.
+    const d = sector(g.cx, g.cy, state.cursorRadius, state.cursorRadius, g.startAngle, g.endAngle, 0);
+    if (!cursor) {
+      seriesLayer.insertAdjacentHTML("beforebegin", `<g class="recharts-layer"><path class="recharts-sector recharts-tooltip-cursor" stroke="#ccc" fill="none" d="${d}"/></g>`);
+    } else {
+      cursor.setAttribute("d", d);
+    }
+    return;
+  }
   if (m.kind === "radar") {
     const end = polarToCartesian(g.cx, g.cy, g.outerRadius, g.angles[i]);
     const d = `M${fmtF(g.cx)},${fmtF(g.cy)}L${fmtF(end.x)},${fmtF(end.y)}`;
@@ -1406,6 +1759,7 @@ function initPanel(script) {
   const render = (alpha = 1) => {
     if (m.kind === "pie") renderPie(panel, m, state, alpha);
     else if (m.kind === "radar") renderRadar(panel, m, state, alpha);
+    else if (m.kind === "radial") renderRadial(panel, m, state, alpha);
     else renderCartesian(panel, m, state, alpha);
     // The points this panel drew are what the next visible panel morphs
     // from, Recharts' previousPointsRef.
@@ -1469,6 +1823,15 @@ function initPanel(script) {
       const angle = p.angle > 90 ? p.angle - 360 : p.angle;
       return activeAngleIndex(angle, g.angles);
     }
+    if (m.kind === "radial") {
+      // inRangeOfSector, then calculateTooltipPos: in a radial layout the
+      // radius picks the row.
+      const p = angleOfPoint(chartX, chartY, g.cx, g.cy);
+      if (p.radius < g.innerRadius || p.radius > g.outerRadius || p.radius === 0) return -1;
+      if (!inAngleRangeOfSector(p.angle, g.startAngle, g.endAngle)) return -1;
+      state.cursorRadius = p.radius;
+      return activeTickIndex(p.radius, g.tickCoords);
+    }
     if (chartX < g.plotX || chartX > g.plotX + g.plotW) return -1;
     if (chartY < g.plotY || chartY > g.plotBottom) return -1;
     if (m.kind === "bar") {
@@ -1505,7 +1868,7 @@ function initPanel(script) {
     // getActiveCoordinate: the category axis snaps to its tick and the
     // other one follows the pointer, so a vertical layout snaps y.
     const g = state.geom;
-    if (m.kind === "radar") {
+    if (m.kind === "radar" || m.kind === "radial") {
       positionTooltip(e, null, null, i);
       return;
     }

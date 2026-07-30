@@ -108,6 +108,15 @@ func chartsFor(chartType string) []modules.ChartEntry {
 			entry("chart-pie-stacked", false),
 			entry("chart-pie-interactive", false),
 		}
+	case "radial":
+		return []modules.ChartEntry{
+			entry("chart-radial-simple", false),
+			entry("chart-radial-label", false),
+			entry("chart-radial-grid", false),
+			entry("chart-radial-text", false),
+			entry("chart-radial-shape", false),
+			entry("chart-radial-stacked", false),
+		}
 	}
 	return nil
 }

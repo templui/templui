@@ -102,8 +102,11 @@ templ ChartPieInteractive() {
 								},
 							}) {
 								@chart.Label(chart.LabelProps{
-									Value: pieInteractiveFormat(d["desktop"].(int)),
-									Text:  "Visitors",
+									DominantBaseline: "middle",
+									Spans: []chart.LabelSpan{
+										{Text: pieInteractiveFormat(d["desktop"].(int)), Class: "fill-foreground text-3xl font-bold"},
+										{Text: "Visitors", Class: "fill-muted-foreground", OffsetY: 24},
+									},
 								})
 							}
 						}

@@ -1,25 +1,22 @@
 package charts
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/templui/templui/components/card"
 	"github.com/templui/templui/components/chart"
 	"github.com/templui/templui/components/icon"
 )
 
-// The pendant of chart-pie-donut-text.tsx.
+// The pendant of chart-radial-simple.tsx.
 
-var chartPieDonutTextData = []chart.Datum{
+var chartRadialSimpleData = []chart.Datum{
 	{"browser": "chrome", "visitors": 275, "fill": "var(--color-chrome)"},
 	{"browser": "safari", "visitors": 200, "fill": "var(--color-safari)"},
-	{"browser": "firefox", "visitors": 287, "fill": "var(--color-firefox)"},
+	{"browser": "firefox", "visitors": 187, "fill": "var(--color-firefox)"},
 	{"browser": "edge", "visitors": 173, "fill": "var(--color-edge)"},
-	{"browser": "other", "visitors": 190, "fill": "var(--color-other)"},
+	{"browser": "other", "visitors": 90, "fill": "var(--color-other)"},
 }
 
-var chartPieDonutTextConfig = chart.Config{
+var chartRadialSimpleConfig = chart.Config{
 	{Key: "visitors", Label: "Visitors"},
 	{Key: "chrome", Label: "Chrome", Color: "var(--chart-1)"},
 	{Key: "safari", Label: "Safari", Color: "var(--chart-2)"},
@@ -28,55 +25,31 @@ var chartPieDonutTextConfig = chart.Config{
 	{Key: "other", Label: "Other", Color: "var(--chart-5)"},
 }
 
-// pieDonutTextTotal sums the visitors for the center label.
-func pieDonutTextTotal() string {
-	sum := 0
-	for _, d := range chartPieDonutTextData {
-		sum += d["visitors"].(int)
-	}
-	s := fmt.Sprintf("%d", sum)
-	var sb strings.Builder
-	for i, r := range s {
-		if i > 0 && (len(s)-i)%3 == 0 {
-			sb.WriteRune(',')
-		}
-		sb.WriteRune(r)
-	}
-	return sb.String()
-}
-
-templ ChartPieDonutText() {
+templ ChartRadialSimple() {
 	@card.Card(card.Props{Class: "flex flex-col"}) {
 		@card.Header(card.HeaderProps{Class: "items-center pb-0"}) {
 			@card.Title() {
-				Pie Chart - Donut with Text
+				Radial Chart
 			}
 			@card.Description() {
 				January - June 2024
 			}
 		}
 		@card.Content(card.ContentProps{Class: "flex-1 pb-0"}) {
-			@chart.Container(chart.ContainerProps{ID: "pie-donut-text", Config: chartPieDonutTextConfig, Class: "mx-auto aspect-square max-h-[250px]"}) {
-				@chart.PieChart() {
+			@chart.Container(chart.ContainerProps{ID: "radial-simple", Config: chartRadialSimpleConfig, Class: "mx-auto aspect-square max-h-[250px]"}) {
+				@chart.RadialBarChart(chart.RadialBarChartProps{
+					Data:        chartRadialSimpleData,
+					InnerRadius: 30,
+					OuterRadius: 110,
+				}) {
 					@chart.Tooltip(chart.TooltipProps{
 						Cursor:  chart.Bool(false),
-						Content: chart.TooltipContentProps{HideLabel: true},
+						Content: chart.TooltipContentProps{HideLabel: true, NameKey: "browser"},
 					})
-					@chart.Pie(chart.PieProps{
-						Data:        chartPieDonutTextData,
-						DataKey:     "visitors",
-						NameKey:     "browser",
-						InnerRadius: 60,
-						StrokeWidth: 5,
-					}) {
-						@chart.Label(chart.LabelProps{
-							DominantBaseline: "middle",
-							Spans: []chart.LabelSpan{
-								{Text: pieDonutTextTotal(), Class: "fill-foreground text-3xl font-bold"},
-								{Text: "Visitors", Class: "fill-muted-foreground", OffsetY: 24},
-							},
-						})
-					}
+					@chart.RadialBar(chart.RadialBarProps{
+						DataKey:      "visitors",
+						Background:   true,
+					})
 				}
 			}
 		}

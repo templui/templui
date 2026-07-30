@@ -1,0 +1,85 @@
+package charts
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/components/icon"
+)
+
+// The pendant of chart-radial-text.tsx.
+
+var chartRadialTextData = []chart.Datum{
+	{"browser": "safari", "visitors": 200, "fill": "var(--color-safari)"},
+}
+
+var chartRadialTextConfig = chart.Config{
+	{Key: "visitors", Label: "Visitors"},
+	{Key: "safari", Label: "Safari", Color: "var(--chart-2)"},
+}
+
+// radialTextValue is the visitors of the row, like the source printing
+// it with toLocaleString.
+func radialTextValue() string {
+	sum := chartRadialTextData[0]["visitors"].(int)
+	s := fmt.Sprintf("%d", sum)
+	var sb strings.Builder
+	for i, r := range s {
+		if i > 0 && (len(s)-i)%3 == 0 {
+			sb.WriteRune(',')
+		}
+		sb.WriteRune(r)
+	}
+	return sb.String()
+}
+
+templ ChartRadialText() {
+	@card.Card(card.Props{Class: "flex flex-col"}) {
+		@card.Header(card.HeaderProps{Class: "items-center pb-0"}) {
+			@card.Title() {
+				Radial Chart - Text
+			}
+			@card.Description() {
+				January - June 2024
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex-1 pb-0"}) {
+			@chart.Container(chart.ContainerProps{ID: "radial-text", Config: chartRadialTextConfig, Class: "mx-auto aspect-square max-h-[250px]"}) {
+				@chart.RadialBarChart(chart.RadialBarChartProps{
+					Data:        chartRadialTextData,
+					StartAngle:  0,
+					EndAngle:    chart.Float(250),
+					InnerRadius: 80,
+					OuterRadius: 90,
+				}) {
+					@chart.PolarGrid(chart.PolarGridProps{GridType: "circle", RadialLines: chart.Bool(false), Stroke: "none", Class: "first:fill-muted last:fill-background", PolarRadius: []float64{90, 80}})
+					@chart.RadialBar(chart.RadialBarProps{
+						DataKey:      "visitors",
+						Background:   true,
+						CornerRadius: 10,
+					})
+					@chart.PolarRadiusAxis(chart.PolarRadiusAxisProps{Tick: chart.Bool(false), TickLine: chart.Bool(false), AxisLine: chart.Bool(false)}) {
+						@chart.Label(chart.LabelProps{
+							DominantBaseline: "middle",
+							Spans: []chart.LabelSpan{
+								{Text: radialTextValue(), Class: "fill-foreground text-4xl font-bold"},
+								{Text: "Visitors", Class: "fill-muted-foreground", OffsetY: 24},
+							},
+						})
+					}
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-2 text-sm"}) {
+			<div class="flex items-center gap-2 leading-none font-medium">
+				Trending up by 5.2% this month
+				@icon.TrendingUp(icon.Props{Class: "h-4 w-4"})
+			</div>
+			<div class="leading-none text-muted-foreground">
+				Showing total visitors for the last 6 months
+			</div>
+		}
+	}
+}

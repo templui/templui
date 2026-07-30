@@ -112,6 +112,18 @@ func Component(name string) templ.Component {
 		return ChartPieDonut()
 	case "chart-pie-interactive":
 		return ChartPieInteractive()
+	case "chart-radial-simple":
+		return ChartRadialSimple()
+	case "chart-radial-label":
+		return ChartRadialLabel()
+	case "chart-radial-grid":
+		return ChartRadialGrid()
+	case "chart-radial-text":
+		return ChartRadialText()
+	case "chart-radial-shape":
+		return ChartRadialShape()
+	case "chart-radial-stacked":
+		return ChartRadialStacked()
 	}
 	return nil
 }

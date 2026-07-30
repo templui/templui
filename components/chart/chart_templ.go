@@ -501,10 +501,22 @@ type SectorProps struct {
 	OuterRadius float64
 }
 
-// LabelProps is the pendant of the Label content in the donut hole.
+// LabelProps is the pendant of the Label content function of the demos:
+// the text in the middle of a donut or a radial chart, written as the
+// tspans of the source.
 type LabelProps struct {
-	Value string
+	Spans []LabelSpan
+	// DominantBaseline is the attribute of the text element, which the
+	// sources either set to "middle" or leave off.
+	DominantBaseline string
+}
+
+// LabelSpan is one tspan of a center label.
+type LabelSpan struct {
 	Text  string
+	Class string
+	// OffsetY shifts the line off the center, the "cy + 24" of the source.
+	OffsetY float64
 }
 
 // AreaChartProps is the pendant of the Recharts AreaChart root.
@@ -539,6 +551,9 @@ type PolarGridProps struct {
 	RadialLines *bool
 	// PolarRadius replaces the radius axis ticks with fixed radii.
 	PolarRadius []float64
+	// Stroke is the grid color, Recharts' "#ccc"; the radial demos pass
+	// "none" and paint the rings through their class instead.
+	Stroke      string
 	StrokeWidth float64
 	Class       string
 }
@@ -582,6 +597,40 @@ type RadarProps struct {
 	Dot         *DotProps
 }
 
+// RadialBarChartProps is the pendant of the Recharts RadialBarChart root.
+type RadialBarChartProps struct {
+	Data []Datum
+	// StartAngle is Recharts' zero by default, so a plain value carries it.
+	// EndAngle defaults to a full turn, which an unset field cannot say,
+	// so it is a pointer.
+	StartAngle  float64
+	EndAngle    *float64
+	InnerRadius float64
+	// OuterRadius defaults to Recharts' 80% of the available radius.
+	OuterRadius float64
+	Margin      *Margin
+}
+
+// RadialBarProps is the pendant of one Recharts RadialBar.
+type RadialBarProps struct {
+	DataKey string
+	Fill    string
+	// Background draws the track behind the bar, over the full angle range.
+	Background   bool
+	CornerRadius float64
+	StackID      string
+	Class        string
+}
+
+// PolarRadiusAxisProps is the pendant of Recharts' PolarRadiusAxis. The
+// demos switch its parts off and keep it for the Label in the middle.
+type PolarRadiusAxisProps struct {
+	// Tick, TickLine and AxisLine all default to Recharts' true.
+	Tick     *bool
+	TickLine *bool
+	AxisLine *bool
+}
+
 // PieChartProps is the pendant of the Recharts PieChart root.
 type PieChartProps struct{}
 
@@ -613,6 +662,20 @@ type chartState struct {
 	polarGrid   *PolarGridProps
 	angleAxis   *PolarAngleAxisProps
 	radars      []RadarProps
+	radialBars  []*radialBarState
+	radiusAxis  *PolarRadiusAxisProps
+	center      *LabelProps
+	startAngle  float64
+	endAngle    *float64
+	innerRadius float64
+	outerRadius float64
+}
+
+// radialBarState pairs a radial bar with the LabelList its children
+// registered.
+type radialBarState struct {
+	props     RadialBarProps
+	labelList *LabelListProps
 }
 
 // lineState pairs a line with the LabelList its children registered.
@@ -1006,8 +1069,8 @@ func Radar(props ...RadarProps) templ.Component {
 	})
 }
 
-// PieChart is the Recharts PieChart root.
-func PieChart(props ...PieChartProps) templ.Component {
+// RadialBarChart is the Recharts RadialBarChart root.
+func RadialBarChart(props ...RadialBarChartProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -1028,7 +1091,15 @@ func PieChart(props ...PieChartProps) templ.Component {
 			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		st := &chartState{kind: "pie"}
+		var p RadialBarChartProps
+		if len(props) > 0 {
+			p = props[0]
+		}
+		st := &chartState{
+			kind: "radial", data: p.Data, margin: p.Margin,
+			startAngle: p.StartAngle, endAngle: p.EndAngle,
+			innerRadius: p.InnerRadius, outerRadius: p.OuterRadius,
+		}
 		ctx = context.WithValue(ctx, stateCtxKey, st)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div style=\"position:relative;width:100%;height:100%\">")
 		if templ_7745c5c3_Err != nil {
@@ -1043,6 +1114,125 @@ func PieChart(props ...PieChartProps) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// RadialBar registers one radial bar series.
+func RadialBar(props ...RadialBarProps) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var16 == nil {
+			templ_7745c5c3_Var16 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		var p RadialBarProps
+		if len(props) > 0 {
+			p = props[0]
+		}
+		if st := stateFrom(ctx); st != nil {
+			st.radialBars = append(st.radialBars, &radialBarState{props: p})
+		}
+		templ_7745c5c3_Err = templ_7745c5c3_Var16.Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// PolarRadiusAxis registers the radius axis, which the demos use to put
+// the Label in the middle of the chart.
+func PolarRadiusAxis(props ...PolarRadiusAxisProps) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var17 == nil {
+			templ_7745c5c3_Var17 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		var p PolarRadiusAxisProps
+		if len(props) > 0 {
+			p = props[0]
+		}
+		if st := stateFrom(ctx); st != nil {
+			st.radiusAxis = &p
+		}
+		templ_7745c5c3_Err = templ_7745c5c3_Var17.Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// PieChart is the Recharts PieChart root.
+func PieChart(props ...PieChartProps) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var18 == nil {
+			templ_7745c5c3_Var18 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		st := &chartState{kind: "pie"}
+		ctx = context.WithValue(ctx, stateCtxKey, st)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div style=\"position:relative;width:100%;height:100%\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templ_7745c5c3_Var18.Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = chartOutput(st).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1068,9 +1258,9 @@ func chartOutput(st *chartState) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var16 == nil {
-			templ_7745c5c3_Var16 = templ.NopComponent
+		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var19 == nil {
+			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		m := buildModel(ctx, st)
@@ -1106,9 +1296,9 @@ func CartesianGrid(props ...CartesianGridProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var17 == nil {
-			templ_7745c5c3_Var17 = templ.NopComponent
+		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var20 == nil {
+			templ_7745c5c3_Var20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p CartesianGridProps
@@ -1139,9 +1329,9 @@ func XAxis(props ...XAxisProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var18 == nil {
-			templ_7745c5c3_Var18 = templ.NopComponent
+		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var21 == nil {
+			templ_7745c5c3_Var21 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p XAxisProps
@@ -1172,9 +1362,9 @@ func YAxis(props ...YAxisProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var19 == nil {
-			templ_7745c5c3_Var19 = templ.NopComponent
+		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var22 == nil {
+			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p YAxisProps
@@ -1205,9 +1395,9 @@ func Tooltip(props ...TooltipProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var20 == nil {
-			templ_7745c5c3_Var20 = templ.NopComponent
+		templ_7745c5c3_Var23 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var23 == nil {
+			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p TooltipProps
@@ -1238,9 +1428,9 @@ func Legend(props ...LegendProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var21 == nil {
-			templ_7745c5c3_Var21 = templ.NopComponent
+		templ_7745c5c3_Var24 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var24 == nil {
+			templ_7745c5c3_Var24 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p LegendProps
@@ -1271,12 +1461,12 @@ func Defs() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var22 == nil {
-			templ_7745c5c3_Var22 = templ.NopComponent
+		templ_7745c5c3_Var25 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var25 == nil {
+			templ_7745c5c3_Var25 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templ_7745c5c3_Var22.Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templ_7745c5c3_Var25.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1327,9 +1517,9 @@ func Area(props ...AreaProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var23 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var23 == nil {
-			templ_7745c5c3_Var23 = templ.NopComponent
+		templ_7745c5c3_Var26 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var26 == nil {
+			templ_7745c5c3_Var26 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p AreaProps
@@ -1360,9 +1550,9 @@ func Bar(props ...BarProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var24 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var24 == nil {
-			templ_7745c5c3_Var24 = templ.NopComponent
+		templ_7745c5c3_Var27 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var27 == nil {
+			templ_7745c5c3_Var27 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p BarProps
@@ -1372,7 +1562,7 @@ func Bar(props ...BarProps) templ.Component {
 		if st := stateFrom(ctx); st != nil {
 			st.bars = append(st.bars, &barState{props: p})
 		}
-		templ_7745c5c3_Err = templ_7745c5c3_Var24.Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templ_7745c5c3_Var27.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1398,9 +1588,9 @@ func Cell(props ...CellProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var25 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var25 == nil {
-			templ_7745c5c3_Var25 = templ.NopComponent
+		templ_7745c5c3_Var28 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var28 == nil {
+			templ_7745c5c3_Var28 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p CellProps
@@ -1432,9 +1622,9 @@ func Line(props ...LineProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var26 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var26 == nil {
-			templ_7745c5c3_Var26 = templ.NopComponent
+		templ_7745c5c3_Var29 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var29 == nil {
+			templ_7745c5c3_Var29 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p LineProps
@@ -1444,7 +1634,7 @@ func Line(props ...LineProps) templ.Component {
 		if st := stateFrom(ctx); st != nil {
 			st.lines = append(st.lines, &lineState{props: p})
 		}
-		templ_7745c5c3_Err = templ_7745c5c3_Var26.Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templ_7745c5c3_Var29.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1469,9 +1659,9 @@ func LabelList(props ...LabelListProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var27 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var27 == nil {
-			templ_7745c5c3_Var27 = templ.NopComponent
+		templ_7745c5c3_Var30 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var30 == nil {
+			templ_7745c5c3_Var30 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p LabelListProps
@@ -1479,7 +1669,9 @@ func LabelList(props ...LabelListProps) templ.Component {
 			p = props[0]
 		}
 		if st := stateFrom(ctx); st != nil {
-			if len(st.pies) > 0 {
+			if len(st.radialBars) > 0 {
+				st.radialBars[len(st.radialBars)-1].labelList = &p
+			} else if len(st.pies) > 0 {
 				st.pies[len(st.pies)-1].labelList = &p
 			} else if len(st.bars) > 0 {
 				b := st.bars[len(st.bars)-1]
@@ -1509,9 +1701,9 @@ func Pie(props ...PieProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var28 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var28 == nil {
-			templ_7745c5c3_Var28 = templ.NopComponent
+		templ_7745c5c3_Var31 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var31 == nil {
+			templ_7745c5c3_Var31 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p PieProps
@@ -1521,7 +1713,7 @@ func Pie(props ...PieProps) templ.Component {
 		if st := stateFrom(ctx); st != nil {
 			st.pies = append(st.pies, &pieState{props: p})
 		}
-		templ_7745c5c3_Err = templ_7745c5c3_Var28.Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templ_7745c5c3_Var31.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1529,7 +1721,8 @@ func Pie(props ...PieProps) templ.Component {
 	})
 }
 
-// Label registers the center label in the donut hole.
+// Label registers the center label: on a Pie the donut hole, on a radial
+// chart the middle of the rings.
 func Label(props ...LabelProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -1546,17 +1739,21 @@ func Label(props ...LabelProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var29 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var29 == nil {
-			templ_7745c5c3_Var29 = templ.NopComponent
+		templ_7745c5c3_Var32 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var32 == nil {
+			templ_7745c5c3_Var32 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		var p LabelProps
 		if len(props) > 0 {
 			p = props[0]
 		}
-		if st := stateFrom(ctx); st != nil && len(st.pies) > 0 {
-			st.pies[len(st.pies)-1].label = &p
+		if st := stateFrom(ctx); st != nil {
+			if len(st.pies) > 0 {
+				st.pies[len(st.pies)-1].label = &p
+			} else {
+				st.center = &p
+			}
 		}
 		return nil
 	})
@@ -1637,6 +1834,9 @@ func buildModel(ctx context.Context, st *chartState) Model {
 	}
 	if st.kind == "radar" {
 		return buildRadarModel(ctx, config, st)
+	}
+	if st.kind == "radial" {
+		return buildRadialModel(ctx, config, st)
 	}
 
 	m := Model{Kind: st.kind, StackOffset: st.stackOffset, Defs: st.defs, Layout: st.layout}
@@ -1814,12 +2014,7 @@ func buildRadarModel(ctx context.Context, config Config, st *chartState) Model {
 	}
 	polar := PolarModel{RadialLines: true}
 	if g := st.polarGrid; g != nil {
-		polar.HasGrid = true
-		polar.GridType = g.GridType
-		polar.RadialLines = boolOr(g.RadialLines, true)
-		polar.PolarRadius = g.PolarRadius
-		polar.StrokeWidth = g.StrokeWidth
-		polar.GridClass = g.Class
+		polar = polarModel(g)
 	}
 	m.Labels = make([]string, len(st.data))
 	m.TooltipLabels = make([]string, len(st.data))
@@ -1857,6 +2052,96 @@ func buildRadarModel(ctx context.Context, config Config, st *chartState) Model {
 		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
 	}
 	return m
+}
+
+// buildRadialModel normalizes a RadialBarChart: the polar geometry, one
+// series per radial bar and the label in the middle.
+func buildRadialModel(ctx context.Context, config Config, st *chartState) Model {
+	m := Model{Kind: "radial"}
+	if st.margin != nil {
+		m.MarginTop, m.MarginRight, m.MarginBottom, m.MarginLeft = st.margin.Top, st.margin.Right, st.margin.Bottom, st.margin.Left
+	} else {
+		m.MarginTop, m.MarginRight, m.MarginBottom, m.MarginLeft = 5, 5, 5, 5
+	}
+	// The RadialBarChart defaults: a full turn from zero, no inner radius
+	// and an outer radius of 80%.
+	r := RadialModel{StartAngle: st.startAngle, EndAngle: 360, InnerRadius: st.innerRadius, OuterRadius: st.outerRadius}
+	if st.endAngle != nil {
+		r.EndAngle = *st.endAngle
+	}
+	if l := st.center; l != nil {
+		r.Center = labelModel(l)
+	}
+	if g := st.polarGrid; g != nil {
+		polar := polarModel(g)
+		m.Polar = &polar
+	}
+	m.Labels = make([]string, len(st.data))
+	for i := range st.data {
+		// The radius axis has no data key, so its domain is the row index,
+		// which is what a tooltip label would show.
+		m.Labels[i] = str(i)
+	}
+	tt := st.tooltip
+	for _, rb := range st.radialBars {
+		p := rb.props
+		s := modelSeries(config, p.DataKey, p.Fill, 0, st.data)
+		s.Background = p.Background
+		s.CornerRadius = p.CornerRadius
+		s.StackID = p.StackID
+		s.Class = p.Class
+		// A fill column names the row's own color, like Recharts reading
+		// the fill off the entry.
+		if hasFillColumn(st.data) {
+			s.Cells = make([]string, len(st.data))
+			for i, row := range st.data {
+				s.Cells[i] = str(row["fill"])
+			}
+		}
+		// getPayloadConfigFromPayload: the tooltip names every row through
+		// the name key, which the rows answer with their own value.
+		nameKey := p.DataKey
+		if tt != nil && tt.Content.NameKey != "" {
+			nameKey = tt.Content.NameKey
+		}
+		s.TooltipNames = make([]string, len(st.data))
+		for i, row := range st.data {
+			s.TooltipNames[i] = config.Label(payloadConfigKey(row, nameKey))
+		}
+		if ll := rb.labelList; ll != nil {
+			lm := labelListModel(*ll, p.DataKey, st.data)
+			s.LabelList = &lm
+		}
+		m.Series = append(m.Series, s)
+	}
+	m.Radial = &r
+	if tt != nil {
+		m.Cursor = boolOr(tt.Cursor, true)
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
+	}
+	return m
+}
+
+// polarModel resolves a PolarGrid into the model the renderer consumes.
+func polarModel(g *PolarGridProps) PolarModel {
+	return PolarModel{
+		HasGrid:     true,
+		GridType:    g.GridType,
+		RadialLines: boolOr(g.RadialLines, true),
+		PolarRadius: g.PolarRadius,
+		Stroke:      g.Stroke,
+		StrokeWidth: g.StrokeWidth,
+		GridClass:   g.Class,
+	}
+}
+
+// labelModel resolves a center Label into the model.
+func labelModel(l *LabelProps) *LabelModel {
+	lm := &LabelModel{DominantBaseline: l.DominantBaseline}
+	for _, sp := range l.Spans {
+		lm.Spans = append(lm.Spans, LabelSpanModel{Text: sp.Text, Class: sp.Class, OffsetY: sp.OffsetY})
+	}
+	return lm
 }
 
 func buildPieModel(ctx context.Context, config Config, st *chartState) Model {
@@ -1912,8 +2197,7 @@ func buildPieModel(ctx context.Context, config Config, st *chartState) Model {
 			}
 		}
 		if l := ps.label; l != nil {
-			pm.CenterValue = l.Value
-			pm.CenterLabel = l.Text
+			pm.Center = labelModel(l)
 		}
 		if ll := ps.labelList; ll != nil {
 			// A pie label list reads the name key by default, the slice it
@@ -2020,39 +2304,39 @@ func legendContent(items []LegendItem, class string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var30 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var30 == nil {
-			templ_7745c5c3_Var30 = templ.NopComponent
+		templ_7745c5c3_Var33 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var33 == nil {
+			templ_7745c5c3_Var33 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"recharts-legend-wrapper\" style=\"position:absolute;left:0;right:0;bottom:5px\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"recharts-legend-wrapper\" style=\"position:absolute;left:0;right:0;bottom:5px\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var31 = []any{utils.TwMerge("flex items-center justify-center gap-4 pt-3", class)}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var31...)
+		var templ_7745c5c3_Var34 = []any{utils.TwMerge("flex items-center justify-center gap-4 pt-3", class)}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var34...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var32 string
-		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var31).String())
+		var templ_7745c5c3_Var35 string
+		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var34).String())
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1, Col: 0}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, it := range items {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div class=\"flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2062,39 +2346,39 @@ func legendContent(items []LegendItem, class string) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"h-2 w-2 shrink-0 rounded-[2px]\" style=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"h-2 w-2 shrink-0 rounded-[2px]\" style=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var33 string
-				templ_7745c5c3_Var33, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + it.Color)
+				var templ_7745c5c3_Var36 string
+				templ_7745c5c3_Var36, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + it.Color)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1354, Col: 88}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1560, Col: 88}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\"></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\"></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			var templ_7745c5c3_Var34 string
-			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(it.Label)
+			var templ_7745c5c3_Var37 string
+			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(it.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1356, Col: 15}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1562, Col: 15}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -2145,6 +2429,30 @@ type Model struct {
 	Pies []PieModel `json:"pies,omitempty"`
 	// Polar carries the radar geometry.
 	Polar *PolarModel `json:"polar,omitempty"`
+	// Radial carries the RadialBarChart geometry.
+	Radial *RadialModel `json:"radial,omitempty"`
+}
+
+// RadialModel is the geometry of a RadialBarChart.
+type RadialModel struct {
+	StartAngle  float64     `json:"startAngle"`
+	EndAngle    float64     `json:"endAngle"`
+	InnerRadius float64     `json:"innerRadius,omitempty"`
+	OuterRadius float64     `json:"outerRadius,omitempty"`
+	Center      *LabelModel `json:"center,omitempty"`
+}
+
+// LabelModel is the text in the middle of a donut or radial chart.
+type LabelModel struct {
+	Spans            []LabelSpanModel `json:"spans"`
+	DominantBaseline string           `json:"dominantBaseline,omitempty"`
+}
+
+// LabelSpanModel is one tspan of a center label.
+type LabelSpanModel struct {
+	Text    string  `json:"text"`
+	Class   string  `json:"class,omitempty"`
+	OffsetY float64 `json:"offsetY,omitempty"`
 }
 
 // TickContentModel is a custom axis tick for the client renderer.
@@ -2169,6 +2477,7 @@ type PolarModel struct {
 	GridType     string             `json:"gridType,omitempty"`
 	RadialLines  bool               `json:"radialLines"`
 	PolarRadius  []float64          `json:"polarRadius,omitempty"`
+	Stroke       string             `json:"stroke,omitempty"`
 	StrokeWidth  float64            `json:"strokeWidth,omitempty"`
 	GridClass    string             `json:"gridClass,omitempty"`
 	Ticks        []TickContentModel `json:"ticks,omitempty"`
@@ -2195,8 +2504,7 @@ type PieModel struct {
 	LabelList    *LabelListModel `json:"labelList,omitempty"`
 	ActiveIndex  *int            `json:"activeIndex,omitempty"`
 	ActiveShape  []SectorProps   `json:"activeShape,omitempty"`
-	CenterValue  string          `json:"centerValue,omitempty"`
-	CenterLabel  string          `json:"centerLabel,omitempty"`
+	Center       *LabelModel     `json:"center,omitempty"`
 }
 
 // PieLabelModel is the resolved label prop of a Pie.
@@ -2226,6 +2534,12 @@ type ModelSeries struct {
 	Dot            *DotModel        `json:"dot,omitempty"`         // lines: per point dots
 	ActiveDotR     float64          `json:"activeDotR,omitempty"`  // lines: hover dot radius
 	LabelList      *LabelListModel  `json:"labelList,omitempty"`   // lines: value labels
+	// radial bars: the track behind the bar, its corner radius and the
+	// class the source puts on the sectors
+	Background   bool     `json:"background,omitempty"`
+	CornerRadius float64  `json:"cornerRadius,omitempty"`
+	Class        string   `json:"class,omitempty"`
+	TooltipNames []string `json:"tooltipNames,omitempty"` // name per row, through the name key
 }
 
 // DotModel describes the per point dots of a line.
