@@ -24,6 +24,7 @@
 @import "./typeset.css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant fixed (&:is(.layout-fixed *));
 
 /* tw-animate's accordion/collapsible keyframes read other libraries' height
    variables (radix, bits, ...) that we never set, so height animates 0 ->
@@ -236,7 +237,7 @@
 }
 
 @utility section-soft {
-  @apply bg-linear-to-b from-background to-surface/40 dark:bg-background;
+  @apply bg-linear-to-b from-background to-surface/40 dark:bg-background 3xl:fixed:bg-none;
 }
 
 @utility scrollbar-none {
