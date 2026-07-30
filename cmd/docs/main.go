@@ -86,7 +86,6 @@ func main() {
 	mux.Handle("GET /docs", http.RedirectHandler("/docs/introduction", http.StatusSeeOther))
 	mux.Handle("GET /docs/getting-started", http.RedirectHandler("/docs/introduction", http.StatusSeeOther))
 	mux.Handle("GET /docs/components", htmxHandler(pages.ComponentsOverview()))
-	mux.Handle("GET /docs/themes", htmxHandler(pages.Themes()))
 	mux.Handle("GET /create", htmxHandler(pages.Create()))
 	mux.Handle("GET /create/preview", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		item := r.URL.Query().Get("item")

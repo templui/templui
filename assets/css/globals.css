@@ -18,10 +18,32 @@
 /* Vendored tw-animate-css (the exact library shadcn uses) so animate-in/out,
    fade/zoom/slide utilities match shadcn 1:1. Local file, no npm dependency. */
 @import "./tw-animate.css";
-@import "./themes.css";
+/* Vendored shadcn/tailwind.css (keyframes, data-* variants shared across bases,
+   scroll-fade/shimmer utilities) — required by the style-*.css files. */
+@import "./shadcn-tailwind.css";
 /* Vendored shadcn/typeset — the docs typography system (.typeset wrapper,
    .not-typeset / [data-not-typeset] opt out). */
 @import "./typeset.css";
+/* The 8 shadcn styles: all component styling lives here as .style-<name> { .cn-* }
+   blocks. Components carry cn-* classes; the style-<name> class on <body> picks
+   the active style. Same import order as shadcn's app/style-registry.css. */
+@import "./styles/style-vega.css" layer(base);
+@import "./styles/style-nova.css" layer(base);
+@import "./styles/style-lyra.css" layer(base);
+@import "./styles/style-maia.css" layer(base);
+@import "./styles/style-mira.css" layer(base);
+@import "./styles/style-luma.css" layer(base);
+@import "./styles/style-sera.css" layer(base);
+@import "./styles/style-rhea.css" layer(base);
+
+@custom-variant style-vega (&:where(.style-vega *));
+@custom-variant style-nova (&:where(.style-nova *));
+@custom-variant style-lyra (&:where(.style-lyra *));
+@custom-variant style-maia (&:where(.style-maia *));
+@custom-variant style-mira (&:where(.style-mira *));
+@custom-variant style-luma (&:where(.style-luma *));
+@custom-variant style-sera (&:where(.style-sera *));
+@custom-variant style-rhea (&:where(.style-rhea *));
 
 @custom-variant dark (&:is(.dark *));
 @custom-variant fixed (&:is(.layout-fixed *));
@@ -229,7 +251,7 @@
 }
 
 @utility container-wrapper {
-  @apply mx-auto w-full px-2;
+  @apply mx-auto w-full px-2 3xl:fixed:max-w-[calc(var(--breakpoint-2xl)+2rem)];
 }
 
 @utility container {
@@ -249,9 +271,20 @@
 }
 
 @utility no-scrollbar {
+  -ms-overflow-style: none;
   scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
+  }
+}
+
+@utility border-ghost {
+  @apply relative after:absolute after:inset-0 after:border after:border-border after:mix-blend-darken dark:after:mix-blend-lighten;
+}
+
+@utility extend-touch-target {
+  @media (pointer: coarse) {
+    @apply relative touch-manipulation after:absolute after:-inset-2;
   }
 }
 
@@ -364,6 +397,17 @@
 }
 
 @layer components {
+  /* Component links (asChild buttons, cards) keep their own affordances
+     inside typeset prose. Same layer as typeset, wins on specificity. */
+  .typeset a[data-slot] {
+    font-weight: inherit;
+    text-decoration-line: none;
+  }
+
+  .dialog-ring {
+    @apply rounded-xl border-none bg-clip-padding shadow-2xl ring-4 ring-neutral-200/80 dark:bg-neutral-900 dark:ring-neutral-800;
+  }
+
   .steps {
     &:first-child {
       @apply !mt-0;
@@ -397,11 +441,28 @@
      air. No scroll-smooth, shadcn jumps instantly. */
   html {
     scroll-padding-top: var(--header-height);
+    @apply overscroll-y-none;
   }
   body {
+    /* shadcn sets bg/text via layout.tsx className; we own it here. */
     @apply bg-background text-foreground;
     position: relative;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
+  }
+  .cn-font-heading {
+    @apply font-heading;
+  }
+  [data-slot="layout"] {
+    @apply overscroll-none;
+  }
+  @supports (font: -apple-system-body) and (-webkit-appearance: none) {
+    [data-wrapper] {
+      @apply min-[1800px]:border-t;
+    }
+  }
+  a:active,
+  button:active {
+    @apply opacity-60 md:opacity-100;
   }
 }

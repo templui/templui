@@ -10,7 +10,6 @@ Components are designed to be composable, customizable, and easy to integrate in
 - [Introduction](https://templui.io/docs/introduction): Core principles and getting started guide
 - [How to Use](https://templui.io/docs/how-to-use): CLI installation and usage guide
 - [Components](https://templui.io/docs/components): Component overview and catalog
-- [Themes](https://templui.io/docs/themes): Theme customization and styling
 - [GitHub](https://github.com/templui/templui): Source code and issue tracker
 
 ## Form & Input
@@ -18,20 +17,18 @@ Components are designed to be composable, customizable, and easy to integrate in
 - [Button](https://templui.io/docs/components/button): Button component with multiple variants.
 - [Calendar](https://templui.io/docs/components/calendar): Calendar component for date selection.
 - [Checkbox](https://templui.io/docs/components/checkbox): Checkbox input component.
-- [Date Picker](https://templui.io/docs/components/date-picker): Date picker component combining input and calendar.
+- [Combobox](https://templui.io/docs/components/combobox): An input with a filterable list of options.
+- [Date Picker](https://templui.io/docs/components/date-picker): A date picker pattern composed of the Calendar, Popover and Button components.
 - [Field](https://templui.io/docs/components/field): Compose accessible form fields with labels, descriptions and errors.
 - [Input](https://templui.io/docs/components/input): Text input component.
 - [Input Group](https://templui.io/docs/components/input-group): An input with leading or trailing addons — icons, text or buttons.
 - [Input OTP](https://templui.io/docs/components/input-otp): One-time password input component.
 - [Label](https://templui.io/docs/components/label): Form label component.
-- [Radio](https://templui.io/docs/components/radio): Radio button group component.
-- [Rating](https://templui.io/docs/components/rating): Star rating input component.
-- [Select Box](https://templui.io/docs/components/select-box): Searchable select component.
+- [Radio Group](https://templui.io/docs/components/radio-group): A set of checkable buttons, known as radio buttons, where no more than one of the buttons can be checked at a time.
+- [Select](https://templui.io/docs/components/select): Displays a list of options for the user to pick from, triggered by a button.
 - [Slider](https://templui.io/docs/components/slider): Slider input component.
 - [Switch](https://templui.io/docs/components/switch): Toggle switch component.
-- [Tags Input](https://templui.io/docs/components/tags-input): Tags input component.
 - [Textarea](https://templui.io/docs/components/textarea): Multi-line text input component.
-- [Time Picker](https://templui.io/docs/components/time-picker): Time picker component.
 - [Toggle](https://templui.io/docs/components/toggle): Two-state button, optionally grouped into a segmented control.
 - [Toggle Group](https://templui.io/docs/components/toggle-group): A set of toggles grouped into a segmented control with single or multiple selection.
 
@@ -49,7 +46,7 @@ Components are designed to be composable, customizable, and easy to integrate in
 
 - [Context Menu](https://templui.io/docs/components/context-menu): Menu shown at the cursor on right click, with actions and shortcuts.
 - [Dialog](https://templui.io/docs/components/dialog): Modal dialog component.
-- [Dropdown](https://templui.io/docs/components/dropdown): Dropdown menu component.
+- [Dropdown Menu](https://templui.io/docs/components/dropdown-menu): Displays a menu of actions or options triggered by a button.
 - [Hover Card](https://templui.io/docs/components/hover-card): Displays rich content in a card when hovering over a trigger. Uses Popover for the popup.
 - [Popover](https://templui.io/docs/components/popover): Floating popover component using the browser popover API and Floating UI positioning.
 - [Sheet](https://templui.io/docs/components/sheet): Slide-out panel component (drawer).
@@ -63,7 +60,7 @@ Components are designed to be composable, customizable, and easy to integrate in
 - [Progress](https://templui.io/docs/components/progress): Progress bar component.
 - [Skeleton](https://templui.io/docs/components/skeleton): Skeleton loading placeholder.
 - [Spinner](https://templui.io/docs/components/spinner): Animated loading indicator built from a spinning icon.
-- [Toast](https://templui.io/docs/components/toast): Toast notification component.
+- [Toast](https://templui.io/docs/components/toast): A succinct message that is displayed temporarily.
 
 ## Display & Media
 
@@ -71,13 +68,12 @@ Components are designed to be composable, customizable, and easy to integrate in
 - [Avatar](https://templui.io/docs/components/avatar): Avatar component for user profiles.
 - [Card](https://templui.io/docs/components/card): Card container component.
 - [Carousel](https://templui.io/docs/components/carousel): Carousel component with navigation controls.
-- [Charts](https://templui.io/docs/components/charts): Chart components for data visualization.
+- [Chart](https://templui.io/docs/components/chart): Beautiful charts. Composable chart elements with a Recharts compatible client renderer.
 - [Kbd](https://templui.io/docs/components/kbd): Displays a keyboard key or shortcut.
 - [Table](https://templui.io/docs/components/table): Table component for displaying data.
 
 ## Misc
 
 - [Collapsible](https://templui.io/docs/components/collapsible): Collapsible container component.
-- [Copy Button](https://templui.io/docs/components/copy-button): Copy to clipboard button component.
 - [Icon](https://templui.io/docs/components/icon): SVG icon component library.
 
