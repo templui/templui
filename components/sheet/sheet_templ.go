@@ -186,11 +186,17 @@ func Content(props ...ContentProps) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 = []any{utils.TwMerge(
-			"fixed z-50 m-0 flex max-w-none flex-col gap-4 bg-popover bg-clip-padding p-0 text-sm text-popover-foreground shadow-lg outline-none transition duration-200 ease-in-out",
-			"data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:left-auto data-[side=right]:h-full data-[side=right]:max-h-none data-[side=right]:w-3/4 data-[side=right]:border-l data-[side=right]:sm:max-w-sm",
-			"data-[side=left]:inset-y-0 data-[side=left]:left-0 data-[side=left]:h-full data-[side=left]:max-h-none data-[side=left]:w-3/4 data-[side=left]:border-r data-[side=left]:sm:max-w-sm",
-			"data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto data-[side=top]:w-full data-[side=top]:border-b",
-			"data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:top-auto data-[side=bottom]:h-auto data-[side=bottom]:w-full data-[side=bottom]:border-t",
+			// 1:1 base/ui/sheet.tsx SheetContent, the look comes from cn-sheet-content.
+			// The data-starting-style/data-ending-style variants are Base UI's
+			// transition lifecycle; dialog.js keys the same lifecycle on
+			// data-tui-dialog-open instead (translated below).
+			"cn-sheet-content data-ending-style:opacity-0 data-starting-style:opacity-0 data-[side=bottom]:data-ending-style:translate-y-[2.5rem] data-[side=bottom]:data-starting-style:translate-y-[2.5rem] data-[side=left]:data-ending-style:translate-x-[-2.5rem] data-[side=left]:data-starting-style:translate-x-[-2.5rem] data-[side=right]:data-ending-style:translate-x-[2.5rem] data-[side=right]:data-starting-style:translate-x-[2.5rem] data-[side=top]:data-ending-style:translate-y-[-2.5rem] data-[side=top]:data-starting-style:translate-y-[-2.5rem]",
+			// Native <dialog> resets: the UA stylesheet gives dialogs margin,
+			// padding, fit-content sizing, max sizes and inset positioning that
+			// the Base UI popup <div> does not have.
+			"m-0 max-w-none p-0 outline-none data-[side=right]:left-auto data-[side=right]:max-h-none data-[side=left]:max-h-none data-[side=bottom]:top-auto data-[side=top]:w-full data-[side=bottom]:w-full",
+			// JS lifecycle keyed to data-tui-dialog-open, plus the display toggle
+			// and the ::backdrop (our stand-in for the cn-sheet-overlay element).
 			"[&:not([open]):not([data-tui-dialog-closing=true])]:hidden",
 			"data-[tui-dialog-open=false]:opacity-0 data-[tui-dialog-open=true]:opacity-100",
 			"data-[side=right]:data-[tui-dialog-open=false]:translate-x-[2.5rem] data-[side=left]:data-[tui-dialog-open=false]:translate-x-[-2.5rem] data-[side=top]:data-[tui-dialog-open=false]:translate-y-[-2.5rem] data-[side=bottom]:data-[tui-dialog-open=false]:translate-y-[2.5rem]",
@@ -320,8 +326,9 @@ func Content(props ...ContentProps) templ.Component {
 			templ_7745c5c3_Err = button.Button(button.Props{
 				Variant: button.VariantGhost,
 				Size:    button.SizeIconSm,
-				Class:   "absolute top-3 right-3",
+				Class:   "cn-sheet-close",
 				Attributes: templ.Attributes{
+					"data-slot":             "sheet-close",
 					"data-tui-dialog-close": true,
 					"aria-label":            "Close",
 				},
@@ -363,7 +370,7 @@ func Header(props ...HeaderProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var11 = []any{utils.TwMerge("flex flex-col gap-0.5 p-4", p.Class)}
+		var templ_7745c5c3_Var11 = []any{utils.TwMerge("cn-sheet-header flex flex-col", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -380,7 +387,7 @@ func Header(props ...HeaderProps) templ.Component {
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/sheet/sheet.templ`, Line: 187, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/sheet/sheet.templ`, Line: 194, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -453,7 +460,7 @@ func Footer(props ...FooterProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var15 = []any{utils.TwMerge("mt-auto flex flex-col gap-2 p-4", p.Class)}
+		var templ_7745c5c3_Var15 = []any{utils.TwMerge("cn-sheet-footer mt-auto flex flex-col", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var15...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -470,7 +477,7 @@ func Footer(props ...FooterProps) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/sheet/sheet.templ`, Line: 204, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/sheet/sheet.templ`, Line: 211, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -543,7 +550,7 @@ func Title(props ...TitleProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var19 = []any{utils.TwMerge("text-base font-medium text-foreground", p.Class)}
+		var templ_7745c5c3_Var19 = []any{utils.TwMerge("cn-sheet-title cn-font-heading", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var19...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -560,7 +567,7 @@ func Title(props ...TitleProps) templ.Component {
 			var templ_7745c5c3_Var20 string
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/sheet/sheet.templ`, Line: 221, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/sheet/sheet.templ`, Line: 228, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
@@ -633,7 +640,7 @@ func Description(props ...DescriptionProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var23 = []any{utils.TwMerge("text-sm text-muted-foreground", p.Class)}
+		var templ_7745c5c3_Var23 = []any{utils.TwMerge("cn-sheet-description", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var23...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -650,7 +657,7 @@ func Description(props ...DescriptionProps) templ.Component {
 			var templ_7745c5c3_Var24 string
 			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/sheet/sheet.templ`, Line: 238, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/sheet/sheet.templ`, Line: 245, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 			if templ_7745c5c3_Err != nil {

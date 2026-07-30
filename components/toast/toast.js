@@ -9,7 +9,7 @@
   var GAP = 12; // --gap: 0.75rem
 
   var TOAST_CLASS = [
-    "rounded-2xl group/toast pointer-events-auto absolute right-0 bottom-0 z-[calc(1000-var(--toast-index))] w-full origin-bottom border bg-popover text-popover-foreground shadow-lg will-change-transform outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+    "cn-toast group/toast pointer-events-auto absolute right-0 bottom-0 z-[calc(1000-var(--toast-index))] w-full origin-bottom border bg-popover text-popover-foreground shadow-lg will-change-transform outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
     "[--gap:0.75rem] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--toast-offset-y)*-1+calc(var(--toast-index)*var(--gap)*-1)+var(--toast-swipe-movement-y))] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--shrink:calc(1-var(--scale))]",
     "h-(--height) [transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--peek))-(var(--shrink)*var(--height))))_scale(var(--scale))] [transition:transform_500ms_cubic-bezier(0.22,1,0.36,1),opacity_500ms,height_150ms]",
     "after:absolute after:top-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-['']",
@@ -34,15 +34,15 @@
     "shrink-0 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4";
 
   // The Button component's classes, resolved for variant outline size sm
-  // (ToastAction) and variant ghost size icon-sm (ToastClose).
+  // (ToastAction) and variant ghost size icon-sm (ToastClose): the base is
+  // button.templ's baseClasses, the look comes from the cn-button-* classes.
   var BUTTON_BASE =
-    "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+    "cn-button group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0";
   var ACTION_CLASS =
-    BUTTON_BASE +
-    " border-border bg-background hover:bg-muted hover:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] [&_svg:not([class*='size-'])]:size-3.5";
+    BUTTON_BASE + " cn-button-variant-outline cn-button-size-sm shrink-0";
   var CLOSE_CLASS =
     BUTTON_BASE +
-    " hover:bg-muted dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] relative text-muted-foreground after:absolute after:-inset-2 after:content-[''] hover:text-foreground";
+    " cn-button-variant-ghost cn-button-size-icon-sm relative shrink-0 text-muted-foreground after:absolute after:-inset-2 after:content-[''] hover:text-foreground";
 
   var ICONS = {
     success:

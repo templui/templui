@@ -92,7 +92,13 @@ templ Content(props ...ContentProps) {
 		role="tooltip"
 		class={
 			utils.TwMerge(
-				"pointer-events-none fixed inset-auto left-0 top-0 m-0 z-50 inline-flex w-fit max-w-xs origin-(--tui-tooltip-transform-origin) items-center gap-1.5 overflow-visible rounded-md bg-foreground px-3 py-1.5 text-xs text-background has-data-[slot=kbd]:pr-1.5 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-sm data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
+				// 1:1 base/ui/tooltip.tsx TooltipContent, the look comes from
+				// cn-tooltip-content (animations key on our data-state attribute).
+				// origin-(--transform-origin) becomes our JS variable name.
+				"cn-tooltip-content cn-tooltip-content-logical z-50 w-fit max-w-xs origin-(--tui-tooltip-transform-origin) bg-foreground text-background",
+				// Native [popover] resets plus JS wiring: the popup stays mounted
+				// after animate-out until hidePopover runs.
+				"pointer-events-none fixed inset-auto left-0 top-0 m-0 overflow-visible data-closed:fill-mode-forwards",
 				p.Class,
 			),
 		}
@@ -101,7 +107,7 @@ templ Content(props ...ContentProps) {
 		{ children... }
 		<span
 			data-tui-tooltip-arrow
-			class="absolute z-50 size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-[2px] bg-foreground data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1 data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1 data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5"
+			class="cn-tooltip-arrow cn-tooltip-arrow-logical absolute z-50 bg-foreground fill-foreground data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1 data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1 data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5"
 		></span>
 		</div>
 	</template>

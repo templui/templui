@@ -139,22 +139,34 @@ type SubContentProps struct {
 
 // Items highlight via real focus (Base UI menus move focus to the item under
 // the pointer and with the arrow keys), so there are no hover: styles here.
-func itemClasses(disabled, inset bool) string {
+// 1:1 base/ui/context-menu.tsx ContextMenuItem, the look comes from
+// cn-context-menu-item; the inset padding keys on the data-inset attribute.
+func itemClasses(disabled bool) string {
 	return utils.TwMerge(
-		"group/context-menu-item relative flex w-full cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-		"focus:bg-accent focus:text-accent-foreground focus:*:[svg]:text-accent-foreground",
-		"data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:text-destructive",
-		utils.If(inset, "pl-7"),
+		"cn-context-menu-item group/context-menu-item relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+		// Native <a>/<button> wiring instead of Base UI's div items.
+		"w-full text-left",
 		utils.If(disabled, "pointer-events-none opacity-50"),
 	)
 }
 
-func checkItemClasses(disabled bool) string {
+// 1:1 base/ui/context-menu.tsx ContextMenuCheckboxItem/RadioItem, cnClass is
+// cn-context-menu-checkbox-item or cn-context-menu-radio-item.
+func checkItemClasses(cnClass string, disabled bool) string {
 	return utils.TwMerge(
-		"group/cmitem relative flex w-full cursor-default items-center gap-1.5 rounded-md py-1 pr-8 pl-1.5 text-left text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+		cnClass+" relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+		// Native <button> wiring: Base UI unmounts the indicator when unchecked,
+		// our indicator toggles on the checked state via the group instead.
+		"group/cmitem w-full text-left",
 		utils.If(disabled, "pointer-events-none opacity-50"),
 	)
 }
+
+// contentClasses is the shared 1:1 base/ui/context-menu.tsx ContextMenuContent
+// class list, the look comes from cn-context-menu-content (animations key on
+// our data-state attribute). The --available-height/--transform-origin
+// variables become our JS variable names.
+const contentClasses = "cn-context-menu-content cn-context-menu-content-logical cn-menu-target cn-menu-translucent z-50 max-h-(--tui-contextmenu-available-height) origin-(--tui-contextmenu-transform-origin) overflow-x-hidden overflow-y-auto outline-none"
 
 // Root renders no element: it only generates the id that links Trigger and
 // Content (via ctx).
@@ -182,7 +194,7 @@ templ Trigger(props ...TriggerProps) {
 		data-slot="context-menu-trigger"
 		data-tui-contextmenu-trigger
 		data-tui-contextmenu-for={ menuID(ctx) }
-		class={ utils.TwMerge("select-none", p.Class) }
+		class={ utils.TwMerge("cn-context-menu-trigger select-none", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -221,7 +233,10 @@ templ Content(props ...ContentProps) {
 			tabindex="-1"
 			class={
 				utils.TwMerge(
-					"pointer-events-auto relative isolate z-50 max-h-(--tui-contextmenu-available-height) min-w-36 origin-(--tui-contextmenu-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-none duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
+					contentClasses,
+					// JS wiring: the positioner wrapper is pointer-events-none, and the
+					// popup stays mounted after animate-out until hidePopover runs.
+					"pointer-events-auto relative isolate data-closed:fill-mode-forwards",
 					p.Class,
 				),
 			}
@@ -253,6 +268,7 @@ templ Item(props ...ItemProps) {
 			}
 			data-slot="context-menu-item"
 			data-variant={ string(p.Variant) }
+			data-inset?={ p.Inset }
 			data-tui-contextmenu-item
 			if p.PreventClose {
 				data-tui-contextmenu-prevent-close="true"
@@ -261,7 +277,7 @@ templ Item(props ...ItemProps) {
 				aria-disabled="true"
 			}
 			role="menuitem"
-			class={ utils.TwMerge(itemClasses(p.Disabled, p.Inset), p.Class) }
+			class={ utils.TwMerge(itemClasses(p.Disabled), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -272,13 +288,14 @@ templ Item(props ...ItemProps) {
 			type="button"
 			data-slot="context-menu-item"
 			data-variant={ string(p.Variant) }
+			data-inset?={ p.Inset }
 			data-tui-contextmenu-item
 			if p.PreventClose {
 				data-tui-contextmenu-prevent-close="true"
 			}
 			disabled?={ p.Disabled }
 			role="menuitem"
-			class={ utils.TwMerge(itemClasses(p.Disabled, p.Inset), p.Class) }
+			class={ utils.TwMerge(itemClasses(p.Disabled), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -308,11 +325,11 @@ templ CheckboxItem(props ...CheckboxItemProps) {
 			aria-checked="false"
 		}
 		disabled?={ p.Disabled }
-		class={ utils.TwMerge(checkItemClasses(p.Disabled), p.Class) }
+		class={ utils.TwMerge(checkItemClasses("cn-context-menu-checkbox-item", p.Disabled), p.Class) }
 		{ p.Attributes... }
 	>
-		<span class="pointer-events-none absolute right-2 opacity-0 group-data-[state=checked]/cmitem:opacity-100">
-			@icon.Check(icon.Props{Class: "size-4"})
+		<span class="cn-context-menu-item-indicator pointer-events-none opacity-0 group-data-[state=checked]/cmitem:opacity-100">
+			@icon.Check()
 		</span>
 		{ children... }
 	</button>
@@ -362,11 +379,11 @@ templ RadioItem(props ...RadioItemProps) {
 			aria-checked="false"
 		}
 		disabled?={ p.Disabled }
-		class={ utils.TwMerge(checkItemClasses(p.Disabled), p.Class) }
+		class={ utils.TwMerge(checkItemClasses("cn-context-menu-radio-item", p.Disabled), p.Class) }
 		{ p.Attributes... }
 	>
-		<span class="pointer-events-none absolute right-2 opacity-0 group-data-[state=checked]/cmitem:opacity-100">
-			@icon.Check(icon.Props{Class: "size-4"})
+		<span class="cn-context-menu-item-indicator pointer-events-none opacity-0 group-data-[state=checked]/cmitem:opacity-100">
+			@icon.Check()
 		</span>
 		{ children... }
 	</button>
@@ -400,7 +417,8 @@ templ Label(props ...LabelProps) {
 			id={ p.ID }
 		}
 		data-slot="context-menu-label"
-		class={ utils.TwMerge("px-1.5 py-1 text-xs font-medium text-muted-foreground", utils.If(p.Inset, "pl-7"), p.Class) }
+		data-inset?={ p.Inset }
+		class={ utils.TwMerge("cn-context-menu-label", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -418,7 +436,7 @@ templ Separator(props ...SeparatorProps) {
 		}
 		role="separator"
 		data-slot="context-menu-separator"
-		class={ utils.TwMerge("-mx-1 my-1 h-px bg-border", p.Class) }
+		class={ utils.TwMerge("cn-context-menu-separator", p.Class) }
 		{ p.Attributes... }
 	></div>
 }
@@ -433,7 +451,7 @@ templ Shortcut(props ...ShortcutProps) {
 			id={ p.ID }
 		}
 		data-slot="context-menu-shortcut"
-		class={ utils.TwMerge("ml-auto text-xs tracking-widest text-muted-foreground group-focus/context-menu-item:text-accent-foreground", p.Class) }
+		class={ utils.TwMerge("cn-context-menu-shortcut", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -469,21 +487,26 @@ templ SubTrigger(props ...SubTriggerProps) {
 		}
 		type="button"
 		data-slot="context-menu-sub-trigger"
+		data-inset?={ p.Inset }
 		data-tui-contextmenu-sub-trigger
 		data-state="closed"
 		role="menuitem"
 		aria-haspopup="menu"
 		class={
 			utils.TwMerge(
-				"flex w-full cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-				utils.If(p.Inset, "pl-7"),
+				// 1:1 base/ui/context-menu.tsx ContextMenuSubTrigger, the look comes
+				// from cn-context-menu-sub-trigger (the open highlight keys on our
+				// data-state attribute via the data-open variants inside the cn class).
+				"cn-context-menu-sub-trigger flex cursor-default items-center outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0",
+				// Native <button> wiring instead of Base UI's div items.
+				"w-full text-left",
 				p.Class,
 			),
 		}
 		{ p.Attributes... }
 	>
 		{ children... }
-		@icon.ChevronRight(icon.Props{Class: "ml-auto size-4"})
+		@icon.ChevronRight(icon.Props{Class: "cn-rtl-flip ml-auto"})
 	</button>
 }
 
@@ -503,7 +526,15 @@ templ SubContent(props ...SubContentProps) {
 		tabindex="-1"
 		class={
 			utils.TwMerge(
-				"hidden fixed inset-auto left-0 top-0 z-50 min-w-32 origin-(--tui-contextmenu-transform-origin) rounded-lg border bg-popover p-1 text-popover-foreground shadow-lg outline-none duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
+				// 1:1 base/ui/context-menu.tsx ContextMenuSubContent: the sub content
+				// is the content plus cn-context-menu-subcontent, the look comes from
+				// the cn classes (animations key on our data-state attribute). max-h
+				// drops out because our JS only sets the available-height variable on
+				// the root positioner.
+				"cn-context-menu-content cn-context-menu-content-logical cn-menu-target cn-menu-translucent cn-context-menu-subcontent z-50 origin-(--tui-contextmenu-transform-origin) overflow-x-hidden overflow-y-auto outline-none",
+				// JS wiring: floatingui positions the sub content as a fixed layer and
+				// toggles the hidden class around the exit animation.
+				"hidden fixed inset-auto left-0 top-0 data-closed:fill-mode-forwards",
 				p.Class,
 			),
 		}

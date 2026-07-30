@@ -171,8 +171,14 @@ func Content(props ...ContentProps) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 = []any{utils.TwMerge(
-			"fixed top-1/2 left-1/2 z-50 m-0 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 outline-none duration-100 sm:max-w-sm",
-			"[&:not([open]):not([data-tui-dialog-closing=true])]:hidden",
+			// 1:1 base/ui/dialog.tsx DialogContent, the look comes from cn-dialog-content.
+			"cn-dialog-content fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 outline-none",
+			// Native <dialog> wiring: Base UI unmounts the popup, our dialog stays in
+			// the DOM, and the JS keys open state on data-tui-dialog-open, so the
+			// data-open variants inside cn-dialog-content never match. The display
+			// toggle, the animations and the ::backdrop (our stand-in for the
+			// cn-dialog-overlay element) stay keyed to our attributes here.
+			"m-0 [&:not([open]):not([data-tui-dialog-closing=true])]:hidden",
 			"data-[tui-dialog-open=true]:animate-in data-[tui-dialog-open=true]:fade-in-0 data-[tui-dialog-open=true]:zoom-in-95 data-[tui-dialog-open=false]:animate-out data-[tui-dialog-open=false]:fade-out-0 data-[tui-dialog-open=false]:zoom-out-95 data-[tui-dialog-open=false]:fill-mode-forwards",
 			"[&::backdrop]:transition-all [&::backdrop]:duration-100 data-[tui-dialog-open=false]:[&::backdrop]:bg-transparent data-[tui-dialog-open=true]:[&::backdrop]:bg-black/10 supports-backdrop-filter:data-[tui-dialog-open=true]:[&::backdrop]:backdrop-blur-xs",
 			p.Class,
@@ -299,8 +305,9 @@ func Content(props ...ContentProps) templ.Component {
 			templ_7745c5c3_Err = button.Button(button.Props{
 				Variant: button.VariantGhost,
 				Size:    button.SizeIconSm,
-				Class:   "absolute top-2 right-2",
+				Class:   "cn-dialog-close",
 				Attributes: templ.Attributes{
+					"data-slot":             "dialog-close",
 					"data-tui-dialog-close": true,
 					"aria-label":            "Close",
 				},
@@ -342,7 +349,7 @@ func Header(props ...HeaderProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var11 = []any{utils.TwMerge("flex flex-col gap-2", p.Class)}
+		var templ_7745c5c3_Var11 = []any{utils.TwMerge("cn-dialog-header flex flex-col", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -359,7 +366,7 @@ func Header(props ...HeaderProps) templ.Component {
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/dialog/dialog.templ`, Line: 165, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/dialog/dialog.templ`, Line: 172, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -432,7 +439,7 @@ func Footer(props ...FooterProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var15 = []any{utils.TwMerge("-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end", p.Class)}
+		var templ_7745c5c3_Var15 = []any{utils.TwMerge("cn-dialog-footer flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var15...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -449,7 +456,7 @@ func Footer(props ...FooterProps) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/dialog/dialog.templ`, Line: 182, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/dialog/dialog.templ`, Line: 189, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -522,7 +529,7 @@ func Title(props ...TitleProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var19 = []any{utils.TwMerge("text-base leading-none font-medium", p.Class)}
+		var templ_7745c5c3_Var19 = []any{utils.TwMerge("cn-dialog-title cn-font-heading", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var19...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -539,7 +546,7 @@ func Title(props ...TitleProps) templ.Component {
 			var templ_7745c5c3_Var20 string
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/dialog/dialog.templ`, Line: 199, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/dialog/dialog.templ`, Line: 206, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
@@ -612,7 +619,7 @@ func Description(props ...DescriptionProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var23 = []any{utils.TwMerge("text-sm text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground", p.Class)}
+		var templ_7745c5c3_Var23 = []any{utils.TwMerge("cn-dialog-description", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var23...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -629,7 +636,7 @@ func Description(props ...DescriptionProps) templ.Component {
 			var templ_7745c5c3_Var24 string
 			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/dialog/dialog.templ`, Line: 216, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/dialog/dialog.templ`, Line: 223, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 			if templ_7745c5c3_Err != nil {

@@ -171,7 +171,13 @@ func Content(props ...ContentProps) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 = []any{utils.TwMerge(
-			"fixed inset-auto left-0 top-0 m-0 z-50 w-64 origin-(--tui-hovercard-transform-origin) overflow-visible rounded-lg bg-popover p-2.5 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:fill-mode-forwards",
+			// 1:1 base/ui/hover-card.tsx HoverCardContent, the look comes from
+			// cn-hover-card-content (animations key on our data-state attribute).
+			// origin-(--transform-origin) becomes our JS variable name.
+			"cn-hover-card-content cn-hover-card-content-logical z-50 origin-(--tui-hovercard-transform-origin) outline-hidden",
+			// Native [popover] resets plus JS wiring: the popup stays mounted
+			// after animate-out until hidePopover runs.
+			"fixed inset-auto left-0 top-0 m-0 overflow-visible data-closed:fill-mode-forwards",
 			p.Class,
 		),
 		}

@@ -127,8 +127,14 @@ templ Content(props ...ContentProps) {
 		}
 		class={
 			utils.TwMerge(
-				"fixed top-1/2 left-1/2 z-50 m-0 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 outline-none duration-100 sm:max-w-sm",
-				"[&:not([open]):not([data-tui-dialog-closing=true])]:hidden",
+				// 1:1 base/ui/dialog.tsx DialogContent, the look comes from cn-dialog-content.
+				"cn-dialog-content fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 outline-none",
+				// Native <dialog> wiring: Base UI unmounts the popup, our dialog stays in
+				// the DOM, and the JS keys open state on data-tui-dialog-open, so the
+				// data-open variants inside cn-dialog-content never match. The display
+				// toggle, the animations and the ::backdrop (our stand-in for the
+				// cn-dialog-overlay element) stay keyed to our attributes here.
+				"m-0 [&:not([open]):not([data-tui-dialog-closing=true])]:hidden",
 				"data-[tui-dialog-open=true]:animate-in data-[tui-dialog-open=true]:fade-in-0 data-[tui-dialog-open=true]:zoom-in-95 data-[tui-dialog-open=false]:animate-out data-[tui-dialog-open=false]:fade-out-0 data-[tui-dialog-open=false]:zoom-out-95 data-[tui-dialog-open=false]:fill-mode-forwards",
 				"[&::backdrop]:transition-all [&::backdrop]:duration-100 data-[tui-dialog-open=false]:[&::backdrop]:bg-transparent data-[tui-dialog-open=true]:[&::backdrop]:bg-black/10 supports-backdrop-filter:data-[tui-dialog-open=true]:[&::backdrop]:backdrop-blur-xs",
 				p.Class,
@@ -141,8 +147,9 @@ templ Content(props ...ContentProps) {
 			@button.Button(button.Props{
 				Variant: button.VariantGhost,
 				Size:    button.SizeIconSm,
-				Class:   "absolute top-2 right-2",
+				Class:   "cn-dialog-close",
 				Attributes: templ.Attributes{
+					"data-slot":             "dialog-close",
 					"data-tui-dialog-close": true,
 					"aria-label":            "Close",
 				},
@@ -165,7 +172,7 @@ templ Header(props ...HeaderProps) {
 			id={ p.ID }
 		}
 		data-slot="dialog-header"
-		class={ utils.TwMerge("flex flex-col gap-2", p.Class) }
+		class={ utils.TwMerge("cn-dialog-header flex flex-col", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -182,7 +189,7 @@ templ Footer(props ...FooterProps) {
 			id={ p.ID }
 		}
 		data-slot="dialog-footer"
-		class={ utils.TwMerge("-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end", p.Class) }
+		class={ utils.TwMerge("cn-dialog-footer flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -199,7 +206,7 @@ templ Title(props ...TitleProps) {
 			id={ p.ID }
 		}
 		data-slot="dialog-title"
-		class={ utils.TwMerge("text-base leading-none font-medium", p.Class) }
+		class={ utils.TwMerge("cn-dialog-title cn-font-heading", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -216,7 +223,7 @@ templ Description(props ...DescriptionProps) {
 			id={ p.ID }
 		}
 		data-slot="dialog-description"
-		class={ utils.TwMerge("text-sm text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground", p.Class) }
+		class={ utils.TwMerge("cn-dialog-description", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
