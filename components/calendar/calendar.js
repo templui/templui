@@ -1,7 +1,10 @@
 (function () {
-  // Verbatim class strings from shadcn's base-nova calendar (react-day-picker
-  // rendered output). The day button template lives in the templ file; the
-  // grid below is (re)built here.
+  // Verbatim class strings from base/ui/calendar.tsx (react-day-picker
+  // classNames slots). The look lives in the vendored style-*.css via the
+  // cn-calendar-* classes; none of the grid slots below has a cn- class in
+  // any style, they are pure structural utilities. The day button template
+  // (cn-calendar-day-button) lives in the templ file; the grid below is
+  // (re)built here.
   const CLS = {
     week: "mt-2 flex w-full",
     weekday:
@@ -17,10 +20,10 @@
     rangeMiddle: "rounded-none",
     rangeEnd:
       "relative isolate z-0 rounded-r-(--cell-radius) bg-muted after:absolute after:inset-y-0 after:left-0 after:w-4 after:bg-muted",
-    rangeSingle: "relative isolate z-0 rounded-(--cell-radius) bg-muted",
     today: "rounded-(--cell-radius) bg-muted text-foreground data-[selected=true]:rounded-none",
     outside: "text-muted-foreground aria-selected:text-muted-foreground",
     disabled: "text-muted-foreground opacity-50",
+    // templUI extension, no shadcn slot or cn- class for booked days exists.
     booked: "[&>button]:line-through opacity-100",
   };
 
@@ -141,12 +144,9 @@
 
   function dayCellClasses(s, mods) {
     let cls = CLS.day + " " + (s.weekNumbers ? CLS.dayFirstRoundWeekNumbers : CLS.dayFirstRound);
-    if (mods.rangeStart && mods.rangeEnd) {
-      cls += " " + CLS.rangeSingle;
-    } else {
-      if (mods.rangeStart) cls += " " + CLS.rangeStart;
-      if (mods.rangeEnd) cls += " " + CLS.rangeEnd;
-    }
+    // A single-day range gets both classes, exactly like react-day-picker.
+    if (mods.rangeStart) cls += " " + CLS.rangeStart;
+    if (mods.rangeEnd) cls += " " + CLS.rangeEnd;
     if (mods.rangeMiddle) cls += " " + CLS.rangeMiddle;
     if (mods.today) cls += " " + CLS.today;
     if (mods.outside) cls += " " + CLS.outside;

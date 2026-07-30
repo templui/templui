@@ -165,7 +165,11 @@ templ Calendar(props ...Props) {
 		}
 		class={
 			utils.TwMerge(
-				"group/calendar w-fit bg-background p-2 [--cell-radius:var(--radius-md)] [--cell-size:--spacing(7)] in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent",
+				// 1:1 base/ui/calendar.tsx className + classNames.root. The rtl
+				// chevron flip lives on the icons as cn-rtl-flip (the tsx's extra
+				// rtl:**:[.rdp-button_next>svg] selectors target rdp-* classes our
+				// DOM does not have).
+				"cn-calendar group/calendar bg-background in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent w-fit",
 				p.Class,
 			),
 		}
@@ -181,25 +185,23 @@ templ Calendar(props ...Props) {
 			<div class="absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1">
 					@button.Button(button.Props{
 						Variant: button.VariantGhost,
-						Size:    button.SizeIcon,
 						Class:   "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
 						Attributes: templ.Attributes{
 							"data-tui-calendar-prev": "",
 							"aria-label":             "Go to the previous month",
 						},
 					}) {
-						@icon.ChevronLeft(icon.Props{Class: "size-4"})
+						@icon.ChevronLeft(icon.Props{Class: "cn-rtl-flip size-4"})
 					}
 					@button.Button(button.Props{
 						Variant: button.VariantGhost,
-						Size:    button.SizeIcon,
 						Class:   "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
 						Attributes: templ.Attributes{
 							"data-tui-calendar-next": "",
 							"aria-label":             "Go to the next month",
 						},
 					}) {
-						@icon.ChevronRight(icon.Props{Class: "size-4"})
+						@icon.ChevronRight(icon.Props{Class: "cn-rtl-flip size-4"})
 					}
 			</div>
 			for m := 0; m < months; m++ {
@@ -207,39 +209,39 @@ templ Calendar(props ...Props) {
 					<div class="flex h-(--cell-size) w-full items-center justify-center px-(--cell-size)">
 						if p.CaptionLayout == CaptionLayoutDropdown && months == 1 {
 						<div class="flex h-(--cell-size) w-full items-center justify-center gap-1.5 text-sm font-medium">
-							<div class="relative rounded-(--cell-radius) border border-transparent has-focus-visible:border-ring has-focus-visible:ring-3 has-focus-visible:ring-ring/50">
+							<div class="cn-calendar-dropdown-root relative rounded-(--cell-radius)">
 								<select
 									data-tui-calendar-month-select
-									class="absolute inset-0 scheme-light bg-popover opacity-0 dark:scheme-dark"
+									class="absolute inset-0 bg-popover opacity-0"
 									aria-label="Choose the month"
 								>
 									for i := 0; i < 12; i++ {
 										<option value={ strconv.Itoa(i) } selected?={ i == int(view.Month())-1 }>{ monthNames[i] }</option>
 									}
 								</select>
-								<span class="flex h-6 items-center gap-1 rounded-(--cell-radius) pr-1 pl-1.5 text-sm font-medium select-none [&>svg]:size-3.5 [&>svg]:text-muted-foreground" aria-hidden="true">
+								<span class="font-medium select-none cn-calendar-caption-label flex items-center gap-1 rounded-(--cell-radius) text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground" aria-hidden="true">
 									<span data-tui-calendar-month-label>{ monthNames[int(view.Month())-1] }</span>
-									@icon.ChevronDown()
+									@icon.ChevronDown(icon.Props{Class: "size-4"})
 								</span>
 							</div>
-							<div class="relative rounded-(--cell-radius) border border-transparent has-focus-visible:border-ring has-focus-visible:ring-3 has-focus-visible:ring-ring/50">
+							<div class="cn-calendar-dropdown-root relative rounded-(--cell-radius)">
 								<select
 									data-tui-calendar-year-select
-									class="absolute inset-0 scheme-light bg-popover opacity-0 dark:scheme-dark"
+									class="absolute inset-0 bg-popover opacity-0"
 									aria-label="Choose the year"
 								>
 									for year := time.Now().Year() - 100; year <= time.Now().Year(); year++ {
 										<option value={ strconv.Itoa(year) } selected?={ year == view.Year() }>{ strconv.Itoa(year) }</option>
 									}
 								</select>
-								<span class="flex h-6 items-center gap-1 rounded-(--cell-radius) pr-1 pl-1.5 text-sm font-medium select-none [&>svg]:size-3.5 [&>svg]:text-muted-foreground" aria-hidden="true">
+								<span class="font-medium select-none cn-calendar-caption-label flex items-center gap-1 rounded-(--cell-radius) text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground" aria-hidden="true">
 									<span data-tui-calendar-year-label>{ strconv.Itoa(view.Year()) }</span>
-									@icon.ChevronDown()
+									@icon.ChevronDown(icon.Props{Class: "size-4"})
 								</span>
 							</div>
 						</div>
 					} else {
-						<span data-tui-calendar-caption class="text-sm font-medium select-none">
+						<span data-tui-calendar-caption class="font-medium select-none cn-calendar-caption text-sm">
 							{ view.AddDate(0, m, 0).Format("January 2006") }
 						</span>
 					}
@@ -257,7 +259,7 @@ templ Calendar(props ...Props) {
 			@button.Button(button.Props{
 				Variant: button.VariantGhost,
 				Size:    button.SizeIcon,
-				Class:   "relative isolate z-10 flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 border-0 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-[3px] group-data-[focused=true]/day:ring-ring/50 data-[range-end=true]:rounded-(--cell-radius) data-[range-end=true]:rounded-r-(--cell-radius) data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-muted data-[range-middle=true]:text-foreground data-[range-start=true]:rounded-(--cell-radius) data-[range-start=true]:rounded-l-(--cell-radius) data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground dark:hover:text-foreground [&>span]:text-xs [&>span]:opacity-70",
+				Class:   "cn-calendar-day-button relative isolate z-10 flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 border-0 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-[3px] group-data-[focused=true]/day:ring-ring/50 data-[range-end=true]:rounded-(--cell-radius) data-[range-end=true]:rounded-r-(--cell-radius) data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-muted data-[range-middle=true]:text-foreground data-[range-start=true]:rounded-(--cell-radius) data-[range-start=true]:rounded-l-(--cell-radius) data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground dark:hover:text-foreground [&>span]:text-xs [&>span]:opacity-70",
 			})
 		</template>
 	</div>
