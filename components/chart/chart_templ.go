@@ -1933,6 +1933,7 @@ func buildModel(ctx context.Context, st *chartState) Model {
 	tt := st.tooltip
 	if tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
+		m.HasTooltip = true
 		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color, DefaultIndex: tt.DefaultIndex}
 		if tt.Content.LabelKey != "" {
 			m.Tooltip.Label = config.Label(tt.Content.LabelKey)
@@ -2113,6 +2114,7 @@ func buildRadarModel(ctx context.Context, config Config, st *chartState) Model {
 	}
 	if tt := st.tooltip; tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
+		m.HasTooltip = true
 		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color}
 	}
 	return m
@@ -2181,6 +2183,7 @@ func buildRadialModel(ctx context.Context, config Config, st *chartState) Model 
 	m.Radial = &r
 	if tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
+		m.HasTooltip = true
 		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color}
 	}
 	return m
@@ -2273,6 +2276,7 @@ func buildPieModel(ctx context.Context, config Config, st *chartState) Model {
 	}
 	if tt := st.tooltip; tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
+		m.HasTooltip = true
 		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color}
 		if tt.Content.LabelKey != "" {
 			m.Tooltip.Label = config.Label(tt.Content.LabelKey)
@@ -2434,7 +2438,7 @@ func legendContent(items []LegendItem, p *LegendProps) templ.Component {
 				var templ_7745c5c3_Var36 string
 				templ_7745c5c3_Var36, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + it.Color)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1633, Col: 88}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1637, Col: 88}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 				if templ_7745c5c3_Err != nil {
@@ -2448,7 +2452,7 @@ func legendContent(items []LegendItem, p *LegendProps) templ.Component {
 			var templ_7745c5c3_Var37 string
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(it.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1635, Col: 15}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1639, Col: 15}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 			if templ_7745c5c3_Err != nil {
@@ -2502,19 +2506,22 @@ type Model struct {
 	GridHorizontal bool    `json:"gridHorizontal,omitempty"`
 	GridVertical   bool    `json:"gridVertical,omitempty"`
 	// Layout "vertical" swaps the axes and draws the bars horizontally.
-	Layout        string                `json:"layout,omitempty"`
-	XAxisHide     bool                  `json:"xAxisHide,omitempty"`
-	YAxisHide     bool                  `json:"yAxisHide,omitempty"`
-	DomainMin     float64               `json:"domainMin,omitempty"` // negative values extend the domain
-	Stacked       bool                  `json:"stacked,omitempty"`
-	StackOffset   string                `json:"stackOffset,omitempty"` // "expand" normalizes each stack to 1
-	Defs          []LinearGradientProps `json:"defs,omitempty"`
-	Cursor        bool                  `json:"cursor"`
-	Labels        []string              `json:"labels"`
-	TooltipLabels []string              `json:"tooltipLabels,omitempty"`
-	SliceColors   []string              `json:"sliceColors,omitempty"` // pie: color per slice
-	Series        []ModelSeries         `json:"series"`
-	Tooltip       TooltipModel          `json:"tooltip"`
+	Layout      string                `json:"layout,omitempty"`
+	XAxisHide   bool                  `json:"xAxisHide,omitempty"`
+	YAxisHide   bool                  `json:"yAxisHide,omitempty"`
+	DomainMin   float64               `json:"domainMin,omitempty"` // negative values extend the domain
+	Stacked     bool                  `json:"stacked,omitempty"`
+	StackOffset string                `json:"stackOffset,omitempty"` // "expand" normalizes each stack to 1
+	Defs        []LinearGradientProps `json:"defs,omitempty"`
+	Cursor      bool                  `json:"cursor"`
+	// HasTooltip marks a declared Tooltip child: without one Recharts
+	// renders no tooltip at all, so the runtime skips the hover wiring.
+	HasTooltip    bool          `json:"hasTooltip,omitempty"`
+	Labels        []string      `json:"labels"`
+	TooltipLabels []string      `json:"tooltipLabels,omitempty"`
+	SliceColors   []string      `json:"sliceColors,omitempty"` // pie: color per slice
+	Series        []ModelSeries `json:"series"`
+	Tooltip       TooltipModel  `json:"tooltip"`
 	// Pies carries the pie geometry for the client renderer.
 	Pies []PieModel `json:"pies,omitempty"`
 	// Polar carries the radar geometry.

@@ -1853,6 +1853,10 @@ function initPanel(script) {
   });
   ro.observe(panel);
 
+  // Without a declared Tooltip child Recharts renders no tooltip, no
+  // active dots and no cursor, so none of the hover wiring applies.
+  if (!m.hasTooltip) return;
+
   const wrapper = tooltipWrapper(container);
 
   // Like Recharts' inRange: the tooltip only activates while the pointer
