@@ -39,6 +39,7 @@ templ ChartLineLabel() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "line-label", Config: chartLineLabelConfig}) {
 				@chart.LineChart(chart.LineChartProps{
+					AccessibilityLayer: true,
 					Data:   chartLineLabelData,
 					Margin: &chart.Margin{Top: 20, Left: 12, Right: 12},
 				}) {

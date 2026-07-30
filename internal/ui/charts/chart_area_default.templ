@@ -38,6 +38,7 @@ templ ChartAreaDefault() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "area-default", Config: chartAreaDefaultConfig}) {
 				@chart.AreaChart(chart.AreaChartProps{
+					AccessibilityLayer: true,
 					Data:   chartAreaDefaultData,
 					Margin: &chart.Margin{Left: 12, Right: 12},
 				}) {

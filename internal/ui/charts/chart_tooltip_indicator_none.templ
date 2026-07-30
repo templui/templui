@@ -45,7 +45,7 @@ templ ChartTooltipIndicatorNone() {
 		}
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "tooltip-indicator-none", Config: chartTooltipIndicatorNoneConfig}) {
-				@chart.BarChart(chart.BarChartProps{Data: chartTooltipIndicatorNoneData}) {
+				@chart.BarChart(chart.BarChartProps{AccessibilityLayer: true, Data: chartTooltipIndicatorNoneData}) {
 					@chart.XAxis(chart.XAxisProps{
 						DataKey:       "date",
 						TickMargin:    10,

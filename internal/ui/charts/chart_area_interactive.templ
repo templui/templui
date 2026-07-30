@@ -153,19 +153,19 @@ templ ChartAreaInteractive() {
 			</div>
 			@selectcomp.Select(selectcomp.Props{Value: "90d"}) {
 				@selectcomp.Trigger(selectcomp.TriggerProps{
-					Class:      "hidden w-[160px] sm:ml-auto sm:flex",
+					Class:      "hidden w-[160px] rounded-lg sm:ml-auto sm:flex",
 					Attributes: templ.Attributes{"aria-label": "Select a value", "data-tui-chart-range-select": "area-interactive"},
 				}) {
 					@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Last 3 months"})
 				}
-				@selectcomp.Content() {
-					@selectcomp.Item(selectcomp.ItemProps{Value: "90d"}) {
+				@selectcomp.Content(selectcomp.ContentProps{Class: "rounded-xl"}) {
+					@selectcomp.Item(selectcomp.ItemProps{Value: "90d", Class: "rounded-lg"}) {
 						Last 3 months
 					}
-					@selectcomp.Item(selectcomp.ItemProps{Value: "30d"}) {
+					@selectcomp.Item(selectcomp.ItemProps{Value: "30d", Class: "rounded-lg"}) {
 						Last 30 days
 					}
-					@selectcomp.Item(selectcomp.ItemProps{Value: "7d"}) {
+					@selectcomp.Item(selectcomp.ItemProps{Value: "7d", Class: "rounded-lg"}) {
 						Last 7 days
 					}
 				}
@@ -178,6 +178,16 @@ templ ChartAreaInteractive() {
 						@chart.AreaChart(chart.AreaChartProps{
 							Data: areaInteractiveFilteredData(rng.Days),
 						}) {
+							@chart.Defs() {
+								@chart.LinearGradient(chart.LinearGradientProps{ID: "fillDesktop", X1: "0", Y1: "0", X2: "0", Y2: "1"}) {
+									<stop offset="5%" stop-color="var(--color-desktop)" stop-opacity="0.8"></stop>
+									<stop offset="95%" stop-color="var(--color-desktop)" stop-opacity="0.1"></stop>
+								}
+								@chart.LinearGradient(chart.LinearGradientProps{ID: "fillMobile", X1: "0", Y1: "0", X2: "0", Y2: "1"}) {
+									<stop offset="5%" stop-color="var(--color-mobile)" stop-opacity="0.8"></stop>
+									<stop offset="95%" stop-color="var(--color-mobile)" stop-opacity="0.1"></stop>
+								}
+							}
 							@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 							@chart.XAxis(chart.XAxisProps{
 								DataKey:       "date",
@@ -192,16 +202,6 @@ templ ChartAreaInteractive() {
 									LabelFormatter: areaInteractiveShortDate,
 								},
 							})
-							@chart.Defs() {
-								@chart.LinearGradient(chart.LinearGradientProps{ID: "fillDesktop", X1: "0", Y1: "0", X2: "0", Y2: "1"}) {
-									<stop offset="5%" stop-color="var(--color-desktop)" stop-opacity="0.8"></stop>
-									<stop offset="95%" stop-color="var(--color-desktop)" stop-opacity="0.1"></stop>
-								}
-								@chart.LinearGradient(chart.LinearGradientProps{ID: "fillMobile", X1: "0", Y1: "0", X2: "0", Y2: "1"}) {
-									<stop offset="5%" stop-color="var(--color-mobile)" stop-opacity="0.8"></stop>
-									<stop offset="95%" stop-color="var(--color-mobile)" stop-opacity="0.1"></stop>
-								}
-							}
 							@chart.Area(chart.AreaProps{
 								DataKey: "mobile",
 								Type:    chart.CurveNatural,

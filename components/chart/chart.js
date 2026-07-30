@@ -24,7 +24,7 @@
  */
 
 const TOOLTIP_CLASS =
-  "border-border/50 bg-background grid min-w-32 items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl";
+  "border-border/50 bg-background grid min-w-[8rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl";
 
 /* ---------------------------------------------------------------- */
 /* Geometry (ports of the Go engine)                                */
@@ -524,10 +524,11 @@ function renderCartesian(panel, m, state, alpha = 1) {
 
   const vertical = m.layout === "vertical";
   // selectChartOffsetInternal: the axes add to the margins, the legend box
-  // adds to the bottom, and the plot never goes negative.
+  // adds to the bottom (or the top with verticalAlign "top", Recharts'
+  // appendOffsetOfLegend), and the plot never goes negative.
   const yAxisW = m.yAxisWidth || 0;
   const plotX = m.marginLeft + yAxisW;
-  const plotY = m.marginTop;
+  const plotY = m.marginTop + (m.legendVAlign === "top" ? legendHeight : 0);
   const plotW = Math.max(W - m.marginLeft - m.marginRight - yAxisW, 0);
   const plotH = Math.max(H - m.marginTop - m.marginBottom - (m.xAxisHeight || 0) - legendHeight, 0);
   const plotBottom = plotY + plotH;
@@ -553,8 +554,10 @@ function renderCartesian(panel, m, state, alpha = 1) {
   }
 
   // Explicit pixel size like Recharts' Surface: the svg never stretches
-  // between resize frames, every frame lays out fresh.
-  let svg = `<svg class="recharts-surface" width="${fmtF(W)}" height="${fmtF(H)}" viewBox="0 0 ${fmtF(W)} ${fmtF(H)}">`;
+  // between resize frames, every frame lays out fresh. The accessibility
+  // layer puts Recharts' role and tabIndex on the surface.
+  const a11y = m.accessibilityLayer ? ` role="application" tabindex="0"` : "";
+  let svg = `<svg class="recharts-surface"${a11y} width="${fmtF(W)}" height="${fmtF(H)}" viewBox="0 0 ${fmtF(W)} ${fmtF(H)}">`;
 
   if (m.defs && m.defs.length) {
     svg += "<defs>";
@@ -705,7 +708,7 @@ function renderCartesian(panel, m, state, alpha = 1) {
         rectSize.push(vertical ? b - a : a - b);
         rectA.push(a);
         rectB.push(b);
-        svg += `<g class="recharts-layer recharts-bar-rectangle"><path ${attrs} d="${d}"/></g>`;
+        svg += `<g class="recharts-layer recharts-bar-rectangle"><path class="recharts-rectangle" ${attrs} d="${d}"/></g>`;
         if (m.stacked) stackBase[i] = to;
       }
       svg += "</g>";
@@ -778,7 +781,12 @@ function renderCartesian(panel, m, state, alpha = 1) {
           } else {
             const fill = (s.dot.fills && s.dot.fills[i]) || s.dot.fill || "#fff";
             const stroke = (s.dot.fills && s.dot.fills[i]) || s.stroke || s.color;
-            svg += `<circle r="${fmtF(s.dot.r || 3)}" stroke="${stroke}" stroke-width="${s.strokeWidth || 1}" fill="${fill}" class="recharts-dot recharts-line-dot" cx="${fmtF(xs[i])}" cy="${fmtF(top[i])}"/>`;
+            // A dot from the data fill is the demos' explicit Dot element,
+            // which carries no strokeWidth, so the SVG default of one wins;
+            // a plain dot inherits the line's strokeWidth like Recharts
+            // spreading the line props into renderDots.
+            const dotStrokeWidth = s.dot.fills ? 1 : s.strokeWidth || 1;
+            svg += `<circle r="${fmtF(s.dot.r || 3)}" stroke="${stroke}" stroke-width="${fmtF(dotStrokeWidth)}" fill="${fill}" class="recharts-dot recharts-line-dot" cx="${fmtF(xs[i])}" cy="${fmtF(top[i])}"/>`;
           }
         }
         svg += `</g>`;
@@ -1575,41 +1583,42 @@ function tooltipWrapper(container) {
   return wrapper;
 }
 
-function indicatorHTML(indicator, color) {
+function indicatorHTML(indicator, color, nestLabel) {
   let cls = "shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)";
   if (indicator === "line") cls += " w-1";
-  else if (indicator === "dashed") cls += " w-0 border-[1.5px] border-dashed bg-transparent";
+  else if (indicator === "dashed") cls += ` w-0 border-[1.5px] border-dashed bg-transparent${nestLabel ? " my-0.5" : ""}`;
   else cls += " h-2.5 w-2.5";
   return `<div class="${cls}" style="--color-bg:${color};--color-border:${color}"></div>`;
 }
 
 function tooltipHTML(m, i, pieIndex = 0) {
   const t = m.tooltip || {};
-  // labelKey resolves the label through the config, otherwise the row's
-  // own label is used.
-  const label = t.label || (m.kind === "pie" ? "" : (m.tooltipLabels && m.tooltipLabels[i]) || m.labels[i]);
-  // Like ChartTooltipContent: a single non-dot series nests the label
-  // inside the row, so the line indicator spans the full row height.
-  const nestLabel = m.kind !== "pie" && m.series.length === 1 && t.indicator && t.indicator !== "dot";
+  // labelKey resolves the label through the config; a pie falls back to
+  // the config label of its own data key, like getPayloadConfigFromPayload
+  // reading item.dataKey.
+  const pie = m.kind === "pie" ? m.pies[pieIndex] : null;
+  const label = pie ? pie.seriesLabel || t.label : t.label || (m.tooltipLabels && m.tooltipLabels[i]) || m.labels[i];
+  // Like ChartTooltipContent: a single non-dot payload nests the label
+  // inside the row, so the line indicator spans the full row height. A pie
+  // always carries a single payload item.
+  const nestLabel = (pie ? true : m.series.length === 1) && t.indicator && t.indicator !== "dot";
+  const labelCls = `font-medium${t.labelClass ? " " + t.labelClass : ""}`;
   let html = `<div class="${TOOLTIP_CLASS}${t.width ? " " + t.width : ""}">`;
   if (!t.hideLabel && !nestLabel) {
-    html += `<div class="font-medium">${label}</div>`;
+    html += `<div class="${labelCls}">${label}</div>`;
   }
   html += `<div class="grid gap-1.5">`;
-  if (m.kind === "pie") {
-    const pie = m.pies[pieIndex];
-    if (t.label && !t.hideLabel) {
-      html = html.replace('<div class="grid gap-1.5">', `<div class="font-medium">${pie.seriesLabel || t.label}</div><div class="grid gap-1.5">`);
-    }
-    const color = pie.colors[i];
+  if (pie) {
+    const color = t.color || pie.colors[i];
     const rowCls =
       "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground" +
       (t.indicator !== "line" && t.indicator !== "dashed" ? " items-center" : "");
+    const nested = nestLabel && !t.hideLabel ? `<div class="${labelCls}">${label}</div>` : "";
     html +=
       `<div class="${rowCls}">` +
-      (t.hideIndicator ? "" : indicatorHTML(t.indicator, color)) +
-      `<div class="flex flex-1 justify-between leading-none items-center">` +
-      `<div class="grid gap-1.5"><span class="text-muted-foreground">${(pie.tooltipNames && pie.tooltipNames[i]) || pie.labels[i]}</span></div>` +
+      (t.hideIndicator ? "" : indicatorHTML(t.indicator, color, nestLabel)) +
+      `<div class="flex flex-1 justify-between leading-none ${nestLabel ? "items-end" : "items-center"}">` +
+      `<div class="grid gap-1.5">${nested}<span class="text-muted-foreground">${(pie.tooltipNames && pie.tooltipNames[i]) || pie.labels[i]}</span></div>` +
       `<span class="font-mono font-medium text-foreground tabular-nums">${pie.values[i].toLocaleString("en-US")}</span>` +
       `</div></div></div></div>`;
     return html;
@@ -1624,16 +1633,17 @@ function tooltipHTML(m, i, pieIndex = 0) {
       html += `<div class="${rowCls}">${t.rows[si][i]}</div>`;
       return;
     }
-    const nested = nestLabel && !t.hideLabel ? `<div class="font-medium">${label}</div>` : "";
-    // ChartTooltipContent's indicatorColor: the row's own fill wins over
-    // the series color, so per row colored bars keep their swatch.
-    const indicatorColor = (s.cells && s.cells[i]) || s.color;
+    const nested = nestLabel && !t.hideLabel ? `<div class="${labelCls}">${label}</div>` : "";
+    // ChartTooltipContent's indicatorColor: the color prop wins, then the
+    // row's own fill, then the series color, so per row colored bars keep
+    // their swatch.
+    const indicatorColor = t.color || (s.cells && s.cells[i]) || s.color;
     // getPayloadConfigFromPayload: a name key that the rows answer names
     // every row on its own, otherwise the series carries the name.
     const name = (s.tooltipNames && s.tooltipNames[i]) || s.label;
     html +=
       `<div class="${rowCls}">` +
-      (s.icon || (t.hideIndicator ? "" : indicatorHTML(t.indicator, indicatorColor))) +
+      (s.icon || (t.hideIndicator ? "" : indicatorHTML(t.indicator, indicatorColor, nestLabel))) +
       `<div class="flex flex-1 justify-between leading-none ${nestLabel ? "items-end" : "items-center"}">` +
       `<div class="grid gap-1.5">${nested}<span class="text-muted-foreground">${name}</span></div>` +
       `<span class="font-mono font-medium text-foreground tabular-nums">${s.values[i].toLocaleString("en-US")}</span>` +
@@ -1933,6 +1943,37 @@ function initPanel(script) {
     };
     if (state.geom) show();
     else state.onFirstRender = show;
+  }
+
+  // The AccessibilityManager pendant: with the accessibility layer the
+  // surface is focusable, focus shows the tooltip at the active index and
+  // the arrow keys walk it through the categories. Recharts spoofs a mouse
+  // move at the tick coordinate and offset.top plus half the height, and
+  // only in the horizontal layout.
+  if (m.accessibilityLayer) {
+    state.a11yIndex = typeof di === "number" ? di : 0;
+    const spoof = () => {
+      const g = state.geom;
+      if (!g || !g.cats || g.vertical) return;
+      const i = Math.min(Math.max(state.a11yIndex, 0), g.cats.length - 1);
+      state.a11yIndex = i;
+      const rect = panel.getBoundingClientRect();
+      const e = { clientX: rect.left + g.cats[i], clientY: rect.top + g.plotY + g.H / 2 };
+      showCursor(panel, m, state, i);
+      showActiveDots(panel, m, state, i);
+      positionTooltip(e, g.cats[i], null, i);
+    };
+    panel.addEventListener("focusin", spoof);
+    panel.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      const g = state.geom;
+      if (!g || !g.cats || g.vertical) return;
+      state.a11yIndex =
+        e.key === "ArrowRight"
+          ? Math.min(state.a11yIndex + 1, g.cats.length - 1)
+          : Math.max(state.a11yIndex - 1, 0);
+      spoof();
+    });
   }
 }
 

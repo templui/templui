@@ -38,6 +38,7 @@ templ ChartBarHorizontal() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "bar-horizontal", Config: chartBarHorizontalConfig}) {
 				@chart.BarChart(chart.BarChartProps{
+					AccessibilityLayer: true,
 					Data:   chartBarHorizontalData,
 					Layout: "vertical",
 					Margin: &chart.Margin{Left: -20},

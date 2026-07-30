@@ -41,19 +41,34 @@ type SeriesTheme struct {
 	Dark  string
 }
 
-// styleBlock is the ChartStyle pendant: one rule per color scheme, the
-// theme color wins over the plain color.
+// styleBlock is the ChartStyle pendant: one rule per color scheme. The
+// theme color wins over the plain color, and a theme without a value for
+// the scheme falls back to the color, like itemConfig.theme?.[theme] ??
+// itemConfig.color. Without any colored entry there is no style at all,
+// like ChartStyle returning null.
 func (c Config) styleBlock(id string) string {
+	hasColor := false
+	for _, s := range c {
+		if s.Color != "" || s.Theme != nil {
+			hasColor = true
+			break
+		}
+	}
+	if !hasColor {
+		return ""
+	}
 	var sb strings.Builder
 	for _, theme := range []struct{ Name, Prefix string }{{"light", ""}, {"dark", ".dark "}} {
 		fmt.Fprintf(&sb, "%s[data-chart=%s] {\n", theme.Prefix, id)
 		for _, s := range c {
 			color := s.Color
 			if s.Theme != nil {
+				themed := s.Theme.Light
 				if theme.Name == "dark" {
-					color = s.Theme.Dark
-				} else {
-					color = s.Theme.Light
+					themed = s.Theme.Dark
+				}
+				if themed != "" {
+					color = themed
 				}
 			}
 			if color != "" {
@@ -109,9 +124,11 @@ func Style(props ...StyleProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		templ_7745c5c3_Err = templ.Raw("<style>"+p.Config.styleBlock(p.ID)+"</style>").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
+		if block := p.Config.styleBlock(p.ID); block != "" {
+			templ_7745c5c3_Err = templ.Raw("<style>"+block+"</style>").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
 		return nil
 	})
@@ -152,10 +169,6 @@ func Container(props ...ContainerProps) templ.Component {
 		// The config travels to the chart root and its children through ctx,
 		// the pendant of shadcn's ChartContext.
 		ctx = context.WithValue(ctx, configCtxKey, p.Config)
-		templ_7745c5c3_Err = templ.Raw("<style>"+p.Config.styleBlock(chartID)+"</style>").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
 		var templ_7745c5c3_Var3 = []any{utils.TwMerge(
 			"flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
 			p.Class,
@@ -171,7 +184,7 @@ func Container(props ...ContainerProps) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(chartID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 107, Col: 22}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 123, Col: 22}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -201,6 +214,12 @@ func Container(props ...ContainerProps) templ.Component {
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, ">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
+		}
+		if block := p.Config.styleBlock(chartID); block != "" {
+			templ_7745c5c3_Err = templ.Raw("<style>"+block+"</style>").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
 		templ_7745c5c3_Err = templ_7745c5c3_Var2.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -355,12 +374,16 @@ type TooltipProps struct {
 
 // TooltipContentProps is the pendant of ChartTooltipContent.
 type TooltipContentProps struct {
-	Indicator      string // "dot" (default), "line", "dashed"
-	LabelKey       string
-	HideLabel      bool
-	HideIndicator  bool
-	NameKey        string
-	Class          string // extra content class, e.g. "w-[150px]"
+	Indicator     string // "dot" (default), "line", "dashed"
+	LabelKey      string
+	HideLabel     bool
+	HideIndicator bool
+	NameKey       string
+	Class         string // extra content class, e.g. "w-[150px]"
+	LabelClass    string // extra label class, ChartTooltipContent's labelClassName
+	// Color overrides the indicator color for every row, the color prop of
+	// ChartTooltipContent.
+	Color          string
 	LabelFormatter func(any) string
 	// Formatter is the pendant of the formatter render prop: it replaces a
 	// row's default indicator, name and value markup. It runs on the server
@@ -466,12 +489,21 @@ type LegendProps struct {
 	// ChartLegendContent.
 	NameKey string
 	Class   string
+	// VerticalAlign "top" places the legend above the plot with a bottom
+	// padding, like Recharts' verticalAlign; everything else is "bottom".
+	VerticalAlign string
+	// HideIcon drops the config icon and falls back to the color swatch,
+	// ChartLegendContent's hideIcon.
+	HideIcon bool
 }
 
 // LineChartProps is the pendant of the Recharts LineChart root.
 type LineChartProps struct {
-	Data   []Datum
-	Margin *Margin
+	// AccessibilityLayer adds the Recharts keyboard layer: the chart is
+	// focusable and the arrow keys walk the tooltip through the categories.
+	AccessibilityLayer bool
+	Data               []Datum
+	Margin             *Margin
 }
 
 // PieProps is the pendant of one Recharts Pie.
@@ -529,8 +561,11 @@ type LabelSpan struct {
 
 // AreaChartProps is the pendant of the Recharts AreaChart root.
 type AreaChartProps struct {
-	Data   []Datum
-	Margin *Margin
+	// AccessibilityLayer adds the Recharts keyboard layer: the chart is
+	// focusable and the arrow keys walk the tooltip through the categories.
+	AccessibilityLayer bool
+	Data               []Datum
+	Margin             *Margin
 	// StackOffset "expand" normalizes each stack to 100%, the pendant of
 	// Recharts' stackOffset prop.
 	StackOffset string
@@ -538,7 +573,10 @@ type AreaChartProps struct {
 
 // BarChartProps is the pendant of the Recharts BarChart root.
 type BarChartProps struct {
-	Data []Datum
+	// AccessibilityLayer adds the Recharts keyboard layer: the chart is
+	// focusable and the arrow keys walk the tooltip through the categories.
+	AccessibilityLayer bool
+	Data               []Datum
 	// Layout "vertical" draws the bars horizontally, like the Recharts
 	// layout prop.
 	Layout string
@@ -677,6 +715,8 @@ type chartState struct {
 	endAngle    *float64
 	innerRadius float64
 	outerRadius float64
+	// accessibilityLayer marks the Recharts keyboard layer on the root.
+	accessibilityLayer bool
 }
 
 // radialBarState pairs a radial bar with the LabelList its children
@@ -812,7 +852,7 @@ func AreaChart(props ...AreaChartProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		st := &chartState{kind: "area", data: p.Data, margin: p.Margin, stackOffset: p.StackOffset}
+		st := &chartState{kind: "area", data: p.Data, margin: p.Margin, stackOffset: p.StackOffset, accessibilityLayer: p.AccessibilityLayer}
 		ctx = context.WithValue(ctx, stateCtxKey, st)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div style=\"position:relative;width:100%;height:100%\">")
 		if templ_7745c5c3_Err != nil {
@@ -860,7 +900,7 @@ func BarChart(props ...BarChartProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		st := &chartState{kind: "bar", data: p.Data, margin: p.Margin, layout: p.Layout}
+		st := &chartState{kind: "bar", data: p.Data, margin: p.Margin, layout: p.Layout, accessibilityLayer: p.AccessibilityLayer}
 		ctx = context.WithValue(ctx, stateCtxKey, st)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div style=\"position:relative;width:100%;height:100%\">")
 		if templ_7745c5c3_Err != nil {
@@ -908,7 +948,7 @@ func LineChart(props ...LineChartProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		st := &chartState{kind: "line", data: p.Data, margin: p.Margin}
+		st := &chartState{kind: "line", data: p.Data, margin: p.Margin, accessibilityLayer: p.AccessibilityLayer}
 		ctx = context.WithValue(ctx, stateCtxKey, st)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div style=\"position:relative;width:100%;height:100%\">")
 		if templ_7745c5c3_Err != nil {
@@ -1277,7 +1317,7 @@ func chartOutput(st *chartState) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if st.legend != nil {
-			templ_7745c5c3_Err = legendContent(legendItems(configFrom(ctx), m, st, st.legend), st.legend.Class).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = legendContent(legendItems(configFrom(ctx), m, st, st.legend), st.legend).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1847,7 +1887,7 @@ func buildModel(ctx context.Context, st *chartState) Model {
 		return buildRadialModel(ctx, config, st)
 	}
 
-	m := Model{Kind: st.kind, StackOffset: st.stackOffset, Defs: st.defs, Layout: st.layout}
+	m := Model{Kind: st.kind, StackOffset: st.stackOffset, Defs: st.defs, Layout: st.layout, AccessibilityLayer: st.accessibilityLayer}
 	if g := st.grid; g != nil {
 		m.Grid = true
 		m.GridHorizontal = boolOr(g.Horizontal, true)
@@ -1888,11 +1928,12 @@ func buildModel(ctx context.Context, st *chartState) Model {
 	}
 	if st.legend != nil {
 		m.LegendHeight = defaultLegendHeight
+		m.LegendVAlign = st.legend.VerticalAlign
 	}
 	tt := st.tooltip
 	if tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, DefaultIndex: tt.DefaultIndex}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color, DefaultIndex: tt.DefaultIndex}
 		if tt.Content.LabelKey != "" {
 			m.Tooltip.Label = config.Label(tt.Content.LabelKey)
 		}
@@ -2072,7 +2113,7 @@ func buildRadarModel(ctx context.Context, config Config, st *chartState) Model {
 	}
 	if tt := st.tooltip; tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color}
 	}
 	return m
 }
@@ -2140,7 +2181,7 @@ func buildRadialModel(ctx context.Context, config Config, st *chartState) Model 
 	m.Radial = &r
 	if tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color}
 	}
 	return m
 }
@@ -2232,7 +2273,7 @@ func buildPieModel(ctx context.Context, config Config, st *chartState) Model {
 	}
 	if tt := st.tooltip; tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color}
 		if tt.Content.LabelKey != "" {
 			m.Tooltip.Label = config.Label(tt.Content.LabelKey)
 		}
@@ -2310,8 +2351,10 @@ func legendItems(config Config, m Model, st *chartState, p *LegendProps) []Legen
 }
 
 // legendContent is the ChartLegendContent pendant, absolutely positioned
-// like Recharts' legend wrapper.
-func legendContent(items []LegendItem, class string) templ.Component {
+// like Recharts' legend wrapper. verticalAlign "top" moves the wrapper to
+// the top edge and swaps the padding side, like cn(verticalAlign === "top"
+// ? "pb-3" : "pt-3").
+func legendContent(items []LegendItem, p *LegendProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -2332,16 +2375,31 @@ func legendContent(items []LegendItem, class string) templ.Component {
 			templ_7745c5c3_Var33 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"recharts-legend-wrapper\" style=\"position:absolute;left:0;right:0;bottom:5px\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"recharts-legend-wrapper\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var34 = []any{utils.TwMerge("flex items-center justify-center gap-4 pt-3", class)}
+		if p.VerticalAlign == "top" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " style=\"position:absolute;left:0;right:0;top:5px\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, " style=\"position:absolute;left:0;right:0;bottom:5px\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, ">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var34 = []any{utils.TwMerge("flex items-center justify-center gap-4 "+legendPad(p.VerticalAlign), p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var34...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -2354,35 +2412,35 @@ func legendContent(items []LegendItem, class string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, it := range items {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div class=\"flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if it.Icon != "" {
+			if it.Icon != "" && !p.HideIcon {
 				templ_7745c5c3_Err = templ.Raw(it.Icon).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"h-2 w-2 shrink-0 rounded-[2px]\" style=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div class=\"h-2 w-2 shrink-0 rounded-[2px]\" style=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var36 string
 				templ_7745c5c3_Var36, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + it.Color)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1583, Col: 88}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1633, Col: 88}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\"></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\"></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -2390,23 +2448,31 @@ func legendContent(items []LegendItem, class string) templ.Component {
 			var templ_7745c5c3_Var37 string
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(it.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1585, Col: 15}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1635, Col: 15}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		return nil
 	})
+}
+
+// legendPad is the padding side of the legend box, away from the plot.
+func legendPad(verticalAlign string) string {
+	if verticalAlign == "top" {
+		return "pb-3"
+	}
+	return "pt-3"
 }
 
 // Model describes one rendered chart for chart.js: the client runtime
@@ -2429,6 +2495,7 @@ type Model struct {
 	YTickLine      bool    `json:"yTickLine,omitempty"`
 	YAxisLine      bool    `json:"yAxisLine,omitempty"`
 	LegendHeight   float64 `json:"legendHeight,omitempty"`
+	LegendVAlign   string  `json:"legendVAlign,omitempty"` // "top" raises the legend above the plot
 	CategoryGap    float64 `json:"categoryGap,omitempty"`
 	Radius         float64 `json:"radius,omitempty"`
 	Grid           bool    `json:"grid,omitempty"`
@@ -2454,6 +2521,9 @@ type Model struct {
 	Polar *PolarModel `json:"polar,omitempty"`
 	// Radial carries the RadialBarChart geometry.
 	Radial *RadialModel `json:"radial,omitempty"`
+	// AccessibilityLayer switches on the keyboard layer, Recharts'
+	// accessibilityLayer prop.
+	AccessibilityLayer bool `json:"accessibilityLayer,omitempty"`
 }
 
 // RadialModel is the geometry of a RadialBarChart.
@@ -2591,7 +2661,9 @@ type TooltipModel struct {
 	Label         string `json:"label,omitempty"`     // labelKey resolved through the config
 	HideLabel     bool   `json:"hideLabel,omitempty"`
 	HideIndicator bool   `json:"hideIndicator,omitempty"`
-	Width         string `json:"width,omitempty"` // extra class, e.g. "w-[150px]"
+	Width         string `json:"width,omitempty"`      // extra class, e.g. "w-[150px]"
+	LabelClass    string `json:"labelClass,omitempty"` // extra label class, labelClassName
+	Color         string `json:"color,omitempty"`      // indicator color override
 	// DefaultIndex shows the tooltip on mount at that category.
 	DefaultIndex *int `json:"defaultIndex,omitempty"`
 	// Rows is the formatter markup per series and data row.

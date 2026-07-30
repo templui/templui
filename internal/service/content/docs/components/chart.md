@@ -199,6 +199,16 @@ To add an x-axis to the chart, we'll use the `XAxis` component.
 
 <Steps className="mb-0 pt-2">
 
+<Step>Define a tick formatter</Step>
+
+The `TickFormatter` is a plain Go function. This one shortens the month names to three letters.
+
+```go title="chart_example.templ" showLineNumbers
+func monthShort(v any) string {
+	return v.(string)[:3]
+}
+```
+
 <Step>Add the `XAxis` component to your chart.</Step>
 
 ```templ showLineNumbers {4-8}
@@ -381,13 +391,21 @@ var chartData = []chart.Datum{
 }
 ```
 
+#### Tailwind
+
+Every `Class` prop takes Tailwind utility classes, so you can also color chart parts with the arbitrary property syntax.
+
+```templ
+@chart.LabelList(chart.LabelListProps{Class: "fill-(--color-desktop)"})
+```
+
 ## Tooltip
 
 A chart tooltip contains a label, name, indicator and value. You can use a combination of these to customize your tooltip.
 
 The tooltip trails the cursor inside the plot area and snaps to the active data point, and the colors are automatically referenced from the chart config.
 
-You can turn the label on and off using the `HideLabel` prop and customize the indicator style using the `Indicator` prop. Use `NameKey` to use a custom key for the tooltip name.
+You can turn the label and the indicator on and off using the `HideLabel` and `HideIndicator` props and customize the indicator style using the `Indicator` prop. Use `LabelKey` and `NameKey` to use a custom key for the tooltip label and name.
 
 Chart comes with the `Tooltip` component and its `TooltipContentProps`, the pendant of `ChartTooltip` and `ChartTooltipContent`. You can use these to add tooltips to your chart.
 
@@ -402,20 +420,26 @@ Chart comes with the `Tooltip` component and its `TooltipContentProps`, the pend
 
 `chart.TooltipProps`
 
-| Prop      | Type                | Description                            |
-| :-------- | :------------------ | :------------------------------------- |
-| `Cursor`  | *bool               | Hover cursor, defaults to on.          |
-| `Content` | TooltipContentProps | The rendered tooltip content.          |
+| Prop           | Type                | Description                                           |
+| :------------- | :------------------ | :---------------------------------------------------- |
+| `Cursor`       | *bool               | Hover cursor, defaults to on.                         |
+| `Content`      | TooltipContentProps | The rendered tooltip content.                         |
+| `DefaultIndex` | *int                | Shows the tooltip on mount at that category.          |
 
 `chart.TooltipContentProps`
 
-| Prop             | Type                     | Description                                    |
-| :--------------- | :----------------------- | :--------------------------------------------- |
-| `Indicator`      | `dot` `line` or `dashed` | The indicator style for the tooltip.           |
-| `HideLabel`      | bool                     | Whether to hide the label.                     |
-| `NameKey`        | string                   | Config key to use for the series name.         |
-| `LabelFormatter` | func(any) string         | Formats the tooltip label.                     |
-| `Class`          | string                   | Extra classes for the tooltip content.         |
+| Prop             | Type                     | Description                                                    |
+| :--------------- | :----------------------- | :------------------------------------------------------------- |
+| `Indicator`      | `dot` `line` or `dashed` | The indicator style for the tooltip.                           |
+| `LabelKey`       | string                   | Config key to use for the tooltip label.                       |
+| `HideLabel`      | bool                     | Whether to hide the label.                                     |
+| `HideIndicator`  | bool                     | Whether to hide the indicator.                                 |
+| `NameKey`        | string                   | Config key to use for the series name.                         |
+| `LabelFormatter` | func(any) string         | Formats the tooltip label.                                     |
+| `Formatter`      | func(value any, name string, item chart.Datum, index int) templ.Component | Replaces a row's default markup, rendered per data row. |
+| `Class`          | string                   | Extra classes for the tooltip content.                         |
+| `LabelClass`     | string                   | Extra classes for the tooltip label.                           |
+| `Color`          | string                   | Overrides the indicator color for every row.                   |
 
 ### Custom
 
@@ -449,3 +473,48 @@ You can use the `Legend` component to add a legend to your chart.
 ```
 
 It renders the label and color of every series, and the colors are automatically referenced from the chart config. When a config entry sets an `Icon`, it replaces the color swatch.
+
+### Props
+
+`chart.LegendProps`
+
+| Prop            | Type   | Description                                                     |
+| :-------------- | :----- | :-------------------------------------------------------------- |
+| `NameKey`       | string | Config key to use for the legend labels.                        |
+| `Class`         | string | Extra classes for the legend content.                           |
+| `VerticalAlign` | string | `top` places the legend above the plot, everything else below.  |
+| `HideIcon`      | bool   | Drops the config icon and falls back to the color swatch.       |
+
+### Custom
+
+To use a custom key for the legend names, use the `NameKey` prop.
+
+```go showLineNumbers /browser/
+var chartData = []chart.Datum{
+	{"browser": "chrome", "visitors": 275, "fill": "var(--color-chrome)"},
+	{"browser": "safari", "visitors": 200, "fill": "var(--color-safari)"},
+}
+
+var chartConfig = chart.Config{
+	{Key: "chrome", Label: "Chrome", Color: "var(--chart-1)"},
+	{Key: "safari", Label: "Safari", Color: "var(--chart-2)"},
+}
+```
+
+```templ
+@chart.Legend(chart.LegendProps{NameKey: "browser"})
+```
+
+This will use the config labels of the `browser` values for the legend names.
+
+## Accessibility
+
+Set `AccessibilityLayer: true` on the chart root to enable the keyboard layer, the pendant of Recharts' `accessibilityLayer` prop.
+
+```templ
+@chart.BarChart(chart.BarChartProps{AccessibilityLayer: true, Data: chartData}) {
+	...
+}
+```
+
+The chart becomes focusable, focusing it shows the tooltip and the left and right arrow keys walk the tooltip through the categories.

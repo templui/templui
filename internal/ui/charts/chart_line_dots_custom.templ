@@ -39,6 +39,7 @@ templ ChartLineDotsCustom() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "line-dots-custom", Config: chartLineDotsCustomConfig}) {
 				@chart.LineChart(chart.LineChartProps{
+					AccessibilityLayer: true,
 					Data:   chartLineDotsCustomData,
 					Margin: &chart.Margin{Left: 12, Right: 12},
 				}) {

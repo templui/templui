@@ -38,6 +38,7 @@ templ ChartLineDefault() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "line-default", Config: chartLineDefaultConfig}) {
 				@chart.LineChart(chart.LineChartProps{
+					AccessibilityLayer: true,
 					Data:   chartLineDefaultData,
 					Margin: &chart.Margin{Left: 12, Right: 12},
 				}) {

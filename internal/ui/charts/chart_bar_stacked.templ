@@ -38,7 +38,7 @@ templ ChartBarStacked() {
 		}
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "bar-stacked", Config: chartBarStackedConfig}) {
-				@chart.BarChart(chart.BarChartProps{Data: chartBarStackedData}) {
+				@chart.BarChart(chart.BarChartProps{AccessibilityLayer: true, Data: chartBarStackedData}) {
 					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 					@chart.XAxis(chart.XAxisProps{
 						DataKey:       "month",

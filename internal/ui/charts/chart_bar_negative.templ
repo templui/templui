@@ -34,7 +34,7 @@ templ ChartBarNegative() {
 		}
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "bar-negative", Config: chartBarNegativeConfig}) {
-				@chart.BarChart(chart.BarChartProps{Data: chartBarNegativeData}) {
+				@chart.BarChart(chart.BarChartProps{AccessibilityLayer: true, Data: chartBarNegativeData}) {
 					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 					@chart.Tooltip(chart.TooltipProps{
 						Cursor:  chart.Bool(false),

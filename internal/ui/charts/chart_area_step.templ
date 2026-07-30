@@ -38,6 +38,7 @@ templ ChartAreaStep() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "area-step", Config: chartAreaStepConfig}) {
 				@chart.AreaChart(chart.AreaChartProps{
+					AccessibilityLayer: true,
 					Data:   chartAreaStepData,
 					Margin: &chart.Margin{Left: 12, Right: 12},
 				}) {

@@ -39,6 +39,7 @@ templ ChartAreaAxes() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "area-axes", Config: chartAreaAxesConfig}) {
 				@chart.AreaChart(chart.AreaChartProps{
+					AccessibilityLayer: true,
 					Data:   chartAreaAxesData,
 					Margin: &chart.Margin{Left: -20, Right: 12},
 				}) {

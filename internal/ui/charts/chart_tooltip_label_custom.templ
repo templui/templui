@@ -46,7 +46,7 @@ templ ChartTooltipLabelCustom() {
 		}
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "tooltip-label-custom", Config: chartTooltipLabelCustomConfig}) {
-				@chart.BarChart(chart.BarChartProps{Data: chartTooltipLabelCustomData}) {
+				@chart.BarChart(chart.BarChartProps{AccessibilityLayer: true, Data: chartTooltipLabelCustomData}) {
 					@chart.XAxis(chart.XAxisProps{
 						DataKey:       "date",
 						TickMargin:    10,

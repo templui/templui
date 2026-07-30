@@ -39,6 +39,7 @@ templ ChartLineMultiple() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "line-multiple", Config: chartLineMultipleConfig}) {
 				@chart.LineChart(chart.LineChartProps{
+					AccessibilityLayer: true,
 					Data:   chartLineMultipleData,
 					Margin: &chart.Margin{Left: 12, Right: 12},
 				}) {

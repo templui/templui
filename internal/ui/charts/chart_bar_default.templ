@@ -38,6 +38,7 @@ templ ChartBarDefault() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "bar-default", Config: chartBarDefaultConfig}) {
 				@chart.BarChart(chart.BarChartProps{
+					AccessibilityLayer: true,
 					Data: chartBarDefaultData,
 				}) {
 					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})

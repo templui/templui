@@ -38,6 +38,7 @@ templ ChartLineLinear() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "line-linear", Config: chartLineLinearConfig}) {
 				@chart.LineChart(chart.LineChartProps{
+					AccessibilityLayer: true,
 					Data:   chartLineLinearData,
 					Margin: &chart.Margin{Left: 12, Right: 12},
 				}) {

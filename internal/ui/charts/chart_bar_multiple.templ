@@ -38,7 +38,7 @@ templ ChartBarMultiple() {
 		}
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "bar-multiple", Config: chartBarMultipleConfig}) {
-				@chart.BarChart(chart.BarChartProps{Data: chartBarMultipleData}) {
+				@chart.BarChart(chart.BarChartProps{AccessibilityLayer: true, Data: chartBarMultipleData}) {
 					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 					@chart.XAxis(chart.XAxisProps{
 						DataKey:       "month",

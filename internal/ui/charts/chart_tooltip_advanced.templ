@@ -70,7 +70,7 @@ templ ChartTooltipAdvanced() {
 		}
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "tooltip-advanced", Config: chartTooltipAdvancedConfig}) {
-				@chart.BarChart(chart.BarChartProps{Data: chartTooltipAdvancedData}) {
+				@chart.BarChart(chart.BarChartProps{AccessibilityLayer: true, Data: chartTooltipAdvancedData}) {
 					@chart.XAxis(chart.XAxisProps{
 						DataKey:       "date",
 						TickMargin:    10,

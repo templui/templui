@@ -179,6 +179,7 @@ templ ChartLineInteractive() {
 				for _, series := range []string{"desktop", "mobile"} {
 					<div data-tui-chart-series-panel={ series } hidden?={ series != "desktop" } style="width:100%;height:100%">
 						@chart.LineChart(chart.LineChartProps{
+							AccessibilityLayer: true,
 							Data:   chartLineInteractiveData,
 							Margin: &chart.Margin{Left: 12, Right: 12},
 						}) {

@@ -38,6 +38,7 @@ templ ChartLineStep() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "line-step", Config: chartLineStepConfig}) {
 				@chart.LineChart(chart.LineChartProps{
+					AccessibilityLayer: true,
 					Data:   chartLineStepData,
 					Margin: &chart.Margin{Left: 12, Right: 12},
 				}) {

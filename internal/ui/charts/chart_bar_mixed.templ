@@ -44,6 +44,7 @@ templ ChartBarMixed() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "bar-mixed", Config: chartBarMixedConfig}) {
 				@chart.BarChart(chart.BarChartProps{
+					AccessibilityLayer: true,
 					Data:   chartBarMixedData,
 					Layout: "vertical",
 					Margin: &chart.Margin{Left: 0},

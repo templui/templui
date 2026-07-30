@@ -39,6 +39,7 @@ templ ChartAreaStacked() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "area-stacked", Config: chartAreaStackedConfig}) {
 				@chart.AreaChart(chart.AreaChartProps{
+					AccessibilityLayer: true,
 					Data:   chartAreaStackedData,
 					Margin: &chart.Margin{Left: 12, Right: 12},
 				}) {

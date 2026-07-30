@@ -39,6 +39,7 @@ templ ChartAreaGradient() {
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "area-gradient", Config: chartAreaGradientConfig}) {
 				@chart.AreaChart(chart.AreaChartProps{
+					AccessibilityLayer: true,
 					Data:   chartAreaGradientData,
 					Margin: &chart.Margin{Left: 12, Right: 12},
 				}) {

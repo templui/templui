@@ -43,7 +43,7 @@ templ ChartBarActive() {
 		}
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "bar-active", Config: chartBarActiveConfig}) {
-				@chart.BarChart(chart.BarChartProps{Data: chartBarActiveData}) {
+				@chart.BarChart(chart.BarChartProps{AccessibilityLayer: true, Data: chartBarActiveData}) {
 					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
 					@chart.XAxis(chart.XAxisProps{
 						DataKey:       "browser",

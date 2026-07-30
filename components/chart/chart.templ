@@ -33,19 +33,34 @@ type SeriesTheme struct {
 	Dark  string
 }
 
-// styleBlock is the ChartStyle pendant: one rule per color scheme, the
-// theme color wins over the plain color.
+// styleBlock is the ChartStyle pendant: one rule per color scheme. The
+// theme color wins over the plain color, and a theme without a value for
+// the scheme falls back to the color, like itemConfig.theme?.[theme] ??
+// itemConfig.color. Without any colored entry there is no style at all,
+// like ChartStyle returning null.
 func (c Config) styleBlock(id string) string {
+	hasColor := false
+	for _, s := range c {
+		if s.Color != "" || s.Theme != nil {
+			hasColor = true
+			break
+		}
+	}
+	if !hasColor {
+		return ""
+	}
 	var sb strings.Builder
 	for _, theme := range []struct{ Name, Prefix string }{{"light", ""}, {"dark", ".dark "}} {
 		fmt.Fprintf(&sb, "%s[data-chart=%s] {\n", theme.Prefix, id)
 		for _, s := range c {
 			color := s.Color
 			if s.Theme != nil {
+				themed := s.Theme.Light
 				if theme.Name == "dark" {
-					color = s.Theme.Dark
-				} else {
-					color = s.Theme.Light
+					themed = s.Theme.Dark
+				}
+				if themed != "" {
+					color = themed
 				}
 			}
 			if color != "" {
@@ -81,7 +96,9 @@ templ Style(props ...StyleProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	@templ.Raw("<style>" + p.Config.styleBlock(p.ID) + "</style>")
+	if block := p.Config.styleBlock(p.ID); block != "" {
+		@templ.Raw("<style>" + block + "</style>")
+	}
 }
 
 // Container is the ChartContainer pendant: aspect-video flex box with the
@@ -101,7 +118,6 @@ templ Container(props ...ContainerProps) {
 	// the pendant of shadcn's ChartContext.
 	ctx = context.WithValue(ctx, configCtxKey, p.Config)
 	}}
-	@templ.Raw("<style>" + p.Config.styleBlock(chartID) + "</style>")
 	<div
 		data-slot="chart"
 		data-chart={ chartID }
@@ -112,6 +128,9 @@ templ Container(props ...ContainerProps) {
 		) }
 		{ p.Attributes... }
 	>
+		if block := p.Config.styleBlock(chartID); block != "" {
+			@templ.Raw("<style>" + block + "</style>")
+		}
 		{ children... }
 	</div>
 }
@@ -223,6 +242,10 @@ type TooltipContentProps struct {
 	HideIndicator  bool
 	NameKey        string
 	Class          string // extra content class, e.g. "w-[150px]"
+	LabelClass     string // extra label class, ChartTooltipContent's labelClassName
+	// Color overrides the indicator color for every row, the color prop of
+	// ChartTooltipContent.
+	Color          string
 	LabelFormatter func(any) string
 	// Formatter is the pendant of the formatter render prop: it replaces a
 	// row's default indicator, name and value markup. It runs on the server
@@ -328,12 +351,21 @@ type LegendProps struct {
 	// ChartLegendContent.
 	NameKey string
 	Class   string
+	// VerticalAlign "top" places the legend above the plot with a bottom
+	// padding, like Recharts' verticalAlign; everything else is "bottom".
+	VerticalAlign string
+	// HideIcon drops the config icon and falls back to the color swatch,
+	// ChartLegendContent's hideIcon.
+	HideIcon bool
 }
 
 // LineChartProps is the pendant of the Recharts LineChart root.
 type LineChartProps struct {
-	Data   []Datum
-	Margin *Margin
+	// AccessibilityLayer adds the Recharts keyboard layer: the chart is
+	// focusable and the arrow keys walk the tooltip through the categories.
+	AccessibilityLayer bool
+	Data               []Datum
+	Margin             *Margin
 }
 
 // PieProps is the pendant of one Recharts Pie.
@@ -391,8 +423,11 @@ type LabelSpan struct {
 
 // AreaChartProps is the pendant of the Recharts AreaChart root.
 type AreaChartProps struct {
-	Data   []Datum
-	Margin *Margin
+	// AccessibilityLayer adds the Recharts keyboard layer: the chart is
+	// focusable and the arrow keys walk the tooltip through the categories.
+	AccessibilityLayer bool
+	Data               []Datum
+	Margin             *Margin
 	// StackOffset "expand" normalizes each stack to 100%, the pendant of
 	// Recharts' stackOffset prop.
 	StackOffset string
@@ -400,7 +435,10 @@ type AreaChartProps struct {
 
 // BarChartProps is the pendant of the Recharts BarChart root.
 type BarChartProps struct {
-	Data []Datum
+	// AccessibilityLayer adds the Recharts keyboard layer: the chart is
+	// focusable and the arrow keys walk the tooltip through the categories.
+	AccessibilityLayer bool
+	Data               []Datum
 	// Layout "vertical" draws the bars horizontally, like the Recharts
 	// layout prop.
 	Layout string
@@ -539,6 +577,8 @@ type chartState struct {
 	endAngle    *float64
 	innerRadius float64
 	outerRadius float64
+	// accessibilityLayer marks the Recharts keyboard layer on the root.
+	accessibilityLayer bool
 }
 
 // radialBarState pairs a radial bar with the LabelList its children
@@ -655,7 +695,7 @@ templ AreaChart(props ...AreaChartProps) {
 		{{ p = props[0] }}
 	}
 	{{
-	st := &chartState{kind: "area", data: p.Data, margin: p.Margin, stackOffset: p.StackOffset}
+	st := &chartState{kind: "area", data: p.Data, margin: p.Margin, stackOffset: p.StackOffset, accessibilityLayer: p.AccessibilityLayer}
 	ctx = context.WithValue(ctx, stateCtxKey, st)
 	}}
 	<div style="position:relative;width:100%;height:100%">
@@ -671,7 +711,7 @@ templ BarChart(props ...BarChartProps) {
 		{{ p = props[0] }}
 	}
 	{{
-	st := &chartState{kind: "bar", data: p.Data, margin: p.Margin, layout: p.Layout}
+	st := &chartState{kind: "bar", data: p.Data, margin: p.Margin, layout: p.Layout, accessibilityLayer: p.AccessibilityLayer}
 	ctx = context.WithValue(ctx, stateCtxKey, st)
 	}}
 	<div style="position:relative;width:100%;height:100%">
@@ -687,7 +727,7 @@ templ LineChart(props ...LineChartProps) {
 		{{ p = props[0] }}
 	}
 	{{
-	st := &chartState{kind: "line", data: p.Data, margin: p.Margin}
+	st := &chartState{kind: "line", data: p.Data, margin: p.Margin, accessibilityLayer: p.AccessibilityLayer}
 	ctx = context.WithValue(ctx, stateCtxKey, st)
 	}}
 	<div style="position:relative;width:100%;height:100%">
@@ -816,7 +856,7 @@ templ chartOutput(st *chartState) {
 	{{ m := buildModel(ctx, st) }}
 	@templ.Raw(ModelScript(m))
 	if st.legend != nil {
-		@legendContent(legendItems(configFrom(ctx), m, st, st.legend), st.legend.Class)
+		@legendContent(legendItems(configFrom(ctx), m, st, st.legend), st.legend)
 	}
 }
 
@@ -1108,7 +1148,7 @@ func buildModel(ctx context.Context, st *chartState) Model {
 		return buildRadialModel(ctx, config, st)
 	}
 
-	m := Model{Kind: st.kind, StackOffset: st.stackOffset, Defs: st.defs, Layout: st.layout}
+	m := Model{Kind: st.kind, StackOffset: st.stackOffset, Defs: st.defs, Layout: st.layout, AccessibilityLayer: st.accessibilityLayer}
 	if g := st.grid; g != nil {
 		m.Grid = true
 		m.GridHorizontal = boolOr(g.Horizontal, true)
@@ -1149,11 +1189,12 @@ func buildModel(ctx context.Context, st *chartState) Model {
 	}
 	if st.legend != nil {
 		m.LegendHeight = defaultLegendHeight
+		m.LegendVAlign = st.legend.VerticalAlign
 	}
 	tt := st.tooltip
 	if tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, DefaultIndex: tt.DefaultIndex}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color, DefaultIndex: tt.DefaultIndex}
 		if tt.Content.LabelKey != "" {
 			m.Tooltip.Label = config.Label(tt.Content.LabelKey)
 		}
@@ -1333,7 +1374,7 @@ func buildRadarModel(ctx context.Context, config Config, st *chartState) Model {
 	}
 	if tt := st.tooltip; tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color}
 	}
 	return m
 }
@@ -1401,7 +1442,7 @@ func buildRadialModel(ctx context.Context, config Config, st *chartState) Model 
 	m.Radial = &r
 	if tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color}
 	}
 	return m
 }
@@ -1493,7 +1534,7 @@ func buildPieModel(ctx context.Context, config Config, st *chartState) Model {
 	}
 	if tt := st.tooltip; tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color}
 		if tt.Content.LabelKey != "" {
 			m.Tooltip.Label = config.Label(tt.Content.LabelKey)
 		}
@@ -1571,13 +1612,22 @@ func legendItems(config Config, m Model, st *chartState, p *LegendProps) []Legen
 }
 
 // legendContent is the ChartLegendContent pendant, absolutely positioned
-// like Recharts' legend wrapper.
-templ legendContent(items []LegendItem, class string) {
-	<div class="recharts-legend-wrapper" style="position:absolute;left:0;right:0;bottom:5px">
-		<div class={ utils.TwMerge("flex items-center justify-center gap-4 pt-3", class) }>
+// like Recharts' legend wrapper. verticalAlign "top" moves the wrapper to
+// the top edge and swaps the padding side, like cn(verticalAlign === "top"
+// ? "pb-3" : "pt-3").
+templ legendContent(items []LegendItem, p *LegendProps) {
+	<div
+		class="recharts-legend-wrapper"
+		if p.VerticalAlign == "top" {
+			style="position:absolute;left:0;right:0;top:5px"
+		} else {
+			style="position:absolute;left:0;right:0;bottom:5px"
+		}
+	>
+		<div class={ utils.TwMerge("flex items-center justify-center gap-4 " + legendPad(p.VerticalAlign), p.Class) }>
 			for _, it := range items {
 				<div class="flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground">
-					if it.Icon != "" {
+					if it.Icon != "" && !p.HideIcon {
 						@templ.Raw(it.Icon)
 					} else {
 						<div class="h-2 w-2 shrink-0 rounded-[2px]" style={ "background-color:" + it.Color }></div>
@@ -1587,6 +1637,14 @@ templ legendContent(items []LegendItem, class string) {
 			}
 		</div>
 	</div>
+}
+
+// legendPad is the padding side of the legend box, away from the plot.
+func legendPad(verticalAlign string) string {
+	if verticalAlign == "top" {
+		return "pb-3"
+	}
+	return "pt-3"
 }
 
 // Model describes one rendered chart for chart.js: the client runtime
@@ -1609,6 +1667,7 @@ type Model struct {
 	YTickLine     bool                  `json:"yTickLine,omitempty"`
 	YAxisLine     bool                  `json:"yAxisLine,omitempty"`
 	LegendHeight  float64               `json:"legendHeight,omitempty"`
+	LegendVAlign  string                `json:"legendVAlign,omitempty"` // "top" raises the legend above the plot
 	CategoryGap   float64               `json:"categoryGap,omitempty"`
 	Radius        float64               `json:"radius,omitempty"`
 	Grid           bool `json:"grid,omitempty"`
@@ -1634,6 +1693,9 @@ type Model struct {
 	Polar *PolarModel `json:"polar,omitempty"`
 	// Radial carries the RadialBarChart geometry.
 	Radial *RadialModel `json:"radial,omitempty"`
+	// AccessibilityLayer switches on the keyboard layer, Recharts'
+	// accessibilityLayer prop.
+	AccessibilityLayer bool `json:"accessibilityLayer,omitempty"`
 }
 
 // RadialModel is the geometry of a RadialBarChart.
@@ -1771,7 +1833,9 @@ type TooltipModel struct {
 	Label         string `json:"label,omitempty"`     // labelKey resolved through the config
 	HideLabel     bool   `json:"hideLabel,omitempty"`
 	HideIndicator bool   `json:"hideIndicator,omitempty"`
-	Width         string `json:"width,omitempty"` // extra class, e.g. "w-[150px]"
+	Width         string `json:"width,omitempty"`      // extra class, e.g. "w-[150px]"
+	LabelClass    string `json:"labelClass,omitempty"` // extra label class, labelClassName
+	Color         string `json:"color,omitempty"`      // indicator color override
 	// DefaultIndex shows the tooltip on mount at that category.
 	DefaultIndex *int `json:"defaultIndex,omitempty"`
 	// Rows is the formatter markup per series and data row.

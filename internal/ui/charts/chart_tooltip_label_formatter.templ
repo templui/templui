@@ -55,7 +55,7 @@ templ ChartTooltipLabelFormatter() {
 		}
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "tooltip-label-formatter", Config: chartTooltipLabelFormatterConfig}) {
-				@chart.BarChart(chart.BarChartProps{Data: chartTooltipLabelFormatterData}) {
+				@chart.BarChart(chart.BarChartProps{AccessibilityLayer: true, Data: chartTooltipLabelFormatterData}) {
 					@chart.XAxis(chart.XAxisProps{
 						DataKey:       "date",
 						TickMargin:    10,

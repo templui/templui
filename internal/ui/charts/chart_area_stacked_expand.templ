@@ -34,12 +34,13 @@ templ ChartAreaStackedExpand() {
 				Area Chart - Stacked Expanded
 			}
 			@card.Description() {
-				Showing total visitors for the last 6 months
+				Showing total visitors for the last 6months
 			}
 		}
 		@card.Content() {
 			@chart.Container(chart.ContainerProps{ID: "area-stacked-expand", Config: chartAreaStackedExpandConfig}) {
 				@chart.AreaChart(chart.AreaChartProps{
+					AccessibilityLayer: true,
 					Data: chartAreaStackedExpandData,
 					Margin: &chart.Margin{
 						Left:  12,
