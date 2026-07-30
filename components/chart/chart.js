@@ -626,7 +626,10 @@ function renderCartesian(panel, m, state, alpha = 1) {
 
   let xs = [];
   let band = 0;
-  state.points = { tops: [], a: [], b: [] };
+  // The update-animation sources, Recharts' prevPoints/prevData: full
+  // point geometry per series (xs and tops for curves, the signed
+  // rectangles for bars, the numeric base line for areas).
+  state.points = { tops: [], xs: [], rects: [], base: plotBottom };
   const vals = m.stackOffset === "expand" ? expandValues(m.series) : m.series.map((s) => s.values);
 
   if (m.kind === "bar") {
@@ -648,8 +651,7 @@ function renderCartesian(panel, m, state, alpha = 1) {
       const s = m.series[si];
       const slot = m.stacked ? 0 : si;
       const tops = [];
-      const rectA = [];
-      const rectB = [];
+      const rects = [];
       // Recharts' Bar geometry keeps the rectangle signed: the origin is
       // the value end and the size runs back to the baseline, so negative
       // bars carry a negative size. Label positions read those signs.
@@ -660,24 +662,43 @@ function renderCartesian(panel, m, state, alpha = 1) {
         const raw = vals[si][i];
         const from = m.stacked ? stackBase[i] : 0;
         const to = m.stacked ? stackBase[i] + raw : raw;
-        // The final rectangle, then Recharts' entrance on top of it:
-        // horizontal grows the height from the baseline, vertical the width.
         const base = valuePos(from);
         const end = valuePos(to);
-        let a = base;
-        let b = end;
+        const cat = catStart + i * band + offsets[slot];
+        // The signed rectangle like Recharts computes it: the origin sits
+        // at the value end and the size runs back to the baseline.
+        let rect = vertical
+          ? { x: base, y: cat, width: end - base, height: barSize }
+          : { x: cat, y: end, width: barSize, height: base - end };
+        // renderRectanglesWithAnimation: with a previous rectangle at the
+        // same index all four sides interpolate; without one the bar plays
+        // the entrance at the animation clock instead.
         if (state.morph) {
-          a = morphPoints(state.morph, si, [a], "a")[0];
-          b = morphPoints(state.morph, si, [b], "b")[0];
+          const prevRects = state.morph.prev.rects && state.morph.prev.rects[si];
+          const prev = prevRects && prevRects[i];
+          const t = state.morph.t;
+          if (prev) {
+            rect = {
+              x: interpolate(prev.x, rect.x, t),
+              y: interpolate(prev.y, rect.y, t),
+              width: interpolate(prev.width, rect.width, t),
+              height: interpolate(prev.height, rect.height, t),
+            };
+          } else if (vertical) {
+            rect.width = rect.width * t;
+          } else {
+            const h = rect.height * t;
+            rect = { ...rect, y: rect.y + rect.height - h, height: h };
+          }
         }
+        // The entrance grows the height from the baseline, vertical the
+        // width, Recharts' no-prev branch driven by the entrance clock.
         if (alpha < 1) {
           if (vertical) {
-            b = base + (end - base) * alpha;
+            rect.width = rect.width * alpha;
           } else {
-            const size = base - end;
-            const h = size * alpha;
-            b = end + size - h;
-            a = b + h;
+            const h = rect.height * alpha;
+            rect = { ...rect, y: rect.y + rect.height - h, height: h };
           }
         }
         const fill = (s.cells && s.cells[i]) || s.color;
@@ -692,29 +713,21 @@ function renderCartesian(panel, m, state, alpha = 1) {
         }
         let d;
         if (vertical) {
-          const y = catStart + i * band + offsets[slot];
-          const x = Math.min(a, b);
-          d = roundedBarPath(x, y, Math.abs(b - a), barSize, s.radius);
+          d = roundedBarPath(Math.min(rect.x, rect.x + rect.width), rect.y, Math.abs(rect.width), rect.height, s.radius);
         } else {
-          const x = catStart + i * band + offsets[slot];
-          const y = Math.min(a, b);
-          d = roundedBarPath(x, y, barSize, Math.abs(b - a), s.radius);
+          d = roundedBarPath(rect.x, Math.min(rect.y, rect.y + rect.height), rect.width, Math.abs(rect.height), s.radius);
         }
-        tops.push(b);
-        // Recharts anchors the rectangle at the value in the default
-        // layout and at the baseline in a vertical one, so the size keeps
-        // the sign of the value in both.
-        rectPos.push(vertical ? a : b);
-        rectSize.push(vertical ? b - a : a - b);
-        rectA.push(a);
-        rectB.push(b);
+        tops.push(vertical ? rect.x + rect.width : rect.y);
+        rectPos.push(vertical ? rect.x : rect.y);
+        rectSize.push(vertical ? rect.width : rect.height);
+        rects.push(rect);
         svg += `<g class="recharts-layer recharts-bar-rectangle"><path class="recharts-rectangle" ${attrs} d="${d}"/></g>`;
         if (m.stacked) stackBase[i] = to;
       }
       svg += "</g>";
-      // Label lists paint after the entrance, like Recharts gates them on
-      // isAnimationFinished.
-      if (alpha >= 1 && s.labelLists) {
+      // Label lists paint after the entrance and after an update morph,
+      // like Recharts gates them on isAnimationFinished.
+      if (alpha >= 1 && !state.morph && s.labelLists) {
         for (const ll of s.labelLists) {
           svg += `<g class="recharts-layer recharts-label-list">`;
           for (let i = 0; i < n; i++) {
@@ -749,8 +762,7 @@ function renderCartesian(panel, m, state, alpha = 1) {
       }
       svg += "</g>";
       state.tops.push(tops);
-      state.points.a.push(rectA);
-      state.points.b.push(rectB);
+      state.points.rects.push(rects);
     }
     xs = cats;
   } else if (m.kind === "line") {
@@ -758,8 +770,11 @@ function renderCartesian(panel, m, state, alpha = 1) {
     state.tops = [];
     for (let si = 0; si < m.series.length; si++) {
       const s = m.series[si];
+      // stepPoints of the update animation: x and y both interpolate from
+      // the previous point picked by prevPointsDiffFactor.
+      const sx = morphPoints(state.morph, si, cats.slice(), "xs");
       const top = morphPoints(state.morph, si, vals[si].map((v) => linearY(v - domainMin, domainMax - domainMin, plotY, plotH)), "tops");
-      const d = curvePath(s.curve, xs, top);
+      const d = curvePath(s.curve, sx, top);
       // The Recharts line entrance: strokeDasharray sweeps the measured
       // curve length from 0 to totalLength.
       let dash = "";
@@ -770,14 +785,15 @@ function renderCartesian(panel, m, state, alpha = 1) {
       svg +=
         `<g class="recharts-layer recharts-line">` +
         `<path class="recharts-curve recharts-line-curve" stroke="${s.stroke || s.color}" stroke-width="${s.strokeWidth || 1}" fill="none"${dash} d="${d}"/>`;
-      // Dots and labels appear when the entrance finished, like Recharts'
-      // isAnimationFinished gate on renderDots and LabelList.
-      if (alpha >= 1 && s.dot) {
+      // Dots and labels appear when the entrance and the update morph
+      // finished, like Recharts' isAnimationFinished gate on renderDots
+      // and LabelList.
+      if (alpha >= 1 && !state.morph && s.dot) {
         svg += `<g class="recharts-layer recharts-line-dots">`;
         for (let i = 0; i < n; i++) {
           if (s.dot.icon) {
             const size = s.dot.size || 24;
-            svg += `<g transform="translate(${fmtF(xs[i] - size / 2)},${fmtF(top[i] - size / 2)})">${s.dot.icon}</g>`;
+            svg += `<g transform="translate(${fmtF(sx[i] - size / 2)},${fmtF(top[i] - size / 2)})">${s.dot.icon}</g>`;
           } else {
             const fill = (s.dot.fills && s.dot.fills[i]) || s.dot.fill || "#fff";
             const stroke = (s.dot.fills && s.dot.fills[i]) || s.stroke || s.color;
@@ -786,32 +802,38 @@ function renderCartesian(panel, m, state, alpha = 1) {
             // a plain dot inherits the line's strokeWidth like Recharts
             // spreading the line props into renderDots.
             const dotStrokeWidth = s.dot.fills ? 1 : s.strokeWidth || 1;
-            svg += `<circle r="${fmtF(s.dot.r || 3)}" stroke="${stroke}" stroke-width="${fmtF(dotStrokeWidth)}" fill="${fill}" class="recharts-dot recharts-line-dot" cx="${fmtF(xs[i])}" cy="${fmtF(top[i])}"/>`;
+            svg += `<circle r="${fmtF(s.dot.r || 3)}" stroke="${stroke}" stroke-width="${fmtF(dotStrokeWidth)}" fill="${fill}" class="recharts-dot recharts-line-dot" cx="${fmtF(sx[i])}" cy="${fmtF(top[i])}"/>`;
           }
         }
         svg += `</g>`;
       }
-      if (alpha >= 1 && s.labelList) {
+      if (alpha >= 1 && !state.morph && s.labelList) {
         const ll = s.labelList;
         svg += `<g class="recharts-layer recharts-label-list">`;
         for (let i = 0; i < n; i++) {
           const fill = ll.class ? "" : ` fill="${s.stroke || s.color}"`;
-          svg += `<text x="${fmtF(xs[i])}" y="${fmtF(top[i] - (ll.offset || 5))}" class="recharts-text recharts-label ${ll.class || ""}" text-anchor="middle" font-size="${fmtF(ll.fontSize || 12)}"${fill}><tspan>${ll.labels[i]}</tspan></text>`;
+          svg += `<text x="${fmtF(sx[i])}" y="${fmtF(top[i] - (ll.offset || 5))}" class="recharts-text recharts-label ${ll.class || ""}" text-anchor="middle" font-size="${fmtF(ll.fontSize || 12)}"${fill}><tspan>${ll.labels[i]}</tspan></text>`;
         }
         svg += `</g>`;
       }
       svg += `</g>`;
       state.tops.push(top);
+      state.points.xs.push(sx);
     }
   } else {
     xs = cats;
     // Recharts' entrance animation reveals areas left to right through a
-    // clipPath rect (AreaRevealShape).
-    const baseline = new Array(n).fill(plotBottom);
+    // clipPath rect (AreaRevealShape). A numeric base line interpolates
+    // during the update morph like stepBaseLine.
+    const baseY = state.morph && state.morph.prev.base != null ? interpolate(state.morph.prev.base, plotBottom, state.morph.t) : plotBottom;
+    const baseline = new Array(n).fill(baseY);
     let base = baseline;
     state.tops = [];
     for (let si = 0; si < m.series.length; si++) {
       const s = m.series[si];
+      // stepPoints of the update animation: x and y both interpolate from
+      // the previous point picked by prevPointsDiffFactor.
+      const sx = morphPoints(state.morph, si, cats.slice(), "xs");
       const top = morphPoints(
         state.morph,
         si,
@@ -822,25 +844,26 @@ function renderCartesian(panel, m, state, alpha = 1) {
       );
       const fill = (s.fill || "").replace("url(#", `url(#${state.uid}-`) || s.color;
       const fillOpacity = s.fillOpacity || 0.6;
-      const areaD = m.stacked ? areaPathBetween(s.curve, xs, top, base) : areaPathBetween(s.curve, xs, top, baseline);
+      const areaD = m.stacked ? areaPathBetween(s.curve, sx, top, base) : areaPathBetween(s.curve, sx, top, baseline);
       // HorizontalRect: the reveal spans the point range and reaches the
       // lowest painted y plus the stroke width.
       let clip = "";
       let clipOpen = "";
       if (alpha < 1) {
-        const width = alpha * Math.abs(xs[0] - xs[n - 1]);
+        const width = alpha * Math.abs(sx[0] - sx[n - 1]);
         const maxY = Math.max(...top, ...(m.stacked ? base : baseline));
         const id = `${state.uid}-reveal-${si}`;
-        clip = `<defs><clipPath id="${id}"><rect x="${fmtF(xs[0] < xs[n - 1] ? xs[0] : xs[0] - width)}" y="0" width="${fmtF(width)}" height="${fmtF(Math.floor(maxY + 1))}"/></clipPath></defs>`;
+        clip = `<defs><clipPath id="${id}"><rect x="${fmtF(sx[0] < sx[n - 1] ? sx[0] : sx[0] - width)}" y="0" width="${fmtF(width)}" height="${fmtF(Math.floor(maxY + 1))}"/></clipPath></defs>`;
         clipOpen = ` clip-path="url(#${id})"`;
       }
       svg +=
         clip +
         `<g class="recharts-layer recharts-area"${clipOpen}>` +
         `<path class="recharts-curve recharts-area-area" fill="${fill}" fill-opacity="${fillOpacity}" stroke="none" d="${areaD}"/>` +
-        `<path class="recharts-curve recharts-area-curve" stroke="${s.stroke || s.color}" fill="none" stroke-width="1" d="${curvePath(s.curve, xs, top)}"/>` +
+        `<path class="recharts-curve recharts-area-curve" stroke="${s.stroke || s.color}" fill="none" stroke-width="1" d="${curvePath(s.curve, sx, top)}"/>` +
         `</g>`;
       state.tops.push(top);
+      state.points.xs.push(sx);
       if (m.stacked) base = top;
     }
   }
