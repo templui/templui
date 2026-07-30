@@ -69,17 +69,30 @@ templ CheckboxTable() {
 		}
 	</div>
 	<script nonce={ templ.GetNonce(ctx) }>
-		// The vanilla pendant of the demo's React selection state.
+		// The vanilla pendant of the demo's React selection state. The
+		// checkbox renders a span root with a hidden native input beside it;
+		// dispatching change after a programmatic check lets checkbox.js sync
+		// the root's state attributes.
+		let updatingCheckboxTable = false;
 		document.addEventListener('change', (e) => {
 			const demo = e.target.closest('[data-checkbox-table-demo]');
-			if (!demo || e.target.type !== 'checkbox') return;
-			const all = demo.querySelector('[data-select-all]');
-			const rows = [...demo.querySelectorAll('tbody input[type="checkbox"]')];
+			if (!demo || !e.target.matches('[data-tui-checkbox-input]') || updatingCheckboxTable) return;
+			const all = demo.querySelector('[data-select-all]')?.nextElementSibling;
+			const rows = [...demo.querySelectorAll('tbody [data-tui-checkbox-input]')];
+			const setChecked = (input, checked) => {
+				if (input.checked === checked) return;
+				input.checked = checked;
+				input.dispatchEvent(new Event('change', { bubbles: true }));
+			};
+			// The dispatched change events re-enter this handler; the guard keeps
+			// them from reacting to the half-updated state.
+			updatingCheckboxTable = true;
 			if (e.target === all) {
-				rows.forEach((row) => (row.checked = all.checked));
+				rows.forEach((row) => setChecked(row, all.checked));
 			} else {
-				all.checked = rows.every((row) => row.checked);
+				setChecked(all, rows.every((row) => row.checked));
 			}
+			updatingCheckboxTable = false;
 			rows.forEach((row) => {
 				row.closest('tr').toggleAttribute('data-state', row.checked);
 				if (row.checked) row.closest('tr').setAttribute('data-state', 'selected');

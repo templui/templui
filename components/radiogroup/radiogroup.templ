@@ -46,8 +46,10 @@ type ItemProps struct {
 	Checked    bool
 }
 
-// Group is the pendant of shadcn's RadioGroup: it shares the name and the
-// selected value with the items (via ctx).
+// RadioGroup is the vanilla port of Base UI's RadioGroup
+// (radio-group/RadioGroup.tsx): a div with role="radiogroup" that shares the
+// name and the selected value with the items (via ctx). radiogroup.js ports
+// the composite arrow-key navigation and roving tab stop.
 templ RadioGroup(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
@@ -62,7 +64,11 @@ templ RadioGroup(props ...Props) {
 			id={ p.ID }
 		}
 		data-slot="radio-group"
+		data-tui-radio-group
 		role="radiogroup"
+		if p.Disabled {
+			aria-disabled="true"
+		}
 		class={ utils.TwMerge("cn-radio-group w-full", p.Class) }
 		{ p.Attributes... }
 	>
@@ -70,9 +76,14 @@ templ RadioGroup(props ...Props) {
 	</div>
 }
 
-// Radio is the pendant of shadcn's RadioGroupItem: the root carries the
-// visuals and state pendants, a hidden native radio inside provides state,
-// forms and the extended hit area, and the indicator is a real element.
+// Item is the vanilla port of Base UI's Radio.Root
+// (radio/root/RadioRoot.tsx): a span root carries role="radio", aria-checked
+// and the data-checked/data-unchecked/data-disabled state attributes the
+// style CSS keys on, and a visually hidden native radio rendered beside it
+// carries id/name/value/form for label association and form submission. The
+// checked item is the group's roving tab stop (CompositeItem, tabindex 0;
+// when no item is checked, radiogroup.js promotes the first enabled item);
+// radiogroup.js ports the runtime behavior.
 templ Item(props ...ItemProps) {
 	{{ var p ItemProps }}
 	if len(props) > 0 {
@@ -86,51 +97,80 @@ templ Item(props ...ItemProps) {
 		checked := p.Checked || (s.value != "" && s.value == p.Value)
 		disabled := p.Disabled || s.disabled
 	}}
-	<div
+	<span
 		data-slot="radio-group-item"
+		data-tui-radio-group-item
+		role="radio"
 		if checked {
+			aria-checked="true"
 			data-checked
 		} else {
+			aria-checked="false"
 			data-unchecked
+		}
+		if disabled {
+			data-disabled
+			aria-disabled="true"
+		}
+		if checked && !disabled {
+			tabindex="0"
+		} else {
+			tabindex="-1"
 		}
 		class={
 			utils.TwMerge(
 				// 1:1 base/ui/radio-group.tsx: structure lives here, the look comes
-				// from the active style-*.css via cn-radio-group-item. Two
-				// deviations for our native-input DOM: the after:-inset hit area
-				// lives on the hidden input instead (a pseudo element on the root
-				// would swallow its clicks), and disabled: is translated to
-				// has-[:disabled] because our root is a div, not Base UI's button.
-				"cn-radio-group-item group/radio-group-item peer relative aspect-square shrink-0 border outline-none has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50",
+				// from the active style-*.css via cn-radio-group-item.
+				"cn-radio-group-item group/radio-group-item peer relative aspect-square shrink-0 border outline-none after:absolute after:-inset-x-3 after:-inset-y-2 disabled:cursor-not-allowed disabled:opacity-50",
 				p.Class,
 			),
 		}
+		{ p.Attributes... }
 	>
-		<input
-			if p.ID != "" {
-				id={ p.ID }
-			}
-			data-slot="radio"
-			type="radio"
-			if p.Name != "" {
-				name={ p.Name }
-			}
-			if p.Value != "" {
-				value={ p.Value }
-			}
-			if p.Form != "" {
-				form={ p.Form }
-			}
-			checked?={ checked }
-			disabled?={ disabled }
-			class="peer absolute -inset-x-3 -inset-y-2 size-auto cursor-default appearance-none outline-none"
-			{ p.Attributes... }
-		/>
 		// Base UI unmounts the indicator while unchecked; our pendant toggles
-		// it with hidden/peer-checked:flex (utilities win over the base-layer
-		// cn-radio-group-indicator display).
-		<span data-slot="radio-group-indicator" class="cn-radio-group-indicator hidden peer-checked:flex">
+		// the hidden attribute instead (same precedent as the context-menu
+		// indicator), radiogroup.js keeps it in sync.
+		<span
+			data-slot="radio-group-indicator"
+			if checked {
+				data-checked
+			} else {
+				data-unchecked
+				hidden
+			}
+			class="cn-radio-group-indicator"
+		>
 			<span class="cn-radio-group-indicator-icon"></span>
 		</span>
-	</div>
+	</span>
+	// Base UI renders the hidden input beside the root. It owns the id, so
+	// native <label for> association keeps working; the inline styles are the
+	// visuallyHiddenInput/visuallyHidden pendants from
+	// @base-ui/utils/visuallyHidden.ts (named inputs stay absolute so native
+	// validation popups anchor near the control).
+	<input
+		type="radio"
+		data-tui-radio-input
+		aria-hidden="true"
+		tabindex="-1"
+		checked?={ checked }
+		disabled?={ disabled }
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		if p.Name != "" {
+			name={ p.Name }
+		}
+		if p.Value != "" {
+			value={ p.Value }
+		}
+		if p.Form != "" {
+			form={ p.Form }
+		}
+		if p.Name != "" {
+			style="clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:absolute"
+		} else {
+			style="clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0"
+		}
+	/>
 }

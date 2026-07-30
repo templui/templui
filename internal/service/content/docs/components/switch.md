@@ -79,7 +79,7 @@ Use the `Size` prop to change the size of the switch.
 
 ### Switch
 
-The `Switch` component renders the toggle with a hidden native checkbox that carries state and form participation.
+The `Switch` component renders the toggle as a `role="switch"` root with a hidden native checkbox beside it that carries form participation and label association.
 
 | Prop       | Type                    | Default       |
 | ---------- | ----------------------- | ------------- |

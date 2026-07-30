@@ -269,6 +269,10 @@
       "files": [
         "components/checkbox/checkbox.templ"
       ],
+      "jsFiles": [
+        "components/checkbox/checkbox.js",
+        "components/checkbox/checkbox.min.js"
+      ],
       "dependencies": [
         "icon"
       ],
@@ -811,6 +815,10 @@
       "files": [
         "components/radiogroup/radiogroup.templ"
       ],
+      "jsFiles": [
+        "components/radiogroup/radiogroup.js",
+        "components/radiogroup/radiogroup.min.js"
+      ],
       "dependencies": [],
       "categories": [
         "form-input"
@@ -950,6 +958,10 @@
       "description": "Toggle switch component.",
       "files": [
         "components/switch/switch.templ"
+      ],
+      "jsFiles": [
+        "components/switch/switch.js",
+        "components/switch/switch.min.js"
       ],
       "dependencies": [],
       "categories": [

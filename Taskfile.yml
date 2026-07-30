@@ -33,6 +33,7 @@ tasks:
         components/calendar/calendar.js \
         components/carousel/carousel.js \
         components/chart/chart.js \
+        components/checkbox/checkbox.js \
         components/collapsible/collapsible.js \
         components/combobox/combobox.js \
         components/contextmenu/contextmenu.js \
@@ -44,9 +45,11 @@ tasks:
         components/inputotp/inputotp.js \
         components/popover/popover.js \
         components/progress/progress.js \
+        components/radiogroup/radiogroup.js \
         components/select/select.js \
         components/sidebar/sidebar.js \
         components/slider/slider.js \
+        components/switch/switch.js \
         components/tabs/tabs.js \
         components/toast/toast.js \
         components/tooltip/tooltip.js \
