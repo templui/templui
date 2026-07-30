@@ -23,8 +23,7 @@
  * (xAxisHeight 0, minTickGap 5, tickCount 5, innerRadius 0).
  */
 
-const TOOLTIP_CLASS =
-  "border-border/50 bg-background grid min-w-[8rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl";
+const TOOLTIP_CLASS = "cn-chart-tooltip grid min-w-32 items-start";
 
 /* ---------------------------------------------------------------- */
 /* Geometry (ports of the Go engine)                                */
