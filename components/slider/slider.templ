@@ -123,10 +123,13 @@ templ Slider(props ...Props) {
 			fs[i] = fraction(v, p.Min, p.Max)
 		}
 	}}
+	// slider.js reads the bare data-vertical flag; the data-horizontal:/
+	// data-vertical: variants match data-orientation (shadcn-tailwind.css).
 	<div
 		id={ p.ID }
 		data-slot="slider"
 		data-tui-slider
+		data-orientation={ string(p.Orientation) }
 		if vertical {
 			data-vertical
 		} else {
@@ -148,35 +151,23 @@ templ Slider(props ...Props) {
 		}
 		<div
 			data-tui-slider-control
-			if vertical {
-				data-vertical
-			} else {
-				data-horizontal
-			}
+			data-orientation={ string(p.Orientation) }
 			if p.Disabled {
 				data-disabled
 			}
-			class="relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-vertical:h-full data-vertical:w-auto data-vertical:flex-col data-vertical:min-h-40"
+			class="cn-slider relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-vertical:h-full data-vertical:w-auto data-vertical:flex-col"
 		>
 			<div
 				data-slot="slider-track"
 				data-tui-slider-track
-				if vertical {
-					data-vertical
-				} else {
-					data-horizontal
-				}
-				class="relative grow overflow-hidden rounded-full bg-muted select-none data-horizontal:h-1 data-horizontal:w-full data-vertical:h-full data-vertical:w-1"
+				data-orientation={ string(p.Orientation) }
+				class="cn-slider-track relative grow overflow-hidden select-none"
 			>
 				<div
 					data-slot="slider-range"
 					data-tui-slider-range
-					if vertical {
-						data-vertical
-					} else {
-						data-horizontal
-					}
-					class="select-none bg-primary data-horizontal:h-full data-vertical:w-full"
+					data-orientation={ string(p.Orientation) }
+					class="cn-slider-range select-none data-horizontal:h-full data-vertical:w-full"
 					style={ indicatorStyle(fs, vertical) }
 				></div>
 			</div>
@@ -199,7 +190,7 @@ templ Slider(props ...Props) {
 						aria-disabled="true"
 					}
 					style={ thumbStyle(fs[i], vertical) }
-					class="relative block size-3 shrink-0 rounded-full border border-ring bg-white ring-ring/50 transition-[color,box-shadow] select-none after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-hidden active:ring-3 disabled:pointer-events-none disabled:opacity-50"
+					class="cn-slider-thumb block shrink-0 select-none disabled:pointer-events-none disabled:opacity-50"
 				></div>
 			}
 		</div>

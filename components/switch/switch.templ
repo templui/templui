@@ -40,21 +40,22 @@ templ Switch(props ...Props) {
 	<div
 		data-slot="switch"
 		data-size={ string(p.Size) }
+		if p.Checked {
+			data-checked
+		} else {
+			data-unchecked
+		}
+		if p.Disabled {
+			data-disabled
+		}
 		class={
 			utils.TwMerge(
-				// shadcn extends the hit area with after:-inset-*; our pendant is
-				// the hidden input below, a pseudo element would paint over it
-				// and swallow the clicks (same lesson as the checkbox).
-				"peer group/switch relative inline-flex shrink-0 items-center rounded-full border border-transparent transition-all outline-none",
-				// data-checked / data-unchecked pendants, mutually exclusive like
-				// Base UI's state attributes.
-				"not-has-[:checked]:bg-input dark:not-has-[:checked]:bg-input/80 has-[:checked]:bg-primary",
-				"has-[:focus-visible]:border-ring has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
-				"has-[[aria-invalid=true]]:border-destructive has-[[aria-invalid=true]]:ring-3 has-[[aria-invalid=true]]:ring-destructive/20 dark:has-[[aria-invalid=true]]:border-destructive/50 dark:has-[[aria-invalid=true]]:ring-destructive/40",
-				// cursor-not-allowed is inert on shadcn's live site (no native
-				// disabled on the Base UI root), so the pendant stays out too.
-				"has-[:disabled]:opacity-50",
-				"data-[size=default]:h-[18.4px] data-[size=default]:w-[32px] data-[size=sm]:h-[14px] data-[size=sm]:w-[24px]",
+				// 1:1 base/ui/switch.tsx: structure lives here, the look comes from
+				// the active style-*.css via cn-switch. One deviation for our
+				// native-input DOM: the after:-inset hit area lives on the hidden
+				// input instead (a pseudo element on the root would paint over it
+				// and swallow the clicks).
+				"cn-switch peer group/switch relative inline-flex items-center transition-all outline-none data-disabled:cursor-not-allowed data-disabled:opacity-50",
 				p.Class,
 			),
 		}
@@ -79,9 +80,17 @@ templ Switch(props ...Props) {
 			class="peer absolute -inset-x-3 -inset-y-2 size-auto cursor-default appearance-none outline-none"
 			{ p.Attributes... }
 		/>
+		// Base UI mirrors data-checked/data-unchecked onto the thumb; the
+		// peer-checked translate pendants keep the thumb moving on our native
+		// input until the state attributes are JS-synced.
 		<span
 			data-slot="switch-thumb"
-			class="pointer-events-none block rounded-full bg-background ring-0 transition-transform peer-not-checked:translate-x-0 peer-checked:translate-x-[calc(100%-2px)] dark:bg-foreground dark:peer-checked:bg-primary-foreground group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3"
+			if p.Checked {
+				data-checked
+			} else {
+				data-unchecked
+			}
+			class="cn-switch-thumb pointer-events-none block ring-0 transition-transform peer-not-checked:translate-x-0 peer-checked:translate-x-[calc(100%-2px)]"
 		></span>
 	</div>
 }

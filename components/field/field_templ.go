@@ -90,15 +90,18 @@ type ErrorProps struct {
 	Attributes templ.Attributes
 }
 
+// 1:1 the fieldVariants cva from base/ui/field.tsx; the [data-slot=checkbox],
+// [data-slot=radio] selectors are our pendants of the tsx [role=checkbox],
+// [role=radio] ones, our items carry data-slot instead of a role.
 func fieldClasses(o Orientation) string {
-	base := "group/field flex w-full gap-2 data-[invalid=true]:text-destructive"
+	base := "cn-field group/field flex w-full"
 	switch o {
 	case OrientationHorizontal:
-		return base + " flex-row items-center has-[>[data-slot=field-content]]:items-start *:data-[slot=field-label]:flex-auto has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px"
+		return base + " cn-field-orientation-horizontal flex-row items-center has-[>[data-slot=field-content]]:items-start *:data-[slot=field-label]:flex-auto has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px"
 	case OrientationResponsive:
-		return base + " flex-col *:w-full @md/field-group:flex-row @md/field-group:items-center @md/field-group:*:w-auto @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:*:data-[slot=field-label]:flex-auto [&>.sr-only]:w-auto @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px @md/field-group:has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px"
+		return base + " cn-field-orientation-responsive flex-col *:w-full @md/field-group:flex-row @md/field-group:items-center @md/field-group:*:w-auto @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:*:data-[slot=field-label]:flex-auto [&>.sr-only]:w-auto @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px @md/field-group:has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px"
 	default:
-		return base + " flex-col *:w-full [&>.sr-only]:w-auto"
+		return base + " cn-field-orientation-vertical flex-col *:w-full [&>.sr-only]:w-auto"
 	}
 }
 
@@ -127,7 +130,7 @@ func Set(props ...SetProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("flex flex-col gap-4 has-[>[data-slot=checkbox-group]]:gap-3 has-[>[data-slot=radio-group]]:gap-3", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.TwMerge("cn-field-set flex flex-col", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -144,7 +147,7 @@ func Set(props ...SetProps) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 104, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 107, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -220,7 +223,7 @@ func Legend(props ...LegendProps) templ.Component {
 		if p.Variant == "" {
 			p.Variant = LegendVariantLegend
 		}
-		var templ_7745c5c3_Var6 = []any{utils.TwMerge("mb-1.5 font-medium data-[variant=label]:text-sm data-[variant=legend]:text-base", p.Class)}
+		var templ_7745c5c3_Var6 = []any{utils.TwMerge("cn-field-legend", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -237,7 +240,7 @@ func Legend(props ...LegendProps) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 124, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 127, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -255,7 +258,7 @@ func Legend(props ...LegendProps) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Variant))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 127, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 130, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -336,7 +339,7 @@ func Group(props ...GroupProps) templ.Component {
 			}
 			attrs[k] = v
 		}
-		var templ_7745c5c3_Var11 = []any{utils.TwMerge("group/field-group @container/field-group flex w-full flex-col gap-5 data-[slot=checkbox-group]:gap-3 *:data-[slot=field-group]:gap-4", p.Class)}
+		var templ_7745c5c3_Var11 = []any{utils.TwMerge("cn-field-group group/field-group @container/field-group flex w-full flex-col", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -353,7 +356,7 @@ func Group(props ...GroupProps) templ.Component {
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 157, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 160, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -371,7 +374,7 @@ func Group(props ...GroupProps) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(slot)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 159, Col: 18}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 162, Col: 18}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -459,7 +462,7 @@ func Field(props ...Props) templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 177, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 180, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -477,7 +480,7 @@ func Field(props ...Props) templ.Component {
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Orientation))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 181, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 184, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -561,7 +564,7 @@ func Content(props ...ContentProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var21 = []any{utils.TwMerge("group/field-content flex flex-1 flex-col gap-0.5 leading-snug", p.Class)}
+		var templ_7745c5c3_Var21 = []any{utils.TwMerge("cn-field-content group/field-content flex flex-1 flex-col leading-snug", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var21...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -578,7 +581,7 @@ func Content(props ...ContentProps) templ.Component {
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 202, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 205, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -651,7 +654,15 @@ func Label(props ...LabelProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var25 = []any{utils.TwMerge("group/field-label peer/field-label flex w-fit items-center gap-2 text-sm leading-snug font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:opacity-50 group-data-[disabled=true]/field:opacity-50 has-[:checked]:border-primary/30 has-[:checked]:bg-primary/5 has-data-checked:border-primary/30 has-data-checked:bg-primary/5 has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col has-[>[data-slot=field]]:rounded-lg has-[>[data-slot=field]]:border *:data-[slot=field]:p-2.5 dark:has-[:checked]:border-primary/20 dark:has-[:checked]:bg-primary/10 dark:has-data-checked:border-primary/20 dark:has-data-checked:bg-primary/10", p.Class)}
+		var templ_7745c5c3_Var25 = []any{utils.TwMerge(
+			// 1:1 base/ui/field.tsx FieldLabel: it composes Label, so the
+			// cn-label base string comes first, then the field-label strings.
+			"cn-label flex items-center select-none group-data-[disabled=true]:pointer-events-none peer-disabled:cursor-not-allowed",
+			"cn-field-label group/field-label peer/field-label flex w-fit",
+			"has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col",
+			p.Class,
+		),
+		}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var25...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -668,7 +679,7 @@ func Label(props ...LabelProps) templ.Component {
 			var templ_7745c5c3_Var26 string
 			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 219, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 222, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 			if templ_7745c5c3_Err != nil {
@@ -687,7 +698,7 @@ func Label(props ...LabelProps) templ.Component {
 			var templ_7745c5c3_Var27 string
 			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(p.For)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 222, Col: 14}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 225, Col: 14}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 			if templ_7745c5c3_Err != nil {
@@ -760,7 +771,7 @@ func Title(props ...TitleProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var30 = []any{utils.TwMerge("flex w-fit items-center gap-2 text-sm font-medium group-data-[disabled=true]/field:opacity-50", p.Class)}
+		var templ_7745c5c3_Var30 = []any{utils.TwMerge("cn-field-title flex w-fit items-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var30...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -777,7 +788,7 @@ func Title(props ...TitleProps) templ.Component {
 			var templ_7745c5c3_Var31 string
 			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 239, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 251, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 			if templ_7745c5c3_Err != nil {
@@ -850,7 +861,7 @@ func Description(props ...DescriptionProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var34 = []any{utils.TwMerge("text-left text-sm leading-normal font-normal text-muted-foreground group-has-data-horizontal/field:text-balance [[data-variant=legend]+&]:-mt-1.5 last:mt-0 nth-last-2:-mt-1 [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary", p.Class)}
+		var templ_7745c5c3_Var34 = []any{utils.TwMerge("cn-field-description leading-normal font-normal group-has-data-horizontal/field:text-balance last:mt-0 nth-last-2:-mt-1 [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var34...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -867,7 +878,7 @@ func Description(props ...DescriptionProps) templ.Component {
 			var templ_7745c5c3_Var35 string
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 256, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 268, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 			if templ_7745c5c3_Err != nil {
@@ -940,7 +951,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var38 = []any{utils.TwMerge("relative -my-2 h-5 text-sm group-data-[variant=outline]/field-group:-mb-2", p.Class)}
+		var templ_7745c5c3_Var38 = []any{utils.TwMerge("cn-field-separator relative", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var38...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -957,7 +968,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 			var templ_7745c5c3_Var39 string
 			templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 273, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 285, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 			if templ_7745c5c3_Err != nil {
@@ -989,7 +1000,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "><div data-slot=\"separator\" class=\"absolute inset-0 top-1/2 h-px w-full bg-border\"></div><span class=\"relative mx-auto block w-fit bg-background px-2 text-muted-foreground\" data-slot=\"field-separator-content\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "><div data-slot=\"separator\" data-orientation=\"horizontal\" class=\"shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch absolute inset-0 top-1/2\"></div><span class=\"cn-field-separator-content relative mx-auto block w-fit bg-background\" data-slot=\"field-separator-content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1030,7 +1041,7 @@ func Error(props ...ErrorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var42 = []any{utils.TwMerge("text-sm font-normal text-destructive", p.Class)}
+		var templ_7745c5c3_Var42 = []any{utils.TwMerge("cn-field-error font-normal", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var42...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1047,7 +1058,7 @@ func Error(props ...ErrorProps) templ.Component {
 			var templ_7745c5c3_Var43 string
 			templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 296, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/field/field.templ`, Line: 312, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 			if templ_7745c5c3_Err != nil {

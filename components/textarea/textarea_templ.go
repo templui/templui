@@ -55,19 +55,9 @@ func Textarea(props ...Props) templ.Component {
 			p.ID = utils.RandomID()
 		}
 		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
-			// Base styles (shadcn base-nova)
-			"flex field-sizing-content min-h-16 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none md:text-sm",
-			// Dark mode background
-			"dark:bg-input/30",
-			// Placeholder
-			"placeholder:text-muted-foreground",
-			// Focus styles
-			"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3",
-			// Disabled styles (shadcn: textarea keeps pointer events so the
-			// not-allowed cursor shows; the input disables them)
-			"disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 dark:disabled:bg-input/80",
-			// Error/Invalid styles
-			"aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
+			// 1:1 base/ui/textarea.tsx: structure lives here, the look comes
+			// from the active style-*.css via cn-textarea.
+			"cn-textarea flex field-sizing-content min-h-16 w-full outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
 			p.Class,
 		),
 		}
@@ -214,7 +204,7 @@ func Textarea(props ...Props) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(p.Value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/textarea/textarea.templ`, Line: 67, Col: 11}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/textarea/textarea.templ`, Line: 57, Col: 11}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {

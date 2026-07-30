@@ -100,7 +100,7 @@ func InputOTP(props ...Props) templ.Component {
 			p = props[0]
 		}
 		ctx = context.WithValue(ctx, stateKey, ctxState{value: p.Value})
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("relative flex items-center has-disabled:opacity-50", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.TwMerge("cn-input-otp relative flex items-center has-disabled:opacity-50", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -253,7 +253,7 @@ func InputOTP(props ...Props) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " class=\"absolute inset-y-0 left-0 h-full opacity-0 disabled:cursor-not-allowed\" style=\"width:calc(100% + 40px);clip-path:inset(0 40px 0 0)\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " class=\"cn-input-otp-input absolute inset-y-0 left-0 h-full opacity-0 disabled:cursor-not-allowed\" style=\"width:calc(100% + 40px);clip-path:inset(0 40px 0 0)\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -286,11 +286,7 @@ func Group(props ...GroupProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var10 = []any{utils.TwMerge(
-			"flex items-center rounded-lg has-aria-invalid:border-destructive has-aria-invalid:ring-3 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40",
-			p.Class,
-		),
-		}
+		var templ_7745c5c3_Var10 = []any{utils.TwMerge("cn-input-otp-group flex items-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var10...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -386,9 +382,7 @@ func Slot(props ...SlotProps) templ.Component {
 			char = string(s.value[p.Index])
 		}
 		var templ_7745c5c3_Var14 = []any{utils.TwMerge(
-			"relative flex size-8 items-center justify-center border-y border-r border-input text-sm transition-all outline-none first:rounded-l-lg first:border-l last:rounded-r-lg dark:bg-input/30",
-			"data-[active=true]:z-10 data-[active=true]:border-ring data-[active=true]:ring-3 data-[active=true]:ring-ring/50",
-			"aria-invalid:border-destructive data-[active=true]:aria-invalid:border-destructive data-[active=true]:aria-invalid:ring-destructive/20 dark:data-[active=true]:aria-invalid:ring-destructive/40",
+			"cn-input-otp-slot relative flex items-center justify-center data-[active=true]:z-10",
 			p.Class,
 		),
 		}
@@ -408,7 +402,7 @@ func Slot(props ...SlotProps) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputotp/inputotp.templ`, Line: 147, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputotp/inputotp.templ`, Line: 142, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -426,7 +420,7 @@ func Slot(props ...SlotProps) templ.Component {
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(p.Index))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputotp/inputotp.templ`, Line: 151, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputotp/inputotp.templ`, Line: 146, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -460,13 +454,13 @@ func Slot(props ...SlotProps) templ.Component {
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(char)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputotp/inputotp.templ`, Line: 162, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputotp/inputotp.templ`, Line: 155, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</span><div data-tui-inputotp-caret class=\"pointer-events-none absolute inset-0 hidden items-center justify-center\"><div class=\"h-4 w-px animate-caret-blink bg-foreground duration-1000\"></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</span><div data-tui-inputotp-caret class=\"cn-input-otp-caret pointer-events-none absolute inset-0 hidden items-center justify-center\"><div class=\"cn-input-otp-caret-line\"></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -499,11 +493,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var20 = []any{utils.TwMerge(
-			"flex items-center [&_svg:not([class*='size-'])]:size-4",
-			p.Class,
-		),
-		}
+		var templ_7745c5c3_Var20 = []any{utils.TwMerge("cn-input-otp-separator flex items-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var20...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -520,7 +510,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 			var templ_7745c5c3_Var21 string
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputotp/inputotp.templ`, Line: 176, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputotp/inputotp.templ`, Line: 171, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {

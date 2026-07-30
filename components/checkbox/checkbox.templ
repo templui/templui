@@ -29,17 +29,20 @@ templ Checkbox(props ...Props) {
 	}
 	<div
 		data-slot="checkbox"
+		if p.Checked {
+			data-checked
+		} else {
+			data-unchecked
+		}
 		class={
 			utils.TwMerge(
-				// Base UI expands the hit area with an ::after on the root, our native
-				// input inside spans the same box instead, a pseudo element would sit
-				// above the input and swallow its clicks.
-				"peer relative flex size-4 shrink-0 items-center justify-center rounded-[4px] border border-input outline-none transition-colors dark:bg-input/30",
-				"has-[:checked]:border-primary has-[:checked]:bg-primary has-[:checked]:text-primary-foreground dark:has-[:checked]:bg-primary",
-				"has-[:indeterminate]:border-primary has-[:indeterminate]:bg-primary has-[:indeterminate]:text-primary-foreground dark:has-[:indeterminate]:bg-primary",
-				"has-[:focus-visible]:border-ring has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
-				"has-[[aria-invalid=true]]:border-destructive has-[[aria-invalid=true]]:ring-destructive/20 has-[[aria-invalid=true]:checked]:border-primary dark:has-[[aria-invalid=true]]:border-destructive/50 dark:has-[[aria-invalid=true]]:ring-destructive/40 has-[[aria-invalid=true]]:ring-3",
-				"has-[:disabled]:opacity-50",
+				// 1:1 base/ui/checkbox.tsx: structure lives here, the look comes
+				// from the active style-*.css via cn-checkbox. Two deviations for
+				// our native-input DOM: the after:-inset hit area lives on the
+				// hidden input instead (a pseudo element on the root would swallow
+				// its clicks), and disabled:/dot-pseudo states are translated to
+				// has-[:disabled] because our root is a div, not Base UI's button.
+				"cn-checkbox peer relative shrink-0 outline-none has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50",
 				p.Class,
 			),
 		}
@@ -67,7 +70,7 @@ templ Checkbox(props ...Props) {
 		/>
 		<div
 			data-slot="checkbox-indicator"
-			class="pointer-events-none grid place-content-center text-current opacity-0 transition-none peer-checked:opacity-100 [&>svg]:size-3.5"
+			class="cn-checkbox-indicator pointer-events-none grid place-content-center text-current opacity-0 transition-none peer-checked:opacity-100"
 		>
 			@icon.Check()
 		</div>

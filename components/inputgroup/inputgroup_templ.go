@@ -109,7 +109,7 @@ func InputGroup(props ...Props) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("group/input-group relative flex h-8 w-full min-w-0 items-center rounded-lg border border-input transition-colors outline-none has-disabled:bg-input/50 has-disabled:opacity-50 has-[[data-slot=input-group-control]:focus-visible]:border-ring has-[[data-slot=input-group-control]:focus-visible]:ring-3 has-[[data-slot=input-group-control]:focus-visible]:ring-ring/50 has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:ring-3 has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>textarea]:h-auto dark:bg-input/30 dark:has-disabled:bg-input/80 dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40 has-[>[data-align=block-end]]:[&>input]:pt-3 has-[>[data-align=block-start]]:[&>input]:pb-3 has-[>[data-align=inline-end]]:[&>input]:pr-1.5 has-[>[data-align=inline-start]]:[&>input]:pl-1.5", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.TwMerge("group/input-group cn-input-group relative flex w-full min-w-0 items-center outline-none has-[>textarea]:h-auto", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -213,7 +213,7 @@ func Input(props ...InputProps) templ.Component {
 			Value:       p.Value,
 			Placeholder: p.Placeholder,
 			Disabled:    p.Disabled,
-			Class:       utils.TwMerge("flex-1 rounded-none border-0 bg-transparent shadow-none ring-0 focus-visible:ring-0 disabled:bg-transparent aria-invalid:ring-0 dark:bg-transparent dark:disabled:bg-transparent", p.Class),
+			Class:       utils.TwMerge("cn-input-group-input flex-1", p.Class),
 			Attributes:  attrs,
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -261,7 +261,7 @@ func Textarea(props ...TextareaProps) templ.Component {
 			Placeholder: p.Placeholder,
 			Rows:        p.Rows,
 			Disabled:    p.Disabled,
-			Class:       utils.TwMerge("flex-1 resize-none rounded-none border-0 bg-transparent py-2 shadow-none ring-0 focus-visible:ring-0 disabled:bg-transparent aria-invalid:ring-0 dark:bg-transparent dark:disabled:bg-transparent", p.Class),
+			Class:       utils.TwMerge("cn-input-group-textarea flex-1 resize-none", p.Class),
 			Attributes:  attrs,
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -299,16 +299,17 @@ func Addon(props ...AddonProps) templ.Component {
 		if p.Align == "" {
 			p.Align = AlignInlineStart
 		}
-		align := "order-first pl-2 has-[>button]:ml-[-0.3rem] has-[>kbd]:ml-[-0.15rem]"
+		// 1:1 the inputGroupAddonVariants cva from base/ui/input-group.tsx.
+		align := "cn-input-group-addon-align-inline-start order-first"
 		switch p.Align {
 		case AlignInlineEnd:
-			align = "order-last pr-2 has-[>button]:mr-[-0.3rem] has-[>kbd]:mr-[-0.15rem]"
+			align = "cn-input-group-addon-align-inline-end order-last"
 		case AlignBlockStart:
-			align = "order-first w-full justify-start px-2.5 pt-2 group-has-[>input]/input-group:pt-2 [.border-b]:pb-2"
+			align = "cn-input-group-addon-align-block-start order-first w-full justify-start"
 		case AlignBlockEnd:
-			align = "order-last w-full justify-start px-2.5 pb-2 group-has-[>input]/input-group:pb-2 [.border-t]:pt-2"
+			align = "cn-input-group-addon-align-block-end order-last w-full justify-start"
 		}
-		var templ_7745c5c3_Var8 = []any{utils.TwMerge("flex h-auto cursor-text items-center justify-center gap-2 py-1.5 text-sm font-medium text-muted-foreground select-none group-data-[disabled=true]/input-group:opacity-50 [&>kbd]:rounded-[calc(var(--radius)-5px)] [&>svg:not([class*='size-'])]:size-4 "+align, p.Class)}
+		var templ_7745c5c3_Var8 = []any{utils.TwMerge("cn-input-group-addon flex cursor-text items-center justify-center select-none "+align, p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var8...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -325,7 +326,7 @@ func Addon(props ...AddonProps) templ.Component {
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputgroup/inputgroup.templ`, Line: 169, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputgroup/inputgroup.templ`, Line: 170, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -343,7 +344,7 @@ func Addon(props ...AddonProps) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Align))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputgroup/inputgroup.templ`, Line: 173, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputgroup/inputgroup.templ`, Line: 174, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -386,17 +387,18 @@ func Addon(props ...AddonProps) templ.Component {
 	})
 }
 
+// 1:1 the inputGroupButtonVariants cva from base/ui/input-group.tsx.
 func inputGroupButtonClasses(size ButtonSize) string {
-	base := "flex items-center gap-2 text-sm shadow-none"
+	base := "cn-input-group-button flex items-center shadow-none"
 	switch size {
 	case ButtonSizeSm:
-		return base
+		return base + " cn-input-group-button-size-sm"
 	case ButtonSizeIconXs:
-		return base + " size-6 rounded-[calc(var(--radius)-3px)] p-0 has-[>svg]:p-0"
+		return base + " cn-input-group-button-size-icon-xs"
 	case ButtonSizeIconSm:
-		return base + " size-8 p-0 has-[>svg]:p-0"
+		return base + " cn-input-group-button-size-icon-sm"
 	default:
-		return base + " h-6 gap-1 rounded-[calc(var(--radius)-3px)] px-1.5 [&>svg:not([class*='size-'])]:size-3.5"
+		return base + " cn-input-group-button-size-xs"
 	}
 }
 
@@ -495,7 +497,7 @@ func Text(props ...TextProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var15 = []any{utils.TwMerge("flex items-center gap-2 text-sm text-muted-foreground [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4", p.Class)}
+		var templ_7745c5c3_Var15 = []any{utils.TwMerge("cn-input-group-text flex items-center [&_svg]:pointer-events-none", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var15...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -512,7 +514,7 @@ func Text(props ...TextProps) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputgroup/inputgroup.templ`, Line: 233, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputgroup/inputgroup.templ`, Line: 235, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {

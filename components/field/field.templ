@@ -82,15 +82,18 @@ type ErrorProps struct {
 	Attributes templ.Attributes
 }
 
+// 1:1 the fieldVariants cva from base/ui/field.tsx; the [data-slot=checkbox],
+// [data-slot=radio] selectors are our pendants of the tsx [role=checkbox],
+// [role=radio] ones, our items carry data-slot instead of a role.
 func fieldClasses(o Orientation) string {
-	base := "group/field flex w-full gap-2 data-[invalid=true]:text-destructive"
+	base := "cn-field group/field flex w-full"
 	switch o {
 	case OrientationHorizontal:
-		return base + " flex-row items-center has-[>[data-slot=field-content]]:items-start *:data-[slot=field-label]:flex-auto has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px"
+		return base + " cn-field-orientation-horizontal flex-row items-center has-[>[data-slot=field-content]]:items-start *:data-[slot=field-label]:flex-auto has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px"
 	case OrientationResponsive:
-		return base + " flex-col *:w-full @md/field-group:flex-row @md/field-group:items-center @md/field-group:*:w-auto @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:*:data-[slot=field-label]:flex-auto [&>.sr-only]:w-auto @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px @md/field-group:has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px"
+		return base + " cn-field-orientation-responsive flex-col *:w-full @md/field-group:flex-row @md/field-group:items-center @md/field-group:*:w-auto @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:*:data-[slot=field-label]:flex-auto [&>.sr-only]:w-auto @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px @md/field-group:has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px"
 	default:
-		return base + " flex-col *:w-full [&>.sr-only]:w-auto"
+		return base + " cn-field-orientation-vertical flex-col *:w-full [&>.sr-only]:w-auto"
 	}
 }
 
@@ -104,7 +107,7 @@ templ Set(props ...SetProps) {
 			id={ p.ID }
 		}
 		data-slot="field-set"
-		class={ utils.TwMerge("flex flex-col gap-4 has-[>[data-slot=checkbox-group]]:gap-3 has-[>[data-slot=radio-group]]:gap-3", p.Class) }
+		class={ utils.TwMerge("cn-field-set flex flex-col", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -125,7 +128,7 @@ templ Legend(props ...LegendProps) {
 		}
 		data-slot="field-legend"
 		data-variant={ string(p.Variant) }
-		class={ utils.TwMerge("mb-1.5 font-medium data-[variant=label]:text-sm data-[variant=legend]:text-base", p.Class) }
+		class={ utils.TwMerge("cn-field-legend", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -157,7 +160,7 @@ templ Group(props ...GroupProps) {
 			id={ p.ID }
 		}
 		data-slot={ slot }
-		class={ utils.TwMerge("group/field-group @container/field-group flex w-full flex-col gap-5 data-[slot=checkbox-group]:gap-3 *:data-[slot=field-group]:gap-4", p.Class) }
+		class={ utils.TwMerge("cn-field-group group/field-group @container/field-group flex w-full flex-col", p.Class) }
 		{ attrs... }
 	>
 		{ children... }
@@ -202,7 +205,7 @@ templ Content(props ...ContentProps) {
 			id={ p.ID }
 		}
 		data-slot="field-content"
-		class={ utils.TwMerge("group/field-content flex flex-1 flex-col gap-0.5 leading-snug", p.Class) }
+		class={ utils.TwMerge("cn-field-content group/field-content flex flex-1 flex-col leading-snug", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -222,7 +225,16 @@ templ Label(props ...LabelProps) {
 			for={ p.For }
 		}
 		data-slot="field-label"
-		class={ utils.TwMerge("group/field-label peer/field-label flex w-fit items-center gap-2 text-sm leading-snug font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:opacity-50 group-data-[disabled=true]/field:opacity-50 has-[:checked]:border-primary/30 has-[:checked]:bg-primary/5 has-data-checked:border-primary/30 has-data-checked:bg-primary/5 has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col has-[>[data-slot=field]]:rounded-lg has-[>[data-slot=field]]:border *:data-[slot=field]:p-2.5 dark:has-[:checked]:border-primary/20 dark:has-[:checked]:bg-primary/10 dark:has-data-checked:border-primary/20 dark:has-data-checked:bg-primary/10", p.Class) }
+		class={
+			utils.TwMerge(
+				// 1:1 base/ui/field.tsx FieldLabel: it composes Label, so the
+				// cn-label base string comes first, then the field-label strings.
+				"cn-label flex items-center select-none group-data-[disabled=true]:pointer-events-none peer-disabled:cursor-not-allowed",
+				"cn-field-label group/field-label peer/field-label flex w-fit",
+				"has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col",
+				p.Class,
+			),
+		}
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -239,7 +251,7 @@ templ Title(props ...TitleProps) {
 			id={ p.ID }
 		}
 		data-slot="field-label"
-		class={ utils.TwMerge("flex w-fit items-center gap-2 text-sm font-medium group-data-[disabled=true]/field:opacity-50", p.Class) }
+		class={ utils.TwMerge("cn-field-title flex w-fit items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -256,7 +268,7 @@ templ Description(props ...DescriptionProps) {
 			id={ p.ID }
 		}
 		data-slot="field-description"
-		class={ utils.TwMerge("text-left text-sm leading-normal font-normal text-muted-foreground group-has-data-horizontal/field:text-balance [[data-variant=legend]+&]:-mt-1.5 last:mt-0 nth-last-2:-mt-1 [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary", p.Class) }
+		class={ utils.TwMerge("cn-field-description leading-normal font-normal group-has-data-horizontal/field:text-balance last:mt-0 nth-last-2:-mt-1 [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -273,12 +285,16 @@ templ Separator(props ...SeparatorProps) {
 			id={ p.ID }
 		}
 		data-slot="field-separator"
-		class={ utils.TwMerge("relative -my-2 h-5 text-sm group-data-[variant=outline]/field-group:-mb-2", p.Class) }
+		class={ utils.TwMerge("cn-field-separator relative", p.Class) }
 		{ p.Attributes... }
 	>
-		<div data-slot="separator" class="absolute inset-0 top-1/2 h-px w-full bg-border"></div>
+		<div
+			data-slot="separator"
+			data-orientation="horizontal"
+			class="shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch absolute inset-0 top-1/2"
+		></div>
 		<span
-			class="relative mx-auto block w-fit bg-background px-2 text-muted-foreground"
+			class="cn-field-separator-content relative mx-auto block w-fit bg-background"
 			data-slot="field-separator-content"
 		>
 			{ children... }
@@ -297,7 +313,7 @@ templ Error(props ...ErrorProps) {
 		}
 		role="alert"
 		data-slot="field-error"
-		class={ utils.TwMerge("text-sm font-normal text-destructive", p.Class) }
+		class={ utils.TwMerge("cn-field-error font-normal", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
