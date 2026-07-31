@@ -1,0 +1,346 @@
+package command
+
+import (
+	"context"
+
+	"github.com/templui/templui/components/dialog"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/inputgroup"
+	"github.com/templui/templui/utils"
+)
+
+type ctxKey string
+
+const stateKey ctxKey = "commandState"
+
+type ctxState struct {
+	id string
+}
+
+func state(ctx context.Context) ctxState {
+	if s, ok := ctx.Value(stateKey).(ctxState); ok {
+		return s
+	}
+	return ctxState{}
+}
+
+type Props struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Label is the accessible label for the command menu. Not shown visibly.
+	Label string
+}
+
+type DialogProps struct {
+	ID string
+	// Title is the dialog's screen-reader title. Defaults to "Command Palette".
+	Title string
+	// Description is the dialog's screen-reader description. Defaults to
+	// "Search for a command to run...".
+	Description string
+	// ShowCloseButton shows the dialog close button. Defaults to false.
+	ShowCloseButton bool
+	Class           string
+}
+
+type InputProps struct {
+	ID          string
+	Class       string
+	Attributes  templ.Attributes
+	Placeholder string
+	Disabled    bool
+}
+
+type ListProps struct {
+	Class      string
+	Attributes templ.Attributes
+	// Label is the accessible label for the list. Defaults to "Suggestions".
+	Label string
+}
+
+type EmptyProps struct {
+	Class      string
+	Attributes templ.Attributes
+}
+
+type GroupProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Heading renders a heading above the group's items.
+	Heading string
+}
+
+type ItemProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Value identifies the item for filtering and selection. Defaults to the
+	// item's text content.
+	Value    string
+	Disabled bool
+}
+
+type ShortcutProps struct {
+	Class      string
+	Attributes templ.Attributes
+}
+
+type SeparatorProps struct {
+	Class      string
+	Attributes templ.Attributes
+	// AlwaysRender keeps the separator visible while searching.
+	AlwaysRender bool
+}
+
+// Command is the root of the command menu, a port of shadcn's base/ui
+// command.tsx on top of cmdk v1.1.1 (its CommandPrimitive): fuzzy
+// command-score filtering with result sorting, a roving selection moved by
+// the arrow keys, Enter activation and aria-activedescendant wiring live in
+// command.js.
+templ Command(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID}) }}
+	<div
+		id={ p.ID }
+		data-slot="command"
+		data-tui-command
+		tabindex="-1"
+		class={ utils.TwMerge("cn-command flex size-full flex-col overflow-hidden", p.Class) }
+		{ p.Attributes... }
+	>
+		// cmdk renders a screen-reader-only label tied to the input.
+		<label data-tui-command-label id={ p.ID + "-label" } for={ p.ID + "-input" } class="sr-only">{ p.Label }</label>
+		{ children... }
+	</div>
+}
+
+// Dialog renders the command menu in a dialog, like shadcn's CommandDialog.
+// Open it from any element via dialog.TriggerFor(id).
+templ Dialog(props ...DialogProps) {
+	{{ var p DialogProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Title == "" {
+		{{ p.Title = "Command Palette" }}
+	}
+	if p.Description == "" {
+		{{ p.Description = "Search for a command to run..." }}
+	}
+	@dialog.Dialog(dialog.Props{ID: p.ID}) {
+		@dialog.Header(dialog.HeaderProps{Class: "sr-only"}) {
+			@dialog.Title() {
+				{ p.Title }
+			}
+			@dialog.Description() {
+				{ p.Description }
+			}
+		}
+		@dialog.Content(dialog.ContentProps{
+			Class:           utils.TwMerge("cn-command-dialog top-1/3 translate-y-0 overflow-hidden p-0", p.Class),
+			HideCloseButton: !p.ShowCloseButton,
+		}) {
+			{ children... }
+		}
+	}
+}
+
+templ Input(props ...InputProps) {
+	{{ var p InputProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ s := state(ctx) }}
+	if p.ID == "" {
+		{{ p.ID = s.id + "-input" }}
+	}
+	<div data-slot="command-input-wrapper" class="cn-command-input-wrapper">
+		@inputgroup.InputGroup(inputgroup.Props{Class: "cn-command-input-group"}) {
+			// A bare input like cmdk's, not inputgroup.Input: shadcn renders
+			// CommandPrimitive.Input directly inside the InputGroup. The
+			// combobox-like aria comes from cmdk (the list is always
+			// "expanded").
+			<input
+				id={ p.ID }
+				data-slot="command-input"
+				data-tui-command-input
+				type="text"
+				autocomplete="off"
+				autocorrect="off"
+				spellcheck="false"
+				role="combobox"
+				aria-autocomplete="list"
+				aria-expanded="true"
+				aria-controls={ s.id + "-list" }
+				aria-labelledby={ s.id + "-label" }
+				if p.Placeholder != "" {
+					placeholder={ p.Placeholder }
+				}
+				disabled?={ p.Disabled }
+				class={ utils.TwMerge("cn-command-input outline-hidden disabled:cursor-not-allowed disabled:opacity-50", p.Class) }
+				{ p.Attributes... }
+			/>
+			@inputgroup.Addon() {
+				@icon.Search(icon.Props{Class: "cn-command-input-icon"})
+			}
+		}
+	</div>
+}
+
+templ List(props ...ListProps) {
+	{{ var p ListProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Label == "" {
+		{{ p.Label = "Suggestions" }}
+	}
+	{{ s := state(ctx) }}
+	<div
+		id={ s.id + "-list" }
+		data-slot="command-list"
+		data-tui-command-list
+		role="listbox"
+		tabindex="-1"
+		aria-label={ p.Label }
+		class={ utils.TwMerge("cn-command-list overflow-x-hidden overflow-y-auto", p.Class) }
+		{ p.Attributes... }
+	>
+		// cmdk's list sizer: filtering hides and sorting reorders the
+		// groups and items inside it.
+		<div data-tui-command-list-sizer>
+			{ children... }
+		</div>
+	</div>
+}
+
+// Empty shows only while no item matches the search; hidden until the script
+// reveals it, exactly like cmdk mounts it only at zero results.
+templ Empty(props ...EmptyProps) {
+	{{ var p EmptyProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		data-slot="command-empty"
+		data-tui-command-empty
+		role="presentation"
+		hidden
+		class={ utils.TwMerge("cn-command-empty", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Group(props ...GroupProps) {
+	{{ var p GroupProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	<div
+		id={ p.ID }
+		data-slot="command-group"
+		data-tui-command-group
+		role="presentation"
+		if p.Heading != "" {
+			data-value={ p.Heading }
+		}
+		class={ utils.TwMerge("cn-command-group", p.Class) }
+		{ p.Attributes... }
+	>
+		if p.Heading != "" {
+			// The bare cmdk-group-heading attribute is what the vendored
+			// cn-command-group styles key on.
+			<div cmdk-group-heading aria-hidden="true" id={ p.ID + "-heading" }>{ p.Heading }</div>
+		}
+		<div
+			data-tui-command-group-items
+			role="group"
+			if p.Heading != "" {
+				aria-labelledby={ p.ID + "-heading" }
+			}
+		>
+			{ children... }
+		</div>
+	</div>
+}
+
+templ Item(props ...ItemProps) {
+	{{ var p ItemProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="command-item"
+		data-tui-command-item
+		role="option"
+		if p.Value != "" {
+			data-value={ p.Value }
+		}
+		aria-disabled={ utils.IfElse(p.Disabled, "true", "false") }
+		data-disabled={ utils.IfElse(p.Disabled, "true", "false") }
+		aria-selected="false"
+		data-selected="false"
+		class={ utils.TwMerge("cn-command-item group/command-item data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+		@icon.Check(icon.Props{Class: "cn-command-item-indicator ml-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100"})
+	</div>
+}
+
+templ Shortcut(props ...ShortcutProps) {
+	{{ var p ShortcutProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<span
+		data-slot="command-shortcut"
+		class={ utils.TwMerge("cn-command-shortcut", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</span>
+}
+
+// Separator is visible while the search is empty, exactly like cmdk hides
+// separators between sorted results.
+templ Separator(props ...SeparatorProps) {
+	{{ var p SeparatorProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		data-slot="command-separator"
+		data-tui-command-separator
+		role="separator"
+		if p.AlwaysRender {
+			data-tui-command-always-render
+		}
+		class={ utils.TwMerge("cn-command-separator", p.Class) }
+		{ p.Attributes... }
+	></div>
+}
+
+var scriptOnce = templ.NewOnceHandle()
+
+templ Script() {
+	@scriptOnce.Once() {
+		@utils.ComponentScript("command")
+	}
+}
