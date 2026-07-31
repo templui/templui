@@ -1,0 +1,245 @@
+/* Self-hosted webfonts for the /create font picker + preview pages.
+   1:1 with shadcn's setup: the 26 fonts from apps/v4/app/(app)/(create)/lib/fonts.ts,
+   family names and fallback stacks verbatim from apps/v4/lib/font-definitions.ts,
+   preview variables from apps/v4/app/(view)/preview/fonts.ts (all latin subset only).
+   Files are the latin/wght variable woff2 from each font's @fontsource-variable/<name>
+   package (instrument-serif: @fontsource/instrument-serif, static weight 400).
+   Weight ranges taken from each fontsource package's index.css.
+   Geist + Geist Mono reuse the already self-hosted files in assets/fonts/geist/. */
+
+@font-face {
+  font-family: "Geist Variable";
+  src: url("/assets/fonts/geist/geist-variable.woff2")
+    format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono Variable";
+  src: url("/assets/fonts/geist/geist-mono-variable.woff2")
+    format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter Variable";
+  src: url("/assets/fonts/create/inter/inter-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Noto Sans Variable";
+  src: url("/assets/fonts/create/noto-sans/noto-sans-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nunito Sans Variable";
+  src: url("/assets/fonts/create/nunito-sans/nunito-sans-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 200 1000;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Figtree Variable";
+  src: url("/assets/fonts/create/figtree/figtree-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 300 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto Variable";
+  src: url("/assets/fonts/create/roboto/roboto-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Raleway Variable";
+  src: url("/assets/fonts/create/raleway/raleway-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DM Sans Variable";
+  src: url("/assets/fonts/create/dm-sans/dm-sans-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 100 1000;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Public Sans Variable";
+  src: url("/assets/fonts/create/public-sans/public-sans-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Outfit Variable";
+  src: url("/assets/fonts/create/outfit/outfit-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Oxanium Variable";
+  src: url("/assets/fonts/create/oxanium/oxanium-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Manrope Variable";
+  src: url("/assets/fonts/create/manrope/manrope-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Grotesk Variable";
+  src: url("/assets/fonts/create/space-grotesk/space-grotesk-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat Variable";
+  src: url("/assets/fonts/create/montserrat/montserrat-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Variable";
+  src: url("/assets/fonts/create/ibm-plex-sans/ibm-plex-sans-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 100 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Source Sans 3 Variable";
+  src: url("/assets/fonts/create/source-sans-3/source-sans-3-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 200 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Instrument Sans Variable";
+  src: url("/assets/fonts/create/instrument-sans/instrument-sans-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono Variable";
+  src: url("/assets/fonts/create/jetbrains-mono/jetbrains-mono-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 100 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Noto Serif Variable";
+  src: url("/assets/fonts/create/noto-serif/noto-serif-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto Slab Variable";
+  src: url("/assets/fonts/create/roboto-slab/roboto-slab-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Merriweather Variable";
+  src: url("/assets/fonts/create/merriweather/merriweather-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 300 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lora Variable";
+  src: url("/assets/fonts/create/lora/lora-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Playfair Display Variable";
+  src: url("/assets/fonts/create/playfair-display/playfair-display-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 400 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "EB Garamond Variable";
+  src: url("/assets/fonts/create/eb-garamond/eb-garamond-latin-wght-normal.woff2")
+    format("woff2-variations");
+  font-weight: 400 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("/assets/fonts/create/instrument-serif/instrument-serif-latin-400-normal.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  --font-geist-sans: "Geist Variable", sans-serif;
+  --font-inter: "Inter Variable", sans-serif;
+  --font-noto-sans: "Noto Sans Variable", sans-serif;
+  --font-nunito-sans: "Nunito Sans Variable", sans-serif;
+  --font-figtree: "Figtree Variable", sans-serif;
+  --font-roboto: "Roboto Variable", sans-serif;
+  --font-raleway: "Raleway Variable", sans-serif;
+  --font-dm-sans: "DM Sans Variable", sans-serif;
+  --font-public-sans: "Public Sans Variable", sans-serif;
+  --font-outfit: "Outfit Variable", sans-serif;
+  --font-oxanium: "Oxanium Variable", sans-serif;
+  --font-manrope: "Manrope Variable", sans-serif;
+  --font-space-grotesk: "Space Grotesk Variable", sans-serif;
+  --font-montserrat: "Montserrat Variable", sans-serif;
+  --font-ibm-plex-sans: "IBM Plex Sans Variable", sans-serif;
+  --font-source-sans-3: "Source Sans 3 Variable", sans-serif;
+  --font-instrument-sans: "Instrument Sans Variable", sans-serif;
+  --font-geist-mono: "Geist Mono Variable", monospace;
+  --font-jetbrains-mono: "JetBrains Mono Variable", monospace;
+  --font-noto-serif: "Noto Serif Variable", serif;
+  --font-roboto-slab: "Roboto Slab Variable", serif;
+  --font-merriweather: "Merriweather Variable", serif;
+  --font-lora: "Lora Variable", serif;
+  --font-playfair-display: "Playfair Display Variable", serif;
+  --font-eb-garamond: "EB Garamond Variable", serif;
+  --font-instrument-serif: "Instrument Serif", serif;
+}
