@@ -1,0 +1,138 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/drawer"
+)
+
+templ DrawerNested() {
+	@drawer.Drawer(drawer.Props{ID: "drawer-nested-1", Direction: drawer.DirectionRight, ShowSwipeHandle: true}) {
+		@button.Button(button.Props{Variant: button.VariantSecondary, Attributes: drawer.Trigger(ctx)}) {
+			Open Drawer
+		}
+		@drawer.Content() {
+			@drawer.Header() {
+				@drawer.Title() {
+					Drawer
+				}
+				@drawer.Description() {
+					Open another drawer from the same direction.
+				}
+			}
+			<div class="flex-1 p-4">
+				<div class="bg-muted group-data-[swipe-axis=x]/drawer-popup:size-full group-data-[swipe-axis=y]/drawer-popup:aspect-video group-data-[swipe-axis=y]/drawer-popup:w-full"></div>
+			</div>
+			@drawer.Footer() {
+				@drawer.Drawer(drawer.Props{ID: "drawer-nested-2", Direction: drawer.DirectionRight, ShowSwipeHandle: true}) {
+					@button.Button(button.Props{Variant: button.VariantOutline, Attributes: drawer.Trigger(ctx)}) {
+						Open Nested Drawer
+					}
+					@drawer.Content() {
+						@drawer.Header() {
+							@drawer.Title() {
+								Nested Drawer
+							}
+							@drawer.Description() {
+								The parent drawer stays mounted behind this one.
+							}
+						}
+						<div class="flex-1 p-4">
+							<div class="bg-muted group-data-[swipe-axis=x]/drawer-popup:size-full group-data-[swipe-axis=y]/drawer-popup:aspect-video group-data-[swipe-axis=y]/drawer-popup:w-full"></div>
+						</div>
+						@drawer.Footer() {
+							@drawer.Drawer(drawer.Props{ID: "drawer-nested-3", Direction: drawer.DirectionRight, ShowSwipeHandle: true}) {
+								@button.Button(button.Props{Variant: button.VariantOutline, Attributes: drawer.Trigger(ctx)}) {
+									Open Third Drawer
+								}
+								@drawer.Content() {
+									@drawer.Header() {
+										@drawer.Title() {
+											Third Drawer
+										}
+										@drawer.Description() {
+											Two drawers are stacked behind this one.
+										}
+									}
+									<div class="flex-1 p-4">
+										<div class="bg-muted group-data-[swipe-axis=x]/drawer-popup:size-full group-data-[swipe-axis=y]/drawer-popup:aspect-video group-data-[swipe-axis=y]/drawer-popup:w-full"></div>
+									</div>
+									@drawer.Footer() {
+										@drawer.Drawer(drawer.Props{ID: "drawer-nested-4", Direction: drawer.DirectionRight, ShowSwipeHandle: true}) {
+											@button.Button(button.Props{Variant: button.VariantOutline, Attributes: drawer.Trigger(ctx)}) {
+												Open Fourth Drawer
+											}
+											@drawer.Content() {
+												@drawer.Header() {
+													@drawer.Title() {
+														Fourth Drawer
+													}
+													@drawer.Description() {
+														This is the frontmost drawer in the stack.
+													}
+												}
+												<div class="flex-1 p-4">
+													<div class="bg-muted group-data-[swipe-axis=x]/drawer-popup:size-full group-data-[swipe-axis=y]/drawer-popup:aspect-video group-data-[swipe-axis=y]/drawer-popup:w-full"></div>
+												</div>
+												@drawer.Footer() {
+													@button.Button(button.Props{Variant: button.VariantOutline, Attributes: drawer.Close(ctx)}) {
+														Close
+													}
+												}
+											}
+										}
+										@button.Button(button.Props{Variant: button.VariantOutline, Attributes: drawer.Close(ctx)}) {
+											Close
+										}
+									}
+								}
+							}
+							@button.Button(button.Props{Variant: button.VariantOutline, Attributes: drawer.Close(ctx)}) {
+								Close
+							}
+						}
+					}
+				}
+				@button.Button(button.Props{Variant: button.VariantOutline, Attributes: drawer.Close(ctx)}) {
+					Close
+				}
+			}
+		}
+	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		(() => {
+			// useIsMobile pendant (hooks/use-mobile.ts), like the drawer-demo:
+			// swipeDirection is down and the swipe handle shows below the md
+			// breakpoint, right and no handle from md up. The dialogs wait in
+			// nested portal <template>s until drawer.js lifts them, so the
+			// lookup searches template contents recursively; attributes set
+			// on the nodes survive the lift (same nodes).
+			const findDialog = (root, id) => {
+				const direct = root.getElementById?.(id) || root.querySelector?.("#" + CSS.escape(id));
+				if (direct) return direct;
+				for (const tpl of root.querySelectorAll("template[data-tui-drawer-portal]")) {
+					const found = findDialog(tpl.content, id);
+					if (found) return found;
+				}
+				return null;
+			};
+
+			const ids = ["drawer-nested-1", "drawer-nested-2", "drawer-nested-3", "drawer-nested-4"];
+			const mq = window.matchMedia("(max-width: 767px)");
+			const apply = () => {
+				for (const id of ids) {
+					const dialog = findDialog(document, id);
+					const popup = dialog?.querySelector('[data-tui-drawer-popup]');
+					if (!popup) continue;
+					popup.setAttribute("data-swipe-direction", mq.matches ? "down" : "right");
+					popup.setAttribute("data-swipe-axis", mq.matches ? "y" : "x");
+					const handle = popup.querySelector('[data-slot="drawer-swipe-handle"]');
+					// Inline display, because the handle's flex class would
+					// win over the [hidden] UA rule.
+					if (handle) handle.style.display = mq.matches ? "" : "none";
+				}
+			};
+			apply();
+			mq.addEventListener("change", apply);
+		})();
+	</script>
+}

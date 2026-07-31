@@ -1,0 +1,29 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/drawer"
+)
+
+templ DrawerNonModal() {
+	@drawer.Drawer(drawer.Props{DisableModal: true, DisableClickAway: true, Direction: drawer.DirectionRight}) {
+		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: drawer.Trigger(ctx)}) {
+			Non Modal
+		}
+		@drawer.Content() {
+			@drawer.Header() {
+				@drawer.Title() {
+					Non Modal Drawer
+				}
+			}
+			<div class="flex-1 p-4">
+				<div class="rounded-2xl bg-muted group-data-[swipe-axis=x]/drawer-popup:size-full group-data-[swipe-axis=y]/drawer-popup:h-80 group-data-[swipe-axis=y]/drawer-popup:w-full"></div>
+			</div>
+			@drawer.Footer() {
+				@button.Button(button.Props{Attributes: drawer.Close(ctx)}) {
+					Close
+				}
+			}
+		}
+	}
+}
