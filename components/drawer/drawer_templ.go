@@ -19,16 +19,16 @@ type ctxKey string
 
 const stateKey ctxKey = "drawerState"
 
-// Direction is the swipe direction used to dismiss the drawer. It also sets
+// SwipeDirection is the swipe direction used to dismiss the drawer. It also sets
 // the edge of the screen the drawer rests on: down = bottom, up = top,
-// left = left edge, right = right edge (1:1 Base UI swipeDirection).
-type Direction string
+// left = left edge, right = right edge (1:1 Base UI swipeSwipeDirection).
+type SwipeDirection string
 
 const (
-	DirectionDown  Direction = "down"
-	DirectionUp    Direction = "up"
-	DirectionLeft  Direction = "left"
-	DirectionRight Direction = "right"
+	SwipeDirectionDown  SwipeDirection = "down"
+	SwipeDirectionUp    SwipeDirection = "up"
+	SwipeDirectionLeft  SwipeDirection = "left"
+	SwipeDirectionRight SwipeDirection = "right"
 )
 
 type ctxState struct {
@@ -37,7 +37,7 @@ type ctxState struct {
 	open             bool
 	disableClickAway bool
 	disableModal     bool
-	direction        Direction
+	direction        SwipeDirection
 	showSwipeHandle  bool
 	snapJSON         string
 	snapSequential   bool
@@ -60,8 +60,8 @@ type Props struct {
 	// DisableModal opens the drawer without backdrop, focus trap and body
 	// scroll lock (Base UI's modal={false}).
 	DisableModal bool
-	// Direction the drawer is swiped in to dismiss. Defaults to down.
-	Direction Direction
+	// SwipeDirection the drawer is swiped in to dismiss. Defaults to down.
+	SwipeDirection SwipeDirection
 	// ShowSwipeHandle renders the drag handle bar inside the panel.
 	ShowSwipeHandle bool
 	// SnapPoints snaps a vertical drawer to preset heights (Base UI's
@@ -143,8 +143,8 @@ func Drawer(props ...Props) templ.Component {
 		if p.ID == "" {
 			p.ID = utils.RandomID()
 		}
-		if p.Direction == "" {
-			p.Direction = DirectionDown
+		if p.SwipeDirection == "" {
+			p.SwipeDirection = SwipeDirectionDown
 		}
 		parentID := state(ctx).id
 		snapJSON := ""
@@ -153,7 +153,7 @@ func Drawer(props ...Props) templ.Component {
 				snapJSON = string(b)
 			}
 		}
-		ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, parentID: parentID, open: p.Open, disableClickAway: p.DisableClickAway, disableModal: p.DisableModal, direction: p.Direction, showSwipeHandle: p.ShowSwipeHandle, snapJSON: snapJSON, snapSequential: p.SnapToSequentialPoints})
+		ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, parentID: parentID, open: p.Open, disableClickAway: p.DisableClickAway, disableModal: p.DisableModal, direction: p.SwipeDirection, showSwipeHandle: p.ShowSwipeHandle, snapJSON: snapJSON, snapSequential: p.SnapToSequentialPoints})
 		templ_7745c5c3_Err = templ_7745c5c3_Var1.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -245,7 +245,7 @@ func Content(props ...ContentProps) templ.Component {
 		}
 		s := state(ctx)
 		axis := "y"
-		if s.direction == DirectionLeft || s.direction == DirectionRight {
+		if s.direction == SwipeDirectionLeft || s.direction == SwipeDirectionRight {
 			axis = "x"
 		}
 		hasSnapPoints := s.snapJSON != ""
@@ -441,13 +441,13 @@ func Content(props ...ContentProps) templ.Component {
 			"data-[swipe-axis=y]:inset-x-0 data-[swipe-axis=y]:data-nested-drawer-open:h-(--stack-height)",
 			// Axis: x.
 			"data-[swipe-axis=x]:inset-y-0 data-[swipe-axis=x]:flex-row",
-			// Direction: down.
+			// SwipeDirection: down.
 			"data-[swipe-direction=down]:bottom-0 data-[swipe-direction=down]:origin-bottom data-[swipe-direction=down]:[--closed-transform:translate3d(0,calc(100%+var(--drawer-inset,0px)+2px),0)] data-[swipe-direction=down]:[--translate-y:calc(var(--drawer-snap-point-offset,0px)+var(--drawer-swipe-movement-y)-var(--stack-peek-offset)-(var(--stack-shrink)*var(--stack-height)))]",
-			// Direction: up.
+			// SwipeDirection: up.
 			"data-[swipe-direction=up]:top-0 data-[swipe-direction=up]:origin-top data-[swipe-direction=up]:[--closed-transform:translate3d(0,calc(-100%-var(--drawer-inset,0px)-2px),0)] data-[swipe-direction=up]:[--translate-y:calc(var(--drawer-snap-point-offset,0px)+var(--drawer-swipe-movement-y)+var(--stack-peek-offset)+(var(--stack-shrink)*var(--stack-height)))]",
-			// Direction: left.
+			// SwipeDirection: left.
 			"data-[swipe-direction=left]:left-0 data-[swipe-direction=left]:origin-left data-[swipe-direction=left]:[--closed-transform:translate3d(calc(-100%-var(--drawer-inset,0px)-2px),0,0)] data-[swipe-direction=left]:[--translate-x:calc(var(--drawer-swipe-movement-x)+var(--stack-peek-offset)+(var(--stack-shrink)*100%))]",
-			// Direction: right.
+			// SwipeDirection: right.
 			"data-[swipe-direction=right]:right-0 data-[swipe-direction=right]:origin-right data-[swipe-direction=right]:[--closed-transform:translate3d(calc(100%+var(--drawer-inset,0px)+2px),0,0)] data-[swipe-direction=right]:[--translate-x:calc(var(--drawer-swipe-movement-x)-var(--stack-peek-offset)-(var(--stack-shrink)*100%))]",
 			p.Class,
 		),

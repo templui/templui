@@ -169,9 +169,9 @@ The drawer also sets data attributes you can target with variants such as `data-
 
 ## Position
 
-Use the `Direction` prop on `drawer.Drawer` to set the side of the drawer.
+Use the `SwipeDirection` prop on `drawer.Drawer` to set the side of the drawer.
 
-Available options are `DirectionUp`, `DirectionRight`, `DirectionDown`, and `DirectionLeft`. The default is `DirectionDown`.
+Available options are `SwipeDirectionUp`, `SwipeDirectionRight`, `SwipeDirectionDown`, and `SwipeDirectionLeft`. The default is `SwipeDirectionDown`.
 
 <ComponentPreview styleName="base-rhea" name="drawer-sides" />
 
@@ -218,7 +218,7 @@ The `drawer.Drawer` component is the root, it carries the id and options that li
 | `Open`                   | `bool`                                                   | `false`         |
 | `DisableClickAway`       | `bool`                                                   | `false`         |
 | `DisableModal`           | `bool`                                                   | `false`         |
-| `Direction`              | `DirectionDown \| DirectionUp \| DirectionLeft \| DirectionRight` | `DirectionDown` |
+| `SwipeDirection`              | `SwipeDirectionDown \| SwipeDirectionUp \| SwipeDirectionLeft \| SwipeDirectionRight` | `SwipeDirectionDown` |
 | `ShowSwipeHandle`        | `bool`                                                   | `false`         |
 | `SnapPoints`             | `[]any`                                                  | -               |
 | `SnapToSequentialPoints` | `bool`                                                   | `false`         |

@@ -25,7 +25,7 @@ var drawerDemoTimes = []drawerDemoTime{
 }
 
 templ DrawerDemo() {
-	@drawer.Drawer(drawer.Props{ID: "drawer-demo", Direction: drawer.DirectionRight, ShowSwipeHandle: true}) {
+	@drawer.Drawer(drawer.Props{ID: "drawer-demo", SwipeDirection: drawer.SwipeDirectionRight, ShowSwipeHandle: true}) {
 		@button.Button(button.Props{Variant: button.VariantSecondary, Attributes: drawer.Trigger(ctx)}) {
 			Open Drawer
 		}
@@ -86,7 +86,7 @@ templ DrawerDemo() {
 				return document.getElementById("drawer-demo");
 			};
 
-			// useIsMobile pendant (hooks/use-mobile.ts): swipeDirection is
+			// useIsMobile pendant (hooks/use-mobile.ts): swipeSwipeDirection is
 			// down and the swipe handle shows below the md breakpoint, right
 			// and no handle from md up. Demo-only behavior, so it lives here
 			// instead of the component API. The direction attributes live on

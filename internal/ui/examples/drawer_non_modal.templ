@@ -6,7 +6,7 @@ import (
 )
 
 templ DrawerNonModal() {
-	@drawer.Drawer(drawer.Props{DisableModal: true, DisableClickAway: true, Direction: drawer.DirectionRight}) {
+	@drawer.Drawer(drawer.Props{DisableModal: true, DisableClickAway: true, SwipeDirection: drawer.SwipeDirectionRight}) {
 		@button.Button(button.Props{Variant: button.VariantOutline, Attributes: drawer.Trigger(ctx)}) {
 			Non Modal
 		}

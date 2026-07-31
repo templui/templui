@@ -6,7 +6,7 @@ import (
 )
 
 templ DrawerSides() {
-	@drawer.Drawer(drawer.Props{Direction: drawer.DirectionLeft}) {
+	@drawer.Drawer(drawer.Props{SwipeDirection: drawer.SwipeDirectionLeft}) {
 		@button.Button(button.Props{Variant: button.VariantSecondary, Attributes: drawer.Trigger(ctx)}) {
 			Open Left Drawer
 		}

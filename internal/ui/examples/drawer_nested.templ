@@ -6,7 +6,7 @@ import (
 )
 
 templ DrawerNested() {
-	@drawer.Drawer(drawer.Props{ID: "drawer-nested-1", Direction: drawer.DirectionRight, ShowSwipeHandle: true}) {
+	@drawer.Drawer(drawer.Props{ID: "drawer-nested-1", SwipeDirection: drawer.SwipeDirectionRight, ShowSwipeHandle: true}) {
 		@button.Button(button.Props{Variant: button.VariantSecondary, Attributes: drawer.Trigger(ctx)}) {
 			Open Drawer
 		}
@@ -23,7 +23,7 @@ templ DrawerNested() {
 				<div class="bg-muted group-data-[swipe-axis=x]/drawer-popup:size-full group-data-[swipe-axis=y]/drawer-popup:aspect-video group-data-[swipe-axis=y]/drawer-popup:w-full"></div>
 			</div>
 			@drawer.Footer() {
-				@drawer.Drawer(drawer.Props{ID: "drawer-nested-2", Direction: drawer.DirectionRight, ShowSwipeHandle: true}) {
+				@drawer.Drawer(drawer.Props{ID: "drawer-nested-2", SwipeDirection: drawer.SwipeDirectionRight, ShowSwipeHandle: true}) {
 					@button.Button(button.Props{Variant: button.VariantOutline, Attributes: drawer.Trigger(ctx)}) {
 						Open Nested Drawer
 					}
@@ -40,7 +40,7 @@ templ DrawerNested() {
 							<div class="bg-muted group-data-[swipe-axis=x]/drawer-popup:size-full group-data-[swipe-axis=y]/drawer-popup:aspect-video group-data-[swipe-axis=y]/drawer-popup:w-full"></div>
 						</div>
 						@drawer.Footer() {
-							@drawer.Drawer(drawer.Props{ID: "drawer-nested-3", Direction: drawer.DirectionRight, ShowSwipeHandle: true}) {
+							@drawer.Drawer(drawer.Props{ID: "drawer-nested-3", SwipeDirection: drawer.SwipeDirectionRight, ShowSwipeHandle: true}) {
 								@button.Button(button.Props{Variant: button.VariantOutline, Attributes: drawer.Trigger(ctx)}) {
 									Open Third Drawer
 								}
@@ -57,7 +57,7 @@ templ DrawerNested() {
 										<div class="bg-muted group-data-[swipe-axis=x]/drawer-popup:size-full group-data-[swipe-axis=y]/drawer-popup:aspect-video group-data-[swipe-axis=y]/drawer-popup:w-full"></div>
 									</div>
 									@drawer.Footer() {
-										@drawer.Drawer(drawer.Props{ID: "drawer-nested-4", Direction: drawer.DirectionRight, ShowSwipeHandle: true}) {
+										@drawer.Drawer(drawer.Props{ID: "drawer-nested-4", SwipeDirection: drawer.SwipeDirectionRight, ShowSwipeHandle: true}) {
 											@button.Button(button.Props{Variant: button.VariantOutline, Attributes: drawer.Trigger(ctx)}) {
 												Open Fourth Drawer
 											}
@@ -101,7 +101,7 @@ templ DrawerNested() {
 	<script nonce={ templ.GetNonce(ctx) }>
 		(() => {
 			// useIsMobile pendant (hooks/use-mobile.ts), like the drawer-demo:
-			// swipeDirection is down and the swipe handle shows below the md
+			// swipeSwipeDirection is down and the swipe handle shows below the md
 			// breakpoint, right and no handle from md up. The dialogs wait in
 			// nested portal <template>s until drawer.js lifts them, so the
 			// lookup searches template contents recursively; attributes set
