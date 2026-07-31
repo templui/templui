@@ -112,7 +112,11 @@ templ BaseLayout(title, description string) {
 		<body
 			class="style-nova transition-colors duration-200"
 		>
-			<div class="min-h-screen flex flex-col">
+			// group/layout + the designer gates are the pendant of shadcn's
+		// app/(app)/layout.tsx: designer pages (data-slot="designer") pin the
+		// layout to the viewport, and the navbar's designer actions show via
+		// group-has-data-[slot=designer]/layout.
+		<div data-slot="layout" class="group/layout min-h-screen flex flex-col has-data-[slot=designer]:h-svh has-data-[slot=designer]:overflow-hidden">
 				{ children... }
 			</div>
 			@toast.Toaster(toast.ToasterProps{ID: "toaster"})

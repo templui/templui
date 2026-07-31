@@ -1,178 +1,873 @@
 package pages
 
 import (
+	"github.com/templui/templui/components/alertdialog"
 	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/command"
 	"github.com/templui/templui/components/dialog"
+	"github.com/templui/templui/components/drawer"
+	"github.com/templui/templui/components/field"
 	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/input"
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
 	"github.com/templui/templui/utils"
 )
 
-// Create is the templUI pendant of ui.shadcn.com/create: customizer on the
-// left, live preview iframe on the right, state in the ?preset= param.
+// The /create designer, 1:1 pendant of shadcn's app/(app)/(create)/create:
+// customizer card (customizer.tsx), preview iframe host (preview.tsx) and the
+// picker DOM from picker.tsx, SSRd here with the DEFAULT_CONFIG state.
+// Behavior lives in assets/js/create.js; the state is the ?preset= param.
+
+// Class blocks verbatim from app/(app)/(create)/components/picker.tsx.
+const (
+	createTriggerClass = "relative w-36 shrink-0 touch-manipulation rounded-xl p-3 ring-1 ring-foreground/10 select-none hover:bg-muted focus-visible:ring-foreground/50 focus-visible:outline-none disabled:opacity-50 data-popup-open:bg-muted md:w-full md:rounded-lg md:px-2.5 md:py-2"
+	createContentClass = "cn-menu-target fixed z-50 no-scrollbar max-h-(--available-height) w-[calc(var(--available-width)-(--spacing(6)))] min-w-32 origin-(--transform-origin) translate-y-2 overflow-x-hidden overflow-y-auto rounded-xl border-0 bg-neutral-950/80 p-1.5 text-neutral-100 ring-1 ring-neutral-950/80 backdrop-blur-xl outline-none md:w-52 dark:bg-neutral-800/90 dark:ring-neutral-700/50 data-closed:overflow-hidden"
+	createRadioItemClass = "relative flex cursor-default items-center gap-2 rounded-lg py-1.5 pr-8 pl-2 text-sm font-medium outline-hidden select-none **:text-neutral-100 focus:bg-neutral-600 focus:text-neutral-100 focus:**:text-neutral-100 data-inset:pl-8 dark:focus:bg-neutral-700/80 pointer-coarse:gap-3 pointer-coarse:py-2.5 pointer-coarse:pl-3 pointer-coarse:text-base data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+	createMenuItemClass  = "group/dropdown-menu-item relative flex cursor-default items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium outline-hidden select-none **:text-neutral-100 focus:bg-neutral-600 focus:text-neutral-100 focus:**:text-neutral-100 data-inset:pl-8 dark:focus:bg-neutral-700/80 pointer-coarse:gap-3 pointer-coarse:py-2.5 pointer-coarse:pl-3 pointer-coarse:text-base data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+	createLabelClass     = "px-2 py-1.5 text-xs font-medium text-neutral-400 data-inset:pl-8"
+	createSeparatorClass = "-mx-1.5 my-1.5 h-px bg-neutral-600 dark:bg-neutral-700"
+	createShortcutClass  = "ml-auto text-xs tracking-widest text-neutral-400! group-focus/dropdown-menu-item:text-neutral-100"
+	// Footer button override, verbatim from copy-preset.tsx / open-preset.tsx /
+	// random-button.tsx.
+	createFooterButtonClass = "touch-manipulation bg-transparent! px-2! py-0! text-sm! transition-none select-none hover:bg-muted! pointer-coarse:h-10!"
+	// Lock button, verbatim from lock-button.tsx.
+	createLockClass = "flex size-4 cursor-pointer items-center justify-center rounded opacity-0 ring-foreground/60 transition-opacity outline-none group-focus-within/picker:opacity-100 group-hover/picker:opacity-100 focus:opacity-100 focus-visible:ring-1 data-[locked=true]:opacity-100 pointer-coarse:hidden absolute top-1/2 right-8 -translate-y-1/2"
+)
+
+// Default style icon (Nova) from registry/styles.tsx; create.js swaps it per
+// state from window.tuiCreateConfig.STYLES.
+const createNovaIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" role="img" color="currentColor" class="size-4"><path d="M2 12C2 9.19974 2 7.79961 2.54497 6.73005C3.02433 5.78924 3.78924 5.02433 4.73005 4.54497C5.79961 4 7.19974 4 10 4H14C16.8003 4 18.2004 4 19.27 4.54497C20.2108 5.02433 20.9757 5.78924 21.455 6.73005C22 7.79961 22 9.19974 22 12C22 14.8003 22 16.2004 21.455 17.27C20.9757 18.2108 20.2108 18.9757 19.27 19.455C18.2004 20 16.8003 20 14 20H10C7.19974 20 5.79961 20 4.73005 19.455C3.78924 18.9757 3.02433 18.2108 2.54497 17.27C2 16.2004 2 14.8003 2 12Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path></svg>`
+
+// Lucide logo from icon-library-picker.tsx logos.lucide.
+const createLucideLogo = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path stroke="currentColor" d="M14 12a4 4 0 0 0-8 0 8 8 0 1 0 16 0 11.97 11.97 0 0 0-4-8.944"></path><path stroke="currentColor" d="M10 12a4 4 0 0 0 8 0 8 8 0 1 0-16 0 11.97 11.97 0 0 0 4.063 9"></path></svg>`
+
+type createOption struct {
+	Value    string
+	Label    string
+	Disabled bool
+}
+
+// registry/styles.tsx order.
+var createStyles = []createOption{
+	{Value: "vega", Label: "Vega"},
+	{Value: "nova", Label: "Nova"},
+	{Value: "maia", Label: "Maia"},
+	{Value: "lyra", Label: "Lyra"},
+	{Value: "mira", Label: "Mira"},
+	{Value: "luma", Label: "Luma"},
+	{Value: "sera", Label: "Sera"},
+	{Value: "rhea", Label: "Rhea"},
+}
+
+// registry/base-colors.ts order.
+var createBaseColors = []createOption{
+	{Value: "neutral", Label: "Neutral"},
+	{Value: "stone", Label: "Stone"},
+	{Value: "zinc", Label: "Zinc"},
+	{Value: "mauve", Label: "Mauve"},
+	{Value: "olive", Label: "Olive"},
+	{Value: "mist", Label: "Mist"},
+	{Value: "taupe", Label: "Taupe"},
+}
+
+// The colored themes in registry/themes.ts order (base colors excluded);
+// second group of the theme and chart color pickers.
+var createColorThemes = []createOption{
+	{Value: "amber", Label: "Amber"},
+	{Value: "blue", Label: "Blue"},
+	{Value: "cyan", Label: "Cyan"},
+	{Value: "emerald", Label: "Emerald"},
+	{Value: "fuchsia", Label: "Fuchsia"},
+	{Value: "green", Label: "Green"},
+	{Value: "indigo", Label: "Indigo"},
+	{Value: "lime", Label: "Lime"},
+	{Value: "orange", Label: "Orange"},
+	{Value: "pink", Label: "Pink"},
+	{Value: "purple", Label: "Purple"},
+	{Value: "red", Label: "Red"},
+	{Value: "rose", Label: "Rose"},
+	{Value: "sky", Label: "Sky"},
+	{Value: "teal", Label: "Teal"},
+	{Value: "violet", Label: "Violet"},
+	{Value: "yellow", Label: "Yellow"},
+}
+
+// app/(app)/(create)/lib/fonts.ts order, grouped by type like font-picker.tsx.
+var createFontsSans = []createOption{
+	{Value: "geist", Label: "Geist"},
+	{Value: "inter", Label: "Inter"},
+	{Value: "noto-sans", Label: "Noto Sans"},
+	{Value: "nunito-sans", Label: "Nunito Sans"},
+	{Value: "figtree", Label: "Figtree"},
+	{Value: "roboto", Label: "Roboto"},
+	{Value: "raleway", Label: "Raleway"},
+	{Value: "dm-sans", Label: "DM Sans"},
+	{Value: "public-sans", Label: "Public Sans"},
+	{Value: "outfit", Label: "Outfit"},
+	{Value: "oxanium", Label: "Oxanium"},
+	{Value: "manrope", Label: "Manrope"},
+	{Value: "space-grotesk", Label: "Space Grotesk"},
+	{Value: "montserrat", Label: "Montserrat"},
+	{Value: "ibm-plex-sans", Label: "IBM Plex Sans"},
+	{Value: "source-sans-3", Label: "Source Sans 3"},
+	{Value: "instrument-sans", Label: "Instrument Sans"},
+}
+
+var createFontsMono = []createOption{
+	{Value: "geist-mono", Label: "Geist Mono"},
+	{Value: "jetbrains-mono", Label: "JetBrains Mono"},
+}
+
+var createFontsSerif = []createOption{
+	{Value: "noto-serif", Label: "Noto Serif"},
+	{Value: "roboto-slab", Label: "Roboto Slab"},
+	{Value: "merriweather", Label: "Merriweather"},
+	{Value: "lora", Label: "Lora"},
+	{Value: "playfair-display", Label: "Playfair Display"},
+	{Value: "eb-garamond", Label: "EB Garamond"},
+	{Value: "instrument-serif", Label: "Instrument Serif"},
+}
+
+// shadcn/icons libraries order. Only lucide ships in templUI.
+var createIconLibraries = []createOption{
+	{Value: "lucide", Label: "Lucide"},
+	{Value: "tabler", Label: "Tabler Icons", Disabled: true},
+	{Value: "hugeicons", Label: "HugeIcons", Disabled: true},
+	{Value: "phosphor", Label: "Phosphor Icons", Disabled: true},
+	{Value: "remixicon", Label: "Remix Icon", Disabled: true},
+}
+
+// registry/config.ts RADII, minus "default" (its own group in radius-picker.tsx).
+var createOtherRadii = []createOption{
+	{Value: "none", Label: "None"},
+	{Value: "small", Label: "Small"},
+	{Value: "medium", Label: "Medium"},
+	{Value: "large", Label: "Large"},
+}
+
 templ Create() {
 	@layouts.BaseLayout("New Project - templUI", "Customize everything. Pick your base color, theme, fonts and create your own version of templUI.") {
 		@modules.AnnouncementBar()
 		@modules.Navbar()
+		<link rel="stylesheet" href={ utils.ScriptURL("/assets/css/create-fonts.css") }/>
+		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/preset.js") }></script>
+		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-config.js") }></script>
 		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-themes.js") }></script>
 		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create.js") }></script>
+		// create/page.tsx shell.
 		<main
 			data-tui-create
-			class="section-soft relative z-10 flex h-[calc(100svh-3.5rem)] min-h-0 flex-1 flex-col overflow-hidden [--customizer-width:--spacing(48)] [--gap:--spacing(4)] md:[--gap:--spacing(6)] 2xl:[--customizer-width:--spacing(56)]"
+			class="section-soft relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden [--customizer-width:--spacing(48)] [--gap:--spacing(4)] md:[--gap:--spacing(6)] 2xl:[--customizer-width:--spacing(56)]"
 		>
 			<div
 				data-slot="designer"
 				class="flex min-h-0 flex-1 flex-col gap-(--gap) p-(--gap) pt-[calc(var(--gap)*0.25)] md:flex-row-reverse"
 			>
-				<!-- Preview -->
-				<div class="relative flex flex-1 flex-col justify-center overflow-hidden rounded-2xl ring ring-foreground/10 md:ring-muted dark:ring-foreground/10">
-					<div class="relative z-0 mx-auto flex w-full flex-1 flex-col overflow-hidden">
-						<div class="absolute inset-0 bg-muted dark:bg-muted/30"></div>
-						<iframe
-							data-tui-create-preview
-							src="/create/preview"
-							class="z-10 size-full flex-1"
-							title="Preview"
-						></iframe>
-					</div>
-					<!-- Preview switcher -->
-					<div class="dark absolute right-3 bottom-3 z-20 flex items-center gap-1 rounded-xl bg-card/90 p-1 shadow-xl backdrop-blur-xl">
-						@previewSwitchButton("01", "preview-02")
-						@previewSwitchButton("02", "preview")
-					</div>
-				</div>
-				<!-- Customizer -->
-				<div class="dark isolate z-10 flex max-h-full min-h-0 w-full flex-col self-start overflow-hidden rounded-2xl bg-card/90 text-sm text-card-foreground ring-1 ring-foreground/10 backdrop-blur-xl md:h-full md:w-(--customizer-width)">
-					<div class="hidden items-center justify-between gap-2 border-b p-3 md:flex">
-						<button
-							type="button"
-							data-tui-create-menu
-							class="flex w-full items-center justify-between gap-2 rounded-lg px-1.75 py-1 ring-1 ring-foreground/10 select-none hover:bg-muted focus-visible:ring-1 focus-visible:ring-foreground/50 focus-visible:outline-none data-open:bg-muted"
-						>
-							<span class="font-medium">Menu</span>
-							@icon.Menu(icon.Props{Class: "size-5"})
-						</button>
-					</div>
-					<div class="no-scrollbar min-h-0 flex-1 overflow-x-auto overflow-y-hidden p-3 md:overflow-x-hidden md:overflow-y-auto">
-						<div class="flex flex-row gap-2.5 md:flex-col md:gap-3">
-							@pickerRow("style", "Style", "Nova", true)
-							@pickerRow("iconLibrary", "Icons", "Lucide", true)
-							<div class="hidden h-px bg-border md:block"></div>
-							@pickerRow("baseColor", "Base Color", "Neutral", false)
-							@pickerRow("theme", "Theme", "Neutral", false)
-							@pickerRow("chartColor", "Chart Colors", "Neutral", false)
-							<div class="hidden h-px bg-border md:block"></div>
-							@pickerRow("font", "Font", "Geist", false)
-							@pickerRow("radius", "Radius", "Default", false)
-						</div>
-					</div>
-					<div class="flex min-w-0 flex-col gap-2 border-t p-3 **:[button]:w-full">
-						@button.Button(button.Props{
-							Variant:    button.VariantSecondary,
-							Size:       button.SizeSm,
-							Attributes: templ.Attributes{"data-tui-create-copy": true},
-						}) {
-							Copy Preset
-						}
-						<div class="flex gap-2 *:flex-1">
-							@button.Button(button.Props{
-								Variant:    button.VariantSecondary,
-								Size:       button.SizeSm,
-								Attributes: templ.Attributes{"data-tui-create-random": true},
-							}) {
-								Random
-							}
-							@button.Button(button.Props{
-								Variant:    button.VariantGhost,
-								Size:       button.SizeSm,
-								Attributes: templ.Attributes{"data-tui-create-reset": true},
-							}) {
-								Reset
-							}
-						</div>
-						@button.Button(button.Props{
-							Size:       button.SizeSm,
-							Attributes: dialog.TriggerFor("create-code-dialog"),
-						}) {
-							Get Code
-						}
-					</div>
-				</div>
+				@createPreviewHost()
+				@createCustomizer()
 			</div>
-			<!-- Picker popup, filled and positioned by create.js -->
-			<div
-				data-tui-create-popup
-				hidden
-				class="dark no-scrollbar fixed z-50 max-h-[70svh] w-52 overflow-x-hidden overflow-y-auto rounded-xl border-0 bg-neutral-950/80 p-1.5 text-neutral-100 ring-1 ring-neutral-950/80 backdrop-blur-xl outline-none"
-			></div>
-		</main>
-		@dialog.Dialog(dialog.Props{ID: "create-code-dialog"}) {
-			@dialog.Content(dialog.ContentProps{Class: "sm:max-w-lg"}) {
-				@dialog.Header() {
-					@dialog.Title() {
-						Your theme
-					}
-					@dialog.Description() {
-						Copy this into your globals.css to apply the design system you built.
+			// PickerContent portal: position:fixed popups must not live inside
+			// the backdrop-blur card (backdrop-filter creates a containing
+			// block), so like Base UI's portal they render at shell level.
+			<div data-tui-create-portal>
+				// The transparent hover shield from PickerContent's portal.
+				<div data-tui-create-shield hidden class="fixed inset-y-0 right-0 left-62 z-40 bg-transparent"></div>
+				@createMainMenuContent()
+				@createPickerContent("style", "") {
+					@createRadioGroup("style") {
+						@createGroup() {
+							for _, opt := range createStyles {
+								@createRadioItem(opt.Value, opt.Label, opt.Value == "nova", false)
+							}
+						}
 					}
 				}
-				<textarea
-					data-tui-create-css
-					readonly
-					class="h-72 w-full resize-none rounded-lg border bg-surface p-3 font-mono text-xs outline-none"
-				></textarea>
+				@createPickerContent("baseColor", "") {
+					@createRadioGroup("baseColor") {
+						@createGroup() {
+							for _, opt := range createBaseColors {
+								@createRadioItem(opt.Value, opt.Label, opt.Value == "neutral", false)
+							}
+						}
+					}
+				}
+				@createPickerContent("theme", "max-h-92") {
+					@createRadioGroup("theme") {
+						@createThemeItems("neutral")
+					}
+				}
+				@createPickerContent("chartColor", "max-h-92") {
+					@createRadioGroup("chartColor") {
+						@createThemeItems("neutral")
+					}
+				}
+				@createPickerContent("fontHeading", "max-h-96") {
+					@createRadioGroup("fontHeading") {
+						@createGroup() {
+							// Inherit item; its label is the current body font
+							// name (font-picker.tsx inheritFontLabel).
+							@createRadioItem("inherit", "Inter", true, false)
+						}
+						@createPopupSeparator()
+						@createFontGroups()
+					}
+				}
+				@createPickerContent("font", "max-h-96") {
+					@createRadioGroup("font") {
+						@createFontGroups()
+					}
+				}
+				@createPickerContent("iconLibrary", "") {
+					@createRadioGroup("iconLibrary") {
+						@createGroup() {
+							for _, opt := range createIconLibraries {
+								@createRadioItem(opt.Value, opt.Label, opt.Value == "lucide", opt.Disabled)
+							}
+						}
+					}
+				}
+				@createPickerContent("radius", "") {
+					@createRadioGroup("radius") {
+						@createGroup() {
+							@createRadioItem("default", "Default", true, false)
+						}
+						@createPopupSeparator()
+						@createGroup() {
+							for _, opt := range createOtherRadii {
+								@createRadioItem(opt.Value, opt.Label, false, false)
+							}
+						}
+					}
+				}
+				@createPickerContent("menuColor", "") {
+					@createGroup() {
+						@createPopupLabel("Color")
+						@createRadioGroup("menuColorColor") {
+							@createRadioItem("default", "Default", true, false)
+							@createRadioItem("inverted", "Inverted", false, false)
+						}
+					}
+					@createPopupSeparator()
+					@createGroup() {
+						@createPopupLabel("Appearance")
+						@createRadioGroup("menuColorSurface") {
+							@createRadioItem("solid", "Solid", true, false)
+							@createRadioItem("translucent", "Translucent", false, false)
+						}
+					}
+				}
+				@createPickerContent("menuAccent", "") {
+					@createRadioGroup("menuAccent") {
+						@createGroup() {
+							@createRadioItem("subtle", "Subtle", true, false)
+							@createRadioItem("bold", "Bold", false, false)
+						}
+					}
+				}
+			</div>
+		</main>
+		@createOpenPresetDialog()
+		@createOpenPresetDrawer()
+		@createResetDialog()
+		@createCodeDialog()
+		@createActionMenu()
+		@createWelcomeDialog()
+	}
+}
+
+// createPreviewHost is the pendant of preview.tsx: the iframe with the
+// bg-muted layer, plus the PreviewSwitcher (preview-switcher.tsx). create.js
+// sets the iframe src (item + preset serialized) before the first load.
+templ createPreviewHost() {
+	<div class="relative flex flex-1 flex-col justify-center overflow-hidden rounded-2xl ring ring-foreground/10 md:ring-muted dark:ring-foreground/10">
+		<div class="relative z-0 mx-auto flex w-full flex-1 flex-col overflow-hidden">
+			<div class="absolute inset-0 bg-muted dark:bg-muted/30"></div>
+			<iframe
+				data-tui-create-preview
+				class="z-10 size-full flex-1"
+				title="Preview"
+			></iframe>
+		</div>
+		<div class="dark absolute right-3 bottom-3 z-20 flex items-center gap-1 rounded-xl bg-card/90 p-1 shadow-xl backdrop-blur-xl">
+			@createPreviewSwitchButton("01", "preview-02")
+			@createPreviewSwitchButton("02", "preview")
+		</div>
+	</div>
+}
+
+templ createPreviewSwitchButton(label, item string) {
+	@button.Button(button.Props{
+		Variant: button.VariantGhost,
+		Size:    button.SizeSm,
+		Class:   "h-7 min-w-8 cursor-pointer rounded-lg px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground data-[active=true]:bg-accent data-[active=true]:text-accent-foreground",
+		Attributes: templ.Attributes{
+			"data-tui-create-preview-item": item,
+			"data-active":                  utils.IfElse(item == "preview-02", "true", "false"),
+		},
+	}) {
+		{ label }
+	}
+}
+
+// createCustomizer is the pendant of customizer.tsx: the dark card with the
+// MainMenu header, the picker rows in exact order and the two footers.
+templ createCustomizer() {
+	@card.Card(card.Props{
+		Size:  card.SizeSm,
+		Class: "dark top-24 right-12 isolate z-10 max-h-full min-h-0 w-full self-start rounded-2xl bg-card/90 backdrop-blur-xl md:w-(--customizer-width)",
+	}) {
+		@card.Header(card.HeaderProps{Class: "hidden items-center justify-between gap-2 border-b group-data-reversed/layout:flex-row-reverse md:flex"}) {
+			@createMainMenuTrigger()
+		}
+		@card.Content(card.ContentProps{Class: "no-scrollbar min-h-0 flex-1 overflow-x-auto overflow-y-hidden md:overflow-y-auto"}) {
+			@field.Group(field.GroupProps{Class: "flex-row gap-2.5 py-px **:data-[slot=field-separator]:-mx-4 **:data-[slot=field-separator]:w-auto md:flex-col md:gap-3.25"}) {
+				@createPickerRow("style", "Style", "Nova", "") {
+					<div data-tui-create-indicator="style" class="pointer-events-none absolute top-1/2 right-4 flex size-4 -translate-y-1/2 items-center justify-center select-none md:right-2.5">
+						@templ.Raw(createNovaIcon)
+					</div>
+				}
+				@field.Separator(field.SeparatorProps{Class: "hidden md:block"})
+				@createPickerRow("baseColor", "Base Color", "Neutral", "") {
+					<div data-tui-create-indicator="baseColor" class="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 rounded-full bg-(--color) select-none md:right-2.5"></div>
+				}
+				@createPickerRow("theme", "Theme", "Neutral", "") {
+					<div data-tui-create-indicator="theme" class="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 rounded-full bg-(--color) select-none md:right-2.5"></div>
+				}
+				@createPickerRow("chartColor", "Chart Color", "Neutral", "") {
+					<div data-tui-create-indicator="chartColor" class="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 rounded-full bg-(--color) select-none md:right-2.5"></div>
+				}
+				@field.Separator(field.SeparatorProps{Class: "hidden md:block"})
+				@createPickerRow("fontHeading", "Heading", "Inter", "") {
+					<div data-tui-create-indicator="fontHeading" class="pointer-events-none absolute top-1/2 right-4 flex size-4 -translate-y-1/2 items-center justify-center text-base text-foreground select-none md:right-2.5">Aa</div>
+				}
+				@createPickerRow("font", "Font", "Inter", "") {
+					<div data-tui-create-indicator="font" class="pointer-events-none absolute top-1/2 right-4 flex size-4 -translate-y-1/2 items-center justify-center text-base text-foreground select-none md:right-2.5">Aa</div>
+				}
+				@field.Separator(field.SeparatorProps{Class: "hidden md:block"})
+				@createPickerRow("iconLibrary", "Icon Library", "Lucide", "") {
+					<div class="pointer-events-none absolute top-1/2 right-4 flex size-4 -translate-y-1/2 items-center justify-center text-base text-foreground select-none md:right-2.5 *:[svg]:text-foreground!">
+						@templ.Raw(createLucideLogo)
+					</div>
+				}
+				@createPickerRow("radius", "Radius", "Default", "") {
+					<div class="pointer-events-none absolute top-1/2 right-4 flex size-4 -translate-y-1/2 rotate-90 items-center justify-center text-base text-foreground select-none md:right-2.5">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-foreground">
+							<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 20v-5C4 8.925 8.925 4 15 4h5"></path>
+						</svg>
+					</div>
+				}
+				@field.Separator(field.SeparatorProps{Class: "hidden md:block"})
+				@createPickerRow("menuColor", "Menu", "Default / Solid", "") {
+					<div class="pointer-events-none absolute top-1/2 right-4 flex size-4 -translate-y-1/2 items-center justify-center text-base text-foreground select-none md:right-2.5">
+						// Hugeicons Menu02Icon (menu-picker.tsx).
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">
+							<path d="M4 5L16 5"></path>
+							<path d="M4 12L20 12"></path>
+							<path d="M4 19L12 19"></path>
+						</svg>
+					</div>
+				}
+				@createPickerRow("menuAccent", "Menu Accent", "Subtle", "pr-3 md:pr-0") {
+					<div class="pointer-events-none absolute top-1/2 right-4 flex size-4 -translate-y-1/2 items-center justify-center text-base text-foreground select-none md:right-2.5">
+						// accent-picker.tsx trigger svg; create.js keeps
+						// data-accent in sync with the state.
+						<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24" fill="none" class="size-4 text-foreground" data-tui-create-indicator="menuAccent">
+							<path d="M19 12.1294L12.9388 18.207C11.1557 19.9949 10.2641 20.8889 9.16993 20.9877C8.98904 21.0041 8.80705 21.0041 8.62616 20.9877C7.53195 20.8889 6.64039 19.9949 4.85726 18.207L2.83687 16.1811C1.72104 15.0622 1.72104 13.2482 2.83687 12.1294M19 12.1294L10.9184 4.02587M19 12.1294H2.83687M10.9184 4.02587L2.83687 12.1294M10.9184 4.02587L8.89805 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-accent="subtle" class="fill-muted-foreground/30 data-[accent=bold]:fill-foreground"></path>
+							<path d="M22 20C22 21.1046 21.1046 22 20 22C18.8954 22 18 21.1046 18 20C18 18.8954 20 17 20 17C20 17 22 18.8954 22 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-accent="subtle" class="fill-muted-foreground/30 data-[accent=bold]:fill-foreground"></path>
+						</svg>
+					</div>
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex min-w-0 gap-2 md:flex-col md:rounded-b-none md:**:[button,a]:w-full"}) {
+			// CopyPreset: the label IS the command (copy-preset.tsx).
+			@button.Button(button.Props{
+				Variant: button.VariantOutline,
+				Class:   utils.TwMerge(createFooterButtonClass, "min-w-0 flex-1 md:flex-none"),
+				Attributes: templ.Attributes{
+					"data-tui-create-copy": true,
+					"title":                "--preset b0",
+				},
+			}) {
+				<span class="block min-w-0 truncate" data-tui-create-copy-label>--preset b0</span>
+			}
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Class:      utils.TwMerge(createFooterButtonClass, "max-w-20 min-w-0 flex-1 sm:max-w-none md:flex-none"),
+				Attributes: templ.Attributes{"data-tui-create-open-preset": true},
+			}) {
+				<span class="hidden md:inline">Open Preset</span>
+				<span class="md:hidden">Open</span>
+			}
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Class:      utils.TwMerge(createFooterButtonClass, "max-w-20 min-w-0 flex-1 sm:max-w-none md:flex-none"),
+				Attributes: templ.Attributes{"data-tui-create-shuffle": true},
+			}) {
+				<span class="w-full truncate text-center font-medium">Shuffle</span>
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "-mt-3 hidden min-w-0 gap-2 md:flex md:flex-col md:**:[button,a]:w-full"}) {
+			@button.Button(button.Props{
+				Attributes: dialog.TriggerFor("create-code-dialog"),
+			}) {
+				Get Code
+			}
+		}
+	}
+}
+
+// createPickerRow is a picker trigger row (picker.tsx PickerTrigger inside the
+// group/picker wrapper from the *-picker.tsx components); the children slot is
+// the trailing indicator.
+templ createPickerRow(param, label, value, wrapperClass string) {
+	<div class={ utils.TwMerge("group/picker relative", wrapperClass) }>
+		<button
+			type="button"
+			data-tui-create-trigger={ param }
+			data-slot="dropdown-menu-trigger"
+			aria-haspopup="menu"
+			aria-expanded="false"
+			class={ createTriggerClass }
+		>
+			<div class="flex flex-col justify-start text-left">
+				<div class="text-xs text-muted-foreground">{ label }</div>
+				if param == "fontHeading" || param == "font" || param == "menuColor" {
+					<div class="line-clamp-1 max-w-[80%] truncate text-sm font-medium text-foreground" data-tui-create-value={ param }>{ value }</div>
+				} else {
+					<div class="text-sm font-medium text-foreground" data-tui-create-value={ param }>{ value }</div>
+				}
+			</div>
+			{ children... }
+		</button>
+		@createLockButton(param)
+	</div>
+}
+
+// createLockButton is the lock-button.tsx pendant with the two Hugeicons
+// (SquareLock01Icon / SquareUnlock01Icon) inline.
+templ createLockButton(param string) {
+	<button
+		type="button"
+		title="Lock"
+		aria-label="Lock"
+		data-tui-create-lock={ param }
+		data-locked="false"
+		class={ createLockClass }
+	>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-5 text-foreground" data-tui-create-lock-icon="locked" hidden>
+			<path d="M4.26781 18.8447C4.49269 20.515 5.87613 21.8235 7.55966 21.9009C8.97627 21.966 10.4153 22 12 22C13.5847 22 15.0237 21.966 16.4403 21.9009C18.1239 21.8235 19.5073 20.515 19.7322 18.8447C19.879 17.7547 20 16.6376 20 15.5C20 14.3624 19.879 13.2453 19.7322 12.1553C19.5073 10.485 18.1239 9.17649 16.4403 9.09909C15.0237 9.03397 13.5847 9 12 9C10.4153 9 8.97627 9.03397 7.55966 9.09909C5.87613 9.17649 4.49269 10.485 4.26781 12.1553C4.12104 13.2453 4 14.3624 4 15.5C4 16.6376 4.12104 17.7547 4.26781 18.8447Z"></path>
+			<path d="M7.5 9V6.5C7.5 4.01472 9.51472 2 12 2C14.4853 2 16.5 4.01472 16.5 6.5V9" stroke-linecap="round" stroke-linejoin="round"></path>
+			<path d="M12.125 15.5H12M12.25 15.5C12.25 15.6381 12.1381 15.75 12 15.75C11.8619 15.75 11.75 15.6381 11.75 15.5C11.75 15.3619 11.8619 15.25 12 15.25C12.1381 15.25 12.25 15.3619 12.25 15.5Z" stroke-linecap="round"></path>
+		</svg>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-5 text-foreground" data-tui-create-lock-icon="unlocked">
+			<path d="M4.26781 18.8447C4.49269 20.515 5.87613 21.8235 7.55966 21.9009C8.97627 21.966 10.4153 22 12 22C13.5847 22 15.0237 21.966 16.4403 21.9009C18.1239 21.8235 19.5073 20.515 19.7322 18.8447C19.879 17.7547 20 16.6376 20 15.5C20 14.3624 19.879 13.2453 19.7322 12.1553C19.5073 10.485 18.1239 9.17649 16.4403 9.09909C15.0237 9.03397 13.5847 9 12 9C10.4153 9 8.97627 9.03397 7.55965 9.09909C5.87613 9.17649 4.49269 10.485 4.26781 12.1553C4.12104 13.2453 4 14.3624 4 15.5C4 16.6376 4.12104 17.7547 4.26781 18.8447Z"></path>
+			<path d="M7.5 9V6.5C7.5 4.01472 9.51472 2 12 2C13.9593 2 15.5 3.5 16 5" stroke-linecap="round" stroke-linejoin="round"></path>
+			<path d="M12.125 15.5H12M12.25 15.5C12.25 15.6381 12.1381 15.75 12 15.75C11.8619 15.75 11.75 15.6381 11.75 15.5C11.75 15.3619 11.8619 15.25 12 15.25C12.1381 15.25 12.25 15.3619 12.25 15.5Z" stroke-linecap="round"></path>
+		</svg>
+	</button>
+}
+
+// createMainMenuTrigger is the MainMenu trigger (main-menu.tsx) with the
+// Hugeicons Menu09Icon inline.
+templ createMainMenuTrigger() {
+	<button
+		type="button"
+		data-tui-create-trigger="mainmenu"
+		data-slot="dropdown-menu-trigger"
+		aria-haspopup="menu"
+		aria-expanded="false"
+		class={ utils.TwMerge(createTriggerClass, "flex items-center justify-between gap-2 rounded-lg px-1.75 ring-1 ring-foreground/10 focus-visible:ring-1") }
+	>
+		<span class="font-medium">Menu</span>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5">
+			<path d="M4 8.5L20 8.5"></path>
+			<path d="M4 15.5L20 15.5"></path>
+		</svg>
+	</button>
+}
+
+// createMainMenuContent is the MainMenu popup (main-menu.tsx): the items in
+// exact order, shortcuts filled per platform by create.js.
+templ createMainMenuContent() {
+	<div
+		data-tui-create-content="mainmenu"
+		data-slot="dropdown-menu-content"
+		role="menu"
+		hidden
+		class={ createContentClass }
+	>
+		@createGroup() {
+			@createMenuActionItem("navigate", "Navigate...") {
+				<span data-slot="dropdown-menu-shortcut" data-tui-create-shortcut="navigate" class={ createShortcutClass }>⌘P</span>
+			}
+			@createMenuActionItem("open-preset", "Open Preset...") {
+				<span data-slot="dropdown-menu-shortcut" class={ createShortcutClass }>O</span>
+			}
+			@createMenuActionItem("shuffle", "Shuffle") {
+				<span data-slot="dropdown-menu-shortcut" class={ createShortcutClass }>R</span>
+			}
+			@createMenuActionItem("toggle-theme", "Light/Dark") {
+				<span data-slot="dropdown-menu-shortcut" class={ createShortcutClass }>D</span>
+			}
+		}
+		@createPopupSeparator()
+		@createGroup() {
+			@createMenuActionItem("undo", "Undo") {
+				<span data-slot="dropdown-menu-shortcut" data-tui-create-shortcut="undo" class={ createShortcutClass }>⌘Z</span>
+			}
+			@createMenuActionItem("redo", "Redo") {
+				<span data-slot="dropdown-menu-shortcut" data-tui-create-shortcut="redo" class={ createShortcutClass }>⇧⌘Z</span>
+			}
+			@createPopupSeparator()
+			@createMenuActionItem("reset", "Reset") {
+				<span data-slot="dropdown-menu-shortcut" class={ createShortcutClass }>⇧R</span>
+			}
+		}
+	</div>
+}
+
+templ createMenuActionItem(action, label string) {
+	<div
+		role="menuitem"
+		tabindex="-1"
+		data-slot="dropdown-menu-item"
+		data-tui-create-action={ action }
+		class={ createMenuItemClass }
+	>
+		{ label }
+		{ children... }
+	</div>
+}
+
+// createPickerContent is a PickerContent popup for one picker, portaled to
+// shell level and positioned by create.js.
+templ createPickerContent(param, extraClass string) {
+	<div
+		data-tui-create-content={ param }
+		data-slot="dropdown-menu-content"
+		role="menu"
+		hidden
+		class={ utils.TwMerge(createContentClass, extraClass) }
+	>
+		{ children... }
+	</div>
+}
+
+templ createRadioGroup(name string) {
+	<div data-slot="dropdown-menu-radio-group" role="group" data-tui-create-radiogroup={ name }>
+		{ children... }
+	</div>
+}
+
+templ createGroup() {
+	<div data-slot="dropdown-menu-group" role="group">
+		{ children... }
+	</div>
+}
+
+templ createPopupLabel(text string) {
+	<div data-slot="dropdown-menu-label" class={ createLabelClass }>{ text }</div>
+}
+
+templ createPopupSeparator() {
+	<div data-slot="dropdown-menu-separator" role="separator" class={ createSeparatorClass }></div>
+}
+
+// createRadioItem is a PickerRadioItem. create.js drives data-checked, the
+// indicator visibility and data-disabled; item markup rebuilt at runtime (the
+// theme and chart color lists) mirrors this exactly.
+templ createRadioItem(value, label string, checked, disabled bool) {
+	<div
+		role="menuitemradio"
+		tabindex="-1"
+		data-slot="dropdown-menu-radio-item"
+		data-tui-create-item
+		data-value={ value }
+		aria-checked={ utils.IfElse(checked, "true", "false") }
+		data-checked={ utils.IfElse(checked, "true", "false") }
+		if disabled {
+			data-disabled=""
+			aria-disabled="true"
+		}
+		class={ createRadioItemClass }
+	>
+		<span class="pointer-events-none absolute right-2 flex items-center justify-center" data-slot="dropdown-menu-radio-item-indicator" hidden?={ !checked }>
+			@icon.Check(icon.Props{Class: "size-4 pointer-coarse:size-5"})
+		</span>
+		{ label }
+	</div>
+}
+
+// createThemeItems renders the theme/chart color list for a base color:
+// base-colored themes first, then the colored themes (theme-picker.tsx).
+templ createThemeItems(baseColor string) {
+	@createGroup() {
+		for _, opt := range createBaseColors {
+			if opt.Value == baseColor {
+				@createRadioItem(opt.Value, opt.Label, true, false)
+			}
+		}
+	}
+	@createPopupSeparator()
+	@createGroup() {
+		for _, opt := range createColorThemes {
+			@createRadioItem(opt.Value, opt.Label, false, false)
+		}
+	}
+}
+
+// createFontGroups renders the FONTS grouped by type (font-picker.tsx
+// groupedFonts): Sans, Mono, Serif.
+templ createFontGroups() {
+	@createGroup() {
+		@createPopupLabel("Sans")
+		for _, opt := range createFontsSans {
+			@createRadioItem(opt.Value, opt.Label, false, false)
+		}
+	}
+	@createGroup() {
+		@createPopupLabel("Mono")
+		for _, opt := range createFontsMono {
+			@createRadioItem(opt.Value, opt.Label, false, false)
+		}
+	}
+	@createGroup() {
+		@createPopupLabel("Serif")
+		for _, opt := range createFontsSerif {
+			@createRadioItem(opt.Value, opt.Label, false, false)
+		}
+	}
+}
+
+// createOpenPresetDialog is the desktop Open Preset dialog (open-preset.tsx).
+templ createOpenPresetDialog() {
+	@dialog.Dialog(dialog.Props{ID: "create-open-preset-dialog"}) {
+		@dialog.Content(dialog.ContentProps{Class: "dark"}) {
+			<form data-tui-create-preset-form>
+				@dialog.Header() {
+					@dialog.Title() {
+						Open Preset
+					}
+					@dialog.Description() {
+						Paste a preset code to load a saved configuration.
+					}
+				}
+				<div class="py-4">
+					@createPresetField("create-preset-code")
+				</div>
 				@dialog.Footer() {
 					@button.Button(button.Props{
 						Variant:    button.VariantOutline,
-						Attributes: dialog.CloseFor("create-code-dialog"),
+						Type:       button.TypeButton,
+						Attributes: dialog.CloseFor("create-open-preset-dialog"),
 					}) {
-						Close
+						Cancel
 					}
 					@button.Button(button.Props{
-						Attributes: templ.Attributes{"data-tui-create-copy-css": true},
+						Type:       button.TypeSubmit,
+						Disabled:   true,
+						Attributes: templ.Attributes{"data-tui-create-preset-submit": true},
 					}) {
-						Copy CSS
+						Open
+					}
+				}
+			</form>
+		}
+	}
+}
+
+// createOpenPresetDrawer is the mobile Open Preset drawer (open-preset.tsx).
+templ createOpenPresetDrawer() {
+	@drawer.Drawer(drawer.Props{ID: "create-open-preset-drawer"}) {
+		@drawer.Content(drawer.ContentProps{Class: "dark rounded-t-2xl!"}) {
+			@drawer.Header() {
+				@drawer.Title(drawer.TitleProps{Class: "text-xl"}) {
+					Open Preset
+				}
+				@drawer.Description() {
+					Paste a preset code to load a saved configuration.
+				}
+			}
+			<form data-tui-create-preset-form>
+				<div class="px-4 py-2">
+					@createPresetField("create-preset-code-mobile")
+				</div>
+				@drawer.Footer() {
+					@button.Button(button.Props{
+						Type:       button.TypeSubmit,
+						Class:      "h-10",
+						Disabled:   true,
+						Attributes: templ.Attributes{"data-tui-create-preset-submit": true},
+					}) {
+						Open
+					}
+					@button.Button(button.Props{
+						Variant:    button.VariantOutline,
+						Type:       button.TypeButton,
+						Class:      "h-10",
+						Attributes: drawer.CloseFor("create-open-preset-drawer"),
+					}) {
+						Cancel
+					}
+				}
+			</form>
+		}
+	}
+}
+
+templ createPresetField(id string) {
+	@field.Field(field.Props{Attributes: templ.Attributes{"data-tui-create-preset-field": true}}) {
+		@field.Label(field.LabelProps{For: id, Class: "sr-only"}) {
+			Preset code
+		}
+		@field.Content() {
+			@input.Input(input.Props{
+				ID:          id,
+				Placeholder: "b2D0wqNxT or --preset b2D0wqNxT",
+				Class:       "h-10 md:h-8",
+				Attributes: templ.Attributes{
+					"data-tui-create-preset-input": true,
+					"autocapitalize":               "none",
+					"autocorrect":                  "off",
+					"spellcheck":                   "false",
+				},
+			})
+		}
+	}
+}
+
+// createResetDialog is the reset confirmation (reset-button.tsx ResetDialog).
+templ createResetDialog() {
+	@alertdialog.AlertDialog(alertdialog.Props{ID: "create-reset-dialog"}) {
+		@alertdialog.Content(alertdialog.ContentProps{Size: alertdialog.SizeSm}) {
+			@alertdialog.Header() {
+				@alertdialog.Title() {
+					Reset to defaults?
+				}
+				@alertdialog.Description() {
+					This will reset all customization options to their default values.
+				}
+			}
+			@alertdialog.Footer() {
+				@alertdialog.Cancel() {
+					Cancel
+				}
+				@alertdialog.Action(alertdialog.ActionProps{Attributes: templ.Attributes{"data-tui-create-reset-confirm": true}}) {
+					Reset
+				}
+			}
+		}
+	}
+}
+
+// createCodeDialog is the Get Code dialog: the templUI pendant of
+// project-form.tsx reduced to its Theme tab (the CLI tabs have no templUI
+// counterpart) — the generated theme tokens for globals.css.
+templ createCodeDialog() {
+	@dialog.Dialog(dialog.Props{ID: "create-code-dialog"}) {
+		@dialog.Content(dialog.ContentProps{Class: "sm:max-w-lg"}) {
+			@dialog.Header() {
+				@dialog.Title() {
+					Your theme
+				}
+				@dialog.Description() {
+					Copy this into your globals.css to apply the design system you built.
+				}
+			}
+			<textarea
+				data-tui-create-css
+				readonly
+				class="h-72 w-full resize-none rounded-lg border bg-surface p-3 font-mono text-xs outline-none"
+			></textarea>
+			@dialog.Footer() {
+				@button.Button(button.Props{
+					Variant:    button.VariantOutline,
+					Attributes: dialog.CloseFor("create-code-dialog"),
+				}) {
+					Close
+				}
+				@button.Button(button.Props{
+					Attributes: templ.Attributes{"data-tui-create-copy-css": true},
+				}) {
+					Copy CSS
+				}
+			}
+		}
+	}
+}
+
+// createActionMenu is the ⌘P navigator (action-menu.tsx): a CommandDialog
+// listing the available preview items.
+templ createActionMenu() {
+	@command.Dialog(command.DialogProps{ID: "create-action-menu", Class: "animate-none!"}) {
+		@command.Command() {
+			@command.Input(command.InputProps{Placeholder: "Search"})
+			@command.List() {
+				@command.Empty() {
+					No items found.
+				}
+				@command.Group() {
+					@command.Item(command.ItemProps{
+						Value: "Preview 01 item items component components",
+						Class: "px-2",
+						Attributes: templ.Attributes{
+							"data-tui-create-registry-item": "preview-02",
+							"data-checked":                  "true",
+						},
+					}) {
+						Preview 01
+					}
+					@command.Item(command.ItemProps{
+						Value: "Preview 02 item items component components",
+						Class: "px-2",
+						Attributes: templ.Attributes{
+							"data-tui-create-registry-item": "preview",
+							"data-checked":                  "false",
+						},
+					}) {
+						Preview 02
 					}
 				}
 			}
 		}
-		@dialog.Script()
 	}
 }
 
-templ previewSwitchButton(label, item string) {
-	<button
-		type="button"
-		data-tui-create-item={ item }
-		class="h-7 min-w-8 cursor-pointer rounded-lg px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
-	>
-		{ label }
-	</button>
-}
-
-// pickerRow is a customizer row: label on top, current value below, opened by
-// create.js as a dark picker menu next to the card.
-templ pickerRow(param, label, initial string, disabled bool) {
-	<div class="group/picker relative">
-		<button
-			type="button"
-			if !disabled {
-				data-tui-create-picker={ param }
-			}
-			disabled?={ disabled }
-			class="relative w-36 shrink-0 touch-manipulation rounded-xl p-3 text-left ring-1 ring-foreground/10 select-none hover:bg-muted focus-visible:ring-foreground/50 focus-visible:outline-none disabled:opacity-50 data-open:bg-muted md:w-full md:rounded-lg md:px-2.5 md:py-2"
-		>
-			<div class="flex flex-col justify-start text-left">
-				<div class="text-xs text-muted-foreground">{ label }</div>
-				<div class="text-sm font-medium text-foreground" data-tui-create-value={ param }>{ initial }</div>
+// createWelcomeDialog is the first-visit dialog (welcome-dialog.tsx), shown by
+// create.js when the localStorage flag is missing.
+templ createWelcomeDialog() {
+	@dialog.Dialog(dialog.Props{ID: "create-welcome-dialog"}) {
+		@dialog.Content(dialog.ContentProps{
+			HideCloseButton: true,
+			Class:           "dialog-ring max-w-92 min-w-0 gap-0 overflow-hidden rounded-xl p-0 sm:max-w-sm dark:bg-neutral-900",
+		}) {
+			<div class="flex aspect-[2/1.2] w-full items-center justify-center rounded-t-xl bg-neutral-950 text-center text-neutral-100 sm:aspect-2/1">
+				<div class="font-mono text-2xl font-bold">
+					@icon.ToggleLeft(icon.Props{Class: "size-12"})
+				</div>
 			</div>
-			if param == "baseColor" || param == "theme" || param == "chartColor" {
-				<span
-					data-tui-create-swatch={ param }
-					class="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 rounded-full bg-(--color) select-none md:right-2.5"
-				></span>
+			@dialog.Header(dialog.HeaderProps{Class: "gap-1 p-4"}) {
+				@dialog.Title(dialog.TitleProps{Class: "text-left text-base"}) {
+					Build your own templUI
+				}
+				@dialog.Description(dialog.DescriptionProps{Class: "text-left leading-relaxed text-foreground"}) {
+					Customize everything from the ground up. Pick your component library, font, color scheme, and more.
+				}
+				@dialog.Description(dialog.DescriptionProps{Class: "mt-2 text-left leading-relaxed font-medium text-foreground"}) {
+					Available for all major React frameworks.
+				}
 			}
-		</button>
-	</div>
+			@dialog.Footer(dialog.FooterProps{Class: "m-0"}) {
+				@button.Button(button.Props{
+					Class:      "w-full",
+					Attributes: dialog.CloseFor("create-welcome-dialog"),
+				}) {
+					Get Started
+				}
+			}
+		}
+	}
 }

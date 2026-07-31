@@ -27,6 +27,9 @@ templ CreatePreview(item string) {
 }
 
 templ createPreviewContent(item string) {
+	<link rel="stylesheet" href={ utils.ScriptURL("/assets/css/create-fonts.css") }/>
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/preset.js") }></script>
+	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-config.js") }></script>
 	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-themes.js") }></script>
 	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-preview.js") }></script>
 	if item == "preview" {

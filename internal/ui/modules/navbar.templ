@@ -3,6 +3,7 @@ package modules
 import (
 	"fmt"
 	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/dialog"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/components/separator"
 	"github.com/templui/templui/components/sheet"
@@ -61,6 +62,19 @@ templ Navbar() {
 				</div>
 			</div>
 			<div class="flex gap-1 items-center justify-center">
+				// Pendant of components/designer-actions.tsx: hidden unless a
+				// designer page (data-slot="designer") is in the layout. The
+				// Get Code dialog lives on the /create page.
+				<div class="hidden items-center gap-2 group-has-data-[slot=designer]/layout:md:flex">
+					@separator.Separator(separator.Props{
+						Orientation: separator.OrientationVertical,
+					})
+					@button.Button(button.Props{
+						Attributes: dialog.TriggerFor("create-code-dialog"),
+					}) {
+						Get Code
+					}
+				</div>
 				@button.Button(button.Props{
 					Variant: button.VariantGhost,
 					Href:    "https://github.com/templui/templui",
