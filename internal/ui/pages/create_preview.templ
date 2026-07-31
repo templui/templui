@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/internal/ui/modules"
 	"github.com/templui/templui/utils"
 )
@@ -23,11 +24,34 @@ templ createPreviewContent(item string) {
 	<script defer src={ utils.ScriptURL("/components/js/combobox/combobox.min.js") }></script>
 	<script defer src={ utils.ScriptURL("/components/js/inputgroup/inputgroup.min.js") }></script>
 	<script defer src={ utils.ScriptURL("/components/js/toggle/toggle.min.js") }></script>
-	if item == "preview" {
-		@createPreviewGrid()
-	} else {
-		@createPreview02Grid()
+	// Item resolution like shadcn's preview/[base]/[name] route: the two
+	// static walls by name, every other name from the registry index. shadcn
+	// 404s on unknown names; inside our iframe the default wall is friendlier.
+	switch {
+		case item == "" || item == "preview-02":
+			@createPreview02Grid()
+		case item == "preview":
+			@createPreviewGrid()
+		default:
+			if entry, ok := examples.Registry[item]; ok {
+				@createRegistryItemPreview(entry.Component)
+			} else {
+				@createPreview02Grid()
+			}
 	}
+}
+
+// createRegistryItemPreview renders a registry demo in the preview shell.
+// shadcn's preview route renders the item bare in <div class="relative
+// bg-background"> because their example items bring their own full-page
+// ExampleWrapper; our docs demos do not, so they get a centered flex
+// container like the docs showcase rendering.
+templ createRegistryItemPreview(demo templ.Component) {
+	<div class="relative bg-background">
+		<div class="flex min-h-svh w-full items-center justify-center p-6">
+			@demo
+		</div>
+	</div>
 }
 
 // createPreviewGrid mirrors shadcn's preview block (the "02" switcher

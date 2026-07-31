@@ -1,6 +1,9 @@
 package pages
 
 import (
+	"sort"
+	"strings"
+
 	"github.com/templui/templui/components/alertdialog"
 	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/card"
@@ -10,6 +13,7 @@ import (
 	"github.com/templui/templui/components/field"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/components/input"
+	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
 	"github.com/templui/templui/utils"
@@ -799,8 +803,47 @@ templ createCodeDialog() {
 	}
 }
 
+// createRegistryNavItems returns every examples.Registry demo with its human
+// title (kebab-case name -> Title Case, like shadcn item titles), alphabetical
+// by title. This is our pendant of getAllItems' registry:example group.
+func createRegistryNavItems() []createOption {
+	items := make([]createOption, 0, len(examples.Registry))
+	for name := range examples.Registry {
+		items = append(items, createOption{Value: name, Label: createItemTitle(name)})
+	}
+	sort.Slice(items, func(i, j int) bool {
+		if items[i].Label != items[j].Label {
+			return items[i].Label < items[j].Label
+		}
+		return items[i].Value < items[j].Value
+	})
+	return items
+}
+
+func createItemTitle(name string) string {
+	parts := strings.Split(name, "-")
+	for i, part := range parts {
+		if part == "" {
+			continue
+		}
+		parts[i] = strings.ToUpper(part[:1]) + part[1:]
+	}
+	return strings.Join(parts, " ")
+}
+
+// Search keywords appended to the command value, from SEARCH_KEYWORDS in
+// use-action-menu.ts: registry:block has an explicit entry, registry:example
+// falls back to type.replace(":", " ").
+const (
+	createBlockKeywords   = "block blocks component components"
+	createExampleKeywords = "registry example"
+)
+
 // createActionMenu is the ⌘P navigator (action-menu.tsx): a CommandDialog
-// listing the available preview items.
+// listing every registry item. Like shadcn, all groups render flat inside a
+// single CommandGroup: blocks first (sortRegistryGroups), then the
+// "Components" group with the example demos. create.js keeps data-checked on
+// the active item and sets ?item= on select (command-select listener).
 templ createActionMenu() {
 	@command.Dialog(command.DialogProps{ID: "create-action-menu", Class: "animate-none!"}) {
 		@command.Command() {
@@ -810,29 +853,27 @@ templ createActionMenu() {
 					No items found.
 				}
 				@command.Group() {
-					@command.Item(command.ItemProps{
-						Value: "Preview 01 item items component components",
-						Class: "px-2",
-						Attributes: templ.Attributes{
-							"data-tui-create-registry-item": "preview-02",
-							"data-checked":                  "true",
-						},
-					}) {
-						Preview 01
-					}
-					@command.Item(command.ItemProps{
-						Value: "Preview 02 item items component components",
-						Class: "px-2",
-						Attributes: templ.Attributes{
-							"data-tui-create-registry-item": "preview",
-							"data-checked":                  "false",
-						},
-					}) {
-						Preview 02
+					@createActionMenuItem("preview", "Preview", createBlockKeywords, false)
+					@createActionMenuItem("preview-02", "Preview 02", createBlockKeywords, true)
+					for _, item := range createRegistryNavItems() {
+						@createActionMenuItem(item.Value, item.Label, createExampleKeywords, false)
 					}
 				}
 			}
 		}
+	}
+}
+
+templ createActionMenuItem(name, title, keywords string, checked bool) {
+	@command.Item(command.ItemProps{
+		Value: title + " " + keywords,
+		Class: "px-2",
+		Attributes: templ.Attributes{
+			"data-tui-create-registry-item": name,
+			"data-checked":                  utils.IfElse(checked, "true", "false"),
+		},
+	}) {
+		{ title }
 	}
 }
 
