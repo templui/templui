@@ -1,20 +1,6 @@
 package pages
 
 import (
-	"github.com/templui/templui/components/avatar"
-	"github.com/templui/templui/components/badge"
-	"github.com/templui/templui/components/button"
-	"github.com/templui/templui/components/calendar"
-	"github.com/templui/templui/components/card"
-	"github.com/templui/templui/components/checkbox"
-	"github.com/templui/templui/components/field"
-	"github.com/templui/templui/components/input"
-	"github.com/templui/templui/components/label"
-	"github.com/templui/templui/components/progress"
-	selectcomp "github.com/templui/templui/components/select"
-	switchcomp "github.com/templui/templui/components/switch"
-	"github.com/templui/templui/components/tabs"
-	"github.com/templui/templui/components/textarea"
 	"github.com/templui/templui/internal/ui/modules"
 	"github.com/templui/templui/utils"
 )
@@ -32,406 +18,143 @@ templ createPreviewContent(item string) {
 	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-config.js") }></script>
 	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-themes.js") }></script>
 	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-preview.js") }></script>
+	// Component scripts the shared preview layout does not load yet.
+	<script defer src={ utils.ScriptURL("/components/js/accordion/accordion.min.js") }></script>
+	<script defer src={ utils.ScriptURL("/components/js/combobox/combobox.min.js") }></script>
+	<script defer src={ utils.ScriptURL("/components/js/inputgroup/inputgroup.min.js") }></script>
+	<script defer src={ utils.ScriptURL("/components/js/toggle/toggle.min.js") }></script>
 	if item == "preview" {
-		<div class="min-h-svh bg-background p-6 text-foreground md:p-10">
-			@createPreviewOne()
-		</div>
+		@createPreviewGrid()
 	} else {
 		@createPreview02Grid()
 	}
 }
 
-// createPreview02Grid mirrors shadcn's preview-02 block: a wide, horizontally
-// scrollable card wall on bg-muted. Cards land column slot by column slot as
-// they get ported (see COMMIT_PLAN.md).
-templ createPreview02Grid() {
-	<div class="min-h-svh overflow-x-auto overflow-y-hidden bg-muted contain-[paint] [--gap:--spacing(4)] md:[--gap:--spacing(10)] dark:bg-background">
+// createPreviewGrid mirrors shadcn's preview block (the "02" switcher
+// item): a wide, horizontally scrollable card wall on bg-muted.
+templ createPreviewGrid() {
+	<div class="min-h-svh overflow-x-auto overflow-y-hidden bg-muted contain-[paint] [--gap:--spacing(4)] 3xl:[--gap:--spacing(12)] md:[--gap:--spacing(10)] dark:bg-background style-lyra:md:[--gap:--spacing(6)] style-mira:md:[--gap:--spacing(6)]">
 		<div class="flex w-full min-w-max justify-center">
 			<div
+				class="grid w-[2400px] grid-cols-7 items-start gap-(--gap) bg-muted p-(--gap) md:w-[3000px] dark:bg-background style-lyra:md:w-[2600px] style-mira:md:w-[2600px] *:[div]:gap-(--gap)"
 				data-slot="capture-target"
-				class="grid w-[1400px] grid-cols-4 items-start gap-(--gap) bg-muted p-(--gap) dark:bg-background *:[div]:gap-(--gap)"
 			>
-				<div class="flex flex-col p-1">
+				<div class="flex flex-col p-px [contain-intrinsic-size:380px_1200px] [content-visibility:auto]">
+					@cardStyleOverview()
+					@cardTypographySpecimen()
+					<div class="md:hidden">
+						@cardUIElements("mobile")
+					</div>
+					@cardCodespaces()
+					@cardInvoice()
+				</div>
+				<div class="flex flex-col p-px [contain-intrinsic-size:380px_1200px] [content-visibility:auto]">
+					@cardIconPreviewGrid()
+					<div class="hidden w-full md:flex">
+						@cardUIElements("desktop")
+					</div>
+					@cardObservability()
+					@cardShippingAddress()
+				</div>
+				<div class="flex flex-col p-px [contain-intrinsic-size:380px_1200px] [content-visibility:auto]">
+					@cardEnvironmentVariables()
+					@cardBarChart()
+					@cardInviteTeam()
+					@cardActivateAgentDialog()
+				</div>
+				<div class="flex flex-col p-px [contain-intrinsic-size:380px_1200px] [content-visibility:auto]">
+					@cardSkeletonLoading()
+					@cardPieChart()
+					@cardNoTeamMembers()
+					@cardReportBug()
+					@cardContributors()
+				</div>
+				<div class="flex flex-col p-px [contain-intrinsic-size:380px_1200px] [content-visibility:auto]">
+					@cardFeedbackForm()
+					@cardBookAppointment()
+					@cardSleepReport()
+					@cardGithubProfile()
+				</div>
+				<div class="flex flex-col p-px [contain-intrinsic-size:380px_1200px] [content-visibility:auto]">
+					@cardWeeklyFitnessSummary()
+					@cardFileUpload()
+					@cardAnalytics()
+					@cardUsage()
+					@cardShortcuts()
+				</div>
+				<div class="flex flex-col p-px [contain-intrinsic-size:380px_1200px] [content-visibility:auto]">
+					@cardAnomalyAlert()
+					@cardLiveWaveform()
+					@cardVisitors()
+					@cardContributionsActivity()
+					@cardNotFound()
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+// createPreview02Grid mirrors shadcn's preview-02 block (the default "01"
+// switcher item): a wide, horizontally scrollable card wall on bg-muted.
+templ createPreview02Grid() {
+	<div class="min-h-svh overflow-x-auto overflow-y-hidden bg-muted contain-[paint] [--gap:--spacing(4)] 3xl:[--gap:--spacing(12)] md:[--gap:--spacing(10)] dark:bg-background style-lyra:md:[--gap:--spacing(6)] style-mira:md:[--gap:--spacing(6)]">
+		<div class="flex w-full min-w-max justify-center">
+			<div
+				class="grid w-[2400px] grid-cols-7 items-start gap-(--gap) bg-muted p-(--gap) md:w-[3000px] dark:bg-background style-lyra:md:w-[2600px] style-mira:md:w-[2600px] *:[div]:gap-(--gap)"
+				data-slot="capture-target"
+			>
+				<div class="flex flex-col p-1 [contain-intrinsic-size:380px_1200px] [content-visibility:auto]">
+					@cardContributionHistory()
+					@cardEmptyDistributeTrack()
+					@cardQrConnect()
+					@cardDividendIncome()
+					@cardIndexInvesting()
+					@cardSyncingState()
+				</div>
+				<div class="flex flex-col p-1 [contain-intrinsic-size:380px_1200px] [content-visibility:auto]">
+					@cardPayoutThreshold()
 					@cardClaimableBalance()
 					@cardPreferences()
+					@cardSavingsProgress()
+					@cardKitchenIsland()
 				</div>
-				<div class="flex flex-col p-1">
-					@cardPayoutThreshold()
-					@cardUpcomingPayments()
-				</div>
-				<div class="col-span-2 flex flex-col p-1">
-					@cardFaq()
+				<div class="col-span-2 flex flex-col p-1 [contain-intrinsic-size:760px_1200px] [content-visibility:auto]">
+					@cardSavingsTargets()
+					@cardRecentTransactions()
 					<div class="grid grid-cols-2 items-start gap-(--gap)">
 						<div class="flex flex-col gap-(--gap)">
-							@createPreviewMemberCard()
+							@cardSidebarNav()
+							@cardFaq()
 						</div>
 						<div class="flex flex-col gap-(--gap)">
-							@createPreviewNotifications()
+							@cardPayments()
+							@cardFrontDoor()
 						</div>
 					</div>
+					@cardReleaseCatalog()
+				</div>
+				<div class="flex flex-col p-1 [contain-intrinsic-size:380px_1200px] [content-visibility:auto]">
+					@cardAccountAccess()
+					@cardOverview()
+					@cardTransferFunds()
+					@cardCoverArt()
+					@cardLoading()
+				</div>
+				<div class="flex flex-col p-1 [contain-intrinsic-size:380px_1200px] [content-visibility:auto]">
+					@cardReceivingMethod()
+					@cardPowerUsage()
+					@cardEmptyConnectBank()
+					@cardUpcomingPayments()
+					@cardRollerShades()
+				</div>
+				<div class="flex flex-col p-1 [contain-intrinsic-size:380px_1200px] [content-visibility:auto]">
+					@cardStockPerformance()
+					@cardEmptyExploreCatalog()
+					@cardNewMilestone()
+					@cardSocialLinks()
+					@cardNotificationSettings()
 				</div>
 			</div>
 		</div>
 	</div>
-}
-
-templ createPreviewMemberCard() {
-	@card.Card() {
-		@card.Header() {
-			@card.Title() {
-				Team Members
-			}
-			@card.Description() {
-				Invite your team members to collaborate.
-			}
-		}
-		@card.Content() {
-			<div class="grid gap-4">
-				@createPreviewMember("Axel Adrian", "axel@templui.io", "Owner")
-				@createPreviewMember("Adrian Hajdin", "adrian@templui.io", "Member")
-				@createPreviewMember("Jo Davis", "jo@templui.io", "Member")
-			</div>
-		}
-	}
-}
-
-templ createPreviewNotifications() {
-	@card.Card() {
-		@card.Header() {
-			@card.Title() {
-				Notifications
-			}
-			@card.Description() {
-				Choose what you want to be notified about.
-			}
-		}
-		@card.Content() {
-			<div class="grid gap-4">
-				<div class="flex items-center justify-between gap-4">
-					@label.Label(label.Props{For: "cpn-1"}) {
-						Everything
-					}
-					@switchcomp.Switch(switchcomp.Props{ID: "cpn-1", Checked: true})
-				</div>
-				<div class="flex items-center justify-between gap-4">
-					@label.Label(label.Props{For: "cpn-2"}) {
-						Mentions only
-					}
-					@switchcomp.Switch(switchcomp.Props{ID: "cpn-2"})
-				</div>
-				<div class="flex items-center gap-2">
-					@checkbox.Checkbox(checkbox.Props{ID: "cpn-3", Checked: true})
-					@label.Label(label.Props{For: "cpn-3"}) {
-						Email digest
-					}
-				</div>
-			</div>
-		}
-	}
-}
-
-templ createPreviewOne() {
-	<div class="mx-auto grid max-w-6xl gap-6 md:grid-cols-2 xl:grid-cols-3">
-		<div class="flex flex-col gap-6">
-			@card.Card() {
-				@card.Header() {
-					@card.Title() {
-						Total Revenue
-					}
-					@card.Description() {
-						Trending up by 5.2% this month
-					}
-				}
-				@card.Content() {
-					<div class="text-3xl font-semibold tabular-nums">$15,231.89</div>
-					<div class="mt-4">
-						@progress.Progress(progress.Props{Value: 62})
-					</div>
-				}
-			}
-			@card.Card() {
-				@card.Header() {
-					@card.Title() {
-						Create project
-					}
-					@card.Description() {
-						Deploy your new project in one-click.
-					}
-				}
-				@card.Content() {
-					<div class="grid gap-4">
-						<div class="grid gap-2">
-							@label.Label(label.Props{For: "cp-name"}) {
-								Name
-							}
-							@input.Input(input.Props{ID: "cp-name", Placeholder: "Name of your project"})
-						</div>
-						<div class="grid gap-2">
-							@label.Label(label.Props{For: "cp-framework"}) {
-								Framework
-							}
-							@selectcomp.Select() {
-								@selectcomp.Trigger(selectcomp.TriggerProps{ID: "cp-framework", Class: "w-full"}) {
-									@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select"})
-								}
-								@selectcomp.Content() {
-									@selectcomp.Item(selectcomp.ItemProps{Value: "templ"}) {
-										templ
-									}
-									@selectcomp.Item(selectcomp.ItemProps{Value: "gin"}) {
-										Gin
-									}
-									@selectcomp.Item(selectcomp.ItemProps{Value: "echo"}) {
-										Echo
-									}
-									@selectcomp.Item(selectcomp.ItemProps{Value: "chi"}) {
-										Chi
-									}
-								}
-							}
-						</div>
-					</div>
-				}
-				@card.Footer(card.FooterProps{Class: "justify-between"}) {
-					@button.Button(button.Props{Variant: button.VariantOutline}) {
-						Cancel
-					}
-					@button.Button() {
-						Deploy
-					}
-				}
-			}
-		</div>
-		<div class="flex flex-col gap-6">
-			@card.Card() {
-				@card.Content() {
-					@calendar.Calendar()
-				}
-			}
-			@card.Card() {
-				@card.Header() {
-					@card.Title() {
-						Team Members
-					}
-					@card.Description() {
-						Invite your team members to collaborate.
-					}
-				}
-				@card.Content() {
-					<div class="grid gap-4">
-						@createPreviewMember("Axel Adrian", "axel@templui.io", "Owner")
-						@createPreviewMember("Adrian Hajdin", "adrian@templui.io", "Member")
-						@createPreviewMember("Jo Davis", "jo@templui.io", "Member")
-					</div>
-				}
-			}
-		</div>
-		<div class="flex flex-col gap-6 md:col-span-2 xl:col-span-1">
-			@card.Card() {
-				@card.Header() {
-					@card.Title() {
-						Notifications
-					}
-					@card.Description() {
-						Choose what you want to be notified about.
-					}
-				}
-				@card.Content() {
-					<div class="grid gap-4">
-						<div class="flex items-center justify-between gap-4">
-							@label.Label(label.Props{For: "cp-n1"}) {
-								Everything
-							}
-							@switchcomp.Switch(switchcomp.Props{ID: "cp-n1", Checked: true})
-						</div>
-						<div class="flex items-center justify-between gap-4">
-							@label.Label(label.Props{For: "cp-n2"}) {
-								Mentions only
-							}
-							@switchcomp.Switch(switchcomp.Props{ID: "cp-n2"})
-						</div>
-						<div class="flex items-center gap-2">
-							@checkbox.Checkbox(checkbox.Props{ID: "cp-n3", Checked: true})
-							@label.Label(label.Props{For: "cp-n3"}) {
-								Email digest
-							}
-						</div>
-					</div>
-				}
-			}
-			@card.Card() {
-				@card.Header() {
-					@card.Title() {
-						Report an issue
-					}
-					@card.Description() {
-						What area are you having problems with?
-					}
-				}
-				@card.Content() {
-					<div class="grid gap-4">
-						<div class="grid gap-2">
-							@label.Label(label.Props{For: "cp-subject"}) {
-								Subject
-							}
-							@input.Input(input.Props{ID: "cp-subject", Placeholder: "I need help with..."})
-						</div>
-						<div class="grid gap-2">
-							@label.Label(label.Props{For: "cp-desc"}) {
-								Description
-							}
-							@textarea.Textarea(textarea.Props{ID: "cp-desc", Placeholder: "Please include all information relevant to your issue."})
-						</div>
-					</div>
-				}
-				@card.Footer(card.FooterProps{Class: "justify-end gap-2"}) {
-					@button.Button(button.Props{Variant: button.VariantGhost}) {
-						Cancel
-					}
-					@button.Button() {
-						Submit
-					}
-				}
-			}
-		</div>
-	</div>
-}
-
-templ createPreviewMember(name, email, role string) {
-	<div class="flex items-center justify-between gap-4">
-		<div class="flex items-center gap-3">
-			@avatar.Avatar() {
-				@avatar.Fallback() {
-					{ name[:1] }
-				}
-			}
-			<div class="grid">
-				<span class="text-sm font-medium">{ name }</span>
-				<span class="text-xs text-muted-foreground">{ email }</span>
-			</div>
-		</div>
-		@badge.Badge(badge.Props{Variant: badge.VariantOutline}) {
-			{ role }
-		}
-	</div>
-}
-
-templ createPreviewTwo() {
-	<div class="mx-auto flex max-w-xl flex-col gap-6">
-		@tabs.Tabs(tabs.Props{DefaultValue: "account"}) {
-			@tabs.List(tabs.ListProps{Class: "w-full"}) {
-				@tabs.Trigger(tabs.TriggerProps{Value: "account", Class: "flex-1"}) {
-					Account
-				}
-				@tabs.Trigger(tabs.TriggerProps{Value: "password", Class: "flex-1"}) {
-					Password
-				}
-			}
-			@tabs.Content(tabs.ContentProps{Value: "account"}) {
-				@card.Card() {
-					@card.Header() {
-						@card.Title() {
-							Account
-						}
-						@card.Description() {
-							Make changes to your account here. Click save when you're done.
-						}
-					}
-					@card.Content() {
-						<div class="grid gap-4">
-							<div class="grid gap-2">
-								@label.Label(label.Props{For: "cp2-name"}) {
-									Name
-								}
-								@input.Input(input.Props{ID: "cp2-name", Value: "Axel Adrian"})
-							</div>
-							<div class="grid gap-2">
-								@label.Label(label.Props{For: "cp2-username"}) {
-									Username
-								}
-								@input.Input(input.Props{ID: "cp2-username", Value: "@axadrn"})
-							</div>
-						</div>
-					}
-					@card.Footer() {
-						@button.Button() {
-							Save changes
-						}
-					}
-				}
-			}
-			@tabs.Content(tabs.ContentProps{Value: "password"}) {
-				@card.Card() {
-					@card.Header() {
-						@card.Title() {
-							Password
-						}
-						@card.Description() {
-							Change your password here. After saving, you'll be logged out.
-						}
-					}
-					@card.Content() {
-						<div class="grid gap-4">
-							<div class="grid gap-2">
-								@label.Label(label.Props{For: "cp2-current"}) {
-									Current password
-								}
-								@input.Input(input.Props{ID: "cp2-current", Type: input.TypePassword})
-							</div>
-							<div class="grid gap-2">
-								@label.Label(label.Props{For: "cp2-new"}) {
-									New password
-								}
-								@input.Input(input.Props{ID: "cp2-new", Type: input.TypePassword})
-							</div>
-						</div>
-					}
-					@card.Footer() {
-						@button.Button() {
-							Save password
-						}
-					}
-				}
-			}
-		}
-		@field.Field() {
-			@field.Label() {
-				Plan
-			}
-			@field.Description() {
-				Pick the plan that fits your team.
-			}
-		}
-		<div class="grid gap-4 sm:grid-cols-2">
-			@createPreviewPlan("Hobby", "$0/mo", "For personal projects", false)
-			@createPreviewPlan("Pro", "$20/mo", "For growing teams", true)
-		</div>
-	</div>
-}
-
-templ createPreviewPlan(name, price, blurb string, active bool) {
-	@card.Card(card.Props{Class: utils.If(active, "ring-2 ring-primary")}) {
-		@card.Header() {
-			@card.Title() {
-				{ name }
-			}
-			@card.Description() {
-				{ blurb }
-			}
-		}
-		@card.Content() {
-			<div class="text-2xl font-semibold">{ price }</div>
-		}
-		@card.Footer() {
-			if active {
-				@button.Button(button.Props{Class: "w-full"}) {
-					Current plan
-				}
-			} else {
-				@button.Button(button.Props{Variant: button.VariantOutline, Class: "w-full"}) {
-					Choose plan
-				}
-			}
-		}
-	}
 }

@@ -1,25 +1,51 @@
 package pages
 
 import (
+	"fmt"
+
 	"github.com/templui/templui/components/accordion"
+	"github.com/templui/templui/components/alert"
+	"github.com/templui/templui/components/alertdialog"
+	"github.com/templui/templui/components/avatar"
 	"github.com/templui/templui/components/badge"
+	"github.com/templui/templui/components/breadcrumb"
 	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/buttongroup"
 	"github.com/templui/templui/components/calendar"
 	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/chart"
+	"github.com/templui/templui/components/checkbox"
+	"github.com/templui/templui/components/combobox"
+	"github.com/templui/templui/components/dialog"
+	"github.com/templui/templui/components/dropdownmenu"
+	"github.com/templui/templui/components/empty"
 	"github.com/templui/templui/components/field"
 	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/input"
+	"github.com/templui/templui/components/inputgroup"
 	"github.com/templui/templui/components/item"
+	"github.com/templui/templui/components/kbd"
+	"github.com/templui/templui/components/label"
+	"github.com/templui/templui/components/progress"
+	"github.com/templui/templui/components/radiogroup"
 	selectcomp "github.com/templui/templui/components/select"
 	"github.com/templui/templui/components/separator"
+	"github.com/templui/templui/components/sidebar"
+	"github.com/templui/templui/components/skeleton"
 	"github.com/templui/templui/components/slider"
+	"github.com/templui/templui/components/spinner"
 	switchcomp "github.com/templui/templui/components/switch"
+	"github.com/templui/templui/components/table"
 	"github.com/templui/templui/components/tabs"
 	"github.com/templui/templui/components/textarea"
+	"github.com/templui/templui/components/togglegroup"
+	"github.com/templui/templui/components/tooltip"
+	"github.com/templui/templui/utils"
 )
 
-// Ports of shadcn's preview-02 cards (registry/bases/base/blocks/preview-02),
-// card by card. Cards that need the chart rewrite are still missing; the
-// remaining ones land incrementally (tracked in COMMIT_PLAN.md).
+// Ports of shadcn's preview card walls, card by card: the preview-02 cards
+// (registry/bases/base/blocks/preview-02) first, the preview cards
+// (registry/bases/base/blocks/preview) below them.
 
 templ cardClaimableBalance() {
 	@card.Card() {
@@ -304,6 +330,3728 @@ templ faqList(entries []faqEntry) {
 				}
 				@accordion.Content() {
 					{ entry.a }
+				}
+			}
+		}
+	}
+}
+
+var contributionHistoryData = []chart.Datum{
+	{"month": "Dec", "amount": 800},
+	{"month": "Jan", "amount": 1100},
+	{"month": "Feb", "amount": 900},
+	{"month": "Mar", "amount": 1300},
+	{"month": "Apr", "amount": 750},
+	{"month": "May", "amount": 1400},
+}
+
+var contributionHistoryConfig = chart.Config{
+	{Key: "amount", Label: "Contribution", Color: "var(--chart-2)"},
+}
+
+templ cardContributionHistory() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Contribution History
+			}
+			@card.Description() {
+				Last 6 months of activity
+			}
+		}
+		@card.Content() {
+			@chart.Container(chart.ContainerProps{ID: "p02-contribution-history", Config: contributionHistoryConfig, Class: "h-[200px] w-full"}) {
+				@chart.BarChart(chart.BarChartProps{
+					AccessibilityLayer: true,
+					Data:               contributionHistoryData,
+					Margin:             &chart.Margin{Left: 0, Right: 0, Top: 8, Bottom: 0},
+				}) {
+					@chart.XAxis(chart.XAxisProps{DataKey: "month", TickMargin: 8})
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  chart.Bool(false),
+						Content: chart.TooltipContentProps{HideLabel: true, Class: "min-w-40"},
+					})
+					@chart.Bar(chart.BarProps{DataKey: "amount", Fill: "var(--color-amount)", Radius: []float64{6, 6, 0, 0}})
+				}
+			}
+		}
+		@card.Content() {
+			<div class="grid w-full grid-cols-1 gap-3 md:grid-cols-2">
+				@item.Item(item.Props{Variant: item.VariantMuted, Class: "flex-col items-stretch"}) {
+					@item.Content(item.ContentProps{Class: "gap-1"}) {
+						@item.Description(item.DescriptionProps{Class: "text-xs font-medium tracking-wider text-muted-foreground uppercase"}) {
+							Upcoming
+						}
+						<span class="cn-font-heading text-lg font-semibold">May 25, 2024</span>
+						<span class="text-sm text-muted-foreground">$1,000 scheduled</span>
+					}
+				}
+				@item.Item(item.Props{Variant: item.VariantMuted, Class: "flex-col items-stretch"}) {
+					@item.Content(item.ContentProps{Class: "gap-1"}) {
+						@item.Description(item.DescriptionProps{Class: "text-xs font-medium tracking-wider text-muted-foreground uppercase"}) {
+							Auto-Save Plan
+						}
+						<span class="cn-font-heading text-lg font-semibold">Accelerated</span>
+						<span class="text-sm text-muted-foreground">Recurring weekly</span>
+					}
+				}
+			</div>
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Class: "w-full"}) {
+				View Full Report
+			}
+		}
+	}
+}
+
+templ cardEmptyDistributeTrack() {
+	@card.Card() {
+		@card.Content() {
+			@empty.Empty(empty.Props{Class: "p-4"}) {
+				@empty.Media(empty.MediaProps{Variant: empty.MediaVariantIcon}) {
+					@icon.Plus()
+				}
+				@empty.Header() {
+					@empty.Title() {
+						Distribute Track
+					}
+					@empty.Description() {
+						Upload your first master to start reaching listeners on Spotify, Apple Music, and more.
+					}
+				}
+				@empty.Content() {
+					@button.Button() {
+						Create Release
+					}
+				}
+			}
+		}
+	}
+}
+
+// qrConnectPath is the module path of the QR code for
+// https://ledger.app/connect/jd-4829 (error correction level M), the value
+// react-qr-code renders in the reference card.
+const qrConnectPath = "M0,0h7v1h-7zM9,0h2v1h-2zM12,0h4v1h-4zM17,0h4v1h-4zM22,0h7v1h-7zM0,1h1v1h-1zM6,1h1v1h-1zM9,1h3v1h-3zM13,1h5v1h-5zM22,1h1v1h-1zM28,1h1v1h-1zM0,2h1v1h-1zM2,2h3v1h-3zM6,2h1v1h-1zM8,2h3v1h-3zM13,2h1v1h-1zM15,2h1v1h-1zM18,2h3v1h-3zM22,2h1v1h-1zM24,2h3v1h-3zM28,2h1v1h-1zM0,3h1v1h-1zM2,3h3v1h-3zM6,3h1v1h-1zM8,3h2v1h-2zM11,3h2v1h-2zM14,3h2v1h-2zM17,3h1v1h-1zM19,3h1v1h-1zM22,3h1v1h-1zM24,3h3v1h-3zM28,3h1v1h-1zM0,4h1v1h-1zM2,4h3v1h-3zM6,4h1v1h-1zM8,4h1v1h-1zM11,4h2v1h-2zM15,4h2v1h-2zM18,4h3v1h-3zM22,4h1v1h-1zM24,4h3v1h-3zM28,4h1v1h-1zM0,5h1v1h-1zM6,5h1v1h-1zM8,5h1v1h-1zM10,5h3v1h-3zM20,5h1v1h-1zM22,5h1v1h-1zM28,5h1v1h-1zM0,6h7v1h-7zM8,6h1v1h-1zM10,6h1v1h-1zM12,6h1v1h-1zM14,6h1v1h-1zM16,6h1v1h-1zM18,6h1v1h-1zM20,6h1v1h-1zM22,6h7v1h-7zM8,7h3v1h-3zM14,7h1v1h-1zM16,7h1v1h-1zM19,7h2v1h-2zM0,8h1v1h-1zM2,8h5v1h-5zM10,8h1v1h-1zM17,8h1v1h-1zM19,8h1v1h-1zM22,8h5v1h-5zM3,9h3v1h-3zM7,9h4v1h-4zM13,9h3v1h-3zM18,9h7v1h-7zM28,9h1v1h-1zM0,10h1v1h-1zM4,10h1v1h-1zM6,10h1v1h-1zM8,10h1v1h-1zM10,10h1v1h-1zM13,10h6v1h-6zM20,10h1v1h-1zM23,10h1v1h-1zM1,11h1v1h-1zM3,11h2v1h-2zM7,11h4v1h-4zM13,11h1v1h-1zM15,11h1v1h-1zM19,11h1v1h-1zM23,11h3v1h-3zM27,11h1v1h-1zM1,12h1v1h-1zM6,12h2v1h-2zM10,12h1v1h-1zM12,12h1v1h-1zM14,12h1v1h-1zM16,12h2v1h-2zM25,12h2v1h-2zM0,13h1v1h-1zM2,13h1v1h-1zM9,13h1v1h-1zM19,13h2v1h-2zM22,13h3v1h-3zM28,13h1v1h-1zM0,14h1v1h-1zM5,14h2v1h-2zM8,14h4v1h-4zM15,14h1v1h-1zM20,14h2v1h-2zM24,14h3v1h-3zM1,15h3v1h-3zM5,15h1v1h-1zM7,15h1v1h-1zM12,15h1v1h-1zM14,15h1v1h-1zM18,15h7v1h-7zM27,15h1v1h-1zM3,16h8v1h-8zM15,16h5v1h-5zM21,16h1v1h-1zM25,16h2v1h-2zM0,17h3v1h-3zM7,17h2v1h-2zM11,17h4v1h-4zM17,17h3v1h-3zM21,17h4v1h-4zM26,17h1v1h-1zM28,17h1v1h-1zM0,18h1v1h-1zM2,18h1v1h-1zM6,18h5v1h-5zM13,18h3v1h-3zM17,18h1v1h-1zM22,18h3v1h-3zM26,18h1v1h-1zM0,19h1v1h-1zM5,19h1v1h-1zM9,19h1v1h-1zM11,19h1v1h-1zM13,19h1v1h-1zM15,19h1v1h-1zM21,19h4v1h-4zM27,19h1v1h-1zM0,20h1v1h-1zM2,20h3v1h-3zM6,20h2v1h-2zM9,20h2v1h-2zM14,20h1v1h-1zM16,20h2v1h-2zM20,20h5v1h-5zM26,20h3v1h-3zM8,21h3v1h-3zM12,21h1v1h-1zM17,21h4v1h-4zM24,21h5v1h-5zM0,22h7v1h-7zM9,22h1v1h-1zM15,22h1v1h-1zM17,22h4v1h-4zM22,22h1v1h-1zM24,22h3v1h-3zM0,23h1v1h-1zM6,23h1v1h-1zM8,23h2v1h-2zM11,23h2v1h-2zM14,23h3v1h-3zM18,23h3v1h-3zM24,23h1v1h-1zM27,23h2v1h-2zM0,24h1v1h-1zM2,24h3v1h-3zM6,24h1v1h-1zM8,24h3v1h-3zM15,24h3v1h-3zM20,24h5v1h-5zM26,24h2v1h-2zM0,25h1v1h-1zM2,25h3v1h-3zM6,25h1v1h-1zM8,25h2v1h-2zM11,25h1v1h-1zM14,25h1v1h-1zM18,25h1v1h-1zM25,25h4v1h-4zM0,26h1v1h-1zM2,26h3v1h-3zM6,26h1v1h-1zM8,26h1v1h-1zM10,26h3v1h-3zM15,26h2v1h-2zM21,26h7v1h-7zM0,27h1v1h-1zM6,27h1v1h-1zM10,27h1v1h-1zM12,27h2v1h-2zM15,27h2v1h-2zM18,27h4v1h-4zM24,27h2v1h-2zM27,27h1v1h-1zM0,28h7v1h-7zM8,28h2v1h-2zM12,28h1v1h-1zM14,28h1v1h-1zM17,28h3v1h-3zM23,28h1v1h-1zM26,28h1v1h-1z"
+
+templ cardQrConnect() {
+	@card.Card() {
+		@card.Content(card.ContentProps{Class: "flex justify-center pt-6"}) {
+			<div class="rounded-xl border bg-white p-4">
+				<svg width="160" height="160" viewBox="0 0 29 29" shape-rendering="crispEdges" role="img" aria-label="QR code for https://ledger.app/connect/jd-4829">
+					<path fill="#000000" d={ qrConnectPath }></path>
+				</svg>
+			</div>
+		}
+		@card.Header(card.HeaderProps{Class: "text-center"}) {
+			@card.Title() {
+				Scan to connect your mobile device
+			}
+			@card.Description() {
+				Open the Ledger mobile app and scan this code to link your device.
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Variant: button.VariantSecondary, Class: "w-full"}) {
+				Got it
+			}
+		}
+	}
+}
+
+type dividendHolding struct {
+	name   string
+	shares string
+	amount string
+	data   []chart.Datum
+}
+
+var dividendHoldings = []dividendHolding{
+	{
+		name:   "Vanguard VIG",
+		shares: "450 Shares",
+		amount: "$1,842.10",
+		data: []chart.Datum{
+			{"q": "Q1", "value": 380},
+			{"q": "Q2", "value": 420},
+			{"q": "Q3", "value": 390},
+			{"q": "Q4", "value": 652},
+		},
+	},
+	{
+		name:   "S&P 500 VOO",
+		shares: "112 Shares",
+		amount: "$928.40",
+		data: []chart.Datum{
+			{"q": "Q1", "value": 180},
+			{"q": "Q2", "value": 210},
+			{"q": "Q3", "value": 320},
+			{"q": "Q4", "value": 218},
+		},
+	},
+	{
+		name:   "Apple AAPL",
+		shares: "85 Shares",
+		amount: "$340.00",
+		data: []chart.Datum{
+			{"q": "Q1", "value": 60},
+			{"q": "Q2", "value": 70},
+			{"q": "Q3", "value": 120},
+			{"q": "Q4", "value": 90},
+		},
+	},
+	{
+		name:   "Realty Income",
+		shares: "320 Shares",
+		amount: "$1,139.50",
+		data: []chart.Datum{
+			{"q": "Q1", "value": 240},
+			{"q": "Q2", "value": 260},
+			{"q": "Q3", "value": 280},
+			{"q": "Q4", "value": 360},
+		},
+	},
+}
+
+var dividendMiniChartConfig = chart.Config{
+	{Key: "value", Label: "Dividend", Color: "var(--chart-2)"},
+}
+
+templ cardDividendIncome() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Q2 Dividend Income
+			}
+			@card.Description() {
+				Quarterly dividend payouts across your portfolio holdings.
+			}
+			@card.Action() {
+				@button.Button(button.Props{Variant: button.VariantGhost, Size: button.SizeIconSm, Class: "bg-muted"}) {
+					@icon.X()
+				}
+			}
+		}
+		@card.Content() {
+			@item.Group() {
+				for i, holding := range dividendHoldings {
+					@item.Item(item.Props{Variant: item.VariantMuted}) {
+						@item.Content() {
+							@item.Title() {
+								{ holding.name }
+							}
+							@item.Description() {
+								{ holding.shares }
+							}
+						}
+						@chart.Container(chart.ContainerProps{ID: fmt.Sprintf("p02-dividend-%d", i), Config: dividendMiniChartConfig, Class: "hidden h-8 w-24 md:block"}) {
+							@chart.BarChart(chart.BarChartProps{
+								Data:   holding.data,
+								Margin: &chart.Margin{Top: 0, Right: 0, Bottom: 0, Left: 0},
+							}) {
+								@chart.Tooltip(chart.TooltipProps{
+									Cursor:  chart.Bool(false),
+									Content: chart.TooltipContentProps{HideLabel: true},
+								})
+								@chart.Bar(chart.BarProps{DataKey: "value", Fill: "var(--color-value)", Radius: []float64{3, 3, 0, 0}})
+							}
+						}
+						<span class="hidden text-sm font-semibold tabular-nums md:block">{ holding.amount }</span>
+					}
+				}
+			}
+		}
+	}
+}
+
+templ cardIndexInvesting() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Dollar-Cost Averaging
+			}
+			@card.Description() {
+				A strategy for building wealth over time.
+			}
+		}
+		@card.Content() {
+			@card.Description(card.DescriptionProps{Class: "mt-3 text-sm leading-relaxed style-sera:mt-0"}) {
+				<a href="#" class="underline underline-offset-4 hover:text-primary">Over time</a>
+				, this smooths out the average cost of your investments. When prices
+				drop, your fixed amount buys more shares. When prices rise, you buy
+				fewer. The result is a lower average cost per share compared to
+				lump-sum investing during volatile periods.
+			}
+		}
+	}
+}
+
+templ cardSyncingState() {
+	@card.Card() {
+		@card.Content(card.ContentProps{Class: "p-0"}) {
+			@empty.Empty(empty.Props{Class: "p-4"}) {
+				@empty.Header() {
+					@empty.Media(empty.MediaProps{Variant: empty.MediaVariantIcon}) {
+						@spinner.Spinner()
+					}
+					@empty.Title() {
+						Syncing your accounts
+					}
+					@empty.Description() {
+						We're pulling in your latest transactions. This usually takes a few seconds.
+					}
+				}
+				@empty.Content() {
+					@button.Button(button.Props{Variant: button.VariantOutline}) {
+						Cancel
+					}
+				}
+			}
+		}
+	}
+}
+
+var savingsProgressData = []chart.Datum{
+	{"name": "saved", "value": 24000, "fill": "var(--color-saved)"},
+	{"name": "remaining", "value": 6000, "fill": "var(--color-remaining)"},
+}
+
+var savingsProgressConfig = chart.Config{
+	{Key: "saved", Label: "Saved", Color: "var(--chart-2)"},
+	{Key: "remaining", Label: "Remaining", Color: "var(--chart-1)"},
+}
+
+templ cardSavingsProgress() {
+	@card.Card() {
+		@card.Content() {
+			@chart.Container(chart.ContainerProps{ID: "p02-savings-progress", Config: savingsProgressConfig, Class: "mx-auto aspect-square max-h-[220px]"}) {
+				@chart.PieChart() {
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  chart.Bool(false),
+						Content: chart.TooltipContentProps{HideLabel: true},
+					})
+					@chart.Pie(chart.PieProps{
+						Data:        savingsProgressData,
+						DataKey:     "value",
+						NameKey:     "name",
+						InnerRadius: 70,
+						OuterRadius: 95,
+						Stroke:      "0",
+					}) {
+						@chart.Label(chart.LabelProps{
+							DominantBaseline: "middle",
+							Spans: []chart.LabelSpan{
+								{Text: "$24,000", Class: "fill-foreground text-2xl font-bold", OffsetY: -12},
+								{Text: "80% of $30,000", Class: "fill-muted-foreground text-xs", OffsetY: 12},
+							},
+						})
+					}
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-0"}) {
+			<div class="flex w-full items-center justify-between py-3">
+				<span class="text-sm text-muted-foreground">Projected Finish</span>
+				<span class="text-sm font-semibold">October 2024</span>
+			</div>
+			@separator.Separator()
+			<div class="flex w-full items-center justify-between py-3">
+				<span class="text-sm text-muted-foreground">Monthly Average</span>
+				<span class="text-sm font-semibold tabular-nums">$1,250</span>
+			</div>
+			@separator.Separator()
+			<div class="flex w-full items-center justify-between py-3">
+				<span class="text-sm text-muted-foreground">Top Contributor</span>
+				<span class="text-sm font-semibold">Auto-Transfer</span>
+			</div>
+		}
+	}
+}
+
+templ cardKitchenIsland() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Kitchen Island
+			}
+			@card.Description() {
+				Hue Color Ambient
+			}
+			@card.Action() {
+				@switchcomp.Switch(switchcomp.Props{Checked: true})
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			<div class="flex flex-col gap-2">
+				<span class="sr-only">Scenes</span>
+				@togglegroup.ToggleGroup(togglegroup.Props{
+					Type:    togglegroup.TypeSingle,
+					Variant: togglegroup.VariantOutline,
+					Spacing: utils.Ptr(1),
+					Class:   "flex-wrap",
+				}) {
+					@togglegroup.Item(togglegroup.ItemProps{Value: "cooking", Pressed: true}) {
+						Cooking
+					}
+					@togglegroup.Item(togglegroup.ItemProps{Value: "dining"}) {
+						Dining
+					}
+					@togglegroup.Item(togglegroup.ItemProps{Value: "nightlight"}) {
+						Nightlight
+					}
+					@togglegroup.Item(togglegroup.ItemProps{Value: "focus"}) {
+						Focus
+					}
+				}
+			</div>
+			@item.Group() {
+				@item.Item(item.Props{Size: item.SizeSm, Variant: item.VariantOutline}) {
+					@item.Media(item.MediaProps{Variant: item.MediaVariantIcon}) {
+						@icon.Sun()
+					}
+					@item.Content(item.ContentProps{Class: "flex-row items-center gap-3"}) {
+						@item.Title(item.TitleProps{Class: "shrink-0"}) {
+							Brightness
+						}
+					}
+					@item.Actions(item.ActionsProps{Class: "flex-1"}) {
+						@slider.Slider(slider.Props{Values: []float64{90}, Max: 100, Class: "w-full"})
+					}
+				}
+				@item.Item(item.Props{Size: item.SizeSm, Variant: item.VariantOutline}) {
+					@item.Media(item.MediaProps{Variant: item.MediaVariantIcon}) {
+						@icon.Thermometer()
+					}
+					@item.Content(item.ContentProps{Class: "flex-row items-center gap-3"}) {
+						@item.Title(item.TitleProps{Class: "shrink-0"}) {
+							Color Temp
+						}
+					}
+					@item.Actions(item.ActionsProps{Class: "flex-1"}) {
+						@slider.Slider(slider.Props{Values: []float64{70}, Max: 100})
+					}
+				}
+				@item.Item(item.Props{Size: item.SizeSm, Variant: item.VariantOutline}) {
+					@item.Media(item.MediaProps{Variant: item.MediaVariantIcon}) {
+						@icon.Volume2()
+					}
+					@item.Content(item.ContentProps{Class: "flex-row items-center gap-3"}) {
+						@item.Title(item.TitleProps{Class: "shrink-0"}) {
+							Volume
+						}
+					}
+					@item.Actions(item.ActionsProps{Class: "flex-1"}) {
+						@slider.Slider(slider.Props{Values: []float64{30}, Max: 100})
+					}
+				}
+				@item.Item(item.Props{Size: item.SizeSm, Variant: item.VariantOutline}) {
+					@item.Media(item.MediaProps{Variant: item.MediaVariantIcon}) {
+						@icon.Timer()
+					}
+					@item.Content(item.ContentProps{Class: "flex-row items-center gap-3"}) {
+						@item.Title(item.TitleProps{Class: "shrink-0"}) {
+							Fade
+						}
+					}
+					@item.Actions(item.ActionsProps{Class: "flex-1"}) {
+						@slider.Slider(slider.Props{Values: []float64{0}, Max: 100})
+					}
+				}
+			}
+		}
+	}
+}
+
+templ cardSavingsTargets() {
+	<div class="grid grid-cols-2 gap-(--gap)">
+		@card.Card() {
+			@card.Header() {
+				@card.Title() {
+					Savings Targets
+				}
+				@card.Description() {
+					Active milestones for 2024
+				}
+				@card.Action() {
+					@button.Button(button.Props{Variant: button.VariantOutline, Size: button.SizeSm}) {
+						New Goal
+					}
+				}
+			}
+			@card.Content() {
+				@item.Group(item.GroupProps{Class: "gap-3"}) {
+					@item.Item(item.Props{Variant: item.VariantMuted, Class: "flex-col items-stretch"}) {
+						@item.Content(item.ContentProps{Class: "gap-3"}) {
+							@item.Description(item.DescriptionProps{Class: "cn-font-heading text-xs font-medium tracking-wider text-muted-foreground uppercase"}) {
+								Retirement
+							}
+							<span class="text-3xl font-semibold tabular-nums">$420,000</span>
+							@progress.Progress(progress.Props{Value: 65})
+						}
+						@item.Footer() {
+							<span class="text-sm text-muted-foreground">65% achieved</span>
+							<span class="text-sm font-medium tabular-nums">$273,000</span>
+						}
+					}
+					@item.Item(item.Props{Variant: item.VariantMuted, Class: "flex-col items-stretch"}) {
+						@item.Content(item.ContentProps{Class: "gap-3"}) {
+							@item.Description(item.DescriptionProps{Class: "cn-font-heading text-xs font-medium tracking-wider text-muted-foreground uppercase"}) {
+								Real Estate
+							}
+							<span class="text-3xl font-semibold tabular-nums">$85,000</span>
+							@progress.Progress(progress.Props{Value: 32})
+						}
+						@item.Footer() {
+							<span class="text-sm text-muted-foreground">32% achieved</span>
+							<span class="text-sm font-medium tabular-nums">$27,200</span>
+						}
+					}
+				}
+			}
+			@card.Footer() {
+				@card.Description(card.DescriptionProps{Class: "text-center"}) {
+					You have not met your targets for this year.
+				}
+			}
+		}
+		@card.Card() {
+			@card.Header() {
+				@card.Title() {
+					Buy Investment
+				}
+			}
+			@card.Content(card.ContentProps{Class: "flex flex-1 flex-col gap-3"}) {
+				@field.Group(field.GroupProps{Class: "flex-1"}) {
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "invest-amount"}) {
+							Amount to Invest
+						}
+						@inputgroup.InputGroup() {
+							@inputgroup.Addon() {
+								@inputgroup.Text() {
+									$
+								}
+							}
+							@inputgroup.Input(inputgroup.InputProps{ID: "invest-amount", Value: "1,000.00"})
+						}
+					}
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "invest-type"}) {
+							Order Type
+						}
+						@selectcomp.Select() {
+							@selectcomp.Trigger(selectcomp.TriggerProps{ID: "invest-type", Class: "w-full"}) {
+								@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select"})
+							}
+							@selectcomp.Content() {
+								@selectcomp.Group() {
+									@selectcomp.Item(selectcomp.ItemProps{Value: "market", Selected: true}) {
+										Market Order
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "limit"}) {
+										Limit Order
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "stop"}) {
+										Stop Order
+									}
+								}
+							}
+						}
+						@field.Description() {
+							Market orders execute at the current price.
+						}
+					}
+					<div class="flex flex-col gap-2">
+						<div class="flex items-center justify-between">
+							<span class="text-sm text-muted-foreground">Estimated Shares</span>
+							<span class="text-sm font-semibold tabular-nums">1.95</span>
+						</div>
+						<div class="flex items-center justify-between">
+							<span class="text-sm text-muted-foreground">Buying Power</span>
+							<span class="text-sm font-semibold tabular-nums">$12,450.00</span>
+						</div>
+					</div>
+				}
+			}
+			@card.Footer(card.FooterProps{Class: "flex-col gap-3"}) {
+				@button.Button(button.Props{Class: "w-full"}) {
+					Review Order
+				}
+				@card.Description(card.DescriptionProps{Class: "text-center"}) {
+					Trades are typically executed within minutes during market hours.
+				}
+			}
+		}
+	</div>
+}
+
+type recentTransaction struct {
+	icon     func(...icon.Props) templ.Component
+	name     string
+	category string
+	date     string
+	amount   string
+	positive bool
+}
+
+var recentTransactions = []recentTransaction{
+	{icon: icon.Coffee, name: "Blue Bottle Coffee", category: "Food & Drink", date: "Today, 10:24 AM", amount: "-$6.50"},
+	{icon: icon.ShoppingCart, name: "Whole Foods Market", category: "Groceries", date: "Yesterday", amount: "-$142.30"},
+	{icon: icon.Wallet, name: "Stripe Payout", category: "Income", date: "Oct 12", amount: "+$4,200.00", positive: true},
+	{icon: icon.Car, name: "Uber Technologies", category: "Transport", date: "Oct 11", amount: "-$24.10"},
+	{icon: icon.Tv, name: "Netflix Subscription", category: "Entertainment", date: "Oct 10", amount: "-$19.99"},
+}
+
+templ cardRecentTransactions() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Recent Transactions
+			}
+			@card.Description() {
+				Your latest account activity.
+			}
+			@card.Action() {
+				@button.Button(button.Props{Variant: button.VariantOutline, Size: button.SizeSm}) {
+					View All
+				}
+			}
+		}
+		@card.Content() {
+			@table.Table() {
+				@table.Body() {
+					for _, tx := range recentTransactions {
+						@table.Row() {
+							@table.Cell(table.CellProps{Class: "w-10"}) {
+								<div class="flex size-10 items-center justify-center rounded-lg bg-muted">
+									@tx.icon(icon.Props{Class: "size-4 shrink-0"})
+								</div>
+							}
+							@table.Cell() {
+								<div class="flex flex-col">
+									<span class="font-medium">{ tx.name }</span>
+									<span class="text-sm text-muted-foreground">{ tx.category }</span>
+								</div>
+							}
+							@table.Cell(table.CellProps{Class: "text-sm text-muted-foreground"}) {
+								{ tx.date }
+							}
+							@table.Cell(table.CellProps{Class: "text-right"}) {
+								if tx.positive {
+									<span class="text-sm font-semibold text-emerald-500 tabular-nums">{ tx.amount }</span>
+								} else {
+									<span class="text-sm font-semibold tabular-nums">{ tx.amount }</span>
+								}
+							}
+							@table.Cell(table.CellProps{Class: "w-8"}) {
+								@dropdownmenu.DropdownMenu() {
+									@button.Button(button.Props{Variant: button.VariantGhost, Size: button.SizeIconSm, Attributes: dropdownmenu.Trigger(ctx)}) {
+										@icon.Ellipsis()
+									}
+									@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignEnd}) {
+										@dropdownmenu.Item() {
+											View details
+										}
+										@dropdownmenu.Item() {
+											Add note
+										}
+										@dropdownmenu.Item() {
+											Categorize
+										}
+										@dropdownmenu.Separator()
+										@dropdownmenu.Item() {
+											Dispute
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+type sidebarNavEntry struct {
+	icon   func(...icon.Props) templ.Component
+	label  string
+	active bool
+}
+
+type sidebarNavGroup struct {
+	label   string
+	entries []sidebarNavEntry
+}
+
+var sidebarNavLeft = []sidebarNavGroup{
+	{
+		label: "Overview",
+		entries: []sidebarNavEntry{
+			{icon: icon.LayoutDashboard, label: "Dashboard", active: true},
+			{icon: icon.ArrowLeftRight, label: "Transactions"},
+			{icon: icon.TrendingUp, label: "Investments"},
+			{icon: icon.Building2, label: "Accounts"},
+			{icon: icon.ChartPie, label: "Spending"},
+		},
+	},
+	{
+		label: "Planning",
+		entries: []sidebarNavEntry{
+			{icon: icon.Target, label: "Goals"},
+			{icon: icon.Wallet, label: "Budget"},
+			{icon: icon.FileChartColumn, label: "Reports"},
+			{icon: icon.FileText, label: "Documents"},
+		},
+	},
+}
+
+var sidebarNavRight = []sidebarNavGroup{
+	{
+		label: "Account",
+		entries: []sidebarNavEntry{
+			{icon: icon.User, label: "Profile"},
+			{icon: icon.CreditCard, label: "Billing", active: true},
+			{icon: icon.Bell, label: "Notifications"},
+			{icon: icon.Shield, label: "Security"},
+			{icon: icon.Paintbrush, label: "Appearance"},
+		},
+	},
+	{
+		label: "Support",
+		entries: []sidebarNavEntry{
+			{icon: icon.CircleQuestionMark, label: "Help Center"},
+			{icon: icon.MessageSquare, label: "Contact Us"},
+			{icon: icon.BookOpen, label: "Documentation"},
+			{icon: icon.Activity, label: "Status"},
+		},
+	},
+}
+
+templ cardSidebarNav() {
+	<div class="grid grid-cols-2 items-start gap-6">
+		@sidebarNavCard(sidebarNavLeft)
+		@sidebarNavCard(sidebarNavRight)
+	</div>
+}
+
+templ sidebarNavCard(groups []sidebarNavGroup) {
+	@card.Card(card.Props{Class: "overflow-hidden py-0"}) {
+		@sidebar.Provider(sidebar.ProviderProps{Class: "min-h-0"}) {
+			@sidebar.Sidebar(sidebar.Props{Collapsible: sidebar.CollapsibleNone, Class: "w-full bg-transparent"}) {
+				@sidebar.Content(sidebar.ContentProps{Class: "gap-0"}) {
+					for i, group := range groups {
+						if i > 0 {
+							@sidebar.Separator(sidebar.SeparatorProps{Class: "w-auto!"})
+						}
+						@sidebar.Group(sidebar.GroupProps{Class: utils.IfElse(i == 0, "pb-1", "pt-1")}) {
+							@sidebar.GroupLabel() {
+								{ group.label }
+							}
+							@sidebar.GroupContent() {
+								@sidebar.Menu() {
+									for _, entry := range group.entries {
+										@sidebar.MenuItem() {
+											@sidebar.MenuButton(sidebar.MenuButtonProps{IsActive: entry.active}) {
+												@entry.icon()
+												{ entry.label }
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+templ cardPayments() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "flex flex-col gap-3"}) {
+			@breadcrumb.Breadcrumb() {
+				@breadcrumb.List() {
+					@breadcrumb.Item() {
+						@breadcrumb.Link(breadcrumb.LinkProps{Href: "#"}) {
+							Home
+						}
+					}
+					@breadcrumb.Separator()
+					@breadcrumb.Item() {
+						@dropdownmenu.DropdownMenu() {
+							@button.Button(button.Props{Size: button.SizeIconSm, Variant: button.VariantGhost, Attributes: dropdownmenu.Trigger(ctx)}) {
+								@icon.Ellipsis()
+								<span class="sr-only">Account options</span>
+							}
+							@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignStart}) {
+								@dropdownmenu.Group() {
+									@dropdownmenu.Item() {
+										Profile
+									}
+									@dropdownmenu.Item() {
+										Statements
+									}
+									@dropdownmenu.Item() {
+										Documents
+									}
+								}
+							}
+						}
+					}
+					@breadcrumb.Separator()
+					@breadcrumb.Item() {
+						@breadcrumb.Page() {
+							Payments
+						}
+					}
+				}
+			}
+		}
+		@card.Content() {
+			@item.Group() {
+				@paymentItem(icon.Gauge, "Change transfer limit", "Adjust how much you can send from your balance.")
+				@paymentItem(icon.Calendar, "Scheduled transfers", "Set up a transfer to send at a later date.")
+				@paymentItem(icon.Repeat, "Direct Debits", "Set up and manage regular payments.")
+				@paymentItem(icon.RefreshCw, "Recurring card payments", "Manage your repeated card transactions.")
+			}
+		}
+	}
+}
+
+templ paymentItem(iconFn func(...icon.Props) templ.Component, title, description string) {
+	@item.Item(item.Props{Variant: item.VariantMuted, Href: "#"}) {
+		@item.Media(item.MediaProps{Variant: item.MediaVariantIcon}) {
+			@iconFn()
+		}
+		@item.Content() {
+			@item.Title() {
+				{ title }
+			}
+			@item.Description() {
+				{ description }
+			}
+		}
+		@icon.ChevronRight(icon.Props{Class: "size-4 shrink-0 text-muted-foreground"})
+	}
+}
+
+templ cardFrontDoor() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Front Door
+			}
+			@card.Description() {
+				Smart Lock Pro
+			}
+			@card.Action() {
+				<div class="flex items-center gap-1.5 text-sm text-muted-foreground">
+					Locked
+					@icon.Lock(icon.Props{Class: "size-4"})
+				</div>
+			}
+		}
+		@card.Content() {
+			<div class="relative flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-muted bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,var(--border)_10px,var(--border)_11px)]">
+				@badge.Badge(badge.Props{Variant: badge.VariantDestructive, Class: "absolute top-2 right-2"}) {
+					Live
+				}
+			</div>
+		}
+	}
+}
+
+type catalogHolding struct {
+	ticker string
+	name   string
+	typ    string
+	added  string
+	shares string
+	value  string
+}
+
+var catalogHoldings = []catalogHolding{
+	{ticker: "VOO", name: "Vanguard S&P 500 ETF", typ: "ETF", added: "Jan 2021", shares: "112", value: "$48,230.40"},
+	{ticker: "VIG", name: "Vanguard Dividend Appreciation", typ: "ETF", added: "Mar 2022", shares: "450", value: "$26,033.79"},
+	{ticker: "AAPL", name: "Apple Inc.", typ: "Stock", added: "Nov 2020", shares: "85", value: "$18,488.90"},
+	{ticker: "O", name: "Realty Income Corp", typ: "REIT", added: "Jun 2023", shares: "320", value: "$15,136.59"},
+}
+
+templ cardReleaseCatalog() {
+	@card.Card() {
+		@card.Header() {
+			<div class="flex items-center justify-between gap-3">
+				@inputgroup.InputGroup(inputgroup.Props{Class: "max-w-sm"}) {
+					@inputgroup.Addon() {
+						@icon.Search()
+					}
+					@inputgroup.Input(inputgroup.InputProps{Placeholder: "Search holdings or tickers..."})
+				}
+				@togglegroup.ToggleGroup(togglegroup.Props{
+					Type:    togglegroup.TypeSingle,
+					Variant: togglegroup.VariantOutline,
+					Spacing: utils.Ptr(1),
+				}) {
+					@togglegroup.Item(togglegroup.ItemProps{Value: "stocks"}) {
+						Stocks
+					}
+					@togglegroup.Item(togglegroup.ItemProps{Value: "etfs", Pressed: true}) {
+						ETFs
+					}
+					@togglegroup.Item(togglegroup.ItemProps{Value: "reits"}) {
+						REITs
+					}
+				}
+			</div>
+		}
+		@card.Content() {
+			@item.Group() {
+				for _, holding := range catalogHoldings {
+					@item.Item(item.Props{Variant: item.VariantMuted}) {
+						@item.Media() {
+							<div class="flex size-12 items-center justify-center rounded-lg border text-sm font-semibold">
+								{ holding.ticker }
+							</div>
+						}
+						@item.Content() {
+							@item.Title() {
+								{ holding.name }
+							}
+							@item.Description(item.DescriptionProps{Class: "text-xs tracking-wider uppercase"}) {
+								{ holding.shares } Shares · { holding.added }
+							}
+						}
+						<div class="flex shrink-0 items-center gap-6">
+							@badge.Badge(badge.Props{Variant: badge.VariantOutline}) {
+								{ holding.typ }
+							}
+							<div class="flex flex-col items-end gap-0.5">
+								<span class="text-xs tracking-wider text-muted-foreground uppercase">Value</span>
+								<span class="font-medium tabular-nums">{ holding.value }</span>
+							</div>
+						</div>
+					}
+				}
+			}
+		}
+	}
+}
+
+templ cardAccountAccess() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Account Access
+			}
+			@card.Description() {
+				Update your credentials or re-authenticate.
+			}
+		}
+		@card.Content() {
+			@field.Group() {
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "email-address"}) {
+						Email Address
+					}
+					@input.Input(input.Props{ID: "email-address", Type: input.TypeEmail, Value: "artist@studio.inc"})
+				}
+				@field.Field() {
+					<div class="flex items-center justify-between">
+						@field.Label(field.LabelProps{For: "current-password"}) {
+							Current Password
+						}
+						<a href="#" class="text-xs font-medium tracking-wider text-muted-foreground uppercase hover:text-foreground">
+							Forgot?
+						</a>
+					</div>
+					@input.Input(input.Props{ID: "current-password", Type: input.TypePassword, Value: "password123"})
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-4"}) {
+			@button.Button(button.Props{Class: "w-full"}) {
+				@icon.LockKeyhole()
+				Update Security
+			}
+			@item.Item(item.Props{Variant: item.VariantMuted, Href: "#"}) {
+				@item.Media(item.MediaProps{Variant: item.MediaVariantIcon}) {
+					@icon.CircleAlert(icon.Props{Class: "text-destructive"})
+				}
+				@item.Content() {
+					@item.Title() {
+						Danger Zone
+					}
+					@item.Description(item.DescriptionProps{Class: "line-clamp-1"}) {
+						Archive account and remove catalog
+					}
+				}
+				@icon.ArrowRight(icon.Props{Class: "size-4"})
+			}
+		}
+	}
+}
+
+var cardOverviewActivityData = []chart.Datum{
+	{"month": "Jan", "amount": 40},
+	{"month": "Feb", "amount": 55},
+	{"month": "Mar", "amount": 35},
+	{"month": "Apr", "amount": 60},
+	{"month": "May", "amount": 45},
+	{"month": "Jun", "amount": 50},
+	{"month": "Jul", "amount": 65},
+	{"month": "Aug", "amount": 40},
+	{"month": "Sep", "amount": 55},
+	{"month": "Oct", "amount": 70},
+	{"month": "Nov", "amount": 45},
+	{"month": "Dec", "amount": 80},
+}
+
+var cardOverviewChartConfig = chart.Config{
+	{Key: "amount", Label: "Activity", Color: "var(--chart-2)"},
+}
+
+func cardOverviewMonthInitial(v any) string {
+	return v.(string)[:1]
+}
+
+templ cardOverview() {
+	<div class="grid grid-cols-2 gap-3">
+		@card.Card() {
+			@card.Content() {
+				@card.Description() {
+					Card Balance
+				}
+				@card.Title(card.TitleProps{Class: "text-2xl tabular-nums"}) {
+					US$12.94
+				}
+				@card.Description(card.DescriptionProps{Class: "tabular-nums"}) {
+					US$11,337.06 Available
+				}
+			}
+		}
+		@card.Card(card.Props{Class: "flex flex-col justify-between"}) {
+			@card.Content(card.ContentProps{Class: "flex flex-1 flex-col justify-between"}) {
+				<div class="flex flex-col gap-1">
+					@card.Description() {
+						Payment Due
+					}
+					@card.Title(card.TitleProps{Class: "text-2xl"}) {
+						1 Apr
+					}
+				</div>
+				@button.Button(button.Props{Variant: button.VariantOutline, Size: button.SizeSm, Class: "mt-3 w-full"}) {
+					Pay Early
+				}
+			}
+		}
+		@card.Card(card.Props{Class: "col-span-2"}) {
+			@card.Content(card.ContentProps{Class: "flex flex-col gap-2"}) {
+				<div class="flex items-center justify-between">
+					@card.Description() {
+						Yearly Activity
+					}
+					@badge.Badge(badge.Props{Variant: badge.VariantSecondary}) {
+						+US$0.25 Daily Cash
+					}
+				</div>
+				@chart.Container(chart.ContainerProps{ID: "p02-card-overview", Config: cardOverviewChartConfig, Class: "h-20 w-full"}) {
+					@chart.BarChart(chart.BarChartProps{
+						Data:   cardOverviewActivityData,
+						Margin: &chart.Margin{Top: 4, Right: 0, Bottom: 0, Left: 0},
+					}) {
+						@chart.XAxis(chart.XAxisProps{DataKey: "month", TickMargin: 4, TickFormatter: cardOverviewMonthInitial})
+						@chart.Tooltip(chart.TooltipProps{
+							Cursor:  chart.Bool(false),
+							Content: chart.TooltipContentProps{HideLabel: true},
+						})
+						@chart.Bar(chart.BarProps{DataKey: "amount", Fill: "var(--color-amount)", Radius: []float64{3, 3, 0, 0}})
+					}
+				}
+			}
+		}
+	</div>
+}
+
+type transferAccount struct {
+	label string
+	value string
+}
+
+var transferFromAccounts = []transferAccount{
+	{label: "Main Checking (··8402) — $12,450.00", value: "checking"},
+	{label: "Business (··7731) — $8,920.00", value: "business"},
+}
+
+var transferToAccounts = []transferAccount{
+	{label: "High Yield Savings (··1192) — $42,100.00", value: "savings"},
+	{label: "Investment (··3349) — $18,200.00", value: "investment"},
+}
+
+templ cardTransferFunds() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Transfer Funds
+			}
+			@card.Description() {
+				Move money between your connected accounts.
+			}
+			@card.Action() {
+				@button.Button(button.Props{Variant: button.VariantGhost, Size: button.SizeIconSm, Class: "bg-muted"}) {
+					@icon.X()
+				}
+			}
+		}
+		@card.Content() {
+			@field.Group() {
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "transfer-amount"}) {
+						Amount to Transfer
+					}
+					@inputgroup.InputGroup() {
+						@inputgroup.Addon() {
+							@inputgroup.Text() {
+								$
+							}
+						}
+						@inputgroup.Input(inputgroup.InputProps{ID: "transfer-amount", Value: "1,200.00"})
+					}
+				}
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "from-account"}) {
+						From Account
+					}
+					@transferAccountSelect("from-account", transferFromAccounts, "checking")
+				}
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "to-account"}) {
+						To Account
+					}
+					@transferAccountSelect("to-account", transferToAccounts, "savings")
+				}
+				@item.Item(item.Props{Variant: item.VariantMuted, Class: "flex-col items-stretch"}) {
+					@item.Content(item.ContentProps{Class: "gap-3"}) {
+						<div class="flex items-center justify-between">
+							<span class="text-sm text-muted-foreground">Estimated arrival</span>
+							<span class="text-sm font-medium">Today, Apr 14</span>
+						</div>
+						@separator.Separator()
+						<div class="flex items-center justify-between">
+							<span class="text-sm text-muted-foreground">Transaction fee</span>
+							<span class="text-sm font-medium tabular-nums">$0.00</span>
+						</div>
+						@separator.Separator()
+						<div class="flex items-center justify-between">
+							<span class="text-sm font-medium">Total amount</span>
+							<span class="text-sm font-semibold tabular-nums">$1,200.00</span>
+						</div>
+					}
+				}
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Class: "w-full"}) {
+				Confirm Transfer
+			}
+		}
+	}
+}
+
+templ transferAccountSelect(id string, accounts []transferAccount, selected string) {
+	@selectcomp.Select() {
+		@selectcomp.Trigger(selectcomp.TriggerProps{ID: id, Class: "w-full"}) {
+			@selectcomp.Value()
+		}
+		@selectcomp.Content() {
+			@selectcomp.Group() {
+				for _, account := range accounts {
+					@selectcomp.Item(selectcomp.ItemProps{Value: account.value, Selected: account.value == selected}) {
+						{ account.label }
+					}
+				}
+			}
+		}
+	}
+}
+
+templ cardCoverArt() {
+	@card.Card() {
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-3"}) {
+			@label.Label(label.Props{For: "cover-art", Class: "text-center text-xs font-normal tracking-wider text-muted-foreground uppercase"}) {
+				Cover Art
+			}
+			@item.Item(item.Props{Variant: item.VariantOutline, Class: "aspect-square"}) {
+				<label for="cover-art" class="flex size-full cursor-pointer items-center justify-center">
+					@icon.Image(icon.Props{Class: "size-10 text-muted-foreground/50"})
+				</label>
+			}
+			<input id="cover-art" type="file" accept="image/jpeg,image/png" class="sr-only"/>
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-2"}) {
+			@button.Button(button.Props{Variant: button.VariantSecondary, Class: "w-full cursor-pointer"}) {
+				Upload Artwork
+			}
+			@card.Description(card.DescriptionProps{Class: "text-center text-xs"}) {
+				Minimum 3000 × 3000px
+				<br/>
+				JPEG or PNG only
+			}
+		}
+	}
+}
+
+templ cardLoading() {
+	@card.Card() {
+		@card.Header() {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-32"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-48"})
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-32 w-full rounded-lg"})
+			<div class="flex flex-col gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-full"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-3/4"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-1/2"})
+			</div>
+			<div class="flex gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 flex-1 rounded-md"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 flex-1 rounded-md"})
+			</div>
+		}
+	}
+}
+
+templ cardReceivingMethod() {
+	@card.Card() {
+		@card.Header() {
+			@card.Description() {
+				Payout Preferences
+			}
+			@card.Title() {
+				Receiving Method
+			}
+			@card.Action() {
+				@button.Button(button.Props{Variant: button.VariantGhost, Size: button.SizeIconSm, Class: "bg-muted"}) {
+					@icon.X()
+				}
+			}
+		}
+		@card.Content() {
+			@field.Group() {
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "account-holder"}) {
+						Account Holder Name
+					}
+					@input.Input(input.Props{ID: "account-holder", Value: "Synthetic Horizons Music LLC"})
+				}
+				@field.Set() {
+					@field.Legend(field.LegendProps{Variant: field.LegendVariantLabel}) {
+						Receiving Method
+					}
+					<div data-slot="radio-group" class="grid grid-cols-1 items-start gap-3 md:grid-cols-2 style-sera:grid-cols-1">
+						@field.Label(field.LabelProps{For: "method-bank"}) {
+							@field.Field(field.Props{Orientation: field.OrientationHorizontal, Class: "pb-2.5"}) {
+								@radiogroup.Item(radiogroup.ItemProps{Name: "receiving-method", Value: "bank", ID: "method-bank", Checked: true})
+								@field.Content() {
+									@field.Title() {
+										Bank Transfer
+									}
+									@field.Description() {
+										SWIFT / IBAN
+									}
+								}
+							}
+						}
+						@field.Label(field.LabelProps{For: "method-paypal"}) {
+							@field.Field(field.Props{Orientation: field.OrientationHorizontal, Class: "pb-2.5"}) {
+								@radiogroup.Item(radiogroup.ItemProps{Name: "receiving-method", Value: "paypal", ID: "method-paypal"})
+								@field.Content() {
+									@field.Title() {
+										PayPal
+									}
+									@field.Description(field.DescriptionProps{Class: "line-clamp-1"}) {
+										Instant Payout
+									}
+								}
+							}
+						}
+					</div>
+				}
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "iban"}) {
+						IBAN / Account Number
+					}
+					@input.Input(input.Props{ID: "iban", Placeholder: "DE89 3704 0044 ...."})
+				}
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Class: "w-full", Disabled: true}) {
+				Save Payout Settings
+			}
+		}
+	}
+}
+
+var powerUsageData = []chart.Datum{
+	{"hour": "6a", "usage": 1.2},
+	{"hour": "8a", "usage": 2.8},
+	{"hour": "10a", "usage": 3.1},
+	{"hour": "12p", "usage": 2.4},
+	{"hour": "2p", "usage": 3.4},
+	{"hour": "4p", "usage": 2.9},
+	{"hour": "6p", "usage": 3.8},
+	{"hour": "8p", "usage": 3.2},
+}
+
+var powerUsageConfig = chart.Config{
+	{Key: "usage", Label: "Usage (kW)", Color: "var(--chart-2)"},
+}
+
+templ cardPowerUsage() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Power Usage
+			}
+			@card.Description() {
+				Whole Home
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			@chart.Container(chart.ContainerProps{ID: "p02-power-usage", Config: powerUsageConfig, Class: "h-[140px] w-full"}) {
+				@chart.BarChart(chart.BarChartProps{
+					Data:   powerUsageData,
+					Margin: &chart.Margin{Left: 0, Right: 0, Top: 4, Bottom: 0},
+				}) {
+					@chart.XAxis(chart.XAxisProps{DataKey: "hour", TickMargin: 6})
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  chart.Bool(false),
+						Content: chart.TooltipContentProps{HideLabel: true},
+					})
+					@chart.Bar(chart.BarProps{DataKey: "usage", Fill: "var(--color-usage)", Radius: []float64{4, 4, 0, 0}})
+				}
+			}
+			@separator.Separator()
+			<div class="grid grid-cols-2 gap-4">
+				<div class="flex flex-col gap-0.5">
+					<span class="text-sm text-muted-foreground">Currently Using</span>
+					<span class="text-lg font-semibold tabular-nums">3.4 kW</span>
+				</div>
+				<div class="flex flex-col gap-0.5">
+					<span class="text-sm text-muted-foreground">Solar Gen</span>
+					<span class="text-lg font-semibold text-chart-1 tabular-nums">+1.2 kW</span>
+				</div>
+			</div>
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col items-start gap-1"}) {
+			<span class="text-sm text-muted-foreground">Battery Level</span>
+			<div class="flex w-full items-center gap-2">
+				@progress.Progress(progress.Props{Value: 85, Class: "flex-1"})
+				<span class="text-sm font-medium tabular-nums">85%</span>
+			</div>
+		}
+	}
+}
+
+templ cardEmptyConnectBank() {
+	@card.Card() {
+		@card.Content() {
+			@empty.Empty(empty.Props{Class: "p-4"}) {
+				@empty.Media(empty.MediaProps{Variant: empty.MediaVariantIcon}) {
+					@icon.CreditCard()
+				}
+				@empty.Header() {
+					@empty.Title() {
+						Connect Bank
+					}
+					@empty.Description() {
+						Link your payout method to receive monthly royalty distributions automatically.
+					}
+				}
+				@empty.Content() {
+					@button.Button() {
+						Set Up Payouts
+					}
+				}
+			}
+		}
+	}
+}
+
+templ cardRollerShades() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Living Room
+			}
+			@card.Description() {
+				Roller Shades
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			<div class="flex h-32 flex-col overflow-hidden rounded-lg border bg-muted">
+				<div class="bg-muted-foreground transition-all duration-300" style="height: 50%"></div>
+			</div>
+			<div class="flex items-center gap-3">
+				<span class="text-xs font-medium tracking-wider text-muted-foreground uppercase">Open</span>
+				@slider.Slider(slider.Props{Values: []float64{50}, Max: 100, Class: "flex-1"})
+				<span class="text-xs font-medium tracking-wider text-muted-foreground uppercase">Close</span>
+			</div>
+		}
+		@card.Footer() {
+			@togglegroup.ToggleGroup(togglegroup.Props{
+				Type:    togglegroup.TypeSingle,
+				Variant: togglegroup.VariantOutline,
+				Spacing: utils.Ptr(1),
+				Class:   "w-full",
+			}) {
+				@togglegroup.Item(togglegroup.ItemProps{Value: "open", Class: "flex-1"}) {
+					Open
+				}
+				@togglegroup.Item(togglegroup.ItemProps{Value: "half", Pressed: true, Class: "flex-1"}) {
+					Half
+				}
+				@togglegroup.Item(togglegroup.ItemProps{Value: "closed", Class: "flex-1"}) {
+					Closed
+				}
+			}
+		}
+	}
+}
+
+var stockTickers = []string{"VOO", "VIG", "AAPL", "MSFT", "GOOGL", "AMZN", "TSLA"}
+
+var stockPerformanceData = []chart.Datum{
+	{"month": "Jan", "price": 412},
+	{"month": "Feb", "price": 438},
+	{"month": "Mar", "price": 395},
+	{"month": "Apr", "price": 450},
+	{"month": "May", "price": 420},
+	{"month": "Jun", "price": 462},
+}
+
+var stockPerformanceConfig = chart.Config{
+	{Key: "price", Label: "Price", Color: "var(--chart-1)"},
+}
+
+templ cardStockPerformance() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Stock Performance
+			}
+			@card.Description() {
+				6-month price history.
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			@field.Group() {
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "ticker-select"}) {
+						Ticker
+					}
+					@combobox.Combobox(combobox.Props{Value: "VOO"}) {
+						@combobox.Input(combobox.InputProps{ID: "ticker-select", Placeholder: "Search ticker..."})
+						@combobox.Content() {
+							@combobox.Empty() {
+								No tickers found.
+							}
+							@combobox.List() {
+								for _, ticker := range stockTickers {
+									@combobox.Item(combobox.ItemProps{Value: ticker}) {
+										{ ticker }
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			@separator.Separator(separator.Props{Class: "style-sera:hidden"})
+			@chart.Container(chart.ContainerProps{ID: "p02-stock-performance", Config: stockPerformanceConfig, Class: "h-[200px] w-full"}) {
+				@chart.AreaChart(chart.AreaChartProps{
+					AccessibilityLayer: true,
+					Data:               stockPerformanceData,
+					Margin:             &chart.Margin{Left: 0, Right: 0, Top: 8, Bottom: 0},
+				}) {
+					@chart.Defs() {
+						@chart.LinearGradient(chart.LinearGradientProps{ID: "fillPrice", X1: "0", Y1: "0", X2: "0", Y2: "1"}) {
+							<stop offset="0%" stop-color="var(--color-price)" stop-opacity="0.3"></stop>
+							<stop offset="100%" stop-color="var(--color-price)" stop-opacity="0.05"></stop>
+						}
+					}
+					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  chart.Bool(false),
+						Content: chart.TooltipContentProps{HideLabel: true},
+					})
+					// strokeWidth={2} of the source is not portable: chart.AreaProps
+					// has no stroke width prop.
+					@chart.Area(chart.AreaProps{
+						DataKey: "price",
+						Type:    "monotone",
+						Stroke:  "var(--color-price)",
+						Fill:    "url(#fillPrice)",
+					})
+				}
+			}
+		}
+	}
+}
+
+templ cardEmptyExploreCatalog() {
+	@card.Card() {
+		@card.Content() {
+			@empty.Empty(empty.Props{Class: "p-4"}) {
+				@empty.Media(empty.MediaProps{Variant: empty.MediaVariantIcon}) {
+					@icon.AudioLines()
+				}
+				@empty.Header() {
+					@empty.Title() {
+						Explore Catalog
+					}
+					@empty.Description() {
+						Check your ISRC codes, metadata, and visual assets before going live.
+					}
+				}
+				@empty.Content() {
+					@button.Button() {
+						View Catalog
+					}
+				}
+			}
+		}
+	}
+}
+
+templ cardNewMilestone() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Set a new milestone
+			}
+			@card.Description() {
+				Define your financial target and we'll help you pace your savings.
+			}
+		}
+		@card.Content() {
+			@field.Group() {
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "goal-name"}) {
+						Goal Name
+					}
+					@input.Input(input.Props{ID: "goal-name", Placeholder: "e.g. New Car, Home Downpayment"})
+				}
+				<div class="grid grid-cols-2 gap-3">
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "target-amount"}) {
+							Target Amount
+						}
+						@input.Input(input.Props{ID: "target-amount", Value: "$15,000"})
+					}
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "target-date"}) {
+							Target Date
+						}
+						@input.Input(input.Props{ID: "target-date", Value: "Dec 2025"})
+					}
+				</div>
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-2"}) {
+			@button.Button(button.Props{Class: "w-full"}) {
+				Create Goal
+			}
+			@button.Button(button.Props{Variant: button.VariantOutline, Class: "w-full"}) {
+				Cancel
+			}
+		}
+	}
+}
+
+templ cardSocialLinks() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Social Links
+			}
+		}
+		@card.Content() {
+			@field.Group() {
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "spotify-url"}) {
+						Spotify Artist URL
+					}
+					@inputgroup.InputGroup() {
+						@inputgroup.Addon() {
+							@icon.CirclePlus()
+						}
+						@inputgroup.Input(inputgroup.InputProps{ID: "spotify-url", Value: "spotify.com/artist/3j...2k"})
+					}
+				}
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "instagram-handle"}) {
+						Instagram Handle
+					}
+					@inputgroup.InputGroup() {
+						@inputgroup.Addon() {
+							@icon.Camera()
+						}
+						@inputgroup.Input(inputgroup.InputProps{ID: "instagram-handle", Value: "@axadrn_music"})
+					}
+				}
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "soundcloud-url"}) {
+						SoundCloud URL
+					}
+					@inputgroup.InputGroup() {
+						@inputgroup.Addon() {
+							@icon.Cloud()
+						}
+						@inputgroup.Input(inputgroup.InputProps{ID: "soundcloud-url", Placeholder: "soundcloud.com/username"})
+					}
+				}
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "website-url"}) {
+						Website
+					}
+					@inputgroup.InputGroup() {
+						@inputgroup.Addon() {
+							@icon.Globe()
+						}
+						@inputgroup.Input(inputgroup.InputProps{ID: "website-url", Placeholder: "https://yoursite.com"})
+					}
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "justify-end gap-2 style-sera:justify-center"}) {
+			@button.Button(button.Props{Variant: button.VariantSecondary, Class: "style-sera:flex-1"}) {
+				Discard
+			}
+			@button.Button(button.Props{Class: "style-sera:flex-1"}) {
+				Save Changes
+			}
+		}
+	}
+}
+
+type notificationSetting struct {
+	id          string
+	label       string
+	description string
+	checked     bool
+}
+
+var notificationSettings = []notificationSetting{
+	{id: "transactions", label: "Transaction alerts", description: "Deposits, withdrawals, and transfers.", checked: true},
+	{id: "security", label: "Security alerts", description: "Login attempts and account changes.", checked: true},
+	{id: "goals", label: "Goal milestones", description: "Updates at 25%, 50%, 75%, and 100%.", checked: false},
+	{id: "market", label: "Market updates", description: "Daily portfolio summary and price alerts.", checked: false},
+}
+
+templ cardNotificationSettings() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Notifications
+			}
+			@card.Description() {
+				Choose what you want to be notified about.
+			}
+		}
+		@card.Content() {
+			@field.Group() {
+				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
+					@checkbox.Checkbox(checkbox.Props{ID: "notify-all"})
+					@field.Content() {
+						@field.Label(field.LabelProps{For: "notify-all"}) {
+							Select all
+						}
+					}
+				}
+				for _, setting := range notificationSettings {
+					@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
+						@checkbox.Checkbox(checkbox.Props{ID: "notify-" + setting.id, Checked: setting.checked})
+						@field.Content() {
+							@field.Label(field.LabelProps{For: "notify-" + setting.id}) {
+								{ setting.label }
+							}
+							@field.Description() {
+								{ setting.description }
+							}
+						}
+					}
+				}
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Class: "w-full"}) {
+				Save Preferences
+			}
+		}
+	}
+}
+
+// The preview (item "02") wall cards, ports of
+// registry/bases/base/blocks/preview/cards. The style and font names in the
+// style overview and typography specimen are the defaults (Nova, Geist);
+// shadcn derives them from the live search params in React.
+
+var styleOverviewVariables = []string{
+	"--background",
+	"--foreground",
+	"--primary",
+	"--secondary",
+	"--muted",
+	"--accent",
+	"--border",
+	"--chart-1",
+	"--chart-2",
+	"--chart-3",
+	"--chart-4",
+	"--chart-5",
+}
+
+templ cardStyleOverview() {
+	@card.Card() {
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-6 style-lyra:gap-4 style-mira:gap-4"}) {
+			<div class="flex flex-col gap-1">
+				<div class="cn-font-heading text-2xl font-medium style-lyra:text-lg style-mira:text-lg style-sera:text-lg style-sera:font-semibold style-sera:tracking-wide style-sera:uppercase">
+					Nova - Geist
+				</div>
+				<div class="line-clamp-2 text-base text-muted-foreground style-lyra:text-sm style-mira:text-sm style-sera:text-sm style-sera:leading-relaxed">
+					Designers love packing quirky glyphs into test phrases. This is a
+					preview of the typography styles.
+				</div>
+			</div>
+			<div class="grid grid-cols-6 gap-3">
+				for _, variable := range styleOverviewVariables {
+					<div class="flex flex-col flex-wrap items-center gap-2">
+						<div
+							class="relative aspect-square w-full rounded-lg bg-(--color) after:absolute after:inset-0 after:rounded-lg after:border after:border-border after:mix-blend-darken dark:after:mix-blend-lighten style-sera:rounded-none style-sera:after:rounded-none"
+							style={ templ.SafeCSS("--color: var(" + variable + ")") }
+						></div>
+						<div class="hidden max-w-14 truncate font-mono text-[0.60rem] md:block style-lyra:max-w-10 style-mira:max-w-10">
+							{ variable }
+						</div>
+					</div>
+				}
+			</div>
+		}
+	}
+}
+
+templ cardTypographySpecimen() {
+	@card.Card() {
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-2"}) {
+			<div class="text-xs font-medium text-muted-foreground uppercase">
+				Inherit - Geist
+			</div>
+			<p class="cn-font-heading text-2xl font-medium style-sera:text-lg style-sera:font-semibold style-sera:tracking-wider style-sera:uppercase">
+				Designing with rhythm and hierarchy.
+			</p>
+			<p class="text-sm leading-relaxed text-muted-foreground">
+				A strong body style keeps long-form content readable and balances the
+				visual weight of headings.
+			</p>
+			<p class="text-sm leading-relaxed text-muted-foreground">
+				Thoughtful spacing and cadence help paragraphs scan quickly without
+				feeling dense.
+			</p>
+		}
+		@card.Footer() {
+			@dialog.Dialog() {
+				@button.Button(button.Props{Variant: button.VariantOutline, Class: "w-full", Attributes: dialog.Trigger(ctx)}) {
+					Share Feedback
+				}
+				@dialog.Content() {
+					@dialog.Header() {
+						@dialog.Title() {
+							Share Feedback
+						}
+						@dialog.Description() {
+							Let us know how we can improve your experience.
+						}
+					}
+					@field.Group() {
+						<div class="grid grid-cols-2 gap-3">
+							@field.Field() {
+								@field.Label(field.LabelProps{For: "feedback-name"}) {
+									Name
+								}
+								@input.Input(input.Props{ID: "feedback-name", Placeholder: "Your name"})
+							}
+							@field.Field() {
+								@field.Label(field.LabelProps{For: "feedback-email"}) {
+									Email
+								}
+								@input.Input(input.Props{ID: "feedback-email", Type: input.TypeEmail, Placeholder: "you@example.com"})
+							}
+						</div>
+						@field.Field() {
+							@field.Label(field.LabelProps{For: "feedback-category"}) {
+								Category
+							}
+							@selectcomp.Select() {
+								@selectcomp.Trigger(selectcomp.TriggerProps{ID: "feedback-category", Class: "w-full"}) {
+									@selectcomp.Value()
+								}
+								@selectcomp.Content() {
+									@selectcomp.Group() {
+										@selectcomp.Item(selectcomp.ItemProps{Value: "general", Selected: true}) {
+											General
+										}
+										@selectcomp.Item(selectcomp.ItemProps{Value: "bug"}) {
+											Bug Report
+										}
+										@selectcomp.Item(selectcomp.ItemProps{Value: "feature"}) {
+											Feature Request
+										}
+										@selectcomp.Item(selectcomp.ItemProps{Value: "improvement"}) {
+											Improvement
+										}
+									}
+								}
+							}
+						}
+						@field.Field() {
+							@field.Label(field.LabelProps{For: "feedback-message"}) {
+								Message
+							}
+							@textarea.Textarea(textarea.Props{ID: "feedback-message", Placeholder: "Tell us what's on your mind...", Class: "min-h-24 resize-none"})
+						}
+					}
+					@dialog.Footer() {
+						@button.Button(button.Props{Variant: button.VariantOutline, Attributes: dialog.Close(ctx)}) {
+							Cancel
+						}
+						@button.Button() {
+							Submit
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+templ cardUIElements(suffix string) {
+	@card.Card(card.Props{Class: "w-full"}) {
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-6"}) {
+			<div class="flex flex-col gap-4">
+				<div class="flex flex-wrap gap-2">
+					@button.Button() {
+						Button
+					}
+					@button.Button(button.Props{Variant: button.VariantSecondary}) {
+						Secondary
+					}
+					@button.Button(button.Props{Variant: button.VariantOutline}) {
+						Outline
+					}
+					@button.Button(button.Props{Variant: button.VariantGhost}) {
+						Ghost
+					}
+				</div>
+				@item.Item(item.Props{Variant: item.VariantOutline}) {
+					@item.Content() {
+						@item.Title() {
+							Two-factor authentication
+						}
+						@item.Description(item.DescriptionProps{Class: "text-pretty xl:hidden 2xl:block"}) {
+							Verify via email or phone number.
+						}
+					}
+					@item.Actions(item.ActionsProps{Class: "hidden md:flex"}) {
+						@button.Button(button.Props{Size: button.SizeSm, Variant: button.VariantSecondary}) {
+							Enable
+						}
+					}
+				}
+			</div>
+			@slider.Slider(slider.Props{Values: []float64{500}, Max: 1000, Min: 0, Step: 10, Class: "flex-1", Attributes: templ.Attributes{"aria-label": "Slider"}})
+			@field.Group() {
+				@field.Field() {
+					@inputgroup.InputGroup() {
+						@inputgroup.Input(inputgroup.InputProps{Placeholder: "Name"})
+						@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignInlineEnd}) {
+							@inputgroup.Text() {
+								@icon.Search()
+							}
+						}
+					}
+				}
+				@field.Field(field.Props{Class: "flex-1"}) {
+					@textarea.Textarea(textarea.Props{Placeholder: "Message", Class: "resize-none"})
+				}
+			}
+			<div class="flex items-center gap-2">
+				<div class="flex gap-2">
+					@badge.Badge() {
+						Badge
+					}
+					@badge.Badge(badge.Props{Variant: badge.VariantSecondary}) {
+						Secondary
+					}
+					@badge.Badge(badge.Props{Variant: badge.VariantOutline}) {
+						Outline
+					}
+				</div>
+				<div data-slot="radio-group" class="ml-auto flex w-fit gap-3">
+					@radiogroup.Item(radiogroup.ItemProps{Name: "ui-elements-fruit-" + suffix, Value: "apple", Checked: true})
+					@radiogroup.Item(radiogroup.ItemProps{Name: "ui-elements-fruit-" + suffix, Value: "banana"})
+				</div>
+				<div class="flex gap-3">
+					@checkbox.Checkbox(checkbox.Props{Checked: true})
+					@checkbox.Checkbox()
+				</div>
+			</div>
+			<div class="flex items-center gap-4">
+				@alertdialog.AlertDialog() {
+					@button.Button(button.Props{Variant: button.VariantOutline, Attributes: alertdialog.Trigger(ctx)}) {
+						<span class="hidden md:flex style-sera:md:hidden">Alert Dialog</span>
+						<span class="flex md:hidden style-sera:md:flex">Dialog</span>
+					}
+					@alertdialog.Content(alertdialog.ContentProps{Size: alertdialog.SizeSm}) {
+						@alertdialog.Header() {
+							@alertdialog.Title() {
+								Allow accessory to connect?
+							}
+							@alertdialog.Description() {
+								Do you want to allow the USB accessory to connect to this device and your data?
+							}
+						}
+						@alertdialog.Footer() {
+							@alertdialog.Cancel() {
+								Don't allow
+							}
+							@alertdialog.Action() {
+								Allow
+							}
+						}
+					}
+				}
+				@buttongroup.ButtonGroup() {
+					@button.Button(button.Props{Variant: button.VariantOutline}) {
+						<span class="style-sera:hidden">Button Group</span>
+						<span class="hidden style-sera:block">Group</span>
+					}
+					@dropdownmenu.DropdownMenu() {
+						@button.Button(button.Props{Variant: button.VariantOutline, Size: button.SizeIcon, Attributes: dropdownmenu.Trigger(ctx)}) {
+							@icon.ChevronUp()
+						}
+						@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignEnd, Side: dropdownmenu.SideTop, Class: "w-fit"}) {
+							@dropdownmenu.Group() {
+								@dropdownmenu.Label() {
+									Quick Actions
+								}
+								@dropdownmenu.Item() {
+									Mute Conversation
+								}
+								@dropdownmenu.Item() {
+									Mark as Read
+								}
+								@dropdownmenu.Item() {
+									Block User
+								}
+							}
+							@dropdownmenu.Separator()
+							@dropdownmenu.Group() {
+								@dropdownmenu.Label() {
+									Conversation
+								}
+								@dropdownmenu.Item() {
+									Share Conversation
+								}
+								@dropdownmenu.Item() {
+									Copy Conversation
+								}
+								@dropdownmenu.Item() {
+									Report Conversation
+								}
+							}
+							@dropdownmenu.Separator()
+							@dropdownmenu.Group() {
+								@dropdownmenu.Item(dropdownmenu.ItemProps{Variant: dropdownmenu.ItemVariantDestructive}) {
+									Delete Conversation
+								}
+							}
+						}
+					}
+				}
+				@switchcomp.Switch(switchcomp.Props{Checked: true, Class: "ml-auto"})
+			</div>
+		}
+	}
+}
+
+templ cardCodespaces() {
+	@card.Card() {
+		@card.Content() {
+			@tabs.Tabs(tabs.Props{DefaultValue: "codespaces"}) {
+				@tabs.List(tabs.ListProps{Class: "w-full"}) {
+					@tabs.Trigger(tabs.TriggerProps{Value: "codespaces"}) {
+						Codespaces
+					}
+					@tabs.Trigger(tabs.TriggerProps{Value: "local"}) {
+						Local
+					}
+				}
+				@tabs.Content(tabs.ContentProps{Value: "codespaces"}) {
+					@item.Item(item.Props{Size: item.SizeSm, Class: "px-1 pt-2"}) {
+						@item.Content() {
+							@item.Title() {
+								Codespaces
+							}
+							@item.Description() {
+								Your workspaces in the cloud
+							}
+						}
+						@item.Actions() {
+							@tooltip.Tooltip() {
+								@button.Button(button.Props{Variant: button.VariantGhost, Size: button.SizeIconSm, Attributes: tooltip.Trigger(ctx)}) {
+									@icon.Plus()
+								}
+								@tooltip.Content(tooltip.ContentProps{Side: tooltip.SideBottom}) {
+									Create a codespace on main
+								}
+							}
+							@dropdownmenu.DropdownMenu() {
+								@button.Button(button.Props{Variant: button.VariantGhost, Size: button.SizeIconSm, Attributes: dropdownmenu.Trigger(ctx)}) {
+									@icon.Ellipsis()
+								}
+								@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignEnd, Class: "w-56"}) {
+									@dropdownmenu.Group() {
+										@dropdownmenu.Item() {
+											@icon.Plus()
+											New with options...
+										}
+										@dropdownmenu.Item() {
+											@icon.Container()
+											Configure container
+										}
+										@dropdownmenu.Item() {
+											@icon.Zap()
+											Set up prebuilds
+										}
+									}
+									@dropdownmenu.Separator()
+									@dropdownmenu.Group() {
+										@dropdownmenu.Item() {
+											@icon.Server()
+											Manage codespaces
+										}
+										@dropdownmenu.Item() {
+											@icon.Share()
+											Share deep link
+										}
+										@dropdownmenu.Item() {
+											@icon.Info()
+											What are codespaces?
+										}
+									}
+								}
+							}
+						}
+					}
+					@separator.Separator(separator.Props{Class: "-mx-2 my-2 w-auto!"})
+					@empty.Empty(empty.Props{Class: "p-4"}) {
+						@empty.Header() {
+							@empty.Media(empty.MediaProps{Variant: empty.MediaVariantIcon}) {
+								@icon.Server()
+							}
+							@empty.Title() {
+								No codespaces
+							}
+							@empty.Description() {
+								You don't have any codespaces with this repository checked out
+							}
+						}
+						@empty.Content() {
+							@button.Button(button.Props{Size: button.SizeSm}) {
+								Create Codespace
+							}
+							<a href="#learn-more" class="text-xs text-muted-foreground underline underline-offset-4">
+								Learn more about codespaces
+							</a>
+						}
+					}
+					@separator.Separator(separator.Props{Class: "-mx-2 my-2 w-auto!"})
+					<div class="p-1.5 text-xs text-muted-foreground">
+						Codespace usage for this repository is paid for by <span class="font-medium">templui</span>.
+					</div>
+				}
+				@tabs.Content(tabs.ContentProps{Value: "local"}) {
+					@item.Item(item.Props{Size: item.SizeSm, Class: "hidden p-0"}) {
+						@item.Content() {
+							@item.Title(item.TitleProps{Class: "gap-2"}) {
+								@icon.Terminal(icon.Props{Class: "size-4"})
+								Clone
+							}
+						}
+						@item.Actions() {
+							@tooltip.Tooltip() {
+								@button.Button(button.Props{Variant: button.VariantGhost, Size: button.SizeIcon, Attributes: tooltip.Trigger(ctx)}) {
+									@icon.Info()
+								}
+								@tooltip.Content(tooltip.ContentProps{Side: tooltip.SideLeft}) {
+									Which remote URL should I use?
+								}
+							}
+						}
+					}
+					@tabs.Tabs(tabs.Props{DefaultValue: "https"}) {
+						@tabs.List(tabs.ListProps{Variant: tabs.VariantLine, Class: "w-full justify-start border-b *:[button]:flex-0"}) {
+							@tabs.Trigger(tabs.TriggerProps{Value: "https"}) {
+								HTTPS
+							}
+							@tabs.Trigger(tabs.TriggerProps{Value: "ssh"}) {
+								SSH
+							}
+							@tabs.Trigger(tabs.TriggerProps{Value: "cli"}) {
+								GitHub CLI
+							}
+						}
+						<div class="rounded-md border bg-muted/30 p-2">
+							@tabs.Content(tabs.ContentProps{Value: "https"}) {
+								@field.Field(field.Props{Class: "gap-2"}) {
+									@field.Label(field.LabelProps{For: "https-url", Class: "sr-only"}) {
+										HTTPS URL
+									}
+									@cloneURLInputGroup("https-url", "https://github.com/templui/templui.git")
+									@field.Description() {
+										Clone using the web URL.
+									}
+								}
+							}
+							@tabs.Content(tabs.ContentProps{Value: "ssh"}) {
+								@field.Field(field.Props{Class: "gap-2"}) {
+									@field.Label(field.LabelProps{For: "ssh-url", Class: "sr-only"}) {
+										SSH URL
+									}
+									@cloneURLInputGroup("ssh-url", "git@github.com:templui/templui.git")
+									@field.Description() {
+										Use a password-protected SSH key.
+									}
+								}
+							}
+							@tabs.Content(tabs.ContentProps{Value: "cli"}) {
+								@field.Field(field.Props{Class: "gap-2"}) {
+									@field.Label(field.LabelProps{For: "cli-command", Class: "sr-only"}) {
+										CLI Command
+									}
+									@cloneURLInputGroup("cli-command", "gh repo clone templui/templui")
+									@field.Description() {
+										Work fast with our official CLI. <a href="#learn-more">Learn more</a>
+									}
+								}
+							}
+						</div>
+					}
+					@separator.Separator(separator.Props{Class: "-mx-2 my-2 w-auto!"})
+					<div class="flex flex-col">
+						@button.Button(button.Props{Variant: button.VariantGhost, Size: button.SizeSm, Class: "justify-start gap-1.5"}) {
+							@icon.Monitor(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-start"}})
+							Open with GitHub Desktop
+						}
+						@button.Button(button.Props{Variant: button.VariantGhost, Size: button.SizeSm, Class: "justify-start gap-1.5"}) {
+							@icon.Download(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-start"}})
+							Download ZIP
+						}
+					</div>
+				}
+			}
+		}
+	}
+}
+
+templ cloneURLInputGroup(id, value string) {
+	@inputgroup.InputGroup() {
+		@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignInlineEnd}) {
+			@inputgroup.Button(inputgroup.ButtonProps{Variant: button.VariantGhost, Size: inputgroup.ButtonSizeIconXs}) {
+				@icon.Copy()
+			}
+		}
+		@inputgroup.Input(inputgroup.InputProps{ID: id, Value: value, Attributes: templ.Attributes{"readonly": true}})
+	}
+}
+
+type invoiceItem struct {
+	item      string
+	qty       int
+	unitPrice int
+}
+
+var invoiceItems = []invoiceItem{
+	{item: "Design System License", qty: 1, unitPrice: 499},
+	{item: "Priority Support", qty: 12, unitPrice: 99},
+	{item: "Custom Components", qty: 3, unitPrice: 250},
+}
+
+// invoiceUSD is the pendant of the Intl.NumberFormat en-US currency
+// formatter of the source.
+func invoiceUSD(value int) string {
+	s := fmt.Sprintf("%d", value)
+	out := ""
+	for i, r := range s {
+		if i > 0 && (len(s)-i)%3 == 0 {
+			out += ","
+		}
+		out += string(r)
+	}
+	return "$" + out + ".00"
+}
+
+func invoiceSubtotal() int {
+	sum := 0
+	for _, row := range invoiceItems {
+		sum += row.qty * row.unitPrice
+	}
+	return sum
+}
+
+templ cardInvoice() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Invoice #INV-2847
+			}
+			@card.Description() {
+				Due March 30, 2026
+			}
+			@card.Action() {
+				@badge.Badge(badge.Props{Variant: badge.VariantSecondary}) {
+					Pending
+				}
+			}
+		}
+		@card.Content() {
+			@table.Table() {
+				@table.Header() {
+					@table.Row() {
+						@table.Head() {
+							Item
+						}
+						@table.Head(table.HeadProps{Class: "text-right"}) {
+							Qty
+						}
+						@table.Head(table.HeadProps{Class: "text-right"}) {
+							Rate
+						}
+						@table.Head(table.HeadProps{Class: "text-right"}) {
+							Amount
+						}
+					}
+				}
+				@table.Body() {
+					for _, row := range invoiceItems {
+						@table.Row() {
+							@table.Cell() {
+								{ row.item }
+							}
+							@table.Cell(table.CellProps{Class: "text-right tabular-nums"}) {
+								{ fmt.Sprintf("%d", row.qty) }
+							}
+							@table.Cell(table.CellProps{Class: "text-right tabular-nums"}) {
+								{ invoiceUSD(row.unitPrice) }
+							}
+							@table.Cell(table.CellProps{Class: "text-right tabular-nums"}) {
+								{ invoiceUSD(row.qty * row.unitPrice) }
+							}
+						}
+					}
+					@table.Row() {
+						@table.Cell(table.CellProps{Class: "text-right", Attributes: templ.Attributes{"colspan": "3"}}) {
+							Subtotal
+						}
+						@table.Cell(table.CellProps{Class: "text-right tabular-nums"}) {
+							{ invoiceUSD(invoiceSubtotal()) }
+						}
+					}
+					@table.Row() {
+						@table.Cell(table.CellProps{Class: "text-right", Attributes: templ.Attributes{"colspan": "3"}}) {
+							Tax
+						}
+						@table.Cell(table.CellProps{Class: "text-right tabular-nums"}) {
+							$0.00
+						}
+					}
+					@table.Row() {
+						@table.Cell(table.CellProps{Class: "text-right", Attributes: templ.Attributes{"colspan": "3"}}) {
+							Total Due
+						}
+						@table.Cell(table.CellProps{Class: "text-right tabular-nums"}) {
+							{ invoiceUSD(invoiceSubtotal()) }
+						}
+					}
+				}
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Variant: button.VariantOutline, Size: button.SizeSm}) {
+				Download PDF
+			}
+			@button.Button(button.Props{Size: button.SizeSm, Class: "ml-auto"}) {
+				Pay Now
+			}
+		}
+	}
+}
+
+var previewIcons = []func(...icon.Props) templ.Component{
+	icon.Copy,
+	icon.CircleAlert,
+	icon.Trash,
+	icon.Share,
+	icon.ShoppingBag,
+	icon.Ellipsis,
+	icon.LoaderCircle,
+	icon.Plus,
+	icon.Minus,
+	icon.ArrowLeft,
+	icon.ArrowRight,
+	icon.Check,
+	icon.ChevronDown,
+	icon.ChevronRight,
+	icon.Search,
+	icon.Settings,
+}
+
+templ cardIconPreviewGrid() {
+	@card.Card() {
+		@card.Content() {
+			<div class="grid grid-cols-8 place-items-center gap-4">
+				for _, iconFn := range previewIcons {
+					<div class="flex size-8 items-center justify-center rounded-md ring ring-border style-sera:rounded-none *:[svg]:size-4">
+						@iconFn()
+					</div>
+				}
+			</div>
+		}
+	}
+}
+
+templ cardObservability() {
+	@card.Card(card.Props{Class: "relative w-full max-w-md overflow-hidden pt-0"}) {
+		<div class="absolute inset-0 z-30 aspect-video bg-primary opacity-50 mix-blend-color"></div>
+		<img
+			src="https://images.unsplash.com/photo-1604076850742-4c7221f3101b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+			alt="Photo by mymind on Unsplash"
+			title="Photo by mymind on Unsplash"
+			class="relative z-20 aspect-video w-full object-cover brightness-60 grayscale"
+		/>
+		@card.Header() {
+			@card.Title() {
+				Observability Plus is replacing Monitoring
+			}
+			@card.Description() {
+				Switch to the improved way to explore your data, with natural
+				language. Monitoring will no longer be available on the Pro plan in
+				November, 2025
+			}
+		}
+		@card.Footer() {
+			@button.Button() {
+				Create Query
+				@icon.Plus(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-end"}})
+			}
+			@badge.Badge(badge.Props{Variant: badge.VariantSecondary, Class: "ml-auto"}) {
+				Warning
+			}
+		}
+	}
+}
+
+templ cardShippingAddress() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Shipping Address
+			}
+			@card.Description() {
+				Where should we deliver?
+			}
+		}
+		@card.Content() {
+			@field.Group() {
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "shipping-street"}) {
+						Street address
+					}
+					@input.Input(input.Props{ID: "shipping-street", Placeholder: "123 Main Street"})
+				}
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "shipping-apt"}) {
+						Apt / Suite
+					}
+					@input.Input(input.Props{ID: "shipping-apt", Placeholder: "Apt 4B"})
+				}
+				@field.Group(field.GroupProps{Class: "grid grid-cols-2"}) {
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "shipping-city"}) {
+							City
+						}
+						@input.Input(input.Props{ID: "shipping-city", Placeholder: "San Francisco"})
+					}
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "shipping-state"}) {
+							State
+						}
+						@selectcomp.Select() {
+							@selectcomp.Trigger(selectcomp.TriggerProps{ID: "shipping-state", Class: "w-full"}) {
+								@selectcomp.Value()
+							}
+							@selectcomp.Content() {
+								@selectcomp.Group() {
+									@selectcomp.Item(selectcomp.ItemProps{Value: "CA", Selected: true}) {
+										California
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "NY"}) {
+										New York
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "TX"}) {
+										Texas
+									}
+								}
+							}
+						}
+					}
+				}
+				@field.Group(field.GroupProps{Class: "grid grid-cols-2"}) {
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "shipping-zip"}) {
+							ZIP Code
+						}
+						@input.Input(input.Props{ID: "shipping-zip", Placeholder: "94102"})
+					}
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "shipping-country"}) {
+							Country
+						}
+						@selectcomp.Select() {
+							@selectcomp.Trigger(selectcomp.TriggerProps{ID: "shipping-country", Class: "w-full"}) {
+								@selectcomp.Value()
+							}
+							@selectcomp.Content() {
+								@selectcomp.Group() {
+									@selectcomp.Item(selectcomp.ItemProps{Value: "US", Selected: true}) {
+										United States
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "CA"}) {
+										Canada
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "UK"}) {
+										United Kingdom
+									}
+								}
+							}
+						}
+					}
+				}
+				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
+					@checkbox.Checkbox(checkbox.Props{ID: "shipping-save", Checked: true})
+					@field.Label(field.LabelProps{For: "shipping-save", Class: "font-normal"}) {
+						Save as default address
+					}
+				}
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Variant: button.VariantOutline, Size: button.SizeSm}) {
+				Cancel
+			}
+			@button.Button(button.Props{Size: button.SizeSm, Class: "ml-auto"}) {
+				Save Address
+			}
+		}
+	}
+}
+
+type envVariable struct {
+	key    string
+	masked bool
+}
+
+var envVariables = []envVariable{
+	{key: "DATABASE_URL", masked: true},
+	{key: "NEXT_PUBLIC_API", masked: false},
+	{key: "STRIPE_SECRET", masked: true},
+}
+
+templ cardEnvironmentVariables() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Environment Variables
+			}
+			@card.Description() {
+				Production · 8 variables
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-2"}) {
+			for _, env := range envVariables {
+				<div class="flex items-center gap-2 rounded-md px-2.5 py-2 font-mono text-xs ring ring-border">
+					<span class="font-medium">{ env.key }</span>
+					<span class="ml-auto text-muted-foreground">
+						if env.masked {
+							••••••••
+						} else {
+							https://api.example.com
+						}
+					</span>
+				</div>
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Variant: button.VariantOutline}) {
+				Edit
+			}
+			@button.Button(button.Props{Class: "ml-auto"}) {
+				Deploy
+			}
+		}
+	}
+}
+
+var barChartCardData = []chart.Datum{
+	{"month": "January", "desktop": 186, "mobile": 80},
+	{"month": "February", "desktop": 305, "mobile": 200},
+	{"month": "March", "desktop": 237, "mobile": 120},
+	{"month": "April", "desktop": 73, "mobile": 190},
+	{"month": "May", "desktop": 209, "mobile": 130},
+	{"month": "June", "desktop": 214, "mobile": 140},
+}
+
+var barChartCardConfig = chart.Config{
+	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
+	{Key: "mobile", Label: "Mobile", Color: "var(--chart-2)"},
+}
+
+func barChartCardTotal(series string) int {
+	sum := 0
+	for _, d := range barChartCardData {
+		sum += d[series].(int)
+	}
+	return sum
+}
+
+// barChartCardTotals mirrors the source's toLocaleString and delta math.
+func barChartCardTotalString(series string) string {
+	s := fmt.Sprintf("%d", barChartCardTotal(series))
+	out := ""
+	for i, r := range s {
+		if i > 0 && (len(s)-i)%3 == 0 {
+			out += ","
+		}
+		out += string(r)
+	}
+	return out
+}
+
+func barChartCardDelta() string {
+	desktop := barChartCardTotal("desktop")
+	mobile := barChartCardTotal("mobile")
+	delta := int(float64(desktop-mobile)/float64(mobile)*100 + 0.5)
+	prefix := ""
+	if delta > 0 {
+		prefix = "+"
+	}
+	return fmt.Sprintf("%s%d%%", prefix, delta)
+}
+
+func barChartCardMonthShort(v any) string {
+	return v.(string)[:3]
+}
+
+templ cardBarChart() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title(card.TitleProps{Class: "text-lg"}) {
+				Traffic channels
+			}
+			@card.Description(card.DescriptionProps{Class: "line-clamp-2 text-sm leading-snug"}) {
+				Monthly desktop and mobile traffic for the last six months—compare
+				volume and mix across platforms and devices at a glance.
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4 pt-0"}) {
+			@chart.Container(chart.ContainerProps{ID: "p1-bar-chart", Config: barChartCardConfig, Class: "max-h-[180px] w-full"}) {
+				@chart.BarChart(chart.BarChartProps{
+					AccessibilityLayer: true,
+					Data:               barChartCardData,
+					Margin:             &chart.Margin{Left: 0, Right: 0, Top: 8, Bottom: 0},
+				}) {
+					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
+					@chart.XAxis(chart.XAxisProps{DataKey: "month", TickMargin: 8, TickFormatter: barChartCardMonthShort})
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  chart.Bool(false),
+						Content: chart.TooltipContentProps{Indicator: "dashed"},
+					})
+					@chart.Legend()
+					@chart.Bar(chart.BarProps{DataKey: "desktop", Fill: "var(--color-desktop)", Radius: []float64{6, 6, 0, 0}})
+					@chart.Bar(chart.BarProps{DataKey: "mobile", Fill: "var(--color-mobile)", Radius: []float64{6, 6, 0, 0}})
+				}
+			}
+			<div class="grid w-full grid-cols-3 divide-x divide-border/60">
+				<div class="px-2 text-center">
+					<div class="text-[0.65rem] text-muted-foreground uppercase">Desktop</div>
+					<div class="text-sm font-medium tabular-nums">{ barChartCardTotalString("desktop") }</div>
+				</div>
+				<div class="px-2 text-center">
+					<div class="text-[0.65rem] text-muted-foreground uppercase">Mobile</div>
+					<div class="text-sm font-medium tabular-nums">{ barChartCardTotalString("mobile") }</div>
+				</div>
+				<div class="px-2 text-center">
+					<div class="text-[0.65rem] text-muted-foreground uppercase">Mix Delta</div>
+					<div class="text-sm font-medium tabular-nums">{ barChartCardDelta() }</div>
+				</div>
+			</div>
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Class: "w-full"}) {
+				View report
+			}
+		}
+	}
+}
+
+type inviteTeamRow struct {
+	email string
+	role  string
+}
+
+var inviteTeamRows = []inviteTeamRow{
+	{email: "alex@example.com", role: "editor"},
+	{email: "sam@example.com", role: "viewer"},
+}
+
+templ cardInviteTeam() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Invite Team
+			}
+			@card.Description() {
+				Add members to your workspace
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			<div class="flex flex-col gap-3">
+				for _, invite := range inviteTeamRows {
+					<div class="flex items-center gap-2">
+						@input.Input(input.Props{Value: invite.email, Class: "flex-1"})
+						@selectcomp.Select() {
+							@selectcomp.Trigger(selectcomp.TriggerProps{Class: "w-24"}) {
+								@selectcomp.Value()
+							}
+							@selectcomp.Content(selectcomp.ContentProps{Position: selectcomp.PositionPopper, Align: selectcomp.AlignEnd}) {
+								@selectcomp.Group() {
+									@selectcomp.Item(selectcomp.ItemProps{Value: "admin", Selected: invite.role == "admin"}) {
+										Admin
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "editor", Selected: invite.role == "editor"}) {
+										Editor
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "viewer", Selected: invite.role == "viewer"}) {
+										Viewer
+									}
+								}
+							}
+						}
+					</div>
+				}
+			</div>
+			@button.Button(button.Props{Variant: button.VariantOutline}) {
+				@icon.Plus(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-start"}})
+				Add another
+			}
+			@separator.Separator()
+			@field.Field() {
+				@field.Label(field.LabelProps{For: "invite-link"}) {
+					Or share invite link
+				}
+				@inputgroup.InputGroup() {
+					@inputgroup.Input(inputgroup.InputProps{ID: "invite-link", Value: "https://app.co/invite/x8f2k", Attributes: templ.Attributes{"readonly": true}})
+					@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignInlineEnd}) {
+						@inputgroup.Button(inputgroup.ButtonProps{Size: inputgroup.ButtonSizeIconXs, Attributes: templ.Attributes{"aria-label": "Copy link"}}) {
+							@icon.Copy()
+						}
+					}
+				}
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Class: "w-full"}) {
+				Send Invites
+			}
+		}
+	}
+}
+
+templ cardActivateAgentDialog() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Ship faster & safer with Vercel Agent
+			}
+			@card.Description() {
+				Your use is subject to Vercel's <a href="#">Public Beta Agreement</a> and <a href="#">AI Product Terms</a>.
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			@item.Group(item.GroupProps{Class: "gap-0"}) {
+				@agentFeatureItem() {
+					<strong>Code reviews</strong> with full codebase context to catch <strong>hard-to-find</strong> bugs.
+				}
+				@agentFeatureItem() {
+					<strong>Code suggestions</strong> validated in sandboxes before you merge.
+				}
+				@agentFeatureItem() {
+					<strong>Root-cause analysis</strong> { "for production issues with deployment context." }
+					@badge.Badge(badge.Props{Variant: badge.VariantSecondary, Class: "bg-chart-1 text-chart-5"}) {
+						Requires Observability Plus
+					}
+				}
+			}
+			@alert.Alert() {
+				@alert.Description() {
+					Pro teams get $100 in Vercel Agent trial credit for 2 weeks after activation.
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "justify-end gap-2"}) {
+			@button.Button(button.Props{Variant: button.VariantOutline, Class: "style-sera:hidden"}) {
+				Cancel
+			}
+			@button.Button(button.Props{Class: "style-sera:w-full"}) {
+				Enable with $100 credits
+			}
+		}
+	}
+}
+
+templ agentFeatureItem() {
+	@item.Item(item.Props{Size: item.SizeXs, Class: "px-0"}) {
+		@item.Media(item.MediaProps{Variant: item.MediaVariantIcon, Class: "self-start"}) {
+			@icon.CircleCheck(icon.Props{Class: "size-5 fill-primary text-primary-foreground"})
+		}
+		@item.Content() {
+			@item.Title(item.TitleProps{Class: "inline leading-relaxed font-normal text-muted-foreground *:[strong]:font-medium *:[strong]:text-foreground"}) {
+				{ children... }
+			}
+		}
+	}
+}
+
+templ cardSkeletonLoading() {
+	@card.Card() {
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			<div class="flex items-center gap-3">
+				@skeleton.Skeleton(skeleton.Props{Class: "size-10 rounded-full"})
+				<div class="flex flex-1 flex-col gap-2">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-3/4"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-1/2"})
+				</div>
+			</div>
+			<div class="flex flex-col gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-full"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-full"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-4/5"})
+			</div>
+			<div class="flex gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-8 w-20"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-8 w-20"})
+			</div>
+		}
+	}
+}
+
+var pieChartCardData = []chart.Datum{
+	{"browser": "chrome", "visitors": 275, "fill": "var(--color-chrome)"},
+	{"browser": "safari", "visitors": 200, "fill": "var(--color-safari)"},
+	{"browser": "firefox", "visitors": 287, "fill": "var(--color-firefox)"},
+	{"browser": "edge", "visitors": 173, "fill": "var(--color-edge)"},
+}
+
+var pieChartCardConfig = chart.Config{
+	{Key: "visitors", Label: "Visitors"},
+	{Key: "chrome", Label: "Chrome", Color: "var(--chart-1)"},
+	{Key: "safari", Label: "Safari", Color: "var(--chart-2)"},
+	{Key: "firefox", Label: "Firefox", Color: "var(--chart-3)"},
+	{Key: "edge", Label: "Edge", Color: "var(--chart-4)"},
+}
+
+// The source derives these from the data: firefox is the top browser with
+// 287 of 935 visitors.
+func pieChartCardTotal() int {
+	sum := 0
+	for _, d := range pieChartCardData {
+		sum += d["visitors"].(int)
+	}
+	return sum
+}
+
+func pieChartCardTop() (string, int) {
+	top := pieChartCardData[0]
+	for _, d := range pieChartCardData {
+		if d["visitors"].(int) > top["visitors"].(int) {
+			top = d
+		}
+	}
+	share := int(float64(top["visitors"].(int))/float64(pieChartCardTotal())*100 + 0.5)
+	return pieChartCardConfig.Label(top["browser"].(string)), share
+}
+
+templ cardPieChart() {
+	{{ topBrowser, topShare := pieChartCardTop() }}
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "pb-0"}) {
+			@card.Title() {
+				Browser Share
+			}
+			@card.Description() {
+				January - June 2026
+			}
+			@card.Action() {
+				@badge.Badge(badge.Props{Variant: badge.VariantOutline}) {
+					{ topBrowser }
+				}
+			}
+		}
+		@card.Content(card.ContentProps{Class: "pt-0"}) {
+			@chart.Container(chart.ContainerProps{ID: "p1-pie-chart", Config: pieChartCardConfig, Class: "mx-auto aspect-square max-h-[190px]"}) {
+				@chart.PieChart() {
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  chart.Bool(false),
+						Content: chart.TooltipContentProps{HideLabel: true},
+					})
+					@chart.Pie(chart.PieProps{
+						Data:        pieChartCardData,
+						DataKey:     "visitors",
+						NameKey:     "browser",
+						InnerRadius: 50,
+						StrokeWidth: 5,
+					}) {
+						@chart.Label(chart.LabelProps{
+							DominantBaseline: "middle",
+							Spans: []chart.LabelSpan{
+								{Text: fmt.Sprintf("%d", pieChartCardTotal()), Class: "fill-foreground text-2xl font-bold", OffsetY: -16},
+								{Text: "Visitors", Class: "fill-muted-foreground text-xs", OffsetY: 4},
+							},
+						})
+					}
+					@chart.Legend(chart.LegendProps{NameKey: "browser", Class: "translate-y-2"})
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col items-stretch gap-2"}) {
+			<div class="flex items-center text-xs">
+				<span class="font-medium">{ topBrowser }</span>
+				<span class="ml-auto text-muted-foreground tabular-nums">{ fmt.Sprintf("%d%%", topShare) }</span>
+			</div>
+			@progress.Progress(progress.Props{Value: topShare, Class: "**:data-[slot=progress-indicator]:bg-chart-3"})
+		}
+	}
+}
+
+templ cardNoTeamMembers() {
+	@card.Card() {
+		@card.Content() {
+			@empty.Empty(empty.Props{Class: "h-56 border"}) {
+				@empty.Header() {
+					@empty.Media() {
+						@avatar.Group(avatar.GroupProps{Class: "grayscale"}) {
+							@avatar.Avatar(avatar.Props{Size: avatar.SizeLg}) {
+								@avatar.Image(avatar.ImageProps{Src: "https://github.com/axadrn.png", Alt: "@axadrn"})
+								@avatar.Fallback() {
+									AA
+								}
+							}
+							@avatar.Avatar(avatar.Props{Size: avatar.SizeLg}) {
+								@avatar.Image(avatar.ImageProps{Src: "https://github.com/a-h.png", Alt: "@a-h"})
+								@avatar.Fallback() {
+									AH
+								}
+							}
+							@avatar.Avatar(avatar.Props{Size: avatar.SizeLg}) {
+								@avatar.Image(avatar.ImageProps{Src: "https://github.com/joerdav.png", Alt: "@joerdav"})
+								@avatar.Fallback() {
+									JD
+								}
+							}
+						}
+					}
+					@empty.Title() {
+						No Team Members
+					}
+					@empty.Description() {
+						Invite your team to collaborate on this project.
+					}
+				}
+				@empty.Content() {
+					@button.Button(button.Props{Size: button.SizeSm}) {
+						Invite Members
+					}
+				}
+			}
+		}
+	}
+}
+
+templ cardReportBug() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Report Bug
+			}
+			@card.Description() {
+				Help us fix issues faster.
+			}
+		}
+		@card.Content() {
+			@field.Group() {
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "bug-title"}) {
+						Title
+					}
+					@input.Input(input.Props{ID: "bug-title", Placeholder: "Brief description of the issue"})
+				}
+				<div class="grid grid-cols-2 gap-3">
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "bug-severity"}) {
+							Severity
+						}
+						@selectcomp.Select() {
+							@selectcomp.Trigger(selectcomp.TriggerProps{ID: "bug-severity", Class: "w-full"}) {
+								@selectcomp.Value()
+							}
+							@selectcomp.Content() {
+								@selectcomp.Group() {
+									@selectcomp.Item(selectcomp.ItemProps{Value: "critical"}) {
+										Critical
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "high"}) {
+										High
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "medium", Selected: true}) {
+										Medium
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "low"}) {
+										Low
+									}
+								}
+							}
+						}
+					}
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "bug-component"}) {
+							Component
+						}
+						@selectcomp.Select() {
+							@selectcomp.Trigger(selectcomp.TriggerProps{ID: "bug-component", Class: "w-full"}) {
+								@selectcomp.Value()
+							}
+							@selectcomp.Content() {
+								@selectcomp.Group() {
+									@selectcomp.Item(selectcomp.ItemProps{Value: "dashboard", Selected: true}) {
+										Dashboard
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "auth"}) {
+										Auth
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "api"}) {
+										API
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "billing"}) {
+										Billing
+									}
+								}
+							}
+						}
+					}
+				</div>
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "bug-steps"}) {
+						Steps to reproduce
+					}
+					@textarea.Textarea(textarea.Props{ID: "bug-steps", Placeholder: "1. Go to\n2. Click on\n3. Observe...", Class: "min-h-24 resize-none"})
+				}
+			}
+		}
+		@card.Footer() {
+			@field.Field(field.Props{Orientation: field.OrientationHorizontal, Class: "justify-end style-sera:justify-center"}) {
+				@button.Button(button.Props{Variant: button.VariantOutline, Class: "style-sera:flex-1"}) {
+					Attach File
+				}
+				@button.Button(button.Props{Class: "style-sera:flex-1"}) {
+					Submit Bug
+				}
+			}
+		}
+	}
+}
+
+// contributorHandles are the GitHub avatars of the contributors card, led
+// by Axel's handles instead of shadcn's.
+var contributorHandles = []string{
+	"axadrn",
+	"a-h",
+	"joerdav",
+	"tailwindlabs",
+	"typescript-lang",
+	"eslint",
+	"prettier",
+	"babel",
+	"webpack",
+	"rollup",
+	"parcel",
+	"vite",
+	"react",
+	"vue",
+	"angular",
+	"solid",
+}
+
+templ cardContributors() {
+	@card.Card(card.Props{Class: "max-w-sm"}) {
+		@card.Header() {
+			@card.Title() {
+				Contributors
+				@badge.Badge(badge.Props{Variant: badge.VariantSecondary}) {
+					312
+				}
+			}
+		}
+		@card.Content() {
+			<div class="flex flex-wrap gap-2">
+				for _, username := range contributorHandles {
+					@avatar.Avatar(avatar.Props{Class: "grayscale"}) {
+						@avatar.Image(avatar.ImageProps{Src: "https://github.com/" + username + ".png", Alt: username})
+						@avatar.Fallback() {
+							{ username[:1] }
+						}
+					}
+				}
+			</div>
+		}
+		@card.Footer() {
+			<a href="#" class="text-sm underline underline-offset-4">+ 810 contributors</a>
+		}
+	}
+}
+
+type feedbackTopic struct {
+	value string
+	label string
+}
+
+var feedbackTopics = []feedbackTopic{
+	{value: "ai", label: "AI"},
+	{value: "accounts-and-access-controls", label: "Accounts and Access Controls"},
+	{value: "billing", label: "Billing"},
+	{value: "cdn", label: "CDN (Firewall, Caching)"},
+	{value: "ci-cd", label: "CI/CD (Builds, Deployments, Environment Variables)"},
+	{value: "dashboard-interface", label: "Dashboard Interface (Navigation, UI Issues)"},
+	{value: "domains", label: "Domains"},
+	{value: "frameworks", label: "Frameworks"},
+	{value: "marketplace-and-integrations", label: "Marketplace and Integrations"},
+	{value: "observability", label: "Observability (Observability, Logs, Monitoring)"},
+	{value: "storage", label: "Storage"},
+}
+
+templ cardFeedbackForm() {
+	@card.Card() {
+		@card.Content() {
+			<form id="feedback-form">
+				@field.Group() {
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "topic"}) {
+							Topic
+						}
+						@selectcomp.Select() {
+							@selectcomp.Trigger(selectcomp.TriggerProps{ID: "topic", Class: "w-full"}) {
+								@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a topic"})
+							}
+							@selectcomp.Content() {
+								@selectcomp.Group() {
+									for _, topic := range feedbackTopics {
+										@selectcomp.Item(selectcomp.ItemProps{Value: topic.value}) {
+											{ topic.label }
+										}
+									}
+								}
+							}
+						}
+					}
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "feedback"}) {
+							Feedback
+						}
+						@textarea.Textarea(textarea.Props{ID: "feedback", Placeholder: "Your feedback helps us improve..."})
+					}
+				}
+			</form>
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Type: button.TypeSubmit, Form: "feedback-form", Class: "style-sera:w-full"}) {
+				Submit
+			}
+		}
+	}
+}
+
+var appointmentSlots = []string{"9:00 AM", "10:30 AM", "11:00 AM", "1:30 PM"}
+
+templ cardBookAppointment() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Book Appointment
+			}
+			@card.Description() {
+				Dr. Sarah Chen · Cardiology
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			@field.Group() {
+				@field.Field() {
+					@field.Label() {
+						Available on March 18, 2026
+					}
+					@togglegroup.ToggleGroup(togglegroup.Props{Type: togglegroup.TypeSingle, Spacing: utils.Ptr(2)}) {
+						for i, slot := range appointmentSlots {
+							@togglegroup.Item(togglegroup.ItemProps{Value: fmt.Sprintf("slot-%d", i), Pressed: i == 0}) {
+								{ slot }
+							}
+						}
+					}
+				}
+			}
+			@alert.Alert() {
+				@alert.Title() {
+					New patient?
+				}
+				@alert.Description() {
+					Please arrive 15 minutes early.
+				}
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Class: "w-full"}) {
+				Book Appointment
+			}
+		}
+	}
+}
+
+var sleepChartData = []chart.Datum{
+	{"hour": "10pm", "deep": 0, "light": 30, "rem": 0},
+	{"hour": "11pm", "deep": 20, "light": 10, "rem": 0},
+	{"hour": "12am", "deep": 40, "light": 0, "rem": 10},
+	{"hour": "1am", "deep": 30, "light": 5, "rem": 15},
+	{"hour": "2am", "deep": 10, "light": 20, "rem": 30},
+	{"hour": "3am", "deep": 25, "light": 10, "rem": 20},
+	{"hour": "4am", "deep": 15, "light": 25, "rem": 10},
+	{"hour": "5am", "deep": 5, "light": 35, "rem": 15},
+	{"hour": "6am", "deep": 0, "light": 20, "rem": 25},
+}
+
+var sleepChartConfig = chart.Config{
+	{Key: "deep", Label: "Deep", Color: "var(--chart-1)"},
+	{Key: "light", Label: "Light", Color: "var(--chart-2)"},
+	{Key: "rem", Label: "REM", Color: "var(--chart-3)"},
+}
+
+type sleepStat struct {
+	label string
+	value string
+}
+
+var sleepStats = []sleepStat{
+	{label: "Deep", value: "2h 10m"},
+	{label: "Light", value: "3h 48m"},
+	{label: "REM", value: "1h 26m"},
+	{label: "Score", value: "84"},
+}
+
+templ cardSleepReport() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Sleep Report
+			}
+			@card.Description() {
+				Last night · 7h 24m
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-3"}) {
+			@chart.Container(chart.ContainerProps{ID: "p1-sleep-report", Config: sleepChartConfig, Class: "h-32 w-full"}) {
+				@chart.BarChart(chart.BarChartProps{
+					AccessibilityLayer: true,
+					Data:               sleepChartData,
+					Margin:             &chart.Margin{Left: 0, Right: 0, Top: 0, Bottom: 0},
+				}) {
+					@chart.Bar(chart.BarProps{DataKey: "deep", StackID: "a", Fill: "var(--color-deep)", Radius: 0})
+					@chart.Bar(chart.BarProps{DataKey: "light", StackID: "a", Fill: "var(--color-light)", Radius: 0})
+					@chart.Bar(chart.BarProps{DataKey: "rem", StackID: "a", Fill: "var(--color-rem)", Radius: []float64{2, 2, 0, 0}})
+				}
+			}
+			<div class="grid grid-cols-4 gap-2">
+				for _, stat := range sleepStats {
+					<div class="text-center">
+						<div class="text-sm font-medium tabular-nums">{ stat.value }</div>
+						<div class="text-xs text-muted-foreground">{ stat.label }</div>
+					</div>
+				}
+			</div>
+		}
+		@card.Footer() {
+			@badge.Badge(badge.Props{Variant: badge.VariantOutline}) {
+				Good
+			}
+			@button.Button(button.Props{Variant: button.VariantOutline, Size: button.SizeSm, Class: "ml-auto"}) {
+				Details
+			}
+		}
+	}
+}
+
+templ cardGithubProfile() {
+	@card.Card(card.Props{Class: "mx-auto w-full max-w-md"}) {
+		@card.Header() {
+			@card.Title() {
+				Profile
+			}
+			@card.Description() {
+				Manage your profile information.
+			}
+		}
+		@card.Content() {
+			<form id="profile">
+				@field.Group() {
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "name"}) {
+							Name
+						}
+						@input.Input(input.Props{ID: "name", Placeholder: "axadrn"})
+						@field.Description() {
+							Your name may appear around GitHub where you contribute or are
+							mentioned. You can remove it at any time.
+						}
+					}
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "email"}) {
+							Public Email
+						}
+						@selectcomp.Select() {
+							@selectcomp.Trigger(selectcomp.TriggerProps{ID: "email", Class: "w-full"}) {
+								@selectcomp.Value()
+							}
+							@selectcomp.Content() {
+								@selectcomp.Group() {
+									@selectcomp.Item(selectcomp.ItemProps{Value: "m@example.com", Selected: true}) {
+										m@example.com
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "m@gmail.com"}) {
+										m@gmail.com
+									}
+								}
+							}
+						}
+						@field.Description() {
+							You can manage verified email addresses in your <a href="#email-settings">email settings</a>.
+						}
+					}
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "bio"}) {
+							Bio
+						}
+						@textarea.Textarea(textarea.Props{ID: "bio", Placeholder: "Tell us a little bit about yourself"})
+						@field.Description() {
+							You can <span>{ "@mention" }</span> other users and organizations to link to them.
+						}
+					}
+				}
+			</form>
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Form: "profile", Class: "style-sera:w-full"}) {
+				Save Profile
+			}
+		}
+	}
+}
+
+type fitnessDay struct {
+	day  string
+	load int
+}
+
+var fitnessWeeklyLoad = []fitnessDay{
+	{day: "M", load: 84},
+	{day: "T", load: 52},
+	{day: "W", load: 73},
+	{day: "T", load: 66},
+	{day: "F", load: 91},
+	{day: "S", load: 48},
+	{day: "S", load: 61},
+}
+
+templ cardWeeklyFitnessSummary() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Weekly Fitness Summary
+			}
+			@card.Description() {
+				Calories and workout load by day
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			<div class="grid grid-cols-7 gap-1.5">
+				for _, day := range fitnessWeeklyLoad {
+					<div class="rounded-md p-1.5 text-center ring ring-border">
+						<div class="text-sm text-muted-foreground">{ day.day }</div>
+						<div class="relative mt-1 h-16 overflow-hidden rounded-sm bg-muted">
+							<div
+								class="absolute inset-x-0 bottom-0 rounded-sm bg-chart-3"
+								style={ templ.SafeCSS(fmt.Sprintf("height: %d%%", day.load)) }
+							></div>
+						</div>
+					</div>
+				}
+			</div>
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Class: "w-full"}) {
+				View details
+			}
+		}
+	}
+}
+
+templ cardFileUpload() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				File Upload
+			}
+			@card.Description() {
+				Drag and drop or browse
+			}
+		}
+		@card.Content() {
+			@empty.Empty(empty.Props{Class: "border"}) {
+				@empty.Header() {
+					@empty.Media(empty.MediaProps{Variant: empty.MediaVariantIcon}) {
+						@icon.CloudUpload()
+					}
+					@empty.Title() {
+						Upload files
+					}
+					@empty.Description() {
+						PNG, JPG, PDF up to 10MB
+					}
+				}
+				@empty.Content() {
+					@button.Button() {
+						Browse Files
+					}
+				}
+			}
+		}
+	}
+}
+
+var analyticsChartData = []chart.Datum{
+	{"month": "January", "visitors": 186},
+	{"month": "February", "visitors": 305},
+	{"month": "March", "visitors": 237},
+	{"month": "April", "visitors": 73},
+	{"month": "May", "visitors": 209},
+	{"month": "June", "visitors": 214},
+}
+
+var analyticsChartConfig = chart.Config{
+	{Key: "visitors", Label: "Visitors", Color: "var(--chart-1)"},
+}
+
+templ cardAnalytics() {
+	@card.Card(card.Props{Size: card.SizeSm, Class: "mx-auto w-full max-w-sm data-[size=sm]:pb-0"}) {
+		@card.Header() {
+			@card.Title() {
+				Analytics
+			}
+			@card.Description() {
+				418.2K Visitors
+				@badge.Badge() {
+					+10%
+				}
+			}
+			@card.Action() {
+				@button.Button(button.Props{Variant: button.VariantOutline, Size: button.SizeSm}) {
+					View Analytics
+				}
+			}
+		}
+		@chart.Container(chart.ContainerProps{ID: "p1-analytics", Config: analyticsChartConfig, Class: "aspect-[1/0.35]"}) {
+			@chart.AreaChart(chart.AreaChartProps{
+				AccessibilityLayer: true,
+				Data:               analyticsChartData,
+				Margin:             &chart.Margin{Left: 0, Right: 0},
+			}) {
+				@chart.Tooltip(chart.TooltipProps{
+					Cursor:  chart.Bool(false),
+					Content: chart.TooltipContentProps{Indicator: "line", HideLabel: true},
+				})
+				@chart.Area(chart.AreaProps{
+					DataKey:     "visitors",
+					Type:        "linear",
+					Fill:        "var(--color-visitors)",
+					FillOpacity: 0.4,
+					Stroke:      "var(--color-visitors)",
+				})
+			}
+		}
+	}
+}
+
+type usageItem struct {
+	name       string
+	value      string
+	percentage float64
+}
+
+var usageItems = []usageItem{
+	{name: "Edge Requests", value: "$1.83K", percentage: 67.34},
+	{name: "Fast Data Transfer", value: "$952.51", percentage: 52.18},
+	{name: "Monitoring data points", value: "$901.20", percentage: 89.42},
+	{name: "Web Analytics Events", value: "$603.71", percentage: 45.67},
+	{name: "ISR Writes", value: "524.52K / 2M", percentage: 26.23},
+	{name: "Function Duration", value: "5.11 GB Hrs / 1K GB Hrs", percentage: 5.11},
+}
+
+// usageGauge is the pendant of the CircularGauge SVG of the source.
+templ usageGauge(percentage float64) {
+	{{
+	normalized := percentage
+	if normalized < 0 {
+		normalized = 0
+	}
+	if normalized > 100 {
+		normalized = 100
+	}
+	circumference := 2 * 3.141592653589793 * 42.5
+	strokePercent := normalized / 100 * circumference
+	}}
+	<svg
+		aria-hidden="true"
+		fill="none"
+		height="16"
+		width="16"
+		stroke-width="2"
+		viewBox="0 0 100 100"
+		class="-rotate-90"
+	>
+		<circle
+			cx="50"
+			cy="50"
+			r="42.5"
+			stroke-width="12"
+			stroke-dashoffset="0"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			class="opacity-20"
+			stroke="currentColor"
+			style={ templ.SafeCSS(fmt.Sprintf("stroke-dasharray: %f %f", circumference, circumference)) }
+		></circle>
+		<circle
+			cx="50"
+			cy="50"
+			r="42.5"
+			stroke-width="12"
+			stroke-dashoffset="0"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			stroke="currentColor"
+			class="transition-all duration-300"
+			style={ templ.SafeCSS(fmt.Sprintf("stroke-dasharray: %f %f", strokePercent, circumference)) }
+		></circle>
+	</svg>
+}
+
+templ cardUsage() {
+	@card.Card(card.Props{Class: "w-full max-w-sm gap-4"}) {
+		@card.Header() {
+			@card.Title(card.TitleProps{Class: "px-1 text-sm"}) {
+				5 days remaining in cycle
+			}
+		}
+		@card.Content() {
+			@item.Group(item.GroupProps{Class: "gap-0"}) {
+				for _, entry := range usageItems {
+					@item.Item(item.Props{Size: item.SizeXs, Class: "px-0 group-hover/item-group:bg-transparent", Href: "#"}) {
+						@item.Media(item.MediaProps{Variant: item.MediaVariantIcon, Class: "text-primary"}) {
+							@usageGauge(entry.percentage)
+						}
+						@item.Content(item.ContentProps{Class: "inline-block truncate"}) {
+							@item.Title(item.TitleProps{Class: "inline"}) {
+								{ entry.name }
+							}
+						}
+						@item.Actions() {
+							<span class="font-mono text-xs font-medium text-muted-foreground tabular-nums">{ entry.value }</span>
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+type shortcutEntry struct {
+	label string
+	keys  []string
+}
+
+var shortcutEntries = []shortcutEntry{
+	{label: "Search", keys: []string{"⌘", "K"}},
+	{label: "Quick Actions", keys: []string{"⌘", "J"}},
+	{label: "New File", keys: []string{"⌘", "N"}},
+	{label: "Save", keys: []string{"⌘", "S"}},
+	{label: "Toggle Sidebar", keys: []string{"⌘", "B"}},
+}
+
+templ cardShortcuts() {
+	@card.Card() {
+		@card.Content() {
+			<div class="flex flex-col gap-3">
+				<div class="text-sm font-medium">Shortcuts</div>
+				@item.Group(item.GroupProps{Class: "gap-2 text-muted-foreground", Attributes: templ.Attributes{"data-size": "xs"}}) {
+					for i, shortcut := range shortcutEntries {
+						if i > 0 {
+							@item.Separator()
+						}
+						@item.Item(item.Props{Variant: item.VariantDefault, Size: item.SizeXs, Class: "border-0 px-0 py-0"}) {
+							@item.Header() {
+								@item.Title(item.TitleProps{Class: "font-normal"}) {
+									{ shortcut.label }
+								}
+								@item.Actions() {
+									<div class="flex gap-1">
+										for _, key := range shortcut.keys {
+											@kbd.Kbd() {
+												{ key }
+											}
+										}
+									</div>
+								}
+							}
+						}
+					}
+				}
+			</div>
+		}
+	}
+}
+
+templ cardAnomalyAlert() {
+	@card.Card() {
+		@card.Content() {
+			@empty.Empty(empty.Props{Class: "h-48"}) {
+				@empty.Header() {
+					@empty.Title() {
+						Get alerted for anomalies
+					}
+					@empty.Description() {
+						Automatically monitor your projects for anomalies and get notified.
+					}
+				}
+				@empty.Content() {
+					@button.Button() {
+						Upgrade to Observability Plus
+					}
+				}
+			}
+		}
+	}
+}
+
+// cardLiveWaveform renders the reference card in its idle waveform state:
+// the live canvas animation is microphone-driven React code that has no
+// server-side pendant.
+templ cardLiveWaveform() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Live Audio Waveform
+			}
+			@card.Description() {
+				Real-time microphone input visualization with audio reactivity
+			}
+		}
+		@card.Content() {
+			<div class="relative h-full w-full" style="height: 80px" aria-label="Audio waveform idle" role="img">
+				<div class="absolute top-1/2 right-0 left-0 -translate-y-1/2 border-t-2 border-dotted border-muted-foreground/20"></div>
+				<canvas class="block h-full w-full" aria-hidden="true"></canvas>
+			</div>
+		}
+		@card.Footer(card.FooterProps{Class: "gap-2"}) {
+			@button.Button(button.Props{Size: button.SizeSm, Variant: button.VariantOutline}) {
+				Start Listening
+			}
+			@button.Button(button.Props{Size: button.SizeSm}) {
+				Stop Processing
+			}
+			@button.Button(button.Props{Size: button.SizeSm, Variant: button.VariantOutline}) {
+				Static
+			}
+		}
+	}
+}
+
+var visitorsChartData = []chart.Datum{
+	{"month": "January", "desktop": 186},
+	{"month": "February", "desktop": 305},
+	{"month": "March", "desktop": 237},
+	{"month": "April", "desktop": 73},
+	{"month": "May", "desktop": 209},
+	{"month": "June", "desktop": 214},
+}
+
+var visitorsChartConfig = chart.Config{
+	{Key: "desktop", Label: "Desktop", Color: "var(--chart-1)"},
+}
+
+// visitorsTrend mirrors the source's trend math: 214 vs 209 is +2%.
+func visitorsTrend() string {
+	latest := visitorsChartData[len(visitorsChartData)-1]["desktop"].(int)
+	previous := visitorsChartData[len(visitorsChartData)-2]["desktop"].(int)
+	trend := int(float64(latest-previous)/float64(previous)*100 + 0.5)
+	prefix := ""
+	if trend > 0 {
+		prefix = "+"
+	}
+	return fmt.Sprintf("%s%d%% vs last month", prefix, trend)
+}
+
+templ cardVisitors() {
+	@card.Card(card.Props{Class: "pb-0"}) {
+		@card.Header() {
+			@card.Title() {
+				Visitors
+			}
+			@card.Description() {
+				Last 6 months
+			}
+			@card.Action() {
+				@badge.Badge(badge.Props{Variant: badge.VariantSecondary}) {
+					{ visitorsTrend() }
+				}
+			}
+		}
+		@card.Content(card.ContentProps{Class: "px-0"}) {
+			@chart.Container(chart.ContainerProps{ID: "p1-visitors", Config: visitorsChartConfig, Class: "h-48 w-full"}) {
+				@chart.AreaChart(chart.AreaChartProps{
+					AccessibilityLayer: true,
+					Data:               visitorsChartData,
+					Margin:             &chart.Margin{Left: 0, Right: 0, Top: 6, Bottom: 0},
+				}) {
+					@chart.XAxis(chart.XAxisProps{DataKey: "month", Hide: true, TickMargin: 6})
+					@chart.Tooltip(chart.TooltipProps{
+						Cursor:  chart.Bool(false),
+						Content: chart.TooltipContentProps{Indicator: "line"},
+					})
+					// strokeWidth={2} of the source is not portable: chart.AreaProps
+					// has no stroke width prop.
+					@chart.Area(chart.AreaProps{
+						DataKey:     "desktop",
+						Type:        chart.CurveNatural,
+						Fill:        "var(--color-desktop)",
+						FillOpacity: 0.15,
+						Stroke:      "var(--color-desktop)",
+					})
+				}
+			}
+		}
+	}
+}
+
+templ cardContributionsActivity() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Contributions & Activity
+			}
+			@card.Description() {
+				Manage your contributions and activity visibility.
+			}
+		}
+		@card.Content() {
+			<form id="contributions-activity">
+				@field.Group() {
+					@field.Set() {
+						@field.Legend(field.LegendProps{Class: "sr-only"}) {
+							Contributions & activity
+						}
+						@field.Group() {
+							@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
+								@checkbox.Checkbox(checkbox.Props{ID: "activity-private-profile"})
+								@field.Content() {
+									@field.Label(field.LabelProps{For: "activity-private-profile"}) {
+										Make profile private and hide activity
+									}
+									@field.Description() {
+										Enabling this will hide your contributions and activity
+										from your GitHub profile and from social features like
+										followers, stars, feeds, leaderboards and releases.
+									}
+								}
+							}
+						}
+					}
+				}
+			</form>
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Form: "contributions-activity", Class: "style-sera:w-full"}) {
+				Save Changes
+			}
+		}
+	}
+}
+
+templ cardNotFound() {
+	@card.Card() {
+		@card.Content() {
+			@empty.Empty(empty.Props{Class: "h-72"}) {
+				@empty.Header() {
+					@empty.Title() {
+						404 - Not Found
+					}
+					@empty.Description() {
+						The page you're looking for doesn't exist. Try searching for what you need below.
+					}
+				}
+				@empty.Content() {
+					@inputgroup.InputGroup(inputgroup.Props{Class: "w-3/4"}) {
+						@inputgroup.Input(inputgroup.InputProps{Placeholder: "Try searching for pages..."})
+						@inputgroup.Addon() {
+							@icon.Search()
+						}
+						@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignInlineEnd}) {
+							@kbd.Kbd() {
+								/
+							}
+						}
+					}
+					@button.Button(button.Props{Variant: button.VariantLink}) {
+						Go to homepage
+					}
 				}
 			}
 		}
