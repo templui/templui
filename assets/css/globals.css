@@ -36,6 +36,15 @@
 @import "./styles/style-sera.css" layer(base);
 @import "./styles/style-rhea.css" layer(base);
 
+/* The docs previews render the compiled utility build of each style (the
+   inliner's HTML pass expands cn-* into the style map's utilities, like
+   shadcn's docs render compiled registry output). Tailwind's scanner skips
+   .css files, so the utilities living only in the style sheets' @apply lines
+   would never be generated — style-classes.txt lists every style map utility
+   as a scan candidate. Regenerate with `task generate-style-classes` after
+   touching the vendored style-*.css files. */
+@source "./style-classes.txt";
+
 @custom-variant style-vega (&:where(.style-vega *));
 @custom-variant style-nova (&:where(.style-nova *));
 @custom-variant style-lyra (&:where(.style-lyra *));

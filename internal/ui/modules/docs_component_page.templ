@@ -21,13 +21,16 @@ import (
 
 // ComponentPreviewBlock mirrors shadcn's ComponentPreview: one rounded-2xl
 // bordered container with the live demo on top and the source attached below
-// (border-t), clamped to a few lines behind a View Code button.
+// (border-t), clamped to a few lines behind a View Code button. The demo
+// renders as the compiled utility build of its style (see
+// inlinedPreviewHTML), like shadcn's docs render compiled registry output.
 templ ComponentPreviewBlock(entry examples.RegistryEntry, attrs map[string]string) {
 	{{ align := attrs["align"] }}
 	if align == "" {
 		{{ align = "center" }}
 	}
 	{{ _, hideCode := attrs["hideCode"] }}
+	{{ previewHTML, previewErr := inlinedPreviewHTML(ctx, entry.Component, attrs["styleName"]) }}
 	<div
 		data-slot="component-preview"
 		data-not-typeset
@@ -44,7 +47,7 @@ templ ComponentPreviewBlock(entry examples.RegistryEntry, attrs map[string]strin
 					attrs["previewClassName"],
 				) }
 			>
-				@entry.Component
+				@templ.Raw(previewHTML, previewErr)
 			</div>
 		</div>
 		if !hideCode {
