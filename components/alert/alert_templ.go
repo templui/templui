@@ -417,10 +417,12 @@ func Action(props ...ActionProps) templ.Component {
 }
 
 func variantClasses(variant Variant) string {
-	if variant == "" {
-		variant = VariantDefault
+	switch variant {
+	case VariantDestructive:
+		return "cn-alert-variant-destructive"
+	default:
+		return "cn-alert-variant-default"
 	}
-	return "cn-alert-variant-" + string(variant)
 }
 
 var _ = templruntime.GeneratedTemplate

@@ -702,10 +702,30 @@ const menuButtonBaseClasses = "cn-sidebar-menu-button peer/menu-button group/men
 func menuButtonClasses(p MenuButtonProps) string {
 	return utils.TwMerge(
 		menuButtonBaseClasses,
-		"cn-sidebar-menu-button-variant-"+string(p.Variant),
-		"cn-sidebar-menu-button-size-"+string(p.Size),
+		menuButtonVariantClasses(p.Variant),
+		menuButtonSizeClasses(p.Size),
 		p.Class,
 	)
+}
+
+func menuButtonVariantClasses(v MenuButtonVariant) string {
+	switch v {
+	case MenuButtonVariantOutline:
+		return "cn-sidebar-menu-button-variant-outline"
+	default:
+		return "cn-sidebar-menu-button-variant-default"
+	}
+}
+
+func menuButtonSizeClasses(s MenuButtonSize) string {
+	switch s {
+	case MenuButtonSizeSm:
+		return "cn-sidebar-menu-button-size-sm"
+	case MenuButtonSizeLg:
+		return "cn-sidebar-menu-button-size-lg"
+	default:
+		return "cn-sidebar-menu-button-size-default"
+	}
 }
 
 templ MenuButton(props ...MenuButtonProps) {

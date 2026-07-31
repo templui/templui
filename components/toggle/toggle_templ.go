@@ -85,11 +85,23 @@ type Props struct {
 const baseClasses = "cn-toggle group/toggle inline-flex items-center justify-center whitespace-nowrap outline-none hover:bg-muted focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0"
 
 func variantClasses(v Variant) string {
-	return "cn-toggle-variant-" + string(v)
+	switch v {
+	case VariantOutline:
+		return "cn-toggle-variant-outline"
+	default:
+		return "cn-toggle-variant-default"
+	}
 }
 
 func sizeClasses(s Size) string {
-	return "cn-toggle-size-" + string(s)
+	switch s {
+	case SizeSm:
+		return "cn-toggle-size-sm"
+	case SizeLg:
+		return "cn-toggle-size-lg"
+	default:
+		return "cn-toggle-size-default"
+	}
 }
 
 // groupItemClasses is the verbatim ToggleGroupItem class string from
@@ -147,7 +159,7 @@ func Toggle(props ...Props) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Variant))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 109, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 121, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -160,7 +172,7 @@ func Toggle(props ...Props) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Size))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 110, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 122, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -173,7 +185,7 @@ func Toggle(props ...Props) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(spacing))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 111, Col: 39}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 123, Col: 39}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -197,7 +209,7 @@ func Toggle(props ...Props) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 116, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 128, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -220,7 +232,7 @@ func Toggle(props ...Props) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.Value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 120, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 132, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -238,7 +250,7 @@ func Toggle(props ...Props) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatBool(p.Pressed))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 122, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 134, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {

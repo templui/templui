@@ -102,12 +102,41 @@ type SeparatorProps struct {
 // active style-*.css via the cn-item-* classes.
 func itemClasses(variant Variant, size Size) string {
 	base := "cn-item group/item flex w-full flex-wrap items-center transition-colors duration-100 outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 [a]:transition-colors"
-	return utils.TwMerge(base, "cn-item-variant-"+string(variant), "cn-item-size-"+string(size))
+	return utils.TwMerge(base, variantClasses(variant), sizeClasses(size))
+}
+
+func variantClasses(variant Variant) string {
+	switch variant {
+	case VariantOutline:
+		return "cn-item-variant-outline"
+	case VariantMuted:
+		return "cn-item-variant-muted"
+	default:
+		return "cn-item-variant-default"
+	}
+}
+
+func sizeClasses(size Size) string {
+	switch size {
+	case SizeSm:
+		return "cn-item-size-sm"
+	case SizeXs:
+		return "cn-item-size-xs"
+	default:
+		return "cn-item-size-default"
+	}
 }
 
 func mediaClasses(variant MediaVariant) string {
 	base := "cn-item-media flex shrink-0 items-center justify-center [&_svg]:pointer-events-none"
-	return base + " cn-item-media-variant-" + string(variant)
+	switch variant {
+	case MediaVariantIcon:
+		return base + " cn-item-media-variant-icon"
+	case MediaVariantImage:
+		return base + " cn-item-media-variant-image"
+	default:
+		return base + " cn-item-media-variant-default"
+	}
 }
 
 func Group(props ...GroupProps) templ.Component {
@@ -156,7 +185,7 @@ func Group(props ...GroupProps) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 116, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 145, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -253,7 +282,7 @@ func Item(props ...Props) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 141, Col: 13}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 170, Col: 13}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -271,7 +300,7 @@ func Item(props ...Props) templ.Component {
 			var templ_7745c5c3_Var8 templ.SafeURL
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(p.Href))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 143, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 172, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -289,7 +318,7 @@ func Item(props ...Props) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(p.Target)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 145, Col: 21}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 174, Col: 21}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -307,7 +336,7 @@ func Item(props ...Props) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Variant))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 148, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 177, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -320,7 +349,7 @@ func Item(props ...Props) templ.Component {
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Size))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 149, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 178, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -377,7 +406,7 @@ func Item(props ...Props) templ.Component {
 				var templ_7745c5c3_Var14 string
 				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 158, Col: 13}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 187, Col: 13}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
@@ -395,7 +424,7 @@ func Item(props ...Props) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Variant))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 161, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 190, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -408,7 +437,7 @@ func Item(props ...Props) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Size))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 162, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 191, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -501,7 +530,7 @@ func Media(props ...MediaProps) templ.Component {
 			var templ_7745c5c3_Var20 string
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 185, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 214, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
@@ -519,7 +548,7 @@ func Media(props ...MediaProps) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Variant))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 188, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 217, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -608,7 +637,7 @@ func Content(props ...ContentProps) templ.Component {
 			var templ_7745c5c3_Var25 string
 			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 207, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 236, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 			if templ_7745c5c3_Err != nil {
@@ -698,7 +727,7 @@ func Title(props ...TitleProps) templ.Component {
 			var templ_7745c5c3_Var29 string
 			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 224, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 253, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 			if templ_7745c5c3_Err != nil {
@@ -792,7 +821,7 @@ func Description(props ...DescriptionProps) templ.Component {
 			var templ_7745c5c3_Var33 string
 			templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 245, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 274, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 			if templ_7745c5c3_Err != nil {
@@ -882,7 +911,7 @@ func Actions(props ...ActionsProps) templ.Component {
 			var templ_7745c5c3_Var37 string
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 262, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 291, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 			if templ_7745c5c3_Err != nil {
@@ -972,7 +1001,7 @@ func Header(props ...HeaderProps) templ.Component {
 			var templ_7745c5c3_Var41 string
 			templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 279, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 308, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 			if templ_7745c5c3_Err != nil {
@@ -1062,7 +1091,7 @@ func Footer(props ...FooterProps) templ.Component {
 			var templ_7745c5c3_Var45 string
 			templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 296, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 325, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 			if templ_7745c5c3_Err != nil {
@@ -1152,7 +1181,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 			var templ_7745c5c3_Var49 string
 			templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 313, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/item/item.templ`, Line: 342, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var49))
 			if templ_7745c5c3_Err != nil {

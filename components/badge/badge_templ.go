@@ -238,7 +238,20 @@ func (p Props) variant() Variant {
 }
 
 func (p Props) variantClasses() string {
-	return "cn-badge-variant-" + string(p.variant())
+	switch p.variant() {
+	case VariantSecondary:
+		return "cn-badge-variant-secondary"
+	case VariantDestructive:
+		return "cn-badge-variant-destructive"
+	case VariantOutline:
+		return "cn-badge-variant-outline"
+	case VariantGhost:
+		return "cn-badge-variant-ghost"
+	case VariantLink:
+		return "cn-badge-variant-link"
+	default:
+		return "cn-badge-variant-default"
+	}
 }
 
 var _ = templruntime.GeneratedTemplate

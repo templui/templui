@@ -77,11 +77,23 @@ type Props struct {
 const baseClasses = "cn-toggle group/toggle inline-flex items-center justify-center whitespace-nowrap outline-none hover:bg-muted focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0"
 
 func variantClasses(v Variant) string {
-	return "cn-toggle-variant-" + string(v)
+	switch v {
+	case VariantOutline:
+		return "cn-toggle-variant-outline"
+	default:
+		return "cn-toggle-variant-default"
+	}
 }
 
 func sizeClasses(s Size) string {
-	return "cn-toggle-size-" + string(s)
+	switch s {
+	case SizeSm:
+		return "cn-toggle-size-sm"
+	case SizeLg:
+		return "cn-toggle-size-lg"
+	default:
+		return "cn-toggle-size-default"
+	}
 }
 
 // groupItemClasses is the verbatim ToggleGroupItem class string from

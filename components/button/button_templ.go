@@ -313,11 +313,41 @@ func Button(props ...Props) templ.Component {
 }
 
 func (b Props) variantClasses() string {
-	return "cn-button-variant-" + string(b.Variant)
+	switch b.Variant {
+	case VariantDestructive:
+		return "cn-button-variant-destructive"
+	case VariantOutline:
+		return "cn-button-variant-outline"
+	case VariantSecondary:
+		return "cn-button-variant-secondary"
+	case VariantGhost:
+		return "cn-button-variant-ghost"
+	case VariantLink:
+		return "cn-button-variant-link"
+	default:
+		return "cn-button-variant-default"
+	}
 }
 
 func (b Props) sizeClasses() string {
-	return "cn-button-size-" + string(b.Size)
+	switch b.Size {
+	case SizeXs:
+		return "cn-button-size-xs"
+	case SizeSm:
+		return "cn-button-size-sm"
+	case SizeLg:
+		return "cn-button-size-lg"
+	case SizeIcon:
+		return "cn-button-size-icon"
+	case SizeIconXs:
+		return "cn-button-size-icon-xs"
+	case SizeIconSm:
+		return "cn-button-size-icon-sm"
+	case SizeIconLg:
+		return "cn-button-size-icon-lg"
+	default:
+		return "cn-button-size-default"
+	}
 }
 
 var _ = templruntime.GeneratedTemplate

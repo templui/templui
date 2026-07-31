@@ -94,12 +94,41 @@ type SeparatorProps struct {
 // active style-*.css via the cn-item-* classes.
 func itemClasses(variant Variant, size Size) string {
 	base := "cn-item group/item flex w-full flex-wrap items-center transition-colors duration-100 outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 [a]:transition-colors"
-	return utils.TwMerge(base, "cn-item-variant-"+string(variant), "cn-item-size-"+string(size))
+	return utils.TwMerge(base, variantClasses(variant), sizeClasses(size))
+}
+
+func variantClasses(variant Variant) string {
+	switch variant {
+	case VariantOutline:
+		return "cn-item-variant-outline"
+	case VariantMuted:
+		return "cn-item-variant-muted"
+	default:
+		return "cn-item-variant-default"
+	}
+}
+
+func sizeClasses(size Size) string {
+	switch size {
+	case SizeSm:
+		return "cn-item-size-sm"
+	case SizeXs:
+		return "cn-item-size-xs"
+	default:
+		return "cn-item-size-default"
+	}
 }
 
 func mediaClasses(variant MediaVariant) string {
 	base := "cn-item-media flex shrink-0 items-center justify-center [&_svg]:pointer-events-none"
-	return base + " cn-item-media-variant-" + string(variant)
+	switch variant {
+	case MediaVariantIcon:
+		return base + " cn-item-media-variant-icon"
+	case MediaVariantImage:
+		return base + " cn-item-media-variant-image"
+	default:
+		return base + " cn-item-media-variant-default"
+	}
 }
 
 templ Group(props ...GroupProps) {
