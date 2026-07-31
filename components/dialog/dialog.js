@@ -726,22 +726,17 @@
       }
 
       // Remove portaled leftovers whose page content got swapped out: a
-      // closed dialog with no triggers, or an open dialog that had triggers
-      // when it was lifted but lost all of them to a swap. A fresh lift that
-      // is about to open (server-rendered Open true, e.g. swapped in via
-      // htmx) is exempt: it legitimately has no trigger yet.
+      // dialog that had triggers when it was lifted (or gained some later)
+      // but lost all of them to a swap. A dialog that never had triggers is
+      // driven programmatically (window.tui.dialog.open) and stays alive.
       const state = dialogs.get(popup);
       const hasTriggers = triggersFor(popup).length > 0;
-      const aboutToOpen =
-        !state && popup.getAttribute("data-tui-dialog-initial-open") === "true";
-      if (!hasTriggers && !aboutToOpen) {
-        if (!state || !state.open || state.hadTriggers) {
-          destroyDialog(popup);
-          return;
-        }
+      if (state) {
+        if (hasTriggers) state.hadTriggers = true;
+        else if (state.hadTriggers) destroyDialog(popup);
+        return;
       }
 
-      if (state) return;
       const fresh = ensureDialog(root);
       if (!fresh) return;
 

@@ -1254,8 +1254,12 @@
   function initDrawers(root = document) {
     liftTemplates();
     // Remove portaled leftovers whose trigger got swapped out of the page.
+    // A drawer that never had triggers is driven programmatically
+    // (window.tui.drawer.open) and stays alive.
     document.querySelectorAll("body > dialog[data-tui-drawer-content]").forEach((dialog) => {
-      if (!dialog.open && !triggersFor(dialog).length) {
+      if (triggersFor(dialog).length) {
+        dialog.dataset.tuiDrawerHadTriggers = "true";
+      } else if (!dialog.open && dialog.dataset.tuiDrawerHadTriggers === "true") {
         unwatchSnapResize(dialog);
         dialog.remove();
       }

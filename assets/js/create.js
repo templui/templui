@@ -1270,8 +1270,9 @@
 
     if (e.metaKey || e.ctrlKey) {
       var key = e.key.toLowerCase();
-      // use-action-menu: Cmd/Ctrl+P toggles the navigator.
-      if (key === "p") {
+      // use-action-menu: Cmd/Ctrl+P toggles the navigator; the iframe
+      // forwards Cmd/Ctrl+K too (action-menu.tsx), so both open it here.
+      if (key === "p" || key === "k") {
         e.preventDefault();
         window.tui.dialog.toggle("create-action-menu");
         return;
