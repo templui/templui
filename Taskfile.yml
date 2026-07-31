@@ -36,9 +36,11 @@ tasks:
         components/checkbox/checkbox.js \
         components/collapsible/collapsible.js \
         components/combobox/combobox.js \
+        components/command/command.js \
         components/contextmenu/contextmenu.js \
         components/copybutton/copybutton.js \
         components/dialog/dialog.js \
+        components/drawer/drawer.js \
         components/dropdownmenu/dropdownmenu.js \
         components/hovercard/hovercard.js \
         components/inputgroup/inputgroup.js \
@@ -117,6 +119,11 @@ tasks:
     desc: Generate llms.txt from registry.json
     cmds:
       - go run cmd/generate-llms/main.go
+
+  generate-style-classes:
+    desc: Generate assets/css/style-classes.txt (Tailwind scan candidates for the compiled docs previews) from the vendored style css
+    cmds:
+      - go run ./cmd/generate-style-classes
 
   install-compinstall:
     desc: Install compinstall tool

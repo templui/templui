@@ -45,6 +45,29 @@
       ]
     },
     {
+      "name": "alertdialog",
+      "slug": "alert-dialog",
+      "displayName": "Alert Dialog",
+      "description": "A modal dialog that interrupts the user with important content and expects a response.",
+      "files": [
+        "components/alertdialog/alertdialog.templ"
+      ],
+      "dependencies": [
+        "button",
+        "dialog"
+      ],
+      "categories": [
+        "overlays-dialogs"
+      ],
+      "tags": [
+        "alert-dialog",
+        "alertdialog",
+        "dialog",
+        "modal",
+        "confirmation"
+      ]
+    },
+    {
       "name": "aspectratio",
       "slug": "aspect-ratio",
       "displayName": "Aspect Ratio",
@@ -338,6 +361,33 @@
       ]
     },
     {
+      "name": "command",
+      "slug": "command",
+      "displayName": "Command",
+      "description": "Fast, composable command menu.",
+      "files": [
+        "components/command/command.templ"
+      ],
+      "jsFiles": [
+        "components/command/command.js",
+        "components/command/command.min.js"
+      ],
+      "dependencies": [
+        "dialog",
+        "icon",
+        "inputgroup"
+      ],
+      "categories": [
+        "overlays-dialogs"
+      ],
+      "tags": [
+        "command",
+        "palette",
+        "search",
+        "menu"
+      ]
+    },
+    {
       "name": "datepicker",
       "slug": "date-picker",
       "displayName": "Date Picker",
@@ -495,6 +545,29 @@
         "form",
         "accessibility",
         "text"
+      ]
+    },
+    {
+      "name": "drawer",
+      "slug": "drawer",
+      "displayName": "Drawer",
+      "description": "A panel that slides in from the edge of the screen and can be swiped away.",
+      "files": [
+        "components/drawer/drawer.templ"
+      ],
+      "jsFiles": [
+        "components/drawer/drawer.js",
+        "components/drawer/drawer.min.js"
+      ],
+      "dependencies": [],
+      "categories": [
+        "overlays-dialogs"
+      ],
+      "tags": [
+        "drawer",
+        "overlay",
+        "panel",
+        "swipe"
       ]
     },
     {
