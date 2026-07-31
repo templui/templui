@@ -114,51 +114,63 @@ templ Content(props ...ContentProps) {
 	}
 	{{ s := state(ctx) }}
 	// Inert until the script portals it to <body> at init, so the SSRd
-	// content never participates in layout or sibling CSS.
+	// content never participates in layout or sibling CSS. The wrapper div is
+	// the FloatingPortal node: it stays in <body>, [hidden] while the dialog
+	// is unmounted (Base UI removes the portal subtree instead), and the
+	// script drives the Base UI data-open/data-closed/data-starting-style/
+	// data-ending-style lifecycle on backdrop and popup.
 	<template data-tui-dialog-portal>
-	<dialog
-		id={ s.id }
-		data-tui-dialog-content
-		data-tui-dialog-open={ utils.IfElse(s.open, "true", "false") }
-		data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
-		data-tui-dialog-show-modal={ utils.IfElse(!p.DisableModal, "true", "false") }
-		if s.disableClickAway {
-			data-tui-dialog-disable-click-away="true"
-		}
-		class={
-			utils.TwMerge(
-				// 1:1 base/ui/dialog.tsx DialogContent, the look comes from cn-dialog-content.
-				"cn-dialog-content fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 outline-none",
-				// Native <dialog> wiring: Base UI unmounts the popup, our dialog stays in
-				// the DOM, and the JS keys open state on data-tui-dialog-open, so the
-				// data-open variants inside cn-dialog-content never match. The display
-				// toggle, the animations and the ::backdrop (our stand-in for the
-				// cn-dialog-overlay element) stay keyed to our attributes here.
-				"m-0 [&:not([open]):not([data-tui-dialog-closing=true])]:hidden",
-				"data-[tui-dialog-open=true]:animate-in data-[tui-dialog-open=true]:fade-in-0 data-[tui-dialog-open=true]:zoom-in-95 data-[tui-dialog-open=false]:animate-out data-[tui-dialog-open=false]:fade-out-0 data-[tui-dialog-open=false]:zoom-out-95 data-[tui-dialog-open=false]:fill-mode-forwards",
-				"[&::backdrop]:transition-all [&::backdrop]:duration-100 data-[tui-dialog-open=false]:[&::backdrop]:bg-transparent data-[tui-dialog-open=true]:[&::backdrop]:bg-black/10 supports-backdrop-filter:data-[tui-dialog-open=true]:[&::backdrop]:backdrop-blur-xs",
-				p.Class,
-			),
-		}
-		{ p.Attributes... }
-	>
-		{ children... }
-		if !p.HideCloseButton {
-			@button.Button(button.Props{
-				Variant: button.VariantGhost,
-				Size:    button.SizeIconSm,
-				Class:   "cn-dialog-close",
-				Attributes: templ.Attributes{
-					"data-slot":             "dialog-close",
-					"data-tui-dialog-close": true,
-					"aria-label":            "Close",
-				},
-			}) {
-				@icon.X()
-				<span class="sr-only">Close</span>
-			}
-		}
-	</dialog>
+		<div data-tui-dialog-root hidden>
+			// 1:1 base/ui/dialog.tsx DialogOverlay (Dialog.Backdrop): the look
+			// comes from cn-dialog-overlay. user-select none is Base UI's
+			// inline style on the backdrop.
+			<div
+				data-slot="dialog-overlay"
+				data-tui-dialog-backdrop
+				role="presentation"
+				style="user-select: none; -webkit-user-select: none;"
+				class="cn-dialog-overlay fixed inset-0 isolate z-50"
+			></div>
+			// 1:1 base/ui/dialog.tsx DialogContent (Dialog.Popup): the look
+			// comes from cn-dialog-content. tabindex is managed at runtime
+			// like Base UI's handleTabIndex.
+			<div
+				id={ s.id }
+				role="dialog"
+				tabindex="-1"
+				data-slot="dialog-content"
+				data-tui-dialog-content
+				data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
+				data-tui-dialog-show-modal={ utils.IfElse(!p.DisableModal, "true", "false") }
+				if s.disableClickAway {
+					data-tui-dialog-disable-click-away="true"
+				}
+				class={
+					utils.TwMerge(
+						"cn-dialog-content fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 outline-none",
+						p.Class,
+					),
+				}
+				{ p.Attributes... }
+			>
+				{ children... }
+				if !p.HideCloseButton {
+					@button.Button(button.Props{
+						Variant: button.VariantGhost,
+						Size:    button.SizeIconSm,
+						Class:   "cn-dialog-close",
+						Attributes: templ.Attributes{
+							"data-slot":             "dialog-close",
+							"data-tui-dialog-close": true,
+							"aria-label":            "Close",
+						},
+					}) {
+						@icon.X()
+						<span class="sr-only">Close</span>
+					}
+				}
+			</div>
+		</div>
 	</template>
 }
 
@@ -201,11 +213,14 @@ templ Title(props ...TitleProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	// data-tui-dialog-title is the Title registration: the script wires the
+	// popup's aria-labelledby to this element, like Base UI's useDialogTitle.
 	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
 		data-slot="dialog-title"
+		data-tui-dialog-title
 		class={ utils.TwMerge("cn-dialog-title cn-font-heading", p.Class) }
 		{ p.Attributes... }
 	>
@@ -218,11 +233,14 @@ templ Description(props ...DescriptionProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	// data-tui-dialog-description is the Description registration: the script
+	// wires the popup's aria-describedby to this element, like Base UI.
 	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
 		data-slot="dialog-description"
+		data-tui-dialog-description
 		class={ utils.TwMerge("cn-dialog-description", p.Class) }
 		{ p.Attributes... }
 	>

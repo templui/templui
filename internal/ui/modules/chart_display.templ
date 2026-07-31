@@ -136,10 +136,13 @@ templ chartCodeViewer(entry ChartEntry) {
 			// The charts app uses shadcn's app-level sheet: keyframe
 			// slide-in from the right (500ms in, 300ms out), no fade. The
 			// important markers beat the base sheet's transition styles
-			// and its data-[side=right]:sm:max-w-sm width.
+			// (transition-none plus neutralized data-starting-style/
+			// data-ending-style translates) and its
+			// data-[side=right]:sm:max-w-sm width; the keyframes ride Base
+			// UI's data-open/data-closed lifecycle driven by dialog.js.
 			// Below md the viewer comes up from the bottom like shadcn's
 			// Drawer variant, from md on it is the right side sheet.
-			Class: "flex flex-col gap-0 border-l-0 p-0 sm:max-w-sm! md:w-[700px]! md:max-w-[700px]! dark:border-l bg-background ease-in-out transition-none data-[tui-dialog-open=false]:translate-x-0! data-[tui-dialog-open=false]:translate-y-0! data-[tui-dialog-open=false]:opacity-100! data-[tui-dialog-open=true]:animate-in data-[tui-dialog-open=false]:animate-out data-[tui-dialog-open=false]:fill-mode-forwards data-[tui-dialog-open=true]:duration-500 data-[tui-dialog-open=false]:duration-300 max-md:inset-x-0! max-md:bottom-0! max-md:top-auto! max-md:h-auto! max-md:max-h-[80vh]! max-md:w-full! max-md:max-w-none! max-md:rounded-t-2xl max-md:border-t max-md:border-l-0 max-md:data-[tui-dialog-open=true]:slide-in-from-bottom max-md:data-[tui-dialog-open=false]:slide-out-to-bottom md:data-[tui-dialog-open=true]:slide-in-from-right md:data-[tui-dialog-open=false]:slide-out-to-right",
+			Class: "flex flex-col gap-0 border-l-0 p-0 sm:max-w-sm! md:w-[700px]! md:max-w-[700px]! dark:border-l bg-background ease-in-out transition-none data-starting-style:translate-x-0! data-starting-style:translate-y-0! data-starting-style:opacity-100! data-ending-style:translate-x-0! data-ending-style:translate-y-0! data-ending-style:opacity-100! data-open:animate-in data-closed:animate-out data-open:duration-500 data-closed:duration-300 max-md:inset-x-0! max-md:bottom-0! max-md:top-auto! max-md:h-auto! max-md:max-h-[80vh]! max-md:w-full! max-md:max-w-none! max-md:rounded-t-2xl max-md:border-t max-md:border-l-0 max-md:data-open:slide-in-from-bottom max-md:data-closed:slide-out-to-bottom md:data-open:slide-in-from-right md:data-closed:slide-out-to-right",
 		}) {
 			<div class="sr-only">
 				@sheet.Title() {
