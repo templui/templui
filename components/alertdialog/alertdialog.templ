@@ -1,0 +1,338 @@
+package alertdialog
+
+import (
+	"context"
+
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/dialog"
+	"github.com/templui/templui/utils"
+)
+
+type ctxKey string
+
+const stateKey ctxKey = "alertDialogState"
+
+type Size string
+
+const (
+	SizeDefault Size = "default"
+	SizeSm      Size = "sm"
+)
+
+type ctxState struct {
+	id   string
+	open bool
+}
+
+func state(ctx context.Context) ctxState {
+	if s, ok := ctx.Value(stateKey).(ctxState); ok {
+		return s
+	}
+	return ctxState{}
+}
+
+type Props struct {
+	ID string
+	// Open renders the alert dialog already open on page load.
+	Open bool
+}
+
+type ContentProps struct {
+	Class      string
+	Attributes templ.Attributes
+	// Size of the alert dialog. Defaults to default.
+	Size Size
+}
+
+type HeaderProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type FooterProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type MediaProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type TitleProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type DescriptionProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+type ActionProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	Variant    button.Variant
+	Size       button.Size
+}
+
+type CancelProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+	// Variant of the cancel button. Defaults to outline, like shadcn.
+	Variant button.Variant
+	Size    button.Size
+}
+
+// AlertDialog renders no element: it only carries the id and options that
+// link Trigger, Content and Cancel (via ctx). Like shadcn, the alert dialog
+// IS the dialog primitive without light dismiss; the dialog script drives it.
+templ AlertDialog(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: p.Open}) }}
+	{ children... }
+}
+
+// Trigger returns the attributes that turn any element (usually a button)
+// into the alert dialog trigger — the asChild equivalent: no wrapper element.
+func Trigger(ctx context.Context) templ.Attributes {
+	return TriggerFor(state(ctx).id)
+}
+
+// TriggerFor targets an alert dialog outside the current AlertDialog root by id.
+func TriggerFor(id string) templ.Attributes {
+	return templ.Attributes{
+		"data-tui-dialog-trigger": true,
+		"aria-controls":           id,
+		"aria-haspopup":           "dialog",
+		"aria-expanded":           "false",
+	}
+}
+
+// Close returns the attributes that make any element close the alert dialog.
+func Close(ctx context.Context) templ.Attributes {
+	return CloseFor(state(ctx).id)
+}
+
+// CloseFor targets an alert dialog outside the current AlertDialog root by id.
+func CloseFor(id string) templ.Attributes {
+	return templ.Attributes{
+		"data-tui-dialog-close":  true,
+		"data-tui-dialog-target": id,
+	}
+}
+
+templ Content(props ...ContentProps) {
+	{{ var p ContentProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Size == "" {
+		{{ p.Size = SizeDefault }}
+	}
+	{{ s := state(ctx) }}
+	// Inert until the script portals it to <body> at init, so the SSRd
+	// content never participates in layout or sibling CSS.
+	// Base UI's AlertDialog is a Dialog with disablePointerDismissal locked
+	// on: a press on the backdrop never closes it (disable-click-away below),
+	// only Esc and the buttons do.
+	<template data-tui-dialog-portal>
+		<div data-tui-dialog-root hidden>
+			// 1:1 base/ui/alert-dialog.tsx AlertDialogOverlay
+			// (AlertDialog.Backdrop): the look comes from
+			// cn-alert-dialog-overlay. user-select none is Base UI's inline
+			// style on the backdrop.
+			<div
+				data-slot="alert-dialog-overlay"
+				data-tui-dialog-backdrop
+				role="presentation"
+				style="user-select: none; -webkit-user-select: none;"
+				class="cn-alert-dialog-overlay fixed inset-0 isolate z-50"
+			></div>
+			// 1:1 base/ui/alert-dialog.tsx AlertDialogContent
+			// (AlertDialog.Popup): the look comes from cn-alert-dialog-content.
+			<div
+				id={ s.id }
+				role="alertdialog"
+				tabindex="-1"
+				data-slot="alert-dialog-content"
+				data-tui-dialog-content
+				data-size={ string(p.Size) }
+				data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
+				data-tui-dialog-show-modal="true"
+				data-tui-dialog-disable-click-away="true"
+				class={
+					utils.TwMerge(
+						"cn-alert-dialog-content group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 outline-none",
+						p.Class,
+					),
+				}
+				{ p.Attributes... }
+			>
+				{ children... }
+			</div>
+		</div>
+	</template>
+}
+
+templ Header(props ...HeaderProps) {
+	{{ var p HeaderProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="alert-dialog-header"
+		class={ utils.TwMerge("cn-alert-dialog-header", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Footer(props ...FooterProps) {
+	{{ var p FooterProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="alert-dialog-footer"
+		class={ utils.TwMerge("cn-alert-dialog-footer flex flex-col-reverse gap-2 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Media(props ...MediaProps) {
+	{{ var p MediaProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="alert-dialog-media"
+		class={ utils.TwMerge("cn-alert-dialog-media", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Title(props ...TitleProps) {
+	{{ var p TitleProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="alert-dialog-title"
+		data-tui-dialog-title
+		class={ utils.TwMerge("cn-alert-dialog-title cn-font-heading", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+templ Description(props ...DescriptionProps) {
+	{{ var p DescriptionProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="alert-dialog-description"
+		data-tui-dialog-description
+		class={ utils.TwMerge("cn-alert-dialog-description", p.Class) }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+// Action is a plain button, exactly like shadcn's AlertDialogAction: it does
+// not close the alert dialog by itself. Spread alertdialog.Close(ctx) into
+// Attributes (or submit a form) to wire the confirm behavior.
+templ Action(props ...ActionProps) {
+	{{ var p ActionProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{
+		attrs := templ.Attributes{"data-slot": "alert-dialog-action"}
+		for k, v := range p.Attributes {
+			attrs[k] = v
+		}
+	}}
+	@button.Button(button.Props{
+		ID:         p.ID,
+		Variant:    p.Variant,
+		Size:       p.Size,
+		Class:      utils.TwMerge("cn-alert-dialog-action", p.Class),
+		Attributes: attrs,
+	}) {
+		{ children... }
+	}
+}
+
+// Cancel closes the alert dialog, rendered as an outline button like shadcn.
+templ Cancel(props ...CancelProps) {
+	{{ var p CancelProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Variant == "" {
+		{{ p.Variant = button.VariantOutline }}
+	}
+	{{
+		attrs := templ.Attributes{
+			"data-slot":              "alert-dialog-cancel",
+			"data-tui-dialog-close":  true,
+			"data-tui-dialog-target": state(ctx).id,
+		}
+		for k, v := range p.Attributes {
+			attrs[k] = v
+		}
+	}}
+	@button.Button(button.Props{
+		ID:         p.ID,
+		Variant:    p.Variant,
+		Size:       p.Size,
+		Class:      utils.TwMerge("cn-alert-dialog-cancel", p.Class),
+		Attributes: attrs,
+	}) {
+		{ children... }
+	}
+}
+
+// Script loads the dialog script: alert dialogs are dialogs without light
+// dismiss. Delegating to dialog.Script shares its once-handle, so a page
+// rendering both never emits the script twice.
+templ Script() {
+	@dialog.Script()
+}

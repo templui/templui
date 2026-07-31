@@ -1,0 +1,35 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/alertdialog"
+	"github.com/templui/templui/components/button"
+)
+
+templ AlertDialogBasic() {
+	@alertdialog.AlertDialog() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: alertdialog.Trigger(ctx),
+		}) {
+			Show Dialog
+		}
+		@alertdialog.Content() {
+			@alertdialog.Header() {
+				@alertdialog.Title() {
+					Are you absolutely sure?
+				}
+				@alertdialog.Description() {
+					This action cannot be undone. This will permanently delete your account and remove your data from our servers.
+				}
+			}
+			@alertdialog.Footer() {
+				@alertdialog.Cancel() {
+					Cancel
+				}
+				@alertdialog.Action() {
+					Continue
+				}
+			}
+		}
+	}
+}

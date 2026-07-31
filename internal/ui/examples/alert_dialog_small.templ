@@ -1,0 +1,35 @@
+package examples
+
+import (
+	"github.com/templui/templui/components/alertdialog"
+	"github.com/templui/templui/components/button"
+)
+
+templ AlertDialogSmall() {
+	@alertdialog.AlertDialog() {
+		@button.Button(button.Props{
+			Variant:    button.VariantOutline,
+			Attributes: alertdialog.Trigger(ctx),
+		}) {
+			Show Dialog
+		}
+		@alertdialog.Content(alertdialog.ContentProps{Size: alertdialog.SizeSm}) {
+			@alertdialog.Header() {
+				@alertdialog.Title() {
+					Allow accessory to connect?
+				}
+				@alertdialog.Description() {
+					Do you want to allow the USB accessory to connect to this device?
+				}
+			}
+			@alertdialog.Footer() {
+				@alertdialog.Cancel() {
+					Don't allow
+				}
+				@alertdialog.Action() {
+					Allow
+				}
+			}
+		}
+	}
+}
