@@ -6,49 +6,23 @@ import (
 	"github.com/templui/templui/internal/ui/modules"
 )
 
-templ MarkdownDoc(doc *service.DocPage) {
+templ MarkdownDoc(doc *service.DocPage, prev, next PagerLink) {
 	@layouts.DocsLayout(
 		doc.Title,
 		doc.Description,
 		doc.TOC,
 	) {
-		@modules.PageWrapper(modules.PageWrapperProps{
-			Name:        doc.Title,
-			HideSource:  true,
-			Description: templ.Raw(doc.Description),
-			Breadcrumbs: modules.Breadcrumbs{
-				Items: []modules.BreadcrumbItem{
-					{
-						Text: "Docs",
-						Path: "/docs",
-					},
-					{
-						Text: doc.Title,
-						Path: "/docs/" + doc.Slug,
-					},
-				},
-			},
-		}) {
-			<article class="prose prose-neutral dark:prose-invert max-w-none prose-a:text-primary/90 prose-a:underline-offset-4 hover:prose-a:text-primary/80">
-				<style>
-					/* Override prose for inline code only - NOT pre blocks */
-					.prose :not(pre) > code {
-						@apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground;
-					}
-					.prose :not(pre) > code::before,
-					.prose :not(pre) > code::after {
-						content: none;
-					}
-
-					/* Code blocks - Shiki handles all styling, we just add border */
-					.prose .code-highlighting-container {
-						@apply rounded-lg border border-border/50 mb-6 not-prose;
-					}
-				</style>
-				@templ.Raw(doc.Content)
-			</article>
-			// Include copy button script
-			<script src="/assets/js/docs-copy.js"></script>
-		}
+		@modules.DocsCodeToggleScript()
+		// shadcn's docs column: header and content are siblings in a gap-6
+		// flex column (app/(app)/docs/[[...slug]]/page.tsx line 96).
+		<div class="flex w-full flex-1 flex-col gap-6">
+			@modules.DocsPageHeader(doc.Title, doc.Description, prev.Href, next.Href)
+			<div class="typeset w-full flex-1 pb-16 sm:pb-0">
+				for _, segment := range doc.Segments {
+					@renderSegment(segment)
+				}
+			</div>
+			@modules.DocsPager(prev.Title, prev.Href, next.Title, next.Href)
+		</div>
 	}
 }

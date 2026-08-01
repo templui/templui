@@ -51,6 +51,18 @@ var Sections = []Section{
 				Href: "/docs/how-to-use",
 			},
 			{
+				Text: "Theming",
+				Href: "/docs/theming",
+			},
+			{
+				Text: "Typeset",
+				Href: "/docs/typeset",
+			},
+			{
+				Text: "Dark Mode",
+				Href: "/docs/dark-mode",
+			},
+			{
 				Text: "llms.txt",
 				Href: "/llms.txt",
 			},

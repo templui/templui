@@ -103,16 +103,32 @@ func main() {
 				return
 			}
 
-			if middleware.IsHtmxRequest(r) {
-				templ.Handler(pages.MarkdownDoc(doc), templ.WithFragments("content", "toc")).ServeHTTP(w, r)
-			} else {
-				templ.Handler(pages.MarkdownDoc(doc)).ServeHTTP(w, r)
-			}
+			prev, next := docsPagerLinks("/docs/" + slug)
+			htmxHandler(pages.MarkdownDoc(doc, prev, next)).ServeHTTP(w, r)
 		})
 	}
 
-	mux.Handle("GET /docs/introduction", markdownDocsHandler("introduction"))
-	mux.Handle("GET /docs/how-to-use", markdownDocsHandler("how-to-use"))
+	// Raw markdown of a root docs page under <slug>.md, like the component
+	// pages, for the copy-page menu.
+	markdownSourceHandler := func(slug string) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			source, err := docsService.GetPageSource(slug)
+			if err != nil {
+				http.NotFound(w, r)
+				return
+			}
+			w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
+			w.Write(source)
+		})
+	}
+
+	for _, slug := range []string{"introduction", "how-to-use", "theming", "typeset", "dark-mode"} {
+		mux.Handle("GET /docs/"+slug, markdownDocsHandler(slug))
+		mux.Handle("GET /docs/"+slug+".md", markdownSourceHandler(slug))
+	}
+	// Typography redirects to /docs/typeset, like shadcn's
+	// /docs/components/*/typography redirects (permanent: true).
+	mux.Handle("GET /docs/components/typography", http.RedirectHandler("/docs/typeset", http.StatusMovedPermanently))
 	// Components
 	mux.Handle("GET /docs/components/{slug}", componentDocHandler(docsService))
 	mux.Handle("GET /charts", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -289,29 +305,33 @@ func componentDocHandler(docsService *service.DocsService) http.Handler {
 			http.NotFound(w, r)
 			return
 		}
-		prev, next := componentPagerLinks("/docs/components/" + slug)
+		prev, next := docsPagerLinks("/docs/components/" + slug)
 		htmxHandler(pages.ComponentDoc(page, prev, next)).ServeHTTP(w, r)
 	})
 }
 
-// componentPagerLinks finds the previous/next component from the sidebar's
-// components section.
-func componentPagerLinks(href string) (pages.PagerLink, pages.PagerLink) {
-	var prev, next pages.PagerLink
+// docsPagerLinks finds the previous/next docs page from the sidebar sections,
+// flattened across section boundaries like shadcn's findNeighbour over the
+// docs page tree. Links outside /docs/ (llms.txt) are not pages and stay out.
+func docsPagerLinks(href string) (pages.PagerLink, pages.PagerLink) {
+	var flat []shared.SideLink
 	for _, section := range shared.Sections {
-		if section.Title != "Components" {
+		for _, link := range section.Links {
+			if strings.HasPrefix(link.Href, "/docs/") {
+				flat = append(flat, link)
+			}
+		}
+	}
+	var prev, next pages.PagerLink
+	for i, link := range flat {
+		if link.Href != href {
 			continue
 		}
-		for i, link := range section.Links {
-			if link.Href != href {
-				continue
-			}
-			if i > 0 {
-				prev = pages.PagerLink{Title: section.Links[i-1].Text, Href: section.Links[i-1].Href}
-			}
-			if i < len(section.Links)-1 {
-				next = pages.PagerLink{Title: section.Links[i+1].Text, Href: section.Links[i+1].Href}
-			}
+		if i > 0 {
+			prev = pages.PagerLink{Title: flat[i-1].Text, Href: flat[i-1].Href}
+		}
+		if i < len(flat)-1 {
+			next = pages.PagerLink{Title: flat[i+1].Text, Href: flat[i+1].Href}
 		}
 	}
 	return prev, next

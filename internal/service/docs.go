@@ -33,7 +33,7 @@ type DocPage struct {
 	Title       string
 	Description string
 	Order       int
-	Content     string
+	Segments    []markdown.Segment
 	TOC         []modules.TableOfContentsItem
 }
 
@@ -79,7 +79,9 @@ func (s *DocsService) GetComponentPage(slug string) (*ComponentDocPage, error) {
 	return page, nil
 }
 
-// GetPage loads and parses a markdown document by slug
+// GetPage loads and parses a markdown document by slug. Like the component
+// docs, the source runs through the segment pipeline so the shadcn mdx
+// shortcodes (Callout, Steps, CodeCollapsibleWrapper, ...) work here too.
 func (s *DocsService) GetPage(slug string) (*DocPage, error) {
 	// Construct file path
 	mdPath := filepath.Join("content/docs", slug+".md")
@@ -90,20 +92,16 @@ func (s *DocsService) GetPage(slug string) (*DocPage, error) {
 		return nil, fmt.Errorf("failed to read markdown file: %w", err)
 	}
 
-	// Parse with frontmatter
-	html, meta, err := s.parser.ParseWithFrontmatter(content)
+	segments, meta, toc, err := s.parser.ParseSegments(content)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse markdown: %w", err)
 	}
 
-	// Extract table of contents
-	toc := s.parser.ExtractTableOfContents(content)
-
 	// Extract metadata
 	page := &DocPage{
-		Slug:    slug,
-		Content: string(html),
-		TOC:     toc,
+		Slug:     slug,
+		Segments: segments,
+		TOC:      toc,
 	}
 
 	if title, ok := meta["title"].(string); ok {
@@ -117,6 +115,12 @@ func (s *DocsService) GetPage(slug string) (*DocPage, error) {
 	}
 
 	return page, nil
+}
+
+// GetPageSource returns the raw markdown of a root docs page for the
+// exported <slug>.md view (the copy-page menu).
+func (s *DocsService) GetPageSource(slug string) ([]byte, error) {
+	return readContent(filepath.Join("content/docs", slug+".md"))
 }
 
 // GetComponentPageSource returns the markdown of a component doc for the

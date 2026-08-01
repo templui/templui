@@ -21,18 +21,22 @@ type PagerLink struct {
 // against the examples registry.
 templ ComponentDoc(page *service.ComponentDocPage, prev, next PagerLink) {
 	@layouts.DocsLayout(
-		page.Title+" - templUI",
+		page.Title,
 		page.Description,
 		page.TOC,
 	) {
 		@modules.DocsCodeToggleScript()
-		@modules.DocsPageHeader(page.Title, page.Description, prev.Href, next.Href)
-		<div class="typeset w-full flex-1 pb-16 sm:pb-0">
-			for _, segment := range page.Segments {
-				@renderSegment(segment)
-			}
+		// shadcn's docs column: header and content are siblings in a gap-6
+		// flex column (app/(app)/docs/[[...slug]]/page.tsx line 96).
+		<div class="flex w-full flex-1 flex-col gap-6">
+			@modules.DocsPageHeader(page.Title, page.Description, prev.Href, next.Href)
+			<div class="typeset w-full flex-1 pb-16 sm:pb-0">
+				for _, segment := range page.Segments {
+					@renderSegment(segment)
+				}
+			</div>
+			@modules.DocsPager(prev.Title, prev.Href, next.Title, next.Href)
 		</div>
-		@modules.DocsPager(prev.Title, prev.Href, next.Title, next.Href)
 	}
 }
 
@@ -66,6 +70,14 @@ templ renderSegment(segment markdown.Segment) {
 			@templ.Raw("</div>")
 		case "Step":
 			@templ.Raw("<h3>" + segment.HTML + "</h3>")
+		case "CodeCollapsibleWrapper":
+			// The shadcn CodeCollapsibleWrapper: the inner code figure clamped
+			// behind an Expand/Collapse toggle.
+			@modules.CodeCollapsibleWrapper() {
+				for _, sub := range segment.Children {
+					@renderSegment(sub)
+				}
+			}
 		case "CodeTabs":
 			// The shadcn CodeTabs pendant: hand written tab blocks in the
 			// markdown, each tab's body is its own segment list.

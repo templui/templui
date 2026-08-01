@@ -20,6 +20,9 @@ type Segment struct {
 	Attrs     map[string]string
 	// Tabs carries the parsed CodeTabs structure.
 	Tabs []SegmentTab
+	// Children carries the inner segments of wrapping shortcodes
+	// (CodeCollapsibleWrapper).
+	Children []Segment
 	// ID is a page unique id for shortcodes that need one (CodeTabs).
 	ID string
 }
@@ -32,10 +35,10 @@ type SegmentTab struct {
 }
 
 // Shortcode tags mirror shadcn's mdx components, so their docs sources can
-// be adopted nearly verbatim. Callout and CodeTabs carry inner markdown,
-// Steps wraps the segments between its tags and Step is a numbered
-// heading; the others are self closing.
-var shortcodeRe = regexp.MustCompile(`(?ms)^(?:<(ComponentPreview|ComponentSource)\b(.*?)/>|<(Callout)\b([^>\n]*)>(.*?)</Callout>|<(Steps)([^>\n]*)>|(</Steps>)|<(Step)>(.*?)</Step>|<(CodeTabs)>(.*?)</CodeTabs>)\s*$`)
+// be adopted nearly verbatim. Callout, CodeTabs and CodeCollapsibleWrapper
+// carry inner markdown, Steps wraps the segments between its tags and Step
+// is a numbered heading; the others are self closing.
+var shortcodeRe = regexp.MustCompile(`(?ms)^(?:<(ComponentPreview|ComponentSource)\b(.*?)/>|<(Callout)\b([^>\n]*)>(.*?)</Callout>|<(Steps)([^>\n]*)>|(</Steps>)|<(Step)>(.*?)</Step>|<(CodeTabs)>(.*?)</CodeTabs>|<(CodeCollapsibleWrapper)>(.*?)</CodeCollapsibleWrapper>)\s*$`)
 
 var (
 	tabsTriggerRe = regexp.MustCompile(`(?s)<TabsTrigger value="([^"]+)">\s*(.*?)\s*</TabsTrigger>`)
@@ -128,6 +131,12 @@ func (p *Parser) parseChunks(source []byte, idContext parser.Context, counter *i
 				return nil, err
 			}
 			segments = append(segments, seg)
+		case m[26] != -1: // CodeCollapsibleWrapper with inner markdown
+			children, err := p.parseChunks(source[m[28]:m[29]], idContext, counter)
+			if err != nil {
+				return nil, err
+			}
+			segments = append(segments, Segment{Shortcode: "CodeCollapsibleWrapper", Children: children})
 		default:
 			segments = append(segments, Segment{
 				Shortcode: string(source[m[2]:m[3]]),
