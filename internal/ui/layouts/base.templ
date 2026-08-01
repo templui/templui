@@ -74,7 +74,7 @@ templ BaseLayout(title, description string) {
 				(function() {
 					// Get current theme preference (system, light, or dark)
 					function getThemePreference() {
-						return localStorage.getItem('themePreference') || 'system';
+						return localStorage.getItem('theme') || 'system';
 					}
 					
 					// Apply theme based on preference
@@ -99,7 +99,7 @@ templ BaseLayout(title, description string) {
 					// the chart and block preview iframes) when the
 					// preference changes.
 					window.addEventListener('storage', function(e) {
-						if (e.key !== 'themePreference') return;
+						if (e.key !== 'theme') return;
 						const p = e.newValue || 'system';
 						const dark = p === 'system'
 							? window.matchMedia('(prefers-color-scheme: dark)').matches

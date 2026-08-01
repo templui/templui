@@ -394,7 +394,7 @@
     // writes localStorage, the storage event fires here (base.templ does the
     // same for the docs pages).
     window.addEventListener("storage", function (e) {
-      if (e.key !== "themePreference") return;
+      if (e.key !== "theme") return;
       var p = e.newValue || "system";
       var dark =
         p === "system"

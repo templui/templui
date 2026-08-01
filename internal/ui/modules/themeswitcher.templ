@@ -21,7 +21,7 @@ templ ThemeSwitcher(props ...ThemeSwitcherProps) {
 			
 			// Get current theme preference (system, light, or dark)
 			window.themeUtils.getThemePreference = function() {
-				return localStorage.getItem('themePreference') || 'system';
+				return localStorage.getItem('theme') || 'system';
 			}
 
 			// Apply theme based on preference
@@ -57,7 +57,7 @@ templ ThemeSwitcher(props ...ThemeSwitcherProps) {
 					next = current === 'light' ? 'dark' : 'light';
 				}
 				
-				localStorage.setItem('themePreference', next);
+				localStorage.setItem('theme', next);
 				window.themeUtils.applyTheme();
 			}
 
