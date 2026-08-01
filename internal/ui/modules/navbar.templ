@@ -55,6 +55,12 @@ templ Navbar() {
 					}
 					@button.Button(button.Props{
 						Variant: button.VariantGhost,
+						Href:    "/typeset",
+					}) {
+						Typeset
+					}
+					@button.Button(button.Props{
+						Variant: button.VariantGhost,
 						Href:    "/create",
 					}) {
 						Create
@@ -64,17 +70,21 @@ templ Navbar() {
 			<div class="flex gap-1 items-center justify-center">
 				// Pendant of components/designer-actions.tsx: hidden unless a
 				// designer page (data-slot="designer") is in the layout. The
-				// Get Code dialog lives on the /create page.
-				<div class="hidden items-center gap-2 group-has-data-[slot=designer]/layout:md:flex">
-					@separator.Separator(separator.Props{
-						Orientation: separator.OrientationVertical,
-					})
-					@button.Button(button.Props{
-						Attributes: dialog.TriggerFor("create-code-dialog"),
-					}) {
-						Get Code
-					}
-				</div>
+				// Get Code dialog lives on the /create page. Typeset carries
+				// its own docs panel, so the header stays clean there (the
+				// same route gate as designer-actions.tsx).
+				if ctx.Value(ctxkeys.URLPathValue) != "/typeset" {
+					<div class="hidden items-center gap-2 group-has-data-[slot=designer]/layout:md:flex">
+						@separator.Separator(separator.Props{
+							Orientation: separator.OrientationVertical,
+						})
+						@button.Button(button.Props{
+							Attributes: dialog.TriggerFor("create-code-dialog"),
+						}) {
+							Get Code
+						}
+					</div>
+				}
 				@button.Button(button.Props{
 					Variant: button.VariantGhost,
 					Href:    "https://github.com/templui/templui",
@@ -142,6 +152,14 @@ templ NavbarMobileMenu() {
 									class="text-sm inline-flex items-center px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 w-full"
 								>
 									<span>Charts</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="/typeset"
+									class="text-sm inline-flex items-center px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 w-full"
+								>
+									<span>Typeset</span>
 								</a>
 							</li>
 							<li>

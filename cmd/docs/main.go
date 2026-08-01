@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/a-h/templ"
@@ -93,6 +94,40 @@ func main() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}))
+	mux.Handle("GET /typeset", htmxHandler(pages.Typeset()))
+	mux.Handle("GET /typeset/preview", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		item := r.URL.Query().Get("item")
+		if item == "" {
+			item = "docs"
+		}
+		if !pages.TypesetFixtureExists(item) {
+			http.NotFound(w, r)
+			return
+		}
+		params := pages.LoadTypesetPreviewParams(r.URL.Query())
+		if err := pages.TypesetPreview(item, params).Render(r.Context(), w); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}))
+	// Raw stylesheet for the typeset Get Code button, the pendant of shadcn's
+	// app/typeset.css/route.ts: read fresh on every request so the copy is
+	// never a stale snapshot.
+	mux.HandleFunc("GET /typeset.css", func(w http.ResponseWriter, r *http.Request) {
+		var css []byte
+		var err error
+		if config.AppConfig.GoEnv != "production" {
+			css, err = os.ReadFile("./assets/css/typeset.css")
+		} else {
+			css, err = assets.Assets.ReadFile("css/typeset.css")
+		}
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "text/css; charset=utf-8")
+		w.Header().Set("Cache-Control", "no-store")
+		w.Write(css)
+	})
 
 	// Markdown-based documentation pages
 	markdownDocsHandler := func(slug string) http.Handler {

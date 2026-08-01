@@ -1,0 +1,221 @@
+package pages
+
+import (
+	"net/url"
+
+	"github.com/templui/templui/utils"
+)
+
+// TypesetPreview renders inside the /typeset iframe (and standalone via Open
+// in New Tab), the pendant of shadcn's app/(view)/preview/typeset: the layout
+// wires the --preview-* variables onto the container with the request's query
+// params as fallbacks (shadcn's layout bakes the defaults in because Next
+// prerenders the route; our per-request render can respect searchParams, so
+// the first paint is correct even before typeset-preview.js runs).
+// typeset-preview.js keeps the variables in sync with the parent's
+// postMessage stream and its own URL. The fixture HTML renders verbatim
+// inside the .typeset container ([name]/page.tsx).
+
+// TypesetFixtureExists reports whether a preview fixture exists for the item.
+func TypesetFixtureExists(item string) bool {
+	_, ok := typesetFixtures[item]
+	return ok
+}
+
+// typesetPreviewFonts mirrors create-config.js FONTS minus lib/fonts.ts
+// EXCLUDED_FONTS (instrument-serif, eb-garamond, playfair-display): font id
+// to the CSS value the preview consumes, "var(<previewVariable>), <family>".
+var typesetPreviewFonts = map[string]string{
+	"geist":           "var(--font-geist-sans), 'Geist Variable', sans-serif",
+	"inter":           "var(--font-inter), 'Inter Variable', sans-serif",
+	"noto-sans":       "var(--font-noto-sans), 'Noto Sans Variable', sans-serif",
+	"nunito-sans":     "var(--font-nunito-sans), 'Nunito Sans Variable', sans-serif",
+	"figtree":         "var(--font-figtree), 'Figtree Variable', sans-serif",
+	"roboto":          "var(--font-roboto), 'Roboto Variable', sans-serif",
+	"raleway":         "var(--font-raleway), 'Raleway Variable', sans-serif",
+	"dm-sans":         "var(--font-dm-sans), 'DM Sans Variable', sans-serif",
+	"public-sans":     "var(--font-public-sans), 'Public Sans Variable', sans-serif",
+	"outfit":          "var(--font-outfit), 'Outfit Variable', sans-serif",
+	"oxanium":         "var(--font-oxanium), 'Oxanium Variable', sans-serif",
+	"manrope":         "var(--font-manrope), 'Manrope Variable', sans-serif",
+	"space-grotesk":   "var(--font-space-grotesk), 'Space Grotesk Variable', sans-serif",
+	"montserrat":      "var(--font-montserrat), 'Montserrat Variable', sans-serif",
+	"ibm-plex-sans":   "var(--font-ibm-plex-sans), 'IBM Plex Sans Variable', sans-serif",
+	"source-sans-3":   "var(--font-source-sans-3), 'Source Sans 3 Variable', sans-serif",
+	"instrument-sans": "var(--font-instrument-sans), 'Instrument Sans Variable', sans-serif",
+	"geist-mono":      "var(--font-geist-mono), 'Geist Mono Variable', monospace",
+	"jetbrains-mono":  "var(--font-jetbrains-mono), 'JetBrains Mono Variable', monospace",
+	"noto-serif":      "var(--font-noto-serif), 'Noto Serif Variable', serif",
+	"roboto-slab":     "var(--font-roboto-slab), 'Roboto Slab Variable', serif",
+	"merriweather":    "var(--font-merriweather), 'Merriweather Variable', serif",
+	"lora":            "var(--font-lora), 'Lora Variable', serif",
+}
+
+// TypesetPreviewParams are the typographic query params of /typeset/preview,
+// normalized like lib/search-params.ts loadTypesetSearchParams: missing or
+// invalid values fall back to the defaults.
+type TypesetPreviewParams struct {
+	Body    string
+	Heading string
+	Mono    string
+	Scale   string
+	Measure string
+	Flow    string
+	Leading string
+}
+
+func typesetOptionExists(options []createOption, value string) bool {
+	for _, option := range options {
+		if option.Value == value {
+			return true
+		}
+	}
+	return false
+}
+
+// LoadTypesetPreviewParams normalizes the query params against the same
+// tables typeset-preview.js and typeset.js use (lib/search-params.ts).
+func LoadTypesetPreviewParams(query url.Values) TypesetPreviewParams {
+	params := TypesetPreviewParams{
+		Body:    "geist",
+		Heading: "inherit",
+		Mono:    "geist-mono",
+		Scale:   "15",
+		Measure: "80",
+		Flow:    "1.25em",
+		Leading: "1.75",
+	}
+	if _, ok := typesetPreviewFonts[query.Get("body")]; ok {
+		params.Body = query.Get("body")
+	}
+	if _, ok := typesetPreviewFonts[query.Get("heading")]; ok || query.Get("heading") == "inherit" {
+		params.Heading = query.Get("heading")
+	}
+	if _, ok := typesetPreviewFonts[query.Get("mono")]; ok {
+		params.Mono = query.Get("mono")
+	}
+	if typesetOptionExists(typesetSizes, query.Get("scale")) {
+		params.Scale = query.Get("scale")
+	}
+	for _, measure := range typesetMeasures {
+		if measure.Value == query.Get("measure") {
+			params.Measure = measure.Value
+		}
+	}
+	if typesetOptionExists(typesetFlows, query.Get("flow")) {
+		params.Flow = query.Get("flow")
+	}
+	if typesetOptionExists(typesetLeadings, query.Get("leading")) {
+		params.Leading = query.Get("leading")
+	}
+	return params
+}
+
+// preview-provider.tsx previewValues, server-side.
+
+func (p TypesetPreviewParams) fontValue() string {
+	return typesetPreviewFonts[p.Body]
+}
+
+func (p TypesetPreviewParams) headingValue() string {
+	if p.Heading == "inherit" {
+		return p.fontValue()
+	}
+	return typesetPreviewFonts[p.Heading]
+}
+
+func (p TypesetPreviewParams) monoValue() string {
+	return typesetPreviewFonts[p.Mono]
+}
+
+func (p TypesetPreviewParams) measureWidth() string {
+	for _, measure := range typesetMeasures {
+		if measure.Value == p.Measure {
+			return measure.Width
+		}
+	}
+	return ""
+}
+
+// paramsStyle is the pendant of layout.tsx PARAMS_STYLE plus the layout's
+// inline var() wiring, emitted as a stylesheet because templ escapes quoted
+// font names in style attributes: every --preview-* consumer falls back to
+// the request params. All interpolated values are whitelist-normalized above.
+func (p TypesetPreviewParams) paramsStyle() string {
+	return "<style>" +
+		".preview-frame { font-family: var(--preview-font, " + p.fontValue() +
+		"); --font-heading: var(--preview-font-heading, " + p.headingValue() +
+		"); --font-mono: var(--preview-font-mono, " + p.monoValue() + "); }\n" +
+		".preview-params { font-size: var(--preview-size, " + p.Scale +
+		"px); max-width: var(--preview-measure, " + p.measureWidth() + "); }\n" +
+		".preview-params .typeset { --typeset-leading: var(--preview-leading, " +
+		p.Leading + "); --typeset-flow: var(--preview-flow, " + p.Flow + "); }" +
+		"</style>"
+}
+
+templ TypesetPreview(item string, params TypesetPreviewParams) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Typeset Preview - templUI</title>
+			<meta name="robots" content="noindex"/>
+			<link rel="preload" href="/assets/fonts/geist/geist-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous"/>
+			<link rel="preload" href="/assets/fonts/geist/geist-mono-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous"/>
+			<link href={ utils.ScriptURL("/assets/css/output.css") } rel="stylesheet"/>
+			<link rel="stylesheet" href={ utils.ScriptURL("/assets/css/create-fonts.css") }/>
+			// layout.tsx PARAMS_STYLE with the request params as fallbacks.
+			@templ.Raw(params.paramsStyle())
+			// Theme initialization before paint plus the next-themes-style
+			// storage sync, like base.templ: the parent's (or any same-origin
+			// window's) theme switch reaches this document via the storage
+			// event.
+			<script nonce={ templ.GetNonce(ctx) }>
+				(function() {
+					function isDarkPreference(p) {
+						return p === 'system'
+							? window.matchMedia('(prefers-color-scheme: dark)').matches
+							: p === 'dark';
+					}
+					if (isDarkPreference(localStorage.getItem('theme') || 'system')) {
+						document.documentElement.classList.add('dark');
+					}
+					window.addEventListener('storage', function(e) {
+						if (e.key !== 'theme') return;
+						document.documentElement.classList.toggle(
+							'dark',
+							isDarkPreference(e.newValue || 'system')
+						);
+					});
+				})();
+			</script>
+			// No defer: the params from the URL must land on :root before the
+			// body paints (preview-provider.tsx applies them pre-paint).
+			<script nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-config.js") }></script>
+			<script nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/typeset-preview.js") }></script>
+		</head>
+		<body class="style-nova bg-background text-foreground">
+			<div class="preview-frame flex min-h-svh justify-center px-6 pt-8 pb-24 md:pt-24 md:pb-32">
+				<div class="preview-params w-full">
+					if item == "chat" {
+						<div class="flex w-full flex-col gap-10">
+							// The user bubble is page chrome, rendered outside
+							// the typeset container ([name]/page.tsx).
+							<div class="ml-auto w-fit max-w-[65%] rounded-3xl bg-muted px-4 py-2.5">
+								{ typesetChatQuestion }
+							</div>
+							<div class="typeset w-full">
+								@templ.Raw(typesetFixtures[item])
+							</div>
+						</div>
+					} else {
+						<div class="typeset w-full">
+							@templ.Raw(typesetFixtures[item])
+						</div>
+					}
+				</div>
+			</div>
+		</body>
+	</html>
+}

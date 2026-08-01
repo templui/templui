@@ -23,7 +23,7 @@ A typeset is just a small preset class. You can have multiple typesets in your a
 }
 ```
 
-[Build your typeset](https://ui.shadcn.com/typeset) in shadcn's typeset builder. It generates the same `typeset.css` file templUI ships.
+[Build your typeset](/typeset) in the typeset builder. It generates the `typeset.css` file templUI ships, with your picks baked into the preset.
 
 ---
 
@@ -46,7 +46,7 @@ So they sat down and condensed everything into three controls: size, leading, an
 
 ## Building Your Typeset
 
-templUI ships the stylesheet as `assets/css/typeset.css`. If you want to tune it visually first, use the [typeset builder](https://ui.shadcn.com/typeset) on shadcn's site: pick your fonts and rhythm, preview them on docs, chat, articles, and other real content, then copy the generated `typeset.css` and preset class into your project.
+templUI ships the stylesheet as `assets/css/typeset.css`. If you want to tune it visually first, use the [typeset builder](/typeset): pick your fonts and rhythm, preview them on docs, chat, articles, and other real content, then copy the generated `typeset.css` and preset class into your project.
 
 Put `typeset.css` next to your main CSS file and import it after Tailwind:
 

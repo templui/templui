@@ -1,0 +1,733 @@
+package pages
+
+import (
+	"fmt"
+
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/drawer"
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/tabs"
+	"github.com/templui/templui/components/tooltip"
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/utils"
+)
+
+// The /typeset builder, 1:1 pendant of shadcn's app/(app)/(typeset): docs
+// panel (docs-panel.tsx), preview iframe host (preview.tsx + toolbar.tsx) and
+// the customizer card (customizer.tsx) with the picker DOM from picker.tsx,
+// SSRd here with the default params. Behavior lives in assets/js/typeset.js;
+// the state is the individual URL params (body, heading, mono, scale,
+// measure, flow, leading, item), shallow-replaced like lib/search-params.ts.
+
+// lib/search-params.ts option tables, verbatim.
+var typesetSizes = []createOption{
+	{Value: "14", Label: "14px"},
+	{Value: "15", Label: "15px"},
+	{Value: "16", Label: "16px"},
+	{Value: "18", Label: "18px"},
+}
+
+var typesetLeadings = []createOption{
+	{Value: "1.6", Label: "Tight (1.6)"},
+	{Value: "1.75", Label: "Regular (1.75)"},
+	{Value: "1.9", Label: "Loose (1.9)"},
+}
+
+var typesetFlows = []createOption{
+	{Value: "1em", Label: "Compact (1em)"},
+	{Value: "1.25em", Label: "Regular (1.25em)"},
+	{Value: "2em", Label: "Airy (2em)"},
+}
+
+type typesetMeasure struct {
+	Value string
+	Label string
+	Width string
+}
+
+var typesetMeasures = []typesetMeasure{
+	{Value: "60", Label: "60ch", Width: "28em"},
+	{Value: "70", Label: "70ch", Width: "33em"},
+	{Value: "80", Label: "80ch", Width: "37em"},
+	{Value: "90", Label: "90ch", Width: "42em"},
+}
+
+// lib/fixtures/index.ts CONTENT_OPTIONS: the toolbar pills. The commented-out
+// entries (recipe, elements) and the dev-only tailwind baseline stay off the
+// toolbar like shadcn's production build; their fixtures are still served.
+var typesetContentOptions = []createOption{
+	{Value: "docs", Label: "Docs"},
+	{Value: "chat", Label: "Chat"},
+	{Value: "article", Label: "Article"},
+	{Value: "changelog", Label: "Changelog"},
+	{Value: "notes", Label: "Notes"},
+}
+
+// lib/fonts.ts: FONT_DEFINITIONS minus the display-only serifs
+// (instrument-serif, eb-garamond, playfair-display). Sans and Mono reuse the
+// create tables; Serif is the filtered set.
+var typesetFontsSerif = []createOption{
+	{Value: "noto-serif", Label: "Noto Serif"},
+	{Value: "roboto-slab", Label: "Roboto Slab"},
+	{Value: "merriweather", Label: "Merriweather"},
+	{Value: "lora", Label: "Lora"},
+}
+
+// lock-button.tsx class (the typeset variant adds max-md:hidden), plus the
+// picker-row positioning the *-picker.tsx components pass in.
+const typesetLockClass = "flex size-4 cursor-pointer items-center justify-center rounded opacity-0 ring-foreground/60 transition-opacity outline-none group-focus-within/picker:opacity-100 group-hover/picker:opacity-100 focus:opacity-100 focus-visible:ring-1 data-[locked=true]:opacity-100 max-md:hidden pointer-coarse:hidden absolute top-1/2 right-8 -translate-y-1/2"
+
+// Default body font stack (Geist), for the SSRd Aa indicators.
+const typesetDefaultFontFamily = "var(--font-geist-sans), 'Geist Variable', sans-serif"
+const typesetDefaultMonoFamily = "var(--font-geist-mono), 'Geist Mono Variable', monospace"
+
+// Docs panel code blocks in the default state (body geist, heading inherit,
+// mono geist-mono, scale 15, measure 80, flow 1.25em, leading 1.75, item
+// docs); typeset.js re-renders them from the live params.
+const typesetImportSnippet = "@import \"tailwindcss\";\n@import \"./typeset.css\";"
+
+const typesetDefaultPreset = `/* globals.css */
+@import "tailwindcss";
+@import "./typeset.css";
+
+.typeset-docs {
+  --typeset-font-body: var(--font-geist);
+  --typeset-font-heading: var(--font-geist);
+  --typeset-font-mono: var(--font-geist-mono);
+  --typeset-size: 15px;
+  --typeset-leading: 1.75;
+  --typeset-flow: 1.25em;
+}`
+
+const typesetDefaultUsage = "<div class=\"typeset typeset-docs max-w-[37em]\">\n\t@templ.Raw(content)\n</div>"
+
+const typesetDefaultFontsCommand = "pnpm add @fontsource-variable/geist @fontsource-variable/geist-mono"
+
+const typesetDefaultFontsCss = `/* globals.css */
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+:root {
+  --font-geist: 'Geist Variable', sans-serif;
+  --font-geist-mono: 'Geist Mono Variable', monospace;
+}`
+
+templ Typeset() {
+	@layouts.BaseLayout("Typeset", "Typography for markdown you don't control.") {
+		@modules.AnnouncementBar()
+		@modules.Navbar()
+		<link rel="stylesheet" href={ utils.ScriptURL("/assets/css/create-fonts.css") }/>
+		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-config.js") }></script>
+		<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/typeset.js") }></script>
+		// typeset/page.tsx shell.
+		<main
+			data-tui-typeset
+			class="section-soft relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden [--customizer-width:--spacing(48)] [--gap:--spacing(4)] md:[--gap:--spacing(6)] 2xl:[--customizer-width:--spacing(56)]"
+		>
+			<div
+				data-slot="designer"
+				class="flex min-h-0 flex-1 flex-col items-start gap-(--gap) p-(--gap) pt-[calc(var(--gap)*0.25)] md:flex-row-reverse"
+			>
+				@typesetDocsPanel()
+				@typesetPreviewHost()
+				@typesetCustomizer()
+			</div>
+			// PickerContent portal: position:fixed popups must not live inside
+			// the backdrop-blur card (backdrop-filter creates a containing
+			// block), so like Base UI's portal they render at shell level.
+			<div data-tui-typeset-portal>
+				// The transparent hover shield from PickerContent's portal
+				// (picker.tsx: left-54 clears the card).
+				<div data-tui-typeset-shield hidden class="fixed inset-y-0 right-0 left-54 z-40 bg-transparent"></div>
+				@typesetMainMenuContent()
+				@typesetPickerContent("measure", "") {
+					@typesetRadioGroup("measure") {
+						@createGroup() {
+							for _, opt := range typesetMeasures {
+								@typesetRadioItem(opt.Value, opt.Label, opt.Value == "80", false)
+							}
+						}
+					}
+				}
+				@typesetPickerContent("heading", "max-h-96") {
+					@typesetRadioGroup("heading") {
+						@createGroup() {
+							// Inherit item; its label is the current body font
+							// name (font-picker.tsx bodyFont.label).
+							@typesetRadioItem("inherit", "Geist", true, false)
+						}
+						@createPopupSeparator()
+						@typesetFontGroups("heading")
+					}
+				}
+				@typesetPickerContent("body", "max-h-96") {
+					@typesetRadioGroup("body") {
+						@typesetFontGroups("body")
+					}
+				}
+				@typesetPickerContent("mono", "max-h-96") {
+					@typesetRadioGroup("mono") {
+						@typesetFontGroups("mono")
+					}
+				}
+				@typesetPickerContent("scale", "") {
+					@typesetRadioGroup("scale") {
+						@createGroup() {
+							for _, opt := range typesetSizes {
+								@typesetRadioItem(opt.Value, opt.Label, opt.Value == "15", false)
+							}
+						}
+					}
+				}
+				@typesetPickerContent("leading", "") {
+					@typesetRadioGroup("leading") {
+						@createGroup() {
+							for _, opt := range typesetLeadings {
+								@typesetRadioItem(opt.Value, opt.Label, opt.Value == "1.75", false)
+							}
+						}
+					}
+				}
+				@typesetPickerContent("flow", "") {
+					@typesetRadioGroup("flow") {
+						@createGroup() {
+							for _, opt := range typesetFlows {
+								@typesetRadioItem(opt.Value, opt.Label, opt.Value == "1.25em", false)
+							}
+						}
+					}
+				}
+			</div>
+		</main>
+		@typesetGetCodeDrawer()
+	}
+}
+
+// typesetDocsPanel is the pendant of docs-panel.tsx TypesetDocsPanel: the
+// xl-only install panel plus the docs link.
+templ typesetDocsPanel() {
+	<div class="hidden w-88 flex-col items-start gap-3 xl:flex 2xl:w-104">
+		<div class="isolate flex max-h-[calc(100vh-16rem)] w-full flex-col overflow-hidden rounded-2xl bg-background ring-1 ring-foreground/10">
+			@typesetDocsContent()
+		</div>
+		@button.Button(button.Props{
+			Variant: button.VariantLink,
+			Size:    button.SizeSm,
+			Class:   "text-muted-foreground",
+			Href:    "/docs/typeset",
+		}) {
+			Read the docs
+		}
+	</div>
+}
+
+// typesetDocsContent is docs-panel.tsx TypesetDocsContent: the Docs/Prompt
+// tabs with the four install steps. It renders twice (panel + get-code
+// drawer); typeset.js updates every instance. shadcn's framework Select
+// (Next.js vs Vite font loading) has no templUI counterpart, so the
+// fontsource variant is the one shown, like /create dropped the CLI tabs.
+templ typesetDocsContent() {
+	@tabs.Tabs(tabs.Props{DefaultValue: "docs", Class: "min-h-0 flex-1 flex-col gap-0"}) {
+		<div class="flex items-center justify-between gap-2 border-b px-4 py-3">
+			@tabs.List() {
+				@tabs.Trigger(tabs.TriggerProps{Value: "docs"}) {
+					Docs
+				}
+				@tabs.Trigger(tabs.TriggerProps{Value: "prompt"}) {
+					Prompt
+				}
+			}
+		</div>
+		<div class="min-h-0 flex-1 scroll-fade scrollbar-none overflow-y-auto p-4 md:p-6">
+			@tabs.Content(tabs.ContentProps{Value: "docs", Class: "flex flex-col gap-6"}) {
+				@typesetDocsSection("1. Create typeset.css") {
+					@typesetDocsProse() {
+						Copy the stylesheet into a <code class="font-mono">typeset.css</code> file next to your main CSS file, then import it:
+					}
+					@typesetCopyButton("data-tui-typeset-copy-css", "Copy typeset.css", true)
+					@typesetDocsCode("") {
+						{ typesetImportSnippet }
+					}
+				}
+				@typesetDocsSection("2. Add the fonts") {
+					@typesetDocsCommand()
+					@typesetDocsProse() {
+						Then import them in your CSS file:
+					}
+					@typesetDocsCodeAttr("", "data-tui-typeset-fonts-css") {
+						{ typesetDefaultFontsCss }
+					}
+				}
+				@typesetDocsSection("3. Create your custom typeset") {
+					@typesetDocsCodeAttr("", "data-tui-typeset-preset-code") {
+						{ typesetDefaultPreset }
+					}
+				}
+				@typesetDocsSection("4. Wrap your content") {
+					@typesetDocsCodeAttr("", "data-tui-typeset-usage-code") {
+						{ typesetDefaultUsage }
+					}
+				}
+			}
+			@tabs.Content(tabs.ContentProps{Value: "prompt", Class: "flex flex-col gap-2.5"}) {
+				@typesetDocsProse() {
+					One prompt with your picks baked in. Copy it and paste it into your coding agent.
+				}
+				@typesetDocsCodeAttr("max-h-102 scroll-fade overflow-y-auto whitespace-pre-wrap", "data-tui-typeset-prompt") {
+					// Filled by typeset.js from the live params.
+				}
+				@typesetCopyButton("data-tui-typeset-copy-prompt", "Copy Prompt", false)
+			}
+		</div>
+	}
+}
+
+templ typesetDocsSection(title string) {
+	<section class="flex flex-col gap-2.5">
+		<h3 class="text-sm font-medium">{ title }</h3>
+		{ children... }
+	</section>
+}
+
+templ typesetDocsProse() {
+	<p class="text-sm leading-relaxed text-muted-foreground">
+		{ children... }
+	</p>
+}
+
+templ typesetDocsCode(extraClass string) {
+	<div class="relative rounded-lg bg-muted/60">
+		<pre class={ utils.TwMerge("scrollbar-none overflow-x-auto p-3 font-mono text-sm leading-relaxed", extraClass) }>{ children... }</pre>
+	</div>
+}
+
+templ typesetDocsCodeAttr(extraClass, attr string) {
+	<div class="relative rounded-lg bg-muted/60">
+		<pre
+			class={ utils.TwMerge("scrollbar-none overflow-x-auto p-3 font-mono text-sm leading-relaxed", extraClass) }
+			{ templ.Attributes{attr: true}... }
+		>{ children... }</pre>
+	</div>
+}
+
+// typesetDocsCommand is docs-panel.tsx DocsCommand: the install command with
+// the package manager switcher row.
+templ typesetDocsCommand() {
+	<div class="rounded-lg bg-muted/60">
+		<div class="flex items-center gap-3 px-3 pt-2">
+			for _, pm := range []string{"pnpm", "npm", "yarn", "bun"} {
+				<button
+					type="button"
+					data-tui-typeset-pm={ pm }
+					data-active={ utils.IfElse(pm == "pnpm", "true", "false") }
+					class="font-mono text-xs text-muted-foreground transition-colors hover:text-foreground data-[active=true]:text-foreground"
+				>{ pm }</button>
+			}
+		</div>
+		<pre class="scrollbar-none overflow-x-auto p-3 font-mono text-xs leading-relaxed" data-tui-typeset-fonts-command>{ typesetDefaultFontsCommand }</pre>
+	</div>
+}
+
+// typesetCopyButton is the CopyCssButton / CopyPromptButton pendant; the two
+// icons swap on copy via typeset.js.
+templ typesetCopyButton(attr, label string, disabled bool) {
+	@button.Button(button.Props{
+		Variant:  button.VariantOutline,
+		Size:     button.SizeSm,
+		Class:    "w-fit",
+		Disabled: disabled,
+		Attributes: templ.Attributes{
+			attr: true,
+		},
+	}) {
+		@icon.Copy(icon.Props{Class: "size-4", Attributes: templ.Attributes{"data-icon": "inline-start", "data-tui-typeset-copy-icon": "copy"}})
+		@icon.Check(icon.Props{Class: "size-4", Attributes: templ.Attributes{"data-icon": "inline-start", "data-tui-typeset-copy-icon": "check", "hidden": true}})
+		{ label }
+	}
+}
+
+// typesetPreviewHost is the pendant of preview.tsx: the iframe plus the
+// toolbar (toolbar.tsx). typeset.js sets the iframe src (item + params
+// serialized) before the first load.
+templ typesetPreviewHost() {
+	<div class="relative isolate flex size-full min-h-0 flex-1 overflow-hidden rounded-2xl bg-background ring-1 ring-foreground/10">
+		<iframe
+			data-tui-typeset-preview
+			src="about:blank"
+			title="typeset preview"
+			class="size-full"
+		></iframe>
+		<div class="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 items-center justify-center gap-1.5">
+			<div class="dark flex items-center gap-1 rounded-xl bg-card/90 p-1 shadow-xl backdrop-blur-xl">
+				for i, opt := range typesetContentOptions {
+					@typesetItemPill(opt.Value, opt.Label, i+1, opt.Value == "docs")
+				}
+			</div>
+			<div class="dark flex items-center gap-1 rounded-xl bg-card/90 p-1 shadow-xl backdrop-blur-xl">
+				@typesetOpenInNewTab()
+			</div>
+		</div>
+	</div>
+}
+
+templ typesetItemPill(value, label string, number int, active bool) {
+	@tooltip.Tooltip() {
+		@button.Button(button.Props{
+			Variant: button.VariantGhost,
+			Size:    button.SizeSm,
+			Class:   "h-7 min-w-7 cursor-pointer rounded-lg px-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground data-[active=true]:bg-accent data-[active=true]:text-accent-foreground",
+			Attributes: utils.MergeAttributes(tooltip.Trigger(ctx), templ.Attributes{
+				"data-tui-typeset-fixture": value,
+				"data-active":              utils.IfElse(active, "true", "false"),
+			}),
+		}) {
+			{ typesetPillNumber(number) }
+		}
+		@tooltip.Content(tooltip.ContentProps{Side: tooltip.SideTop, SideOffset: 10}) {
+			{ label }
+		}
+	}
+}
+
+// typesetPillNumber is toolbar.tsx's String(number).padStart(2, "0").
+func typesetPillNumber(number int) string {
+	return fmt.Sprintf("%02d", number)
+}
+
+templ typesetOpenInNewTab() {
+	@button.Button(button.Props{
+		Variant: button.VariantGhost,
+		Size:    button.SizeSm,
+		Class:   "h-7 cursor-pointer rounded-lg px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground",
+		Href:    "/typeset/preview",
+		Target:  "_blank",
+		Attributes: templ.Attributes{
+			"data-tui-typeset-open": true,
+			"rel":                   "noreferrer",
+		},
+	}) {
+		// Hugeicons LinkSquare02Icon (toolbar.tsx).
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 md:hidden">
+			<path d="M11.0991 3.00012C7.45013 3.00669 5.53932 3.09629 4.31817 4.31764C3.00034 5.63568 3.00034 7.75704 3.00034 11.9997C3.00034 16.2424 3.00034 18.3638 4.31817 19.6818C5.63599 20.9999 7.75701 20.9999 11.9991 20.9999C16.241 20.9999 18.3621 20.9999 19.6799 19.6818C20.901 18.4605 20.9906 16.5493 20.9972 12.8998"></path>
+			<path d="M20.556 3.49612L11.0487 13.0586M20.556 3.49612C20.062 3.00151 16.7343 3.04761 16.0308 3.05762M20.556 3.49612C21.05 3.99074 21.0039 7.32273 20.9939 8.02714"></path>
+		</svg>
+		<span class="max-md:sr-only">Open in New Tab</span>
+	}
+}
+
+// typesetCustomizer is the pendant of customizer.tsx: the dark card with the
+// MainMenu header, the picker rows in exact order and the footer.
+templ typesetCustomizer() {
+	@card.Card(card.Props{
+		Size:  card.SizeSm,
+		Class: "dark isolate z-10 max-h-full min-h-0 w-full self-start rounded-2xl bg-card/90 backdrop-blur-xl md:w-(--customizer-width)",
+	}) {
+		@card.Header(card.HeaderProps{Class: "hidden items-center justify-between gap-2 border-b md:flex"}) {
+			@typesetMainMenuTrigger()
+		}
+		@card.Content(card.ContentProps{Class: "no-scrollbar min-h-0 flex-1 overflow-x-auto overflow-y-hidden max-md:px-0 md:overflow-y-auto"}) {
+			@field.Group(field.GroupProps{Class: "flex-row gap-2.5 py-px **:data-[slot=field-separator]:-mx-4 **:data-[slot=field-separator]:w-auto max-md:px-3 md:flex-col md:gap-3.25"}) {
+				// Below ~60ch the viewport already constrains width, so
+				// measure does nothing: hide it (customizer.tsx).
+				@typesetOptionPickerRow("measure", "Measure", "80ch", "max-[28rem]:hidden") {
+					// Hugeicons ArrowHorizontalIcon.
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4.5">
+						<path d="M5 9C4.39316 9.58984 2 11.1597 2 12C2 12.8403 4.39316 14.4102 5 15"></path>
+						<path d="M19 9C19.6068 9.58984 22 11.1597 22 12C22 12.8403 19.6068 14.4102 19 15"></path>
+						<path d="M2.42285 11.9795H21.868"></path>
+					</svg>
+				}
+				@field.Separator(field.SeparatorProps{Class: "hidden md:block"})
+				@typesetFontPickerRow("heading", "Heading", "Geist")
+				@typesetFontPickerRow("body", "Body", "Geist")
+				@typesetFontPickerRow("mono", "Mono", "Geist Mono")
+				@field.Separator(field.SeparatorProps{Class: "hidden md:block"})
+				@typesetOptionPickerRow("scale", "Size", "15px", "") {
+					// Hugeicons TextSmallcapsIcon.
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="size-4.5">
+						<path d="M10.5714 18H5.42857M8 3V18M8 3C6.81082 3 5.28326 3.12265 4.06709 3.24346C3.55271 3.29456 3.29552 3.32011 3.06788 3.41021C2.59438 3.59763 2.21271 4.00855 2.06906 4.48556C2 4.71489 2 4.97659 2 5.5M8 3C9.18918 3 10.7167 3.12265 11.9329 3.24346C12.4473 3.29456 12.7045 3.32011 12.9321 3.41021C13.4056 3.59763 13.7873 4.00855 13.9309 4.48556C14 4.71489 14 4.97659 14 5.5"></path>
+						<path d="M19.7143 21H16.2857M18 12V21M18 12C17.2072 12 16.1888 12.0818 15.3781 12.1623C15.0351 12.1964 14.8637 12.2134 14.7119 12.2735C14.3963 12.3984 14.1418 12.6724 14.046 12.9904C14 13.1433 14 13.3177 14 13.6667M18 12C18.7928 12 19.8112 12.0818 20.6219 12.1623C20.9649 12.1964 21.1363 12.2134 21.2881 12.2735C21.6037 12.3984 21.8582 12.6724 21.954 12.9904C22 13.1433 22 13.3177 22 13.6667"></path>
+					</svg>
+				}
+				@typesetOptionPickerRow("leading", "Leading", "Regular (1.75)", "") {
+					// customizer.tsx LineHeightIcon.
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="size-4.5">
+						<path d="M4.5 3.5H19.5"></path>
+						<path d="M4.5 20.5H19.5"></path>
+						<path d="M17 17L14.8905 11.4741C13.9109 8.90801 13.4211 7.625 12.625 7.625C11.8289 7.625 11.3391 8.90801 10.3595 11.4741L8.25 17"></path>
+						<path d="M9.5 13H15.75"></path>
+					</svg>
+				}
+				@typesetOptionPickerRow("flow", "Flow", "Regular (1.25em)", "") {
+					// Hugeicons ParagraphSpacingIcon.
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4.5">
+						<path d="M3 2H21"></path>
+						<path d="M3 22H21"></path>
+						<path d="M9.47266 8.50877L11.2737 6.37445C11.6424 5.93292 12.2676 5.92911 12.6732 6.37445L14.4529 8.50877M11.9734 7.08442V11.4079L11.9719 16.9993M14.4727 15.575L12.6716 17.7093C12.3029 18.1508 11.6777 18.1546 11.2721 17.7093L9.4924 15.575"></path>
+					</svg>
+				}
+				// Scroll-end spacer: the group is a CQ container (inline-size
+				// containment), so trailing padding cannot grow it.
+				<div aria-hidden="true" class="w-0.5 shrink-0 md:hidden"></div>
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex min-w-0 flex-row-reverse gap-2 border-t md:flex-col md:**:[button]:w-full"}) {
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Class:      utils.TwMerge(createFooterButtonClass, "min-w-0 flex-1 md:flex-none"),
+				Attributes: templ.Attributes{"data-tui-typeset-shuffle": true},
+			}) {
+				<span class="w-full truncate text-center font-medium">Shuffle</span>
+			}
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Class:      utils.TwMerge(createFooterButtonClass, "min-w-0 flex-1 md:flex-none xl:hidden"),
+				Attributes: drawer.TriggerFor("typeset-get-code"),
+			}) {
+				Get Code
+			}
+		}
+	}
+}
+
+// typesetFontPickerRow is a FontPicker trigger row (font-picker.tsx): label,
+// current font name and the Aa indicator in the current font.
+templ typesetFontPickerRow(param, label, value string) {
+	<div class="group/picker relative">
+		<button
+			type="button"
+			data-tui-typeset-trigger={ param }
+			data-slot="dropdown-menu-trigger"
+			aria-haspopup="menu"
+			aria-expanded="false"
+			class={ createTriggerClass }
+		>
+			<div class="flex flex-col justify-start text-left">
+				<div class="text-xs text-muted-foreground">{ label }</div>
+				<div class="line-clamp-1 max-w-[80%] truncate text-sm font-medium text-foreground" data-tui-typeset-value={ param }>{ value }</div>
+			</div>
+			<div
+				data-tui-typeset-indicator={ param }
+				class="pointer-events-none absolute top-1/2 right-4 flex size-4 -translate-y-1/2 items-center justify-center text-base text-foreground select-none md:right-2.5"
+				if param == "mono" {
+					style={ "font-family: " + typesetDefaultMonoFamily }
+				} else {
+					style={ "font-family: " + typesetDefaultFontFamily }
+				}
+			>Aa</div>
+		</button>
+		@typesetLockButton(param)
+	</div>
+}
+
+// typesetOptionPickerRow is an OptionPicker trigger row (option-picker.tsx):
+// label, current option label and a trailing icon.
+templ typesetOptionPickerRow(param, label, value, wrapperClass string) {
+	<div class={ utils.TwMerge("group/picker relative", wrapperClass) }>
+		<button
+			type="button"
+			data-tui-typeset-trigger={ param }
+			data-slot="dropdown-menu-trigger"
+			aria-haspopup="menu"
+			aria-expanded="false"
+			class={ createTriggerClass }
+		>
+			<div class="flex min-w-0 flex-col justify-start pr-8 text-left">
+				<div class="text-xs text-muted-foreground">{ label }</div>
+				<div class="line-clamp-1 text-sm font-medium text-foreground" data-tui-typeset-value={ param }>{ value }</div>
+			</div>
+			<div class="pointer-events-none absolute top-1/2 right-4 flex size-4 -translate-y-1/2 items-center justify-center text-foreground select-none md:right-2.5">
+				{ children... }
+			</div>
+		</button>
+		@typesetLockButton(param)
+	</div>
+}
+
+// typesetLockButton is the lock-button.tsx pendant with the two Hugeicons
+// (SquareLock01Icon / SquareUnlock01Icon) inline.
+templ typesetLockButton(param string) {
+	<button
+		type="button"
+		title="Lock"
+		aria-label="Lock"
+		data-tui-typeset-lock={ param }
+		data-locked="false"
+		class={ typesetLockClass }
+	>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-5 text-foreground" data-tui-typeset-lock-icon="locked" hidden>
+			<path d="M4.26781 18.8447C4.49269 20.515 5.87613 21.8235 7.55966 21.9009C8.97627 21.966 10.4153 22 12 22C13.5847 22 15.0237 21.966 16.4403 21.9009C18.1239 21.8235 19.5073 20.515 19.7322 18.8447C19.879 17.7547 20 16.6376 20 15.5C20 14.3624 19.879 13.2453 19.7322 12.1553C19.5073 10.485 18.1239 9.17649 16.4403 9.09909C15.0237 9.03397 13.5847 9 12 9C10.4153 9 8.97627 9.03397 7.55966 9.09909C5.87613 9.17649 4.49269 10.485 4.26781 12.1553C4.12104 13.2453 4 14.3624 4 15.5C4 16.6376 4.12104 17.7547 4.26781 18.8447Z"></path>
+			<path d="M7.5 9V6.5C7.5 4.01472 9.51472 2 12 2C14.4853 2 16.5 4.01472 16.5 6.5V9" stroke-linecap="round" stroke-linejoin="round"></path>
+			<path d="M12.125 15.5H12M12.25 15.5C12.25 15.6381 12.1381 15.75 12 15.75C11.8619 15.75 11.75 15.6381 11.75 15.5C11.75 15.3619 11.8619 15.25 12 15.25C12.1381 15.25 12.25 15.3619 12.25 15.5Z" stroke-linecap="round"></path>
+		</svg>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-5 text-foreground" data-tui-typeset-lock-icon="unlocked">
+			<path d="M4.26781 18.8447C4.49269 20.515 5.87613 21.8235 7.55966 21.9009C8.97627 21.966 10.4153 22 12 22C13.5847 22 15.0237 21.966 16.4403 21.9009C18.1239 21.8235 19.5073 20.515 19.7322 18.8447C19.879 17.7547 20 16.6376 20 15.5C20 14.3624 19.879 13.2453 19.7322 12.1553C19.5073 10.485 18.1239 9.17649 16.4403 9.09909C15.0237 9.03397 13.5847 9 12 9C10.4153 9 8.97627 9.03397 7.55965 9.09909C5.87613 9.17649 4.49269 10.485 4.26781 12.1553C4.12104 13.2453 4 14.3624 4 15.5C4 16.6376 4.12104 17.7547 4.26781 18.8447Z"></path>
+			<path d="M7.5 9V6.5C7.5 4.01472 9.51472 2 12 2C13.9593 2 15.5 3.5 16 5" stroke-linecap="round" stroke-linejoin="round"></path>
+			<path d="M12.125 15.5H12M12.25 15.5C12.25 15.6381 12.1381 15.75 12 15.75C11.8619 15.75 11.75 15.6381 11.75 15.5C11.75 15.3619 11.8619 15.25 12 15.25C12.1381 15.25 12.25 15.3619 12.25 15.5Z" stroke-linecap="round"></path>
+		</svg>
+	</button>
+}
+
+// typesetMainMenuTrigger is the MainMenu trigger (main-menu.tsx) with the
+// Hugeicons Menu09Icon inline.
+templ typesetMainMenuTrigger() {
+	<button
+		type="button"
+		data-tui-typeset-trigger="mainmenu"
+		data-slot="dropdown-menu-trigger"
+		aria-haspopup="menu"
+		aria-expanded="false"
+		class={ utils.TwMerge(createTriggerClass, "flex items-center justify-between gap-2 rounded-lg px-1.75 ring-1 ring-foreground/10 focus-visible:ring-1") }
+	>
+		<span class="font-medium">Menu</span>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5">
+			<path d="M4 8.5L20 8.5"></path>
+			<path d="M4 15.5L20 15.5"></path>
+		</svg>
+	</button>
+}
+
+// typesetMainMenuContent is the MainMenu popup (main-menu.tsx): the items in
+// exact order, undo/redo shortcuts filled per platform by typeset.js.
+templ typesetMainMenuContent() {
+	<div
+		data-tui-typeset-content="mainmenu"
+		data-slot="dropdown-menu-content"
+		role="menu"
+		hidden
+		class={ createContentClass }
+	>
+		@createGroup() {
+			@typesetMenuActionItem("shuffle", "Shuffle") {
+				<span data-slot="dropdown-menu-shortcut" class={ createShortcutClass }>R</span>
+			}
+			@typesetMenuActionItem("toggle-theme", "Light/Dark") {
+				<span data-slot="dropdown-menu-shortcut" class={ createShortcutClass }>D</span>
+			}
+		}
+		@createPopupSeparator()
+		@createGroup() {
+			@typesetMenuActionItem("undo", "Undo") {
+				<span data-slot="dropdown-menu-shortcut" data-tui-typeset-shortcut="undo" class={ createShortcutClass }>⌘Z</span>
+			}
+			@typesetMenuActionItem("redo", "Redo") {
+				<span data-slot="dropdown-menu-shortcut" data-tui-typeset-shortcut="redo" class={ createShortcutClass }>⇧⌘Z</span>
+			}
+			@createPopupSeparator()
+			@typesetMenuActionItem("reset", "Reset") {
+				<span data-slot="dropdown-menu-shortcut" class={ createShortcutClass }>⇧R</span>
+			}
+		}
+	</div>
+}
+
+templ typesetMenuActionItem(action, label string) {
+	<div
+		role="menuitem"
+		tabindex="-1"
+		data-slot="dropdown-menu-item"
+		data-tui-typeset-action={ action }
+		class={ createMenuItemClass }
+	>
+		{ label }
+		{ children... }
+	</div>
+}
+
+// typesetPickerContent is a PickerContent popup for one picker, portaled to
+// shell level and positioned by typeset.js.
+templ typesetPickerContent(param, extraClass string) {
+	<div
+		data-tui-typeset-content={ param }
+		data-slot="dropdown-menu-content"
+		role="menu"
+		hidden
+		class={ utils.TwMerge(createContentClass, extraClass) }
+	>
+		{ children... }
+	</div>
+}
+
+templ typesetRadioGroup(name string) {
+	<div data-slot="dropdown-menu-radio-group" role="group" data-tui-typeset-radiogroup={ name }>
+		{ children... }
+	</div>
+}
+
+// typesetRadioItem is a PickerRadioItem. typeset.js drives data-checked and
+// the indicator visibility.
+templ typesetRadioItem(value, label string, checked, disabled bool) {
+	<div
+		role="menuitemradio"
+		tabindex="-1"
+		data-slot="dropdown-menu-radio-item"
+		data-tui-typeset-item
+		data-value={ value }
+		aria-checked={ utils.IfElse(checked, "true", "false") }
+		data-checked={ utils.IfElse(checked, "true", "false") }
+		if disabled {
+			data-disabled=""
+			aria-disabled="true"
+		}
+		class={ createRadioItemClass }
+	>
+		<span class="pointer-events-none absolute right-2 flex items-center justify-center" data-slot="dropdown-menu-radio-item-indicator" hidden?={ !checked }>
+			@icon.Check(icon.Props{Class: "size-4 pointer-coarse:size-5"})
+		</span>
+		{ label }
+	</div>
+}
+
+// typesetFontGroups renders the fonts grouped by type (font-picker.tsx
+// groupedFonts): Sans, Serif, Mono. Every picker offers every font.
+templ typesetFontGroups(param string) {
+	@createGroup() {
+		@createPopupLabel("Sans")
+		for _, opt := range createFontsSans {
+			@typesetRadioItem(opt.Value, opt.Label, param == "body" && opt.Value == "geist", false)
+		}
+	}
+	@createGroup() {
+		@createPopupLabel("Serif")
+		for _, opt := range typesetFontsSerif {
+			@typesetRadioItem(opt.Value, opt.Label, false, false)
+		}
+	}
+	@createGroup() {
+		@createPopupLabel("Mono")
+		for _, opt := range createFontsMono {
+			@typesetRadioItem(opt.Value, opt.Label, param == "mono" && opt.Value == "geist-mono", false)
+		}
+	}
+}
+
+// typesetGetCodeDrawer is get-code-drawer.tsx: the below-xl Get Code surface.
+// The swipe direction follows the viewport (down on mobile, right on
+// desktop); typeset.js flips the popup's data-swipe-direction like shadcn's
+// isMobile prop swap.
+templ typesetGetCodeDrawer() {
+	@drawer.Drawer(drawer.Props{ID: "typeset-get-code"}) {
+		@drawer.Content(drawer.ContentProps{Class: "max-md:max-h-[85svh]"}) {
+			@drawer.Header() {
+				@drawer.Title() {
+					Get Code
+				}
+				@drawer.Description() {
+					Install typeset with the values you picked.
+				}
+			}
+			@typesetDocsContent()
+			@drawer.Footer() {
+				@button.Button(button.Props{
+					Variant:    button.VariantOutline,
+					Attributes: drawer.CloseFor("typeset-get-code"),
+				}) {
+					Done
+				}
+			}
+		}
+	}
+}
