@@ -44,8 +44,11 @@ Components are designed to be composable, customizable, and easy to integrate in
 
 ## Overlays & Dialogs
 
+- [Alert Dialog](https://templui.io/docs/components/alert-dialog): A modal dialog that interrupts the user with important content and expects a response.
+- [Command](https://templui.io/docs/components/command): Fast, composable command menu.
 - [Context Menu](https://templui.io/docs/components/context-menu): Menu shown at the cursor on right click, with actions and shortcuts.
 - [Dialog](https://templui.io/docs/components/dialog): Modal dialog component.
+- [Drawer](https://templui.io/docs/components/drawer): A panel that slides in from the edge of the screen and can be swiped away.
 - [Dropdown Menu](https://templui.io/docs/components/dropdown-menu): Displays a menu of actions or options triggered by a button.
 - [Hover Card](https://templui.io/docs/components/hover-card): Displays rich content in a card when hovering over a trigger. Uses Popover for the popup.
 - [Popover](https://templui.io/docs/components/popover): Floating popover component using the browser popover API and Floating UI positioning.
