@@ -195,7 +195,7 @@ templ TypesetPreview(item string, params TypesetPreviewParams) {
 			<script nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-config.js") }></script>
 			<script nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/typeset-preview.js") }></script>
 		</head>
-		<body class="style-nova bg-background text-foreground">
+		<body class="style-nova antialiased bg-background text-foreground">
 			<div class="preview-frame flex min-h-svh justify-center px-6 pt-8 pb-24 md:pt-24 md:pb-32">
 				<div class="preview-params w-full">
 					if item == "chat" {
