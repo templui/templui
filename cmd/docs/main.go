@@ -12,11 +12,12 @@ import (
 	"github.com/templui/templui/assets"
 	"github.com/templui/templui/components"
 	"github.com/templui/templui/internal/config"
-	"github.com/templui/templui/internal/ui/charts"
-	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/internal/middleware"
+	"github.com/templui/templui/internal/registryapi"
 	"github.com/templui/templui/internal/service"
 	"github.com/templui/templui/internal/shared"
+	"github.com/templui/templui/internal/ui/charts"
+	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/internal/ui/pages"
 	"github.com/templui/templui/static"
 )
@@ -128,6 +129,14 @@ func main() {
 		w.Header().Set("Cache-Control", "no-store")
 		w.Write(css)
 	})
+
+	// Registry server, the pendant of shadcn's /init route and static
+	// r/styles registry: /init returns the registry:base item for a design
+	// system config (?preset=<code> or individual params, ?only=theme|font
+	// for the partial item); /r/styles/{style}/{name}.json returns a
+	// component compiled for that style through the inliner.
+	mux.Handle("GET /init", registryapi.InitHandler())
+	mux.Handle("GET /r/styles/{style}/{file}", registryapi.StylesHandler())
 
 	// Markdown-based documentation pages
 	markdownDocsHandler := func(slug string) http.Handler {

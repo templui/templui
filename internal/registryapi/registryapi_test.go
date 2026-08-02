@@ -1,0 +1,394 @@
+package registryapi
+
+import (
+	"encoding/json"
+	"net/url"
+	"strings"
+	"testing"
+)
+
+func TestVarsOrder(t *testing.T) {
+	var v Vars
+	if err := json.Unmarshal([]byte(`{"b":"1","a":"2","c":"3"}`), &v); err != nil {
+		t.Fatal(err)
+	}
+	// Updating an existing key keeps its position (JS spread semantics).
+	v.Set("a", "9")
+	v.Set("d", "4")
+	out, err := json.Marshal(&v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := `{"b":"1","a":"9","c":"3","d":"4"}`
+	if string(out) != want {
+		t.Errorf("Vars marshal = %s, want %s", out, want)
+	}
+}
+
+func TestThemesData(t *testing.T) {
+	all := Themes()
+	if len(all) != 24 {
+		t.Fatalf("Themes() = %d entries, want 24", len(all))
+	}
+	if all[0].Name != "neutral" {
+		t.Errorf("first theme = %q, want neutral", all[0].Name)
+	}
+	if got := len(BaseColors()); got != 7 {
+		t.Errorf("BaseColors() = %d entries, want 7", got)
+	}
+
+	// Neutral base color: neutral itself and all colored themes, but not the
+	// other base colors.
+	names := map[string]bool{}
+	for _, th := range ThemesForBaseColor("neutral") {
+		names[th.Name] = true
+	}
+	if !names["neutral"] || !names["blue"] || names["stone"] || names["taupe"] {
+		t.Errorf("ThemesForBaseColor(neutral) unexpected set: %v", names)
+	}
+}
+
+func mustParse(t *testing.T, rawQuery string) DesignSystemConfig {
+	t.Helper()
+	q, err := url.ParseQuery(rawQuery)
+	if err != nil {
+		t.Fatal(err)
+	}
+	config, err := ParseDesignSystemConfig(q)
+	if err != nil {
+		t.Fatalf("ParseDesignSystemConfig(%q): %v", rawQuery, err)
+	}
+	return config
+}
+
+func parseErr(t *testing.T, rawQuery string) string {
+	t.Helper()
+	q, _ := url.ParseQuery(rawQuery)
+	_, err := ParseDesignSystemConfig(q)
+	if err == nil {
+		t.Fatalf("ParseDesignSystemConfig(%q) succeeded, want error", rawQuery)
+	}
+	return err.Error()
+}
+
+func TestParseDesignSystemConfig(t *testing.T) {
+	// preset=b0 is the all-defaults v2 code.
+	c := mustParse(t, "preset=b0")
+	if c != DefaultConfig {
+		t.Errorf("preset=b0 = %+v, want DEFAULT_CONFIG %+v", c, DefaultConfig)
+	}
+
+	// bIkeymG differs from the default only in the style (vega), verified
+	// against the live ui.shadcn.com/init?preset=bIkeymG.
+	c = mustParse(t, "preset=bIkeymG")
+	if c.Style != "vega" || c.Theme != "neutral" {
+		t.Errorf("preset=bIkeymG = %+v", c)
+	}
+
+	// v1 code: chartColor restored through the v1 chart color map.
+	c = mustParse(t, "preset=a0")
+	if c.ChartColor != "blue" {
+		t.Errorf("preset=a0 chartColor = %q, want blue (V1 map)", c.ChartColor)
+	}
+
+	// Query overrides on top of a preset.
+	c = mustParse(t, "preset=b0&chartColor=emerald&fontHeading=lora&rtl=true&pointer=true")
+	if c.ChartColor != "emerald" || c.FontHeading != "lora" || !c.RTL || !c.Pointer {
+		t.Errorf("preset overrides = %+v", c)
+	}
+
+	// Individual params: every enum param is required (zod defaults do not
+	// apply to null), like the live route.
+	c = mustParse(t, "base=base&style=nova&iconLibrary=lucide&baseColor=neutral&theme=neutral&font=inter&fontHeading=inherit&menuAccent=subtle&menuColor=default&radius=default")
+	if c.Style != "nova" || c.ChartColor != "neutral" {
+		t.Errorf("individual params = %+v", c)
+	}
+
+	if msg := parseErr(t, ""); msg != "Expected 'base', received null" {
+		t.Errorf("empty query error = %q", msg)
+	}
+	if msg := parseErr(t, "base=base"); !strings.Contains(msg, "received null") || !strings.Contains(msg, "'vega'") {
+		t.Errorf("missing style error = %q", msg)
+	}
+	if msg := parseErr(t, "preset=b0&fontHeading=bogus"); !strings.HasPrefix(msg, "Invalid enum value.") {
+		t.Errorf("bad fontHeading error = %q", msg)
+	}
+	// An unusable preset param falls through to the individual-params branch.
+	if msg := parseErr(t, "preset=zzzz"); msg != "Expected 'base', received null" {
+		t.Errorf("bad preset error = %q", msg)
+	}
+	// Refinement: stone is a base color, not available under neutral.
+	msg := parseErr(t, "base=base&style=nova&iconLibrary=lucide&baseColor=neutral&theme=stone&font=inter&fontHeading=inherit&menuAccent=subtle&menuColor=default&radius=default")
+	if msg != `Theme "stone" is not available for base color "neutral"` {
+		t.Errorf("refine error = %q", msg)
+	}
+}
+
+func TestParseRegistryBaseParts(t *testing.T) {
+	if parts, err := ParseRegistryBaseParts(nil); parts != nil || err != nil {
+		t.Errorf("nil value = %v, %v", parts, err)
+	}
+	v := "theme, fonts,THEME"
+	parts, err := ParseRegistryBaseParts(&v)
+	if err != nil || len(parts) != 2 || parts[0] != "theme" || parts[1] != "font" {
+		t.Errorf("parts = %v, %v", parts, err)
+	}
+	bad := "theme,bogus"
+	if _, err := ParseRegistryBaseParts(&bad); err == nil {
+		t.Error("invalid part accepted")
+	}
+	empty := " , "
+	if _, err := ParseRegistryBaseParts(&empty); err == nil {
+		t.Error("empty parts accepted")
+	}
+}
+
+// mustVar reads a key or fails.
+func mustVar(t *testing.T, v *Vars, key string) string {
+	t.Helper()
+	val, ok := v.Get(key)
+	if !ok {
+		t.Fatalf("missing var %q", key)
+	}
+	return val
+}
+
+func TestBuildRegistryTheme(t *testing.T) {
+	// Defaults: the merged vars equal the neutral theme, golden values from
+	// the live /init?preset=b0.
+	theme, err := BuildRegistryTheme(DefaultConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if theme.Name != "neutral-neutral" || theme.Type != "registry:theme" {
+		t.Errorf("theme identity = %q %q", theme.Name, theme.Type)
+	}
+	if got := mustVar(t, theme.Light, "primary"); got != "oklch(0.205 0 0)" {
+		t.Errorf("light primary = %q", got)
+	}
+	if got := mustVar(t, theme.Light, "chart-1"); got != "oklch(0.87 0 0)" {
+		t.Errorf("light chart-1 = %q", got)
+	}
+	if got := mustVar(t, theme.Light, "radius"); got != "0.625rem" {
+		t.Errorf("light radius = %q", got)
+	}
+	if got := mustVar(t, theme.Dark, "border"); got != "oklch(1 0 0 / 10%)" {
+		t.Errorf("dark border = %q", got)
+	}
+
+	// Chart color overlays only chart-1..5.
+	config := DefaultConfig
+	config.ChartColor = "blue"
+	theme, err = BuildRegistryTheme(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	blue := GetTheme("blue")
+	wantChart1, _ := blue.CSSVars.Light.Get("chart-1")
+	if got := mustVar(t, theme.Light, "chart-1"); got != wantChart1 {
+		t.Errorf("chart override chart-1 = %q, want %q", got, wantChart1)
+	}
+	bluePrimary, _ := blue.CSSVars.Light.Get("primary")
+	if got := mustVar(t, theme.Light, "primary"); got == bluePrimary {
+		t.Error("chart color must not overlay primary")
+	}
+
+	// Bold menu accent: accent := primary.
+	config = DefaultConfig
+	config.MenuAccent = "bold"
+	theme, _ = BuildRegistryTheme(config)
+	if mustVar(t, theme.Light, "accent") != mustVar(t, theme.Light, "primary") {
+		t.Error("bold accent != primary (light)")
+	}
+	if mustVar(t, theme.Dark, "accent-foreground") != mustVar(t, theme.Dark, "primary-foreground") {
+		t.Error("bold accent-foreground != primary-foreground (dark)")
+	}
+
+	// Radius override goes to light only.
+	config = DefaultConfig
+	config.Radius = "small"
+	theme, _ = BuildRegistryTheme(config)
+	if got := mustVar(t, theme.Light, "radius"); got != "0.45rem" {
+		t.Errorf("small radius = %q", got)
+	}
+}
+
+func TestBuildRegistryBaseGolden(t *testing.T) {
+	config := mustParse(t, "preset=b0")
+	item, err := BuildRegistryBase(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if item.Name != "base-nova" || item.Extends != "none" || item.Type != "registry:base" {
+		t.Errorf("identity = %q %q %q", item.Name, item.Extends, item.Type)
+	}
+	if len(item.Dependencies) != 1 || item.Dependencies[0] != ModuleDependency {
+		t.Errorf("dependencies = %v", item.Dependencies)
+	}
+	if strings.Join(item.RegistryDependencies, ",") != "utils,font-inter" {
+		t.Errorf("registryDependencies = %v", item.RegistryDependencies)
+	}
+	if got := mustVar(t, item.CSSVars.Theme, "--font-heading"); got != "var(--font-sans)" {
+		t.Errorf("--font-heading = %q", got)
+	}
+	if item.Config.Style != "base-nova" || item.Config.IconLibrary != "lucide" ||
+		item.Config.Tailwind.BaseColor != "neutral" || item.Config.RTL == nil || *item.Config.RTL ||
+		item.Config.MenuColor != "default" || item.Config.MenuAccent != "subtle" {
+		t.Errorf("config block = %+v", item.Config)
+	}
+
+	// JSON shape: field order and css keys match the live init output
+	// (extends first, config last; both npm @imports mapped to the vendored
+	// stylesheets).
+	out, err := json.Marshal(item)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := string(out)
+	if !strings.HasPrefix(s, `{"extends":"none","name":"base-nova","dependencies":[`) {
+		t.Errorf("field order prefix = %.80s", s)
+	}
+	for _, want := range []string{
+		`"@import \"./tw-animate.css\"":{}`,
+		`"@import \"./shadcn-tailwind.css\"":{}`,
+		`"@layer base":{"*":{"@apply border-border outline-ring/50":{}},"body":{"@apply bg-background text-foreground":{}}}`,
+		`"type":"registry:base","config":{`,
+	} {
+		if !strings.Contains(s, want) {
+			t.Errorf("marshaled base item missing %s", want)
+		}
+	}
+
+	// Pointer adds the cursor rule.
+	config.Pointer = true
+	item, _ = BuildRegistryBase(config)
+	out, _ = json.Marshal(item)
+	if !strings.Contains(string(out), `"cursor":"pointer"`) {
+		t.Error("pointer cursor rule missing")
+	}
+
+	// fontHeading equal to font normalizes to inherit.
+	config = mustParse(t, "preset=b0&fontHeading=inter")
+	item, _ = BuildRegistryBase(config)
+	if strings.Contains(strings.Join(item.RegistryDependencies, ","), "font-heading") {
+		t.Errorf("normalized fontHeading leaked: %v", item.RegistryDependencies)
+	}
+	// A real heading font becomes a registry dependency and no theme var.
+	config = mustParse(t, "preset=b0&fontHeading=lora")
+	item, _ = BuildRegistryBase(config)
+	if !contains(item.RegistryDependencies, "font-heading-lora") {
+		t.Errorf("font-heading-lora missing: %v", item.RegistryDependencies)
+	}
+	if item.CSSVars.Theme.Len() != 0 {
+		t.Errorf("theme vars should be empty with explicit heading font, got %v", item.CSSVars.Theme)
+	}
+}
+
+func TestBuildPartialRegistryBase(t *testing.T) {
+	config := mustParse(t, "preset=b0")
+
+	item, err := BuildPartialRegistryBase(config, []string{"theme"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if item.Name != "base-nova-theme" {
+		t.Errorf("name = %q", item.Name)
+	}
+	if item.Config == nil || item.Config.Style != "" || item.Config.MenuColor != "default" {
+		t.Errorf("partial config = %+v", item.Config)
+	}
+	if item.CSSVars == nil || item.CSSVars.Theme != nil || item.CSSVars.Light.Len() == 0 {
+		t.Errorf("partial cssVars = %+v", item.CSSVars)
+	}
+	if item.RegistryDependencies != nil {
+		t.Errorf("theme part must not add registryDependencies: %v", item.RegistryDependencies)
+	}
+
+	item, _ = BuildPartialRegistryBase(config, []string{"font"})
+	if item.Name != "base-nova-font" || !contains(item.RegistryDependencies, "font-inter") {
+		t.Errorf("font part = %+v", item)
+	}
+	if item.CSSVars == nil || item.CSSVars.Theme == nil {
+		t.Fatalf("font part cssVars = %+v", item.CSSVars)
+	}
+	if got := mustVar(t, item.CSSVars.Theme, "--font-heading"); got != "var(--font-sans)" {
+		t.Errorf("font part --font-heading = %q", got)
+	}
+
+	item, _ = BuildPartialRegistryBase(config, []string{"theme", "font", "theme"})
+	if item.Name != "base-nova-theme-font" {
+		t.Errorf("combined name = %q", item.Name)
+	}
+}
+
+func TestBuildStyleItem(t *testing.T) {
+	// Force the embed path so the test does not depend on the working
+	// directory (development mode reads ./assets and ./components from the
+	// repo root).
+	t.Setenv("GO_ENV", "production")
+
+	item, err := BuildStyleItem("base-nova", "button")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if item == nil {
+		t.Fatal("button not found")
+	}
+	if item.Name != "button" || item.Type != "registry:ui" {
+		t.Errorf("identity = %q %q", item.Name, item.Type)
+	}
+	if len(item.Files) == 0 || item.Files[0].Path != "components/button/button.templ" {
+		t.Fatalf("files = %+v", item.Files)
+	}
+	content := item.Files[0].Content
+	if strings.Contains(content, "cn-") {
+		t.Error("compiled content still contains cn-* markers")
+	}
+	if !strings.Contains(content, "bg-primary") {
+		t.Error("compiled content misses flat utility classes")
+	}
+	if item.Meta == nil || item.Meta.Links.Docs != SiteURL+"/docs/components/button" {
+		t.Errorf("meta = %+v", item.Meta)
+	}
+
+	vega, err := BuildStyleItem("base-vega", "button")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if vega.Files[0].Content == content {
+		t.Error("vega and nova compile to identical content")
+	}
+
+	// Unknown style and unknown component are the 404 case.
+	if item, _ := BuildStyleItem("base-bogus", "button"); item != nil {
+		t.Error("unknown style returned an item")
+	}
+	if item, _ := BuildStyleItem("radix-nova", "button"); item != nil {
+		t.Error("radix base must 404, templUI has only base-*")
+	}
+	if item, _ := BuildStyleItem("base-nova", "bogus"); item != nil {
+		t.Error("unknown component returned an item")
+	}
+}
+
+func TestBuildStyleIndex(t *testing.T) {
+	item := BuildStyleIndex("base-nova")
+	if item == nil {
+		t.Fatal("index missing")
+	}
+	out, err := json.Marshal(item)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := string(out)
+	// files and cssVars are present but empty, like the golden index.json.
+	for _, want := range []string{`"files":[]`, `"cssVars":{}`, `"type":"registry:style"`, `"name":"index"`} {
+		if !strings.Contains(s, want) {
+			t.Errorf("index item missing %s in %s", want, s)
+		}
+	}
+	if BuildStyleIndex("base-bogus") != nil {
+		t.Error("unknown style index returned an item")
+	}
+}
