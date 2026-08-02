@@ -75,20 +75,12 @@ templ ComponentSourceBlock(name, title string) {
 	}
 }
 
-// componentSourceFiles returns a component's source paths from the registry;
-// generated .min.js files are noise as a code block and stay out.
+// componentSourceFiles returns a component's source paths from the registry.
 func componentSourceFiles(name string) []string {
 	for _, c := range registry.Get().Components {
-		if c.Name != name {
-			continue
+		if c.Name == name {
+			return c.Files
 		}
-		files := append([]string{}, c.Files...)
-		for _, f := range c.JSFiles {
-			if !strings.HasSuffix(f, ".min.js") {
-				files = append(files, f)
-			}
-		}
-		return files
 	}
 	return nil
 }

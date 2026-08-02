@@ -6,11 +6,8 @@
       "displayName": "Accordion",
       "description": "Collapsible accordion component.",
       "files": [
-        "components/accordion/accordion.templ"
-      ],
-      "jsFiles": [
-        "components/accordion/accordion.js",
-        "components/accordion/accordion.min.js"
+        "components/accordion/accordion.templ",
+        "components/accordion/accordion.js"
       ],
       "dependencies": [
         "icon"
@@ -92,11 +89,8 @@
       "displayName": "Avatar",
       "description": "Avatar component for user profiles.",
       "files": [
-        "components/avatar/avatar.templ"
-      ],
-      "jsFiles": [
-        "components/avatar/avatar.js",
-        "components/avatar/avatar.min.js"
+        "components/avatar/avatar.templ",
+        "components/avatar/avatar.js"
       ],
       "dependencies": [],
       "categories": [
@@ -196,11 +190,8 @@
       "displayName": "Calendar",
       "description": "Calendar component for date selection.",
       "files": [
-        "components/calendar/calendar.templ"
-      ],
-      "jsFiles": [
-        "components/calendar/calendar.js",
-        "components/calendar/calendar.min.js"
+        "components/calendar/calendar.templ",
+        "components/calendar/calendar.js"
       ],
       "dependencies": [
         "icon"
@@ -242,11 +233,8 @@
       "displayName": "Carousel",
       "description": "Carousel component with navigation controls.",
       "files": [
-        "components/carousel/carousel.templ"
-      ],
-      "jsFiles": [
-        "components/carousel/carousel.js",
-        "components/carousel/carousel.min.js"
+        "components/carousel/carousel.templ",
+        "components/carousel/carousel.js"
       ],
       "dependencies": [
         "icon"
@@ -267,11 +255,8 @@
       "displayName": "Chart",
       "description": "Beautiful charts. Composable chart elements with a Recharts compatible client renderer.",
       "files": [
-        "components/chart/chart.templ"
-      ],
-      "jsFiles": [
-        "components/chart/chart.js",
-        "components/chart/chart.min.js"
+        "components/chart/chart.templ",
+        "components/chart/chart.js"
       ],
       "dependencies": [],
       "categories": [
@@ -290,11 +275,8 @@
       "displayName": "Checkbox",
       "description": "Checkbox input component.",
       "files": [
-        "components/checkbox/checkbox.templ"
-      ],
-      "jsFiles": [
-        "components/checkbox/checkbox.js",
-        "components/checkbox/checkbox.min.js"
+        "components/checkbox/checkbox.templ",
+        "components/checkbox/checkbox.js"
       ],
       "dependencies": [
         "icon"
@@ -315,11 +297,8 @@
       "displayName": "Collapsible",
       "description": "Collapsible container component.",
       "files": [
-        "components/collapsible/collapsible.templ"
-      ],
-      "jsFiles": [
-        "components/collapsible/collapsible.js",
-        "components/collapsible/collapsible.min.js"
+        "components/collapsible/collapsible.templ",
+        "components/collapsible/collapsible.js"
       ],
       "categories": [
         "misc"
@@ -337,11 +316,8 @@
       "displayName": "Combobox",
       "description": "An input with a filterable list of options.",
       "files": [
-        "components/combobox/combobox.templ"
-      ],
-      "jsFiles": [
+        "components/combobox/combobox.templ",
         "components/combobox/combobox.js",
-        "components/combobox/combobox.min.js",
         "components/floatingui/floating_ui_core.js",
         "components/floatingui/floating_ui_dom.js"
       ],
@@ -366,11 +342,8 @@
       "displayName": "Command",
       "description": "Fast, composable command menu.",
       "files": [
-        "components/command/command.templ"
-      ],
-      "jsFiles": [
-        "components/command/command.js",
-        "components/command/command.min.js"
+        "components/command/command.templ",
+        "components/command/command.js"
       ],
       "dependencies": [
         "dialog",
@@ -437,11 +410,8 @@
       "displayName": "Dropdown Menu",
       "description": "Displays a menu of actions or options triggered by a button.",
       "files": [
-        "components/dropdownmenu/dropdownmenu.templ"
-      ],
-      "jsFiles": [
+        "components/dropdownmenu/dropdownmenu.templ",
         "components/dropdownmenu/dropdownmenu.js",
-        "components/dropdownmenu/dropdownmenu.min.js",
         "components/floatingui/floating_ui_core.js",
         "components/floatingui/floating_ui_dom.js"
       ],
@@ -504,11 +474,8 @@
       "displayName": "Input OTP",
       "description": "One-time password input component.",
       "files": [
-        "components/inputotp/inputotp.templ"
-      ],
-      "jsFiles": [
-        "components/inputotp/inputotp.js",
-        "components/inputotp/inputotp.min.js"
+        "components/inputotp/inputotp.templ",
+        "components/inputotp/inputotp.js"
       ],
       "dependencies": [
         "input"
@@ -532,10 +499,6 @@
       "files": [
         "components/label/label.templ"
       ],
-      "jsFiles": [
-        "components/label/label.js",
-        "components/label/label.min.js"
-      ],
       "dependencies": [],
       "categories": [
         "form-input"
@@ -553,11 +516,8 @@
       "displayName": "Drawer",
       "description": "A panel that slides in from the edge of the screen and can be swiped away.",
       "files": [
-        "components/drawer/drawer.templ"
-      ],
-      "jsFiles": [
-        "components/drawer/drawer.js",
-        "components/drawer/drawer.min.js"
+        "components/drawer/drawer.templ",
+        "components/drawer/drawer.js"
       ],
       "dependencies": [],
       "categories": [
@@ -576,11 +536,8 @@
       "displayName": "Dialog",
       "description": "Modal dialog component.",
       "files": [
-        "components/dialog/dialog.templ"
-      ],
-      "jsFiles": [
-        "components/dialog/dialog.js",
-        "components/dialog/dialog.min.js"
+        "components/dialog/dialog.templ",
+        "components/dialog/dialog.js"
       ],
       "dependencies": [
         "button",
@@ -624,11 +581,8 @@
       "displayName": "Popover",
       "description": "Floating popover component using the browser popover API and Floating UI positioning.",
       "files": [
-        "components/popover/popover.templ"
-      ],
-      "jsFiles": [
+        "components/popover/popover.templ",
         "components/popover/popover.js",
-        "components/popover/popover.min.js",
         "components/floatingui/floating_ui_core.js",
         "components/floatingui/floating_ui_dom.js"
       ],
@@ -649,7 +603,10 @@
       "displayName": "Hover Card",
       "description": "Displays rich content in a card when hovering over a trigger. Uses Popover for the popup.",
       "files": [
-        "components/hovercard/hovercard.templ"
+        "components/hovercard/hovercard.templ",
+        "components/hovercard/hovercard.js",
+        "components/floatingui/floating_ui_core.js",
+        "components/floatingui/floating_ui_dom.js"
       ],
       "dependencies": [],
       "categories": [
@@ -661,12 +618,6 @@
         "popover",
         "overlay",
         "preview"
-      ],
-      "jsFiles": [
-        "components/hovercard/hovercard.js",
-        "components/hovercard/hovercard.min.js",
-        "components/floatingui/floating_ui_core.js",
-        "components/floatingui/floating_ui_dom.js"
       ]
     },
     {
@@ -713,7 +664,8 @@
       "displayName": "Input Group",
       "description": "An input with leading or trailing addons \u2014 icons, text or buttons.",
       "files": [
-        "components/inputgroup/inputgroup.templ"
+        "components/inputgroup/inputgroup.templ",
+        "components/inputgroup/inputgroup.js"
       ],
       "dependencies": [],
       "categories": [
@@ -792,11 +744,8 @@
       "displayName": "Toggle",
       "description": "Two-state button, optionally grouped into a segmented control.",
       "files": [
-        "components/toggle/toggle.templ"
-      ],
-      "jsFiles": [
-        "components/toggle/toggle.js",
-        "components/toggle/toggle.min.js"
+        "components/toggle/toggle.templ",
+        "components/toggle/toggle.js"
       ],
       "dependencies": [],
       "categories": [
@@ -837,11 +786,8 @@
       "displayName": "Context Menu",
       "description": "Menu shown at the cursor on right click, with actions and shortcuts.",
       "files": [
-        "components/contextmenu/contextmenu.templ"
-      ],
-      "jsFiles": [
+        "components/contextmenu/contextmenu.templ",
         "components/contextmenu/contextmenu.js",
-        "components/contextmenu/contextmenu.min.js",
         "components/floatingui/floating_ui_core.js",
         "components/floatingui/floating_ui_dom.js"
       ],
@@ -863,11 +809,8 @@
       "displayName": "Progress",
       "description": "Progress bar component.",
       "files": [
-        "components/progress/progress.templ"
-      ],
-      "jsFiles": [
-        "components/progress/progress.js",
-        "components/progress/progress.min.js"
+        "components/progress/progress.templ",
+        "components/progress/progress.js"
       ],
       "dependencies": [],
       "categories": [
@@ -886,11 +829,8 @@
       "displayName": "Radio Group",
       "description": "A set of checkable buttons, known as radio buttons, where no more than one of the buttons can be checked at a time.",
       "files": [
-        "components/radiogroup/radiogroup.templ"
-      ],
-      "jsFiles": [
-        "components/radiogroup/radiogroup.js",
-        "components/radiogroup/radiogroup.min.js"
+        "components/radiogroup/radiogroup.templ",
+        "components/radiogroup/radiogroup.js"
       ],
       "dependencies": [],
       "categories": [
@@ -910,11 +850,8 @@
       "displayName": "Select",
       "description": "Displays a list of options for the user to pick from, triggered by a button.",
       "files": [
-        "components/select/select.templ"
-      ],
-      "jsFiles": [
+        "components/select/select.templ",
         "components/select/select.js",
-        "components/select/select.min.js",
         "components/floatingui/floating_ui_core.js",
         "components/floatingui/floating_ui_dom.js"
       ],
@@ -956,11 +893,8 @@
       "displayName": "Sidebar",
       "description": "Collapsible sidebar component for app layouts.",
       "files": [
-        "components/sidebar/sidebar.templ"
-      ],
-      "jsFiles": [
-        "components/sidebar/sidebar.js",
-        "components/sidebar/sidebar.min.js"
+        "components/sidebar/sidebar.templ",
+        "components/sidebar/sidebar.js"
       ],
       "dependencies": [
         "button",
@@ -1006,11 +940,8 @@
       "displayName": "Slider",
       "description": "Slider input component.",
       "files": [
-        "components/slider/slider.templ"
-      ],
-      "jsFiles": [
-        "components/slider/slider.js",
-        "components/slider/slider.min.js"
+        "components/slider/slider.templ",
+        "components/slider/slider.js"
       ],
       "dependencies": [],
       "categories": [
@@ -1030,11 +961,8 @@
       "displayName": "Switch",
       "description": "Toggle switch component.",
       "files": [
-        "components/switch/switch.templ"
-      ],
-      "jsFiles": [
-        "components/switch/switch.js",
-        "components/switch/switch.min.js"
+        "components/switch/switch.templ",
+        "components/switch/switch.js"
       ],
       "dependencies": [],
       "categories": [
@@ -1073,11 +1001,8 @@
       "displayName": "Tabs",
       "description": "Tabbed interface component.",
       "files": [
-        "components/tabs/tabs.templ"
-      ],
-      "jsFiles": [
-        "components/tabs/tabs.js",
-        "components/tabs/tabs.min.js"
+        "components/tabs/tabs.templ",
+        "components/tabs/tabs.js"
       ],
       "dependencies": [],
       "categories": [
@@ -1116,11 +1041,8 @@
       "displayName": "Toast",
       "description": "A succinct message that is displayed temporarily.",
       "files": [
-        "components/toast/toast.templ"
-      ],
-      "jsFiles": [
-        "components/toast/toast.js",
-        "components/toast/toast.min.js"
+        "components/toast/toast.templ",
+        "components/toast/toast.js"
       ],
       "dependencies": [
         "icon"
@@ -1141,7 +1063,10 @@
       "displayName": "Tooltip",
       "description": "Tooltip component for additional context.",
       "files": [
-        "components/tooltip/tooltip.templ"
+        "components/tooltip/tooltip.templ",
+        "components/tooltip/tooltip.js",
+        "components/floatingui/floating_ui_core.js",
+        "components/floatingui/floating_ui_dom.js"
       ],
       "dependencies": [],
       "categories": [
@@ -1152,12 +1077,6 @@
         "hint",
         "info",
         "hover"
-      ],
-      "jsFiles": [
-        "components/tooltip/tooltip.js",
-        "components/tooltip/tooltip.min.js",
-        "components/floatingui/floating_ui_core.js",
-        "components/floatingui/floating_ui_dom.js"
       ]
     }
   ],

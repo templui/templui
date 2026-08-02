@@ -297,17 +297,6 @@ func installComponent(
 	for _, repoUtilPath := range comp.RequiredUtils {
 		requiredUtils[repoUtilPath] = true
 	}
-	if len(comp.JSFiles) > 0 {
-		requiredUtils["utils/templui.go"] = true
-	}
-
-	// Download the component's JavaScript asset when it has one.
-	if config.JSDir != "" && len(comp.JSFiles) > 0 {
-		err := installComponentJS(config, ref, comp.JSFiles, force)
-		if err != nil {
-			return fmt.Errorf("failed to install JavaScript for component '%s': %w", comp.Name, err)
-		}
-	}
 
 	return nil
 }
@@ -402,61 +391,6 @@ func installUtils(config Config, utilPaths []string, ref string, force bool) err
 				fmt.Printf("   Installed %s\n", destPath)
 			}
 		}
-	}
-
-	return nil
-}
-
-// installComponentJS downloads all component JavaScript assets listed in the registry.
-func installComponentJS(config Config, ref string, jsFiles []string, force bool) error {
-	if err := os.MkdirAll(config.JSDir, 0755); err != nil {
-		return fmt.Errorf("failed to create JS directory '%s': %w", config.JSDir, err)
-	}
-
-	for _, sourceRepoPath := range jsFiles {
-		if err := installComponentJSFile(config, ref, sourceRepoPath, force); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func installComponentJSFile(config Config, ref string, sourceRepoPath string, force bool) error {
-	jsDestPath := filepath.Join(config.JSDir, filepath.Base(sourceRepoPath))
-
-	fileExists := false
-	if _, err := os.Stat(jsDestPath); err == nil {
-		fileExists = true
-	}
-
-	shouldWriteJS := true
-	if fileExists && !force {
-		fmt.Printf("   JavaScript file '%s' already exists. Overwrite? (y/N): ", jsDestPath)
-		var response string
-		fmt.Scanln(&response)
-		shouldWriteJS = strings.ToLower(strings.TrimSpace(response)) == "y"
-	}
-
-	if !shouldWriteJS {
-		return nil
-	}
-
-	jsSourceURL := buildRawContentURL(ref, sourceRepoPath)
-	fmt.Printf("   Downloading JavaScript: %s\n", jsSourceURL)
-	jsData, err := downloadFile(jsSourceURL)
-	if err != nil {
-		return fmt.Errorf("failed to download JS file from %s: %w", jsSourceURL, err)
-	}
-
-	if err := os.WriteFile(jsDestPath, jsData, 0644); err != nil {
-		return fmt.Errorf("failed to write JS file '%s': %w", jsDestPath, err)
-	}
-
-	if fileExists {
-		fmt.Printf("   Overwritten %s\n", jsDestPath)
-	} else {
-		fmt.Printf("   Installed %s\n", jsDestPath)
 	}
 
 	return nil

@@ -146,11 +146,3 @@ templ Content(props ...ContentProps) {
 	</div>
 	</template>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("hovercard")
-	}
-}

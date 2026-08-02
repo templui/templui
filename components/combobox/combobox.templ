@@ -590,11 +590,3 @@ templ Chip(props ...ChipProps) {
 		}
 	</div>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("combobox")
-	}
-}

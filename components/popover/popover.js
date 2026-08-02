@@ -1,6 +1,4 @@
-import "../floatingui/floating_ui_core.js";
-import "../floatingui/floating_ui_dom.js";
-
+// Uses window.FloatingUIDOM from components/floatingui (loaded in the same bundle).
 (function () {
   // Constants from Base UI's popover, shadcn's reference implementation.
   const EXIT_MS = 120; // exit animation (duration-100) + slack

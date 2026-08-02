@@ -960,13 +960,3 @@ templ MenuSubButton(props ...MenuSubButtonProps) {
 		</button>
 	}
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@sheet.Script()
-		@tooltip.Script()
-		@utils.ComponentScript("sidebar")
-	}
-}

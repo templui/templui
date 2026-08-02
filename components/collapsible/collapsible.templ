@@ -96,11 +96,3 @@ templ Content(props ...ContentProps) {
 		{ children... }
 	</div>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("collapsible")
-	}
-}

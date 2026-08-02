@@ -240,11 +240,3 @@ templ Text(props ...TextProps) {
 		{ children... }
 	</span>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("inputgroup")
-	}
-}

@@ -21,7 +21,6 @@ type ComponentDef struct {
 	DisplayName  string   `json:"displayName"`
 	Description  string   `json:"description"`
 	Files        []string `json:"files"`
-	JSFiles      []string `json:"jsFiles,omitempty"`
 	Dependencies []string `json:"dependencies"`
 	Categories   []string `json:"categories"`
 	Tags         []string `json:"tags"`

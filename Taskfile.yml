@@ -23,45 +23,6 @@ tasks:
     cmds:
       - "tailwindcss -i ./assets/css/globals.css -o ./assets/css/output.css --watch"
 
-  minify-js-components:
-    desc: Minify and watch JavaScript component files
-    cmds:
-      - |
-        npx esbuild \
-        components/accordion/accordion.js \
-        components/avatar/avatar.js \
-        components/calendar/calendar.js \
-        components/carousel/carousel.js \
-        components/chart/chart.js \
-        components/checkbox/checkbox.js \
-        components/collapsible/collapsible.js \
-        components/combobox/combobox.js \
-        components/command/command.js \
-        components/contextmenu/contextmenu.js \
-        components/copybutton/copybutton.js \
-        components/dialog/dialog.js \
-        components/drawer/drawer.js \
-        components/dropdownmenu/dropdownmenu.js \
-        components/hovercard/hovercard.js \
-        components/inputgroup/inputgroup.js \
-        components/inputotp/inputotp.js \
-        components/popover/popover.js \
-        components/progress/progress.js \
-        components/radiogroup/radiogroup.js \
-        components/select/select.js \
-        components/sidebar/sidebar.js \
-        components/slider/slider.js \
-        components/switch/switch.js \
-        components/tabs/tabs.js \
-        components/toast/toast.js \
-        components/tooltip/tooltip.js \
-        components/toggle/toggle.js \
-        --minify \
-        --watch \
-        --bundle \
-        --outdir=components \
-        --out-extension:.js=.min.js
-
   kill-ports:
     desc: Kill leftover processes on the dev ports (8090 app, 7331 templ proxy, 3000 shiki)
     cmds:
@@ -73,7 +34,7 @@ tasks:
       - kill-ports
       - tailwind-clean
     cmds:
-      - task --parallel tailwind-watch templ shiki-highlighter minify-js-components
+      - task --parallel tailwind-watch templ shiki-highlighter
 
   # Build & Validation
   templ-generate:

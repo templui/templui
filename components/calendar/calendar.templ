@@ -264,11 +264,3 @@ templ Calendar(props ...Props) {
 		</template>
 	</div>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("calendar")
-	}
-}

@@ -135,16 +135,6 @@ templ Container(props ...ContainerProps) {
 	</div>
 }
 
-// Script loads the chart component JS (tooltips, cursors, responsive
-// re-rendering).
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("chart")
-	}
-}
-
-var scriptOnce = templ.NewOnceHandle()
-
 // Datum is one row of chart data, the pendant of the plain objects in
 // shadcn's chartData arrays.
 type Datum map[string]any
@@ -178,7 +168,6 @@ func Bool(v bool) *bool {
 func Float(v float64) *float64 {
 	return &v
 }
-
 
 // Index returns a pointer to i, for the optional index props.
 func Index(i int) *int {
@@ -1066,7 +1055,6 @@ templ Label(props ...LabelProps) {
 	}
 	}}
 }
-
 
 // radiusCorners normalizes Recharts' radius union into corner radii:
 // a number applies to all four corners, a slice is used as given.

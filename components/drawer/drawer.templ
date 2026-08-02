@@ -389,11 +389,3 @@ templ Description(props ...DescriptionProps) {
 		{ children... }
 	</div>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("drawer")
-	}
-}

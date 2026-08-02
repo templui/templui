@@ -49,7 +49,6 @@ type GroupCountProps struct {
 	Attributes templ.Attributes
 }
 
-
 templ Avatar(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
@@ -159,12 +158,4 @@ templ GroupCount(props ...GroupCountProps) {
 	>
 		{ children... }
 	</div>
-}
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("avatar")
-	}
 }

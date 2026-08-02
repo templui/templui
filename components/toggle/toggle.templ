@@ -144,11 +144,3 @@ templ Toggle(props ...Props) {
 		{ children... }
 	</button>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("toggle")
-	}
-}

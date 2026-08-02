@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/templui/templui/components/button"
-	"github.com/templui/templui/components/dialog"
 	"github.com/templui/templui/utils"
 )
 
@@ -328,11 +327,4 @@ templ Cancel(props ...CancelProps) {
 	}) {
 		{ children... }
 	}
-}
-
-// Script loads the dialog script: alert dialogs are dialogs without light
-// dismiss. Delegating to dialog.Script shares its once-handle, so a page
-// rendering both never emits the script twice.
-templ Script() {
-	@dialog.Script()
 }

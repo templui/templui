@@ -59,12 +59,7 @@ func listComponents(ref string) error {
 				desc = desc[:42] + "..."
 			}
 
-			jsStatus := ""
-			if len(comp.JSFiles) > 0 {
-				jsStatus = " [JS]"
-			}
-
-			fmt.Printf("  - %-20s : %s%s\n", comp.Name, desc, jsStatus)
+			fmt.Printf("  - %-20s : %s\n", comp.Name, desc)
 		}
 	}
 

@@ -1,7 +1,6 @@
 package sheet
 
 import (
-	"github.com/templui/templui/components/dialog"
 	"context"
 
 	"github.com/templui/templui/components/button"
@@ -255,11 +254,4 @@ templ Description(props ...DescriptionProps) {
 	>
 		{ children... }
 	</div>
-}
-
-// Script loads the dialog script: sheets are dialogs with side styling.
-// Delegating to dialog.Script shares its once-handle, so a page rendering
-// both never emits the script twice.
-templ Script() {
-	@dialog.Script()
 }

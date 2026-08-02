@@ -546,11 +546,3 @@ templ SubContent(props ...SubContentProps) {
 		{ children... }
 	</div>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("dropdownmenu")
-	}
-}

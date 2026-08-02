@@ -213,11 +213,3 @@ templ Next(props ...NextProps) {
 		<span class="sr-only">Next slide</span>
 	}
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("carousel")
-	}
-}

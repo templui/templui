@@ -39,11 +39,3 @@ templ CopyButton(props Props) {
 		}
 	</div>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("copybutton")
-	}
-}

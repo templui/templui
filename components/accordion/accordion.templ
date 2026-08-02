@@ -163,11 +163,3 @@ templ Content(props ...ContentProps) {
 		</div>
 	</div>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("accordion")
-	}
-}

@@ -253,32 +253,8 @@ func SetupAssetsRoutes(mux *http.ServeMux) {
 
 	mux.Handle("GET /assets/", http.StripPrefix("/assets/", assetHandler))
 
-	// Component JS Handler - serves individual minified JS files
-	componentJSHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Extract the component path from the URL
-		// e.g., /components/js/avatar/avatar.min.js -> avatar/avatar.min.js
-		path := strings.TrimPrefix(r.URL.Path, "/components/js/")
-
-		// Set content type for JS files
-		w.Header().Set("Content-Type", "application/javascript")
-
-		if isDevelopment {
-			w.Header().Set("Cache-Control", "no-store")
-			// In dev, serve from filesystem
-			http.ServeFile(w, r, "./components/"+path)
-		} else {
-			// In production, serve from embedded FS
-			w.Header().Set("Cache-Control", "public, max-age=31536000")
-			data, err := components.TemplFiles.ReadFile(path)
-			if err != nil {
-				http.Error(w, "File not found", http.StatusNotFound)
-				return
-			}
-			w.Write(data)
-		}
-	})
-
-	mux.Handle("GET /components/js/", componentJSHandler)
+	// Component JS bundle
+	mux.Handle("GET /components/templui.js", components.ScriptsHandler())
 
 	// Safari Favicon Compatibility
 	// Safari often ignores HTML favicon tags and looks for files in the root directory.

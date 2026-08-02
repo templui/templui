@@ -197,14 +197,6 @@ func IDFromContext(ctx context.Context) string {
 	return ""
 }
 
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("tabs")
-	}
-}
-
 func listVariant(v Variant) Variant {
 	if v == "" {
 		return VariantDefault

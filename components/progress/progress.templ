@@ -158,11 +158,3 @@ templ Value(props ...ValueProps) {
 		{ fmt.Sprintf("%d%%", percentage(s.value, s.max)) }
 	</span>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("progress")
-	}
-}

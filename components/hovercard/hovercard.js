@@ -1,6 +1,4 @@
-import "../floatingui/floating_ui_core.js";
-import "../floatingui/floating_ui_dom.js";
-
+// Uses window.FloatingUIDOM from components/floatingui (loaded in the same bundle).
 (function () {
   // Exit animations run for 100ms (duration-100); hide shortly after.
   const EXIT_MS = 120;

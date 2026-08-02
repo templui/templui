@@ -99,11 +99,3 @@ templ Toast(props ...Props) {
 		class={ utils.If(p.Class != "", p.Class) }
 	></div>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("toast")
-	}
-}

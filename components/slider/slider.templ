@@ -196,11 +196,3 @@ templ Slider(props ...Props) {
 		</div>
 	</div>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("slider")
-	}
-}

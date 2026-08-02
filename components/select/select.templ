@@ -357,11 +357,3 @@ templ Separator(props ...SeparatorProps) {
 		{ p.Attributes... }
 	></div>
 }
-
-var scriptOnce = templ.NewOnceHandle()
-
-templ Script() {
-	@scriptOnce.Once() {
-		@utils.ComponentScript("select")
-	}
-}
