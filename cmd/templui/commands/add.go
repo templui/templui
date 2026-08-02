@@ -1,0 +1,201 @@
+// The add command, the pendant of src/commands/add.ts, with the shared
+// install pipeline of src/utils/add-components.ts inlined below (templUI has
+// no monorepo/workspace split, so one pipeline is enough).
+//
+// Dropped npm-only options: -y/--yes (this add never prompts), --dry-run/
+// --diff/--view (no pendant yet) and the interactive component multiselect.
+package commands
+
+import (
+	"flag"
+	"fmt"
+	"path/filepath"
+	"sort"
+	"strings"
+
+	"github.com/templui/templui/cmd/templui/registry"
+	"github.com/templui/templui/cmd/templui/utils"
+	"github.com/templui/templui/cmd/templui/utils/updaters"
+)
+
+// AddOptions are the flags of templui add.
+type AddOptions struct {
+	Cwd       string
+	Overwrite bool
+	All       bool
+	Path      string
+	Silent    bool
+	Registry  string
+}
+
+// NewAddFlagSet declares the add flags.
+func NewAddFlagSet(opts *AddOptions) *flag.FlagSet {
+	fs := flag.NewFlagSet("add", flag.ContinueOnError)
+	fs.BoolVar(&opts.Overwrite, "overwrite", false, "overwrite existing files")
+	fs.BoolVar(&opts.Overwrite, "o", false, "shorthand for --overwrite")
+	fs.BoolVar(&opts.All, "all", false, "add all available components")
+	fs.BoolVar(&opts.All, "a", false, "shorthand for --all")
+	fs.StringVar(&opts.Path, "path", "", "the path to add the component to")
+	fs.StringVar(&opts.Path, "p", "", "shorthand for --path")
+	fs.BoolVar(&opts.Silent, "silent", false, "mute output")
+	fs.BoolVar(&opts.Silent, "s", false, "shorthand for --silent")
+	fs.StringVar(&opts.Registry, "registry", "", "registry URL (default "+registry.DefaultRegistry+", env "+registry.EnvRegistry+")")
+	fs.StringVar(&opts.Cwd, "cwd", ".", "the working directory")
+	fs.StringVar(&opts.Cwd, "c", ".", "shorthand for --cwd")
+	return fs
+}
+
+// RunAdd executes templui add.
+func RunAdd(components []string, opts AddOptions) error {
+	cwd, err := filepath.Abs(opts.Cwd)
+	if err != nil {
+		return err
+	}
+	registryURL := registry.Resolve(opts.Registry)
+
+	config, err := utils.GetConfig(cwd)
+	if err != nil {
+		return err
+	}
+	if config == nil {
+		return fmt.Errorf("no %s found at %s. Run 'templui init' first", utils.ConfigFileName, cwd)
+	}
+
+	if opts.All {
+		if len(components) > 0 {
+			return fmt.Errorf("--all cannot be combined with component names")
+		}
+		components, err = allComponentNames(registryURL)
+		if err != nil {
+			return err
+		}
+	}
+	if len(components) == 0 {
+		return fmt.Errorf("no components specified. Usage: templui add <component>... (or --all)")
+	}
+
+	return addComponents(components, config, registryURL, addComponentsOptions{
+		Overwrite: opts.Overwrite,
+		Silent:    opts.Silent,
+		Path:      opts.Path,
+	})
+}
+
+// allComponentNames lists the registry:ui items of the registry index.
+func allComponentNames(registryURL string) ([]string, error) {
+	index, err := registry.GetIndex(registryURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch registry index: %w", err)
+	}
+	var names []string
+	for _, item := range index.Items {
+		if item.Type == "registry:ui" {
+			names = append(names, item.Name)
+		}
+	}
+	sort.Strings(names)
+	return names, nil
+}
+
+// addComponentsOptions mirrors AddComponentsOptions of add-components.ts.
+type addComponentsOptions struct {
+	Overwrite        bool
+	OverwriteCssVars bool
+	Silent           bool
+	Path             string
+}
+
+// addComponents is the addComponents pendant: resolve the registry tree,
+// write the files and update the CSS last.
+func addComponents(components []string, config *utils.Config, registryURL string, options addComponentsOptions) error {
+	logf(options.Silent, "Checking registry.\n")
+	tree, err := registry.ResolveTree(registryURL, config.Style, components)
+	if err != nil {
+		return err
+	}
+	if tree == nil {
+		return fmt.Errorf("failed to fetch components from registry")
+	}
+
+	result, err := updaters.UpdateFiles(tree.Files, config, updaters.UpdateFilesOptions{
+		Overwrite: options.Overwrite,
+		Silent:    options.Silent,
+		Path:      options.Path,
+	})
+	if err != nil {
+		return err
+	}
+
+	// CSS last, so a file watcher rebuild sees the finished component files.
+	overwriteCssVars := options.OverwriteCssVars || tree.HasThemeItem
+	if !tree.CSSVars.Empty() || tree.CSS.Len() > 0 {
+		relCSS, _ := filepath.Rel(config.ResolvedPaths.Cwd, config.ResolvedPaths.TailwindCSS)
+		logf(options.Silent, "Updating %s.\n", relCSS)
+		vendored, err := updaters.UpdateCSS(config.ResolvedPaths.TailwindCSS, updaters.UpdateCSSOptions{
+			CSSVars:          tree.CSSVars,
+			CSS:              tree.CSS,
+			OverwriteCssVars: overwriteCssVars,
+		})
+		if err != nil {
+			return err
+		}
+		if err := vendorCSSImports(vendored, config, registryURL, options.Silent); err != nil {
+			return err
+		}
+	}
+
+	printFontNote(tree.FontDependencies, options.Silent)
+
+	if result.HasJS() {
+		logf(options.Silent, "Component scripts installed. Render @components.Scripts() once in your layout <head> and mount components.ScriptsHandler().\n")
+	}
+
+	if tree.Docs != "" {
+		logf(options.Silent, "%s", tree.Docs)
+	}
+
+	if len(result.FilesCreated) > 0 || len(result.FilesUpdated) > 0 {
+		// The Go pendant of shadcn's npm install step: the copied sources
+		// need templ generation and their module dependencies resolved.
+		logf(options.Silent, "Run 'templ generate' and 'go mod tidy' to complete the install.\n")
+	}
+
+	return nil
+}
+
+// vendorCSSImports fetches the vendored stylesheets a registry css block
+// imports relatively (./tw-animate.css, ./shadcn-tailwind.css) and writes
+// them next to the Tailwind entry file. They are the pendants of the
+// tw-animate-css and shadcn/tailwind.css npm imports.
+func vendorCSSImports(names []string, config *utils.Config, registryURL string, silent bool) error {
+	cssDir := filepath.Dir(config.ResolvedPaths.TailwindCSS)
+	for _, name := range names {
+		content, err := registry.FetchText(registryURL + "/assets/css/" + name)
+		if err != nil {
+			logf(silent, "Warning: could not fetch %s: %v\n", name, err)
+			continue
+		}
+		target := filepath.Join(cssDir, name)
+		if err := writeFile(target, content); err != nil {
+			return err
+		}
+		rel, _ := filepath.Rel(config.ResolvedPaths.Cwd, target)
+		logf(silent, "Created %s\n", rel)
+	}
+	return nil
+}
+
+// printFontNote is the honest pendant of shadcn's font install: their font
+// items add fontsource npm packages, which have no Go pendant, so the CLI
+// prints instructions instead.
+func printFontNote(fontDeps []string, silent bool) {
+	for _, dep := range fontDeps {
+		variable := "--font-sans"
+		font := strings.TrimPrefix(dep, "font-")
+		if heading, ok := strings.CutPrefix(font, "heading-"); ok {
+			variable = "--font-heading"
+			font = heading
+		}
+		logf(silent, "Fonts are not installed by the CLI. Load the %q font yourself (e.g. Google Fonts or Fontsource) and set %s in your CSS.\n", font, variable)
+	}
+}

@@ -12,6 +12,7 @@ import (
 	"strings"
 	"sync"
 
+	templui "github.com/templui/templui"
 	"github.com/templui/templui/assets"
 	"github.com/templui/templui/components"
 	"github.com/templui/templui/internal/inliner"
@@ -89,11 +90,15 @@ func styleMapFor(bare string) (inliner.StyleMap, error) {
 	return styleMap, nil
 }
 
-// componentSource reads a registry file path ("components/button/button.templ")
-// from disk in development, from the components embed in production.
+// componentSource reads a registry file path ("components/button/button.templ",
+// "utils/templui.go") from disk in development, from the embeds in
+// production.
 func componentSource(filePath string) ([]byte, error) {
 	if isDevelopment() {
 		return os.ReadFile("./" + filePath)
+	}
+	if strings.HasPrefix(filePath, "utils/") {
+		return templui.UtilsFiles.ReadFile(filePath)
 	}
 	return components.TemplFiles.ReadFile(strings.TrimPrefix(filePath, "components/"))
 }
@@ -157,10 +162,12 @@ func BuildStyleItem(styleName, name string) (*Item, error) {
 		Name:                 def.Name,
 		RegistryDependencies: def.RegistryDependencies,
 		Files:                files,
-		Meta: &ItemMeta{
+		Type:                 def.Type,
+	}
+	if def.Type == "registry:ui" {
+		item.Meta = &ItemMeta{
 			Links: ItemLinks{Docs: SiteURL + "/docs/components/" + def.Name},
-		},
-		Type: "registry:ui",
+		}
 	}
 
 	if !isDevelopment() {
