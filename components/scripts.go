@@ -2,6 +2,7 @@ package components
 
 import (
 	"bytes"
+	"compress/gzip"
 	"crypto/sha256"
 	"encoding/hex"
 	"io/fs"
@@ -44,29 +45,52 @@ func buildBundle(fsys fs.FS) ([]byte, string) {
 var (
 	prodOnce sync.Once
 	prodJS   []byte
+	prodGz   []byte
 	prodHash string
 )
 
-func bundle() ([]byte, string) {
+// gzipBundle compresses once so bare Go deployments without a compressing
+// proxy still ship ~5x smaller transfers; proxies that compress themselves
+// simply never see the identity variant.
+func gzipBundle(js []byte) []byte {
+	var buf bytes.Buffer
+	zw, _ := gzip.NewWriterLevel(&buf, gzip.BestCompression)
+	_, _ = zw.Write(js)
+	_ = zw.Close()
+	return buf.Bytes()
+}
+
+func bundle() ([]byte, []byte, string) {
 	if isDevelopment() {
-		return buildBundle(os.DirFS("components"))
+		js, hash := buildBundle(os.DirFS("components"))
+		return js, nil, hash
 	}
 	prodOnce.Do(func() {
 		prodJS, prodHash = buildBundle(TemplFiles)
+		prodGz = gzipBundle(prodJS)
 	})
-	return prodJS, prodHash
+	return prodJS, prodGz, prodHash
 }
 
+// The content hash lives in the path like Next's static chunks
+// (/_next/static/chunks/<hash>.js): query strings are ignored by some CDN
+// caches, path hashes never are.
 func scriptsSrc() string {
-	_, hash := bundle()
-	return "/components/templui.js?v=" + hash
+	_, _, hash := bundle()
+	return "/components/templui-" + hash + ".js"
 }
 
-// ScriptsHandler serves the component JS bundle. Mount it on the route the
-// Scripts() tag points at: GET /components/templui.js.
+// ScriptsHandler serves the component JS bundle. Mount it on
+// GET /components/{bundle}: it answers the current hashed name
+// (templui-<hash>.js) and the plain templui.js alias, 404s anything else.
 func ScriptsHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		js, hash := bundle()
+		js, gz, hash := bundle()
+		base := r.URL.Path[strings.LastIndex(r.URL.Path, "/")+1:]
+		if base != "templui.js" && base != "templui-"+hash+".js" {
+			http.NotFound(w, r)
+			return
+		}
 		etag := `"` + hash + `"`
 		w.Header().Set("Content-Type", "application/javascript")
 		w.Header().Set("ETag", etag)
@@ -78,6 +102,12 @@ func ScriptsHandler() http.Handler {
 				w.WriteHeader(http.StatusNotModified)
 				return
 			}
+		}
+		if gz != nil && strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+			w.Header().Set("Content-Encoding", "gzip")
+			w.Header().Set("Vary", "Accept-Encoding")
+			_, _ = w.Write(gz)
+			return
 		}
 		_, _ = w.Write(js)
 	})

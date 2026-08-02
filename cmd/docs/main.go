@@ -13,6 +13,7 @@ import (
 	"github.com/templui/templui/components"
 	"github.com/templui/templui/internal/config"
 	"github.com/templui/templui/internal/middleware"
+	"github.com/templui/templui/internal/registry"
 	"github.com/templui/templui/internal/registryapi"
 	"github.com/templui/templui/internal/service"
 	"github.com/templui/templui/internal/shared"
@@ -137,6 +138,13 @@ func main() {
 	// component compiled for that style through the inliner.
 	mux.Handle("GET /init", registryapi.InitHandler())
 	mux.Handle("GET /r/styles/{style}/{file}", registryapi.StylesHandler())
+
+	// The source registry file (shadcn's app-root registry.json shape),
+	// served verbatim.
+	mux.HandleFunc("GET /r/registry.json", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(registry.JSON())
+	})
 
 	// Markdown-based documentation pages
 	markdownDocsHandler := func(slug string) http.Handler {
@@ -265,7 +273,7 @@ func SetupAssetsRoutes(mux *http.ServeMux) {
 	mux.Handle("GET /assets/", http.StripPrefix("/assets/", assetHandler))
 
 	// Component JS bundle
-	mux.Handle("GET /components/templui.js", components.ScriptsHandler())
+	mux.Handle("GET /components/{bundle}", components.ScriptsHandler())
 
 	// Safari Favicon Compatibility
 	// Safari often ignores HTML favicon tags and looks for files in the root directory.
