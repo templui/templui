@@ -23,14 +23,6 @@ The `InputOTP` component is a native templ and vanilla JavaScript implementation
 templui add inputotp
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @inputotp.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -43,15 +35,7 @@ Load the script once in your layout:
 
 <ComponentSource name="inputotp" title="components/inputotp/inputotp.js" />
 
-Copy `inputotp.min.js` as well, or minify `inputotp.js` yourself. `inputotp.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @inputotp.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

@@ -19,14 +19,6 @@ description: A set of two-state buttons that can be toggled on or off.
 templui add togglegroup
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @togglegroup.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -37,15 +29,7 @@ Load the script once in your layout:
 
 <ComponentSource name="togglegroup" title="components/togglegroup/togglegroup.templ" />
 
-Copy `togglegroup.min.js` as well, or minify `togglegroup.js` yourself. `togglegroup.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @togglegroup.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

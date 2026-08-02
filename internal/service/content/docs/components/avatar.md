@@ -19,14 +19,6 @@ description: An image element with a fallback for representing the user.
 templui add avatar
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @avatar.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -39,15 +31,7 @@ Load the script once in your layout:
 
 <ComponentSource name="avatar" title="components/avatar/avatar.js" />
 
-Copy `avatar.min.js` as well, or minify `avatar.js` yourself. `avatar.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @avatar.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

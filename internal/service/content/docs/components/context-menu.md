@@ -19,14 +19,6 @@ description: Displays a menu located at the pointer, triggered by a right click 
 templui add contextmenu
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @contextmenu.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -43,15 +35,7 @@ Load the script once in your layout:
 
 <ComponentSource name="contextmenu" title="components/floatingui/floating_ui_dom.js" />
 
-Copy `contextmenu.min.js` as well, or minify `contextmenu.js` yourself. `contextmenu.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @contextmenu.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

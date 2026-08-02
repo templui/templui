@@ -157,10 +157,12 @@ func main() {
 		})
 	}
 
-	for _, slug := range []string{"introduction", "how-to-use", "theming", "typeset", "dark-mode"} {
+	for _, slug := range []string{"introduction", "installation", "theming", "typeset", "dark-mode"} {
 		mux.Handle("GET /docs/"+slug, markdownDocsHandler(slug))
 		mux.Handle("GET /docs/"+slug+".md", markdownSourceHandler(slug))
 	}
+	// The old How To Use page moved into the installation chapter.
+	mux.Handle("GET /docs/how-to-use", http.RedirectHandler("/docs/installation", http.StatusMovedPermanently))
 	// Typography redirects to /docs/typeset, like shadcn's
 	// /docs/components/*/typography redirects (permanent: true).
 	mux.Handle("GET /docs/components/typography", http.RedirectHandler("/docs/typeset", http.StatusMovedPermanently))

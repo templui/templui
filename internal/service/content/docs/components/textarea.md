@@ -19,14 +19,6 @@ description: Displays a form textarea or a component that looks like a textarea.
 templui add textarea
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @textarea.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -37,15 +29,7 @@ Load the script once in your layout:
 
 <ComponentSource name="textarea" title="components/textarea/textarea.templ" />
 
-Copy `textarea.min.js` as well, or minify `textarea.js` yourself. `textarea.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @textarea.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

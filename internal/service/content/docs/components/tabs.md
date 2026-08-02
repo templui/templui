@@ -19,14 +19,6 @@ description: A set of layered sections of content—known as tab panels—that a
 templui add tabs
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @tabs.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -39,15 +31,7 @@ Load the script once in your layout:
 
 <ComponentSource name="tabs" title="components/tabs/tabs.js" />
 
-Copy `tabs.min.js` as well, or minify `tabs.js` yourself. `tabs.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @tabs.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

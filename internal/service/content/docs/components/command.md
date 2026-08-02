@@ -23,14 +23,6 @@ The `Command` component is a native templ and vanilla JavaScript port of the [`c
 templui add command
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @command.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -43,15 +35,7 @@ Load the script once in your layout:
 
 <ComponentSource name="command" title="components/command/command.js" />
 
-Copy `command.min.js` as well, or minify `command.js` yourself. `command.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @command.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

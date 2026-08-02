@@ -104,7 +104,7 @@ templui is a collection of beautifully designed, accessible UI components built 
 Components are designed to be composable, customizable, and easy to integrate into your Go projects.
 
 - [Introduction](https://templui.io/docs/introduction): Core principles and getting started guide
-- [How to Use](https://templui.io/docs/how-to-use): CLI installation and usage guide
+- [Installation](https://templui.io/docs/installation): Installation and setup guide
 - [Components](https://templui.io/docs/components): Component overview and catalog
 - [GitHub](https://github.com/templui/templui): Source code and issue tracker
 

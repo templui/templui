@@ -19,14 +19,6 @@ description: A vertically stacked set of interactive headings that each reveal a
 templui add accordion
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @accordion.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -39,15 +31,7 @@ Load the script once in your layout:
 
 <ComponentSource name="accordion" title="components/accordion/accordion.js" />
 
-Copy `accordion.min.js` as well, or minify `accordion.js` yourself. `accordion.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @accordion.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

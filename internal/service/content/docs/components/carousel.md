@@ -23,14 +23,6 @@ The carousel component is built using native templ and vanilla JavaScript, no ex
 templui add carousel
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @carousel.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -43,15 +35,7 @@ Load the script once in your layout:
 
 <ComponentSource name="carousel" title="components/carousel/carousel.js" />
 
-Copy `carousel.min.js` as well, or minify `carousel.js` yourself. `carousel.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @carousel.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

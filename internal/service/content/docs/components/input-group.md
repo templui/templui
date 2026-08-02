@@ -19,14 +19,6 @@ description: Display additional information or actions to an input or textarea.
 templui add inputgroup
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @inputgroup.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -37,15 +29,7 @@ Load the script once in your layout:
 
 <ComponentSource name="inputgroup" title="components/inputgroup/inputgroup.templ" />
 
-Copy `inputgroup.min.js` as well, or minify `inputgroup.js` yourself. `inputgroup.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @inputgroup.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

@@ -19,14 +19,6 @@ description: A panel that slides in from the edge of the screen and can be swipe
 templui add drawer
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @drawer.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -39,15 +31,7 @@ Load the script once in your layout:
 
 <ComponentSource name="drawer" title="components/drawer/drawer.js" />
 
-Copy `drawer.min.js` as well, or minify `drawer.js` yourself. `drawer.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @drawer.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

@@ -19,14 +19,6 @@ description: Displays rich content in a portal, triggered by a button.
 templui add popover
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @popover.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -43,15 +35,7 @@ Load the script once in your layout:
 
 <ComponentSource name="popover" title="components/floatingui/floating_ui_dom.js" />
 
-Copy `popover.min.js` as well, or minify `popover.js` yourself. `popover.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @popover.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

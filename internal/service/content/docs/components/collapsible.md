@@ -19,14 +19,6 @@ description: An interactive component which expands/collapses a panel.
 templui add collapsible
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @collapsible.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -39,15 +31,7 @@ Load the script once in your layout:
 
 <ComponentSource name="collapsible" title="components/collapsible/collapsible.js" />
 
-Copy `collapsible.min.js` as well, or minify `collapsible.js` yourself. `collapsible.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @collapsible.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

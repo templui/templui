@@ -19,14 +19,6 @@ description: For sighted users to preview content available behind a link.
 templui add hovercard
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @hovercard.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -43,15 +35,7 @@ Load the script once in your layout:
 
 <ComponentSource name="hovercard" title="components/floatingui/floating_ui_dom.js" />
 
-Copy `hovercard.min.js` as well, or minify `hovercard.js` yourself. `hovercard.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @hovercard.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

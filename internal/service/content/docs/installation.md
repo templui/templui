@@ -1,6 +1,6 @@
 ---
-title: "How To Use"
-description: "Learn how to use templUI via the CLI or direct imports."
+title: "Installation"
+description: "How to install dependencies and structure your app."
 order: 2
 ---
 
@@ -26,7 +26,7 @@ go mod tidy
 task dev
 ```
 
-## Tools
+## Prerequisites
 
 The documented setup uses these tools in every workflow.
 
@@ -59,18 +59,6 @@ go install github.com/go-task/task/v3/cmd/task@latest
 ```
 
 > **📝 Note:** Learn more at [taskfile.dev](https://taskfile.dev)
-
-## Component Props
-
-Every component accepts three universal props that are left out of the per-component API tables:
-
-| Prop         | Type               | Description                                          |
-| ------------ | ------------------ | ---------------------------------------------------- |
-| `ID`         | `string`           | HTML id for the rendered element.                    |
-| `Class`      | `string`           | Additional CSS classes, merged with the defaults.    |
-| `Attributes` | `templ.Attributes` | Additional HTML attributes spread onto the element.  |
-
-Standard HTML behavior (`Disabled`, `Type`, `Href`, ...) works the way the platform defines it; the API tables only document what a component adds on top.
 
 ## Import Workflow
 
@@ -269,76 +257,6 @@ import "github.com/templui/templui/components/button"
 }
 ```
 
-### 5. Load JavaScript
-
-Interactive components load JavaScript explicitly in your layout.
-
-```go
-import (
-  "github.com/templui/templui/components/datepicker"
-)
-```
-
-```templ
-<head>
-  @datepicker.Script()
-</head>
-```
-
-`@datepicker.Script()` loads the `datepicker` script and its direct dependencies like `calendar` and `popover`.
-
-For debugging, you can switch to the unminified scripts during app startup:
-
-```go
-func init() {
-  utils.UseUnminifiedScripts = true
-}
-```
-
-```go
-func main() {
-  utils.UseUnminifiedScripts = true
-  // setup routes, then start server
-}
-```
-
-### 6. Serve Assets
-
-Use `setupAssetsRoutes(...)` to serve your app assets like Tailwind CSS output, fonts, images, and local files. In the import workflow, this is also where you mount templUI's embedded component scripts.
-
-```go
-func setupAssetsRoutes(mux *http.ServeMux) {
-  isDevelopment := os.Getenv("GO_ENV") != "production"
-
-  // Your app assets (CSS, fonts, images, ...)
-  assetHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-    if isDevelopment {
-      w.Header().Set("Cache-Control", "no-store")
-    } else {
-      w.Header().Set("Cache-Control", "public, max-age=31536000")
-    }
-
-    var fs http.Handler
-    if isDevelopment {
-      fs = http.FileServer(http.Dir("./assets"))
-    } else {
-      fs = http.FileServer(http.FS(assets.Assets))
-    }
-
-    fs.ServeHTTP(w, r)
-  })
-
-  mux.Handle("GET /assets/", http.StripPrefix("/assets/", assetHandler))
-
-  // templUI embedded component scripts
-  utils.SetupScriptRoutes(mux, isDevelopment)
-}
-```
-
-Your Go app must serve `/assets/...` so the browser can load `assets/css/output.css`, fonts, images, and local files. For import-based apps, `utils.SetupScriptRoutes(...)` adds templUI's embedded component scripts.
-
-For a complete import-based app setup, see [`templui/templui-quickstart`](https://github.com/templui/templui-quickstart).
-
 ## CLI Workflow
 
 Use this when you want templUI to copy component source into your own project for you.
@@ -356,11 +274,7 @@ templui --version
 templui init
 ```
 
-This creates `.templui.json` in your project root.
-
-### 3. Config File
-
-After running `templui init`, `.templui.json` is created:
+This creates `.templui.json` in your project root:
 
 ```json
 {
@@ -372,22 +286,13 @@ After running `templui init`, `.templui.json` is created:
 }
 ```
 
-**Configuration:**
-
 - `componentsDir` - templ components location (relative to project root)
 - `utilsDir` - Utility Go files location
 - `moduleName` - Your Go module name (for import paths)
 - `jsDir` - JavaScript files disk location
-- `jsPublicPath` _(optional)_ - Public URL path for serving JS files
+- `jsPublicPath` - Public URL path for serving JS files, defaults to `"/" + jsDir`
 
-**jsPublicPath examples:**
-- `"/assets/js"` → yoursite.com/assets/js/
-- `"/app/static/js"` → yoursite.com/app/static/js/
-- `"/static"` → yoursite.com/static/
-
-> **📝 Note:** If not set, defaults to `"/" + jsDir`
-
-### 4. Base Styles
+### 3. Base Styles
 
 Create `assets/css/input.css`:
 
@@ -525,7 +430,7 @@ This is your Tailwind entry file. Tailwind reads it and writes the compiled resu
 
 > **💡 Tip:** For custom themes and color palettes, see the [theming docs](/docs/theming).
 
-### 5. Create Taskfile
+### 4. Create Taskfile
 
 Create `Taskfile.yml` in your project root:
 
@@ -555,11 +460,9 @@ Run everything with:
 task dev
 ```
 
-> **📝 Note:** The Tailwind CSS standalone CLI is required for this workflow.
+Adjust the `--proxy` port (default: 8090) if your app uses a different port. templ's dev server runs at http://localhost:7331
 
-> **📝 Note:** Adjust the `--proxy` port (default: 8090) if your app uses a different port. templ's dev server runs at http://localhost:7331
-
-### 6. Add Components
+### 5. Add Components
 
 Install components and their dependencies:
 
@@ -575,7 +478,7 @@ templui add@main button
 templui add@v0.84.0 dialog
 ```
 
-### 7. Use a component
+### 6. Use a component
 
 ```go
 import "your-app/components/button"
@@ -587,45 +490,78 @@ import "your-app/components/button"
 }
 ```
 
-### 8. Load JavaScript
+### 7. Update Components
 
-Load JavaScript explicitly in your layout:
+Update all installed components at once:
+
+```shell
+templui --installed add              # Update all installed components
+templui --installed add@v1.0.0      # Update to specific version
+templui --force --installed add       # Force without prompts
+```
+
+Or update specific components:
+
+```shell
+templui add carousel       # Prompts for confirmation
+templui --force add carousel    # Force without prompts
+```
+
+Updates overwrite custom modifications, so back up your changes first.
+
+### 8. List Components
+
+View all available components:
+
+```shell
+templui list              # Latest version
+templui list@v0.1.0       # Specific version
+```
+
+### 9. Upgrade
+
+Update the CLI and utils:
+
+```shell
+templui upgrade              # Latest version
+templui upgrade@v0.84.0      # Specific version
+```
+
+This updates both the CLI tool and `utils/templui.go` to ensure you have the latest helper functions.
+
+## JavaScript
+
+templUI ships all component behavior as one script bundle. The setup is a one-time step in your app, no per-component script tags.
+
+Render the script tag once in your layout `<head>`:
 
 ```go
-import (
-  "your-app/components/datepicker"
-)
+import "github.com/templui/templui/components"
 ```
 
 ```templ
 <head>
-  @datepicker.Script()
+  @components.Scripts()
 </head>
 ```
 
-`templui add` downloads both the matching `.js` and `.min.js` files into your project. By default `@component.Script()` uses the minified file. For debugging, set `utils.UseUnminifiedScripts = true` during app startup, either in `init()` or early in `main()`.
+Mount the route the script tag points at:
 
 ```go
-func init() {
-  utils.UseUnminifiedScripts = true
-}
+mux.Handle("GET /components/templui.js", components.ScriptsHandler())
 ```
 
-```go
-func main() {
-  utils.UseUnminifiedScripts = true
-  // setup routes, then start server
-}
-```
+The bundle is the concatenation of every `components/*/*.js` file. In production (`GO_ENV=production`) it is built once from the embedded files and served with immutable caching; in development it is rebuilt from the local `components` directory on every request, so edits to copied component scripts hot-reload.
 
-### 9. Serve Assets
+## Serve Assets
 
-Use `setupAssetsRoutes(...)` to serve your app assets like Tailwind CSS output, fonts, images, and local files. In the CLI workflow, your normal asset setup also serves the copied templUI `.min.js` files from `jsDir` and `jsPublicPath`:
+Use `setupAssetsRoutes(...)` to serve your app assets like Tailwind CSS output, fonts, images, and local files:
 
 ```go
 func setupAssetsRoutes(mux *http.ServeMux) {
   isDevelopment := os.Getenv("GO_ENV") != "production"
 
+  // Your app assets (CSS, fonts, images, ...)
   assetHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
     if isDevelopment {
       w.Header().Set("Cache-Control", "no-store")
@@ -644,46 +580,24 @@ func setupAssetsRoutes(mux *http.ServeMux) {
   })
 
   mux.Handle("GET /assets/", http.StripPrefix("/assets/", assetHandler))
+
+  // templUI component script bundle
+  mux.Handle("GET /components/templui.js", components.ScriptsHandler())
 }
 ```
 
-`templui init` installs the shared utils files. `templui add` downloads both script variants into your configured `jsDir`, and the copied `utils/templui.go` already points each `@component.Script()` call at your configured `jsPublicPath`.
+Your Go app must serve `/assets/...` so the browser can load `assets/css/output.css`, fonts, images, and local files. The `/components/templui.js` route serves the script bundle that `@components.Scripts()` loads.
 
-### 10. Update Components
+For a complete import-based app setup, see [`templui/templui-quickstart`](https://github.com/templui/templui-quickstart).
 
-Update all installed components at once:
+## Component Props
 
-```shell
-templui --installed add              # Update all installed components
-templui --installed add@v1.0.0      # Update to specific version
-templui --force --installed add       # Force without prompts
-```
+Every component accepts three universal props that are left out of the per-component API tables:
 
-Or update specific components:
+| Prop         | Type               | Description                                          |
+| ------------ | ------------------ | ---------------------------------------------------- |
+| `ID`         | `string`           | HTML id for the rendered element.                    |
+| `Class`      | `string`           | Additional CSS classes, merged with the defaults.    |
+| `Attributes` | `templ.Attributes` | Additional HTML attributes spread onto the element.  |
 
-```shell
-templui add carousel       # Prompts for confirmation
-templui --force add carousel    # Force without prompts
-```
-
-> **⚠️ Warning:** Updates overwrite custom modifications. Always backup your changes first.
-
-### 11. List Components
-
-View all available components:
-
-```shell
-templui list              # Latest version
-templui list@v0.1.0       # Specific version
-```
-
-### 12. Upgrade
-
-Update the CLI and utils:
-
-```shell
-templui upgrade              # Latest version
-templui upgrade@v0.84.0      # Specific version
-```
-
-This updates both the CLI tool and `utils/templui.go` to ensure you have the latest helper functions.
+Standard HTML behavior (`Disabled`, `Type`, `Href`, ...) works the way the platform defines it; the API tables only document what a component adds on top.

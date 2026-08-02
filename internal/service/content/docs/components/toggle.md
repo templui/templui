@@ -19,14 +19,6 @@ description: A two-state button that can be either on or off.
 templui add toggle
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @toggle.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -39,15 +31,7 @@ Load the script once in your layout:
 
 <ComponentSource name="toggle" title="components/toggle/toggle.js" />
 
-Copy `toggle.min.js` as well, or minify `toggle.js` yourself. `toggle.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @toggle.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

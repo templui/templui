@@ -47,8 +47,8 @@ var Sections = []Section{
 				Href: "/docs/introduction",
 			},
 			{
-				Text: "How to Use",
-				Href: "/docs/how-to-use",
+				Text: "Installation",
+				Href: "/docs/installation",
 			},
 			{
 				Text: "Theming",

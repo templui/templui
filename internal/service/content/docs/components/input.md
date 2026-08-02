@@ -19,14 +19,6 @@ description: Displays a form input field or a component that looks like an input
 templui add input
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @input.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -37,15 +29,7 @@ Load the script once in your layout:
 
 <ComponentSource name="input" title="components/input/input.templ" />
 
-Copy `input.min.js` as well, or minify `input.js` yourself. `input.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @input.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

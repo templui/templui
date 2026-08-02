@@ -19,14 +19,6 @@ description: A calendar component that allows users to select a date or a range 
 templui add calendar
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @calendar.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -39,15 +31,7 @@ Load the script once in your layout:
 
 <ComponentSource name="calendar" title="components/calendar/calendar.js" />
 
-Copy `calendar.min.js` as well, or minify `calendar.js` yourself. `calendar.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @calendar.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

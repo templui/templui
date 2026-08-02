@@ -19,14 +19,6 @@ description: Displays a list of options for the user to pick from, triggered by 
 templui add select
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @select.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -43,15 +35,7 @@ Load the script once in your layout:
 
 <ComponentSource name="select" title="components/floatingui/floating_ui_dom.js" />
 
-Copy `select.min.js` as well, or minify `select.js` yourself. `select.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @select.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

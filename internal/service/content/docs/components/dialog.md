@@ -19,14 +19,6 @@ description: A window overlaid on either the primary window or another dialog wi
 templui add dialog
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @dialog.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -39,15 +31,7 @@ Load the script once in your layout:
 
 <ComponentSource name="dialog" title="components/dialog/dialog.js" />
 
-Copy `dialog.min.js` as well, or minify `dialog.js` yourself. `dialog.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @dialog.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

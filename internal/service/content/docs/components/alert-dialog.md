@@ -19,14 +19,6 @@ description: A modal dialog that interrupts the user with important content and 
 templui add alertdialog
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @alertdialog.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -37,15 +29,9 @@ Load the script once in your layout:
 
 <ComponentSource name="alertdialog" title="components/alertdialog/alertdialog.templ" />
 
-The alert dialog reuses the dialog component and its script. Copy the `dialog` component as well, including `dialog.js` and `dialog.min.js`.
+The alert dialog reuses the dialog component and its script. Copy the `dialog` component as well, including `dialog.js`.
 
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @alertdialog.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

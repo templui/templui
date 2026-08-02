@@ -19,14 +19,6 @@ description: Displays an indicator showing the completion progress of a task, ty
 templui add progress
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @progress.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -39,15 +31,7 @@ Load the script once in your layout:
 
 <ComponentSource name="progress" title="components/progress/progress.js" />
 
-Copy `progress.min.js` as well, or minify `progress.js` yourself. `progress.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @progress.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

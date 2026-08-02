@@ -19,14 +19,6 @@ description: Displays a menu to the user, such as a set of actions or functions,
 templui add dropdownmenu
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @dropdownmenu.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -43,15 +35,7 @@ Load the script once in your layout:
 
 <ComponentSource name="dropdownmenu" title="components/floatingui/floating_ui_dom.js" />
 
-Copy `dropdownmenu.min.js` as well, or minify `dropdownmenu.js` yourself. `dropdownmenu.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @dropdownmenu.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

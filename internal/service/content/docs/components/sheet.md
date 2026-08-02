@@ -19,14 +19,6 @@ description: Extends the Dialog component to display content that complements th
 templui add sheet
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @sheet.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -37,15 +29,7 @@ Load the script once in your layout:
 
 <ComponentSource name="sheet" title="components/sheet/sheet.templ" />
 
-Copy `sheet.min.js` as well, or minify `sheet.js` yourself. `sheet.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @sheet.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

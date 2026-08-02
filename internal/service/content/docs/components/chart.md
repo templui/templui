@@ -50,14 +50,6 @@ The runtime watches the DOM, so charts arriving through htmx or Datastar swaps r
 templui add chart
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @chart.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -92,15 +84,7 @@ Load the script once in your layout:
 }
 ```
 
-Copy `chart.min.js` as well, or minify `chart.js` yourself. `chart.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @chart.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

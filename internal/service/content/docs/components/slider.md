@@ -19,14 +19,6 @@ description: An input where the user selects a value from within a given range.
 templui add slider
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @slider.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -39,15 +31,7 @@ Load the script once in your layout:
 
 <ComponentSource name="slider" title="components/slider/slider.js" />
 
-Copy `slider.min.js` as well, or minify `slider.js` yourself. `slider.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @slider.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

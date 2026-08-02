@@ -19,14 +19,6 @@ description: A succinct message that is displayed temporarily.
 templui add toast
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @toast.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -39,15 +31,7 @@ Load the script once in your layout:
 
 <ComponentSource name="toast" title="components/toast/toast.js" />
 
-Copy `toast.min.js` as well, or minify `toast.js` yourself. `toast.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @toast.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 
@@ -67,7 +51,6 @@ templ Layout() {
 		<body>
 			<main>{ children... }</main>
 			@toast.Toaster()
-			@toast.Script()
 		</body>
 	</html>
 }

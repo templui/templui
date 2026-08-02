@@ -25,14 +25,6 @@ Customizable.
 templui add sidebar
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @sidebar.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -45,15 +37,7 @@ Load the script once in your layout:
 
 <ComponentSource name="sidebar" title="components/sidebar/sidebar.js" />
 
-Copy `sidebar.min.js` as well, or minify `sidebar.js` yourself. `sidebar.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @sidebar.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 
@@ -76,7 +60,6 @@ templ Layout() {
 			{ children... }
 		</main>
 	}
-	@sidebar.Script()
 }
 ```
 

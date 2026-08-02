@@ -19,14 +19,6 @@ description: A popup that displays information related to an element when the el
 templui add tooltip
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @tooltip.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -43,15 +35,7 @@ Load the script once in your layout:
 
 <ComponentSource name="tooltip" title="components/floatingui/floating_ui_dom.js" />
 
-Copy `tooltip.min.js` as well, or minify `tooltip.js` yourself. `tooltip.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @tooltip.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 

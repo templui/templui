@@ -19,14 +19,6 @@ description: Autocomplete input with a list of suggestions.
 templui add combobox
 ```
 
-Load the script once in your layout:
-
-```templ
-<head>
-  @combobox.Script()
-</head>
-```
-
 </TabsContent>
 
 <TabsContent value="manual">
@@ -43,15 +35,7 @@ Load the script once in your layout:
 
 <ComponentSource name="combobox" title="components/floatingui/floating_ui_dom.js" />
 
-Copy `combobox.min.js` as well, or minify `combobox.js` yourself. `combobox.Script()` loads the minified file.
-
-<Step>Add the script once to your layout.</Step>
-
-```templ
-<head>
-  @combobox.Script()
-</head>
-```
+Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 
 <Step>Update the import paths to match your project setup.</Step>
 
