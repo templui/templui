@@ -1,7 +1,7 @@
 ---
 title: "Dark Mode"
 description: "Adding dark mode to your site."
-order: 5
+order: 6
 ---
 
 <Steps>

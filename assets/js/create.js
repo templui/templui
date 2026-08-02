@@ -75,6 +75,11 @@
   var renderedBaseColor = null;
   var copied = false;
   var copiedTimer = 0;
+  // project-form.tsx state: activeTab, applyMode and the copiedTarget flash.
+  var activeTab = "new-project";
+  var applyMode = "full";
+  var copiedTarget = null;
+  var copiedTargetTimer = 0;
   var isMac = MAC_REGEX.test(navigator.platform || navigator.userAgent);
 
   // use-history.tsx: entries of settled preset codes; the first entry is ""
@@ -728,6 +733,78 @@
     window.tui.drawer.close("create-open-preset-drawer");
   }
 
+  // ----- get code dialog (project-form.tsx) ----------------------------------
+
+  // The command builders. Our pendants of the shadcn init/apply commands have
+  // no package manager variants (the CLI installs via go install) and no
+  // template/base/monorepo/rtl/pointer flags (templui init takes none).
+  function initCommand() {
+    return "templui init --preset " + getPresetCode(params);
+  }
+
+  function applyCommand() {
+    var onlyFlag =
+      applyMode === "theme" ? " --only theme" : applyMode === "font" ? " --only font" : "";
+    return "templui apply --preset " + getPresetCode(params) + onlyFlag;
+  }
+
+  function copyTargetText(target) {
+    if (target === "command") return initCommand();
+    if (target === "apply") return applyCommand();
+    return generateThemeCss();
+  }
+
+  // handleCopy/handleCopyApply/handleCopyTheme: copy and flash the matching
+  // buttons for 2s (the copiedTarget timeout effect).
+  function copyProjectTarget(target) {
+    var text = copyTargetText(target);
+    if (navigator.clipboard) navigator.clipboard.writeText(text).catch(function () {});
+    copiedTarget = target;
+    clearTimeout(copiedTargetTimer);
+    copiedTargetTimer = setTimeout(function () {
+      copiedTarget = null;
+      renderProjectForm();
+    }, 2000);
+    renderProjectForm();
+  }
+
+  function renderProjectForm() {
+    // ToggleGroup value={[activeTab]}: the group is controlled, so pressed
+    // states re-sync here (toggle.js already flipped them on click).
+    document
+      .querySelectorAll("[data-tui-create-tabs] [data-tui-toggle]")
+      .forEach(function (toggle) {
+        var on = toggle.getAttribute("data-tui-toggle-value") === activeTab;
+        toggle.setAttribute("data-state", on ? "on" : "off");
+        toggle.setAttribute("aria-pressed", String(on));
+      });
+    document.querySelectorAll("[data-tui-create-tab]").forEach(function (panel) {
+      panel.hidden = panel.getAttribute("data-tui-create-tab") !== activeTab;
+    });
+
+    // Live commands and the theme CSS.
+    document.querySelectorAll('[data-tui-create-command="init"]').forEach(function (el) {
+      el.textContent = initCommand();
+    });
+    document.querySelectorAll('[data-tui-create-command="apply"]').forEach(function (el) {
+      el.textContent = applyCommand();
+    });
+    var css = document.querySelector("[data-tui-create-css]");
+    if (css) css.textContent = generateThemeCss();
+
+    // Copy flashes: icon buttons swap Copy -> Check, footer buttons swap
+    // their label to "Copied".
+    document.querySelectorAll("[data-tui-create-copy-target]").forEach(function (button) {
+      var isCopied = copiedTarget === button.getAttribute("data-tui-create-copy-target");
+      var copyIcon = button.querySelector('[data-tui-create-copy-icon="copy"]');
+      var checkIcon = button.querySelector('[data-tui-create-copy-icon="check"]');
+      if (copyIcon) copyIcon.hidden = isCopied;
+      if (checkIcon) checkIcon.hidden = !isCopied;
+      var idleLabel = button.getAttribute("data-tui-create-copy-label");
+      if (idleLabel) button.textContent = isCopied ? "Copied" : idleLabel;
+    });
+  }
+
   // ----- theme css export (project-form.tsx theme tab) -----------------------
 
   // registry/config.ts buildRegistryTheme.
@@ -1166,9 +1243,8 @@
       );
     });
 
-    // Get Code css.
-    var css = document.querySelector("[data-tui-create-css]");
-    if (css) css.value = generateThemeCss();
+    // Get Code dialog: tabs, live commands, theme css, copy flashes.
+    renderProjectForm();
 
     renderLocks();
     renderHistoryItems();
@@ -1498,13 +1574,20 @@
         setItem(previewItemButton.getAttribute("data-tui-create-preview-item"));
         return;
       }
-      var copyCss = e.target.closest("[data-tui-create-copy-css]");
-      if (copyCss) {
-        var css = document.querySelector("[data-tui-create-css]");
-        if (css && navigator.clipboard) {
-          navigator.clipboard.writeText(css.value).catch(function () {});
-        }
+      var copyTarget = e.target.closest("[data-tui-create-copy-target]");
+      if (copyTarget) {
+        copyProjectTarget(copyTarget.getAttribute("data-tui-create-copy-target"));
       }
+    });
+
+    // Get Code tabs (project-form.tsx onValueChange: an empty selection —
+    // pressing the active tab again — falls back to "new-project").
+    document.addEventListener("toggle-change", function (e) {
+      var group = e.target instanceof Element && e.target.closest("[data-tui-create-tabs]");
+      if (!group) return;
+      var on = group.querySelector('[data-tui-toggle][data-state="on"]');
+      activeTab = (on && on.getAttribute("data-tui-toggle-value")) || "new-project";
+      renderProjectForm();
     });
 
     // Hover previews: mousemove re-arms the trailing timer while the cursor
@@ -1555,6 +1638,15 @@
     document.addEventListener("input", function (e) {
       var form = e.target instanceof Element && e.target.closest("[data-tui-create-preset-form]");
       if (form) updatePresetForm(form);
+    });
+
+    // APPLY_MODES radio (project-form.tsx setApplyMode): the hidden radio
+    // inputs fire native change events on selection.
+    document.addEventListener("change", function (e) {
+      var input = e.target;
+      if (!(input instanceof HTMLInputElement) || input.name !== "create-apply-mode") return;
+      applyMode = input.value;
+      renderProjectForm();
     });
 
     // Action menu selection (command.js command-select event).

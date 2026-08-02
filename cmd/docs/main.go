@@ -174,7 +174,7 @@ func main() {
 		})
 	}
 
-	for _, slug := range []string{"introduction", "installation", "theming", "typeset", "dark-mode"} {
+	for _, slug := range []string{"introduction", "installation", "components-json", "theming", "typeset", "dark-mode", "cli"} {
 		mux.Handle("GET /docs/"+slug, markdownDocsHandler(slug))
 		mux.Handle("GET /docs/"+slug+".md", markdownSourceHandler(slug))
 	}

@@ -48,6 +48,12 @@ var Sections = []Section{
 				Text: "Installation",
 				Href: "/docs/installation",
 			},
+			// Order per shadcn's (root)/meta.json: components.json follows
+			// Installation, CLI follows the Dark Mode link.
+			{
+				Text: "components.json",
+				Href: "/docs/components-json",
+			},
 			{
 				Text: "Theming",
 				Href: "/docs/theming",
@@ -59,6 +65,10 @@ var Sections = []Section{
 			{
 				Text: "Dark Mode",
 				Href: "/docs/dark-mode",
+			},
+			{
+				Text: "CLI",
+				Href: "/docs/cli",
 			},
 			{
 				Text: "llms.txt",

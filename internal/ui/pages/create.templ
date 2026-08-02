@@ -11,6 +11,8 @@ import (
 	"github.com/templui/templui/components/field"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/components/input"
+	"github.com/templui/templui/components/radiogroup"
+	"github.com/templui/templui/components/togglegroup"
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
 	"github.com/templui/templui/utils"
@@ -764,39 +766,195 @@ templ createResetDialog() {
 	}
 }
 
-// createCodeDialog is the Get Code dialog: the templUI pendant of
-// project-form.tsx reduced to its Theme tab (the CLI tabs have no templUI
-// counterpart) — the generated theme tokens for globals.css.
+// APPLY_MODES verbatim from project-form.tsx: the radio driving the
+// `templui apply --preset <code> [--only theme|font]` command.
+var createApplyModes = []struct{ Value, Title, Description string }{
+	{"full", "Full preset", "Everything from the preset, including components, theme, and fonts."},
+	{"theme", "Theme only", "Theme tokens only, like colors, radii, and shadows. Components stay as they are."},
+	{"font", "Fonts only", "Only preset fonts for body and headings. Components stay as they are."},
+}
+
+// createCodeDialog is the Get Code dialog, the pendant of project-form.tsx:
+// the "New Project" | "Existing Project" | "Theme" ToggleGroup header and one
+// panel per tab, driven by create.js (activeTab, applyMode, copiedTarget).
+//
+// Deliberate omissions against the tsx, all npm-only: the framework template
+// grid, the Base component-library grid and the pointer/monorepo/RTL switches
+// (templui init scaffolds no frameworks and takes no such flags), and the
+// package manager Tabs (Go has exactly one toolchain), so each command
+// renders in a single box with a static "templui" label where the pm TabsList
+// sits. The commands are the real CLI: `templui init --preset <code>` and
+// `templui apply --preset <code> [--only theme|font]`.
 templ createCodeDialog() {
 	@dialog.Dialog(dialog.Props{ID: "create-code-dialog"}) {
-		@dialog.Content(dialog.ContentProps{Class: "sm:max-w-lg"}) {
-			@dialog.Header() {
-				@dialog.Title() {
-					Your theme
+		@dialog.Content(dialog.ContentProps{Class: "dark top-[64px] no-scrollbar flex max-h-[calc(100svh-2rem)] translate-y-0 flex-col rounded-2xl p-0 shadow-xl **:data-[slot=dialog-close]:top-4.5 **:data-[slot=dialog-close]:right-4 **:data-[slot=field-separator]:h-2 sm:max-w-md"}) {
+			<div class="flex min-w-0 flex-1 flex-col gap-0 overflow-hidden rounded-2xl">
+				@dialog.Header(dialog.HeaderProps{Class: "border-b px-6 py-5"}) {
+					// The tab switcher is a ToggleGroup like the tsx; our items
+					// carry data-state instead of Base UI's data-pressed.
+					@togglegroup.ToggleGroup(togglegroup.Props{
+						Class: "**:data-[slot=toggle-group-item]:data-[state=on]:bg-neutral-700/70",
+						Attributes: templ.Attributes{
+							"aria-label":           "Project type",
+							"data-tui-create-tabs": true,
+						},
+					}) {
+						@togglegroup.Item(togglegroup.ItemProps{Value: "new-project", Pressed: true}) {
+							New Project
+						}
+						@togglegroup.Item(togglegroup.ItemProps{Value: "existing-project"}) {
+							Existing Project
+						}
+						@togglegroup.Item(togglegroup.ItemProps{Value: "theme"}) {
+							Theme
+						}
+					}
 				}
-				@dialog.Description() {
-					Copy this into your globals.css to apply the design system you built.
-				}
-			}
-			<textarea
-				data-tui-create-css
-				readonly
-				class="h-72 w-full resize-none rounded-lg border bg-surface p-3 font-mono text-xs outline-none"
-			></textarea>
-			@dialog.Footer() {
-				@button.Button(button.Props{
-					Variant:    button.VariantOutline,
-					Attributes: dialog.CloseFor("create-code-dialog"),
-				}) {
-					Close
-				}
-				@button.Button(button.Props{
-					Attributes: templ.Attributes{"data-tui-create-copy-css": true},
-				}) {
-					Copy CSS
+				<div class="no-scrollbar overflow-y-auto" data-tui-create-tab="new-project">
+					@field.Group(field.GroupProps{Class: "px-6 py-4"}) {
+						@field.Set(field.SetProps{Class: "gap-3"}) {
+							@field.Legend(field.LegendProps{Variant: field.LegendVariantLabel}) {
+								New Project
+							}
+							// The one-line CLI install hint from installation.md
+							// (there are no framework templates to pick).
+							@field.Description() {
+								Run init inside your Go module to start a new project with this preset. Get the CLI with <code class="font-mono">go install github.com/templui/templui/cmd/templui@latest</code>.
+							}
+						}
+					}
+					@dialog.Footer(dialog.FooterProps{Class: "m-0 min-w-0 p-6"}) {
+						<div class="flex w-full min-w-0 flex-col gap-3">
+							@createCommandBox("command", "init", "templui init --preset b0")
+							@createCopyButton("command", "Copy Command")
+						</div>
+					}
+				</div>
+				<div class="no-scrollbar overflow-y-auto" data-tui-create-tab="existing-project" hidden>
+					@field.Group(field.GroupProps{Class: "px-6 py-4"}) {
+						@field.Set(field.SetProps{Class: "gap-3"}) {
+							@field.Legend(field.LegendProps{Variant: field.LegendVariantLabel}) {
+								Apply Preset
+							}
+							@field.Description() {
+								Pick which parts of the preset to apply.
+							}
+							@createApplyModeGrid()
+						}
+					}
+					@dialog.Footer(dialog.FooterProps{Class: "m-0 min-w-0 p-6"}) {
+						<div class="flex w-full min-w-0 flex-col gap-3">
+							@createCommandBox("apply", "apply", "templui apply --preset b0")
+							@createCopyButton("apply", "Copy Command")
+						</div>
+					}
+				</div>
+				<div class="no-scrollbar overflow-y-auto" data-tui-create-tab="theme" hidden>
+					@field.Group(field.GroupProps{Class: "min-w-0 px-6 py-4"}) {
+						@field.Set(field.SetProps{Class: "min-w-0 gap-3"}) {
+							@field.Legend(field.LegendProps{Variant: field.LegendVariantLabel}) {
+								Theme Tokens
+							}
+							@field.Description() {
+								Copy the CSS variables for this preset.
+							}
+							<div class="w-full min-w-0 overflow-hidden rounded-xl border-0 ring-1 ring-border">
+								<div class="flex items-center gap-2 py-1 pr-1.5 pl-3">
+									<div class="min-w-0 truncate font-mono text-sm text-muted-foreground">globals.css</div>
+									@createCopyIconButton("theme", "Copy theme")
+								</div>
+								<div class="relative no-scrollbar max-h-[45svh] overflow-auto border-t bg-popover p-3">
+									<pre class="min-w-max font-mono leading-normal whitespace-pre"><code data-tui-create-css></code></pre>
+								</div>
+							</div>
+						}
+					}
+					@dialog.Footer(dialog.FooterProps{Class: "m-0 min-w-0 p-6"}) {
+						@createCopyButton("theme", "Copy Theme")
+					}
+				</div>
+			</div>
+		}
+	}
+}
+
+// createApplyModeGrid is the ApplyModeGrid pendant: the APPLY_MODES radio.
+// The native change event of the hidden radio inputs drives applyMode in
+// create.js.
+templ createApplyModeGrid() {
+	@radiogroup.RadioGroup(radiogroup.Props{
+		Name:       "create-apply-mode",
+		Value:      "full",
+		Attributes: templ.Attributes{"aria-label": "Apply"},
+	}) {
+		for _, mode := range createApplyModes {
+			@field.Label(field.LabelProps{For: "create-apply-" + mode.Value}) {
+				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
+					@radiogroup.Item(radiogroup.ItemProps{ID: "create-apply-" + mode.Value, Value: mode.Value})
+					@field.Content() {
+						@field.Title() {
+							{ mode.Title }
+						}
+						@field.Description() {
+							{ mode.Description }
+						}
+					}
 				}
 			}
 		}
+	}
+}
+
+// createCommandBox is the command Tabs pendant reduced to the single Go
+// runner: the reference header row keeps its layout (pm TabsList left, icon
+// copy button right) with a static "templui" label in the TabsList slot, the
+// command sits in the bg-popover content row. create.js keeps the command
+// text live with the current preset code (data-tui-create-command).
+templ createCommandBox(target, command, initial string) {
+	<div class="w-full min-w-0 overflow-hidden rounded-xl border-0 ring-1 ring-border">
+		<div class="flex items-center gap-2 py-1 pr-1.5 pl-3">
+			<div class="min-w-0 truncate font-mono text-sm text-muted-foreground">templui</div>
+			@createCopyIconButton(target, "Copy command")
+		</div>
+		<div class="relative overflow-hidden border-t bg-popover p-3">
+			<div class="no-scrollbar overflow-x-auto">
+				<code class="font-mono text-sm whitespace-nowrap" data-tui-create-command={ command }>{ initial }</code>
+			</div>
+		</div>
+	</div>
+}
+
+// createCopyIconButton is the icon copy button of a command/theme box; the
+// Copy icon flashes to Check while copiedTarget matches (project-form.tsx
+// Copy01Icon/Tick02Icon swap).
+templ createCopyIconButton(target, srLabel string) {
+	@button.Button(button.Props{
+		Variant:    button.VariantGhost,
+		Size:       button.SizeIconSm,
+		Class:      "ml-auto",
+		Attributes: templ.Attributes{"data-tui-create-copy-target": target},
+	}) {
+		<span data-tui-create-copy-icon="copy">
+			@icon.Copy()
+		</span>
+		<span data-tui-create-copy-icon="check" hidden>
+			@icon.Check()
+		</span>
+		<span class="sr-only">{ srLabel }</span>
+	}
+}
+
+// createCopyButton is the full-width footer copy button; its label flashes to
+// "Copied" while copiedTarget matches.
+templ createCopyButton(target, label string) {
+	@button.Button(button.Props{
+		Class: "h-9 w-full",
+		Attributes: templ.Attributes{
+			"data-tui-create-copy-target": target,
+			"data-tui-create-copy-label":  label,
+		},
+	}) {
+		{ label }
 	}
 }
 

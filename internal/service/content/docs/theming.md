@@ -1,7 +1,7 @@
 ---
 title: "Theming"
 description: "Using CSS variables and theme tokens."
-order: 3
+order: 4
 ---
 
 <Callout>
@@ -16,6 +16,19 @@ This gives you semantic theme tokens like `background`, `foreground`, and `prima
 
 ```templ /bg-background/ /text-foreground/
 <div class="bg-background text-foreground"></div>
+```
+
+To use CSS variables for theming, set `tailwind.cssVariables` to `true` in your `components.json` file. This is the default.
+
+```json title="components.json" showLineNumbers
+{
+  "style": "base-nova",
+  "tailwind": {
+    "css": "assets/css/input.css",
+    "baseColor": "neutral",
+    "cssVariables": true
+  }
+}
 ```
 
 Tailwind maps these tokens into utilities like `bg-background`, `text-foreground`, `border-border`, and `ring-ring`.
@@ -130,7 +143,7 @@ You can now use `bg-warning` and `text-warning-foreground` in your components.
 
 ## Base Colors
 
-The base color controls the default token values generated for your project. Pick one on [templUI Create](/create) to generate a theme with it.
+`tailwind.baseColor` controls the default token values generated for your project when you run `init` or use a preset. Pick one on [templUI Create](/create) to generate a theme with it.
 
 The available base colors are: **Neutral**, **Stone**, **Zinc**, **Mauve**, **Olive**, **Mist**, and **Taupe**.
 
