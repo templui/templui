@@ -82,7 +82,9 @@
 
   function isMultiple(content) {
     const popup = popupFor(content);
-    return popup && popup.hasAttribute("data-chips");
+    // data-chips is always rendered as "true"/"false" (React stringifies
+    // data-* booleans the same way), so the value decides, not presence.
+    return popup && popup.getAttribute("data-chips") === "true";
   }
 
   function selectedItems(content) {
@@ -364,7 +366,8 @@
   function selectItem(content, item) {
     const input = inputFor(content);
     if (isMultiple(content)) {
-      item.toggleAttribute("data-selected");
+      if (item.hasAttribute("data-selected")) item.removeAttribute("data-selected");
+      else item.setAttribute("data-selected", "true");
       item.setAttribute("aria-selected", item.hasAttribute("data-selected") ? "true" : "false");
       afterSelectionChange(content);
       if (input) {
@@ -379,7 +382,7 @@
       i.removeAttribute("data-selected");
       i.setAttribute("aria-selected", "false");
     });
-    item.setAttribute("data-selected", "");
+    item.setAttribute("data-selected", "true");
     item.setAttribute("aria-selected", "true");
     if (input) input.value = labelOf(item);
     afterSelectionChange(content);
