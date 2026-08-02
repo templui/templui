@@ -2,6 +2,7 @@ package pages
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/templui/templui/components/accordion"
 	"github.com/templui/templui/components/alert"
@@ -100,7 +101,8 @@ templ cardUpcomingPayments() {
 		}
 		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
 			@item.Item(item.Props{Variant: item.VariantOutline, Class: "justify-center"}) {
-				@calendar.Calendar(calendar.Props{Class: "w-full [--cell-size:--spacing(8)] md:[--cell-size:--spacing(10)]"})
+				// The source preselects today: React.useState(new Date()).
+				@calendar.Calendar(calendar.Props{Value: time.Now(), Class: "w-full [--cell-size:--spacing(8)] md:[--cell-size:--spacing(10)]"})
 			}
 			@item.Group(item.GroupProps{Class: "w-full"}) {
 				@upcomingPayment("Netflix Subscription", "Apr 15, 2024", "$19.99")
@@ -212,7 +214,7 @@ templ currencySelect(id string) {
 }
 
 templ cardPayoutThreshold() {
-	@card.Card() {
+	@card.Card(card.Props{Attributes: templ.Attributes{"data-payout-threshold": ""}}) {
 		@card.Header() {
 			@card.Title() {
 				Payout Threshold
@@ -239,7 +241,7 @@ templ cardPayoutThreshold() {
 						@field.Label(field.LabelProps{For: "min-payout"}) {
 							Minimum Payout Amount
 						}
-						<span class="text-2xl font-semibold tabular-nums">$2500.00</span>
+						<span data-payout-amount class="text-2xl font-semibold tabular-nums">$2500.00</span>
 					</div>
 					@slider.Slider(slider.Props{ID: "min-payout", Min: 50, Max: 10000, Step: 50, Values: []float64{2500}})
 					<div class="flex items-center justify-between">
@@ -265,6 +267,19 @@ templ cardPayoutThreshold() {
 			}
 		}
 	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		// The vanilla pendant of payout-threshold.tsx's amount state: the
+		// slider drives the display, formatted like ${amount[0].toFixed(2)}.
+		(() => {
+			if (window.__tuiDemoPayoutThreshold) return;
+			window.__tuiDemoPayoutThreshold = true;
+			document.addEventListener("slider-change", (e) => {
+				const card = e.target.closest("[data-payout-threshold]");
+				if (!card) return;
+				card.querySelector("[data-payout-amount]").textContent = "$" + e.detail.values[0].toFixed(2);
+			});
+		})();
+	</script>
 }
 
 templ cardFaq() {
@@ -670,7 +685,7 @@ templ cardSavingsProgress() {
 }
 
 templ cardKitchenIsland() {
-	@card.Card() {
+	@card.Card(card.Props{Attributes: templ.Attributes{"data-kitchen-island": ""}}) {
 		@card.Header() {
 			@card.Title() {
 				Kitchen Island
@@ -761,6 +776,80 @@ templ cardKitchenIsland() {
 			}
 		}
 	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		// The vanilla pendant of kitchen-island.tsx's state: the scene toggle
+		// group applies its SCENES preset to the four sliders (brightness,
+		// color temp, volume, fade in DOM order), the header switch
+		// enables/disables scenes and sliders. Dragging a slider changes only
+		// that slider, exactly like the source.
+		(() => {
+			if (window.__tuiDemoKitchenIsland) return;
+			window.__tuiDemoKitchenIsland = true;
+			// kitchen-island.tsx SCENES, as [brightness, colorTemp, volume, fade].
+			const SCENES = {
+				cooking: [90, 70, 30, 0],
+				dining: [50, 40, 20, 60],
+				nightlight: [15, 20, 0, 80],
+				focus: [100, 85, 0, 0],
+			};
+			// slider.js render() for the single horizontal thumb, same repeat
+			// as the roller shades demo.
+			const setSlider = (root, v) => {
+				const min = parseFloat(root.getAttribute("data-min") || "0");
+				const max = parseFloat(root.getAttribute("data-max") || "100");
+				const f = max === min ? 0 : Math.min(1, Math.max(0, (v - min) / (max - min)));
+				const thumb = root.querySelector("[data-tui-slider-thumb]");
+				thumb.setAttribute("aria-valuenow", String(v));
+				thumb.style.left = "calc(" + (f * 100).toFixed(4) + "% - " + (f * 12).toFixed(2) + "px)";
+				const range = root.querySelector("[data-tui-slider-range]");
+				range.style.left = "0";
+				range.style.width = "calc(" + (f * 100).toFixed(4) + "% + " + (6 - f * 12).toFixed(2) + "px)";
+			};
+			document.addEventListener("toggle-change", (e) => {
+				const card = e.target.closest("[data-kitchen-island]");
+				if (!card) return;
+				// handleSceneChange(value[0] ?? "cooking"): unpressing falls
+				// back to the cooking scene.
+				const scene = e.detail.pressed ? e.detail.value : "cooking";
+				const preset = SCENES[scene];
+				if (!preset) return;
+				card.querySelectorAll("[data-tui-slider]").forEach((root, i) => {
+					if (preset[i] != null) setSlider(root, preset[i]);
+				});
+				const group = card.querySelector("[data-tui-toggle-group]");
+				group.querySelectorAll("[data-tui-toggle]").forEach((t) => {
+					const on = t.getAttribute("data-tui-toggle-value") === scene;
+					t.setAttribute("data-state", on ? "on" : "off");
+					t.setAttribute("aria-pressed", on ? "true" : "false");
+				});
+				group.setAttribute("data-tui-toggle-group-value", scene);
+			});
+			document.addEventListener("change", (e) => {
+				if (!e.target.matches || !e.target.matches("[data-tui-switch-input]")) return;
+				const card = e.target.closest("[data-kitchen-island]");
+				if (!card) return;
+				const disabled = !e.target.checked;
+				card.querySelectorAll("[data-tui-toggle]").forEach((t) => {
+					t.disabled = disabled;
+				});
+				// The slider's Disabled prop pendant: root + control carry
+				// data-disabled (behavior + 50% opacity), the thumb loses its
+				// tab stop.
+				card.querySelectorAll("[data-tui-slider]").forEach((root) => {
+					root.toggleAttribute("data-disabled", disabled);
+					root.querySelector("[data-tui-slider-control]").toggleAttribute("data-disabled", disabled);
+					const thumb = root.querySelector("[data-tui-slider-thumb]");
+					thumb.toggleAttribute("data-disabled", disabled);
+					if (disabled) {
+						thumb.setAttribute("aria-disabled", "true");
+					} else {
+						thumb.removeAttribute("aria-disabled");
+					}
+					thumb.setAttribute("tabindex", disabled ? "-1" : "0");
+				});
+			});
+		})();
+	</script>
 }
 
 templ cardSavingsTargets() {
@@ -1683,7 +1772,7 @@ templ cardEmptyConnectBank() {
 }
 
 templ cardRollerShades() {
-	@card.Card() {
+	@card.Card(card.Props{Attributes: templ.Attributes{"data-roller-shades": ""}}) {
 		@card.Header() {
 			@card.Title() {
 				Living Room
@@ -1694,7 +1783,7 @@ templ cardRollerShades() {
 		}
 		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
 			<div class="flex h-32 flex-col overflow-hidden rounded-lg border bg-muted">
-				<div class="bg-muted-foreground transition-all duration-300" style="height: 50%"></div>
+				<div data-roller-shade class="bg-muted-foreground transition-all duration-300" style="height: 50%"></div>
 			</div>
 			<div class="flex items-center gap-3">
 				<span class="text-xs font-medium tracking-wider text-muted-foreground uppercase">Open</span>
@@ -1721,17 +1810,97 @@ templ cardRollerShades() {
 			}
 		}
 	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		// The vanilla pendant of roller-shades.tsx's position state: the
+		// slider drives the shade height, the derived preset (<=10 open,
+		// >=90 closed, else half) drives the toggle group, and the toggle
+		// group is controlled, so unpressing keeps the current preset.
+		(() => {
+			if (window.__tuiDemoRollerShades) return;
+			window.__tuiDemoRollerShades = true;
+			const POSITIONS = { open: 0, half: 50, closed: 100 };
+			const presetOf = (v) => (v <= 10 ? "open" : v >= 90 ? "closed" : "half");
+			// slider.js render() for the single horizontal thumb: the demo sets
+			// the value from outside, so it repeats the edge-aligned math.
+			const setSlider = (root, v) => {
+				const min = parseFloat(root.getAttribute("data-min") || "0");
+				const max = parseFloat(root.getAttribute("data-max") || "100");
+				const f = max === min ? 0 : Math.min(1, Math.max(0, (v - min) / (max - min)));
+				const thumb = root.querySelector("[data-tui-slider-thumb]");
+				thumb.setAttribute("aria-valuenow", String(v));
+				thumb.style.left = "calc(" + (f * 100).toFixed(4) + "% - " + (f * 12).toFixed(2) + "px)";
+				const range = root.querySelector("[data-tui-slider-range]");
+				range.style.left = "0";
+				range.style.width = "calc(" + (f * 100).toFixed(4) + "% + " + (6 - f * 12).toFixed(2) + "px)";
+			};
+			const render = (card, v) => {
+				card.querySelector("[data-roller-shade]").style.height = v + "%";
+				const preset = presetOf(v);
+				const group = card.querySelector("[data-tui-toggle-group]");
+				group.querySelectorAll("[data-tui-toggle]").forEach((t) => {
+					const on = t.getAttribute("data-tui-toggle-value") === preset;
+					t.setAttribute("data-state", on ? "on" : "off");
+					t.setAttribute("aria-pressed", on ? "true" : "false");
+				});
+				group.setAttribute("data-tui-toggle-group-value", preset);
+			};
+			document.addEventListener("slider-change", (e) => {
+				const card = e.target.closest("[data-roller-shades]");
+				if (!card) return;
+				render(card, e.detail.values[0]);
+			});
+			document.addEventListener("toggle-change", (e) => {
+				const card = e.target.closest("[data-roller-shades]");
+				if (!card) return;
+				const sliderRoot = card.querySelector("[data-tui-slider]");
+				let v;
+				if (e.detail.pressed && e.detail.value in POSITIONS) {
+					v = POSITIONS[e.detail.value];
+					setSlider(sliderRoot, v);
+				} else {
+					// Unpressing keeps the position; render re-asserts the
+					// controlled preset.
+					v = parseFloat(sliderRoot.querySelector("[data-tui-slider-thumb]").getAttribute("aria-valuenow"));
+				}
+				render(card, v);
+			});
+		})();
+	</script>
 }
 
 var stockTickers = []string{"VOO", "VIG", "AAPL", "MSFT", "GOOGL", "AMZN", "TSLA"}
 
-var stockPerformanceData = []chart.Datum{
-	{"month": "Jan", "price": 412},
-	{"month": "Feb", "price": 438},
-	{"month": "Mar", "price": 395},
-	{"month": "Apr", "price": 450},
-	{"month": "May", "price": 420},
-	{"month": "Jun", "price": 462},
+// stockPerformancePanels are the source's CHART_DATA entries plus its
+// DEFAULT_DATA fallback for every other ticker; the combobox toggles the
+// SSR rendered variants like the interactive chart demos.
+var stockPerformancePanels = []struct {
+	Key  string
+	Data []chart.Datum
+}{
+	{"VOO", []chart.Datum{
+		{"month": "Jan", "price": 412},
+		{"month": "Feb", "price": 438},
+		{"month": "Mar", "price": 395},
+		{"month": "Apr", "price": 450},
+		{"month": "May", "price": 420},
+		{"month": "Jun", "price": 462},
+	}},
+	{"AAPL", []chart.Datum{
+		{"month": "Jan", "price": 185},
+		{"month": "Feb", "price": 210},
+		{"month": "Mar", "price": 172},
+		{"month": "Apr", "price": 198},
+		{"month": "May", "price": 178},
+		{"month": "Jun", "price": 215},
+	}},
+	{"default", []chart.Datum{
+		{"month": "Jan", "price": 100},
+		{"month": "Feb", "price": 118},
+		{"month": "Mar", "price": 95},
+		{"month": "Apr", "price": 125},
+		{"month": "May", "price": 108},
+		{"month": "Jun", "price": 130},
+	}},
 }
 
 var stockPerformanceConfig = chart.Config{
@@ -1739,7 +1908,7 @@ var stockPerformanceConfig = chart.Config{
 }
 
 templ cardStockPerformance() {
-	@card.Card() {
+	@card.Card(card.Props{Attributes: templ.Attributes{"data-stock-performance": ""}}) {
 		@card.Header() {
 			@card.Title() {
 				Stock Performance
@@ -1773,34 +1942,59 @@ templ cardStockPerformance() {
 			}
 			@separator.Separator(separator.Props{Class: "style-sera:hidden"})
 			@chart.Container(chart.ContainerProps{ID: "p02-stock-performance", Config: stockPerformanceConfig, Class: "h-[200px] w-full"}) {
-				@chart.AreaChart(chart.AreaChartProps{
-					AccessibilityLayer: true,
-					Data:               stockPerformanceData,
-					Margin:             &chart.Margin{Left: 0, Right: 0, Top: 8, Bottom: 0},
-				}) {
-					@chart.Defs() {
-						@chart.LinearGradient(chart.LinearGradientProps{ID: "fillPrice", X1: "0", Y1: "0", X2: "0", Y2: "1"}) {
-							<stop offset="0%" stop-color="var(--color-price)" stop-opacity="0.3"></stop>
-							<stop offset="100%" stop-color="var(--color-price)" stop-opacity="0.05"></stop>
+				for _, panel := range stockPerformancePanels {
+					<div data-stock-chart={ panel.Key } hidden?={ panel.Key != "VOO" } style="width:100%;height:100%">
+						@chart.AreaChart(chart.AreaChartProps{
+							AccessibilityLayer: true,
+							Data:               panel.Data,
+							Margin:             &chart.Margin{Left: 0, Right: 0, Top: 8, Bottom: 0},
+						}) {
+							@chart.Defs() {
+								@chart.LinearGradient(chart.LinearGradientProps{ID: "fillPrice", X1: "0", Y1: "0", X2: "0", Y2: "1"}) {
+									<stop offset="0%" stop-color="var(--color-price)" stop-opacity="0.3"></stop>
+									<stop offset="100%" stop-color="var(--color-price)" stop-opacity="0.05"></stop>
+								}
+							}
+							@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
+							@chart.Tooltip(chart.TooltipProps{
+								Cursor:  chart.Bool(false),
+								Content: chart.TooltipContentProps{HideLabel: true},
+							})
+							// strokeWidth={2} of the source is not portable: chart.AreaProps
+							// has no stroke width prop.
+							@chart.Area(chart.AreaProps{
+								DataKey: "price",
+								Type:    "monotone",
+								Stroke:  "var(--color-price)",
+								Fill:    "url(#fillPrice)",
+							})
 						}
-					}
-					@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
-					@chart.Tooltip(chart.TooltipProps{
-						Cursor:  chart.Bool(false),
-						Content: chart.TooltipContentProps{HideLabel: true},
-					})
-					// strokeWidth={2} of the source is not portable: chart.AreaProps
-					// has no stroke width prop.
-					@chart.Area(chart.AreaProps{
-						DataKey: "price",
-						Type:    "monotone",
-						Stroke:  "var(--color-price)",
-						Fill:    "url(#fillPrice)",
-					})
+					</div>
 				}
 			}
 		}
 	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		// The vanilla pendant of stock-performance.tsx's ticker state:
+		// CHART_DATA[ticker] ?? DEFAULT_DATA, as SSR rendered chart variants
+		// toggled by the combobox. Clearing the combobox (null) keeps the
+		// last ticker, like the source's onValueChange guard.
+		(() => {
+			if (window.__tuiDemoStockPerformance) return;
+			window.__tuiDemoStockPerformance = true;
+			document.addEventListener("combobox-change", (e) => {
+				const card = e.target.closest("[data-stock-performance]");
+				if (!card) return;
+				const ticker = e.detail.values[0];
+				if (!ticker) return;
+				const panels = [...card.querySelectorAll("[data-stock-chart]")];
+				const key = panels.some((p) => p.getAttribute("data-stock-chart") === ticker) ? ticker : "default";
+				panels.forEach((p) => {
+					p.hidden = p.getAttribute("data-stock-chart") !== key;
+				});
+			});
+		})();
+	</script>
 }
 
 templ cardEmptyExploreCatalog() {
@@ -1954,7 +2148,7 @@ var notificationSettings = []notificationSetting{
 }
 
 templ cardNotificationSettings() {
-	@card.Card() {
+	@card.Card(card.Props{Attributes: templ.Attributes{"data-notification-settings": ""}}) {
 		@card.Header() {
 			@card.Title() {
 				Notifications
@@ -1994,6 +2188,75 @@ templ cardNotificationSettings() {
 			}
 		}
 	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		// The vanilla pendant of notification-settings.tsx's checked record:
+		// the select-all checkbox drives the items, the items drive the
+		// select-all state including Base UI's indeterminate attributes
+		// (aria-checked="mixed" + data-indeterminate), which the checkbox
+		// component itself does not model.
+		(() => {
+			if (window.__tuiDemoNotificationSettings) return;
+			window.__tuiDemoNotificationSettings = true;
+			const partsOf = (card) => {
+				const all = card.querySelector("#notify-all");
+				const items = [...card.querySelectorAll("[data-tui-checkbox-input]")].filter((i) => i !== all);
+				return { all, items };
+			};
+			const setChecked = (input, checked) => {
+				if (input.checked === checked) return;
+				input.checked = checked;
+				input.dispatchEvent(new Event("change", { bubbles: true }));
+			};
+			const syncAll = (card) => {
+				const { all, items } = partsOf(card);
+				const allChecked = items.every((i) => i.checked);
+				const someChecked = items.some((i) => i.checked) && !allChecked;
+				setChecked(all, allChecked);
+				all.indeterminate = someChecked;
+				const root = all.previousElementSibling;
+				root.setAttribute("aria-checked", someChecked ? "mixed" : String(allChecked));
+				root.toggleAttribute("data-indeterminate", someChecked);
+				const indicator = root.querySelector('[data-slot="checkbox-indicator"]');
+				indicator.toggleAttribute("data-indeterminate", someChecked);
+				// Base UI renders the indicator when checked or indeterminate.
+				indicator.hidden = !(allChecked || someChecked);
+			};
+			let updating = false;
+			document.addEventListener("change", (e) => {
+				if (updating || !e.target.matches || !e.target.matches("[data-tui-checkbox-input]")) return;
+				const card = e.target.closest("[data-notification-settings]");
+				if (!card) return;
+				const { all } = partsOf(card);
+				const target = e.target;
+				updating = true;
+				// checkbox.js's own change listener runs after this one and
+				// resets the root attributes from input.checked; the microtask
+				// re-applies the derived select-all state afterwards.
+				queueMicrotask(() => {
+					if (target === all) {
+						partsOf(card).items.forEach((i) => setChecked(i, all.checked));
+					}
+					syncAll(card);
+					updating = false;
+				});
+			});
+			// Initial render: two of four are checked, so the select-all
+			// starts indeterminate, like the source's initial state. Runs
+			// after checkbox.js's DOMContentLoaded setup pass.
+			const initial = () => {
+				setTimeout(() => {
+					updating = true;
+					document.querySelectorAll("[data-notification-settings]").forEach(syncAll);
+					updating = false;
+				}, 0);
+			};
+			if (document.readyState === "loading") {
+				document.addEventListener("DOMContentLoaded", initial);
+			} else {
+				initial();
+			}
+		})();
+	</script>
 }
 
 // The preview (item "02") wall cards, ports of
@@ -2020,7 +2283,7 @@ templ cardStyleOverview() {
 	@card.Card() {
 		@card.Content(card.ContentProps{Class: "flex flex-col gap-6 style-lyra:gap-4 style-mira:gap-4"}) {
 			<div class="flex flex-col gap-1">
-				<div class="cn-font-heading text-2xl font-medium style-lyra:text-lg style-mira:text-lg style-sera:text-lg style-sera:font-semibold style-sera:tracking-wide style-sera:uppercase">
+				<div data-style-overview-title class="cn-font-heading text-2xl font-medium style-lyra:text-lg style-mira:text-lg style-sera:text-lg style-sera:font-semibold style-sera:tracking-wide style-sera:uppercase">
 					Nova - Geist
 				</div>
 				<div class="line-clamp-2 text-base text-muted-foreground style-lyra:text-sm style-mira:text-sm style-sera:text-sm style-sera:leading-relaxed">
@@ -2043,12 +2306,61 @@ templ cardStyleOverview() {
 			</div>
 		}
 	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		// The vanilla pendant of style-overview.tsx's useDesignSystemSearchParams
+		// wiring: the title derives from the live style/font params. Initial
+		// paint from the iframe URL (same preset decoding as create-preview.js),
+		// updates from the parent's design-system-params postMessage.
+		(() => {
+			if (window.__tuiDemoStyleOverviewTitle) return;
+			window.__tuiDemoStyleOverviewTitle = true;
+			const apply = (p) => {
+				const cfg = window.tuiCreateConfig;
+				const el = document.querySelector("[data-style-overview-title]");
+				if (!cfg || !el || !p) return;
+				const style = cfg.STYLES.find((s) => s.name === p.style);
+				const font = cfg.FONTS.find((f) => f.value === p.font);
+				const heading = cfg.FONTS.find((f) => f.value === p.fontHeading);
+				const fontName = font ? font.name : "";
+				const headingName = heading ? heading.name : "";
+				el.textContent =
+					(style ? style.title : "") +
+					" - " +
+					(headingName && headingName !== fontName ? headingName : fontName);
+			};
+			const initialParams = () => {
+				const cfg = window.tuiCreateConfig;
+				const preset = window.tuiPreset;
+				if (!cfg) return null;
+				const p = Object.assign({}, cfg.DEFAULT_CONFIG);
+				const code = new URLSearchParams(window.location.search).get("preset");
+				if (code && preset && preset.isPresetCode(code)) {
+					const decoded = preset.decodePreset(code);
+					if (decoded) Object.assign(p, decoded);
+				}
+				return p;
+			};
+			window.addEventListener("message", (event) => {
+				if (event.origin !== window.location.origin) return;
+				const data = event.data;
+				if (data && typeof data === "object" && data.type === "design-system-params" && data.data) {
+					apply(data.data);
+				}
+			});
+			const init = () => apply(initialParams());
+			if (document.readyState === "loading") {
+				document.addEventListener("DOMContentLoaded", init);
+			} else {
+				init();
+			}
+		})();
+	</script>
 }
 
 templ cardTypographySpecimen() {
 	@card.Card() {
 		@card.Content(card.ContentProps{Class: "flex flex-col gap-2"}) {
-			<div class="text-xs font-medium text-muted-foreground uppercase">
+			<div data-typography-specimen-title class="text-xs font-medium text-muted-foreground uppercase">
 				Inherit - Geist
 			</div>
 			<p class="cn-font-heading text-2xl font-medium style-sera:text-lg style-sera:font-semibold style-sera:tracking-wider style-sera:uppercase">
@@ -2137,6 +2449,53 @@ templ cardTypographySpecimen() {
 			}
 		}
 	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		// The vanilla pendant of typography-specimen.tsx's
+		// useDesignSystemSearchParams wiring: headingLabel falls back to
+		// "Inherit", bodyLabel to "Default". Same params plumbing as the
+		// style overview card above.
+		(() => {
+			if (window.__tuiDemoTypographySpecimenTitle) return;
+			window.__tuiDemoTypographySpecimenTitle = true;
+			const apply = (p) => {
+				const cfg = window.tuiCreateConfig;
+				const el = document.querySelector("[data-typography-specimen-title]");
+				if (!cfg || !el || !p) return;
+				const font = cfg.FONTS.find((f) => f.value === p.font);
+				const heading = cfg.FONTS.find((f) => f.value === p.fontHeading);
+				const fontName = font ? font.name : "";
+				const headingName = heading ? heading.name : "";
+				const headingLabel = headingName && headingName !== fontName ? headingName : "Inherit";
+				const bodyLabel = fontName || "Default";
+				el.textContent = headingLabel + " - " + bodyLabel;
+			};
+			const initialParams = () => {
+				const cfg = window.tuiCreateConfig;
+				const preset = window.tuiPreset;
+				if (!cfg) return null;
+				const p = Object.assign({}, cfg.DEFAULT_CONFIG);
+				const code = new URLSearchParams(window.location.search).get("preset");
+				if (code && preset && preset.isPresetCode(code)) {
+					const decoded = preset.decodePreset(code);
+					if (decoded) Object.assign(p, decoded);
+				}
+				return p;
+			};
+			window.addEventListener("message", (event) => {
+				if (event.origin !== window.location.origin) return;
+				const data = event.data;
+				if (data && typeof data === "object" && data.type === "design-system-params" && data.data) {
+					apply(data.data);
+				}
+			});
+			const init = () => apply(initialParams());
+			if (document.readyState === "loading") {
+				document.addEventListener("DOMContentLoaded", init);
+			} else {
+				init();
+			}
+		})();
+	</script>
 }
 
 templ cardUIElements(suffix string) {
@@ -2372,7 +2731,10 @@ templ cardCodespaces() {
 							}
 						}
 						@empty.Content() {
-							@button.Button(button.Props{Size: button.SizeSm}) {
+							@button.Button(button.Props{Size: button.SizeSm, Attributes: templ.Attributes{"data-codespaces-create": ""}}) {
+								// The source mounts the spinner while isCreatingCodespace;
+								// our pendant toggles the hidden class.
+								@spinner.Spinner(spinner.Props{Class: "hidden", Attributes: templ.Attributes{"data-icon": "inline-start"}})
 								Create Codespace
 							}
 							<a href="#learn-more" class="text-xs text-muted-foreground underline underline-offset-4">
@@ -2467,6 +2829,26 @@ templ cardCodespaces() {
 			}
 		}
 	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		// The vanilla pendant of codespaces-card.tsx's isCreatingCodespace
+		// state: the button disables and shows the spinner for 2 seconds.
+		(() => {
+			if (window.__tuiDemoCodespaces) return;
+			window.__tuiDemoCodespaces = true;
+			document.addEventListener("click", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const btn = e.target.closest("[data-codespaces-create]");
+				if (!btn || btn.disabled) return;
+				const spin = btn.querySelector('[data-slot="spinner"]');
+				btn.disabled = true;
+				if (spin) spin.classList.remove("hidden");
+				setTimeout(() => {
+					btn.disabled = false;
+					if (spin) spin.classList.add("hidden");
+				}, 2000);
+			});
+		})();
+	</script>
 }
 
 templ cloneURLInputGroup(id, value string) {
@@ -3885,7 +4267,7 @@ templ cardAnomalyAlert() {
 // the live canvas animation is microphone-driven React code that has no
 // server-side pendant.
 templ cardLiveWaveform() {
-	@card.Card() {
+	@card.Card(card.Props{Attributes: templ.Attributes{"data-live-waveform": ""}}) {
 		@card.Header() {
 			@card.Title() {
 				Live Audio Waveform
@@ -3895,23 +4277,327 @@ templ cardLiveWaveform() {
 			}
 		}
 		@card.Content() {
-			<div class="relative h-full w-full" style="height: 80px" aria-label="Audio waveform idle" role="img">
-				<div class="absolute top-1/2 right-0 left-0 -translate-y-1/2 border-t-2 border-dotted border-muted-foreground/20"></div>
+			// Initial state of the source card: processing on, so the idle
+			// dotted line starts hidden.
+			<div data-waveform class="relative h-full w-full" style="height: 80px" aria-label="Processing audio" role="img">
+				<div data-waveform-idle hidden class="absolute top-1/2 right-0 left-0 -translate-y-1/2 border-t-2 border-dotted border-muted-foreground/20"></div>
 				<canvas class="block h-full w-full" aria-hidden="true"></canvas>
 			</div>
 		}
 		@card.Footer(card.FooterProps{Class: "gap-2"}) {
-			@button.Button(button.Props{Size: button.SizeSm, Variant: button.VariantOutline}) {
+			@button.Button(button.Props{Size: button.SizeSm, Variant: button.VariantOutline, Attributes: templ.Attributes{"data-waveform-listen": ""}}) {
 				Start Listening
 			}
-			@button.Button(button.Props{Size: button.SizeSm}) {
+			@button.Button(button.Props{Size: button.SizeSm, Attributes: templ.Attributes{"data-waveform-process": ""}}) {
 				Stop Processing
 			}
-			@button.Button(button.Props{Size: button.SizeSm, Variant: button.VariantOutline}) {
+			@button.Button(button.Props{Size: button.SizeSm, Variant: button.VariantOutline, Attributes: templ.Attributes{"data-waveform-mode": ""}}) {
 				Static
 			}
 		}
 	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		// The vanilla pendant of live-waveform.tsx: the LiveWaveform canvas
+		// component with the card's props baked in (height 80, barWidth 3,
+		// barGap 2, fadeEdges, barColor "gray", historySize 120) plus the
+		// card's active/processing/mode state and its three buttons.
+		(() => {
+			const card = document.querySelector("[data-live-waveform]");
+			if (!card || card.hasAttribute("data-waveform-initialized")) return;
+			card.setAttribute("data-waveform-initialized", "");
+
+			const container = card.querySelector("[data-waveform]");
+			const idleLine = card.querySelector("[data-waveform-idle]");
+			const canvas = container.querySelector("canvas");
+			const ctx = canvas.getContext("2d");
+			const listenBtn = card.querySelector("[data-waveform-listen]");
+			const processBtn = card.querySelector("[data-waveform-process]");
+			const modeBtn = card.querySelector("[data-waveform-mode]");
+
+			// The card's LiveWaveform props and the component defaults.
+			const BAR_WIDTH = 3;
+			const BAR_GAP = 2;
+			const BAR_RADIUS = 1.5;
+			const BASE_BAR_HEIGHT = 4;
+			const SENSITIVITY = 1;
+			const SMOOTHING = 0.8;
+			const FFT_SIZE = 256;
+			const HISTORY_SIZE = 120;
+			const UPDATE_RATE = 30;
+			const FADE_WIDTH = 24;
+			const BAR_COLOR = "gray";
+
+			// Card state (useState) and the component's refs.
+			let active = false;
+			let processing = true;
+			let mode = "static";
+			let history = [];
+			let staticBars = [];
+			let lastActiveData = [];
+			let transitionProgress = 0;
+			let needsRedraw = true;
+			let gradientCache = null;
+			let lastWidth = 0;
+			let lastUpdate = 0;
+			let procRaf = 0;
+			let analyser = null;
+			let audioContext = null;
+			let stream = null;
+
+			// Canvas resizing effect.
+			new ResizeObserver(() => {
+				const rect = container.getBoundingClientRect();
+				const dpr = window.devicePixelRatio || 1;
+				canvas.width = rect.width * dpr;
+				canvas.height = rect.height * dpr;
+				canvas.style.width = rect.width + "px";
+				canvas.style.height = rect.height + "px";
+				ctx.scale(dpr, dpr);
+				gradientCache = null;
+				lastWidth = rect.width;
+				needsRedraw = true;
+			}).observe(container);
+
+			// The processing/idle effect ([processing, active, mode] deps).
+			const syncProcessing = () => {
+				if (procRaf) {
+					cancelAnimationFrame(procRaf);
+					procRaf = 0;
+				}
+				if (processing && !active) {
+					let time = 0;
+					transitionProgress = 0;
+					const animateProcessing = () => {
+						time += 0.03;
+						transitionProgress = Math.min(1, transitionProgress + 0.02);
+						const processingData = [];
+						const barCount = Math.floor(
+							(container.getBoundingClientRect().width || 200) / (BAR_WIDTH + BAR_GAP)
+						);
+						if (mode === "static") {
+							const halfCount = Math.floor(barCount / 2);
+							for (let i = 0; i < barCount; i++) {
+								const normalizedPosition = (i - halfCount) / halfCount;
+								const centerWeight = 1 - Math.abs(normalizedPosition) * 0.4;
+								const wave1 = Math.sin(time * 1.5 + normalizedPosition * 3) * 0.25;
+								const wave2 = Math.sin(time * 0.8 - normalizedPosition * 2) * 0.2;
+								const wave3 = Math.cos(time * 2 + normalizedPosition) * 0.15;
+								const processingValue = (0.2 + wave1 + wave2 + wave3) * centerWeight;
+								let finalValue = processingValue;
+								if (lastActiveData.length > 0 && transitionProgress < 1) {
+									const lastValue = lastActiveData[Math.min(i, lastActiveData.length - 1)] || 0;
+									finalValue = lastValue * (1 - transitionProgress) + processingValue * transitionProgress;
+								}
+								processingData.push(Math.max(0.05, Math.min(1, finalValue)));
+							}
+						} else {
+							for (let i = 0; i < barCount; i++) {
+								const normalizedPosition = (i - barCount / 2) / (barCount / 2);
+								const centerWeight = 1 - Math.abs(normalizedPosition) * 0.4;
+								const wave1 = Math.sin(time * 1.5 + i * 0.15) * 0.25;
+								const wave2 = Math.sin(time * 0.8 - i * 0.1) * 0.2;
+								const wave3 = Math.cos(time * 2 + i * 0.05) * 0.15;
+								const processingValue = (0.2 + wave1 + wave2 + wave3) * centerWeight;
+								let finalValue = processingValue;
+								if (lastActiveData.length > 0 && transitionProgress < 1) {
+									const lastValue = lastActiveData[Math.floor((i / barCount) * lastActiveData.length)] || 0;
+									finalValue = lastValue * (1 - transitionProgress) + processingValue * transitionProgress;
+								}
+								processingData.push(Math.max(0.05, Math.min(1, finalValue)));
+							}
+						}
+						if (mode === "static") {
+							staticBars = processingData;
+						} else {
+							history = processingData;
+						}
+						needsRedraw = true;
+						procRaf = requestAnimationFrame(animateProcessing);
+					};
+					animateProcessing();
+				} else if (!active && !processing) {
+					const hasData = mode === "static" ? staticBars.length > 0 : history.length > 0;
+					if (hasData) {
+						let fadeProgress = 0;
+						const fadeToIdle = () => {
+							fadeProgress += 0.03;
+							if (fadeProgress < 1) {
+								if (mode === "static") {
+									staticBars = staticBars.map((value) => value * (1 - fadeProgress));
+								} else {
+									history = history.map((value) => value * (1 - fadeProgress));
+								}
+								needsRedraw = true;
+								requestAnimationFrame(fadeToIdle);
+							} else if (mode === "static") {
+								staticBars = [];
+							} else {
+								history = [];
+							}
+						};
+						fadeToIdle();
+					}
+				}
+			};
+
+			// The microphone setup/teardown effect ([active] deps).
+			const syncMic = () => {
+				if (!active) {
+					if (stream) {
+						stream.getTracks().forEach((track) => track.stop());
+						stream = null;
+					}
+					if (audioContext && audioContext.state !== "closed") {
+						audioContext.close();
+					}
+					audioContext = null;
+					analyser = null;
+					return;
+				}
+				navigator.mediaDevices
+					.getUserMedia({
+						audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+					})
+					.then((s) => {
+						stream = s;
+						const AC = window.AudioContext || window.webkitAudioContext;
+						audioContext = new AC();
+						analyser = audioContext.createAnalyser();
+						analyser.fftSize = FFT_SIZE;
+						analyser.smoothingTimeConstant = SMOOTHING;
+						audioContext.createMediaStreamSource(s).connect(analyser);
+						history = [];
+					})
+					.catch(() => {});
+			};
+
+			// The persistent draw loop.
+			const animate = (currentTime) => {
+				const rect = canvas.getBoundingClientRect();
+				if (active && currentTime - lastUpdate > UPDATE_RATE) {
+					lastUpdate = currentTime;
+					if (analyser) {
+						const dataArray = new Uint8Array(analyser.frequencyBinCount);
+						analyser.getByteFrequencyData(dataArray);
+						const startFreq = Math.floor(dataArray.length * 0.05);
+						const endFreq = Math.floor(dataArray.length * 0.4);
+						const relevantData = dataArray.slice(startFreq, endFreq);
+						if (mode === "static") {
+							const barCount = Math.floor(rect.width / (BAR_WIDTH + BAR_GAP));
+							const halfCount = Math.floor(barCount / 2);
+							const newBars = [];
+							for (let i = halfCount - 1; i >= 0; i--) {
+								const dataIndex = Math.floor((i / halfCount) * relevantData.length);
+								newBars.push(Math.max(0.05, Math.min(1, (relevantData[dataIndex] / 255) * SENSITIVITY)));
+							}
+							for (let i = 0; i < halfCount; i++) {
+								const dataIndex = Math.floor((i / halfCount) * relevantData.length);
+								newBars.push(Math.max(0.05, Math.min(1, (relevantData[dataIndex] / 255) * SENSITIVITY)));
+							}
+							staticBars = newBars;
+							lastActiveData = newBars;
+						} else {
+							let sum = 0;
+							for (let i = 0; i < relevantData.length; i++) {
+								sum += relevantData[i];
+							}
+							const average = (sum / relevantData.length / 255) * SENSITIVITY;
+							history.push(Math.min(1, Math.max(0.05, average)));
+							lastActiveData = [...history];
+							if (history.length > HISTORY_SIZE) {
+								history.shift();
+							}
+						}
+						needsRedraw = true;
+					}
+				}
+				if (!needsRedraw && !active) {
+					requestAnimationFrame(animate);
+					return;
+				}
+				needsRedraw = active;
+				ctx.clearRect(0, 0, rect.width, rect.height);
+				const step = BAR_WIDTH + BAR_GAP;
+				const barCount = Math.floor(rect.width / step);
+				const centerY = rect.height / 2;
+				const bars = mode === "static" ? staticBars : history;
+				for (let i = 0; i < barCount && i < bars.length; i++) {
+					const value = (mode === "static" ? bars[i] : bars[bars.length - 1 - i]) || 0.1;
+					const x = mode === "static" ? i * step : rect.width - (i + 1) * step;
+					const bh = Math.max(BASE_BAR_HEIGHT, value * rect.height * 0.8);
+					const y = centerY - bh / 2;
+					ctx.fillStyle = BAR_COLOR;
+					ctx.globalAlpha = 0.4 + value * 0.6;
+					if (BAR_RADIUS > 0) {
+						ctx.beginPath();
+						ctx.roundRect(x, y, BAR_WIDTH, bh, BAR_RADIUS);
+						ctx.fill();
+					} else {
+						ctx.fillRect(x, y, BAR_WIDTH, bh);
+					}
+				}
+				if (FADE_WIDTH > 0 && rect.width > 0) {
+					if (!gradientCache || lastWidth !== rect.width) {
+						const gradient = ctx.createLinearGradient(0, 0, rect.width, 0);
+						const fadePercent = Math.min(0.3, FADE_WIDTH / rect.width);
+						gradient.addColorStop(0, "rgba(255,255,255,1)");
+						gradient.addColorStop(fadePercent, "rgba(255,255,255,0)");
+						gradient.addColorStop(1 - fadePercent, "rgba(255,255,255,0)");
+						gradient.addColorStop(1, "rgba(255,255,255,1)");
+						gradientCache = gradient;
+						lastWidth = rect.width;
+					}
+					ctx.globalCompositeOperation = "destination-out";
+					ctx.fillStyle = gradientCache;
+					ctx.fillRect(0, 0, rect.width, rect.height);
+					ctx.globalCompositeOperation = "source-over";
+				}
+				ctx.globalAlpha = 1;
+				requestAnimationFrame(animate);
+			};
+			requestAnimationFrame(animate);
+
+			const setVariant = (btn, on) => {
+				btn.classList.toggle("cn-button-variant-default", on);
+				btn.classList.toggle("cn-button-variant-outline", !on);
+			};
+			const syncUI = () => {
+				idleLine.hidden = active || processing;
+				container.setAttribute(
+					"aria-label",
+					active ? "Live audio waveform" : processing ? "Processing audio" : "Audio waveform idle"
+				);
+				setVariant(listenBtn, active);
+				listenBtn.textContent = (active ? "Stop" : "Start") + " Listening";
+				setVariant(processBtn, processing);
+				processBtn.textContent = (processing ? "Stop" : "Start") + " Processing";
+				modeBtn.textContent = mode === "static" ? "Static" : "Scrolling";
+			};
+
+			listenBtn.addEventListener("click", () => {
+				active = !active;
+				if (active) processing = false;
+				syncMic();
+				syncProcessing();
+				syncUI();
+			});
+			processBtn.addEventListener("click", () => {
+				processing = !processing;
+				if (processing) active = false;
+				syncMic();
+				syncProcessing();
+				syncUI();
+			});
+			modeBtn.addEventListener("click", () => {
+				mode = mode === "static" ? "scrolling" : "static";
+				syncProcessing();
+				syncUI();
+			});
+
+			// Initial state: processing runs from mount.
+			syncProcessing();
+		})();
+	</script>
 }
 
 var visitorsChartData = []chart.Datum{

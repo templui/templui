@@ -19,11 +19,10 @@ templ createPreviewContent(item string) {
 	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-config.js") }></script>
 	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-themes.js") }></script>
 	<script defer nonce={ templ.GetNonce(ctx) } src={ utils.ScriptURL("/assets/js/create-preview.js") }></script>
-	// Component scripts the shared preview layout does not load yet.
-	<script defer src={ utils.ScriptURL("/components/js/accordion/accordion.min.js") }></script>
-	<script defer src={ utils.ScriptURL("/components/js/combobox/combobox.min.js") }></script>
-	<script defer src={ utils.ScriptURL("/components/js/inputgroup/inputgroup.min.js") }></script>
-	<script defer src={ utils.ScriptURL("/components/js/toggle/toggle.min.js") }></script>
+	// The shared preview layout loads the full component bundle
+	// (components.Scripts()); loading any component .min.js here again would
+	// double-bind its document-level listeners (a doubled toggle click
+	// handler cancels itself out).
 	// Item resolution like shadcn's preview/[base]/[name] route: the two
 	// static walls by name, every other name from the registry index. shadcn
 	// 404s on unknown names; inside our iframe the default wall is friendlier.
@@ -32,6 +31,11 @@ templ createPreviewContent(item string) {
 			@createPreview02Grid()
 		case item == "preview":
 			@createPreviewGrid()
+		// The palette's registry items and the docs demos are separate
+		// namespaces like shadcn's registry vs ExamplesIndex; chart-example
+		// exists in both, the registry item wins here.
+		case item == "chart-example":
+			@createRegistryItemPreview(examples.ChartExamplePage())
 		default:
 			if entry, ok := examples.Registry[item]; ok {
 				@createRegistryItemPreview(entry.Component)
