@@ -1,8 +1,6 @@
 package pages
 
 import (
-	"sort"
-	"strings"
 
 	"github.com/templui/templui/components/alertdialog"
 	"github.com/templui/templui/components/button"
@@ -13,7 +11,6 @@ import (
 	"github.com/templui/templui/components/field"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/components/input"
-	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/internal/ui/layouts"
 	"github.com/templui/templui/internal/ui/modules"
 	"github.com/templui/templui/utils"
@@ -803,32 +800,66 @@ templ createCodeDialog() {
 	}
 }
 
-// createRegistryNavItems returns every examples.Registry demo with its human
-// title (kebab-case name -> Title Case, like shadcn item titles), alphabetical
-// by title. This is our pendant of getAllItems' registry:example group.
+// createRegistryNavItems is the curated registry:example list from
+// getAllItems: one kitchen-sink page per component, names and titles
+// verbatim from registry/bases/base/examples/_registry.ts, alphabetical by
+// title (sortRegistryGroups). Docs demos are a separate namespace and never
+// appear here, exactly like shadcn's ExamplesIndex vs registry items.
 func createRegistryNavItems() []createOption {
-	items := make([]createOption, 0, len(examples.Registry))
-	for name := range examples.Registry {
-		items = append(items, createOption{Value: name, Label: createItemTitle(name)})
+	return []createOption{
+		{Value: "accordion-example", Label: "Accordion"},
+		{Value: "alert-example", Label: "Alert"},
+		{Value: "alert-dialog-example", Label: "Alert Dialog"},
+		{Value: "aspect-ratio-example", Label: "Aspect Ratio"},
+		{Value: "avatar-example", Label: "Avatar"},
+		{Value: "badge-example", Label: "Badge"},
+		{Value: "breadcrumb-example", Label: "Breadcrumb"},
+		{Value: "button-example", Label: "Button"},
+		{Value: "button-group-example", Label: "Button Group"},
+		{Value: "calendar-example", Label: "Calendar"},
+		{Value: "card-example", Label: "Card"},
+		{Value: "carousel-example", Label: "Carousel"},
+		{Value: "chart-example", Label: "Chart"},
+		{Value: "checkbox-example", Label: "Checkbox"},
+		{Value: "collapsible-example", Label: "Collapsible"},
+		{Value: "combobox-example", Label: "Combobox"},
+		{Value: "command-example", Label: "Command"},
+		{Value: "context-menu-example", Label: "Context Menu"},
+		{Value: "dialog-example", Label: "Dialog"},
+		{Value: "drawer-example", Label: "Drawer"},
+		{Value: "dropdown-menu-example", Label: "Dropdown Menu"},
+		{Value: "empty-example", Label: "Empty"},
+		{Value: "field-example", Label: "Field"},
+		{Value: "hover-card-example", Label: "Hover Card"},
+		{Value: "input-example", Label: "Input"},
+		{Value: "input-group-example", Label: "Input Group"},
+		{Value: "input-otp-example", Label: "Input OTP"},
+		{Value: "item-example", Label: "Item"},
+		{Value: "kbd-example", Label: "Kbd"},
+		{Value: "label-example", Label: "Label"},
+		{Value: "pagination-example", Label: "Pagination"},
+		{Value: "popover-example", Label: "Popover"},
+		{Value: "progress-example", Label: "Progress"},
+		{Value: "radio-group-example", Label: "Radio Group"},
+		{Value: "select-example", Label: "Select"},
+		{Value: "separator-example", Label: "Separator"},
+		{Value: "sheet-example", Label: "Sheet"},
+		{Value: "sidebar-example", Label: "Sidebar"},
+		{Value: "sidebar-floating-example", Label: "Sidebar (Floating)"},
+		{Value: "sidebar-icon-example", Label: "Sidebar (Icon)"},
+		{Value: "sidebar-inset-example", Label: "Sidebar (Inset)"},
+		{Value: "skeleton-example", Label: "Skeleton"},
+		{Value: "slider-example", Label: "Slider"},
+		{Value: "spinner-example", Label: "Spinner"},
+		{Value: "switch-example", Label: "Switch"},
+		{Value: "table-example", Label: "Table"},
+		{Value: "tabs-example", Label: "Tabs"},
+		{Value: "textarea-example", Label: "Textarea"},
+		{Value: "toast-example", Label: "Toast"},
+		{Value: "toggle-example", Label: "Toggle"},
+		{Value: "toggle-group-example", Label: "Toggle Group"},
+		{Value: "tooltip-example", Label: "Tooltip"},
 	}
-	sort.Slice(items, func(i, j int) bool {
-		if items[i].Label != items[j].Label {
-			return items[i].Label < items[j].Label
-		}
-		return items[i].Value < items[j].Value
-	})
-	return items
-}
-
-func createItemTitle(name string) string {
-	parts := strings.Split(name, "-")
-	for i, part := range parts {
-		if part == "" {
-			continue
-		}
-		parts[i] = strings.ToUpper(part[:1]) + part[1:]
-	}
-	return strings.Join(parts, " ")
 }
 
 // Search keywords appended to the command value, from SEARCH_KEYWORDS in
@@ -853,8 +884,9 @@ templ createActionMenu() {
 					No items found.
 				}
 				@command.Group() {
+					// getAllItems filters names ending in digits, so preview-02
+					// (the default item) is not listed, exactly like shadcn.
 					@createActionMenuItem("preview", "Preview", createBlockKeywords, false)
-					@createActionMenuItem("preview-02", "Preview 02", createBlockKeywords, true)
 					for _, item := range createRegistryNavItems() {
 						@createActionMenuItem(item.Value, item.Label, createExampleKeywords, false)
 					}
