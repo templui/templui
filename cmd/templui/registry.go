@@ -7,27 +7,53 @@ import (
 	"net/http"
 )
 
-// Registry defines the structure of the registry.json file.
-type Registry struct {
-	Components []ComponentDef `json:"components"`
-	Utils      []UtilDef      `json:"utils"`
+// registryFile mirrors the repo-root registry.json (shadcn's registry.json
+// schema).
+type registryFile struct {
+	Schema   string         `json:"$schema"`
+	Name     string         `json:"name"`
+	Homepage string         `json:"homepage"`
+	Items    []registryItem `json:"items"`
 }
 
-// ComponentDef describes a single component within the registry.
+// registryItem is a registry item in shadcn's registry-item.json schema (the
+// fields the CLI uses).
+type registryItem struct {
+	Name                 string             `json:"name"`
+	Type                 string             `json:"type"`
+	Title                string             `json:"title"`
+	Description          string             `json:"description"`
+	RegistryDependencies []string           `json:"registryDependencies"`
+	Files                []registryItemFile `json:"files"`
+}
+
+// registryItemFile is one files[] entry of a registry item.
+type registryItemFile struct {
+	Path string `json:"path"`
+	Type string `json:"type"`
+}
+
+// Registry is the CLI's flat view of the registry: components (registry:ui
+// items) and utils (the files of registry:lib items).
+type Registry struct {
+	Components []ComponentDef
+	Utils      []UtilDef
+}
+
+// ComponentDef describes a single component within the registry. Name is the
+// kebab-case registry item name (alert-dialog), which doubles as the docs
+// slug.
 type ComponentDef struct {
-	Name          string   `json:"name"`
-	Slug          string   `json:"slug"`
-	DisplayName   string   `json:"displayName"`
-	Description   string   `json:"description"`
-	Files         []string `json:"files"`             // Paths relative to the repository root
-	Dependencies  []string `json:"dependencies"`      // Names of other required components
-	RequiredUtils []string `json:"requiredUtils"`     // Paths to required utils relative to the repository root
+	Name         string
+	Description  string
+	Files        []string // Paths relative to the repository root
+	Dependencies []string // Names of other required registry items
 }
 
 // UtilDef describes a single utility file within the registry.
 type UtilDef struct {
-	Path        string `json:"path"` // Path relative to the repository root
-	Description string `json:"description"`
+	Path        string // Path relative to the repository root
+	Description string
 }
 
 // fetchRegistry downloads and parses the registry.json file for a given git ref.
@@ -49,10 +75,34 @@ func fetchRegistry(ref string) (Registry, error) {
 		return Registry{}, fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	var registry Registry
-	err = json.Unmarshal(body, &registry)
+	var file registryFile
+	err = json.Unmarshal(body, &file)
 	if err != nil {
 		return Registry{}, fmt.Errorf("failed to parse registry JSON (from %s): %w", registryURL, err)
+	}
+
+	var registry Registry
+	for _, item := range file.Items {
+		switch item.Type {
+		case "registry:ui":
+			files := make([]string, len(item.Files))
+			for i, f := range item.Files {
+				files[i] = f.Path
+			}
+			registry.Components = append(registry.Components, ComponentDef{
+				Name:         item.Name,
+				Description:  item.Description,
+				Files:        files,
+				Dependencies: item.RegistryDependencies,
+			})
+		case "registry:lib":
+			for _, f := range item.Files {
+				registry.Utils = append(registry.Utils, UtilDef{
+					Path:        f.Path,
+					Description: item.Description,
+				})
+			}
+		}
 	}
 
 	return registry, nil

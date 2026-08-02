@@ -16,7 +16,7 @@ description: A modal dialog that interrupts the user with important content and 
 <TabsContent value="cli">
 
 ```bash
-templui add alertdialog
+templui add alert-dialog
 ```
 
 </TabsContent>
@@ -27,7 +27,7 @@ templui add alertdialog
 
 <Step>Copy and paste the following code into your project.</Step>
 
-<ComponentSource name="alertdialog" title="components/alertdialog/alertdialog.templ" />
+<ComponentSource name="alert-dialog" title="components/alertdialog/alertdialog.templ" />
 
 The alert dialog reuses the dialog component and its script. Copy the `dialog` component as well, including `dialog.js`.
 

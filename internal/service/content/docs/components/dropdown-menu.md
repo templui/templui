@@ -16,7 +16,7 @@ description: Displays a menu to the user, such as a set of actions or functions,
 <TabsContent value="cli">
 
 ```bash
-templui add dropdownmenu
+templui add dropdown-menu
 ```
 
 </TabsContent>
@@ -27,13 +27,13 @@ templui add dropdownmenu
 
 <Step>Copy and paste the following code into your project.</Step>
 
-<ComponentSource name="dropdownmenu" title="components/dropdownmenu/dropdownmenu.templ" />
+<ComponentSource name="dropdown-menu" title="components/dropdownmenu/dropdownmenu.templ" />
 
-<ComponentSource name="dropdownmenu" title="components/dropdownmenu/dropdownmenu.js" />
+<ComponentSource name="dropdown-menu" title="components/dropdownmenu/dropdownmenu.js" />
 
-<ComponentSource name="dropdownmenu" title="components/floatingui/floating_ui_core.js" />
+<ComponentSource name="dropdown-menu" title="components/floatingui/floating_ui_core.js" />
 
-<ComponentSource name="dropdownmenu" title="components/floatingui/floating_ui_dom.js" />
+<ComponentSource name="dropdown-menu" title="components/floatingui/floating_ui_dom.js" />
 
 Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 

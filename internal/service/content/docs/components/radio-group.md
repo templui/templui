@@ -16,7 +16,7 @@ description: A set of checkable buttons, known as radio buttons, where no more t
 <TabsContent value="cli">
 
 ```bash
-templui add radiogroup
+templui add radio-group
 ```
 
 </TabsContent>
@@ -27,7 +27,7 @@ templui add radiogroup
 
 <Step>Copy and paste the following code into your project.</Step>
 
-<ComponentSource name="radiogroup" title="components/radiogroup/radiogroup.templ" />
+<ComponentSource name="radio-group" title="components/radiogroup/radiogroup.templ" />
 
 <Step>Update the import paths to match your project setup.</Step>
 

@@ -20,7 +20,7 @@ The `InputOTP` component is a native templ and vanilla JavaScript implementation
 <TabsContent value="cli">
 
 ```bash
-templui add inputotp
+templui add input-otp
 ```
 
 </TabsContent>
@@ -31,9 +31,9 @@ templui add inputotp
 
 <Step>Copy and paste the following code into your project.</Step>
 
-<ComponentSource name="inputotp" title="components/inputotp/inputotp.templ" />
+<ComponentSource name="input-otp" title="components/inputotp/inputotp.templ" />
 
-<ComponentSource name="inputotp" title="components/inputotp/inputotp.js" />
+<ComponentSource name="input-otp" title="components/inputotp/inputotp.js" />
 
 Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 

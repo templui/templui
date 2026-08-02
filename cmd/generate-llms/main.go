@@ -8,28 +8,23 @@ import (
 	"strings"
 )
 
-// Registry defines the structure of the registry.json file.
+// Registry mirrors the repo-root registry.json (shadcn's registry.json
+// schema).
 type Registry struct {
-	Components []ComponentDef `json:"components"`
-	Utils      []UtilDef      `json:"utils"`
+	Schema   string `json:"$schema"`
+	Name     string `json:"name"`
+	Homepage string `json:"homepage"`
+	Items    []Item `json:"items"`
 }
 
-// ComponentDef describes a single component within the registry.
-type ComponentDef struct {
-	Name         string   `json:"name"`
-	Slug         string   `json:"slug"`
-	DisplayName  string   `json:"displayName"`
-	Description  string   `json:"description"`
-	Files        []string `json:"files"`
-	Dependencies []string `json:"dependencies"`
-	Categories   []string `json:"categories"`
-	Tags         []string `json:"tags"`
-}
-
-// UtilDef describes a single utility file within the registry.
-type UtilDef struct {
-	Path        string `json:"path"`
-	Description string `json:"description"`
+// Item is a registry item in shadcn's registry-item.json schema (the fields
+// this generator uses).
+type Item struct {
+	Name        string   `json:"name"`
+	Type        string   `json:"type"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Categories  []string `json:"categories"`
 }
 
 // Category mappings for organizing components
@@ -53,7 +48,7 @@ var categoryOrder = []string{
 }
 
 func main() {
-	registryPath := "internal/registry/registry.json"
+	registryPath := "registry.json"
 	outputPath := "static/llms.txt"
 
 	// Read registry.json
@@ -70,9 +65,17 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Components are the registry:ui items.
+	var components []Item
+	for _, item := range registry.Items {
+		if item.Type == "registry:ui" {
+			components = append(components, item)
+		}
+	}
+
 	// Group components by category
-	componentsByCategory := make(map[string][]ComponentDef)
-	for _, comp := range registry.Components {
+	componentsByCategory := make(map[string][]Item)
+	for _, comp := range components {
 		if len(comp.Categories) == 0 {
 			// Fallback to "misc" if no category
 			componentsByCategory["misc"] = append(componentsByCategory["misc"], comp)
@@ -112,17 +115,17 @@ Components are designed to be composable, customizable, and easy to integrate in
 
 	// Components by category
 	for _, category := range categoryOrder {
-		components, exists := componentsByCategory[category]
-		if !exists || len(components) == 0 {
+		items, exists := componentsByCategory[category]
+		if !exists || len(items) == 0 {
 			continue
 		}
 
 		categoryName := categoryNames[category]
 		output.WriteString(fmt.Sprintf("## %s\n\n", categoryName))
 
-		for _, comp := range components {
-			docURL := fmt.Sprintf("https://templui.io/docs/components/%s", comp.Slug)
-			output.WriteString(fmt.Sprintf("- [%s](%s): %s\n", comp.DisplayName, docURL, comp.Description))
+		for _, comp := range items {
+			docURL := fmt.Sprintf("https://templui.io/docs/components/%s", comp.Name)
+			output.WriteString(fmt.Sprintf("- [%s](%s): %s\n", comp.Title, docURL, comp.Description))
 		}
 		output.WriteString("\n")
 	}
@@ -135,6 +138,6 @@ Components are designed to be composable, customizable, and easy to integrate in
 	}
 
 	fmt.Printf("✅ Generated %s successfully!\n", outputPath)
-	fmt.Printf("   Components: %d\n", len(registry.Components))
+	fmt.Printf("   Components: %d\n", len(components))
 	fmt.Printf("   Categories: %d\n", len(componentsByCategory))
 }

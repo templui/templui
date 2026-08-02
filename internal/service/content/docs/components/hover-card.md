@@ -16,7 +16,7 @@ description: For sighted users to preview content available behind a link.
 <TabsContent value="cli">
 
 ```bash
-templui add hovercard
+templui add hover-card
 ```
 
 </TabsContent>
@@ -27,13 +27,13 @@ templui add hovercard
 
 <Step>Copy and paste the following code into your project.</Step>
 
-<ComponentSource name="hovercard" title="components/hovercard/hovercard.templ" />
+<ComponentSource name="hover-card" title="components/hovercard/hovercard.templ" />
 
-<ComponentSource name="hovercard" title="components/hovercard/hovercard.js" />
+<ComponentSource name="hover-card" title="components/hovercard/hovercard.js" />
 
-<ComponentSource name="hovercard" title="components/floatingui/floating_ui_core.js" />
+<ComponentSource name="hover-card" title="components/floatingui/floating_ui_core.js" />
 
-<ComponentSource name="hovercard" title="components/floatingui/floating_ui_dom.js" />
+<ComponentSource name="hover-card" title="components/floatingui/floating_ui_dom.js" />
 
 Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 

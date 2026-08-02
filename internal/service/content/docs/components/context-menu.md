@@ -16,7 +16,7 @@ description: Displays a menu located at the pointer, triggered by a right click 
 <TabsContent value="cli">
 
 ```bash
-templui add contextmenu
+templui add context-menu
 ```
 
 </TabsContent>
@@ -27,13 +27,13 @@ templui add contextmenu
 
 <Step>Copy and paste the following code into your project.</Step>
 
-<ComponentSource name="contextmenu" title="components/contextmenu/contextmenu.templ" />
+<ComponentSource name="context-menu" title="components/contextmenu/contextmenu.templ" />
 
-<ComponentSource name="contextmenu" title="components/contextmenu/contextmenu.js" />
+<ComponentSource name="context-menu" title="components/contextmenu/contextmenu.js" />
 
-<ComponentSource name="contextmenu" title="components/floatingui/floating_ui_core.js" />
+<ComponentSource name="context-menu" title="components/floatingui/floating_ui_core.js" />
 
-<ComponentSource name="contextmenu" title="components/floatingui/floating_ui_dom.js" />
+<ComponentSource name="context-menu" title="components/floatingui/floating_ui_dom.js" />
 
 Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 

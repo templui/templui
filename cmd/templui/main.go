@@ -10,7 +10,7 @@ import (
 
 const (
 	configFileName = ".templui.json"
-	registryPath   = "internal/registry/registry.json" // Path to the registry within the repository
+	registryPath   = "registry.json" // Path to the registry at the repository root
 )
 
 // getVersion returns the version from build info or dev version for local builds.

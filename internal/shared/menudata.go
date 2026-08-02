@@ -20,17 +20,15 @@ type Section struct {
 
 // loadComponentsFromRegistry reads the registry and generates component links.
 func loadComponentsFromRegistry() []SideLink {
-	reg := registry.Get()
-
 	var links []SideLink
-	for _, comp := range reg.Components {
+	for _, comp := range registry.Components() {
 		links = append(links, SideLink{
-			Text: comp.DisplayName,
-			Href: "/docs/components/" + comp.Slug,
+			Text: comp.Title,
+			Href: "/docs/components/" + comp.Name,
 		})
 	}
 
-	// Sort alphabetically by display name
+	// Sort alphabetically by title
 	sort.Slice(links, func(i, j int) bool {
 		return links[i].Text < links[j].Text
 	})

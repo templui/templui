@@ -120,6 +120,27 @@ func runAdd(args []string, commandArg string, force bool, installed bool) {
 		componentMap[comp.Name] = comp
 	}
 
+	// --installed collects component directory names (components/<dir>/...),
+	// which are flat (alertdialog) while registry item names are kebab-case
+	// (alert-dialog). Translate via each component's own directory.
+	if installed {
+		dirToName := make(map[string]string)
+		for _, comp := range registry.Components {
+			if len(comp.Files) == 0 {
+				continue
+			}
+			parts := strings.SplitN(comp.Files[0], "/", 3)
+			if len(parts) >= 2 && parts[0] == "components" {
+				dirToName[parts[1]] = comp.Name
+			}
+		}
+		for i, name := range componentsToInstallNames {
+			if itemName, ok := dirToName[name]; ok {
+				componentsToInstallNames[i] = itemName
+			}
+		}
+	}
+
 	// If '*' was requested, get all component names from the registry.
 	if isInstallAll {
 		fmt.Printf("\n🚀 Preparing to install all %d components...\n", len(registry.Components))
@@ -274,7 +295,7 @@ func installComponent(
 
 			// Add version comment with documentation link and replace imports.
 			versionComment := fmt.Sprintf("// templui component %s - version: %s installed by templui %s\n", comp.Name, ref, version)
-			versionComment += fmt.Sprintf("// 📚 Documentation: https://templui.io/docs/components/%s\n", comp.Slug)
+			versionComment += fmt.Sprintf("// 📚 Documentation: https://templui.io/docs/components/%s\n", comp.Name)
 			modifiedData := append([]byte(versionComment), data...)
 			if strings.HasSuffix(repoFilePath, ".templ") || strings.HasSuffix(repoFilePath, ".go") {
 				modifiedData = replaceImports(modifiedData, config, comp.Name)
@@ -291,11 +312,6 @@ func installComponent(
 				fmt.Printf("      ✅ Installed %s\n", destPath)
 			}
 		}
-	}
-
-	// Collect required utils for later installation.
-	for _, repoUtilPath := range comp.RequiredUtils {
-		requiredUtils[repoUtilPath] = true
 	}
 
 	return nil

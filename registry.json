@@ -1,0 +1,869 @@
+{
+  "$schema": "https://templui.io/schema/registry.json",
+  "name": "templui",
+  "homepage": "https://templui.io",
+  "items": [
+    {
+      "name": "accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "Collapsible accordion component.",
+      "registryDependencies": ["icon"],
+      "files": [
+        {
+          "path": "components/accordion/accordion.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/accordion/accordion.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["layout-navigation"]
+    },
+    {
+      "name": "alert",
+      "type": "registry:ui",
+      "title": "Alert",
+      "description": "Alert component for messages and notifications.",
+      "files": [
+        {
+          "path": "components/alert/alert.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["feedback-status"]
+    },
+    {
+      "name": "alert-dialog",
+      "type": "registry:ui",
+      "title": "Alert Dialog",
+      "description": "A modal dialog that interrupts the user with important content and expects a response.",
+      "registryDependencies": ["button", "dialog"],
+      "files": [
+        {
+          "path": "components/alertdialog/alertdialog.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["overlays-dialogs"]
+    },
+    {
+      "name": "aspect-ratio",
+      "type": "registry:ui",
+      "title": "Aspect Ratio",
+      "description": "Container that maintains aspect ratio.",
+      "files": [
+        {
+          "path": "components/aspectratio/aspectratio.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["display-media"]
+    },
+    {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "description": "Avatar component for user profiles.",
+      "files": [
+        {
+          "path": "components/avatar/avatar.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/avatar/avatar.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["display-media"]
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "Badge component for labels and status indicators.",
+      "files": [
+        {
+          "path": "components/badge/badge.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["feedback-status"]
+    },
+    {
+      "name": "breadcrumb",
+      "type": "registry:ui",
+      "title": "Breadcrumb",
+      "description": "Breadcrumb navigation component.",
+      "registryDependencies": ["icon"],
+      "files": [
+        {
+          "path": "components/breadcrumb/breadcrumb.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["layout-navigation"]
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "Button component with multiple variants.",
+      "files": [
+        {
+          "path": "components/button/button.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "button-group",
+      "type": "registry:ui",
+      "title": "Button Group",
+      "description": "Group related buttons together with shared borders.",
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "components/buttongroup/buttongroup.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["layout"]
+    },
+    {
+      "name": "calendar",
+      "type": "registry:ui",
+      "title": "Calendar",
+      "description": "Calendar component for date selection.",
+      "registryDependencies": ["icon"],
+      "files": [
+        {
+          "path": "components/calendar/calendar.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/calendar/calendar.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "Card container component.",
+      "registryDependencies": ["aspect-ratio"],
+      "files": [
+        {
+          "path": "components/card/card.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["display-media"]
+    },
+    {
+      "name": "carousel",
+      "type": "registry:ui",
+      "title": "Carousel",
+      "description": "Carousel component with navigation controls.",
+      "registryDependencies": ["icon"],
+      "files": [
+        {
+          "path": "components/carousel/carousel.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/carousel/carousel.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["display-media"]
+    },
+    {
+      "name": "chart",
+      "type": "registry:ui",
+      "title": "Chart",
+      "description": "Beautiful charts. Composable chart elements with a Recharts compatible client renderer.",
+      "files": [
+        {
+          "path": "components/chart/chart.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/chart/chart.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["display-media"]
+    },
+    {
+      "name": "checkbox",
+      "type": "registry:ui",
+      "title": "Checkbox",
+      "description": "Checkbox input component.",
+      "registryDependencies": ["icon"],
+      "files": [
+        {
+          "path": "components/checkbox/checkbox.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/checkbox/checkbox.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "collapsible",
+      "type": "registry:ui",
+      "title": "Collapsible",
+      "description": "Collapsible container component.",
+      "files": [
+        {
+          "path": "components/collapsible/collapsible.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/collapsible/collapsible.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["misc"]
+    },
+    {
+      "name": "combobox",
+      "type": "registry:ui",
+      "title": "Combobox",
+      "description": "An input with a filterable list of options.",
+      "registryDependencies": ["button", "icon", "input-group"],
+      "files": [
+        {
+          "path": "components/combobox/combobox.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/combobox/combobox.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_core.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_dom.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "command",
+      "type": "registry:ui",
+      "title": "Command",
+      "description": "Fast, composable command menu.",
+      "registryDependencies": ["dialog", "icon", "input-group"],
+      "files": [
+        {
+          "path": "components/command/command.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/command/command.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["overlays-dialogs"]
+    },
+    {
+      "name": "date-picker",
+      "type": "registry:ui",
+      "title": "Date Picker",
+      "description": "A date picker pattern composed of the Calendar, Popover and Button components.",
+      "registryDependencies": ["button", "calendar", "popover"],
+      "files": [],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "sheet",
+      "type": "registry:ui",
+      "title": "Sheet",
+      "description": "Slide-out panel component (drawer).",
+      "registryDependencies": ["button", "dialog", "icon"],
+      "files": [
+        {
+          "path": "components/sheet/sheet.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["overlays-dialogs"]
+    },
+    {
+      "name": "dropdown-menu",
+      "type": "registry:ui",
+      "title": "Dropdown Menu",
+      "description": "Displays a menu of actions or options triggered by a button.",
+      "registryDependencies": ["icon"],
+      "files": [
+        {
+          "path": "components/dropdownmenu/dropdownmenu.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/dropdownmenu/dropdownmenu.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_core.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_dom.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["overlays-dialogs"]
+    },
+    {
+      "name": "icon",
+      "type": "registry:ui",
+      "title": "Icon",
+      "description": "SVG icon component library.",
+      "files": [
+        {
+          "path": "components/icon/icon_data.go",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/icon/icon_defs.go",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/icon/icon.go",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["misc"]
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "Text input component.",
+      "files": [
+        {
+          "path": "components/input/input.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "input-otp",
+      "type": "registry:ui",
+      "title": "Input OTP",
+      "description": "One-time password input component.",
+      "registryDependencies": ["input"],
+      "files": [
+        {
+          "path": "components/inputotp/inputotp.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/inputotp/inputotp.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "label",
+      "type": "registry:ui",
+      "title": "Label",
+      "description": "Form label component.",
+      "files": [
+        {
+          "path": "components/label/label.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "drawer",
+      "type": "registry:ui",
+      "title": "Drawer",
+      "description": "A panel that slides in from the edge of the screen and can be swiped away.",
+      "files": [
+        {
+          "path": "components/drawer/drawer.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/drawer/drawer.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["overlays-dialogs"]
+    },
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "Modal dialog component.",
+      "registryDependencies": ["button", "icon"],
+      "files": [
+        {
+          "path": "components/dialog/dialog.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/dialog/dialog.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["overlays-dialogs"]
+    },
+    {
+      "name": "pagination",
+      "type": "registry:ui",
+      "title": "Pagination",
+      "description": "Pagination component for lists and tables.",
+      "registryDependencies": ["button", "icon"],
+      "files": [
+        {
+          "path": "components/pagination/pagination.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["layout-navigation"]
+    },
+    {
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "description": "Floating popover component using the browser popover API and Floating UI positioning.",
+      "files": [
+        {
+          "path": "components/popover/popover.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/popover/popover.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_core.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_dom.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["overlays-dialogs"]
+    },
+    {
+      "name": "hover-card",
+      "type": "registry:ui",
+      "title": "Hover Card",
+      "description": "Displays rich content in a card when hovering over a trigger. Uses Popover for the popup.",
+      "files": [
+        {
+          "path": "components/hovercard/hovercard.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/hovercard/hovercard.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_core.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_dom.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["overlays-dialogs"]
+    },
+    {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "description": "Compose accessible form fields with labels, descriptions and errors.",
+      "files": [
+        {
+          "path": "components/field/field.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Kbd",
+      "description": "Displays a keyboard key or shortcut.",
+      "files": [
+        {
+          "path": "components/kbd/kbd.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["display-media"]
+    },
+    {
+      "name": "input-group",
+      "type": "registry:ui",
+      "title": "Input Group",
+      "description": "An input with leading or trailing addons — icons, text or buttons.",
+      "files": [
+        {
+          "path": "components/inputgroup/inputgroup.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/inputgroup/inputgroup.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "item",
+      "type": "registry:ui",
+      "title": "Item",
+      "description": "A flexible row for lists — media, title, description and actions.",
+      "files": [
+        {
+          "path": "components/item/item.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["layout-navigation"]
+    },
+    {
+      "name": "empty",
+      "type": "registry:ui",
+      "title": "Empty",
+      "description": "Placeholder for empty states — no results, first-run or offline screens.",
+      "files": [
+        {
+          "path": "components/empty/empty.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["feedback-status"]
+    },
+    {
+      "name": "spinner",
+      "type": "registry:ui",
+      "title": "Spinner",
+      "description": "Animated loading indicator built from a spinning icon.",
+      "registryDependencies": ["icon"],
+      "files": [
+        {
+          "path": "components/spinner/spinner.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["feedback-status"]
+    },
+    {
+      "name": "toggle",
+      "type": "registry:ui",
+      "title": "Toggle",
+      "description": "Two-state button, optionally grouped into a segmented control.",
+      "files": [
+        {
+          "path": "components/toggle/toggle.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/toggle/toggle.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "toggle-group",
+      "type": "registry:ui",
+      "title": "Toggle Group",
+      "description": "A set of toggles grouped into a segmented control with single or multiple selection.",
+      "registryDependencies": ["toggle"],
+      "files": [
+        {
+          "path": "components/togglegroup/togglegroup.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "context-menu",
+      "type": "registry:ui",
+      "title": "Context Menu",
+      "description": "Menu shown at the cursor on right click, with actions and shortcuts.",
+      "files": [
+        {
+          "path": "components/contextmenu/contextmenu.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/contextmenu/contextmenu.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_core.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_dom.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["overlays-dialogs"]
+    },
+    {
+      "name": "progress",
+      "type": "registry:ui",
+      "title": "Progress",
+      "description": "Progress bar component.",
+      "files": [
+        {
+          "path": "components/progress/progress.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/progress/progress.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["feedback-status"]
+    },
+    {
+      "name": "radio-group",
+      "type": "registry:ui",
+      "title": "Radio Group",
+      "description": "A set of checkable buttons, known as radio buttons, where no more than one of the buttons can be checked at a time.",
+      "files": [
+        {
+          "path": "components/radiogroup/radiogroup.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/radiogroup/radiogroup.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "Displays a list of options for the user to pick from, triggered by a button.",
+      "registryDependencies": ["icon"],
+      "files": [
+        {
+          "path": "components/select/select.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/select/select.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_core.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_dom.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "Visual divider between content sections.",
+      "files": [
+        {
+          "path": "components/separator/separator.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["layout-navigation"]
+    },
+    {
+      "name": "sidebar",
+      "type": "registry:ui",
+      "title": "Sidebar",
+      "description": "Collapsible sidebar component for app layouts.",
+      "registryDependencies": ["button", "icon", "input", "sheet", "skeleton", "tooltip"],
+      "files": [
+        {
+          "path": "components/sidebar/sidebar.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/sidebar/sidebar.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["layout-navigation"]
+    },
+    {
+      "name": "skeleton",
+      "type": "registry:ui",
+      "title": "Skeleton",
+      "description": "Skeleton loading placeholder.",
+      "files": [
+        {
+          "path": "components/skeleton/skeleton.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["feedback-status"]
+    },
+    {
+      "name": "slider",
+      "type": "registry:ui",
+      "title": "Slider",
+      "description": "Slider input component.",
+      "files": [
+        {
+          "path": "components/slider/slider.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/slider/slider.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "description": "Toggle switch component.",
+      "files": [
+        {
+          "path": "components/switch/switch.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/switch/switch.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table",
+      "description": "Table component for displaying data.",
+      "files": [
+        {
+          "path": "components/table/table.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["display-media"]
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "Tabbed interface component.",
+      "files": [
+        {
+          "path": "components/tabs/tabs.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/tabs/tabs.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["layout-navigation"]
+    },
+    {
+      "name": "textarea",
+      "type": "registry:ui",
+      "title": "Textarea",
+      "description": "Multi-line text input component.",
+      "files": [
+        {
+          "path": "components/textarea/textarea.templ",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["form-input"]
+    },
+    {
+      "name": "toast",
+      "type": "registry:ui",
+      "title": "Toast",
+      "description": "A succinct message that is displayed temporarily.",
+      "registryDependencies": ["icon"],
+      "files": [
+        {
+          "path": "components/toast/toast.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/toast/toast.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["feedback-status"]
+    },
+    {
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip",
+      "description": "Tooltip component for additional context.",
+      "files": [
+        {
+          "path": "components/tooltip/tooltip.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/tooltip/tooltip.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_core.js",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/floatingui/floating_ui_dom.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["overlays-dialogs"]
+    },
+    {
+      "name": "utils",
+      "type": "registry:lib",
+      "description": "Core utility functions, asset URLs, and component script helpers",
+      "files": [
+        {
+          "path": "utils/templui.go",
+          "type": "registry:lib"
+        }
+      ]
+    }
+  ]
+}

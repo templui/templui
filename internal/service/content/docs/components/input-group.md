@@ -16,7 +16,7 @@ description: Display additional information or actions to an input or textarea.
 <TabsContent value="cli">
 
 ```bash
-templui add inputgroup
+templui add input-group
 ```
 
 </TabsContent>
@@ -27,7 +27,7 @@ templui add inputgroup
 
 <Step>Copy and paste the following code into your project.</Step>
 
-<ComponentSource name="inputgroup" title="components/inputgroup/inputgroup.templ" />
+<ComponentSource name="input-group" title="components/inputgroup/inputgroup.templ" />
 
 Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 

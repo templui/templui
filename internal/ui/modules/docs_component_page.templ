@@ -77,10 +77,8 @@ templ ComponentSourceBlock(name, title string) {
 
 // componentSourceFiles returns a component's source paths from the registry.
 func componentSourceFiles(name string) []string {
-	for _, c := range registry.Get().Components {
-		if c.Name == name {
-			return c.Files
-		}
+	if item := registry.Find(name); item != nil {
+		return item.FilePaths()
 	}
 	return nil
 }

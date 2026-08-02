@@ -98,15 +98,6 @@ func componentSource(filePath string) ([]byte, error) {
 	return components.TemplFiles.ReadFile(strings.TrimPrefix(filePath, "components/"))
 }
 
-func findComponent(name string) *registry.ComponentDef {
-	for i, def := range registry.Get().Components {
-		if def.Name == name {
-			return &registry.Get().Components[i]
-		}
-	}
-	return nil
-}
-
 var (
 	itemMu    sync.Mutex
 	itemCache = map[string]*Item{}
@@ -121,7 +112,7 @@ func BuildStyleItem(styleName, name string) (*Item, error) {
 	if !ok {
 		return nil, nil
 	}
-	def := findComponent(name)
+	def := registry.Find(name)
 	if def == nil {
 		return nil, nil
 	}
@@ -142,32 +133,32 @@ func BuildStyleItem(styleName, name string) (*Item, error) {
 	}
 
 	files := make([]ItemFile, 0, len(def.Files))
-	for _, filePath := range def.Files {
-		src, err := componentSource(filePath)
+	for _, file := range def.Files {
+		src, err := componentSource(file.Path)
 		if err != nil {
-			return nil, fmt.Errorf("registryapi: read %s: %w", filePath, err)
+			return nil, fmt.Errorf("registryapi: read %s: %w", file.Path, err)
 		}
 		content := string(src)
-		if strings.HasSuffix(filePath, ".templ") {
+		if strings.HasSuffix(file.Path, ".templ") {
 			content, err = inliner.TransformStyle(content, styleMap, inliner.Options{})
 			if err != nil {
-				return nil, fmt.Errorf("registryapi: inline %s for %s: %w", filePath, styleName, err)
+				return nil, fmt.Errorf("registryapi: inline %s for %s: %w", file.Path, styleName, err)
 			}
 		}
 		files = append(files, ItemFile{
-			Path:    filePath,
+			Path:    file.Path,
 			Content: content,
-			Type:    "registry:ui",
+			Type:    file.Type,
 		})
 	}
 
 	item := &Item{
 		Schema:               SiteURL + "/schema/registry-item.json",
 		Name:                 def.Name,
-		RegistryDependencies: def.Dependencies,
+		RegistryDependencies: def.RegistryDependencies,
 		Files:                files,
 		Meta: &ItemMeta{
-			Links: ItemLinks{Docs: SiteURL + "/docs/components/" + def.Slug},
+			Links: ItemLinks{Docs: SiteURL + "/docs/components/" + def.Name},
 		},
 		Type: "registry:ui",
 	}

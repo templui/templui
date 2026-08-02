@@ -16,7 +16,7 @@ description: A set of two-state buttons that can be toggled on or off.
 <TabsContent value="cli">
 
 ```bash
-templui add togglegroup
+templui add toggle-group
 ```
 
 </TabsContent>
@@ -27,7 +27,7 @@ templui add togglegroup
 
 <Step>Copy and paste the following code into your project.</Step>
 
-<ComponentSource name="togglegroup" title="components/togglegroup/togglegroup.templ" />
+<ComponentSource name="toggle-group" title="components/togglegroup/togglegroup.templ" />
 
 Component scripts are loaded through the shared script bundle, see [JavaScript](/docs/installation#javascript).
 

@@ -16,7 +16,7 @@ description: Displays content within a desired ratio.
 <TabsContent value="cli">
 
 ```bash
-templui add aspectratio
+templui add aspect-ratio
 ```
 
 </TabsContent>
@@ -27,7 +27,7 @@ templui add aspectratio
 
 <Step>Copy and paste the following code into your project.</Step>
 
-<ComponentSource name="aspectratio" title="components/aspectratio/aspectratio.templ" />
+<ComponentSource name="aspect-ratio" title="components/aspectratio/aspectratio.templ" />
 
 <Step>Update the import paths to match your project setup.</Step>
 

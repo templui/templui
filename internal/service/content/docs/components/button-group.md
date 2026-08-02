@@ -16,7 +16,7 @@ description: A container that groups related buttons together with consistent st
 <TabsContent value="cli">
 
 ```bash
-templui add buttongroup
+templui add button-group
 ```
 
 </TabsContent>
@@ -27,7 +27,7 @@ templui add buttongroup
 
 <Step>Copy and paste the following code into your project.</Step>
 
-<ComponentSource name="buttongroup" title="components/buttongroup/buttongroup.templ" />
+<ComponentSource name="button-group" title="components/buttongroup/buttongroup.templ" />
 
 <Step>Update the import paths to match your project setup.</Step>
 
