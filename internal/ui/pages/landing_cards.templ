@@ -1,0 +1,1407 @@
+package pages
+
+import (
+	"strconv"
+
+	"github.com/templui/templui/components/alertdialog"
+	"github.com/templui/templui/components/badge"
+	"github.com/templui/templui/components/breadcrumb"
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/buttongroup"
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/checkbox"
+	"github.com/templui/templui/components/dropdownmenu"
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/input"
+	"github.com/templui/templui/components/inputgroup"
+	"github.com/templui/templui/components/item"
+	"github.com/templui/templui/components/progress"
+	"github.com/templui/templui/components/radiogroup"
+	selectcomp "github.com/templui/templui/components/select"
+	"github.com/templui/templui/components/separator"
+	"github.com/templui/templui/components/sidebar"
+	"github.com/templui/templui/components/skeleton"
+	switchcomp "github.com/templui/templui/components/switch"
+	"github.com/templui/templui/components/textarea"
+	"github.com/templui/templui/utils"
+)
+
+// Ports of the homepage card wall, app/(app)/(root)/cards/*.tsx. These are
+// the static homepage variants of the cards, not the interactive block
+// variants in create_preview_cards.templ (shadcn keeps two copies too): the
+// homepage ones drop recharts, react-qr-code and the "use client" state and
+// draw their charts as plain divs. Where a homepage card is literally the
+// block card, the block templ is reused instead of duplicated
+// (cardNewMilestone, cardEmptyDistributeTrack, cardTransferFunds).
+
+// pct is the Go pendant of the `${(value / max) * 100}%` inline heights the
+// source computes in JSX.
+func landingBarHeight(value, max float64) string {
+	return "height: " + strconv.FormatFloat(value/max*100, 'f', -1, 64) + "%"
+}
+
+// ---------------------------------------------------------------------------
+// ui-elements.tsx
+// ---------------------------------------------------------------------------
+templ landingCardUIElements() {
+	@card.Card(card.Props{Class: "w-full"}) {
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-6"}) {
+			<div class="flex gap-2">
+				@button.Button() {
+					Button{ " " }
+					@icon.ArrowRight(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-end"}})
+				}
+				@button.Button(button.Props{Variant: button.VariantSecondary}) {
+					Secondary
+				}
+				@button.Button(button.Props{Variant: button.VariantOutline}) {
+					Outline
+				}
+			</div>
+			@field.Group() {
+				@field.Field() {
+					@inputgroup.InputGroup() {
+						@inputgroup.Input(inputgroup.InputProps{Placeholder: "Name"})
+						@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignInlineEnd}) {
+							@inputgroup.Text() {
+								@icon.Search()
+							}
+						}
+					}
+				}
+				@field.Field(field.Props{Class: "flex-1"}) {
+					@textarea.Textarea(textarea.Props{Placeholder: "Message", Class: "resize-none"})
+				}
+			}
+			<div class="flex items-center gap-2">
+				<div class="flex gap-2">
+					@badge.Badge() {
+						Badge
+					}
+					@badge.Badge(badge.Props{Variant: badge.VariantSecondary}) {
+						Secondary
+					}
+					@badge.Badge(badge.Props{Variant: badge.VariantOutline, Class: "hidden 4xl:flex"}) {
+						Outline
+					}
+				</div>
+				@radiogroup.RadioGroup(radiogroup.Props{
+					Name:       "landing-ui-elements-fruit",
+					Value:      "apple",
+					Class:      "ml-auto flex w-fit gap-3",
+					Attributes: templ.Attributes{"aria-label": "Fruit preference"},
+				}) {
+					@radiogroup.Item(radiogroup.ItemProps{Value: "apple", Attributes: templ.Attributes{"aria-label": "Apple"}})
+					@radiogroup.Item(radiogroup.ItemProps{Value: "banana", Attributes: templ.Attributes{"aria-label": "Banana"}})
+				}
+				<div class="flex gap-3">
+					@checkbox.Checkbox(checkbox.Props{Checked: true, Attributes: templ.Attributes{"aria-label": "Enable email alerts"}})
+					@checkbox.Checkbox(checkbox.Props{Class: "hidden 4xl:flex", Attributes: templ.Attributes{"aria-label": "Enable push alerts"}})
+				</div>
+				@switchcomp.Switch(switchcomp.Props{Checked: true, Class: "flex 4xl:hidden", Attributes: templ.Attributes{"aria-label": "Enable compact notifications"}})
+			</div>
+			<div class="flex items-center gap-4">
+				@alertdialog.AlertDialog() {
+					@button.Button(button.Props{Variant: button.VariantOutline, Attributes: alertdialog.Trigger(ctx)}) {
+						<span class="hidden md:flex style-sera:md:hidden">Alert Dialog</span>
+						<span class="flex md:hidden style-sera:md:flex">Dialog</span>
+					}
+					@alertdialog.Content(alertdialog.ContentProps{Size: alertdialog.SizeSm, Class: "theme-neutral"}) {
+						@alertdialog.Header() {
+							@alertdialog.Title() {
+								Allow accessory to connect?
+							}
+							@alertdialog.Description() {
+								Do you want to allow the USB accessory to connect to this device and your data?
+							}
+						}
+						@alertdialog.Footer() {
+							@alertdialog.Cancel() {
+								Don't allow
+							}
+							@alertdialog.Action() {
+								Allow
+							}
+						}
+					}
+				}
+				@buttongroup.ButtonGroup(buttongroup.Props{Class: "ml-auto"}) {
+					@button.Button(button.Props{Variant: button.VariantOutline}) {
+						<span class="style-sera:hidden">Button Group</span>
+						<span class="hidden style-sera:block">Group</span>
+					}
+					@dropdownmenu.DropdownMenu() {
+						@button.Button(button.Props{
+							Variant:    button.VariantOutline,
+							Size:       button.SizeIcon,
+							Attributes: utils.MergeAttributes(dropdownmenu.Trigger(ctx), templ.Attributes{"aria-label": "Open quick actions"}),
+						}) {
+							@icon.ChevronUp()
+						}
+						@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignEnd, Side: dropdownmenu.SideTop, Class: "w-40"}) {
+							@dropdownmenu.Group() {
+								@dropdownmenu.Label() {
+									Quick Actions
+								}
+								@dropdownmenu.Item() {
+									Mute Conversation
+								}
+								@dropdownmenu.Item() {
+									Mark as Read
+								}
+								@dropdownmenu.Item() {
+									Block User
+								}
+							}
+							@dropdownmenu.Separator()
+							@dropdownmenu.Group() {
+								@dropdownmenu.Item(dropdownmenu.ItemProps{Variant: dropdownmenu.ItemVariantDestructive}) {
+									Delete Conversation
+								}
+							}
+						}
+					}
+				}
+				@switchcomp.Switch(switchcomp.Props{Checked: true, Class: "hidden 4xl:flex", Attributes: templ.Attributes{"aria-label": "Enable advanced setting"}})
+			</div>
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// sidebar-nav.tsx
+// ---------------------------------------------------------------------------
+
+// The hugeicons of the source mapped onto their lucide pendants, like the
+// rest of our ports.
+var landingSidebarNavSections = []struct {
+	label   string
+	class   string
+	entries []sidebarNavEntry
+}{
+	{
+		label: "Overview",
+		class: "xl:col-start-1 xl:row-start-2",
+		entries: []sidebarNavEntry{
+			{icon: icon.ChartColumn, label: "Analytics", active: true},
+			{icon: icon.ArrowLeftRight, label: "Transactions"},
+			{icon: icon.TrendingUp, label: "Investments"},
+			{icon: icon.Building2, label: "Accounts"},
+			{icon: icon.ChartPie, label: "Spending"},
+		},
+	},
+	{
+		label: "Planning",
+		class: "xl:col-start-1 xl:row-start-1",
+		entries: []sidebarNavEntry{
+			{icon: icon.FileText, label: "Documents"},
+			{icon: icon.Wallet, label: "Budget"},
+			{icon: icon.FileChartColumn, label: "Reports"},
+			{icon: icon.Target, label: "Goals"},
+			{icon: icon.Calendar, label: "Calendar"},
+		},
+	},
+	{
+		label: "Support",
+		class: "flex xl:col-start-2 xl:row-start-1",
+		entries: []sidebarNavEntry{
+			{icon: icon.CircleQuestionMark, label: "Help Center"},
+			{icon: icon.BookOpen, label: "Docs"},
+			{icon: icon.MessageSquare, label: "Contact Us"},
+			{icon: icon.Activity, label: "Status"},
+			{icon: icon.Globe, label: "Community"},
+		},
+	},
+	{
+		label: "Account",
+		class: "flex xl:col-start-2 xl:row-start-2",
+		entries: []sidebarNavEntry{
+			{icon: icon.User, label: "Profile"},
+			{icon: icon.CreditCard, label: "Billing", active: true},
+			{icon: icon.Bell, label: "Notifications"},
+			{icon: icon.Shield, label: "Security"},
+			{icon: icon.Paintbrush, label: "Appearance"},
+		},
+	},
+}
+
+templ landingCardSidebarNav() {
+	<div class="grid w-full grid-cols-2 gap-4 xl:gap-6">
+		for _, section := range landingSidebarNavSections {
+			@landingSidebarSection(section.label, section.class, section.entries)
+		}
+	</div>
+}
+
+templ landingSidebarSection(label, class string, entries []sidebarNavEntry) {
+	@card.Card(card.Props{Class: "w-full overflow-hidden rounded-3xl py-0 " + class}) {
+		@sidebar.Provider(sidebar.ProviderProps{Class: "min-h-0"}) {
+			@sidebar.Sidebar(sidebar.Props{Collapsible: sidebar.CollapsibleNone, Class: "w-full bg-transparent"}) {
+				@sidebar.Content(sidebar.ContentProps{Class: "gap-0 overflow-hidden"}) {
+					@sidebar.Group() {
+						@sidebar.GroupLabel() {
+							{ label }
+						}
+						@sidebar.GroupContent() {
+							@sidebar.Menu(sidebar.MenuProps{Class: "gap-1"}) {
+								for _, entry := range entries {
+									@sidebar.MenuItem() {
+										@sidebar.MenuButton(sidebar.MenuButtonProps{IsActive: entry.active}) {
+											@entry.icon()
+											{ entry.label }
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// savings-targets.tsx
+// ---------------------------------------------------------------------------
+
+type landingSavingsTarget struct {
+	label    string
+	amount   string
+	progress int
+	achieved string
+	saved    string
+	ariaText string
+}
+
+var landingSavingsTargets = []landingSavingsTarget{
+	{label: "Retirement", amount: "$420,000", progress: 65, achieved: "65% achieved", saved: "$273,000", ariaText: "Retirement savings progress"},
+	{label: "Real Estate", amount: "$85,000", progress: 32, achieved: "32% achieved", saved: "$27,200", ariaText: "Real estate savings progress"},
+}
+
+templ landingCardSavingsTargets() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Savings Targets
+			}
+			@card.Description() {
+				Active milestones for 2024 across your portfolio. Monitor how close you are to each savings goal.
+			}
+		}
+		@card.Content() {
+			@item.Group(item.GroupProps{Class: "gap-3"}) {
+				for _, target := range landingSavingsTargets {
+					@item.Item(item.Props{
+						Variant:    item.VariantMuted,
+						Class:      "flex-col items-stretch",
+						Attributes: templ.Attributes{"role": "listitem"},
+					}) {
+						@item.Content(item.ContentProps{Class: "gap-3"}) {
+							@item.Description(item.DescriptionProps{Class: "cn-font-heading text-xs font-medium tracking-wider text-muted-foreground uppercase"}) {
+								{ target.label }
+							}
+							<span class="text-3xl font-semibold tabular-nums">{ target.amount }</span>
+							@progress.Progress(progress.Props{Value: target.progress, Attributes: templ.Attributes{"aria-label": target.ariaText}})
+						}
+						@item.Footer() {
+							<span class="text-sm text-muted-foreground">{ target.achieved }</span>
+							<span class="text-sm font-medium tabular-nums">{ target.saved }</span>
+						}
+					}
+				}
+			}
+		}
+		@card.Footer() {
+			@card.Description(card.DescriptionProps{Class: "text-center"}) {
+				You have not met your targets for this year.
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// contribution-history.tsx
+// ---------------------------------------------------------------------------
+
+type landingContributionBar struct {
+	month  string
+	amount float64
+}
+
+var landingContributionData = []landingContributionBar{
+	{month: "Dec", amount: 800},
+	{month: "Jan", amount: 1100},
+	{month: "Feb", amount: 900},
+	{month: "Mar", amount: 1300},
+	{month: "Apr", amount: 750},
+}
+
+const landingContributionMax = 1300
+
+templ landingCardContributionHistory() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Contribution History
+			}
+			@card.Description() {
+				Last 6 months of activity
+			}
+		}
+		@card.Content() {
+			<div class="flex h-[200px] w-full items-end gap-3" role="img" aria-label="Last 6 months of contribution activity">
+				for index, bar := range landingContributionData {
+					<div class="flex h-full flex-1 flex-col justify-end gap-2">
+						<div
+							data-index={ strconv.Itoa(index) }
+							class="data-[index=5]:bg-chart-6 min-h-2 rounded-lg data-[index=0]:bg-chart-1 data-[index=1]:bg-chart-2 data-[index=2]:bg-chart-3 data-[index=3]:bg-chart-4 data-[index=4]:bg-chart-5"
+							style={ templ.SafeCSS(landingBarHeight(bar.amount, landingContributionMax)) }
+						></div>
+						<span class="text-center text-xs text-muted-foreground">{ bar.month }</span>
+					</div>
+				}
+			</div>
+		}
+		@card.Content() {
+			<div class="grid w-full grid-cols-1 gap-3 xl:grid-cols-2">
+				@item.Item(item.Props{Variant: item.VariantMuted, Class: "flex-col items-stretch"}) {
+					@item.Content(item.ContentProps{Class: "gap-1"}) {
+						@item.Description(item.DescriptionProps{Class: "text-xs font-medium tracking-wider text-muted-foreground uppercase"}) {
+							Upcoming
+						}
+						<span class="cn-font-heading text-base font-semibold">May 2024</span>
+						<span class="text-sm text-muted-foreground">Scheduled</span>
+					}
+				}
+				@item.Item(item.Props{Variant: item.VariantMuted, Class: "hidden flex-col items-stretch xl:flex"}) {
+					@item.Content(item.ContentProps{Class: "gap-1"}) {
+						@item.Description(item.DescriptionProps{Class: "text-xs font-medium tracking-wider text-muted-foreground uppercase"}) {
+							Savings Plan
+						}
+						<span class="cn-font-heading text-base font-semibold">Accelerated</span>
+						<span class="text-sm text-muted-foreground">Recurring</span>
+					}
+				}
+			</div>
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Class: "w-full"}) {
+				View Full Report
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// claimable-balance.tsx
+// ---------------------------------------------------------------------------
+// netRoyalties 1248.75 - processingFee 37.46 = 1211.29, formatted with
+// toLocaleString("en-US") like the source.
+templ landingCardClaimableBalance() {
+	@card.Card() {
+		@card.Header() {
+			@card.Description() {
+				Claimable Balance
+			}
+			@card.Title(card.TitleProps{Class: "text-4xl tabular-nums"}) {
+				$1,211.29
+			}
+			@badge.Badge(badge.Props{Variant: badge.VariantOutline}) {
+				<span class="size-2 rounded-full bg-yellow-500"></span>
+				Pending Setup
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-1 flex-col justify-end"}) {
+			@item.Item(item.Props{Variant: item.VariantMuted, Class: "flex-col items-stretch"}) {
+				@item.Content(item.ContentProps{Class: "gap-3"}) {
+					<div class="flex items-center justify-between">
+						<span class="text-sm text-muted-foreground">Net Royalties</span>
+						<span class="text-sm font-medium tabular-nums">$1,248.75</span>
+					</div>
+					<div class="flex items-center justify-between">
+						<span class="text-sm text-muted-foreground">Processing Fee</span>
+						<span class="text-sm font-medium tabular-nums">-$37.46</span>
+					</div>
+					@separator.Separator()
+					<div class="flex items-center justify-between">
+						<span class="text-sm text-muted-foreground">Total Ready to Claim</span>
+						<span class="text-sm font-semibold tabular-nums">$1,211.29 USD</span>
+					</div>
+				}
+			}
+		}
+		@card.Footer() {
+			@card.Description() {
+				Once your bank is connected, balances over $10.00 are automatically eligible for monthly distribution on the 15th of each month.
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// dividend-income.tsx
+// ---------------------------------------------------------------------------
+
+type landingHolding struct {
+	name   string
+	shares string
+	values []float64
+	max    float64
+}
+
+var landingHoldings = []landingHolding{
+	{name: "Vanguard", shares: "450 Shares", values: []float64{380, 420, 390, 652}, max: 652},
+	{name: "S&P 500 VOO", shares: "112 Shares", values: []float64{180, 210, 320, 218}, max: 320},
+	{name: "Apple AAPL", shares: "85 Shares", values: []float64{60, 70, 120, 90}, max: 120},
+	{name: "Realty Income", shares: "320 Shares", values: []float64{240, 260, 280, 360}, max: 360},
+}
+
+templ landingCardDividendIncome() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Q2 Dividend Income
+			}
+			@card.Description() {
+				Quarterly dividend payouts across your portfolio holdings.
+			}
+			@card.Action() {
+				@button.Button(button.Props{
+					Variant:    button.VariantGhost,
+					Size:       button.SizeIconSm,
+					Class:      "bg-muted",
+					Attributes: templ.Attributes{"aria-label": "Dismiss dividend income"},
+				}) {
+					@icon.X()
+				}
+			}
+		}
+		@card.Content() {
+			@item.Group() {
+				for _, holding := range landingHoldings {
+					@item.Item(item.Props{Variant: item.VariantMuted, Attributes: templ.Attributes{"role": "listitem"}}) {
+						@item.Content() {
+							@item.Title() {
+								{ holding.name }
+							}
+							@item.Description() {
+								{ holding.shares }
+							}
+						}
+						<div class="hidden h-8 w-24 items-end gap-1 md:flex" role="img" aria-label={ holding.name + " quarterly dividends" }>
+							for _, value := range holding.values {
+								<div class="min-h-1 flex-1 rounded-t-sm bg-chart-2" style={ templ.SafeCSS(landingBarHeight(value, holding.max)) }></div>
+							}
+						</div>
+					}
+				}
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// payout-threshold.tsx
+// ---------------------------------------------------------------------------
+
+var landingCurrencies = []createOption{
+	{Value: "usd", Label: "USD — United States Dollar"},
+	{Value: "eur", Label: "EUR — Euro"},
+	{Value: "gbp", Label: "GBP — British Pound"},
+	{Value: "jpy", Label: "JPY — Japanese Yen"},
+}
+
+templ landingCardPayoutThreshold() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Payout Threshold
+			}
+			@card.Description() {
+				Set the minimum balance required before a payout is triggered.
+			}
+			@card.Action() {
+				@button.Button(button.Props{
+					Variant:    button.VariantGhost,
+					Size:       button.SizeIconSm,
+					Class:      "bg-muted",
+					Attributes: templ.Attributes{"aria-label": "Dismiss payout threshold"},
+				}) {
+					@icon.X()
+				}
+			}
+		}
+		@card.Content() {
+			@field.Group() {
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "preferred-currency"}) {
+						Preferred Currency
+					}
+					@selectcomp.Select() {
+						@selectcomp.Trigger(selectcomp.TriggerProps{ID: "preferred-currency", Class: "w-full"}) {
+							@selectcomp.Value()
+						}
+						@selectcomp.Content() {
+							@selectcomp.Group() {
+								for _, currency := range landingCurrencies {
+									@selectcomp.Item(selectcomp.ItemProps{Value: currency.Value, Selected: currency.Value == "usd"}) {
+										{ currency.Label }
+									}
+								}
+							}
+						}
+					}
+				}
+				@field.Field() {
+					<div class="flex items-baseline justify-between">
+						@field.Label(field.LabelProps{ID: "min-payout-label"}) {
+							Minimum Payout Amount
+						}
+						<span class="text-2xl font-semibold tabular-nums">$2500.00</span>
+					</div>
+					@progress.Progress(progress.Props{
+						Value: 25,
+						Attributes: templ.Attributes{
+							"aria-labelledby": "min-payout-label",
+							"aria-valuetext":  "$2,500 of $10,000",
+						},
+					})
+					<div class="flex items-center justify-between">
+						@field.Description() {
+							$50 (MIN)
+						}
+						@field.Description() {
+							$10,000 (MAX)
+						}
+					</div>
+				}
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "payout-notes"}) {
+						Notes
+					}
+					@textarea.Textarea(textarea.Props{ID: "payout-notes", Placeholder: "Add any notes for this payout configuration...", Class: "min-h-[100px]"})
+				}
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Class: "w-full"}) {
+				Save Threshold
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// account-access.tsx
+// ---------------------------------------------------------------------------
+templ landingCardAccountAccess() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Account Access
+			}
+			@card.Description() {
+				Update your credentials or re-authenticate.
+			}
+		}
+		@card.Content() {
+			@field.Group() {
+				@field.Field() {
+					@field.Label(field.LabelProps{For: "email-address"}) {
+						Email Address
+					}
+					@input.Input(input.Props{ID: "email-address", Type: input.TypeEmail, Placeholder: "artist@studio.inc"})
+				}
+				@field.Field() {
+					<div class="flex items-center justify-between">
+						@field.Label(field.LabelProps{For: "current-password"}) {
+							Current Password
+						}
+						<a href="#" class="text-xs font-medium tracking-wider text-muted-foreground uppercase hover:text-foreground">
+							Forgot?
+						</a>
+					</div>
+					@input.Input(input.Props{ID: "current-password", Type: input.TypePassword, Placeholder: "••••••••••••••••••••••••"})
+				}
+			}
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-4"}) {
+			@button.Button(button.Props{Class: "w-full"}) {
+				@icon.LockKeyhole()
+				Update Security
+			}
+			@item.Item(item.Props{Variant: item.VariantMuted, Href: "#"}) {
+				@item.Media(item.MediaProps{Variant: item.MediaVariantIcon}) {
+					@icon.CircleAlert(icon.Props{Class: "text-destructive"})
+				}
+				@item.Content() {
+					@item.Title() {
+						Danger Zone
+					}
+					@item.Description(item.DescriptionProps{Class: "line-clamp-1"}) {
+						Archive account and remove catalog
+					}
+				}
+				@icon.ArrowRight(icon.Props{Class: "size-4"})
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// qr-connect.tsx
+// ---------------------------------------------------------------------------
+// The cell matrix verbatim from the source; the homepage card draws the QR as
+// a static 21x21 grid instead of react-qr-code.
+
+var landingQrCells = []string{
+	"111111100101101111111",
+	"100000101001001000001",
+	"101110101111101011101",
+	"101110100100001011101",
+	"101110101010101011101",
+	"100000100111001000001",
+	"111111101010101111111",
+	"000000001101000000000",
+	"101011111001111010110",
+	"010100001110010101001",
+	"111010111011101111010",
+	"001101000101000010101",
+	"110111101111010111011",
+	"000000001001010001010",
+	"111111101101111101001",
+	"100000100010001001111",
+	"101110101011101110100",
+	"101110100110100010011",
+	"101110101000111101110",
+	"100000101101000011001",
+	"111111101011101101111",
+}
+
+templ landingCardQrConnect() {
+	@card.Card() {
+		@card.Content(card.ContentProps{Class: "flex justify-center pt-6"}) {
+			<div class="rounded-xl border bg-white p-4">
+				<svg viewBox="0 0 21 21" class="size-40 text-black" role="img" aria-label="Connect device QR code" shape-rendering="crispEdges">
+					<rect width="21" height="21" fill="white"></rect>
+					for y, row := range landingQrCells {
+						for x, cell := range row {
+							if cell == '1' {
+								<rect x={ strconv.Itoa(x) } y={ strconv.Itoa(y) } width="1" height="1"></rect>
+							}
+						}
+					}
+				</svg>
+			</div>
+		}
+		@card.Header(card.HeaderProps{Class: "text-center"}) {
+			@card.Title() {
+				Scan to connect your mobile device
+			}
+			@card.Description(card.DescriptionProps{Class: "text-balance"}) {
+				Open the Ledger mobile app and scan this code to link your device.
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// payments.tsx
+// ---------------------------------------------------------------------------
+templ landingCardPayments() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "flex flex-col gap-3"}) {
+			@breadcrumb.Breadcrumb() {
+				@breadcrumb.List() {
+					@breadcrumb.Item() {
+						@breadcrumb.Link(breadcrumb.LinkProps{Href: "#"}) {
+							Home
+						}
+					}
+					@breadcrumb.Separator()
+					@breadcrumb.Item() {
+						@dropdownmenu.DropdownMenu() {
+							@button.Button(button.Props{
+								Size:       button.SizeIconSm,
+								Variant:    button.VariantGhost,
+								Attributes: utils.MergeAttributes(dropdownmenu.Trigger(ctx), templ.Attributes{"aria-label": "Account options"}),
+							}) {
+								@icon.Ellipsis()
+								<span class="sr-only">Account options</span>
+							}
+							@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignStart}) {
+								@dropdownmenu.Group() {
+									@dropdownmenu.Item() {
+										Profile
+									}
+									@dropdownmenu.Item() {
+										Statements
+									}
+									@dropdownmenu.Item() {
+										Documents
+									}
+								}
+							}
+						}
+					}
+					@breadcrumb.Separator()
+					@breadcrumb.Item() {
+						@breadcrumb.Page() {
+							Payments
+						}
+					}
+				}
+			}
+		}
+		@card.Content() {
+			@item.Group() {
+				@landingPaymentItem(icon.Settings, "Change transfer limit", "Adjust how much you can send from your balance.")
+				@landingPaymentItem(icon.Calendar, "Scheduled transfers", "Set up a transfer to send at a later date.")
+				@landingPaymentItem(icon.RefreshCw, "Recurring card payments", "Manage your repeated card transactions.")
+			}
+		}
+	}
+}
+
+templ landingPaymentItem(iconFn func(...icon.Props) templ.Component, title, description string) {
+	<div role="listitem" class="w-full">
+		@item.Item(item.Props{Variant: item.VariantMuted, Href: "#"}) {
+			@item.Media(item.MediaProps{Variant: item.MediaVariantIcon}) {
+				@iconFn()
+			}
+			@item.Content() {
+				@item.Title() {
+					{ title }
+				}
+				@item.Description() {
+					{ description }
+				}
+			}
+			@icon.ChevronRight(icon.Props{Class: "size-4 shrink-0 text-muted-foreground"})
+		}
+	</div>
+}
+
+// ---------------------------------------------------------------------------
+// analytics-card.tsx
+// ---------------------------------------------------------------------------
+
+const landingAnalyticsAreaPath = "M0 52L18 40L36 46L54 70L72 50L100 49V86H0Z"
+const landingAnalyticsStrokePath = "M0 52L18 40L36 46L54 70L72 50L100 49"
+
+templ landingCardAnalytics() {
+	@card.Card(card.Props{Size: card.SizeSm, Class: "mx-auto w-full max-w-sm data-[size=sm]:pb-0"}) {
+		@card.Header() {
+			@card.Title() {
+				Analytics
+			}
+			@card.Description() {
+				418.2K Visitors{ " " }
+				@badge.Badge() {
+					+10%
+				}
+			}
+			@card.Action() {
+				@button.Button(button.Props{Variant: button.VariantOutline, Size: button.SizeSm}) {
+					View Analytics
+				}
+			}
+		}
+		<svg viewBox="0 0 100 86" preserveAspectRatio="none" class="aspect-[1/0.35] w-full text-chart-1" role="img" aria-label="Visitor trend">
+			<path d={ landingAnalyticsAreaPath } fill="currentColor" opacity="0.28"></path>
+			<path d={ landingAnalyticsStrokePath } fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+		</svg>
+	}
+}
+
+// ---------------------------------------------------------------------------
+// notification-settings.tsx
+// ---------------------------------------------------------------------------
+
+type landingNotification struct {
+	id          string
+	label       string
+	description string
+	checked     bool
+}
+
+var landingNotifications = []landingNotification{
+	{id: "transactions", label: "Transaction alerts", description: "Deposits, withdrawals, and transfers.", checked: true},
+	{id: "security", label: "Security alerts", description: "Login attempts and account changes.", checked: true},
+	{id: "goals", label: "Goal milestones", description: "Updates at 25%, 50%, 75%, and 100%.", checked: false},
+	{id: "market", label: "Market updates", description: "Daily portfolio summary and price alerts.", checked: false},
+}
+
+templ landingCardNotificationSettings() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Notifications
+			}
+			@card.Description() {
+				Choose which email and push alerts you want to receive.
+			}
+		}
+		@card.Content() {
+			@field.Group() {
+				for _, notification := range landingNotifications {
+					@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
+						@checkbox.Checkbox(checkbox.Props{ID: "notify-" + notification.id, Checked: notification.checked})
+						@field.Content() {
+							@field.Label(field.LabelProps{For: "notify-" + notification.id}) {
+								{ notification.label }
+							}
+							@field.Description() {
+								{ notification.description }
+							}
+						}
+					}
+				}
+			}
+		}
+		@card.Footer() {
+			@button.Button(button.Props{Class: "w-full"}) {
+				Save Preferences
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// power-usage.tsx
+// ---------------------------------------------------------------------------
+
+type landingPowerBar struct {
+	hour  string
+	usage float64
+}
+
+var landingPowerData = []landingPowerBar{
+	{hour: "6a", usage: 1.2},
+	{hour: "8a", usage: 2.8},
+	{hour: "10a", usage: 3.1},
+	{hour: "12p", usage: 2.4},
+	{hour: "2p", usage: 3.4},
+	{hour: "4p", usage: 2.9},
+	{hour: "6p", usage: 3.8},
+	{hour: "8p", usage: 3.2},
+}
+
+const landingPowerMax = 3.8
+
+templ landingCardPowerUsage() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Power Usage
+			}
+			@card.Description() {
+				Whole Home
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			<div class="flex h-[140px] w-full items-end gap-2" role="img" aria-label="Power usage by hour">
+				for _, bar := range landingPowerData {
+					<div class="flex h-full flex-1 flex-col justify-end gap-1.5">
+						<div class="min-h-2 rounded-t bg-chart-2" style={ templ.SafeCSS(landingBarHeight(bar.usage, landingPowerMax)) }></div>
+						<span class="text-center text-xs text-muted-foreground">{ bar.hour }</span>
+					</div>
+				}
+			</div>
+			@separator.Separator()
+			<div class="grid grid-cols-2 gap-4">
+				<div class="flex flex-col gap-0.5">
+					<span class="text-sm text-muted-foreground">Currently Using</span>
+					<span class="text-lg font-semibold tabular-nums">3.4 kW</span>
+				</div>
+				<div class="flex flex-col gap-0.5">
+					<span class="text-sm text-muted-foreground">Solar Gen</span>
+					<span class="text-lg font-semibold tabular-nums">+1.2 kW</span>
+				</div>
+			</div>
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// skeleton/*.tsx - the decorative rails, aria-hidden and only visible from
+// 2200px up.
+// ---------------------------------------------------------------------------
+templ landingSkeletonUIElements() {
+	@card.Card(card.Props{Class: "w-full"}) {
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-6"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-8 w-full rounded-2xl"})
+			<div class="flex flex-wrap gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-20 rounded-lg"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-24 rounded-lg"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-20 rounded-lg"})
+			</div>
+			<div class="flex flex-col gap-3">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-20 w-full rounded-lg"})
+			</div>
+			<div class="flex items-center gap-2">
+				<div class="flex gap-2">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-12 rounded-full"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-16 rounded-full"})
+					@skeleton.Skeleton(skeleton.Props{Class: "hidden h-5 w-14 rounded-full 4xl:block"})
+				</div>
+				<div class="ml-auto flex gap-3">
+					@skeleton.Skeleton(skeleton.Props{Class: "size-4 rounded-full"})
+					@skeleton.Skeleton(skeleton.Props{Class: "size-4 rounded-full"})
+				</div>
+				<div class="flex gap-3">
+					@skeleton.Skeleton(skeleton.Props{Class: "size-4 rounded-sm"})
+					@skeleton.Skeleton(skeleton.Props{Class: "hidden size-4 rounded-sm 4xl:block"})
+				</div>
+				@skeleton.Skeleton(skeleton.Props{Class: "ml-auto h-5 w-9 rounded-full 4xl:hidden"})
+			</div>
+			<div class="flex items-center gap-4">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-24 rounded-lg"})
+				<div class="flex">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-28 rounded-l-lg rounded-r-none"})
+					@skeleton.Skeleton(skeleton.Props{Class: "ml-px h-9 w-9 rounded-l-none rounded-r-lg"})
+				</div>
+				@skeleton.Skeleton(skeleton.Props{Class: "ml-auto hidden h-5 w-9 rounded-full 4xl:block"})
+			</div>
+		}
+	}
+}
+
+templ landingSkeletonSidebarNav() {
+	<div class="grid w-full items-start gap-4 xl:grid-cols-2 xl:gap-6">
+		@card.Card(card.Props{Class: "w-full overflow-hidden rounded-3xl py-0"}) {
+			@landingSkeletonNav()
+		}
+		@card.Card(card.Props{Class: "hidden w-full overflow-hidden rounded-3xl py-0 xl:flex"}) {
+			@landingSkeletonNav()
+		}
+	</div>
+}
+
+templ landingSkeletonNav() {
+	<div class="flex flex-col gap-1 p-2">
+		for gi := 0; gi < 2; gi++ {
+			<div class="flex flex-col gap-1 px-2 py-1.5">
+				@skeleton.Skeleton(skeleton.Props{Class: "mb-1 h-3 w-20 rounded-md"})
+				for i := 0; i < 5; i++ {
+					<div class="flex items-center gap-2 px-2 py-2">
+						@skeleton.Skeleton(skeleton.Props{Class: "size-4 rounded-md"})
+						@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-24 rounded-md"})
+					</div>
+				}
+				if gi < 1 {
+					@skeleton.Skeleton(skeleton.Props{Class: "my-1 h-px w-full rounded-none"})
+				}
+			</div>
+		}
+	</div>
+}
+
+templ landingSkeletonSavingsTargets() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "gap-2"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-36 rounded-md"})
+			<div class="flex flex-col gap-1.5">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-full max-w-64 rounded-md"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-48 rounded-md"})
+			</div>
+		}
+		@card.Content() {
+			<div class="flex flex-col gap-3">
+				for i := 0; i < 2; i++ {
+					<div class="flex flex-col gap-3 rounded-xl bg-muted p-4">
+						@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-24 rounded-md bg-muted-foreground/15"})
+						@skeleton.Skeleton(skeleton.Props{Class: "h-8 w-36 rounded-md bg-muted-foreground/15"})
+						@skeleton.Skeleton(skeleton.Props{Class: "h-2 w-full rounded-full bg-muted-foreground/15"})
+						<div class="flex items-center justify-between">
+							@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-24 rounded-md bg-muted-foreground/15"})
+							@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-20 rounded-md bg-muted-foreground/15"})
+						</div>
+					</div>
+				}
+			</div>
+		}
+		@card.Footer(card.FooterProps{Class: "justify-center"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-56 rounded-md"})
+		}
+	}
+}
+
+var landingSkeletonContributionBars = []int{60, 80, 65, 95, 50, 100}
+
+templ landingSkeletonContributionHistory() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "gap-2"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-44 rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-52 rounded-md"})
+		}
+		@card.Content() {
+			<div class="flex h-[200px] w-full items-end gap-3">
+				for _, height := range landingSkeletonContributionBars {
+					<div class="flex h-full flex-1 flex-col justify-end gap-2">
+						@skeleton.Skeleton(skeleton.Props{
+							Class:      "w-full rounded-t-md rounded-b-none",
+							Attributes: templ.Attributes{"style": "height: " + strconv.Itoa(height) + "%"},
+						})
+						@skeleton.Skeleton(skeleton.Props{Class: "mx-auto h-3 w-6 rounded-md"})
+					</div>
+				}
+			</div>
+		}
+		@card.Content() {
+			<div class="grid w-full grid-cols-1 gap-3 xl:grid-cols-2">
+				<div class="flex flex-col gap-2 rounded-xl bg-muted p-4">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-20 rounded-md bg-muted-foreground/15"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-28 rounded-md bg-muted-foreground/15"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-24 rounded-md bg-muted-foreground/15"})
+				</div>
+				<div class="hidden flex-col gap-2 rounded-xl bg-muted p-4 xl:flex">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-24 rounded-md bg-muted-foreground/15"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-32 rounded-md bg-muted-foreground/15"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-28 rounded-md bg-muted-foreground/15"})
+				</div>
+			</div>
+		}
+		@card.Footer() {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+		}
+	}
+}
+
+templ landingSkeletonClaimableBalance() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "gap-3"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-36 rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-12 w-56 rounded-lg"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-6 w-32 rounded-full"})
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-1 flex-col justify-end"}) {
+			<div class="flex flex-col gap-3 rounded-xl bg-muted p-4">
+				<div class="flex items-center justify-between">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-28 rounded-md bg-muted-foreground/15"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-20 rounded-md bg-muted-foreground/15"})
+				</div>
+				<div class="flex items-center justify-between">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-32 rounded-md bg-muted-foreground/15"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-16 rounded-md bg-muted-foreground/15"})
+				</div>
+				@skeleton.Skeleton(skeleton.Props{Class: "h-px w-full rounded-none bg-muted-foreground/15"})
+				<div class="flex items-center justify-between">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-36 rounded-md bg-muted-foreground/15"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-24 rounded-md bg-muted-foreground/15"})
+				</div>
+			</div>
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-2"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-full rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-11/12 rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-3/4 rounded-md"})
+		}
+	}
+}
+
+var landingSkeletonMiniBars = []int{40, 60, 80, 50}
+
+templ landingSkeletonDividendIncome() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "gap-2"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-48 rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-64 rounded-md"})
+			@card.Action() {
+				@skeleton.Skeleton(skeleton.Props{Class: "size-8 rounded-md"})
+			}
+		}
+		@card.Content() {
+			<div class="flex flex-col gap-2">
+				for i := 0; i < 4; i++ {
+					<div class="flex items-center gap-3 rounded-xl bg-muted p-3">
+						<div class="flex flex-1 flex-col gap-2">
+							@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-28 rounded-md bg-muted-foreground/15"})
+							@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-20 rounded-md bg-muted-foreground/15"})
+						</div>
+						<div class="hidden h-8 w-24 items-end gap-1 md:flex">
+							for _, height := range landingSkeletonMiniBars {
+								@skeleton.Skeleton(skeleton.Props{
+									Class:      "flex-1 rounded-t-sm rounded-b-none bg-muted-foreground/15",
+									Attributes: templ.Attributes{"style": "height: " + strconv.Itoa(height) + "%"},
+								})
+							}
+						</div>
+						@skeleton.Skeleton(skeleton.Props{Class: "hidden h-4 w-16 rounded-md bg-muted-foreground/15 md:block"})
+					</div>
+				}
+			</div>
+		}
+	}
+}
+
+templ landingSkeletonNewMilestone() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "gap-2"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-44 rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-72 rounded-md"})
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			<div class="flex flex-col gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-20 rounded-md"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+			</div>
+			<div class="grid grid-cols-2 gap-3">
+				<div class="flex flex-col gap-2">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-24 rounded-md"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+				</div>
+				<div class="flex flex-col gap-2">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-20 rounded-md"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+				</div>
+			</div>
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-2"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+		}
+	}
+}
+
+templ landingSkeletonPayoutThreshold() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "gap-2"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-44 rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-72 rounded-md"})
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			<div class="flex flex-col gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-32 rounded-md"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+			</div>
+			<div class="flex flex-col gap-3">
+				<div class="flex items-baseline justify-between">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-40 rounded-md"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-7 w-24 rounded-md"})
+				</div>
+				@skeleton.Skeleton(skeleton.Props{Class: "h-2 w-full rounded-full"})
+				<div class="flex items-center justify-between">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-16 rounded-md"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-20 rounded-md"})
+				</div>
+			</div>
+			<div class="flex flex-col gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-16 rounded-md"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-[100px] w-full rounded-lg"})
+			</div>
+		}
+		@card.Footer() {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+		}
+	}
+}
+
+templ landingSkeletonAccountAccess() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "gap-2"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-36 rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-64 rounded-md"})
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-6"}) {
+			<div class="flex flex-col gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-24 rounded-md"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+			</div>
+			<div class="flex flex-col gap-2">
+				<div class="flex items-center justify-between">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-32 rounded-md"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-12 rounded-md"})
+				</div>
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+			</div>
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col gap-4"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-14 w-full rounded-xl"})
+		}
+	}
+}
+
+templ landingSkeletonQrConnect() {
+	@card.Card() {
+		@card.Content(card.ContentProps{Class: "flex justify-center pt-6"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "size-44 rounded-xl"})
+		}
+		@card.Header(card.HeaderProps{Class: "items-center gap-2 text-center"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-56 rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-64 rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-48 rounded-md"})
+		}
+	}
+}
+
+templ landingSkeletonTransferFunds() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "gap-2"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-36 rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-64 rounded-md"})
+			@card.Action() {
+				@skeleton.Skeleton(skeleton.Props{Class: "size-8 rounded-md"})
+			}
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			<div class="flex flex-col gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-32 rounded-md"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+			</div>
+			<div class="flex flex-col gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-24 rounded-md"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+			</div>
+			<div class="flex flex-col gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-20 rounded-md"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+			</div>
+			<div class="flex flex-col gap-3 rounded-xl bg-muted p-4">
+				<div class="flex items-center justify-between">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-28 rounded-md bg-muted-foreground/15"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-24 rounded-md bg-muted-foreground/15"})
+				</div>
+				@skeleton.Skeleton(skeleton.Props{Class: "h-px w-full rounded-none bg-muted-foreground/15"})
+				<div class="flex items-center justify-between">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-28 rounded-md bg-muted-foreground/15"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-12 rounded-md bg-muted-foreground/15"})
+				</div>
+				@skeleton.Skeleton(skeleton.Props{Class: "h-px w-full rounded-none bg-muted-foreground/15"})
+				<div class="flex items-center justify-between">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-24 rounded-md bg-muted-foreground/15"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-20 rounded-md bg-muted-foreground/15"})
+				</div>
+			</div>
+		}
+		@card.Footer() {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+		}
+	}
+}
+
+templ landingSkeletonPayments() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "flex flex-col gap-3"}) {
+			<div class="flex items-center gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-12 rounded-md"})
+				@skeleton.Skeleton(skeleton.Props{Class: "size-1.5 rounded-full"})
+				@skeleton.Skeleton(skeleton.Props{Class: "size-7 rounded-md"})
+				@skeleton.Skeleton(skeleton.Props{Class: "size-1.5 rounded-full"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-20 rounded-md"})
+			</div>
+		}
+		@card.Content() {
+			<div class="flex flex-col gap-2">
+				for i := 0; i < 3; i++ {
+					<div class="flex items-center gap-3 rounded-xl bg-muted p-3">
+						@skeleton.Skeleton(skeleton.Props{Class: "size-9 rounded-lg bg-muted-foreground/15"})
+						<div class="flex flex-1 flex-col gap-2">
+							@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-40 rounded-md bg-muted-foreground/15"})
+							@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-56 rounded-md bg-muted-foreground/15"})
+						</div>
+						@skeleton.Skeleton(skeleton.Props{Class: "size-4 rounded-md bg-muted-foreground/15"})
+					</div>
+				}
+			</div>
+		}
+	}
+}
+
+templ landingSkeletonEmptyDistributeTrack() {
+	@card.Card() {
+		@card.Content() {
+			<div class="flex flex-col items-center gap-4 p-4">
+				@skeleton.Skeleton(skeleton.Props{Class: "size-12 rounded-xl"})
+				<div class="flex flex-col items-center gap-2">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-40 rounded-md"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-64 rounded-md"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-48 rounded-md"})
+				</div>
+				@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-32 rounded-lg"})
+			</div>
+		}
+	}
+}
+
+templ landingSkeletonAnalyticsCard() {
+	@card.Card(card.Props{Size: card.SizeSm, Class: "mx-auto w-full max-w-sm data-[size=sm]:pb-0"}) {
+		@card.Header(card.HeaderProps{Class: "gap-2"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-24 rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-40 rounded-md"})
+			@card.Action() {
+				@skeleton.Skeleton(skeleton.Props{Class: "h-7 w-28 rounded-lg"})
+			}
+		}
+		@skeleton.Skeleton(skeleton.Props{Class: "mx-6 mb-6 aspect-[1/0.35] w-auto rounded-lg"})
+	}
+}
+
+templ landingSkeletonNotificationSettings() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "gap-2"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-32 rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-64 rounded-md"})
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			for i := 0; i < 4; i++ {
+				<div class="flex items-start gap-3">
+					@skeleton.Skeleton(skeleton.Props{Class: "size-4 rounded-sm"})
+					<div class="flex flex-1 flex-col gap-2">
+						@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-40 rounded-md"})
+						@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-56 rounded-md"})
+					</div>
+				</div>
+			}
+		}
+		@card.Footer() {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-9 w-full rounded-lg"})
+		}
+	}
+}
+
+var landingSkeletonPowerBars = []int{30, 70, 80, 60, 90, 75, 100, 85}
+
+templ landingSkeletonPowerUsage() {
+	@card.Card() {
+		@card.Header(card.HeaderProps{Class: "gap-2"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-32 rounded-md"})
+			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-24 rounded-md"})
+		}
+		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
+			<div class="flex h-[140px] w-full items-end gap-2">
+				for _, height := range landingSkeletonPowerBars {
+					<div class="flex h-full flex-1 flex-col justify-end gap-1.5">
+						@skeleton.Skeleton(skeleton.Props{
+							Class:      "w-full rounded-t rounded-b-none",
+							Attributes: templ.Attributes{"style": "height: " + strconv.Itoa(height) + "%"},
+						})
+						@skeleton.Skeleton(skeleton.Props{Class: "mx-auto h-3 w-5 rounded-md"})
+					</div>
+				}
+			</div>
+			@skeleton.Skeleton(skeleton.Props{Class: "h-px w-full rounded-none"})
+			<div class="grid grid-cols-2 gap-4">
+				<div class="flex flex-col gap-1.5">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-28 rounded-md"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-20 rounded-md"})
+				</div>
+				<div class="flex flex-col gap-1.5">
+					@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-20 rounded-md"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-24 rounded-md"})
+				</div>
+			</div>
+		}
+		@card.Footer(card.FooterProps{Class: "flex-col items-start gap-2"}) {
+			@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-24 rounded-md"})
+			<div class="flex w-full items-center gap-2">
+				@skeleton.Skeleton(skeleton.Props{Class: "h-2 flex-1 rounded-full"})
+				@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-10 rounded-md"})
+			</div>
+		}
+	}
+}
