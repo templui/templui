@@ -11,7 +11,9 @@ import (
 
 // MainNav is the pendant of shadcn's components/main-nav.tsx: ghost sm
 // buttons over the nav items, data-active on the current path. data-new is
-// omitted, templUI has no PAGES_NEW.
+// omitted, templUI has no PAGES_NEW. The reference imports its Button from
+// registry/new-york-v4 (the site's own legacy family); ours is the styled
+// button of the active style, so only the reference's own classes are kept.
 templ MainNav(class string) {
 	{{ path, _ := ctx.Value(ctxkeys.URLPathValue).(string) }}
 	<nav class={ utils.TwMerge("items-center gap-0", class) }>
@@ -20,7 +22,9 @@ templ MainNav(class string) {
 				Variant: button.VariantGhost,
 				Size:    button.SizeSm,
 				Href:    item.Href,
-				Class:   "px-2.5 relative items-center",
+				// "px-2.5" is the Button's class, "relative items-center" the
+				// Link's; our Href button is the one <a>, so they merge.
+				Class: "px-2.5 relative items-center",
 				Attributes: templ.Attributes{
 					"data-active": strconv.FormatBool(path == item.Href),
 				},

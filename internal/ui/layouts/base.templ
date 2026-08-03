@@ -12,7 +12,10 @@ import (
 
 templ BaseLayout(title, description string) {
 	<!DOCTYPE html>
-	<html lang="en">
+	// The header height lives on <html> like shadcn's app/layout.tsx: 14
+	// spacing units, 16 from lg up. Everything sticky (navbar, docs sidebar,
+	// toc) offsets against it.
+	<html lang="en" class="[--header-height:calc(var(--spacing)*14)] lg:[--header-height:calc(var(--spacing)*16)]">
 		<head>
 			// 2.0 beta (v2.templui.io): keep search engines out. REMOVE at the 2.0 release
 			// (tracked in COMMIT_PLAN.md, "Pre-Release / Beta").
@@ -83,14 +86,16 @@ templ BaseLayout(title, description string) {
 				})();
 			</script>
 		</head>
+		// 1:1 their body classes, plus the style-* class that picks the active
+		// style for our cn-* components (shadcn's site scopes that per preview).
 		<body
-			class="style-nova antialiased transition-colors duration-200"
+			class="group/body style-nova overscroll-none antialiased transition-colors duration-200 [--footer-height:calc(var(--spacing)*14)] xl:[--footer-height:calc(var(--spacing)*24)]"
 		>
 			// group/layout + the designer gates are the pendant of shadcn's
 		// app/(app)/layout.tsx: designer pages (data-slot="designer") pin the
 		// layout to the viewport, and the navbar's designer actions show via
 		// group-has-data-[slot=designer]/layout.
-		<div data-slot="layout" class="group/layout min-h-screen flex flex-col has-data-[slot=designer]:h-svh has-data-[slot=designer]:overflow-hidden">
+		<div data-slot="layout" class="group/layout relative z-10 flex min-h-svh flex-col bg-background has-data-[slot=designer]:h-svh has-data-[slot=designer]:overflow-hidden">
 				{ children... }
 			</div>
 			@toast.Toaster(toast.ToasterProps{ID: "toaster"})

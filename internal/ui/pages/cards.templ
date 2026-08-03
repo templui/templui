@@ -37,14 +37,114 @@ import (
 
 // pct is the Go pendant of the `${(value / max) * 100}%` inline heights the
 // source computes in JSX.
-func landingBarHeight(value, max float64) string {
+func cardsBarHeight(value, max float64) string {
 	return "height: " + strconv.FormatFloat(value/max*100, 'f', -1, 64) + "%"
+}
+
+// ---------------------------------------------------------------------------
+// index.tsx
+// ---------------------------------------------------------------------------
+
+// CardsDemo is the wall itself. theme-neutral is verbatim from the reference
+// (it supplies the greyscale --chart-* values). The reference's style comes
+// from its imports — every card pulls @/styles/base-rhea/ui/*, the generated
+// rhea build — so its markup carries flat rhea utilities and no style class;
+// ours gets there through the inliner at the call site (see IndexPage).
+templ CardsDemo() {
+	<div
+		data-slot="demo"
+		class="theme-neutral relative flex w-full max-w-none flex-col gap-(--gap) overflow-hidden bg-muted p-12 pb-0! [--gap:--spacing(8)] 3xl:[--gap:--spacing(8)] min-[1900px]:p-12 min-[1900px]:[--gap:--spacing(10)]! lg:p-6 lg:[--gap:--spacing(6)] dark:bg-background"
+	>
+		@cardsSkeletonRails()
+		<div class="relative z-10 mx-auto grid gap-(--gap) **:data-[slot=card]:w-full min-[1400px]:grid-cols-4! min-[1900px]:grid-cols-5! md:max-w-3xl md:grid-cols-2 lg:max-w-none lg:grid-cols-3 xl:max-w-[1600px] 2xl:max-w-[1900px]">
+			<div class="flex flex-col items-start gap-(--gap)">
+				@UIElements()
+				@SidebarNav()
+				@SavingsTargets()
+			</div>
+			<div class="hidden flex-col gap-(--gap) lg:flex">
+				@ContributionHistory()
+				@ClaimableBalance()
+				@DividendIncome()
+			</div>
+			<div class="hidden flex-col gap-(--gap) min-[1400px]:flex">
+				// Literally the block card, so the existing port is reused.
+				@cardNewMilestone()
+				@PayoutThreshold()
+				@AccountAccess()
+			</div>
+			<div class="hidden flex-col gap-(--gap) md:flex">
+				@QrConnect()
+				// The reference renders MessageScrollerDemo here and keeps
+				// <TransferFunds /> commented out right above it. templUI has
+				// no message-scroller component, so this slot keeps the card
+				// the reference falls back to and that its own skeleton wall
+				// still shows here: TransferFunds.
+				@cardTransferFunds()
+				@Payments()
+			</div>
+			<div class="hidden flex-col gap-(--gap) min-[1900px]:flex">
+				// Literally the block card, so the existing port is reused.
+				@cardEmptyDistributeTrack()
+				@AnalyticsCard()
+				@NotificationSettings()
+				@PowerUsage()
+			</div>
+		</div>
+		<div class="absolute inset-x-0 top-0 z-1 h-120 bg-linear-to-b from-background via-muted to-transparent dark:hidden"></div>
+		<div class="absolute inset-x-0 bottom-0 z-20 h-48 bg-linear-to-t from-background via-muted/80 to-transparent lg:h-80 xl:h-64 dark:via-background/80"></div>
+	</div>
+}
+
+// cardsSkeletonRails is CardsSkeletonRails: the decorative skeleton walls
+// left and right of the grid, only visible from 2200px up.
+templ cardsSkeletonRails() {
+	<div
+		aria-hidden="true"
+		class="pointer-events-none absolute inset-x-0 top-12 z-10 hidden min-[2200px]:block [&_[data-slot=skeleton]:nth-child(even)]:hidden"
+	>
+		<div class="absolute top-0 left-[calc(50%-950px-var(--rail-width)-var(--gap))] grid w-(--rail-width) grid-cols-[repeat(2,var(--rail-column))] gap-(--gap) opacity-50 [--rail-column:20rem] [--rail-width:calc(var(--rail-column)*2+var(--gap))]">
+			<div class="flex flex-col gap-(--gap)">
+				@SkeletonContributionHistory()
+				@SkeletonClaimableBalance()
+				@SkeletonDividendIncome()
+				@SkeletonPayoutThreshold()
+			</div>
+			<div class="flex flex-col gap-(--gap)">
+				@SkeletonUIElements()
+				@SkeletonSavingsTargets()
+				@SkeletonNewMilestone()
+				@SkeletonPayoutThreshold()
+				@SkeletonAccountAccess()
+			</div>
+		</div>
+		<div class="absolute top-0 right-[calc(50%-950px-var(--rail-width)-var(--gap))] grid w-(--rail-width) grid-cols-[repeat(2,var(--rail-column))] gap-(--gap) opacity-50 [--rail-column:20rem] [--rail-width:calc(var(--rail-column)*2+var(--gap))]">
+			<div class="flex flex-col gap-(--gap)">
+				@SkeletonNewMilestone()
+				@SkeletonPayoutThreshold()
+				@SkeletonAccountAccess()
+				@SkeletonQrConnect()
+				@SkeletonTransferFunds()
+				@SkeletonPayments()
+				@SkeletonEmptyDistributeTrack()
+			</div>
+			<div class="flex flex-col gap-(--gap)">
+				@SkeletonQrConnect()
+				@SkeletonTransferFunds()
+				@SkeletonPayments()
+				@SkeletonEmptyDistributeTrack()
+				@SkeletonAnalyticsCard()
+				@SkeletonNotificationSettings()
+				@SkeletonPowerUsage()
+			</div>
+		</div>
+	</div>
 }
 
 // ---------------------------------------------------------------------------
 // ui-elements.tsx
 // ---------------------------------------------------------------------------
-templ landingCardUIElements() {
+templ UIElements() {
 	@card.Card(card.Props{Class: "w-full"}) {
 		@card.Content(card.ContentProps{Class: "flex flex-col gap-6"}) {
 			<div class="flex gap-2">
@@ -87,7 +187,7 @@ templ landingCardUIElements() {
 					}
 				</div>
 				@radiogroup.RadioGroup(radiogroup.Props{
-					Name:       "landing-ui-elements-fruit",
+					Name:       "cards-ui-elements-fruit",
 					Value:      "apple",
 					Class:      "ml-auto flex w-fit gap-3",
 					Attributes: templ.Attributes{"aria-label": "Fruit preference"},
@@ -175,7 +275,7 @@ templ landingCardUIElements() {
 
 // The hugeicons of the source mapped onto their lucide pendants, like the
 // rest of our ports.
-var landingSidebarNavSections = []struct {
+var cardsSidebarNavSections = []struct {
 	label   string
 	class   string
 	entries []sidebarNavEntry
@@ -226,15 +326,15 @@ var landingSidebarNavSections = []struct {
 	},
 }
 
-templ landingCardSidebarNav() {
+templ SidebarNav() {
 	<div class="grid w-full grid-cols-2 gap-4 xl:gap-6">
-		for _, section := range landingSidebarNavSections {
-			@landingSidebarSection(section.label, section.class, section.entries)
+		for _, section := range cardsSidebarNavSections {
+			@sidebarSection(section.label, section.class, section.entries)
 		}
 	</div>
 }
 
-templ landingSidebarSection(label, class string, entries []sidebarNavEntry) {
+templ sidebarSection(label, class string, entries []sidebarNavEntry) {
 	@card.Card(card.Props{Class: "w-full overflow-hidden rounded-3xl py-0 " + class}) {
 		@sidebar.Provider(sidebar.ProviderProps{Class: "min-h-0"}) {
 			@sidebar.Sidebar(sidebar.Props{Collapsible: sidebar.CollapsibleNone, Class: "w-full bg-transparent"}) {
@@ -266,7 +366,7 @@ templ landingSidebarSection(label, class string, entries []sidebarNavEntry) {
 // savings-targets.tsx
 // ---------------------------------------------------------------------------
 
-type landingSavingsTarget struct {
+type cardsSavingsTarget struct {
 	label    string
 	amount   string
 	progress int
@@ -275,12 +375,12 @@ type landingSavingsTarget struct {
 	ariaText string
 }
 
-var landingSavingsTargets = []landingSavingsTarget{
+var cardsSavingsTargets = []cardsSavingsTarget{
 	{label: "Retirement", amount: "$420,000", progress: 65, achieved: "65% achieved", saved: "$273,000", ariaText: "Retirement savings progress"},
 	{label: "Real Estate", amount: "$85,000", progress: 32, achieved: "32% achieved", saved: "$27,200", ariaText: "Real estate savings progress"},
 }
 
-templ landingCardSavingsTargets() {
+templ SavingsTargets() {
 	@card.Card() {
 		@card.Header() {
 			@card.Title() {
@@ -292,7 +392,7 @@ templ landingCardSavingsTargets() {
 		}
 		@card.Content() {
 			@item.Group(item.GroupProps{Class: "gap-3"}) {
-				for _, target := range landingSavingsTargets {
+				for _, target := range cardsSavingsTargets {
 					@item.Item(item.Props{
 						Variant:    item.VariantMuted,
 						Class:      "flex-col items-stretch",
@@ -325,12 +425,12 @@ templ landingCardSavingsTargets() {
 // contribution-history.tsx
 // ---------------------------------------------------------------------------
 
-type landingContributionBar struct {
+type cardsContributionBar struct {
 	month  string
 	amount float64
 }
 
-var landingContributionData = []landingContributionBar{
+var cardsContributionData = []cardsContributionBar{
 	{month: "Dec", amount: 800},
 	{month: "Jan", amount: 1100},
 	{month: "Feb", amount: 900},
@@ -338,9 +438,9 @@ var landingContributionData = []landingContributionBar{
 	{month: "Apr", amount: 750},
 }
 
-const landingContributionMax = 1300
+const cardsContributionMax = 1300
 
-templ landingCardContributionHistory() {
+templ ContributionHistory() {
 	@card.Card() {
 		@card.Header() {
 			@card.Title() {
@@ -352,12 +452,12 @@ templ landingCardContributionHistory() {
 		}
 		@card.Content() {
 			<div class="flex h-[200px] w-full items-end gap-3" role="img" aria-label="Last 6 months of contribution activity">
-				for index, bar := range landingContributionData {
+				for index, bar := range cardsContributionData {
 					<div class="flex h-full flex-1 flex-col justify-end gap-2">
 						<div
 							data-index={ strconv.Itoa(index) }
 							class="data-[index=5]:bg-chart-6 min-h-2 rounded-lg data-[index=0]:bg-chart-1 data-[index=1]:bg-chart-2 data-[index=2]:bg-chart-3 data-[index=3]:bg-chart-4 data-[index=4]:bg-chart-5"
-							style={ templ.SafeCSS(landingBarHeight(bar.amount, landingContributionMax)) }
+							style={ templ.SafeCSS(cardsBarHeight(bar.amount, cardsContributionMax)) }
 						></div>
 						<span class="text-center text-xs text-muted-foreground">{ bar.month }</span>
 					</div>
@@ -399,7 +499,7 @@ templ landingCardContributionHistory() {
 // ---------------------------------------------------------------------------
 // netRoyalties 1248.75 - processingFee 37.46 = 1211.29, formatted with
 // toLocaleString("en-US") like the source.
-templ landingCardClaimableBalance() {
+templ ClaimableBalance() {
 	@card.Card() {
 		@card.Header() {
 			@card.Description() {
@@ -444,21 +544,21 @@ templ landingCardClaimableBalance() {
 // dividend-income.tsx
 // ---------------------------------------------------------------------------
 
-type landingHolding struct {
+type cardsHolding struct {
 	name   string
 	shares string
 	values []float64
 	max    float64
 }
 
-var landingHoldings = []landingHolding{
+var cardsHoldings = []cardsHolding{
 	{name: "Vanguard", shares: "450 Shares", values: []float64{380, 420, 390, 652}, max: 652},
 	{name: "S&P 500 VOO", shares: "112 Shares", values: []float64{180, 210, 320, 218}, max: 320},
 	{name: "Apple AAPL", shares: "85 Shares", values: []float64{60, 70, 120, 90}, max: 120},
 	{name: "Realty Income", shares: "320 Shares", values: []float64{240, 260, 280, 360}, max: 360},
 }
 
-templ landingCardDividendIncome() {
+templ DividendIncome() {
 	@card.Card() {
 		@card.Header() {
 			@card.Title() {
@@ -480,7 +580,7 @@ templ landingCardDividendIncome() {
 		}
 		@card.Content() {
 			@item.Group() {
-				for _, holding := range landingHoldings {
+				for _, holding := range cardsHoldings {
 					@item.Item(item.Props{Variant: item.VariantMuted, Attributes: templ.Attributes{"role": "listitem"}}) {
 						@item.Content() {
 							@item.Title() {
@@ -492,7 +592,7 @@ templ landingCardDividendIncome() {
 						}
 						<div class="hidden h-8 w-24 items-end gap-1 md:flex" role="img" aria-label={ holding.name + " quarterly dividends" }>
 							for _, value := range holding.values {
-								<div class="min-h-1 flex-1 rounded-t-sm bg-chart-2" style={ templ.SafeCSS(landingBarHeight(value, holding.max)) }></div>
+								<div class="min-h-1 flex-1 rounded-t-sm bg-chart-2" style={ templ.SafeCSS(cardsBarHeight(value, holding.max)) }></div>
 							}
 						</div>
 					}
@@ -506,14 +606,14 @@ templ landingCardDividendIncome() {
 // payout-threshold.tsx
 // ---------------------------------------------------------------------------
 
-var landingCurrencies = []createOption{
+var cardsCurrencies = []createOption{
 	{Value: "usd", Label: "USD — United States Dollar"},
 	{Value: "eur", Label: "EUR — Euro"},
 	{Value: "gbp", Label: "GBP — British Pound"},
 	{Value: "jpy", Label: "JPY — Japanese Yen"},
 }
 
-templ landingCardPayoutThreshold() {
+templ PayoutThreshold() {
 	@card.Card() {
 		@card.Header() {
 			@card.Title() {
@@ -545,7 +645,7 @@ templ landingCardPayoutThreshold() {
 						}
 						@selectcomp.Content() {
 							@selectcomp.Group() {
-								for _, currency := range landingCurrencies {
+								for _, currency := range cardsCurrencies {
 									@selectcomp.Item(selectcomp.ItemProps{Value: currency.Value, Selected: currency.Value == "usd"}) {
 										{ currency.Label }
 									}
@@ -596,7 +696,7 @@ templ landingCardPayoutThreshold() {
 // ---------------------------------------------------------------------------
 // account-access.tsx
 // ---------------------------------------------------------------------------
-templ landingCardAccountAccess() {
+templ AccountAccess() {
 	@card.Card() {
 		@card.Header() {
 			@card.Title() {
@@ -656,7 +756,7 @@ templ landingCardAccountAccess() {
 // The cell matrix verbatim from the source; the homepage card draws the QR as
 // a static 21x21 grid instead of react-qr-code.
 
-var landingQrCells = []string{
+var cardsQrCells = []string{
 	"111111100101101111111",
 	"100000101001001000001",
 	"101110101111101011101",
@@ -680,13 +780,13 @@ var landingQrCells = []string{
 	"111111101011101101111",
 }
 
-templ landingCardQrConnect() {
+templ QrConnect() {
 	@card.Card() {
 		@card.Content(card.ContentProps{Class: "flex justify-center pt-6"}) {
 			<div class="rounded-xl border bg-white p-4">
 				<svg viewBox="0 0 21 21" class="size-40 text-black" role="img" aria-label="Connect device QR code" shape-rendering="crispEdges">
 					<rect width="21" height="21" fill="white"></rect>
-					for y, row := range landingQrCells {
+					for y, row := range cardsQrCells {
 						for x, cell := range row {
 							if cell == '1' {
 								<rect x={ strconv.Itoa(x) } y={ strconv.Itoa(y) } width="1" height="1"></rect>
@@ -710,7 +810,7 @@ templ landingCardQrConnect() {
 // ---------------------------------------------------------------------------
 // payments.tsx
 // ---------------------------------------------------------------------------
-templ landingCardPayments() {
+templ Payments() {
 	@card.Card() {
 		@card.Header(card.HeaderProps{Class: "flex flex-col gap-3"}) {
 			@breadcrumb.Breadcrumb() {
@@ -757,15 +857,15 @@ templ landingCardPayments() {
 		}
 		@card.Content() {
 			@item.Group() {
-				@landingPaymentItem(icon.Settings, "Change transfer limit", "Adjust how much you can send from your balance.")
-				@landingPaymentItem(icon.Calendar, "Scheduled transfers", "Set up a transfer to send at a later date.")
-				@landingPaymentItem(icon.RefreshCw, "Recurring card payments", "Manage your repeated card transactions.")
+				@paymentsItem(icon.Settings, "Change transfer limit", "Adjust how much you can send from your balance.")
+				@paymentsItem(icon.Calendar, "Scheduled transfers", "Set up a transfer to send at a later date.")
+				@paymentsItem(icon.RefreshCw, "Recurring card payments", "Manage your repeated card transactions.")
 			}
 		}
 	}
 }
 
-templ landingPaymentItem(iconFn func(...icon.Props) templ.Component, title, description string) {
+templ paymentsItem(iconFn func(...icon.Props) templ.Component, title, description string) {
 	<div role="listitem" class="w-full">
 		@item.Item(item.Props{Variant: item.VariantMuted, Href: "#"}) {
 			@item.Media(item.MediaProps{Variant: item.MediaVariantIcon}) {
@@ -788,10 +888,10 @@ templ landingPaymentItem(iconFn func(...icon.Props) templ.Component, title, desc
 // analytics-card.tsx
 // ---------------------------------------------------------------------------
 
-const landingAnalyticsAreaPath = "M0 52L18 40L36 46L54 70L72 50L100 49V86H0Z"
-const landingAnalyticsStrokePath = "M0 52L18 40L36 46L54 70L72 50L100 49"
+const cardsAnalyticsAreaPath = "M0 52L18 40L36 46L54 70L72 50L100 49V86H0Z"
+const cardsAnalyticsStrokePath = "M0 52L18 40L36 46L54 70L72 50L100 49"
 
-templ landingCardAnalytics() {
+templ AnalyticsCard() {
 	@card.Card(card.Props{Size: card.SizeSm, Class: "mx-auto w-full max-w-sm data-[size=sm]:pb-0"}) {
 		@card.Header() {
 			@card.Title() {
@@ -810,8 +910,8 @@ templ landingCardAnalytics() {
 			}
 		}
 		<svg viewBox="0 0 100 86" preserveAspectRatio="none" class="aspect-[1/0.35] w-full text-chart-1" role="img" aria-label="Visitor trend">
-			<path d={ landingAnalyticsAreaPath } fill="currentColor" opacity="0.28"></path>
-			<path d={ landingAnalyticsStrokePath } fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+			<path d={ cardsAnalyticsAreaPath } fill="currentColor" opacity="0.28"></path>
+			<path d={ cardsAnalyticsStrokePath } fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
 		</svg>
 	}
 }
@@ -820,21 +920,21 @@ templ landingCardAnalytics() {
 // notification-settings.tsx
 // ---------------------------------------------------------------------------
 
-type landingNotification struct {
+type cardsNotification struct {
 	id          string
 	label       string
 	description string
 	checked     bool
 }
 
-var landingNotifications = []landingNotification{
+var cardsNotifications = []cardsNotification{
 	{id: "transactions", label: "Transaction alerts", description: "Deposits, withdrawals, and transfers.", checked: true},
 	{id: "security", label: "Security alerts", description: "Login attempts and account changes.", checked: true},
 	{id: "goals", label: "Goal milestones", description: "Updates at 25%, 50%, 75%, and 100%.", checked: false},
 	{id: "market", label: "Market updates", description: "Daily portfolio summary and price alerts.", checked: false},
 }
 
-templ landingCardNotificationSettings() {
+templ NotificationSettings() {
 	@card.Card() {
 		@card.Header() {
 			@card.Title() {
@@ -846,7 +946,7 @@ templ landingCardNotificationSettings() {
 		}
 		@card.Content() {
 			@field.Group() {
-				for _, notification := range landingNotifications {
+				for _, notification := range cardsNotifications {
 					@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 						@checkbox.Checkbox(checkbox.Props{ID: "notify-" + notification.id, Checked: notification.checked})
 						@field.Content() {
@@ -873,12 +973,12 @@ templ landingCardNotificationSettings() {
 // power-usage.tsx
 // ---------------------------------------------------------------------------
 
-type landingPowerBar struct {
+type cardsPowerBar struct {
 	hour  string
 	usage float64
 }
 
-var landingPowerData = []landingPowerBar{
+var cardsPowerData = []cardsPowerBar{
 	{hour: "6a", usage: 1.2},
 	{hour: "8a", usage: 2.8},
 	{hour: "10a", usage: 3.1},
@@ -889,9 +989,9 @@ var landingPowerData = []landingPowerBar{
 	{hour: "8p", usage: 3.2},
 }
 
-const landingPowerMax = 3.8
+const cardsPowerMax = 3.8
 
-templ landingCardPowerUsage() {
+templ PowerUsage() {
 	@card.Card() {
 		@card.Header() {
 			@card.Title() {
@@ -903,9 +1003,9 @@ templ landingCardPowerUsage() {
 		}
 		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
 			<div class="flex h-[140px] w-full items-end gap-2" role="img" aria-label="Power usage by hour">
-				for _, bar := range landingPowerData {
+				for _, bar := range cardsPowerData {
 					<div class="flex h-full flex-1 flex-col justify-end gap-1.5">
-						<div class="min-h-2 rounded-t bg-chart-2" style={ templ.SafeCSS(landingBarHeight(bar.usage, landingPowerMax)) }></div>
+						<div class="min-h-2 rounded-t bg-chart-2" style={ templ.SafeCSS(cardsBarHeight(bar.usage, cardsPowerMax)) }></div>
 						<span class="text-center text-xs text-muted-foreground">{ bar.hour }</span>
 					</div>
 				}
@@ -929,7 +1029,7 @@ templ landingCardPowerUsage() {
 // skeleton/*.tsx - the decorative rails, aria-hidden and only visible from
 // 2200px up.
 // ---------------------------------------------------------------------------
-templ landingSkeletonUIElements() {
+templ SkeletonUIElements() {
 	@card.Card(card.Props{Class: "w-full"}) {
 		@card.Content(card.ContentProps{Class: "flex flex-col gap-6"}) {
 			@skeleton.Skeleton(skeleton.Props{Class: "h-8 w-full rounded-2xl"})
@@ -970,18 +1070,18 @@ templ landingSkeletonUIElements() {
 	}
 }
 
-templ landingSkeletonSidebarNav() {
+templ SkeletonSidebarNav() {
 	<div class="grid w-full items-start gap-4 xl:grid-cols-2 xl:gap-6">
 		@card.Card(card.Props{Class: "w-full overflow-hidden rounded-3xl py-0"}) {
-			@landingSkeletonNav()
+			@navSkeleton()
 		}
 		@card.Card(card.Props{Class: "hidden w-full overflow-hidden rounded-3xl py-0 xl:flex"}) {
-			@landingSkeletonNav()
+			@navSkeleton()
 		}
 	</div>
 }
 
-templ landingSkeletonNav() {
+templ navSkeleton() {
 	<div class="flex flex-col gap-1 p-2">
 		for gi := 0; gi < 2; gi++ {
 			<div class="flex flex-col gap-1 px-2 py-1.5">
@@ -1000,7 +1100,7 @@ templ landingSkeletonNav() {
 	</div>
 }
 
-templ landingSkeletonSavingsTargets() {
+templ SkeletonSavingsTargets() {
 	@card.Card() {
 		@card.Header(card.HeaderProps{Class: "gap-2"}) {
 			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-36 rounded-md"})
@@ -1030,9 +1130,9 @@ templ landingSkeletonSavingsTargets() {
 	}
 }
 
-var landingSkeletonContributionBars = []int{60, 80, 65, 95, 50, 100}
+var cardsSkeletonContributionBars = []int{60, 80, 65, 95, 50, 100}
 
-templ landingSkeletonContributionHistory() {
+templ SkeletonContributionHistory() {
 	@card.Card() {
 		@card.Header(card.HeaderProps{Class: "gap-2"}) {
 			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-44 rounded-md"})
@@ -1040,7 +1140,7 @@ templ landingSkeletonContributionHistory() {
 		}
 		@card.Content() {
 			<div class="flex h-[200px] w-full items-end gap-3">
-				for _, height := range landingSkeletonContributionBars {
+				for _, height := range cardsSkeletonContributionBars {
 					<div class="flex h-full flex-1 flex-col justify-end gap-2">
 						@skeleton.Skeleton(skeleton.Props{
 							Class:      "w-full rounded-t-md rounded-b-none",
@@ -1071,7 +1171,7 @@ templ landingSkeletonContributionHistory() {
 	}
 }
 
-templ landingSkeletonClaimableBalance() {
+templ SkeletonClaimableBalance() {
 	@card.Card() {
 		@card.Header(card.HeaderProps{Class: "gap-3"}) {
 			@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-36 rounded-md"})
@@ -1103,9 +1203,9 @@ templ landingSkeletonClaimableBalance() {
 	}
 }
 
-var landingSkeletonMiniBars = []int{40, 60, 80, 50}
+var cardsSkeletonMiniBars = []int{40, 60, 80, 50}
 
-templ landingSkeletonDividendIncome() {
+templ SkeletonDividendIncome() {
 	@card.Card() {
 		@card.Header(card.HeaderProps{Class: "gap-2"}) {
 			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-48 rounded-md"})
@@ -1123,7 +1223,7 @@ templ landingSkeletonDividendIncome() {
 							@skeleton.Skeleton(skeleton.Props{Class: "h-3 w-20 rounded-md bg-muted-foreground/15"})
 						</div>
 						<div class="hidden h-8 w-24 items-end gap-1 md:flex">
-							for _, height := range landingSkeletonMiniBars {
+							for _, height := range cardsSkeletonMiniBars {
 								@skeleton.Skeleton(skeleton.Props{
 									Class:      "flex-1 rounded-t-sm rounded-b-none bg-muted-foreground/15",
 									Attributes: templ.Attributes{"style": "height: " + strconv.Itoa(height) + "%"},
@@ -1138,7 +1238,7 @@ templ landingSkeletonDividendIncome() {
 	}
 }
 
-templ landingSkeletonNewMilestone() {
+templ SkeletonNewMilestone() {
 	@card.Card() {
 		@card.Header(card.HeaderProps{Class: "gap-2"}) {
 			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-44 rounded-md"})
@@ -1167,7 +1267,7 @@ templ landingSkeletonNewMilestone() {
 	}
 }
 
-templ landingSkeletonPayoutThreshold() {
+templ SkeletonPayoutThreshold() {
 	@card.Card() {
 		@card.Header(card.HeaderProps{Class: "gap-2"}) {
 			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-44 rounded-md"})
@@ -1200,7 +1300,7 @@ templ landingSkeletonPayoutThreshold() {
 	}
 }
 
-templ landingSkeletonAccountAccess() {
+templ SkeletonAccountAccess() {
 	@card.Card() {
 		@card.Header(card.HeaderProps{Class: "gap-2"}) {
 			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-36 rounded-md"})
@@ -1226,7 +1326,7 @@ templ landingSkeletonAccountAccess() {
 	}
 }
 
-templ landingSkeletonQrConnect() {
+templ SkeletonQrConnect() {
 	@card.Card() {
 		@card.Content(card.ContentProps{Class: "flex justify-center pt-6"}) {
 			@skeleton.Skeleton(skeleton.Props{Class: "size-44 rounded-xl"})
@@ -1239,7 +1339,7 @@ templ landingSkeletonQrConnect() {
 	}
 }
 
-templ landingSkeletonTransferFunds() {
+templ SkeletonTransferFunds() {
 	@card.Card() {
 		@card.Header(card.HeaderProps{Class: "gap-2"}) {
 			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-36 rounded-md"})
@@ -1284,7 +1384,7 @@ templ landingSkeletonTransferFunds() {
 	}
 }
 
-templ landingSkeletonPayments() {
+templ SkeletonPayments() {
 	@card.Card() {
 		@card.Header(card.HeaderProps{Class: "flex flex-col gap-3"}) {
 			<div class="flex items-center gap-2">
@@ -1312,7 +1412,7 @@ templ landingSkeletonPayments() {
 	}
 }
 
-templ landingSkeletonEmptyDistributeTrack() {
+templ SkeletonEmptyDistributeTrack() {
 	@card.Card() {
 		@card.Content() {
 			<div class="flex flex-col items-center gap-4 p-4">
@@ -1328,7 +1428,7 @@ templ landingSkeletonEmptyDistributeTrack() {
 	}
 }
 
-templ landingSkeletonAnalyticsCard() {
+templ SkeletonAnalyticsCard() {
 	@card.Card(card.Props{Size: card.SizeSm, Class: "mx-auto w-full max-w-sm data-[size=sm]:pb-0"}) {
 		@card.Header(card.HeaderProps{Class: "gap-2"}) {
 			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-24 rounded-md"})
@@ -1341,7 +1441,7 @@ templ landingSkeletonAnalyticsCard() {
 	}
 }
 
-templ landingSkeletonNotificationSettings() {
+templ SkeletonNotificationSettings() {
 	@card.Card() {
 		@card.Header(card.HeaderProps{Class: "gap-2"}) {
 			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-32 rounded-md"})
@@ -1364,9 +1464,9 @@ templ landingSkeletonNotificationSettings() {
 	}
 }
 
-var landingSkeletonPowerBars = []int{30, 70, 80, 60, 90, 75, 100, 85}
+var cardsSkeletonPowerBars = []int{30, 70, 80, 60, 90, 75, 100, 85}
 
-templ landingSkeletonPowerUsage() {
+templ SkeletonPowerUsage() {
 	@card.Card() {
 		@card.Header(card.HeaderProps{Class: "gap-2"}) {
 			@skeleton.Skeleton(skeleton.Props{Class: "h-5 w-32 rounded-md"})
@@ -1374,7 +1474,7 @@ templ landingSkeletonPowerUsage() {
 		}
 		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
 			<div class="flex h-[140px] w-full items-end gap-2">
-				for _, height := range landingSkeletonPowerBars {
+				for _, height := range cardsSkeletonPowerBars {
 					<div class="flex h-full flex-1 flex-col justify-end gap-1.5">
 						@skeleton.Skeleton(skeleton.Props{
 							Class:      "w-full rounded-t rounded-b-none",

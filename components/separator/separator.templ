@@ -16,6 +16,11 @@ type Props struct {
 	Orientation Orientation
 }
 
+// Base UI's Separator renders data-orientation, and that is what the vendored
+// data-horizontal / data-vertical variants match
+// (&:where([data-orientation="horizontal"])). Without it the
+// data-horizontal:h-px in the class string never lands and the separator
+// renders 0px high.
 templ Separator(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
@@ -29,6 +34,7 @@ templ Separator(props ...Props) {
 			id={ p.ID }
 		}
 		data-slot="separator"
+		data-orientation={ string(p.Orientation) }
 		data-horizontal?={ p.Orientation == OrientationHorizontal }
 		data-vertical?={ p.Orientation == OrientationVertical }
 		role="separator"

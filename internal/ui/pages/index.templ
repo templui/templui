@@ -1,0 +1,92 @@
+package pages
+
+import (
+	"github.com/templui/templui/components/badge"
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/internal/ui/layouts"
+	"github.com/templui/templui/internal/ui/modules"
+)
+
+// IndexPage is the 1:1 pendant of shadcn's homepage,
+// app/(app)/(root)/page.tsx: the PageHeader hero
+// (components/page-header.tsx) with the Announcement badge
+// (components/announcement.tsx) on top, and the card wall from
+// app/(app)/(root)/cards (CardsDemo) below it. Structure, classes and copy
+// are verbatim; the identity swaps are our changelog headline in the
+// announcement and our own /create link on the CTA.
+
+const indexTitle = "The Foundation for your Design System"
+
+const indexDescription = "A set of beautifully designed components that you can customize, extend, and build on. Start here then make it your own. Open Source. Open Code."
+
+templ IndexPage() {
+	// The card wall is the one part of the page that is not the site's style:
+	// the reference's cards import @/styles/base-rhea/ui/*, i.e. the generated
+	// rhea build of the components, so their markup carries flat rhea
+	// utilities and no style class at all. Ours is rendered the same way, by
+	// compiling the wall's cn-* classes against the rhea style map (see
+	// modules.InlinedStyleHTML) instead of nesting a .style-rhea island in the
+	// nova page — a nested island leaves the wall's own nova rules in the
+	// cascade and they leak back in (visibly: a band under the card footers).
+	{{ cardsHTML, cardsErr := modules.InlinedStyleHTML(ctx, CardsDemo(), "base-rhea") }}
+	@layouts.BaseLayout(indexTitle, indexDescription) {
+		@modules.AnnouncementBar()
+		@modules.Navbar()
+		// app/(app)/layout.tsx's <main> plus page.tsx's root div.
+		<main class="flex min-h-0 flex-1 flex-col">
+			<div class="flex flex-1 flex-col">
+				// PageHeader, with the page's own
+				// md:**:[.container]:pb-8 lg:**:[.container]:pb-12.
+				<section class="border-grid md:**:[.container]:pb-8 lg:**:[.container]:pb-12">
+					<div class="container-wrapper">
+						<div class="container flex flex-col items-center gap-2 px-6 py-8 text-center md:py-16 lg:py-20 xl:gap-4">
+							// Announcement: their badge links to the newest
+							// changelog entry, so ours names ours.
+							@badge.Badge(badge.Props{Variant: badge.VariantSecondary, Class: "bg-muted", Href: "/docs/changelog"}) {
+								Hover Card is now available
+								@icon.ArrowRight()
+							}
+							// PageHeaderHeading with the page's max-w-4xl.
+							<h1 class="leading-tighter max-w-4xl text-3xl font-semibold tracking-tight text-balance text-primary lg:leading-[1.1] lg:font-semibold xl:text-5xl xl:tracking-tighter">
+								{ indexTitle }
+							</h1>
+							// PageHeaderDescription.
+							<p class="max-w-4xl text-base text-balance text-foreground sm:text-lg">
+								{ indexDescription }
+							</p>
+							// PageActions.
+							<div class="flex w-full items-center justify-center gap-2 pt-2 **:data-[slot=button]:shadow-none">
+								@button.Button(button.Props{Href: "/create?preset=b27GcrRo", Class: "h-[31px] rounded-lg"}) {
+									Build Your Own
+									@icon.ArrowRight(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-end"}})
+								}
+							</div>
+						</div>
+					</div>
+				</section>
+				<div class="container-wrapper flex-1 p-0">
+					<div class="container overflow-hidden md:px-0 lg:max-w-none">
+						// Below md the reference swaps the card wall for a
+						// screenshot pair (/images/full-light.png,
+						// /images/full-dark.png). We have no such pair yet, so
+						// the existing readme screenshot stands in for both.
+						<section class="-mx-4 w-[140vw] overflow-hidden md:hidden">
+							<img
+								src="/assets/img/readme.png"
+								width="2718"
+								height="1466"
+								alt="Dashboard"
+								class="block h-auto w-full"
+							/>
+						</section>
+						<section class="hidden md:block">
+							@templ.Raw(cardsHTML, cardsErr)
+						</section>
+					</div>
+				</div>
+			</div>
+		</main>
+		@modules.Footer()
+	}
+}

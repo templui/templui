@@ -25,20 +25,19 @@ templ CommandMenu() {
 		<span class="hidden xl:inline-flex">Search documentation...</span>
 		<span class="inline-flex xl:hidden">Search...</span>
 	}
+	// The search palette is our own command.Dialog, the same component the
+	// docs demo uses, with no class overrides: shadcn's search is built on
+	// their pre-cn command component, so their call site has to re-style the
+	// bare input wrapper. Ours ships that look already.
 	@command.Dialog(command.DialogProps{
 		ID:          "command-menu",
 		Title:       "Search documentation...",
 		Description: "Search for a command to run...",
-		Class:       "top-[15%] rounded-xl border-none bg-clip-padding p-2 pb-11 shadow-2xl ring-4 ring-neutral-200/80 dark:bg-neutral-900 dark:ring-neutral-800",
 	}) {
-		@command.Command(command.Props{
-			ID:    "site-search",
-			Label: "Search documentation...",
-			Class: "rounded-none bg-transparent **:data-[slot=command-input]:h-9! **:data-[slot=command-input]:py-0 **:data-[slot=command-input-wrapper]:mb-0 **:data-[slot=command-input-wrapper]:h-9! **:data-[slot=command-input-wrapper]:rounded-md **:data-[slot=command-input-wrapper]:border **:data-[slot=command-input-wrapper]:border-input **:data-[slot=command-input-wrapper]:bg-input/50",
-		}) {
+		@command.Command(command.Props{ID: "site-search", Label: "Search documentation..."}) {
 			@command.Input(command.InputProps{Placeholder: "Search documentation..."})
-			@command.List(command.ListProps{Class: "no-scrollbar min-h-80 scroll-pt-2 scroll-pb-1.5"}) {
-				@command.Empty(command.EmptyProps{Class: "py-12 text-center text-sm text-muted-foreground"}) {
+			@command.List(command.ListProps{Class: "no-scrollbar min-h-80"}) {
+				@command.Empty() {
 					No results found.
 				}
 				@commandMenuGroup("Pages") {
@@ -65,14 +64,6 @@ templ CommandMenu() {
 				}
 			}
 		}
-		<div class="absolute inset-x-0 bottom-0 z-20 flex h-10 items-center gap-2 rounded-b-xl border-t border-t-neutral-100 bg-neutral-50 px-4 text-xs font-medium text-muted-foreground dark:border-t-neutral-700 dark:bg-neutral-800">
-			<div class="flex items-center gap-2">
-				@commandMenuKbd() {
-					@icon.CornerDownLeft()
-				}
-				Go to Page
-			</div>
-		</div>
 	}
 	@commandMenuScript()
 }
@@ -87,9 +78,12 @@ templ commandMenuGroup(heading string) {
 }
 
 templ commandMenuItem(href, value string) {
+	// rounded-md! beats the style's in-dialog rounded-lg!, the svg rule is the
+	// muted icon color their command item carries, and the check indicator has
+	// no pendant in the reference's item.
 	@command.Item(command.ItemProps{
 		Value: value,
-		Class: "h-9 rounded-md border border-transparent px-3! font-medium data-[selected=true]:border-input data-[selected=true]:bg-input/50",
+		Class: "h-9 rounded-md! border border-transparent px-3! font-medium data-[selected=true]:border-input data-[selected=true]:bg-input/50 [&_svg:not([class*='text-'])]:text-muted-foreground [&_.cn-command-item-indicator]:hidden",
 		Attributes: templ.Attributes{
 			"data-href": href,
 		},

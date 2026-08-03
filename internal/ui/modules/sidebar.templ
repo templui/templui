@@ -23,7 +23,9 @@ templ Sidebar() {
 	}) {
 		<div class="absolute top-12 right-2 bottom-0 hidden h-full w-px bg-[linear-gradient(to_bottom,transparent_0%,var(--border)_10%,var(--border)_90%,transparent_100%)] lg:flex"></div>
 		@sidebar.Content(sidebar.ContentProps{
-			Class: "w-(--sidebar-menu-width) scroll-fade scrollbar-none overflow-x-hidden pl-2.5",
+			// gap-2 is SidebarContent's own gap in their registry sidebar; the
+			// nova style compacts it to gap-0, so the docs sidebar restores it.
+			Class: "gap-2 w-(--sidebar-menu-width) scroll-fade scrollbar-none overflow-x-hidden pl-2.5",
 			Attributes: templ.Attributes{
 				"data-docs-sidebar-content": "",
 			},
@@ -33,7 +35,10 @@ templ Sidebar() {
 					Sections
 				}
 				@sidebar.GroupContent() {
-					@sidebar.Menu() {
+					// The Sections menu takes SidebarMenu's own gap-1 (nova
+					// compacts it to gap-0); the section groups below pass
+					// gap-0.5 like the reference.
+					@sidebar.Menu(sidebar.MenuProps{Class: "gap-1"}) {
 						for _, link := range shared.TopLevelSections {
 							@sidebar.MenuItem() {
 								@docsSidebarLink(link, sidebarSectionActive(link.Href, path))

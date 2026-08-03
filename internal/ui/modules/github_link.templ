@@ -2,7 +2,6 @@ package modules
 
 import (
 	"fmt"
-	"math"
 	"strconv"
 
 	"github.com/templui/templui/components/button"
@@ -10,18 +9,21 @@ import (
 	wrappedicon "github.com/templui/templui/internal/ui/icons"
 )
 
-// formatStars matches StarsCount in github-link.tsx: >= 1000 rounds to the
-// nearest thousand ("91k"), below that the plain number.
+// formatStars is StarsCount in github-link.tsx with one deviation: the
+// reference rounds to full thousands (Math.round(n/1000) + "k"), which is
+// honest at their 91k but turns our 1.6k into "2k". So thousands keep one
+// decimal; below 1000 the plain number, like the reference.
 func formatStars(count int) string {
 	if count >= 1000 {
-		return fmt.Sprintf("%dk", int(math.Round(float64(count)/1000)))
+		return fmt.Sprintf("%.1fk", float64(count)/1000)
 	}
 	return strconv.Itoa(count)
 }
 
 // GitHubLink is the pendant of shadcn's components/github-link.tsx: a ghost
 // sm button with the GitHub mark and the live star count (ours comes from
-// ctx instead of a fetch cache).
+// ctx instead of a fetch cache). The reference's Button comes from
+// registry/new-york-v4, ours is the active style's button.
 templ GitHubLink() {
 	{{ stars := 0 }}
 	{{

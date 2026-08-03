@@ -16,7 +16,13 @@ import (
 templ Navbar() {
 	<header class="sticky top-0 z-50 w-full bg-background">
 		<div class="container-wrapper px-6 group-has-data-[slot=designer]/layout:max-w-none 3xl:fixed:px-0">
-			<div class="flex h-(--header-height) items-center **:data-[slot=separator]:h-4! group-has-data-[slot=designer]/layout:fixed:max-w-none 3xl:fixed:container">
+			// **:data-[slot=separator]:self-center is the one addition to the
+			// reference's class string: its separators come from
+			// registry/new-york-v4 (data-[orientation=vertical]:h-full, no
+			// align-self), ours from base/ui (data-vertical:self-stretch). A
+			// stretch with the h-4! pinned here degrades to flex-start, so the
+			// separators would hang at the top of the row instead of centered.
+			<div class="flex h-(--header-height) items-center **:data-[slot=separator]:h-4! **:data-[slot=separator]:self-center group-has-data-[slot=designer]/layout:fixed:max-w-none 3xl:fixed:container">
 				@MobileNav("flex lg:hidden")
 				@MainNav("hidden lg:flex")
 				<div class="ml-auto flex items-center gap-2 md:flex-1 md:justify-end">

@@ -31,7 +31,7 @@ import (
 // bordered container with the live demo on top and the source attached below
 // (border-t), clamped to a few lines behind a View Code button. The demo
 // renders as the compiled utility build of its style (see
-// inlinedPreviewHTML), like shadcn's docs render compiled registry output.
+// InlinedStyleHTML), like shadcn's docs render compiled registry output.
 func ComponentPreviewBlock(entry examples.RegistryEntry, attrs map[string]string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -58,7 +58,7 @@ func ComponentPreviewBlock(entry examples.RegistryEntry, attrs map[string]string
 			align = "center"
 		}
 		_, hideCode := attrs["hideCode"]
-		previewHTML, previewErr := inlinedPreviewHTML(ctx, entry.Component, attrs["styleName"])
+		previewHTML, previewErr := InlinedStyleHTML(ctx, entry.Component, attrs["styleName"])
 		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
 			"group relative mt-4 mb-12 flex flex-col overflow-hidden rounded-2xl border",
 			attrs["className"],

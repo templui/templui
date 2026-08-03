@@ -85,7 +85,7 @@ func main() {
 		w.Write(content)
 	})
 
-	mux.Handle("GET /{$}", templ.Handler(pages.Landing()))
+	mux.Handle("GET /{$}", templ.Handler(pages.IndexPage()))
 	mux.Handle("GET /docs", http.RedirectHandler("/docs/introduction", http.StatusSeeOther))
 	mux.Handle("GET /docs/getting-started", http.RedirectHandler("/docs/introduction", http.StatusSeeOther))
 	mux.Handle("GET /docs/components", htmxHandler(pages.ComponentsOverview()))

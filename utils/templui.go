@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -80,12 +81,48 @@ func twMapTokens(s string, f func(string) string) string {
 	return strings.Join(tokens, " ")
 }
 
+// twReorder re-emits the classes that survived a merge in the order they had
+// in the input. tailwind-merge-go collects the survivors in a map and ranges
+// over it, so the order it returns is the random map order, while the JS
+// tailwind-merge walks the list and keeps the original order. cn() depends on
+// that order: "p-2 pb-11" is padding with a taller bottom, "pb-11 p-2" is just
+// padding, so a merge that reorders turns the next merge over its own output
+// into a silent loss. Of repeated classes the last one wins, as in the JS
+// implementation, hence the walk from the right.
+func twReorder(input, merged string) string {
+	survivors := strings.Fields(merged)
+	if len(survivors) < 2 {
+		return merged
+	}
+	remaining := make(map[string]int, len(survivors))
+	for _, c := range survivors {
+		remaining[c]++
+	}
+	ordered := make([]string, 0, len(survivors))
+	tokens := strings.Fields(input)
+	for i := len(tokens) - 1; i >= 0; i-- {
+		if remaining[tokens[i]] == 0 {
+			continue
+		}
+		remaining[tokens[i]]--
+		ordered = append(ordered, tokens[i])
+	}
+	// Every survivor is one of the input tokens, verbatim. Should that ever
+	// stop holding, the merge result is still correct, only unordered.
+	if len(ordered) != len(survivors) {
+		return merged
+	}
+	slices.Reverse(ordered)
+	return strings.Join(ordered, " ")
+}
+
 func TwMerge(classes ...string) string {
 	merged := make([]string, len(classes))
 	for i, c := range classes {
 		merged[i] = twMapTokens(twV4Var.ReplaceAllString(c, "-[var($1)]"), twImportantToV3)
 	}
-	out := twMapTokens(twmerge.Merge(merged...), twImportantToV4)
+	input := strings.Join(merged, " ")
+	out := twMapTokens(twReorder(input, twmerge.Merge(merged...)), twImportantToV4)
 	return twV3Var.ReplaceAllString(out, "-($1)")
 }
 
