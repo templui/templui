@@ -287,16 +287,6 @@
   }
 }
 
-@utility border-ghost {
-  @apply relative after:absolute after:inset-0 after:border after:border-border after:mix-blend-darken dark:after:mix-blend-lighten;
-}
-
-@utility extend-touch-target {
-  @media (pointer: coarse) {
-    @apply relative touch-manipulation after:absolute after:-inset-2;
-  }
-}
-
 /* Shiki dual theme (vesper dark / github light, like shadcn): the service
    emits both palettes as CSS variables; dark mode flips to the dark set. */
 .shiki {
@@ -464,11 +454,6 @@
   }
   [data-slot="layout"] {
     @apply overscroll-none;
-  }
-  @supports (font: -apple-system-body) and (-webkit-appearance: none) {
-    [data-wrapper] {
-      @apply min-[1800px]:border-t;
-    }
   }
   a:active,
   button:active {

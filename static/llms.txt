@@ -36,6 +36,7 @@ Components are designed to be composable, customizable, and easy to integrate in
 
 - [Accordion](https://templui.io/docs/components/accordion): Collapsible accordion component.
 - [Breadcrumb](https://templui.io/docs/components/breadcrumb): Breadcrumb navigation component.
+- [Button Group](https://templui.io/docs/components/button-group): Group related buttons together with shared borders.
 - [Item](https://templui.io/docs/components/item): A flexible row for lists — media, title, description and actions.
 - [Pagination](https://templui.io/docs/components/pagination): Pagination component for lists and tables.
 - [Separator](https://templui.io/docs/components/separator): Visual divider between content sections.

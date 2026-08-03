@@ -7,7 +7,7 @@ First off, thank you for considering contributing to templUI! We're excited to h
 ### Prerequisites
 
 - Go 1.24 or higher
-- Node.js (for Tailwind CSS and esbuild)
+- Node.js (for Tailwind CSS)
 - [Task](https://taskfile.dev) - Cross-platform task runner
 
 Install Task:
@@ -29,7 +29,6 @@ This runs all watchers in parallel:
 - `templ` - Template generation with integrated server and hot reload
 - `tailwindcss` - CSS compilation
 - `shiki-highlighter` - Syntax highlighting service
-- `esbuild` - JavaScript minification for component scripts
 
 See available tasks:
 

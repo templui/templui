@@ -14,7 +14,6 @@ meta.json
 bin
 node_modules
 tmp
-out
 
 # Env
 .env

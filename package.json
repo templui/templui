@@ -1,10 +1,5 @@
 {
   "devDependencies": {
-    "@html-eslint/eslint-plugin": "^0.37.0",
-    "@html-eslint/parser": "^0.37.0",
-    "esbuild": "^0.27.0",
-    "eslint": "^9.24.0",
-    "eslint-plugin-html-tailwind": "^1.2.1",
     "tailwindcss": "^4.1.3"
   }
 }

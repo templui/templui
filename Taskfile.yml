@@ -42,34 +42,11 @@ tasks:
     cmds:
       - go tool templ generate
 
-  render-showcases:
-    desc: Render showcase components into out/showcase/
-    cmds:
-      - go run ./cmd/render-showcases
-
-  build-html:
-    desc: Build static showcase HTML
-    cmds:
-      - task: templ-generate
-      - task: render-showcases
-      - echo "✅ Static showcase HTML rendered to ./out"
-
-  lint-html:
-    desc: Lint HTML output using ESLint
-    cmds:
-      - npx eslint --fix "out/**/*.html" --ext .html
-
-  validate-html:
-    desc: Run full pipeline (build + lint)
-    cmds:
-      - task: build-html
-      - task: lint-html
-
   # Generators
   generate-sitemap:
     desc: Generate sitemap.xml
     cmds:
-      - go run ./cmd/sitemap/main.go --baseurl="https://templui.io" --routes="./cmd/docs/main.go" --output="./static/sitemap.xml"
+      - go run ./cmd/sitemap/main.go --baseurl="https://templui.io" --output="./static/sitemap.xml"
 
   generate-icons:
     desc: Generate icon definitions

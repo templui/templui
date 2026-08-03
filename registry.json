@@ -130,7 +130,7 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["layout"]
+      "categories": ["layout-navigation"]
     },
     {
       "name": "calendar",

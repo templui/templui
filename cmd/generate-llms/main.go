@@ -82,6 +82,10 @@ func main() {
 		} else {
 			// Add to first category (primary category)
 			category := comp.Categories[0]
+			if _, known := categoryNames[category]; !known {
+				fmt.Fprintf(os.Stderr, "Error: component %q has unknown category %q (known: %s)\n", comp.Name, category, strings.Join(categoryOrder, ", "))
+				os.Exit(1)
+			}
 			componentsByCategory[category] = append(componentsByCategory[category], comp)
 		}
 	}
