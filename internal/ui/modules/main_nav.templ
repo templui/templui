@@ -1,0 +1,32 @@
+package modules
+
+import (
+	"strconv"
+
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/internal/ctxkeys"
+	"github.com/templui/templui/internal/shared"
+	"github.com/templui/templui/utils"
+)
+
+// MainNav is the pendant of shadcn's components/main-nav.tsx: ghost sm
+// buttons over the nav items, data-active on the current path. data-new is
+// omitted, templUI has no PAGES_NEW.
+templ MainNav(class string) {
+	{{ path, _ := ctx.Value(ctxkeys.URLPathValue).(string) }}
+	<nav class={ utils.TwMerge("items-center gap-0", class) }>
+		for _, item := range shared.NavItems {
+			@button.Button(button.Props{
+				Variant: button.VariantGhost,
+				Size:    button.SizeSm,
+				Href:    item.Href,
+				Class:   "px-2.5 relative items-center",
+				Attributes: templ.Attributes{
+					"data-active": strconv.FormatBool(path == item.Href),
+				},
+			}) {
+				{ item.Text }
+			}
+		}
+	</nav>
+}

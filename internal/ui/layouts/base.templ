@@ -98,10 +98,23 @@ templ BaseLayout(title, description string) {
 		// HTMX
 		<script nonce={ templ.GetNonce(ctx) }>
 			document.body.addEventListener('htmx:after:swap', (e) => {
-				// Active link updater
-				document.querySelectorAll('aside a').forEach(a => {
-					a.classList.toggle('bg-accent', a.href === location.href);
-				});
+				// Active link updater: the docs sidebar sits outside the swapped
+				// fragment, so data-active follows the pushed URL here (their
+				// usePathname). The first group matches by prefix like
+				// TOP_LEVEL_SECTIONS, the section groups match exactly.
+				const sidebar = document.querySelector('[data-docs-sidebar-content]');
+				if (sidebar) {
+					const path = location.pathname;
+					sidebar.querySelectorAll('[data-slot="sidebar-group"]').forEach((group, index) => {
+						group.querySelectorAll('[data-slot="sidebar-menu-button"]').forEach((link) => {
+							const href = link.getAttribute('href');
+							const active = index === 0
+								? (href === '/docs' ? path === href : path.startsWith(href))
+								: path === href;
+							link.setAttribute('data-active', String(active));
+						});
+					});
+				}
 
 				// Scroll to top after content swap. The page scrolls on the
 				// body since the docs layout rework, not on #main-content.

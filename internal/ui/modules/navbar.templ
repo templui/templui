@@ -1,205 +1,69 @@
 package modules
 
 import (
-	"fmt"
 	"github.com/templui/templui/components/button"
 	"github.com/templui/templui/components/dialog"
 	"github.com/templui/templui/components/icon"
 	"github.com/templui/templui/components/separator"
-	"github.com/templui/templui/components/sheet"
 	"github.com/templui/templui/internal/ctxkeys"
-	"github.com/templui/templui/internal/shared"
-	wrappedicon "github.com/templui/templui/internal/ui/icons"
 )
 
-func formatStars(count int) string {
-	if count >= 1000 {
-		return fmt.Sprintf("%.1fk", float64(count)/1000)
-	}
-	return fmt.Sprintf("%d", count)
-}
-
+// Navbar is the pendant of shadcn's components/site-header.tsx (SiteHeader).
+// Like the reference, the header carries no logo: the Home nav item is the
+// way back. Structure and classes are 1:1; the shell pieces live in their own
+// module files like shadcn's components (main_nav, mobile_nav, command_menu,
+// github_link, themeswitcher = mode-switcher).
 templ Navbar() {
-	<nav class="py-4">
-		{{ stars := 0 }}
-		{{
-			if starsVal := ctx.Value(ctxkeys.GitHubStars); starsVal != nil {
-				stars = starsVal.(int)
-			}
-		}}
-		<div class="px-6 flex justify-between items-center relative">
-			<div class="flex items-center">
-				@NavbarMobileMenu()
-				<a href="/" class="flex items-center gap-1.5">
-					@icon.ToggleLeft(icon.Props{Class: "w-6 h-6"})
-					<span class="text-xl">templ<span class="font-bold">UI</span></span>
-				</a>
-				<div class="hidden md:flex gap-1 items-center ml-6">
-					@button.Button(button.Props{
-						Variant: button.VariantGhost,
-						Href:    "/docs/installation",
-					}) {
-						Docs
+	<header class="sticky top-0 z-50 w-full bg-background">
+		<div class="container-wrapper px-6 group-has-data-[slot=designer]/layout:max-w-none 3xl:fixed:px-0">
+			<div class="flex h-(--header-height) items-center **:data-[slot=separator]:h-4! group-has-data-[slot=designer]/layout:fixed:max-w-none 3xl:fixed:container">
+				@MobileNav("flex lg:hidden")
+				@MainNav("hidden lg:flex")
+				<div class="ml-auto flex items-center gap-2 md:flex-1 md:justify-end">
+					<div class="hidden w-full flex-1 md:flex md:w-auto md:flex-none">
+						@CommandMenu()
+					</div>
+					@separator.Separator(separator.Props{
+						Orientation: separator.OrientationVertical,
+						Class:       "ml-2 hidden lg:block",
+					})
+					@GitHubLink()
+					@separator.Separator(separator.Props{
+						Orientation: separator.OrientationVertical,
+					})
+					@ThemeSwitcher()
+					// Pendant of components/designer-actions.tsx: hidden unless a
+					// designer page (data-slot="designer") is in the layout. The
+					// Get Code dialog lives on the /create page. Typeset carries
+					// its own docs panel, so the header stays clean there (the
+					// same route gate as designer-actions.tsx).
+					if ctx.Value(ctxkeys.URLPathValue) != "/typeset" {
+						<div class="hidden items-center gap-2 group-has-data-[slot=designer]/layout:md:flex">
+							@separator.Separator(separator.Props{
+								Orientation: separator.OrientationVertical,
+							})
+							@button.Button(button.Props{
+								Attributes: dialog.TriggerFor("create-code-dialog"),
+							}) {
+								Get Code
+							}
+						</div>
 					}
-					@button.Button(button.Props{
-						Variant: button.VariantGhost,
-						Href:    "/docs/components",
-					}) {
-						Components
-					}
-					@button.Button(button.Props{
-						Variant: button.VariantGhost,
-						Href:    "/charts/area",
-					}) {
-						Charts
-					}
-					@button.Button(button.Props{
-						Variant: button.VariantGhost,
-						Href:    "/typeset",
-					}) {
-						Typeset
-					}
-					@button.Button(button.Props{
-						Variant: button.VariantGhost,
-						Href:    "/create",
-					}) {
-						Create
-					}
-				</div>
-			</div>
-			<div class="flex gap-1 items-center justify-center">
-				// Pendant of components/designer-actions.tsx: hidden unless a
-				// designer page (data-slot="designer") is in the layout. The
-				// Get Code dialog lives on the /create page. Typeset carries
-				// its own docs panel, so the header stays clean there (the
-				// same route gate as designer-actions.tsx).
-				if ctx.Value(ctxkeys.URLPathValue) != "/typeset" {
-					<div class="hidden items-center gap-2 group-has-data-[slot=designer]/layout:md:flex">
+					<div class="flex items-center gap-2 group-has-data-[slot=designer]/layout:hidden">
 						@separator.Separator(separator.Props{
 							Orientation: separator.OrientationVertical,
 						})
 						@button.Button(button.Props{
-							Attributes: dialog.TriggerFor("create-code-dialog"),
+							Size:  button.SizeSm,
+							Class: "h-[31px] rounded-lg",
+							Href:  "/create",
 						}) {
-							Get Code
+							@icon.Plus()
+							New
 						}
 					</div>
-				}
-				@button.Button(button.Props{
-					Variant: button.VariantGhost,
-					Href:    "https://github.com/templui/templui",
-					Target:  "_blank",
-					Class:   "gap-1",
-				}) {
-					@wrappedicon.GitHub(20)
-					if stars > 0 {
-						<span class="text-muted-foreground text-xs tabular-nums">{ formatStars(stars) }</span>
-					}
-				}
-				@separator.Separator(separator.Props{
-					Orientation: separator.OrientationVertical,
-				})
-				@ThemeSwitcher()
-			</div>
-		</div>
-	</nav>
-}
-
-templ NavbarMobileMenu() {
-	@sheet.Sheet() {
-		<button
-			class="mr-2 lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-			{ sheet.Trigger(ctx)... }
-		>
-			@icon.Menu()
-		</button>
-		@sheet.Content(sheet.ContentProps{
-			Side:  sheet.SideLeft,
-			Class: "!p-4",
-		}) {
-			<div class="flex-1 overflow-y-auto">
-				<div class="space-y-4">
-					<div class="pb-4">
-						<h3 class="text-sm font-bold text-gray-600 dark:text-gray-400">Menu</h3>
-						<ul class="mt-2 space-y-1">
-							<li>
-								<a
-									href="/"
-									class="text-sm inline-flex items-center px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 w-full"
-								>
-									<span>Home</span>
-								</a>
-							</li>
-							<li>
-								<a
-									href="/docs/installation"
-									class="text-sm inline-flex items-center px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 w-full"
-								>
-									<span>Docs</span>
-								</a>
-							</li>
-							<li>
-								<a
-									href="/docs/components"
-									class="text-sm inline-flex items-center px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 w-full"
-								>
-									<span>Components</span>
-								</a>
-							</li>
-							<li>
-								<a
-									href="/charts/area"
-									class="text-sm inline-flex items-center px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 w-full"
-								>
-									<span>Charts</span>
-								</a>
-							</li>
-							<li>
-								<a
-									href="/typeset"
-									class="text-sm inline-flex items-center px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 w-full"
-								>
-									<span>Typeset</span>
-								</a>
-							</li>
-							<li>
-								<a
-									href="/create"
-									class="text-sm inline-flex items-center px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 w-full"
-								>
-									<span>Create</span>
-								</a>
-							</li>
-						</ul>
-					</div>
-					for _, section := range shared.Sections {
-						<div class="pb-4">
-							<h3 class="text-sm font-bold text-gray-600 dark:text-gray-400">{ section.Title }</h3>
-							<ul class="mt-2 space-y-1">
-								for _, link := range section.Links {
-									<li>
-										if link.Href == ctx.Value(ctxkeys.URLPathValue) {
-											<a
-												href={ templ.SafeURL(link.Href) }
-												class={ "text-sm inline-flex items-center px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 w-full" }
-											>
-												<span>{ link.Text }</span>
-											</a>
-										} else {
-											<a
-												href={ templ.SafeURL(link.Href) }
-												class={ "text-sm inline-flex items-center px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 w-full" }
-											>
-												<span>{ link.Text }</span>
-											</a>
-										}
-									</li>
-								}
-							</ul>
-						</div>
-					}
 				</div>
 			</div>
-		}
-	}
+		</div>
+	</header>
 }

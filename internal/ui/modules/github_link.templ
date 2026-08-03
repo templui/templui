@@ -1,0 +1,47 @@
+package modules
+
+import (
+	"fmt"
+	"math"
+	"strconv"
+
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/internal/ctxkeys"
+	wrappedicon "github.com/templui/templui/internal/ui/icons"
+)
+
+// formatStars matches StarsCount in github-link.tsx: >= 1000 rounds to the
+// nearest thousand ("91k"), below that the plain number.
+func formatStars(count int) string {
+	if count >= 1000 {
+		return fmt.Sprintf("%dk", int(math.Round(float64(count)/1000)))
+	}
+	return strconv.Itoa(count)
+}
+
+// GitHubLink is the pendant of shadcn's components/github-link.tsx: a ghost
+// sm button with the GitHub mark and the live star count (ours comes from
+// ctx instead of a fetch cache).
+templ GitHubLink() {
+	{{ stars := 0 }}
+	{{
+		if starsVal := ctx.Value(ctxkeys.GitHubStars); starsVal != nil {
+			stars = starsVal.(int)
+		}
+	}}
+	@button.Button(button.Props{
+		Size:    button.SizeSm,
+		Variant: button.VariantGhost,
+		Class:   "h-8 shadow-none",
+		Href:    "https://github.com/templui/templui",
+		Target:  "_blank",
+		Attributes: templ.Attributes{
+			"rel": "noreferrer",
+		},
+	}) {
+		@wrappedicon.GitHub(16)
+		if stars > 0 {
+			<span class="w-fit text-xs text-muted-foreground tabular-nums">{ formatStars(stars) }</span>
+		}
+	}
+}

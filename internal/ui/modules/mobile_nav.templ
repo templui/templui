@@ -1,0 +1,169 @@
+package modules
+
+import (
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/internal/shared"
+	"github.com/templui/templui/utils"
+)
+
+// MobileNav is the pendant of shadcn's components/mobile-nav.tsx: the
+// animated burger trigger and a full-width panel below the header (their
+// radix Popover with sideOffset 14 and the viewport-filling available-height
+// and -width; a small inline script does the same geometry directly, so the
+// generic popover component is not bent around radix popper variables). The
+// burger animation keys on aria-expanded, which the script keeps in sync
+// like the reference keys on open.
+templ MobileNav(class string) {
+	@button.Button(button.Props{
+		Variant: button.VariantGhost,
+		Class: utils.TwMerge(
+			"group/mobile-nav extend-touch-target h-8 touch-manipulation items-center justify-start gap-2.5 p-0! hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 active:bg-transparent dark:hover:bg-transparent",
+			class,
+		),
+		Attributes: templ.Attributes{
+			"data-tui-mobile-nav-trigger": "",
+			"aria-expanded":               "false",
+			"aria-controls":               "mobile-nav",
+		},
+	}) {
+		<div class="relative flex h-8 w-4 items-center justify-center">
+			<div class="relative size-4">
+				<span class="absolute left-0 block h-0.5 w-4 bg-foreground transition-all duration-100 top-1 group-aria-expanded/mobile-nav:top-[0.4rem] group-aria-expanded/mobile-nav:-rotate-45"></span>
+				<span class="absolute left-0 block h-0.5 w-4 bg-foreground transition-all duration-100 top-2.5 group-aria-expanded/mobile-nav:top-[0.4rem] group-aria-expanded/mobile-nav:rotate-45"></span>
+			</div>
+			<span class="sr-only">Toggle Menu</span>
+		</div>
+		<span class="flex h-8 items-center text-lg leading-none font-medium">
+			Menu
+		</span>
+	}
+	<div
+		id="mobile-nav"
+		data-tui-mobile-nav
+		hidden
+		class="no-scrollbar fixed left-0 z-50 h-(--tui-mobile-nav-available-height) w-svw overflow-y-auto rounded-none border-none bg-background/90 p-0 shadow-none backdrop-blur duration-100"
+	>
+		<div class="flex flex-col gap-12 overflow-auto px-6 py-6">
+			<div class="flex flex-col gap-4">
+				<div class="text-sm font-medium text-muted-foreground">
+					Menu
+				</div>
+				<div class="flex flex-col gap-3">
+					for _, item := range shared.NavItems {
+						@mobileLink(item.Href) {
+							{ item.Text }
+						}
+					}
+				</div>
+			</div>
+			<div class="flex flex-col gap-4">
+				<div class="text-sm font-medium text-muted-foreground">
+					Sections
+				</div>
+				<div class="flex flex-col gap-3">
+					for _, link := range shared.TopLevelSections {
+						@mobileLink(link.Href) {
+							{ link.Text }
+						}
+					}
+				</div>
+			</div>
+			<div class="flex flex-col gap-8">
+				// Their tree loop renders the folder groups only; the top level
+				// pages are already in Sections above, so the section that holds
+				// them is skipped (ExcludedSidebarSections).
+				for _, section := range shared.Sections {
+					if !shared.ExcludedSidebarSections[section.Title] {
+						<div class="flex flex-col gap-4">
+							<div class="text-sm font-medium text-muted-foreground">
+								{ section.Title }
+							</div>
+							<div class="flex flex-col gap-3">
+								for _, link := range section.Links {
+									@mobileLink(link.Href) {
+										{ link.Text }
+									}
+								}
+							</div>
+						</div>
+					}
+				}
+			</div>
+		</div>
+	</div>
+	@mobileNavScript()
+}
+
+// mobileLink is the MobileLink pendant; clicking any link closes the panel
+// (the script handles that, the reference does it via onOpenChange).
+templ mobileLink(href string) {
+	<a href={ templ.SafeURL(href) } class="flex items-center gap-2 text-2xl font-medium">
+		{ children... }
+	</a>
+}
+
+templ mobileNavScript() {
+	<script nonce={ templ.GetNonce(ctx) }>
+		(function () {
+			// The reference geometry: the panel opens sideOffset 14 below the
+			// trigger and fills the remaining viewport (radix's
+			// available-height/width).
+			var SIDE_OFFSET = 14;
+
+			function trigger() {
+				return document.querySelector("[data-tui-mobile-nav-trigger]");
+			}
+
+			function panel() {
+				return document.getElementById("mobile-nav");
+			}
+
+			function place() {
+				var t = trigger();
+				var p = panel();
+				if (!t || !p) return;
+				var top = t.getBoundingClientRect().bottom + SIDE_OFFSET;
+				p.style.top = top + "px";
+				p.style.setProperty("--tui-mobile-nav-available-height", window.innerHeight - top + "px");
+			}
+
+			function setOpen(open) {
+				var t = trigger();
+				var p = panel();
+				if (!t || !p) return;
+				if (open) place();
+				p.hidden = !open;
+				t.setAttribute("aria-expanded", open ? "true" : "false");
+			}
+
+			document.addEventListener("click", function (e) {
+				if (!(e.target instanceof Element)) return;
+				var t = e.target.closest("[data-tui-mobile-nav-trigger]");
+				if (t) {
+					var p = panel();
+					if (p) setOpen(p.hidden);
+					return;
+				}
+				if (e.target.closest("#mobile-nav a")) setOpen(false);
+			});
+
+			document.addEventListener("keydown", function (e) {
+				if (e.key === "Escape") setOpen(false);
+			});
+
+			window.addEventListener("resize", function () {
+				var p = panel();
+				if (p && !p.hidden) place();
+			});
+
+			window.addEventListener(
+				"scroll",
+				function () {
+					var p = panel();
+					if (p && !p.hidden) place();
+				},
+				true
+			);
+		})();
+	</script>
+}

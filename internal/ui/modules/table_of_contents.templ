@@ -1,6 +1,10 @@
 package modules
 
-import "github.com/templui/templui/components/button"
+import (
+	"strconv"
+
+	"github.com/templui/templui/components/button"
+)
 
 type TableOfContentsItem struct {
 	ID       string
@@ -12,69 +16,83 @@ type TableOfContentsProps struct {
 	Items []TableOfContentsItem
 }
 
+// TableOfContents is the pendant of shadcn's components/docs-toc.tsx in its
+// "list" variant: a flat list of anchors carrying data-depth for the indent
+// and data-active for the scroll spy. Their toc entries are flat with a depth
+// number, ours nest, so the nesting is flattened to the same depths (h2 = 2).
 templ TableOfContents(props TableOfContentsProps) {
-	<aside
-		class="text-sm"
-		data-toc="container"
-	>
-		if len(props.Items) > 0 {
-			<div class="flex flex-col gap-2 p-4 pt-0">
-				<p class="h-6 bg-background text-xs font-medium text-muted-foreground">On This Page</p>
-				<nav class="flex flex-col gap-0.5">
-					@renderTOCItems(props.Items, 0)
-				</nav>
-			</div>
-		}
-	</aside>
+	if len(props.Items) > 0 {
+		<div class="flex flex-col gap-2 p-4 pt-0 text-sm" data-toc="container">
+			<p class="h-6 bg-background text-xs font-medium text-muted-foreground">On This Page</p>
+			@tocItems(props.Items, 2)
+		</div>
+	}
 }
 
-templ renderTOCItems(items []TableOfContentsItem, level int) {
+templ tocItems(items []TableOfContentsItem, depth int) {
 	for _, item := range items {
 		<a
 			href={ templ.SafeURL("#" + item.ID) }
-			class={ templ.Classes(
-				"block py-1 text-[0.8rem] text-muted-foreground hover:text-foreground",
-				"no-underline transition-colors break-words",
-				"data-[active=true]:font-medium data-[active=true]:text-foreground",
-				templ.KV("pl-4", level == 1),
-				templ.KV("pl-6", level >= 2),
-			) }
-			data-toc-link="true"
-			data-section-id={ item.ID }
+			class="text-[0.8rem] text-muted-foreground no-underline transition-colors hover:text-foreground data-[active=true]:font-medium data-[active=true]:text-foreground data-[depth=3]:pl-4 data-[depth=4]:pl-6"
+			data-active="false"
+			data-depth={ strconv.Itoa(depth) }
+			data-toc-link={ item.ID }
 		>
 			{ item.Text }
 		</a>
 		if len(item.Children) > 0 {
-			@renderTOCItems(item.Children, level+1)
+			@tocItems(item.Children, depth+1)
 		}
 	}
 }
 
+// TableOfContentsScript is their useActiveItem hook: an IntersectionObserver
+// over the headings with the same "0% 0% -80% 0%" root margin. It re-arms
+// after every htmx swap, because the toc is replaced out of band.
 templ TableOfContentsScript() {
 	<script defer nonce={ templ.GetNonce(ctx) }>
-        document.addEventListener('DOMContentLoaded', () => {
-            const toc = document.querySelector('[data-toc="container"]');
-            if (!toc) return;
+		(function () {
+			var observer = null;
 
-            // Scroll spy: highlight the section under the cursor line, like
-            // shadcn (IntersectionObserver with a -80% bottom root margin).
-            const links = [...toc.querySelectorAll('[data-toc-link]')];
-            const setActive = (id) => {
-                links.forEach((link) => {
-                    link.setAttribute('data-active', link.dataset.sectionId === id ? 'true' : 'false');
-                });
-            };
-            const observer = new IntersectionObserver((entries) => {
-                for (const entry of entries) {
-                    if (entry.isIntersecting) setActive(entry.target.id);
-                }
-            }, { rootMargin: '0% 0% -80% 0%' });
-            links.forEach((link) => {
-                const section = document.getElementById(link.dataset.sectionId);
-                if (section) observer.observe(section);
-            });
-        });
-    </script>
+			function arm() {
+				if (observer) {
+					observer.disconnect();
+					observer = null;
+				}
+
+				var links = Array.prototype.slice.call(document.querySelectorAll("[data-toc-link]"));
+				if (!links.length) return;
+
+				function setActive(id) {
+					links.forEach(function (link) {
+						link.setAttribute("data-active", link.dataset.tocLink === id ? "true" : "false");
+					});
+				}
+
+				observer = new IntersectionObserver(
+					function (entries) {
+						for (var i = 0; i < entries.length; i++) {
+							if (entries[i].isIntersecting) setActive(entries[i].target.id);
+						}
+					},
+					{ rootMargin: "0% 0% -80% 0%" }
+				);
+
+				links.forEach(function (link) {
+					var heading = document.getElementById(link.dataset.tocLink);
+					if (heading) observer.observe(heading);
+				});
+			}
+
+			if (document.readyState === "loading") {
+				document.addEventListener("DOMContentLoaded", arm);
+			} else {
+				arm();
+			}
+			document.addEventListener("htmx:after:swap", arm);
+			document.addEventListener("htmx:afterSwap", arm);
+		})();
+	</script>
 }
 
 // TocAdCard is the pendant of shadcn's OpenInV0Cta card below the toc,

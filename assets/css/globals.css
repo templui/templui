@@ -287,6 +287,14 @@
   }
 }
 
+/* Touch targets on coarse pointers grow past the visual box (the header's
+   mode switcher and the mobile nav trigger use it). */
+@utility extend-touch-target {
+  @media (pointer: coarse) {
+    @apply relative touch-manipulation after:absolute after:-inset-2;
+  }
+}
+
 /* Shiki dual theme (vesper dark / github light, like shadcn): the service
    emits both palettes as CSS variables; dark mode flips to the dark set. */
 .shiki {

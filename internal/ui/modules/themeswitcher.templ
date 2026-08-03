@@ -2,11 +2,15 @@ package modules
 
 import (
 	"github.com/templui/templui/components/button"
-	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/utils"
 )
 
+// ThemeSwitcher is the pendant of shadcn's components/mode-switcher.tsx: the
+// ghost icon button with the half-shaded globe that flips light/dark. Their
+// next-themes call is our localStorage cycle below.
 type ThemeSwitcherProps struct {
-	Class string
+	Variant button.Variant
+	Class   string
 }
 
 templ ThemeSwitcher(props ...ThemeSwitcherProps) {
@@ -78,14 +82,25 @@ templ ThemeSwitcher(props ...ThemeSwitcherProps) {
 			});
 		})();
 	</script>
+	if p.Variant == "" {
+		{{ p.Variant = button.VariantGhost }}
+	}
 	@button.Button(button.Props{
 		Size:    button.SizeIcon,
-		Variant: button.VariantGhost,
-		Class:   p.Class,
+		Variant: p.Variant,
+		Class:   utils.TwMerge("group/toggle extend-touch-target size-8", p.Class),
 		Attributes: templ.Attributes{
 			"data-theme-switcher": "true",
 		},
 	}) {
-		@icon.Eclipse(icon.Props{Class: "size-5"})
+		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4.5">
+			<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+			<path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+			<path d="M12 3l0 18"></path>
+			<path d="M12 9l4.65 -4.65"></path>
+			<path d="M12 14.3l7.37 -7.37"></path>
+			<path d="M12 19.6l8.85 -8.85"></path>
+		</svg>
+		<span class="sr-only">Toggle theme</span>
 	}
 }

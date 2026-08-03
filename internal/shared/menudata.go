@@ -35,16 +35,28 @@ var NavItems = []SideLink{
 
 // TopLevelSections is the pendant of TOP_LEVEL_SECTIONS, which shadcn
 // duplicates verbatim in docs-sidebar.tsx and mobile-nav.tsx; one Go slice
-// serves both modules, reduced to the pages templUI has.
+// serves both modules. It lists the docs pages that sit at the top level of
+// the tree, which for templUI is exactly the "Getting Started" section, so
+// the sidebar and the mobile nav skip that section (their EXCLUDED_SECTIONS).
 var TopLevelSections = []SideLink{
 	{Text: "Introduction", Href: "/docs/introduction"},
 	{Text: "Components", Href: "/docs/components"},
 	{Text: "Installation", Href: "/docs/installation"},
+	{Text: "components.json", Href: "/docs/components-json"},
+	{Text: "Package Imports", Href: "/docs/package-imports"},
 	{Text: "Theming", Href: "/docs/theming"},
-	{Text: "CLI", Href: "/docs/cli"},
 	{Text: "Typeset", Href: "/docs/typeset"},
+	{Text: "Dark Mode", Href: "/docs/dark-mode"},
+	{Text: "CLI", Href: "/docs/cli"},
 	{Text: "Registry", Href: "/docs/registry"},
 	{Text: "Changelog", Href: "/docs/changelog"},
+	{Text: "llms.txt", Href: "/llms.txt"},
+}
+
+// ExcludedSidebarSections is the EXCLUDED_SECTIONS pendant: sections whose
+// pages the "Sections" group already lists.
+var ExcludedSidebarSections = map[string]bool{
+	"Getting Started": true,
 }
 
 type Section struct {

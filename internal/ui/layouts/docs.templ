@@ -1,45 +1,56 @@
 package layouts
 
-import "github.com/templui/templui/internal/ui/modules"
+import (
+	"github.com/templui/templui/components/sidebar"
+	"github.com/templui/templui/internal/ui/modules"
+)
 
+// DocsLayout is the pendant of shadcn's app/(app)/layout.tsx plus
+// app/(app)/docs/layout.tsx: the site shell (header, main, footer) hosting a
+// sidebar provider whose grid holds the docs sidebar and the page. The page
+// body is their docs page frame: content column, sticky toc column.
 templ DocsLayout(title, description string, tocItems []modules.TableOfContentsItem) {
 	@BaseLayout(title, description) {
 		@modules.TableOfContentsScript()
 		@modules.IframeThemeSync()
-		<div class="flex min-h-svh flex-col">
-			@modules.AnnouncementBar()
-			<div class="sticky top-0 z-40 bg-background">
-				@modules.Navbar()
-			</div>
-			<div class="flex flex-1 items-start">
-				<aside class="sticky top-14 relative hidden h-[calc(100svh-3.5rem)] w-72 lg:block">
-					<div class="absolute top-12 right-2 bottom-0 hidden w-px bg-[linear-gradient(to_bottom,transparent_0%,var(--border)_10%,var(--border)_90%,transparent_100%)] lg:flex"></div>
-					<div class="no-scrollbar h-full overflow-y-auto pt-8 pb-8 pl-6 pr-4">
-						@modules.Sidebar()
-					</div>
-				</aside>
-				<main class="min-w-0 flex-1" id="main-content">
-					@templ.Fragment("content") {
-						<div class="px-4 pt-8 pb-8">
-							<div class="mx-auto w-full max-w-160 text-[1.05rem] sm:text-[15px]">
-								{ children... }
+		@modules.AnnouncementBar()
+		@modules.Navbar()
+		<main class="flex min-h-0 flex-1 flex-col">
+			<div class="container-wrapper flex flex-1 flex-col px-2">
+				@sidebar.Provider(sidebar.ProviderProps{
+					Class: "min-h-min flex-1 items-start px-0 [--top-spacing:0] lg:grid lg:grid-cols-[var(--sidebar-width)_minmax(0,1fr)] lg:[--top-spacing:calc(var(--spacing)*4)] 3xl:fixed:container 3xl:fixed:px-3",
+					Attributes: templ.Attributes{
+						"style": "--sidebar-width: calc(var(--spacing) * 72); --sidebar-width-icon: 3rem;",
+					},
+				}) {
+					@modules.Sidebar()
+					<div class="h-full w-full">
+						<div data-slot="docs" class="flex scroll-mt-24 items-stretch pb-8 text-[1.05rem] sm:text-[15px] xl:w-full">
+							<div class="flex min-w-0 flex-1 flex-col" id="main-content">
+								@templ.Fragment("content") {
+									<div class="h-(--top-spacing) shrink-0"></div>
+									<div class="mx-auto flex w-full max-w-160 min-w-0 flex-1 flex-col gap-6 px-4 py-6 text-foreground md:px-0 lg:py-8 dark:text-foreground">
+										{ children... }
+									</div>
+								}
+							</div>
+							<div class="sticky top-[calc(var(--header-height)+1px)] z-30 ml-auto hidden h-[90svh] w-(--sidebar-width) flex-col gap-4 overflow-hidden overscroll-none pb-8 xl:flex">
+								<div class="h-(--top-spacing) shrink-0"></div>
+								@templ.Fragment("toc") {
+									<div class="flex scroll-fade scrollbar-none flex-col gap-8 overflow-y-auto px-8" id="toc-container" hx-swap-oob="true">
+										@modules.TableOfContents(modules.TableOfContentsProps{
+											Items: tocItems,
+										})
+									</div>
+								}
+								<div class="hidden flex-1 flex-col gap-6 px-6 xl:flex">
+									@modules.TocAdCard()
+								</div>
 							</div>
 						</div>
-					}
-				</main>
-				<aside class="sticky top-14 z-30 ml-auto hidden h-[90svh] w-72 flex-col gap-4 overflow-hidden overscroll-none pt-8 pb-8 xl:flex">
-					@templ.Fragment("toc") {
-						<div class="scrollbar-none flex min-h-0 flex-col gap-8 overflow-y-auto px-8" id="toc-container" hx-swap-oob="true">
-							@modules.TableOfContents(modules.TableOfContentsProps{
-								Items: tocItems,
-							})
-						</div>
-					}
-					<div class="hidden flex-1 flex-col gap-6 px-6 xl:flex">
-						@modules.TocAdCard()
 					</div>
-				</aside>
+				}
 			</div>
-		</div>
+		</main>
 	}
 }

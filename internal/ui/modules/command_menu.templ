@@ -1,0 +1,137 @@
+package modules
+
+import (
+	"strings"
+
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/command"
+	"github.com/templui/templui/components/dialog"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/internal/shared"
+)
+
+// CommandMenu is the pendant of shadcn's components/command-menu.tsx: the
+// header search button opening a ⌘K command dialog. The honest reduction of
+// their groups: "Pages" lists the nav items and the sidebar sections follow
+// as groups (their pageGroupsSection over the docs tree). No Styles, Colors,
+// Blocks or full-text search groups, templUI has no pendants for those, and
+// the footer shows the one action every item shares: Go to Page.
+templ CommandMenu() {
+	@button.Button(button.Props{
+		Variant:    button.VariantOutline,
+		Class:      "relative h-8 w-full justify-start rounded-lg border-none bg-muted pl-3 text-foreground shadow-none transition-colors hover:bg-muted/50 md:w-48 lg:w-40 xl:w-64 dark:bg-card",
+		Attributes: dialog.TriggerFor("command-menu"),
+	}) {
+		<span class="hidden xl:inline-flex">Search documentation...</span>
+		<span class="inline-flex xl:hidden">Search...</span>
+	}
+	@command.Dialog(command.DialogProps{
+		ID:          "command-menu",
+		Title:       "Search documentation...",
+		Description: "Search for a command to run...",
+		Class:       "top-[15%] rounded-xl border-none bg-clip-padding p-2 pb-11 shadow-2xl ring-4 ring-neutral-200/80 dark:bg-neutral-900 dark:ring-neutral-800",
+	}) {
+		@command.Command(command.Props{
+			ID:    "site-search",
+			Label: "Search documentation...",
+			Class: "rounded-none bg-transparent **:data-[slot=command-input]:h-9! **:data-[slot=command-input]:py-0 **:data-[slot=command-input-wrapper]:mb-0 **:data-[slot=command-input-wrapper]:h-9! **:data-[slot=command-input-wrapper]:rounded-md **:data-[slot=command-input-wrapper]:border **:data-[slot=command-input-wrapper]:border-input **:data-[slot=command-input-wrapper]:bg-input/50",
+		}) {
+			@command.Input(command.InputProps{Placeholder: "Search documentation..."})
+			@command.List(command.ListProps{Class: "no-scrollbar min-h-80 scroll-pt-2 scroll-pb-1.5"}) {
+				@command.Empty(command.EmptyProps{Class: "py-12 text-center text-sm text-muted-foreground"}) {
+					No results found.
+				}
+				@commandMenuGroup("Pages") {
+					for _, item := range shared.NavItems {
+						@commandMenuItem(item.Href, "Navigation "+item.Text) {
+							@icon.ArrowRight()
+							{ item.Text }
+						}
+					}
+				}
+				for _, section := range shared.Sections {
+					@commandMenuGroup(section.Title) {
+						for _, link := range section.Links {
+							@commandMenuItem(link.Href, section.Title+" "+link.Text) {
+								if strings.Contains(link.Href, "/components/") {
+									<div class="aspect-square size-4 rounded-full border border-dashed border-muted-foreground"></div>
+								} else {
+									@icon.ArrowRight()
+								}
+								{ link.Text }
+							}
+						}
+					}
+				}
+			}
+		}
+		<div class="absolute inset-x-0 bottom-0 z-20 flex h-10 items-center gap-2 rounded-b-xl border-t border-t-neutral-100 bg-neutral-50 px-4 text-xs font-medium text-muted-foreground dark:border-t-neutral-700 dark:bg-neutral-800">
+			<div class="flex items-center gap-2">
+				@commandMenuKbd() {
+					@icon.CornerDownLeft()
+				}
+				Go to Page
+			</div>
+		</div>
+	}
+	@commandMenuScript()
+}
+
+templ commandMenuGroup(heading string) {
+	@command.Group(command.GroupProps{
+		Heading: heading,
+		Class:   "p-0! **:[[cmdk-group-heading]]:scroll-mt-16 **:[[cmdk-group-heading]]:p-3! **:[[cmdk-group-heading]]:pb-1!",
+	}) {
+		{ children... }
+	}
+}
+
+templ commandMenuItem(href, value string) {
+	@command.Item(command.ItemProps{
+		Value: value,
+		Class: "h-9 rounded-md border border-transparent px-3! font-medium data-[selected=true]:border-input data-[selected=true]:bg-input/50",
+		Attributes: templ.Attributes{
+			"data-href": href,
+		},
+	}) {
+		{ children... }
+	}
+}
+
+templ commandMenuKbd() {
+	<kbd class="pointer-events-none flex h-5 items-center justify-center gap-1 rounded border bg-background px-1 font-sans text-[0.7rem] font-medium text-muted-foreground select-none [&_svg:not([class*='size-'])]:size-3">
+		{ children... }
+	</kbd>
+}
+
+templ commandMenuScript() {
+	<script nonce={ templ.GetNonce(ctx) }>
+		(function () {
+			// The reference keydown: ⌘K/ctrl+K or "/" toggles, unless typing
+			// in an editable element.
+			document.addEventListener("keydown", function (e) {
+				if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || e.key === "/") {
+					if (
+						(e.target instanceof HTMLElement && e.target.isContentEditable) ||
+						e.target instanceof HTMLInputElement ||
+						e.target instanceof HTMLTextAreaElement ||
+						e.target instanceof HTMLSelectElement
+					) {
+						return;
+					}
+					e.preventDefault();
+					window.tui.dialog.toggle("command-menu");
+				}
+			});
+
+			// Enter/click on an item = the reference's runCommand(router.push).
+			document.addEventListener("command-select", function (e) {
+				if (!(e.target instanceof Element) || !e.target.closest("#site-search")) return;
+				var item = e.target.closest("[data-href]");
+				if (!item) return;
+				window.tui.dialog.close("command-menu");
+				window.location.href = item.dataset.href;
+			});
+		})();
+	</script>
+}
