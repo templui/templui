@@ -29,10 +29,14 @@ templ CommandMenu() {
 	// docs demo uses, with no class overrides: shadcn's search is built on
 	// their pre-cn command component, so their call site has to re-style the
 	// bare input wrapper. Ours ships that look already.
+	// Three deltas from our command dialog defaults, all three are call-site
+	// classes in command-menu.tsx too: sm:max-w-lg width, top-[15%] instead
+	// of the dialog's third, and pb-11 reserving the footer bar's row.
 	@command.Dialog(command.DialogProps{
 		ID:          "command-menu",
 		Title:       "Search documentation...",
 		Description: "Search for a command to run...",
+		Class:       "top-[15%] sm:max-w-lg pb-11",
 	}) {
 		@command.Command(command.Props{ID: "site-search", Label: "Search documentation..."}) {
 			@command.Input(command.InputProps{Placeholder: "Search documentation..."})
@@ -64,6 +68,16 @@ templ CommandMenu() {
 				}
 			}
 		}
+		// The footer bar from command-menu.tsx: one row pinned to the popup's
+		// bottom, showing the action every item shares.
+		<div class="absolute inset-x-0 bottom-0 z-20 flex h-10 items-center gap-2 rounded-b-xl border-t border-t-neutral-100 bg-neutral-50 px-4 text-xs font-medium text-muted-foreground dark:border-t-neutral-700 dark:bg-neutral-800">
+			<div class="flex items-center gap-2">
+				@commandMenuKbd() {
+					@icon.CornerDownLeft()
+				}
+				Go to Page
+			</div>
+		</div>
 	}
 	@commandMenuScript()
 }
