@@ -56,8 +56,10 @@ templ Sidebar() {
 						@sidebar.GroupContent() {
 							@sidebar.Menu(sidebar.MenuProps{Class: "gap-0.5"}) {
 								for _, link := range section.Links {
-									@sidebar.MenuItem() {
-										@docsSidebarLink(link, link.Href == path)
+									if !shared.ExcludedSidebarPages[link.Href] {
+										@sidebar.MenuItem() {
+											@docsSidebarLink(link, link.Href == path)
+										}
 									}
 								}
 							}
@@ -96,6 +98,9 @@ templ docsSidebarLink(link shared.SideLink, active bool) {
 	}) {
 		<span class="absolute inset-0 flex w-(--sidebar-menu-width) bg-transparent"></span>
 		{ link.Text }
+		if shared.PageIsNew(link.Href) {
+			<span class="flex size-2 rounded-full bg-blue-500" title="New"></span>
+		}
 	}
 }
 

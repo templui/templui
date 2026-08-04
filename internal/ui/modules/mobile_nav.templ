@@ -69,9 +69,9 @@ templ MobileNav(class string) {
 				</div>
 			</div>
 			<div class="flex flex-col gap-8">
-				// Their tree loop renders the folder groups only; the top level
-				// pages are already in Sections above, so the section that holds
-				// them is skipped (ExcludedSidebarSections).
+				// Their tree loop: one group per docs folder, minus the
+				// EXCLUDED_SECTIONS folders and the EXCLUDED_PAGES links that
+				// the Sections list above already carries.
 				for _, section := range shared.Sections {
 					if !shared.ExcludedSidebarSections[section.Title] {
 						<div class="flex flex-col gap-4">
@@ -80,8 +80,10 @@ templ MobileNav(class string) {
 							</div>
 							<div class="flex flex-col gap-3">
 								for _, link := range section.Links {
-									@mobileLink(link.Href) {
-										{ link.Text }
+									if !shared.ExcludedSidebarPages[link.Href] {
+										@mobileLink(link.Href) {
+											{ link.Text }
+										}
 									}
 								}
 							</div>
@@ -99,6 +101,9 @@ templ MobileNav(class string) {
 templ mobileLink(href string) {
 	<a href={ templ.SafeURL(href) } class="flex items-center gap-2 text-2xl font-medium">
 		{ children... }
+		if shared.PageIsNew(href) {
+			<span class="flex size-2 rounded-full bg-blue-500"></span>
+		}
 	</a>
 }
 

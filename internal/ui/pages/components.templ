@@ -6,42 +6,52 @@ import (
 	"github.com/templui/templui/internal/ui/modules"
 )
 
-templ ComponentsOverview() {
+// ComponentsOverview is the pendant of the reference's
+// content/docs/components/index.mdx rendered through the docs shell: the
+// markdown page header and pager, a New Components section listing only
+// PAGES_NEW members (no dots), then All Components where the new ones carry
+// the blue dot (components-list.tsx showNewIndicator).
+templ ComponentsOverview(prev, next PagerLink) {
 	@layouts.DocsLayout(
 		"Components",
-		"Browse all available UI components in the templUI library. Beautiful, accessible components for Go templ.",
-		[]modules.TableOfContentsItem{},
+		"Here you can find all the components available in the library. We are working on adding more components.",
+		[]modules.TableOfContentsItem{
+			{ID: "new-components", Text: "New Components"},
+			{ID: "all-components", Text: "All Components"},
+		},
 	) {
-		@modules.PageWrapper(modules.PageWrapperProps{
-			Name:        "Components",
-			Description: templ.Raw("Browse all available UI components in the templUI library. Beautiful, accessible components for Go templ."),
-			Breadcrumbs: modules.Breadcrumbs{
-				Items: []modules.BreadcrumbItem{
-					{
-						Text: "Docs",
-						Path: "/docs",
-					},
-					{
-						Text: "Components",
-					},
-				},
-			},
-			HideSource: true,
-		}) {
-			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-x-8 lg:gap-x-16 lg:gap-y-6 xl:gap-x-20">
-				for _, section := range shared.Sections {
-					if section.Title == "Components" {
-						for _, link := range section.Links {
-							<a
-								href={ templ.SafeURL(link.Href) }
-								class="text-lg font-medium underline-offset-4 hover:underline md:text-base"
-							>
-								{ link.Text }
-							</a>
-						}
+		<div class="flex w-full flex-1 flex-col gap-6">
+			@modules.DocsPageHeader("Components", "Here you can find all the components available in the library. We are working on adding more components.", prev.Href, next.Href)
+			<div class="typeset w-full flex-1 pb-16 sm:pb-0">
+				<h2 id="new-components">New Components</h2>
+				@componentsGrid(true, false)
+				<h2 id="all-components">All Components</h2>
+				@componentsGrid(false, true)
+			</div>
+			@modules.DocsPager(prev.Title, prev.Href, next.Title, next.Href)
+		</div>
+	}
+}
+
+templ componentsGrid(onlyNew bool, showNewIndicator bool) {
+	<div data-not-typeset class="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-x-8 lg:gap-x-16 lg:gap-y-6 xl:gap-x-20">
+		for _, section := range shared.Sections {
+			if section.Title == "Components" {
+				for _, link := range section.Links {
+					if !onlyNew || shared.PageIsNew(link.Href) {
+						<a
+							href={ templ.SafeURL(link.Href) }
+							class="inline-flex items-center gap-2 text-lg font-medium underline-offset-4 hover:underline md:text-base"
+						>
+							{ link.Text }
+							if showNewIndicator && shared.PageIsNew(link.Href) {
+								<span class="sr-only">New</span>
+								<span aria-hidden="true" class="flex size-2 rounded-full bg-blue-500"></span>
+							}
+						</a>
 					}
 				}
-			</div>
+			}
 		}
-	}
+	</div>
 }

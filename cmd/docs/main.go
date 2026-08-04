@@ -88,7 +88,8 @@ func main() {
 	mux.Handle("GET /{$}", templ.Handler(pages.IndexPage()))
 	mux.Handle("GET /docs", http.RedirectHandler("/docs/introduction", http.StatusSeeOther))
 	mux.Handle("GET /docs/getting-started", http.RedirectHandler("/docs/introduction", http.StatusSeeOther))
-	mux.Handle("GET /docs/components", htmxHandler(pages.ComponentsOverview()))
+	componentsPrev, componentsNext := docsPagerLinks("/docs/components")
+	mux.Handle("GET /docs/components", htmxHandler(pages.ComponentsOverview(componentsPrev, componentsNext)))
 	mux.Handle("GET /create", htmxHandler(pages.Create()))
 	mux.Handle("GET /create/preview", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		item := r.URL.Query().Get("item")
@@ -346,6 +347,12 @@ func componentDocHandler(docsService *service.DocsService) http.Handler {
 func docsPagerLinks(href string) (pages.PagerLink, pages.PagerLink) {
 	var flat []shared.SideLink
 	for _, section := range shared.Sections {
+		// The components overview is the section's index page: it sits
+		// between the last root page and the first component, like the
+		// reference's components/index.mdx in the page tree.
+		if section.Title == "Components" {
+			flat = append(flat, shared.SideLink{Text: "Components", Href: "/docs/components"})
+		}
 		for _, link := range section.Links {
 			if strings.HasPrefix(link.Href, "/docs/") {
 				flat = append(flat, link)

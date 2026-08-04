@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"slices"
 	"sort"
 
 	"github.com/templui/templui/internal/registry"
@@ -10,7 +11,7 @@ import (
 // (and their raw markdown under /docs/<slug>.md). cmd/docs registers the
 // routes from this list and cmd/sitemap generates the sitemap from it.
 var DocSlugs = []string{
-	"introduction", "installation", "components-json", "package-imports", "theming", "typeset", "dark-mode", "cli", "changelog",
+	"introduction", "installation", "components-json", "package-imports", "theming", "typeset", "dark-mode", "cli", "changelog", "import-workflow",
 	"utils/scroll-fade", "utils/shimmer",
 	"registry", "registry/getting-started", "registry/registry-json", "registry/registry-item-json",
 }
@@ -33,30 +34,68 @@ var NavItems = []SideLink{
 	{Text: "Create", Href: "/create"},
 }
 
-// TopLevelSections is the pendant of TOP_LEVEL_SECTIONS, which shadcn
-// duplicates verbatim in docs-sidebar.tsx and mobile-nav.tsx; one Go slice
-// serves both modules. It lists the docs pages that sit at the top level of
-// the tree, which for templUI is exactly the "Getting Started" section, so
-// the sidebar and the mobile nav skip that section (their EXCLUDED_SECTIONS).
+// TopLevelSections is the 1:1 pendant of TOP_LEVEL_SECTIONS in shadcn's
+// docs-sidebar.tsx (mobile-nav.tsx duplicates it verbatim; one Go slice
+// serves both modules): same entries, same order, minus Skills, which has no
+// templUI page yet. Their Introduction href is the /docs index page; ours
+// lives at /docs/introduction.
 var TopLevelSections = []SideLink{
 	{Text: "Introduction", Href: "/docs/introduction"},
 	{Text: "Components", Href: "/docs/components"},
 	{Text: "Installation", Href: "/docs/installation"},
-	{Text: "components.json", Href: "/docs/components-json"},
-	{Text: "Package Imports", Href: "/docs/package-imports"},
 	{Text: "Theming", Href: "/docs/theming"},
-	{Text: "Typeset", Href: "/docs/typeset"},
-	{Text: "Dark Mode", Href: "/docs/dark-mode"},
 	{Text: "CLI", Href: "/docs/cli"},
+	{Text: "Typeset", Href: "/docs/typeset"},
 	{Text: "Registry", Href: "/docs/registry"},
 	{Text: "Changelog", Href: "/docs/changelog"},
-	{Text: "llms.txt", Href: "/llms.txt"},
 }
 
-// ExcludedSidebarSections is the EXCLUDED_SECTIONS pendant: sections whose
-// pages the "Sections" group already lists.
-var ExcludedSidebarSections = map[string]bool{
-	"Getting Started": true,
+// ExcludedSidebarSections is the EXCLUDED_SECTIONS pendant: doc tree folders
+// the sidebar does not render as groups. shadcn lists installation,
+// dark-mode, changelog and rtl there - all folders templUI does not have, so
+// the map is empty until one of them grows a section.
+var ExcludedSidebarSections = map[string]bool{}
+
+// ExcludedSidebarPages is the EXCLUDED_PAGES pendant: pages that stay in the
+// section data (the docs pager walks it) but are not rendered inside their
+// group because the "Sections" list above already links them. Theirs excludes
+// /docs (their Introduction) and /docs/changelog the same way.
+var ExcludedSidebarPages = map[string]bool{
+	"/docs/introduction": true,
+	"/docs/changelog":    true,
+}
+
+// PagesNew is the PAGES_NEW pendant of shadcn's lib/docs.ts: docs URLs that
+// render the blue "New" dot in the sidebar, the mobile nav and the components
+// list. Ours marks what templUI 2.0 adds over v1: components without a v1
+// predecessor (renames like dropdown -> dropdown-menu, radio -> radio-group,
+// selectbox -> select do not count, date picker became a pattern page) and
+// the new docs pages. Curated by hand like the reference: a PR that adds a
+// page adds its entry here, and the list is pruned at the release after the
+// one that introduced the entries.
+var PagesNew = []string{
+	"/docs/typeset",
+	"/docs/utils/scroll-fade",
+	"/docs/utils/shimmer",
+	"/docs/components/alert-dialog",
+	"/docs/components/button-group",
+	"/docs/components/combobox",
+	"/docs/components/command",
+	"/docs/components/context-menu",
+	"/docs/components/drawer",
+	"/docs/components/empty",
+	"/docs/components/field",
+	"/docs/components/input-group",
+	"/docs/components/item",
+	"/docs/components/kbd",
+	"/docs/components/spinner",
+	"/docs/components/toggle",
+	"/docs/components/toggle-group",
+}
+
+// PageIsNew reports whether a docs URL is in PagesNew.
+func PageIsNew(href string) bool {
+	return slices.Contains(PagesNew, href)
 }
 
 type Section struct {
@@ -83,8 +122,19 @@ func loadComponentsFromRegistry() []SideLink {
 }
 
 var Sections = []Section{
+	// Group order is the reference's root meta.json tree order: components
+	// first, then the (root) Get Started folder, then utils and registry
+	// (react, helpers and forms have no templUI pages yet).
 	{
-		Title: "Getting Started",
+		Title: "Components",
+		Links: loadComponentsFromRegistry(),
+	},
+	// "Get Started" is their root folder title (content/docs/(root)/meta.json);
+	// like the reference, the group repeats pages the Sections list also has
+	// (Installation, Theming, Typeset, CLI) and hides Introduction and
+	// Changelog via ExcludedSidebarPages.
+	{
+		Title: "Get Started",
 		Links: []SideLink{
 			{
 				Text: "Introduction",
@@ -131,10 +181,6 @@ var Sections = []Section{
 			},
 		},
 	},
-	{
-		Title: "Components",
-		Links: loadComponentsFromRegistry(),
-	},
 	// Utilities before Registry, per shadcn's root meta.json section order
 	// (utils, registry); the page lists mirror utils/meta.json and the
 	// ported subset of registry/meta.json.
@@ -169,6 +215,17 @@ var Sections = []Section{
 			{
 				Text: "registry-item.json",
 				Href: "/docs/registry/registry-item-json",
+			},
+		},
+	},
+	// templUI extra, deliberately its own section at the bottom: the import
+	// workflow lives outside the shadcn-parity chapters.
+	{
+		Title: "Go Module",
+		Links: []SideLink{
+			{
+				Text: "Import Workflow",
+				Href: "/docs/import-workflow",
 			},
 		},
 	},
