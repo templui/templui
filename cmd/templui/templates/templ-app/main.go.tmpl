@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/a-h/templ"
 
@@ -16,11 +18,41 @@ func main() {
 	setupAssetsRoutes(mux)
 	mux.Handle("GET /", templ.Handler(pages.Home()))
 
-	fmt.Println("Server is running on http://localhost:8090")
-	if err := http.ListenAndServe(":8090", mux); err != nil {
+	ln, err := listen()
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+	fmt.Printf("Server is running on http://localhost:%d\n", ln.Addr().(*net.TCPAddr).Port)
+	if err := http.Serve(ln, mux); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+// listen binds the port. An explicit PORT binds exactly (the templ proxy in
+// the Taskfile points at it, so silently moving would break hot reload);
+// without PORT it walks from 8090 to the next free port like node dev
+// servers do.
+func listen() (net.Listener, error) {
+	if env := os.Getenv("PORT"); env != "" {
+		port, err := strconv.Atoi(env)
+		if err != nil {
+			return nil, fmt.Errorf("invalid PORT %q", env)
+		}
+		ln, err := net.Listen("tcp", ":"+strconv.Itoa(port))
+		if err != nil {
+			return nil, fmt.Errorf("port %d is busy - stop the other app or run with another port, e.g. 'task dev PORT=%d'", port, port+1)
+		}
+		return ln, nil
+	}
+	for port := 8090; port < 8100; port++ {
+		ln, err := net.Listen("tcp", ":"+strconv.Itoa(port))
+		if err == nil {
+			return ln, nil
+		}
+	}
+	return nil, fmt.Errorf("no free port found from 8090 upwards")
 }
 
 func setupAssetsRoutes(mux *http.ServeMux) {

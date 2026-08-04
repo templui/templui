@@ -1,10 +1,20 @@
 version: "3"
 
+vars:
+  # The app port: an explicit 'task dev PORT=8091' wins, otherwise the next
+  # free port from 8090 up. The templ proxy and the app share the result,
+  # so hot reload never points at a foreign app.
+  FREE_PORT:
+    sh: port=8090; while nc -z localhost $port >/dev/null 2>&1; do port=$((port+1)); done; echo $port
+  PORT: '{{.PORT | default .FREE_PORT}}'
+
 tasks:
   templ:
     desc: Run templ with integrated server and hot reload
     cmds:
-      - templ generate --watch --proxy="http://localhost:8090" --cmd="go run ./main.go" --open-browser=false
+      - templ generate --watch --proxy="http://localhost:{{.PORT}}" --cmd="go run ./main.go" --open-browser=false
+    env:
+      PORT: "{{.PORT}}"
 
   tailwind:
     desc: Watch Tailwind CSS changes
