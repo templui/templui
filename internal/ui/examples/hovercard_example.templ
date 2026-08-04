@@ -49,7 +49,7 @@ templ hoverCardExampleSidesSection() {
 	@hoverCardExampleSection("Sides", "col-span-2") {
 		<div class="flex flex-wrap items-center justify-center gap-2">
 			for _, side := range hoverCardExampleSides() {
-				@hovercard.HoverCard(hovercard.Props{OpenDelay: 100, CloseDelay: 100}) {
+				@hovercard.HoverCard(hovercard.Props{Delay: 100, CloseDelay: 100}) {
 					@button.Button(button.Props{
 						Variant:    button.VariantOutline,
 						Class:      "capitalize",
@@ -87,7 +87,7 @@ templ hoverCardExampleInDialog() {
 						Hover over the button below to see the hover card.
 					}
 				}
-				@hovercard.HoverCard(hovercard.Props{OpenDelay: 100, CloseDelay: 100}) {
+				@hovercard.HoverCard(hovercard.Props{Delay: 100, CloseDelay: 100}) {
 					@button.Button(button.Props{
 						Variant:    button.VariantOutline,
 						Class:      "w-fit",

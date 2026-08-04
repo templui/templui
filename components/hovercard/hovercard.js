@@ -105,7 +105,7 @@
     clearTimeout(content._tuiClose);
     content._tuiClose = null;
     if (content.getAttribute("data-state") === "open" || content._tuiOpen) return;
-    const delay = parseInt(content.getAttribute("data-tui-hovercard-open-delay"), 10) || 700;
+    const delay = parseInt(content.getAttribute("data-tui-hovercard-delay"), 10) || 600;
     content._tuiOpen = setTimeout(() => {
       content._tuiOpen = null;
       open(content, trigger);

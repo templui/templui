@@ -61,8 +61,8 @@ func Trigger(ctx context.Context) templ.Attributes {
 
 type Props struct {
 	ID string
-	// OpenDelay is the hover intent before showing, in ms. Defaults to 700.
-	OpenDelay int
+	// Delay is the hover intent before showing, in ms. Defaults to 600 like Base UI.
+	Delay int
 	// CloseDelay is the grace period before hiding, in ms. Defaults to 300.
 	CloseDelay int
 }
@@ -112,14 +112,14 @@ func HoverCard(props ...Props) templ.Component {
 		if p.ID == "" {
 			p.ID = utils.RandomID()
 		}
-		if p.OpenDelay == 0 {
-			p.OpenDelay = 700
+		if p.Delay == 0 {
+			p.Delay = 600
 		}
 		if p.CloseDelay == 0 {
 			p.CloseDelay = 300
 		}
 		ctx = context.WithValue(ctx, idKey, p.ID)
-		ctx = context.WithValue(ctx, delaysKey{}, delays{open: p.OpenDelay, close: p.CloseDelay})
+		ctx = context.WithValue(ctx, delaysKey{}, delays{open: p.Delay, close: p.CloseDelay})
 		templ_7745c5c3_Err = templ_7745c5c3_Var1.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -250,14 +250,14 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" data-tui-hovercard-open-delay=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" data-tui-hovercard-delay=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(d.open))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/hovercard/hovercard.templ`, Line: 127, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/hovercard/hovercard.templ`, Line: 127, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {

@@ -53,8 +53,8 @@ func Trigger(ctx context.Context) templ.Attributes {
 
 type Props struct {
 	ID string
-	// OpenDelay is the hover intent before showing, in ms. Defaults to 700.
-	OpenDelay int
+	// Delay is the hover intent before showing, in ms. Defaults to 600 like Base UI.
+	Delay int
 	// CloseDelay is the grace period before hiding, in ms. Defaults to 300.
 	CloseDelay int
 }
@@ -84,14 +84,14 @@ templ HoverCard(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	if p.OpenDelay == 0 {
-		{{ p.OpenDelay = 700 }}
+	if p.Delay == 0 {
+		{{ p.Delay = 600 }}
 	}
 	if p.CloseDelay == 0 {
 		{{ p.CloseDelay = 300 }}
 	}
 	{{ ctx = context.WithValue(ctx, idKey, p.ID) }}
-	{{ ctx = context.WithValue(ctx, delaysKey{}, delays{open: p.OpenDelay, close: p.CloseDelay}) }}
+	{{ ctx = context.WithValue(ctx, delaysKey{}, delays{open: p.Delay, close: p.CloseDelay}) }}
 	{ children... }
 }
 
@@ -124,7 +124,7 @@ templ Content(props ...ContentProps) {
 		data-tui-hovercard-align={ string(p.Align) }
 		data-tui-hovercard-side-offset={ strconv.Itoa(p.SideOffset) }
 		data-tui-hovercard-align-offset={ strconv.Itoa(p.AlignOffset) }
-		data-tui-hovercard-open-delay={ strconv.Itoa(d.open) }
+		data-tui-hovercard-delay={ strconv.Itoa(d.open) }
 		data-tui-hovercard-close-delay={ strconv.Itoa(d.close) }
 		data-state="closed"
 		popover="manual"

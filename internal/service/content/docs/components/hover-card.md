@@ -72,10 +72,10 @@ hovercard.HoverCard
 
 ## Trigger Delays
 
-Use `OpenDelay` and `CloseDelay` on the root to control when the card opens and closes.
+Use `Delay` and `CloseDelay` on the root to control when the card opens and closes.
 
 ```templ showLineNumbers
-@hovercard.HoverCard(hovercard.Props{OpenDelay: 100, CloseDelay: 200}) {
+@hovercard.HoverCard(hovercard.Props{Delay: 100, CloseDelay: 200}) {
 	<span { hovercard.Trigger(ctx)... }>Hover</span>
 	@hovercard.Content() {
 		Content
@@ -112,7 +112,7 @@ The `HoverCard` component is the root that links trigger and content and control
 
 | Prop         | Type  | Default |
 | ------------ | ----- | ------- |
-| `OpenDelay`  | `int` | `700`   |
+| `Delay`  | `int` | `600`   |
 | `CloseDelay` | `int` | `300`   |
 
 ### Trigger
