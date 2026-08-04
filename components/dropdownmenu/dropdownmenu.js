@@ -477,7 +477,7 @@
     if (item) {
       if (
         item.getAttribute("aria-disabled") !== "true" &&
-        item.getAttribute("data-tui-dropdownmenu-prevent-close") !== "true"
+        item.getAttribute("data-tui-dropdownmenu-disable-close-on-click") !== "true"
       ) {
         const content = item.closest("[data-tui-dropdownmenu-content]");
         if (content) close(content, true);

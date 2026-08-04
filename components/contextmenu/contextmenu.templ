@@ -67,7 +67,7 @@ type ItemProps struct {
 	Inset        bool
 	Href         string
 	Target       string
-	PreventClose bool
+	DisableCloseOnClick bool
 }
 
 type CheckboxItemProps struct {
@@ -270,8 +270,8 @@ templ Item(props ...ItemProps) {
 			data-variant={ string(p.Variant) }
 			data-inset?={ p.Inset }
 			data-tui-contextmenu-item
-			if p.PreventClose {
-				data-tui-contextmenu-prevent-close="true"
+			if p.DisableCloseOnClick {
+				data-tui-contextmenu-disable-close-on-click="true"
 			}
 			if p.Disabled {
 				aria-disabled="true"
@@ -290,8 +290,8 @@ templ Item(props ...ItemProps) {
 			data-variant={ string(p.Variant) }
 			data-inset?={ p.Inset }
 			data-tui-contextmenu-item
-			if p.PreventClose {
-				data-tui-contextmenu-prevent-close="true"
+			if p.DisableCloseOnClick {
+				data-tui-contextmenu-disable-close-on-click="true"
 			}
 			disabled?={ p.Disabled }
 			role="menuitem"

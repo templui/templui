@@ -464,7 +464,7 @@
     if (item) {
       if (
         item.getAttribute("aria-disabled") !== "true" &&
-        item.getAttribute("data-tui-contextmenu-prevent-close") !== "true"
+        item.getAttribute("data-tui-contextmenu-disable-close-on-click") !== "true"
       ) {
         const content = item.closest("[data-tui-contextmenu-content]");
         if (content) close(content);

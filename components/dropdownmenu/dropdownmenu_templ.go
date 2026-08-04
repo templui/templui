@@ -96,15 +96,15 @@ type LabelProps struct {
 }
 
 type ItemProps struct {
-	ID           string
-	Class        string
-	Attributes   templ.Attributes
-	Variant      ItemVariant
-	Disabled     bool
-	Inset        bool
-	Href         string
-	Target       string
-	PreventClose bool
+	ID                  string
+	Class               string
+	Attributes          templ.Attributes
+	Variant             ItemVariant
+	Disabled            bool
+	Inset               bool
+	Href                string
+	Target              string
+	DisableCloseOnClick bool
 }
 
 type CheckboxItemProps struct {
@@ -691,8 +691,8 @@ func Item(props ...ItemProps) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if p.PreventClose {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, " data-tui-dropdownmenu-prevent-close=\"true\"")
+			if p.DisableCloseOnClick {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, " data-tui-dropdownmenu-disable-close-on-click=\"true\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -792,8 +792,8 @@ func Item(props ...ItemProps) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if p.PreventClose {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, " data-tui-dropdownmenu-prevent-close=\"true\"")
+			if p.DisableCloseOnClick {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, " data-tui-dropdownmenu-disable-close-on-click=\"true\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
