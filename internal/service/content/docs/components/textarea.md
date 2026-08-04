@@ -86,6 +86,6 @@ The `Textarea` component renders a native textarea element.
 | `Placeholder` | `string` | -       |
 | `Rows`        | `int`    | -       |
 | `Disabled`    | `bool`   | `false` |
-| `Readonly`    | `bool`   | `false` |
+| `ReadOnly`    | `bool`   | `false` |
 | `Required`    | `bool`   | `false` |
 | `Class`       | `string` | -       |

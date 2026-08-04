@@ -15,7 +15,7 @@ type Props struct {
 	Placeholder string
 	Rows        int
 	Disabled    bool
-	Readonly    bool
+	ReadOnly    bool
 }
 
 templ Textarea(props ...Props) {
@@ -44,7 +44,7 @@ templ Textarea(props ...Props) {
 			rows={ strconv.Itoa(p.Rows) }
 		}
 		disabled?={ p.Disabled }
-		readonly?={ p.Readonly }
+		readonly?={ p.ReadOnly }
 		class={
 			utils.CN(
 				// 1:1 base/ui/textarea.tsx: structure lives here, the look comes

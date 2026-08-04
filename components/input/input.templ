@@ -31,9 +31,9 @@ type Props struct {
 	Placeholder string
 	Value       string
 	Disabled    bool
-	Readonly    bool
+	ReadOnly    bool
 	Required    bool
-	FileAccept  string
+	Accept  string
 }
 
 templ Input(props ...Props) {
@@ -62,14 +62,14 @@ templ Input(props ...Props) {
 		if p.Value != "" {
 			value={ p.Value }
 		}
-		if p.Type == TypeFile && p.FileAccept != "" {
-			accept={ p.FileAccept }
+		if p.Type == TypeFile && p.Accept != "" {
+			accept={ p.Accept }
 		}
 		if p.Form != "" {
 			form={ p.Form }
 		}
 		disabled?={ p.Disabled }
-		readonly?={ p.Readonly }
+		readonly?={ p.ReadOnly }
 		required?={ p.Required }
 		class={
 			utils.CN(

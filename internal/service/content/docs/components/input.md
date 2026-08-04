@@ -138,8 +138,8 @@ The `Input` component displays a native input element.
 | `Value`       | `string`                                                                    | -          |
 | `Placeholder` | `string`                                                                    | -          |
 | `Disabled`    | `bool`                                                                      | `false`    |
-| `Readonly`    | `bool`                                                                      | `false`    |
+| `ReadOnly`    | `bool`                                                                      | `false`    |
 | `Required`    | `bool`                                                                      | `false`    |
-| `FileAccept`  | `string`                                                                    | -          |
+| `Accept`  | `string`                                                                    | -          |
 | `Form`        | `string`                                                                    | -          |
 | `Class`       | `string`                                                                    | -          |

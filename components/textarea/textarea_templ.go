@@ -23,7 +23,7 @@ type Props struct {
 	Placeholder string
 	Rows        int
 	Disabled    bool
-	Readonly    bool
+	ReadOnly    bool
 }
 
 func Textarea(props ...Props) templ.Component {
@@ -170,7 +170,7 @@ func Textarea(props ...Props) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if p.Readonly {
+		if p.ReadOnly {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, " readonly")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
