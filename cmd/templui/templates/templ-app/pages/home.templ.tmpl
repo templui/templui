@@ -1,0 +1,16 @@
+package pages
+
+import (
+	"templ-app/components/button"
+	"templ-app/layouts"
+)
+
+templ Home() {
+	@layouts.Base("templ-app") {
+		<div class="flex min-h-svh items-center justify-center">
+			@button.Button() {
+				Click me
+			}
+		</div>
+	}
+}

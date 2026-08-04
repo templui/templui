@@ -1,0 +1,39 @@
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"os"
+
+	"github.com/a-h/templ"
+
+	"templ-app/components"
+	"templ-app/pages"
+)
+
+func main() {
+	mux := http.NewServeMux()
+	setupAssetsRoutes(mux)
+	mux.Handle("GET /", templ.Handler(pages.Home()))
+
+	fmt.Println("Server is running on http://localhost:8090")
+	if err := http.ListenAndServe(":8090", mux); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+func setupAssetsRoutes(mux *http.ServeMux) {
+	assetHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if os.Getenv("GO_ENV") != "production" {
+			w.Header().Set("Cache-Control", "no-store")
+		} else {
+			w.Header().Set("Cache-Control", "public, max-age=31536000")
+		}
+		http.FileServer(http.Dir("./assets")).ServeHTTP(w, r)
+	})
+	mux.Handle("GET /assets/", http.StripPrefix("/assets/", assetHandler))
+
+	// The component JS bundle (hashed name plus the templui.js alias).
+	mux.Handle("GET /components/{bundle}", components.ScriptsHandler())
+}

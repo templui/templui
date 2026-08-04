@@ -52,7 +52,7 @@ func version() string {
 const usage = `templui - add components and dependencies to your project
 
 Usage:
-  templui init [--preset <code|url|name>] [--base-color <color>] [--css <path>] [--force] [--silent] [--registry <url>]
+  templui init [name] [--template <templ>] [--preset <code|url|name>] [--base-color <color>] [--css <path>] [--force] [--silent] [--registry <url>]
   templui add <components...|url> [--all] [--overwrite] [--path <path>] [--silent] [--registry <url>]
   templui apply <preset> [--only theme|font] [--yes] [--silent] [--registry <url>]
   templui preset decode <code> [--json]
@@ -96,7 +96,11 @@ func main() {
 	case "init":
 		var opts commands.InitOptions
 		fs := commands.NewInitFlagSet(&opts)
-		if _, err = parseFlags(fs, args[1:]); err == nil {
+		var rest []string
+		if rest, err = parseFlags(fs, args[1:]); err == nil {
+			if len(rest) > 0 {
+				opts.ProjectName = rest[0]
+			}
 			err = commands.RunInit(opts)
 		}
 	case "add":

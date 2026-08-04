@@ -1,13 +1,14 @@
 // The init command, the pendant of src/commands/init.ts reduced to the
 // templui feature set: fetch the registry:base item for a preset (or the
 // defaults), write components.json, merge the theme CSS into the user's
-// Tailwind entry file and install the utils lib item.
+// Tailwind entry file and install the utils lib item. --template scaffolds a
+// new project from an embedded template first, like their init -t next.
 //
-// Dropped npm-only options, all without a Go pendant: --template (framework
-// scaffolds), --base (component library selection; templui ships one
-// implementation), --monorepo, --cssVariables/--rtl/--pointer toggles beyond
-// what a preset encodes, --defaults/-y prompt shortcuts (this init does not
-// prompt for design choices), and the interactive preset picker.
+// Dropped npm-only options, all without a Go pendant: --base (component
+// library selection; templui ships one implementation), --monorepo,
+// --cssVariables/--rtl/--pointer toggles beyond what a preset encodes,
+// --defaults/-y prompt shortcuts (this init does not prompt for design
+// choices), and the interactive preset picker.
 package commands
 
 import (
@@ -18,18 +19,21 @@ import (
 	"strings"
 
 	"github.com/templui/templui/cmd/templui/registry"
+	"github.com/templui/templui/cmd/templui/templates"
 	"github.com/templui/templui/cmd/templui/utils"
 )
 
 // InitOptions are the flags of templui init.
 type InitOptions struct {
-	Cwd       string
-	Preset    string
-	BaseColor string
-	CSS       string
-	Force     bool
-	Silent    bool
-	Registry  string
+	Cwd         string
+	Preset      string
+	BaseColor   string
+	CSS         string
+	Template    string
+	ProjectName string
+	Force       bool
+	Silent      bool
+	Registry    string
 }
 
 // NewInitFlagSet declares the init flags.
@@ -37,6 +41,8 @@ func NewInitFlagSet(opts *InitOptions) *flag.FlagSet {
 	fs := flag.NewFlagSet("init", flag.ContinueOnError)
 	fs.StringVar(&opts.Preset, "preset", "", "use a preset configuration (code, URL or name)")
 	fs.StringVar(&opts.Preset, "p", "", "shorthand for --preset")
+	fs.StringVar(&opts.Template, "template", "", "scaffold a new project from a template ("+strings.Join(templates.Names(), ", ")+")")
+	fs.StringVar(&opts.Template, "t", "", "shorthand for --template")
 	fs.StringVar(&opts.BaseColor, "base-color", "", "override the base color")
 	fs.StringVar(&opts.CSS, "css", "", "path to your Tailwind CSS entry file")
 	fs.BoolVar(&opts.Force, "force", false, "force overwrite of existing configuration")
@@ -56,6 +62,27 @@ func RunInit(opts InitOptions) error {
 		return err
 	}
 	registryURL := registry.Resolve(opts.Registry)
+
+	// --template scaffolds a new project first (create-template.ts): copy
+	// the embedded template into <cwd>/<name> and continue init in there.
+	scaffolded := false
+	if opts.Template != "" {
+		template, ok := templates.Templates[opts.Template]
+		if !ok {
+			return fmt.Errorf("unknown template %q, valid templates: %s", opts.Template, strings.Join(templates.Names(), ", "))
+		}
+		projectName := opts.ProjectName
+		if projectName == "" {
+			projectName = template.DefaultProjectName
+		}
+		projectPath := filepath.Join(cwd, projectName)
+		logf(opts.Silent, "Creating a new %s project in %s.\n", template.Title, projectName)
+		if err := templates.Create(template, projectPath, projectName); err != nil {
+			return err
+		}
+		cwd = projectPath
+		scaffolded = true
+	}
 
 	// Preflight: a Go module is the templui pendant of a framework project.
 	module, err := utils.ModulePath(cwd)
@@ -156,6 +183,19 @@ func RunInit(opts InitOptions) error {
 		Silent:           opts.Silent,
 	}); err != nil {
 		return err
+	}
+
+	if scaffolded {
+		// The template's home page renders the button component, like their
+		// templates install component-example for the scaffolded page.
+		if err := addComponents([]string{"button"}, config, registryURL, addComponentsOptions{
+			Overwrite: true,
+			Silent:    opts.Silent,
+		}); err != nil {
+			return err
+		}
+		logf(opts.Silent, "\nProject initialization completed.\nNext steps:\n\n  cd %s\n  go mod tidy\n  task dev\n", filepath.Base(cwd))
+		return nil
 	}
 
 	logf(opts.Silent, "\nProject initialization completed.\nYou may now add components.\n")
