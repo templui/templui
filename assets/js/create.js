@@ -736,10 +736,10 @@
   // ----- get code dialog (project-form.tsx) ----------------------------------
 
   // The command builders. Our pendants of the shadcn init/apply commands have
-  // no package manager variants (the CLI installs via go install) and no
-  // template/base/monorepo/rtl/pointer flags (templui init takes none).
+  // no package manager variants (the CLI installs via go install) and one
+  // template (-t templ scaffolds the runnable project like their -t next).
   function initCommand() {
-    return "templui init --preset " + getPresetCode(params);
+    return "templui init -t templ --preset " + getPresetCode(params);
   }
 
   function applyCommand() {

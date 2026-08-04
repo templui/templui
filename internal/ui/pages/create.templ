@@ -819,13 +819,13 @@ templ createCodeDialog() {
 							// The one-line CLI install hint from installation.md
 							// (there are no framework templates to pick).
 							@field.Description() {
-								Run init inside your Go module to start a new project with this preset. Get the CLI with <code class="font-mono">go install github.com/templui/templui/cmd/templui@latest</code>.
+								Scaffolds a new templ project with this preset. Get the CLI with <code class="font-mono">go install github.com/templui/templui/cmd/templui@latest</code>.
 							}
 						}
 					}
 					@dialog.Footer(dialog.FooterProps{Class: "m-0 min-w-0 p-6"}) {
 						<div class="flex w-full min-w-0 flex-col gap-3">
-							@createCommandBox("command", "init", "templui init --preset b0")
+							@createCommandBox("command", "init", "templui init -t templ --preset b0")
 							@createCopyButton("command", "Copy Command")
 						</div>
 					}

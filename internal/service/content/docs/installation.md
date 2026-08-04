@@ -41,53 +41,29 @@ Open [templui/create](/create) and build your preset visually. Choose your style
 
 ### Create Project
 
-Click `Get Code`, choose your project tab, and copy the generated command. Set up a Go module first if you do not have one yet:
+Click `Get Code`, choose your project tab, and copy the generated command. Install the CLI first if you do not have it yet:
 
 ```shell
-mkdir myapp && cd myapp
-go mod init myapp
 go install github.com/templui/templui/cmd/templui@latest
 ```
 
 The generated command will look similar to this:
 
 ```shell
-templui init --preset [CODE]
+templui init -t templ --preset [CODE]
 ```
 
 The exact command will include the preset code that encodes your selected options such as your style, base color and fonts.
 
-### Create Taskfile
+### Run the App
 
-templ and Tailwind run as watchers; a `Taskfile.yml` in your project root wires them into one dev command:
-
-```yaml
-version: "3"
-
-tasks:
-  templ:
-    desc: Run templ with integrated server and hot reload
-    cmds:
-      - templ generate --watch --proxy="http://localhost:8090" --cmd="go run ./main.go" --open-browser=false
-
-  tailwind:
-    desc: Watch Tailwind CSS changes
-    cmds:
-      - "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch"
-
-  dev:
-    desc: Start development server with hot reload
-    cmds:
-      - task --parallel tailwind templ
-```
-
-Run everything with:
+The scaffolded project ships the `Taskfile.yml` dev setup. Run everything with:
 
 ```shell
+cd templ-app
+go mod tidy
 task dev
 ```
-
-Adjust the `--proxy` port (default: 8090) if your app uses a different port. templ's dev server runs at http://localhost:7331
 
 ### Add Components
 
@@ -102,7 +78,7 @@ The command above will add the `Card` component to your project. You can then im
 ```templ title="pages/home.templ" showLineNumbers
 package pages
 
-import "myapp/components/card"
+import "templ-app/components/card"
 
 templ Home() {
 	@card.Card(card.Props{Class: "max-w-sm"}) {
@@ -133,53 +109,29 @@ After adding components, run `templ generate` and `go mod tidy`.
 
 ### Create Project
 
-Run the `init` command to scaffold a new templ project. Create the Go module first, then configure your project with flags: preset, base color, and more:
+Run the `init` command to scaffold a new templ project. Configure your project with flags: preset, base color, and more:
 
 ```shell
-mkdir myapp && cd myapp
-go mod init myapp
 go install github.com/templui/templui/cmd/templui@latest
-templui init
+templui init -t templ
 ```
 
 Pick a design on [templui/create](/create) and pass its preset code, or use one of the named presets (`nova`, `vega`, `maia`, `lyra`, `mira`, `luma`, `sera`, `rhea`):
 
 ```shell
-templui init --preset b2D0wqNxT
-templui init --preset vega
+templui init -t templ --preset b2D0wqNxT
+templui init -t templ --preset vega
 ```
 
-### Create Taskfile
+### Run the App
 
-templ and Tailwind run as watchers; a `Taskfile.yml` in your project root wires them into one dev command:
-
-```yaml
-version: "3"
-
-tasks:
-  templ:
-    desc: Run templ with integrated server and hot reload
-    cmds:
-      - templ generate --watch --proxy="http://localhost:8090" --cmd="go run ./main.go" --open-browser=false
-
-  tailwind:
-    desc: Watch Tailwind CSS changes
-    cmds:
-      - "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch"
-
-  dev:
-    desc: Start development server with hot reload
-    cmds:
-      - task --parallel tailwind templ
-```
-
-Run everything with:
+The scaffolded project ships the `Taskfile.yml` dev setup. Run everything with:
 
 ```shell
+cd templ-app
+go mod tidy
 task dev
 ```
-
-Adjust the `--proxy` port (default: 8090) if your app uses a different port. templ's dev server runs at http://localhost:7331
 
 ### Add Components
 
@@ -194,7 +146,7 @@ The command above will add the `Card` component to your project. You can then im
 ```templ title="pages/home.templ" showLineNumbers
 package pages
 
-import "myapp/components/card"
+import "templ-app/components/card"
 
 templ Home() {
 	@card.Card(card.Props{Class: "max-w-sm"}) {
