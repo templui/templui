@@ -33,33 +33,12 @@ type Props struct {
 	DisableClickAway bool
 }
 
-// PortalProps has no Class: the portal node is the plumbing wrapper that
-// stays [hidden] in <body> while the dialog is unmounted, it renders nothing
-// of its own (base/ui/dialog.tsx DialogPortal passes only data-slot too).
-type PortalProps struct {
-	Attributes templ.Attributes
-}
-
-type OverlayProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-}
-
-// PopupProps is 1:1 base/ui/dialog.tsx DialogContent's props: the popup's own
-// (className) plus HideCloseButton, the inverse of their showCloseButton.
-// DisableModal is Dialog.Root's modal, which our popup carries as an
-// attribute because the root renders no element.
-type PopupProps struct {
+type ContentProps struct {
 	Class           string
 	Attributes      templ.Attributes
 	HideCloseButton bool
 	DisableModal    bool
 }
-
-// ContentProps is PopupProps: Content is Portal + Overlay + Popup and passes
-// them straight through, like DialogContent spreading onto Dialog.Popup.
-type ContentProps = PopupProps
 
 type HeaderProps struct {
 	ID         string
@@ -128,114 +107,71 @@ func CloseFor(id string) templ.Attributes {
 	}
 }
 
-// Portal is 1:1 base/ui/dialog.tsx DialogPortal (Dialog.Portal). Inert until
-// the script portals it to <body> at init, so the SSRd content never
-// participates in layout or sibling CSS. The wrapper div is the FloatingPortal
-// node: it stays in <body>, [hidden] while the dialog is unmounted (Base UI
-// removes the portal subtree instead), and the script drives the Base UI
-// data-open/data-closed/data-starting-style/data-ending-style lifecycle on
-// backdrop and popup.
-//
-// A Portal composed without an Overlay gets Base UI's InternalBackdrop, the
-// invisible full-viewport layer DialogPortal renders for every modal dialog
-// (dialog/portal/DialogPortal.tsx): dialog.js creates it, since a rendered
-// Overlay doubles as it.
-templ Portal(props ...PortalProps) {
-	{{ var p PortalProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
-	}
-	<template data-tui-dialog-portal>
-		<div data-tui-dialog-root hidden { p.Attributes... }>
-			{ children... }
-		</div>
-	</template>
-}
-
-// Overlay is 1:1 base/ui/dialog.tsx DialogOverlay (Dialog.Backdrop): the look
-// comes from cn-dialog-overlay. user-select none is Base UI's inline style on
-// the backdrop.
-templ Overlay(props ...OverlayProps) {
-	{{ var p OverlayProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
-	}
-	<div
-		if p.ID != "" {
-			id={ p.ID }
-		}
-		data-slot="dialog-overlay"
-		data-tui-dialog-backdrop
-		role="presentation"
-		style="user-select: none; -webkit-user-select: none;"
-		class={ utils.TwMerge("cn-dialog-overlay fixed inset-0 isolate z-50", p.Class) }
-		{ p.Attributes... }
-	></div>
-}
-
-// Popup is 1:1 base/ui/dialog.tsx DialogContent's Dialog.Popup — the part
-// their command-menu.tsx composes under DialogPortal on its own: the look
-// comes from cn-dialog-content, tabindex is managed at runtime like Base UI's
-// handleTabIndex.
-templ Popup(props ...PopupProps) {
-	{{ var p PopupProps }}
-	if len(props) > 0 {
-		{{ p = props[0] }}
-	}
-	{{ s := state(ctx) }}
-	<div
-		id={ s.id }
-		role="dialog"
-		tabindex="-1"
-		data-slot="dialog-content"
-		data-tui-dialog-content
-		data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
-		data-tui-dialog-show-modal={ utils.IfElse(!p.DisableModal, "true", "false") }
-		if s.disableClickAway {
-			data-tui-dialog-disable-click-away="true"
-		}
-		class={ p.Class }
-		{ p.Attributes... }
-	>
-		{ children... }
-		if !p.HideCloseButton {
-			@button.Button(button.Props{
-				Variant: button.VariantGhost,
-				Size:    button.SizeIconSm,
-				Class:   "cn-dialog-close",
-				Attributes: templ.Attributes{
-					"data-slot":             "dialog-close",
-					"data-tui-dialog-close": true,
-					"aria-label":            "Close",
-				},
-			}) {
-				@icon.X()
-				<span class="sr-only">Close</span>
-			}
-		}
-	</div>
-}
-
-// Content is 1:1 base/ui/dialog.tsx DialogContent: DialogPortal > DialogOverlay
-// + Dialog.Popup.
 templ Content(props ...ContentProps) {
 	{{ var p ContentProps }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	// Overlay and Popup share a line because templ writes a space between two
-	// component calls on separate lines; the portal node holds elements only.
-	// The wrapper classes live here, not in Popup: Popup is the pendant of
-	// Dialog.Popup (the bare primitive), Content of shadcn's DialogContent
-	// which adds cn-dialog-content and the centering. Callers that need the
-	// bare popup (the command menu, like their local DialogContent) compose
-	// Portal + Popup themselves.
-	{{ p.Class = utils.TwMerge("cn-dialog-content fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 outline-none", p.Class) }}
-	@Portal() {
-		@Overlay()@Popup(p) {
-			{ children... }
-		}
-	}
+	{{ s := state(ctx) }}
+	// Inert until the script portals it to <body> at init, so the SSRd
+	// content never participates in layout or sibling CSS. The wrapper div is
+	// the FloatingPortal node: it stays in <body>, [hidden] while the dialog
+	// is unmounted (Base UI removes the portal subtree instead), and the
+	// script drives the Base UI data-open/data-closed/data-starting-style/
+	// data-ending-style lifecycle on backdrop and popup.
+	<template data-tui-dialog-portal>
+		<div data-tui-dialog-root hidden>
+			// 1:1 base/ui/dialog.tsx DialogOverlay (Dialog.Backdrop): the look
+			// comes from cn-dialog-overlay. user-select none is Base UI's
+			// inline style on the backdrop.
+			<div
+				data-slot="dialog-overlay"
+				data-tui-dialog-backdrop
+				role="presentation"
+				style="user-select: none; -webkit-user-select: none;"
+				class="cn-dialog-overlay fixed inset-0 isolate z-50"
+			></div>
+			// 1:1 base/ui/dialog.tsx DialogContent (Dialog.Popup): the look
+			// comes from cn-dialog-content. tabindex is managed at runtime
+			// like Base UI's handleTabIndex.
+			<div
+				id={ s.id }
+				role="dialog"
+				tabindex="-1"
+				data-slot="dialog-content"
+				data-tui-dialog-content
+				data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
+				data-tui-dialog-show-modal={ utils.IfElse(!p.DisableModal, "true", "false") }
+				if s.disableClickAway {
+					data-tui-dialog-disable-click-away="true"
+				}
+				class={
+					utils.TwMerge(
+						"cn-dialog-content fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 outline-none",
+						p.Class,
+					),
+				}
+				{ p.Attributes... }
+			>
+				{ children... }
+				if !p.HideCloseButton {
+					@button.Button(button.Props{
+						Variant: button.VariantGhost,
+						Size:    button.SizeIconSm,
+						Class:   "cn-dialog-close",
+						Attributes: templ.Attributes{
+							"data-slot":             "dialog-close",
+							"data-tui-dialog-close": true,
+							"aria-label":            "Close",
+						},
+					}) {
+						@icon.X()
+						<span class="sr-only">Close</span>
+					}
+				}
+			</div>
+		</div>
+	</template>
 }
 
 templ Header(props ...HeaderProps) {

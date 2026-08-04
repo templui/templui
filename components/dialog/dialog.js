@@ -596,28 +596,9 @@
     return guard;
   }
 
-  // InternalBackdrop (utils/InternalBackdrop.tsx): the invisible full-viewport
-  // layer DialogPortal renders for every modal dialog — it catches the outside
-  // press and blocks pointer interaction with the page. A rendered
-  // DialogOverlay doubles as it here (it is the same box, only with a look), so
-  // it is created for portals composed without one, like shadcn's
-  // command-menu.tsx. z-index is the z-50 those overlays carry.
-  function ensureInternalBackdrop(root, popup) {
-    if (root.querySelector("[data-tui-dialog-backdrop]")) return;
-    if (popup.getAttribute("data-tui-dialog-show-modal") === "false") return;
-    const backdrop = document.createElement("div");
-    backdrop.setAttribute("role", "presentation");
-    backdrop.setAttribute("data-tui-dialog-backdrop", "");
-    backdrop.style.cssText =
-      "position:fixed;inset:0;z-index:50;user-select:none;-webkit-user-select:none;";
-    root.insertBefore(backdrop, root.firstChild);
-  }
-
   function ensureDialog(root) {
     const popup = root.querySelector("[data-tui-dialog-content]");
     if (!popup || dialogs.has(popup)) return dialogs.get(popup) || null;
-
-    ensureInternalBackdrop(root, popup);
 
     const state = {
       root,
