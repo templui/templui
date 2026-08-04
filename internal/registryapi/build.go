@@ -25,7 +25,11 @@
 //	                         npm-only concepts.
 package registryapi
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/templui/templui/internal/shared"
+)
 
 // moduleVersion is the SHADCN_VERSION pendant for the Go module dependency.
 const moduleVersion = "latest"
@@ -179,7 +183,7 @@ func BuildThemeForPreset(config DesignSystemConfig) (Item, error) {
 	}
 
 	return Item{
-		Schema: SiteURL + "/schema/registry-item.json",
+		Schema: shared.BaseURL() + "/schema/registry-item.json",
 		Name:   registryTheme.Name,
 		Type:   "registry:theme",
 		CSSVars: &ItemVars{

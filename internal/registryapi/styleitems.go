@@ -14,13 +14,11 @@ import (
 
 	templui "github.com/templui/templui"
 	"github.com/templui/templui/assets"
+	"github.com/templui/templui/internal/shared"
 	"github.com/templui/templui/components"
 	"github.com/templui/templui/internal/inliner"
 	"github.com/templui/templui/internal/registry"
 )
-
-// SiteURL is the docs site, used for $schema and meta.links.
-const SiteURL = "https://templui.io"
 
 // isDevelopment mirrors components/scripts.go: outside production every
 // request recompiles from disk so edits hot-reload.
@@ -158,7 +156,7 @@ func BuildStyleItem(styleName, name string) (*Item, error) {
 	}
 
 	item := &Item{
-		Schema:               SiteURL + "/schema/registry-item.json",
+		Schema:               shared.BaseURL() + "/schema/registry-item.json",
 		Name:                 def.Name,
 		RegistryDependencies: def.RegistryDependencies,
 		Files:                files,
@@ -166,7 +164,7 @@ func BuildStyleItem(styleName, name string) (*Item, error) {
 	}
 	if def.Type == "registry:ui" {
 		item.Meta = &ItemMeta{
-			Links: ItemLinks{Docs: SiteURL + "/docs/components/" + def.Name},
+			Links: ItemLinks{Docs: shared.BaseURL() + "/docs/components/" + def.Name},
 		}
 	}
 
@@ -186,7 +184,7 @@ func BuildStyleIndex(styleName string) *Item {
 		return nil
 	}
 	return &Item{
-		Schema:               SiteURL + "/schema/registry-item.json",
+		Schema:               shared.BaseURL() + "/schema/registry-item.json",
 		Name:                 "index",
 		Dependencies:         []string{ModuleDependency},
 		RegistryDependencies: []string{"utils"},

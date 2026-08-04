@@ -71,8 +71,11 @@ WORKDIR /app
 
 RUN apk add --no-cache ca-certificates
 
-# Set environment variable for runtime
+# Set environment variable for runtime. BASE_URL feeds every
+# self-referencing absolute URL (canonical, og:url, AI prompt links);
+# beta interim like the CLI defaults, flips back at stable.
 ENV GO_ENV=production
+ENV BASE_URL=https://v2.templui.io
 
 # Copy the binary, version file, CSS output and the baked highlight cache
 COPY --from=build /app/main .

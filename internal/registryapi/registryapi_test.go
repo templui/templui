@@ -5,6 +5,8 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/templui/templui/internal/shared"
 )
 
 func TestVarsOrder(t *testing.T) {
@@ -348,7 +350,7 @@ func TestBuildStyleItem(t *testing.T) {
 	if !strings.Contains(content, "bg-primary") {
 		t.Error("compiled content misses flat utility classes")
 	}
-	if item.Meta == nil || item.Meta.Links.Docs != SiteURL+"/docs/components/button" {
+	if item.Meta == nil || item.Meta.Links.Docs != shared.BaseURL()+"/docs/components/button" {
 		t.Errorf("meta = %+v", item.Meta)
 	}
 

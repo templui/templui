@@ -1,6 +1,10 @@
 package modules
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/templui/templui/internal/shared"
+)
 
 // SEO is a simple module for all important SEO tags
 templ SEO(title, description, path string) {
@@ -20,13 +24,13 @@ templ SEO(title, description, path string) {
 	// Robots Tags
 	<meta name="robots" content="index, follow"/>
 	// Canonical URL
-	<link rel="canonical" href={ "https://templui.io" + path }/>
+	<link rel="canonical" href={ shared.BaseURL() + path }/>
 	// OpenGraph Tags
 	<meta property="og:title" content={ title }/>
 	<meta property="og:description" content={ description }/>
 	<meta property="og:type" content="website"/>
-	<meta property="og:url" content={ "https://templui.io" + path }/>
-	<meta property="og:image" content="https://templui.io/assets/img/social-preview.png"/>
+	<meta property="og:url" content={ shared.BaseURL() + path }/>
+	<meta property="og:image" content={ shared.BaseURL() + "/assets/img/social-preview.png" }/>
 	<meta property="og:image:width" content="1200"/>
 	<meta property="og:image:height" content="630"/>
 	<meta property="og:image:alt" content="templui - shadcn/ui for templ"/>
@@ -35,7 +39,7 @@ templ SEO(title, description, path string) {
 	<meta name="twitter:card" content="summary_large_image"/>
 	<meta name="twitter:title" content={ title }/>
 	<meta name="twitter:description" content={ description }/>
-	<meta name="twitter:image" content="https://templui.io/assets/img/social-preview.png"/>
+	<meta name="twitter:image" content={ shared.BaseURL() + "/assets/img/social-preview.png" }/>
 	<meta name="twitter:image:alt" content="templui - shadcn/ui for templ"/>
 	// Favicon - Minimal but comprehensive support
 	// Note: Some files are served from root URLs (e.g., /favicon.ico) for Safari compatibility.
