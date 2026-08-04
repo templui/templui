@@ -95,24 +95,68 @@ templ Progress(props ...Props) {
 		{ p.Attributes... }
 	>
 		{ children... }
-		<div
-			data-slot="progress-track"
-			data-tui-progress-part
-			class="cn-progress-track relative flex w-full items-center overflow-x-hidden"
-			{ statusAttr(p.Value, p.Max)... }
-		>
-			<div
-				data-slot="progress-indicator"
-				data-tui-progress-indicator
-				data-tui-progress-part
-				class="cn-progress-indicator h-full transition-all"
-				style={ fmt.Sprintf("inset-inline-start:0;height:inherit;width:%d%%", percentage(p.Value, p.Max)) }
-				{ statusAttr(p.Value, p.Max)... }
-			></div>
-		</div>
+		@Track() {
+			@Indicator()
+		}
 		// Base UI's NVDA workaround span, part of the rendered output.
 		<span role="presentation" style="clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0">x</span>
 	</div>
+}
+
+type TrackProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+// Track is 1:1 base/ui/progress.tsx ProgressTrack; Progress renders it
+// after the children like the reference, and it stays composable alone.
+templ Track(props ...TrackProps) {
+	{{ var p TrackProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ s := state(ctx) }}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="progress-track"
+		data-tui-progress-part
+		class={ utils.CN("cn-progress-track relative flex w-full items-center overflow-x-hidden", p.Class) }
+		{ statusAttr(s.value, s.max)... }
+		{ p.Attributes... }
+	>
+		{ children... }
+	</div>
+}
+
+type IndicatorProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+// Indicator is 1:1 base/ui/progress.tsx ProgressIndicator; the width comes
+// from the root's value via context.
+templ Indicator(props ...IndicatorProps) {
+	{{ var p IndicatorProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ s := state(ctx) }}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="progress-indicator"
+		data-tui-progress-indicator
+		data-tui-progress-part
+		class={ utils.CN("cn-progress-indicator h-full transition-all", p.Class) }
+		style={ fmt.Sprintf("inset-inline-start:0;height:inherit;width:%d%%", percentage(s.value, s.max)) }
+		{ statusAttr(s.value, s.max)... }
+		{ p.Attributes... }
+	></div>
 }
 
 templ Label(props ...LabelProps) {
