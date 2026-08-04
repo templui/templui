@@ -30,7 +30,6 @@ type RowProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	Selected   bool
 }
 
 type HeadProps struct {
@@ -131,16 +130,7 @@ templ Row(props ...RowProps) {
 			id={ p.ID }
 		}
 		data-slot="table-row"
-		class={
-			utils.CN(
-				"cn-table-row has-aria-expanded:bg-muted/50",
-				utils.If(p.Selected, "data-[tui-table-state-selected]:bg-muted"),
-				p.Class,
-			),
-		}
-		if p.Selected {
-			data-tui-table-state-selected
-		}
+		class={ utils.CN("cn-table-row has-aria-expanded:bg-muted/50", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
