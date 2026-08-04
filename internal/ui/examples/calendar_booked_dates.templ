@@ -18,7 +18,7 @@ templ CalendarBookedDates() {
 	@card.Card(card.Props{Class: "mx-auto w-fit p-0"}) {
 		@card.Content(card.ContentProps{Class: "p-0"}) {
 			@calendar.Calendar(calendar.Props{
-				Value:       selected,
+				Selected:       selected,
 				BookedDates: booked,
 			})
 		}

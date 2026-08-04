@@ -62,14 +62,14 @@
       const view = parseISO(root.getAttribute("data-tui-calendar-month")) || selected || new Date();
       root._tui = {
         mode: root.getAttribute("data-tui-calendar-mode") || "single",
-        locale: root.getAttribute("data-tui-calendar-locale-tag") || "en-US",
-        startOfWeek: parseInt(root.getAttribute("data-tui-calendar-start-of-week"), 10) || 0,
+        locale: root.getAttribute("data-tui-calendar-locale") || "en-US",
+        startOfWeek: parseInt(root.getAttribute("data-tui-calendar-week-starts-on"), 10) || 0,
         outsideDays: root.getAttribute("data-tui-calendar-outside-days") !== "false",
         fixedWeeks: root.hasAttribute("data-tui-calendar-fixed-weeks"),
-        weekNumbers: root.hasAttribute("data-tui-calendar-week-numbers"),
+        weekNumbers: root.hasAttribute("data-tui-calendar-week-number"),
         min: parseISO(root.getAttribute("data-tui-calendar-min")),
         max: parseISO(root.getAttribute("data-tui-calendar-max")),
-        disabledDates: (root.getAttribute("data-tui-calendar-disabled-dates") || "")
+        disabledDates: (root.getAttribute("data-tui-calendar-disabled") || "")
           .split(",").map(parseISO).filter(Boolean),
         bookedDates: (root.getAttribute("data-tui-calendar-booked-dates") || "")
           .split(",").map(parseISO).filter(Boolean),

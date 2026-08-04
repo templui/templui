@@ -9,7 +9,7 @@ import (
 templ CalendarDemo() {
 	{{ now := time.Now() }}
 	@calendar.Calendar(calendar.Props{
-		Value:         now,
+		Selected:         now,
 		CaptionLayout: calendar.CaptionLayoutDropdown,
 		Class:         "rounded-lg border",
 	})

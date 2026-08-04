@@ -52,7 +52,7 @@ templ calendarExampleSingle() {
 		@card.Card(card.Props{Class: "mx-auto w-fit p-0"}) {
 			@card.Content(card.ContentProps{Class: "p-0"}) {
 				@calendar.Calendar(calendar.Props{
-					Value:         selected,
+					Selected:         selected,
 					CaptionLayout: calendar.CaptionLayoutDropdown,
 				})
 			}
@@ -66,8 +66,8 @@ templ calendarExampleWeekNumbers() {
 		@card.Card(card.Props{Class: "mx-auto w-fit p-0"}) {
 			@card.Content(card.ContentProps{Class: "p-0"}) {
 				@calendar.Calendar(calendar.Props{
-					Value:           selected,
-					ShowWeekNumbers: true,
+					Selected:           selected,
+					ShowWeekNumber: true,
 				})
 			}
 		}
@@ -86,7 +86,7 @@ templ calendarExampleBookedDates() {
 		@card.Card(card.Props{Class: "mx-auto w-fit p-0"}) {
 			@card.Content(card.ContentProps{Class: "p-0"}) {
 				@calendar.Calendar(calendar.Props{
-					Value:       selected,
+					Selected:       selected,
 					BookedDates: booked,
 				})
 			}
@@ -104,7 +104,7 @@ templ calendarExampleRange() {
 			@card.Content(card.ContentProps{Class: "p-0"}) {
 				@calendar.Calendar(calendar.Props{
 					Mode:           calendar.ModeRange,
-					Value:          from,
+					Selected:          from,
 					EndValue:       to,
 					NumberOfMonths: 2,
 					MinDate:        time.Date(1900, 1, 1, 0, 0, 0, 0, time.Local),
@@ -125,10 +125,10 @@ templ calendarExampleRangeMultipleMonths() {
 			@card.Content(card.ContentProps{Class: "p-0"}) {
 				@calendar.Calendar(calendar.Props{
 					Mode:           calendar.ModeRange,
-					Value:          from,
+					Selected:          from,
 					EndValue:       to,
 					NumberOfMonths: 3,
-					LocaleTag:      "es",
+					Locale:      "es",
 					FixedWeeks:     true,
 				})
 			}
@@ -142,7 +142,7 @@ templ calendarExampleWithTime() {
 		@card.Card(card.Props{Size: card.SizeSm, Class: "mx-auto w-fit"}) {
 			@card.Content() {
 				@calendar.Calendar(calendar.Props{
-					Value: selected,
+					Selected: selected,
 					Class: "p-0",
 				})
 			}
@@ -214,7 +214,7 @@ templ calendarExampleWithPresets() {
 			@card.Content() {
 				@calendar.Calendar(calendar.Props{
 					ID:         "calendar-example-presets",
-					Value:      selected,
+					Selected:      selected,
 					FixedWeeks: true,
 					Class:      "p-0 [--cell-size:--spacing(9.5)]",
 				})
@@ -263,7 +263,7 @@ templ calendarExampleCustomDays() {
 				@calendar.Calendar(calendar.Props{
 					ID:            "calendar-example-custom-days",
 					Mode:          calendar.ModeRange,
-					Value:         from,
+					Selected:         from,
 					EndValue:      to,
 					CaptionLayout: calendar.CaptionLayoutDropdown,
 					Class:         "[--cell-size:--spacing(10)] md:[--cell-size:--spacing(12)]",
@@ -435,7 +435,7 @@ templ calendarExampleDatePickerWithRange() {
 				}) {
 					@calendar.Calendar(calendar.Props{
 						Mode:           calendar.ModeRange,
-						Value:          from,
+						Selected:          from,
 						EndValue:       to,
 						NumberOfMonths: 2,
 					})

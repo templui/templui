@@ -54,32 +54,32 @@ type Props struct {
 	Mode Mode
 	// CaptionLayout: 'label' (default) or 'dropdown'.
 	CaptionLayout CaptionLayout
-	// Value preselects a date (single mode) or the range start.
-	Value time.Time
+	// Selected preselects a date (single mode) or the range start.
+	Selected time.Time
 	// EndValue preselects the range end (range mode).
 	EndValue time.Time
-	// Month controls the initially displayed month. Defaults to Value or now.
+	// Month controls the initially displayed month. Defaults to Selected or now.
 	Month time.Time
 	// Name renders a hidden input that submits the selected date (ISO).
 	Name string
 	// EndName is the hidden input name for the range end. Defaults to Name + "-end".
 	EndName string
-	// LocaleTag is a BCP 47 tag like "de-DE", the browser's Intl handles
+	// Locale is a BCP 47 tag like "de-DE", the browser's Intl handles
 	// every locale natively. Defaults to "en-US".
-	LocaleTag string
-	// StartOfWeek: 0-6, Sunday-Saturday. Defaults to Sunday, like shadcn.
-	StartOfWeek Day
+	Locale string
+	// WeekStartsOn: 0-6, Sunday-Saturday. Defaults to Sunday, like shadcn.
+	WeekStartsOn Day
 	// HideOutsideDays hides the leading/trailing days of adjacent months.
 	HideOutsideDays bool
 	// FixedWeeks always renders six weeks, keeping the height stable.
 	FixedWeeks bool
-	// ShowWeekNumbers renders an ISO week number column.
-	ShowWeekNumbers bool
+	// ShowWeekNumber renders an ISO week number column.
+	ShowWeekNumber bool
 	// MinDate/MaxDate bound the selectable dates.
 	MinDate time.Time
 	MaxDate time.Time
-	// DisabledDates are not selectable.
-	DisabledDates []time.Time
+	// Disabled are not selectable.
+	Disabled []time.Time
 	// BookedDates are not selectable and render struck through.
 	BookedDates []time.Time
 	// NumberOfMonths renders several months side by side. Defaults to 1.
@@ -128,22 +128,22 @@ func Calendar(props ...Props) templ.Component {
 		if p.CaptionLayout == "" {
 			p.CaptionLayout = CaptionLayoutLabel
 		}
-		if p.LocaleTag == "" {
-			p.LocaleTag = "en-US"
+		if p.Locale == "" {
+			p.Locale = "en-US"
 		}
 		if p.Mode == ModeRange && p.Name != "" && p.EndName == "" {
 			p.EndName = p.Name + "-end"
 		}
 		view := time.Now()
-		if !p.Value.IsZero() {
-			view = p.Value
+		if !p.Selected.IsZero() {
+			view = p.Selected
 		}
 		if !p.Month.IsZero() {
 			view = p.Month
 		}
 		selectedISO := ""
-		if !p.Value.IsZero() {
-			selectedISO = p.Value.Format("2006-01-02")
+		if !p.Selected.IsZero() {
+			selectedISO = p.Selected.Format("2006-01-02")
 		}
 		endISO := ""
 		if !p.EndValue.IsZero() {
@@ -193,27 +193,27 @@ func Calendar(props ...Props) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" data-tui-calendar-locale-tag=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" data-tui-calendar-locale=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(p.LocaleTag)
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(p.Locale)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 136, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 136, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" data-tui-calendar-start-of-week=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" data-tui-calendar-week-starts-on=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(int(p.StartOfWeek)))
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(int(p.WeekStartsOn)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 137, Col: 68}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 137, Col: 70}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -286,8 +286,8 @@ func Calendar(props ...Props) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if p.ShowWeekNumbers {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, " data-tui-calendar-week-numbers")
+		if p.ShowWeekNumber {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, " data-tui-calendar-week-number")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -330,15 +330,15 @@ func Calendar(props ...Props) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if len(p.DisabledDates) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, " data-tui-calendar-disabled-dates=\"")
+		if len(p.Disabled) > 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, " data-tui-calendar-disabled=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(isoList(p.DisabledDates))
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(isoList(p.Disabled))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 161, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/calendar/calendar.templ`, Line: 161, Col: 51}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {

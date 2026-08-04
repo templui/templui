@@ -53,7 +53,7 @@ import (
 
 ```templ showLineNumbers
 @calendar.Calendar(calendar.Props{
-	Value: time.Now(),
+	Selected: time.Now(),
 	Class: "rounded-lg border",
 })
 ```
@@ -118,7 +118,7 @@ Or use fixed values:
 
 ## Week Numbers
 
-Use `ShowWeekNumbers` to show week numbers.
+Use `ShowWeekNumber` to show week numbers.
 
 <ComponentPreview name="calendar-week-numbers" previewClassName="h-96" />
 
@@ -132,19 +132,19 @@ The `Calendar` component displays a month grid for selecting a date or a range o
 | ----------------- | --------------------------------------------------- | --------------------- |
 | `Mode`            | `ModeSingle \| ModeRange`                          | `ModeSingle`          |
 | `CaptionLayout`   | `CaptionLayoutLabel \| CaptionLayoutDropdown`      | `CaptionLayoutLabel`  |
-| `Value`           | `time.Time`                                         | -                     |
+| `Selected`           | `time.Time`                                         | -                     |
 | `EndValue`        | `time.Time`                                         | -                     |
-| `Month`           | `time.Time`                                         | `Value` or now        |
+| `Month`           | `time.Time`                                         | `Selected` or now        |
 | `Name`            | `string`                                            | -                     |
 | `EndName`         | `string`                                            | `Name + "-end"`       |
-| `LocaleTag`       | `string` (BCP 47, e.g. "de-DE")                     | `"en-US"`             |
-| `StartOfWeek`     | `Day`                                               | `Sunday`              |
+| `Locale`       | `string` (BCP 47, e.g. "de-DE")                     | `"en-US"`             |
+| `WeekStartsOn`     | `Day`                                               | `Sunday`              |
 | `HideOutsideDays` | `bool`                                              | `false`               |
 | `FixedWeeks`      | `bool`                                              | `false`               |
-| `ShowWeekNumbers` | `bool`                                              | `false`               |
+| `ShowWeekNumber` | `bool`                                              | `false`               |
 | `MinDate`         | `time.Time`                                         | -                     |
 | `MaxDate`         | `time.Time`                                         | -                     |
-| `DisabledDates`   | `[]time.Time`                                       | -                     |
+| `Disabled`   | `[]time.Time`                                       | -                     |
 | `BookedDates`     | `[]time.Time`                                       | -                     |
 | `NumberOfMonths`  | `int`                                               | `1`                   |
 | `Class`           | `string`                                            | -                     |
