@@ -17,7 +17,10 @@ templ MobileNav(class string) {
 	@button.Button(button.Props{
 		Variant: button.VariantGhost,
 		Class: utils.CN(
-			"group/mobile-nav extend-touch-target h-8 touch-manipulation items-center justify-start gap-2.5 p-0! hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 active:bg-transparent dark:hover:bg-transparent",
+			// The reference uses the new-york-v4 ghost button whose open state
+			// stays transparent; our base ghost adds aria-expanded:bg-muted, so
+			// the trigger suppresses it explicitly.
+			"group/mobile-nav extend-touch-target h-8 touch-manipulation items-center justify-start gap-2.5 p-0! hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 active:bg-transparent aria-expanded:bg-transparent dark:hover:bg-transparent",
 			class,
 		),
 		Attributes: templ.Attributes{
