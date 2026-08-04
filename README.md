@@ -1,19 +1,17 @@
-# templUI
+# templui
 
-Beautifully designed components built with templ and Tailwind CSS. Use the CLI to copy components into your app, or import them directly. Customize everything. Own your code. **Use this to build modern Go applications**.
+shadcn/ui for templ. A set of beautifully designed components that you can customize, extend, and build on. Start here then make it your own. Open Source. Open Code. **Use this to build your own component library.**
 
-![hero](./assets/img/readme.png)
+![hero](assets/img/social-preview.png)
 
 ## Documentation
 
-Visit https://templui.io/docs/introduction to view the documentation.
-
-Quickstart repo: [templui/templui-quickstart](https://github.com/templui/templui-quickstart)
+Visit https://templui.io/docs to view the documentation.
 
 ## Contributing
 
-Please read the [contributing guide](CONTRIBUTING.md).
+Please read the [contributing guide](/CONTRIBUTING.md).
 
 ## License
 
-Licensed under the [MIT license](LICENSE).
+Licensed under the [MIT license](./LICENSE).

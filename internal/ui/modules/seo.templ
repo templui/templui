@@ -1,8 +1,13 @@
 package modules
 
+import "strings"
+
 // SEO is a simple module for all important SEO tags
 templ SEO(title, description, path string) {
-	{{ title = title + " - templui" }}
+	// The one title template, applied once (their "%s - shadcn/ui").
+	if !strings.HasSuffix(title, " - templui") {
+		{{ title = title + " - templui" }}
+	}
 	@templ.Fragment("title") {
 		<title hx-swap-oob="true">{ title }</title>
 	}
@@ -24,14 +29,14 @@ templ SEO(title, description, path string) {
 	<meta property="og:image" content="https://templui.io/assets/img/social-preview.png"/>
 	<meta property="og:image:width" content="1200"/>
 	<meta property="og:image:height" content="630"/>
-	<meta property="og:image:alt" content="templui - Modern UI components for Go"/>
+	<meta property="og:image:alt" content="templui - shadcn/ui for templ"/>
 	<meta property="og:site_name" content="templui"/>
 	// Twitter Card
 	<meta name="twitter:card" content="summary_large_image"/>
 	<meta name="twitter:title" content={ title }/>
 	<meta name="twitter:description" content={ description }/>
 	<meta name="twitter:image" content="https://templui.io/assets/img/social-preview.png"/>
-	<meta name="twitter:image:alt" content="templui - Modern UI components for Go"/>
+	<meta name="twitter:image:alt" content="templui - shadcn/ui for templ"/>
 	// Favicon - Minimal but comprehensive support
 	// Note: Some files are served from root URLs (e.g., /favicon.ico) for Safari compatibility.
 	// Safari often ignores HTML favicon tags and looks directly in the root directory.
