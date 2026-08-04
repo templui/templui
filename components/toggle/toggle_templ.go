@@ -142,7 +142,7 @@ func Toggle(props ...Props) templ.Component {
 			p.Size = sizeFromCtx(ctx)
 		}
 		spacing, inGroup := spacingFromCtx(ctx)
-		var templ_7745c5c3_Var2 = []any{utils.CN(utils.If(inGroup, groupItemClasses()), baseClasses, variantClasses(p.Variant), sizeClasses(p.Size), p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.CN(map[string]bool{groupItemClasses(): inGroup}, baseClasses, variantClasses(p.Variant), sizeClasses(p.Size), p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

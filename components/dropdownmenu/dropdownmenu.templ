@@ -162,7 +162,7 @@ func itemClasses(disabled bool) string {
 		"cn-dropdown-menu-item group/dropdown-menu-item relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 		// Native <a>/<button> wiring instead of Base UI's div items.
 		"w-full text-left",
-		utils.If(disabled, "pointer-events-none opacity-50"),
+		map[string]bool{"pointer-events-none opacity-50": disabled},
 	)
 }
 
@@ -174,7 +174,7 @@ func checkItemClasses(cnClass string, disabled bool) string {
 		// Native <button> wiring: Base UI unmounts the indicator when unchecked,
 		// our indicator toggles on the checked state via the group instead.
 		"group/dmitem w-full text-left",
-		utils.If(disabled, "pointer-events-none opacity-50"),
+		map[string]bool{"pointer-events-none opacity-50": disabled},
 	)
 }
 

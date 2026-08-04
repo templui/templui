@@ -520,7 +520,7 @@ func Content(props ...ContentProps) templ.Component {
 		}
 		var templ_7745c5c3_Var21 = []any{utils.CN(
 			"cn-tabs-content flex-1 outline-none",
-			utils.If(!tabsIsActive(ctx, p.Value), "hidden"),
+			map[string]bool{"hidden": !tabsIsActive(ctx, p.Value)},
 			p.Class,
 		),
 		}

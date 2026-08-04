@@ -164,16 +164,6 @@ func flattenClasses(values []any) []string {
 	return out
 }
 
-// If returns value if condition is true, otherwise the zero value of T.
-// Example: true, "bg-red-500" → "bg-red-500"
-func If[T any](condition bool, value T) T {
-	var empty T
-	if condition {
-		return value
-	}
-	return empty
-}
-
 // Ptr returns a pointer to v. Useful for optional props whose zero value is
 // meaningful (e.g. togglegroup.Props{Spacing: utils.Ptr(0)}).
 func Ptr[T any](v T) *T {

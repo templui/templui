@@ -168,7 +168,7 @@ templ Content(props ...ContentProps) {
 		class={
 			utils.CN(
 				"cn-tabs-content flex-1 outline-none",
-				utils.If(!tabsIsActive(ctx, p.Value), "hidden"),
+				map[string]bool{"hidden": !tabsIsActive(ctx, p.Value)},
 				p.Class,
 			),
 		}

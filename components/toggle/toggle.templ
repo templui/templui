@@ -138,7 +138,7 @@ templ Toggle(props ...Props) {
 			data-state="off"
 		}
 		disabled?={ p.Disabled }
-		class={ utils.CN(utils.If(inGroup, groupItemClasses()), baseClasses, variantClasses(p.Variant), sizeClasses(p.Size), p.Class) }
+		class={ utils.CN(map[string]bool{groupItemClasses(): inGroup}, baseClasses, variantClasses(p.Variant), sizeClasses(p.Size), p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
