@@ -5,8 +5,8 @@ WORKDIR /app
 # Copy the source code
 COPY . .
 
-# Install templ
-RUN go install github.com/a-h/templ/cmd/templ@v0.3.1001
+# Install templ, pinned to the version go.mod pins
+RUN go install github.com/a-h/templ/cmd/templ@$(go list -m -f '{{.Version}}' github.com/a-h/templ)
 
 # Generate templ files
 RUN templ generate
@@ -20,17 +20,17 @@ RUN curl -s https://api.github.com/repos/templui/templui/releases/latest | grep 
 # Install Tailwind CSS standalone CLI
 RUN ARCH=$(uname -m) && \
   if [ "$ARCH" = "x86_64" ]; then \
-  TAILWIND_URL="https://github.com/tailwindlabs/tailwindcss/releases/download/v4.1.3/tailwindcss-linux-x64"; \
+  TAILWIND_URL="https://github.com/tailwindlabs/tailwindcss/releases/download/v4.3.3/tailwindcss-linux-x64"; \
   elif [ "$ARCH" = "aarch64" ]; then \
-  TAILWIND_URL="https://github.com/tailwindlabs/tailwindcss/releases/download/v4.1.3/tailwindcss-linux-arm64"; \
+  TAILWIND_URL="https://github.com/tailwindlabs/tailwindcss/releases/download/v4.3.3/tailwindcss-linux-arm64"; \
   else \
   echo "Unsupported architecture: $ARCH"; exit 1; \
   fi && \
   wget -O tailwindcss "$TAILWIND_URL" && \
   chmod +x tailwindcss
 
-# Generate Tailwind CSS output
-RUN ./tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --minify
+# Generate Tailwind CSS output (the 2.0 entry file is globals.css)
+RUN ./tailwindcss -i ./assets/css/globals.css -o ./assets/css/output.css --minify
 
 # Build the application as a static binary
 RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/docs/main.go
