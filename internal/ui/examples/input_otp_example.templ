@@ -64,7 +64,7 @@ templ inputOTPExamplePattern() {
 			@field.Label(field.LabelProps{For: "digits-only"}) {
 				Digits Only
 			}
-			@inputotp.InputOTP(inputotp.Props{ID: "digits-only", Pattern: inputotp.PatternDigits}) {
+			@inputotp.InputOTP(inputotp.Props{ID: "digits-only", Pattern: inputotp.RegexpOnlyDigits}) {
 				@inputotp.Group() {
 					@inputotp.Slot(inputotp.SlotProps{Index: 0})
 					@inputotp.Slot(inputotp.SlotProps{Index: 1})
@@ -113,7 +113,7 @@ templ inputOTPExampleAlphanumeric() {
 			@field.Description() {
 				Accepts both letters and numbers.
 			}
-			@inputotp.InputOTP(inputotp.Props{ID: "alphanumeric", Pattern: inputotp.PatternDigitsAndChars}) {
+			@inputotp.InputOTP(inputotp.Props{ID: "alphanumeric", Pattern: inputotp.RegexpOnlyDigitsAndChars}) {
 				@inputotp.Group() {
 					@inputotp.Slot(inputotp.SlotProps{Index: 0})
 					@inputotp.Slot(inputotp.SlotProps{Index: 1})
@@ -162,7 +162,7 @@ templ inputOTPExampleFourDigits() {
 			@field.Description() {
 				Common pattern for PIN codes.
 			}
-			@inputotp.InputOTP(inputotp.Props{ID: "four-digits", Pattern: inputotp.PatternDigits}) {
+			@inputotp.InputOTP(inputotp.Props{ID: "four-digits", Pattern: inputotp.RegexpOnlyDigits}) {
 				@inputotp.Group() {
 					@inputotp.Slot(inputotp.SlotProps{Index: 0})
 					@inputotp.Slot(inputotp.SlotProps{Index: 1})

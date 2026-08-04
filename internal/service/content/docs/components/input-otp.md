@@ -94,7 +94,7 @@ Use the `Pattern` prop to define a custom pattern for the OTP input.
 
 ```templ showLineNumbers {2}
 @inputotp.InputOTP(inputotp.Props{
-	Pattern: inputotp.PatternDigitsAndChars,
+	Pattern: inputotp.RegexpOnlyDigitsAndChars,
 }) {
 	// ...
 }
@@ -128,13 +128,13 @@ Use `aria-invalid` on the slots to show an error state.
 
 ## Four Digits
 
-A common pattern for PIN codes. This uses the `Pattern: inputotp.PatternDigits` prop.
+A common pattern for PIN codes. This uses the `Pattern: inputotp.RegexpOnlyDigits` prop.
 
 <ComponentPreview name="input-otp-four-digits" />
 
 ## Alphanumeric
 
-Use `inputotp.PatternDigitsAndChars` to accept both letters and numbers.
+Use `inputotp.RegexpOnlyDigitsAndChars` to accept both letters and numbers.
 
 <ComponentPreview name="input-otp-alphanumeric" />
 

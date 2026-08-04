@@ -725,7 +725,7 @@ templ fieldExampleSliderFields() {
 				}
 				@slider.Slider(slider.Props{
 					ID:     "slider-volume",
-					Values: []float64{50},
+					Value: []float64{50},
 					Max:    100,
 					Step:   1,
 				})
@@ -736,7 +736,7 @@ templ fieldExampleSliderFields() {
 				}
 				@slider.Slider(slider.Props{
 					ID:     "slider-brightness",
-					Values: []float64{75},
+					Value: []float64{75},
 					Max:    100,
 					Step:   5,
 				})
@@ -753,7 +753,7 @@ templ fieldExampleSliderFields() {
 				}
 				@slider.Slider(slider.Props{
 					ID:     "slider-quality",
-					Values: []float64{720},
+					Value: []float64{720},
 					Min:    360,
 					Max:    1080,
 					Step:   360,
@@ -765,7 +765,7 @@ templ fieldExampleSliderFields() {
 				}
 				@slider.Slider(slider.Props{
 					ID:     "slider-temperature",
-					Values: []float64{0.3, 0.7},
+					Value: []float64{0.3, 0.7},
 					Min:    0,
 					Max:    1,
 					Step:   0.1,
@@ -780,7 +780,7 @@ templ fieldExampleSliderFields() {
 				}
 				@slider.Slider(slider.Props{
 					ID:     "slider-price-range",
-					Values: []float64{25, 75},
+					Value: []float64{25, 75},
 					Max:    100,
 					Step:   5,
 				})
@@ -794,7 +794,7 @@ templ fieldExampleSliderFields() {
 				}
 				@slider.Slider(slider.Props{
 					ID:     "slider-color-balance",
-					Values: []float64{10, 20, 70},
+					Value: []float64{10, 20, 70},
 					Max:    100,
 					Step:   10,
 				})
@@ -808,7 +808,7 @@ templ fieldExampleSliderFields() {
 				}
 				@slider.Slider(slider.Props{
 					ID:         "slider-invalid",
-					Values:     []float64{30},
+					Value:     []float64{30},
 					Max:        100,
 					Attributes: templ.Attributes{"aria-invalid": "true"},
 				})
@@ -822,7 +822,7 @@ templ fieldExampleSliderFields() {
 				}
 				@slider.Slider(slider.Props{
 					ID:       "slider-disabled-field",
-					Values:   []float64{50},
+					Value:   []float64{50},
 					Max:      100,
 					Disabled: true,
 				})
@@ -913,7 +913,7 @@ templ fieldExampleInputOTPFields() {
 				@field.Label(field.LabelProps{For: "otp-pin"}) {
 					PIN Code
 				}
-				@inputotp.InputOTP(inputotp.Props{ID: "otp-pin", Pattern: inputotp.PatternDigits}) {
+				@inputotp.InputOTP(inputotp.Props{ID: "otp-pin", Pattern: inputotp.RegexpOnlyDigits}) {
 					@inputotp.Group() {
 						@inputotp.Slot(inputotp.SlotProps{Index: 0})
 						@inputotp.Slot(inputotp.SlotProps{Index: 1})
@@ -1044,7 +1044,7 @@ templ fieldExampleHorizontalFields() {
 				}
 				@slider.Slider(slider.Props{
 					ID:     "horizontal-slider",
-					Values: []float64{50},
+					Value: []float64{50},
 					Max:    100,
 				})
 			}

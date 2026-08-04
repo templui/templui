@@ -3,7 +3,7 @@ package examples
 import "github.com/templui/templui/components/inputotp"
 
 templ InputOTPAlphanumeric() {
-	@inputotp.InputOTP(inputotp.Props{Pattern: inputotp.PatternDigitsAndChars}) {
+	@inputotp.InputOTP(inputotp.Props{Pattern: inputotp.RegexpOnlyDigitsAndChars}) {
 		@inputotp.Group() {
 			@inputotp.Slot(inputotp.SlotProps{Index: 0})
 			@inputotp.Slot(inputotp.SlotProps{Index: 1})

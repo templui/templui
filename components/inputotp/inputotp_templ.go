@@ -39,7 +39,7 @@ type Props struct {
 	Name       string
 	Form       string
 	// Pattern restricts input to a regular expression, e.g.
-	// inputotp.PatternDigits (input-otp's REGEXP constants).
+	// inputotp.RegexpOnlyDigits (input-otp's REGEXP constants).
 	Pattern  string
 	Disabled bool
 	Required bool
@@ -47,9 +47,9 @@ type Props struct {
 
 // The pattern constants of the input-otp library.
 const (
-	PatternDigits         = "^\\d+$"
-	PatternChars          = "^[a-zA-Z]+$"
-	PatternDigitsAndChars = "^[a-zA-Z0-9]+$"
+	RegexpOnlyDigits         = "^\\d+$"
+	RegexpOnlyChars          = "^[a-zA-Z]+$"
+	RegexpOnlyDigitsAndChars = "^[a-zA-Z0-9]+$"
 )
 
 type GroupProps struct {
