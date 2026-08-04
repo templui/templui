@@ -1,0 +1,68 @@
+// vendored 1:1 from apps/v4/registry/bases/base/components/example.tsx: the
+// ExampleWrapper grid and the titled Example cell that the scaffolded
+// component-example page composes.
+package example
+
+import "github.com/templui/templui/utils"
+
+type WrapperProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+// Wrapper is ExampleWrapper: the muted full-height grid behind the examples.
+templ Wrapper(props ...WrapperProps) {
+	{{ var p WrapperProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div class="w-full bg-muted dark:bg-background">
+		<div
+			if p.ID != "" {
+				id={ p.ID }
+			}
+			data-slot="example-wrapper"
+			class={ utils.TwMerge("mx-auto grid min-h-screen w-full max-w-5xl min-w-0 content-center items-start gap-8 p-4 pt-2 sm:gap-12 sm:p-6 md:grid-cols-2 md:gap-8 lg:p-12 2xl:max-w-6xl", p.Class) }
+			{ p.Attributes... }
+		>
+			{ children... }
+		</div>
+	</div>
+}
+
+type Props struct {
+	ID             string
+	Class          string
+	ContainerClass string
+	Title          string
+	Attributes     templ.Attributes
+}
+
+// Example is one titled example cell over a card surface.
+templ Example(props ...Props) {
+	{{ var p Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="example"
+		class={ utils.TwMerge("mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none", p.ContainerClass) }
+		{ p.Attributes... }
+	>
+		if p.Title != "" {
+			<div class="px-1.5 py-2 text-xs font-medium text-muted-foreground">
+				{ p.Title }
+			</div>
+		}
+		<div
+			data-slot="example-content"
+			class={ utils.TwMerge("flex min-w-0 flex-1 flex-col items-start gap-6 rounded-xl bg-card p-12 text-foreground style-lyra:rounded-none style-sera:rounded-none *:[div:not([class*='w-'])]:w-full", p.Class) }
+		>
+			{ children... }
+		</div>
+	</div>
+}

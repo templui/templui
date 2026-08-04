@@ -1,0 +1,424 @@
+// vendored 1:1 from apps/v4/registry/bases/base/examples/component-example.tsx:
+// the kitchen-sink page the init templates scaffold (their app/page.tsx
+// renders <ComponentExample />). Icons are the lucide picks of their
+// IconPlaceholder, the framework list is the Go lineup like combobox demos.
+package componentexample
+
+import (
+	"github.com/templui/templui/components/alertdialog"
+	"github.com/templui/templui/components/badge"
+	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/components/card"
+	"github.com/templui/templui/components/combobox"
+	"github.com/templui/templui/components/dropdownmenu"
+	"github.com/templui/templui/components/example"
+	"github.com/templui/templui/components/field"
+	"github.com/templui/templui/components/icon"
+	"github.com/templui/templui/components/input"
+	selectcomp "github.com/templui/templui/components/select"
+	"github.com/templui/templui/components/textarea"
+)
+
+templ ComponentExample() {
+	@example.Wrapper() {
+		@cardExample()
+		@formExample()
+	}
+}
+
+templ cardExample() {
+	@example.Example(example.Props{Title: "Card", Class: "items-center justify-center"}) {
+		@card.Card(card.Props{Class: "relative w-full max-w-sm overflow-hidden pt-0"}) {
+			<div class="absolute inset-0 z-30 aspect-video bg-primary opacity-50 mix-blend-color"></div>
+			<img
+				src="https://images.unsplash.com/photo-1604076850742-4c7221f3101b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+				alt="Photo by mymind on Unsplash"
+				title="Photo by mymind on Unsplash"
+				class="relative z-20 aspect-video w-full object-cover brightness-60 grayscale"
+			/>
+			@card.Header() {
+				@card.Title() {
+					Observability Plus is replacing Monitoring
+				}
+				@card.Description() {
+					Switch to the improved way to explore your data, with natural
+					language. Monitoring will no longer be available on the Pro plan in
+					November, 2025
+				}
+			}
+			@card.Footer() {
+				@alertdialog.AlertDialog() {
+					@button.Button(button.Props{
+						Attributes: alertdialog.Trigger(ctx),
+					}) {
+						@icon.Plus(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-start"}})
+						Show Dialog
+					}
+					@alertdialog.Content(alertdialog.ContentProps{Size: alertdialog.SizeSm}) {
+						@alertdialog.Header() {
+							@alertdialog.Media() {
+								@icon.Bluetooth()
+							}
+							@alertdialog.Title() {
+								Allow accessory to connect?
+							}
+							@alertdialog.Description() {
+								Do you want to allow the USB accessory to connect to this
+								device?
+							}
+						}
+						@alertdialog.Footer() {
+							@alertdialog.Cancel() {
+								Don't allow
+							}
+							@alertdialog.Action() {
+								Allow
+							}
+						}
+					}
+				}
+				@badge.Badge(badge.Props{Variant: badge.VariantSecondary, Class: "ml-auto"}) {
+					Warning
+				}
+			}
+		}
+	}
+}
+
+templ formExample() {
+	@example.Example(example.Props{Title: "Form"}) {
+		@card.Card(card.Props{Class: "w-full max-w-md"}) {
+			@card.Header() {
+				@card.Title() {
+					User Information
+				}
+				@card.Description() {
+					Please fill in your details below
+				}
+				@card.Action() {
+					@formExampleMenu()
+				}
+			}
+			@card.Content() {
+				<form>
+					@field.Group() {
+						<div class="grid grid-cols-2 gap-4">
+							@field.Field() {
+								@field.Label(field.LabelProps{For: "small-form-name"}) {
+									Name
+								}
+								@input.Input(input.Props{
+									ID:          "small-form-name",
+									Placeholder: "Enter your name",
+									Required:    true,
+								})
+							}
+							@field.Field() {
+								@field.Label(field.LabelProps{For: "small-form-role"}) {
+									Role
+								}
+								@selectcomp.Select() {
+									@selectcomp.Trigger(selectcomp.TriggerProps{ID: "small-form-role"}) {
+										@selectcomp.Value()
+									}
+									@selectcomp.Content() {
+										@selectcomp.Group() {
+											@selectcomp.Item(selectcomp.ItemProps{Value: "developer"}) {
+												Developer
+											}
+											@selectcomp.Item(selectcomp.ItemProps{Value: "designer"}) {
+												Designer
+											}
+											@selectcomp.Item(selectcomp.ItemProps{Value: "manager"}) {
+												Manager
+											}
+											@selectcomp.Item(selectcomp.ItemProps{Value: "other"}) {
+												Other
+											}
+										}
+									}
+								}
+							}
+						</div>
+						@field.Field() {
+							@field.Label(field.LabelProps{For: "small-form-framework"}) {
+								Framework
+							}
+							@combobox.Combobox() {
+								@combobox.Input(combobox.InputProps{
+									ID:          "small-form-framework",
+									Placeholder: "Select a framework",
+								})
+								@combobox.Content() {
+									@combobox.Empty() {
+										No frameworks found.
+									}
+									@combobox.List() {
+										@combobox.Item(combobox.ItemProps{Value: "templ"}) {
+											templ
+										}
+										@combobox.Item(combobox.ItemProps{Value: "htmx"}) {
+											htmx
+										}
+										@combobox.Item(combobox.ItemProps{Value: "gin"}) {
+											Gin
+										}
+										@combobox.Item(combobox.ItemProps{Value: "echo"}) {
+											Echo
+										}
+										@combobox.Item(combobox.ItemProps{Value: "chi"}) {
+											Chi
+										}
+									}
+								}
+							}
+						}
+						@field.Field() {
+							@field.Label(field.LabelProps{For: "small-form-comments"}) {
+								Comments
+							}
+							@textarea.Textarea(textarea.Props{
+								ID:          "small-form-comments",
+								Placeholder: "Add any additional comments",
+							})
+						}
+						@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
+							@button.Button(button.Props{Type: "submit"}) {
+								Submit
+							}
+							@button.Button(button.Props{Variant: button.VariantOutline, Type: "button"}) {
+								Cancel
+							}
+						}
+					}
+				</form>
+			}
+		}
+	}
+}
+
+// formExampleMenu is the card action dropdown: the complex file/view/account
+// menu from the reference, behind their ghost icon trigger.
+templ formExampleMenu() {
+	@dropdownmenu.DropdownMenu() {
+		@button.Button(button.Props{
+			Variant:    button.VariantGhost,
+			Size:       button.SizeIcon,
+			Attributes: dropdownmenu.Trigger(ctx),
+		}) {
+			@icon.EllipsisVertical()
+			<span class="sr-only">More options</span>
+		}
+		@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignEnd, Class: "w-56"}) {
+			@dropdownmenu.Group() {
+				@dropdownmenu.Label() {
+					File
+				}
+				@dropdownmenu.Item() {
+					@icon.File()
+					New File
+					@dropdownmenu.Shortcut() {
+						⌘N
+					}
+				}
+				@dropdownmenu.Item() {
+					@icon.Folder()
+					New Folder
+					@dropdownmenu.Shortcut() {
+						⇧⌘N
+					}
+				}
+				@dropdownmenu.Sub() {
+					@dropdownmenu.SubTrigger() {
+						@icon.FolderOpen()
+						Open Recent
+					}
+					@dropdownmenu.SubContent() {
+						@dropdownmenu.Group() {
+							@dropdownmenu.Label() {
+								Recent Projects
+							}
+							@dropdownmenu.Item() {
+								@icon.FileCode()
+								Project Alpha
+							}
+							@dropdownmenu.Item() {
+								@icon.FileCode()
+								Project Beta
+							}
+							@dropdownmenu.Sub() {
+								@dropdownmenu.SubTrigger() {
+									@icon.Ellipsis()
+									More Projects
+								}
+								@dropdownmenu.SubContent() {
+									@dropdownmenu.Item() {
+										@icon.FileCode()
+										Project Gamma
+									}
+									@dropdownmenu.Item() {
+										@icon.FileCode()
+										Project Delta
+									}
+								}
+							}
+						}
+						@dropdownmenu.Separator()
+						@dropdownmenu.Group() {
+							@dropdownmenu.Item() {
+								@icon.FolderSearch()
+								Browse...
+							}
+						}
+					}
+				}
+				@dropdownmenu.Separator()
+				@dropdownmenu.Item() {
+					@icon.Save()
+					Save
+					@dropdownmenu.Shortcut() {
+						⌘S
+					}
+				}
+				@dropdownmenu.Item() {
+					@icon.Download()
+					Export
+					@dropdownmenu.Shortcut() {
+						⇧⌘E
+					}
+				}
+			}
+			@dropdownmenu.Separator()
+			@dropdownmenu.Group() {
+				@dropdownmenu.Label() {
+					View
+				}
+				@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+					@icon.Eye()
+					Show Sidebar
+				}
+				@dropdownmenu.CheckboxItem() {
+					@icon.LayoutTemplate()
+					Show Status Bar
+				}
+				@dropdownmenu.Sub() {
+					@dropdownmenu.SubTrigger() {
+						@icon.Palette()
+						Theme
+					}
+					@dropdownmenu.SubContent() {
+						@dropdownmenu.Group() {
+							@dropdownmenu.Label() {
+								Appearance
+							}
+							@dropdownmenu.RadioGroup() {
+								@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{
+									Value:   "light",
+									Checked: true,
+								}) {
+									@icon.Sun()
+									Light
+								}
+								@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{Value: "dark"}) {
+									@icon.Moon()
+									Dark
+								}
+								@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{Value: "system"}) {
+									@icon.Monitor()
+									System
+								}
+							}
+						}
+					}
+				}
+			}
+			@dropdownmenu.Separator()
+			@dropdownmenu.Group() {
+				@dropdownmenu.Label() {
+					Account
+				}
+				@dropdownmenu.Item() {
+					@icon.User()
+					Profile
+					@dropdownmenu.Shortcut() {
+						⇧⌘P
+					}
+				}
+				@dropdownmenu.Item() {
+					@icon.CreditCard()
+					Billing
+				}
+				@dropdownmenu.Sub() {
+					@dropdownmenu.SubTrigger() {
+						@icon.Settings()
+						Settings
+					}
+					@dropdownmenu.SubContent() {
+						@dropdownmenu.Group() {
+							@dropdownmenu.Label() {
+								Preferences
+							}
+							@dropdownmenu.Item() {
+								@icon.Keyboard()
+								Keyboard Shortcuts
+							}
+							@dropdownmenu.Item() {
+								@icon.Languages()
+								Language
+							}
+							@dropdownmenu.Sub() {
+								@dropdownmenu.SubTrigger() {
+									@icon.Bell()
+									Notifications
+								}
+								@dropdownmenu.SubContent() {
+									@dropdownmenu.Group() {
+										@dropdownmenu.Label() {
+											Notification Types
+										}
+										@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+											@icon.Bell()
+											Push Notifications
+										}
+										@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+											@icon.Mail()
+											Email Notifications
+										}
+									}
+								}
+							}
+						}
+						@dropdownmenu.Separator()
+						@dropdownmenu.Group() {
+							@dropdownmenu.Item() {
+								@icon.Shield()
+								Privacy & Security
+							}
+						}
+					}
+				}
+			}
+			@dropdownmenu.Separator()
+			@dropdownmenu.Group() {
+				@dropdownmenu.Item() {
+					@icon.CircleQuestionMark()
+					Help & Support
+				}
+				@dropdownmenu.Item() {
+					@icon.FileText()
+					Documentation
+				}
+			}
+			@dropdownmenu.Separator()
+			@dropdownmenu.Group() {
+				@dropdownmenu.Item(dropdownmenu.ItemProps{Variant: dropdownmenu.ItemVariantDestructive}) {
+					@icon.LogOut()
+					Sign Out
+					@dropdownmenu.Shortcut() {
+						⇧⌘Q
+					}
+				}
+			}
+		}
+	}
+}

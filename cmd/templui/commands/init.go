@@ -186,9 +186,9 @@ func RunInit(opts InitOptions) error {
 	}
 
 	if scaffolded {
-		// The template's home page renders the button component, like their
-		// templates install component-example for the scaffolded page.
-		if err := addComponents([]string{"button"}, config, registryURL, addComponentsOptions{
+		// The template's home page renders component-example, like their
+		// templates install it for the scaffolded page.
+		if err := addComponents([]string{"component-example"}, config, registryURL, addComponentsOptions{
 			Overwrite: true,
 			Silent:    opts.Silent,
 		}); err != nil {

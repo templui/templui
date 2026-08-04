@@ -84,12 +84,13 @@ func Components() []Item {
 	return out
 }
 
-// Find returns the installable item (registry:ui or registry:lib, e.g. the
+// Find returns the installable item (registry:ui, registry:lib or
+// registry:example, e.g. the
 // utils lib item) with the given name, or nil.
 func Find(name string) *Item {
 	items := Get().Items
 	for i := range items {
-		if (items[i].Type == "registry:ui" || items[i].Type == "registry:lib") && items[i].Name == name {
+		if (items[i].Type == "registry:ui" || items[i].Type == "registry:lib" || items[i].Type == "registry:example") && items[i].Name == name {
 			return &items[i]
 		}
 	}

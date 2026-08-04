@@ -8,7 +8,9 @@
       "type": "registry:ui",
       "title": "Accordion",
       "description": "Collapsible accordion component.",
-      "registryDependencies": ["icon"],
+      "registryDependencies": [
+        "icon"
+      ],
       "files": [
         {
           "path": "components/accordion/accordion.templ",
@@ -19,7 +21,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["layout-navigation"]
+      "categories": [
+        "layout-navigation"
+      ]
     },
     {
       "name": "alert",
@@ -32,21 +36,28 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["feedback-status"]
+      "categories": [
+        "feedback-status"
+      ]
     },
     {
       "name": "alert-dialog",
       "type": "registry:ui",
       "title": "Alert Dialog",
       "description": "A modal dialog that interrupts the user with important content and expects a response.",
-      "registryDependencies": ["button", "dialog"],
+      "registryDependencies": [
+        "button",
+        "dialog"
+      ],
       "files": [
         {
           "path": "components/alertdialog/alertdialog.templ",
           "type": "registry:ui"
         }
       ],
-      "categories": ["overlays-dialogs"]
+      "categories": [
+        "overlays-dialogs"
+      ]
     },
     {
       "name": "aspect-ratio",
@@ -59,7 +70,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["display-media"]
+      "categories": [
+        "display-media"
+      ]
     },
     {
       "name": "avatar",
@@ -76,7 +89,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["display-media"]
+      "categories": [
+        "display-media"
+      ]
     },
     {
       "name": "badge",
@@ -89,21 +104,27 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["feedback-status"]
+      "categories": [
+        "feedback-status"
+      ]
     },
     {
       "name": "breadcrumb",
       "type": "registry:ui",
       "title": "Breadcrumb",
       "description": "Breadcrumb navigation component.",
-      "registryDependencies": ["icon"],
+      "registryDependencies": [
+        "icon"
+      ],
       "files": [
         {
           "path": "components/breadcrumb/breadcrumb.templ",
           "type": "registry:ui"
         }
       ],
-      "categories": ["layout-navigation"]
+      "categories": [
+        "layout-navigation"
+      ]
     },
     {
       "name": "button",
@@ -116,28 +137,36 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "button-group",
       "type": "registry:ui",
       "title": "Button Group",
       "description": "Group related buttons together with shared borders.",
-      "registryDependencies": ["button"],
+      "registryDependencies": [
+        "button"
+      ],
       "files": [
         {
           "path": "components/buttongroup/buttongroup.templ",
           "type": "registry:ui"
         }
       ],
-      "categories": ["layout-navigation"]
+      "categories": [
+        "layout-navigation"
+      ]
     },
     {
       "name": "calendar",
       "type": "registry:ui",
       "title": "Calendar",
       "description": "Calendar component for date selection.",
-      "registryDependencies": ["icon"],
+      "registryDependencies": [
+        "icon"
+      ],
       "files": [
         {
           "path": "components/calendar/calendar.templ",
@@ -148,28 +177,36 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "card",
       "type": "registry:ui",
       "title": "Card",
       "description": "Card container component.",
-      "registryDependencies": ["aspect-ratio"],
+      "registryDependencies": [
+        "aspect-ratio"
+      ],
       "files": [
         {
           "path": "components/card/card.templ",
           "type": "registry:ui"
         }
       ],
-      "categories": ["display-media"]
+      "categories": [
+        "display-media"
+      ]
     },
     {
       "name": "carousel",
       "type": "registry:ui",
       "title": "Carousel",
       "description": "Carousel component with navigation controls.",
-      "registryDependencies": ["icon"],
+      "registryDependencies": [
+        "icon"
+      ],
       "files": [
         {
           "path": "components/carousel/carousel.templ",
@@ -180,7 +217,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["display-media"]
+      "categories": [
+        "display-media"
+      ]
     },
     {
       "name": "chart",
@@ -197,14 +236,18 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["display-media"]
+      "categories": [
+        "display-media"
+      ]
     },
     {
       "name": "checkbox",
       "type": "registry:ui",
       "title": "Checkbox",
       "description": "Checkbox input component.",
-      "registryDependencies": ["icon"],
+      "registryDependencies": [
+        "icon"
+      ],
       "files": [
         {
           "path": "components/checkbox/checkbox.templ",
@@ -215,7 +258,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "collapsible",
@@ -232,14 +277,20 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["misc"]
+      "categories": [
+        "misc"
+      ]
     },
     {
       "name": "combobox",
       "type": "registry:ui",
       "title": "Combobox",
       "description": "An input with a filterable list of options.",
-      "registryDependencies": ["button", "icon", "input-group"],
+      "registryDependencies": [
+        "button",
+        "icon",
+        "input-group"
+      ],
       "files": [
         {
           "path": "components/combobox/combobox.templ",
@@ -258,14 +309,20 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "command",
       "type": "registry:ui",
       "title": "Command",
       "description": "Fast, composable command menu.",
-      "registryDependencies": ["dialog", "icon", "input-group"],
+      "registryDependencies": [
+        "dialog",
+        "icon",
+        "input-group"
+      ],
       "files": [
         {
           "path": "components/command/command.templ",
@@ -276,37 +333,53 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["overlays-dialogs"]
+      "categories": [
+        "overlays-dialogs"
+      ]
     },
     {
       "name": "date-picker",
       "type": "registry:ui",
       "title": "Date Picker",
       "description": "A date picker pattern composed of the Calendar, Popover and Button components.",
-      "registryDependencies": ["button", "calendar", "popover"],
+      "registryDependencies": [
+        "button",
+        "calendar",
+        "popover"
+      ],
       "files": [],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "sheet",
       "type": "registry:ui",
       "title": "Sheet",
       "description": "Slide-out panel component (drawer).",
-      "registryDependencies": ["button", "dialog", "icon"],
+      "registryDependencies": [
+        "button",
+        "dialog",
+        "icon"
+      ],
       "files": [
         {
           "path": "components/sheet/sheet.templ",
           "type": "registry:ui"
         }
       ],
-      "categories": ["overlays-dialogs"]
+      "categories": [
+        "overlays-dialogs"
+      ]
     },
     {
       "name": "dropdown-menu",
       "type": "registry:ui",
       "title": "Dropdown Menu",
       "description": "Displays a menu of actions or options triggered by a button.",
-      "registryDependencies": ["icon"],
+      "registryDependencies": [
+        "icon"
+      ],
       "files": [
         {
           "path": "components/dropdownmenu/dropdownmenu.templ",
@@ -325,7 +398,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["overlays-dialogs"]
+      "categories": [
+        "overlays-dialogs"
+      ]
     },
     {
       "name": "icon",
@@ -346,7 +421,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["misc"]
+      "categories": [
+        "misc"
+      ]
     },
     {
       "name": "input",
@@ -359,14 +436,18 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "input-otp",
       "type": "registry:ui",
       "title": "Input OTP",
       "description": "One-time password input component.",
-      "registryDependencies": ["input"],
+      "registryDependencies": [
+        "input"
+      ],
       "files": [
         {
           "path": "components/inputotp/inputotp.templ",
@@ -377,7 +458,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "label",
@@ -390,7 +473,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "drawer",
@@ -407,14 +492,19 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["overlays-dialogs"]
+      "categories": [
+        "overlays-dialogs"
+      ]
     },
     {
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",
       "description": "Modal dialog component.",
-      "registryDependencies": ["button", "icon"],
+      "registryDependencies": [
+        "button",
+        "icon"
+      ],
       "files": [
         {
           "path": "components/dialog/dialog.templ",
@@ -425,21 +515,28 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["overlays-dialogs"]
+      "categories": [
+        "overlays-dialogs"
+      ]
     },
     {
       "name": "pagination",
       "type": "registry:ui",
       "title": "Pagination",
       "description": "Pagination component for lists and tables.",
-      "registryDependencies": ["button", "icon"],
+      "registryDependencies": [
+        "button",
+        "icon"
+      ],
       "files": [
         {
           "path": "components/pagination/pagination.templ",
           "type": "registry:ui"
         }
       ],
-      "categories": ["layout-navigation"]
+      "categories": [
+        "layout-navigation"
+      ]
     },
     {
       "name": "popover",
@@ -464,7 +561,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["overlays-dialogs"]
+      "categories": [
+        "overlays-dialogs"
+      ]
     },
     {
       "name": "hover-card",
@@ -489,7 +588,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["overlays-dialogs"]
+      "categories": [
+        "overlays-dialogs"
+      ]
     },
     {
       "name": "field",
@@ -502,7 +603,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "kbd",
@@ -515,13 +618,15 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["display-media"]
+      "categories": [
+        "display-media"
+      ]
     },
     {
       "name": "input-group",
       "type": "registry:ui",
       "title": "Input Group",
-      "description": "An input with leading or trailing addons — icons, text or buttons.",
+      "description": "An input with leading or trailing addons \u2014 icons, text or buttons.",
       "files": [
         {
           "path": "components/inputgroup/inputgroup.templ",
@@ -532,47 +637,57 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "item",
       "type": "registry:ui",
       "title": "Item",
-      "description": "A flexible row for lists — media, title, description and actions.",
+      "description": "A flexible row for lists \u2014 media, title, description and actions.",
       "files": [
         {
           "path": "components/item/item.templ",
           "type": "registry:ui"
         }
       ],
-      "categories": ["layout-navigation"]
+      "categories": [
+        "layout-navigation"
+      ]
     },
     {
       "name": "empty",
       "type": "registry:ui",
       "title": "Empty",
-      "description": "Placeholder for empty states — no results, first-run or offline screens.",
+      "description": "Placeholder for empty states \u2014 no results, first-run or offline screens.",
       "files": [
         {
           "path": "components/empty/empty.templ",
           "type": "registry:ui"
         }
       ],
-      "categories": ["feedback-status"]
+      "categories": [
+        "feedback-status"
+      ]
     },
     {
       "name": "spinner",
       "type": "registry:ui",
       "title": "Spinner",
       "description": "Animated loading indicator built from a spinning icon.",
-      "registryDependencies": ["icon"],
+      "registryDependencies": [
+        "icon"
+      ],
       "files": [
         {
           "path": "components/spinner/spinner.templ",
           "type": "registry:ui"
         }
       ],
-      "categories": ["feedback-status"]
+      "categories": [
+        "feedback-status"
+      ]
     },
     {
       "name": "toggle",
@@ -589,21 +704,27 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "toggle-group",
       "type": "registry:ui",
       "title": "Toggle Group",
       "description": "A set of toggles grouped into a segmented control with single or multiple selection.",
-      "registryDependencies": ["toggle"],
+      "registryDependencies": [
+        "toggle"
+      ],
       "files": [
         {
           "path": "components/togglegroup/togglegroup.templ",
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "context-menu",
@@ -628,7 +749,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["overlays-dialogs"]
+      "categories": [
+        "overlays-dialogs"
+      ]
     },
     {
       "name": "progress",
@@ -645,7 +768,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["feedback-status"]
+      "categories": [
+        "feedback-status"
+      ]
     },
     {
       "name": "radio-group",
@@ -662,14 +787,18 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "select",
       "type": "registry:ui",
       "title": "Select",
       "description": "Displays a list of options for the user to pick from, triggered by a button.",
-      "registryDependencies": ["icon"],
+      "registryDependencies": [
+        "icon"
+      ],
       "files": [
         {
           "path": "components/select/select.templ",
@@ -688,7 +817,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "separator",
@@ -701,14 +832,23 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["layout-navigation"]
+      "categories": [
+        "layout-navigation"
+      ]
     },
     {
       "name": "sidebar",
       "type": "registry:ui",
       "title": "Sidebar",
       "description": "Collapsible sidebar component for app layouts.",
-      "registryDependencies": ["button", "icon", "input", "sheet", "skeleton", "tooltip"],
+      "registryDependencies": [
+        "button",
+        "icon",
+        "input",
+        "sheet",
+        "skeleton",
+        "tooltip"
+      ],
       "files": [
         {
           "path": "components/sidebar/sidebar.templ",
@@ -719,7 +859,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["layout-navigation"]
+      "categories": [
+        "layout-navigation"
+      ]
     },
     {
       "name": "skeleton",
@@ -732,7 +874,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["feedback-status"]
+      "categories": [
+        "feedback-status"
+      ]
     },
     {
       "name": "slider",
@@ -749,7 +893,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "switch",
@@ -766,7 +912,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "table",
@@ -779,7 +927,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["display-media"]
+      "categories": [
+        "display-media"
+      ]
     },
     {
       "name": "tabs",
@@ -796,7 +946,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["layout-navigation"]
+      "categories": [
+        "layout-navigation"
+      ]
     },
     {
       "name": "textarea",
@@ -809,14 +961,18 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["form-input"]
+      "categories": [
+        "form-input"
+      ]
     },
     {
       "name": "toast",
       "type": "registry:ui",
       "title": "Toast",
       "description": "A succinct message that is displayed temporarily.",
-      "registryDependencies": ["icon"],
+      "registryDependencies": [
+        "icon"
+      ],
       "files": [
         {
           "path": "components/toast/toast.templ",
@@ -827,7 +983,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["feedback-status"]
+      "categories": [
+        "feedback-status"
+      ]
     },
     {
       "name": "tooltip",
@@ -852,7 +1010,9 @@
           "type": "registry:ui"
         }
       ],
-      "categories": ["overlays-dialogs"]
+      "categories": [
+        "overlays-dialogs"
+      ]
     },
     {
       "name": "utils",
@@ -862,6 +1022,43 @@
         {
           "path": "utils/templui.go",
           "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "example",
+      "type": "registry:example",
+      "title": "Example",
+      "description": "Example wrapper and cell for scaffolded pages.",
+      "files": [
+        {
+          "path": "components/example/example.templ",
+          "type": "registry:example"
+        }
+      ]
+    },
+    {
+      "name": "component-example",
+      "type": "registry:example",
+      "title": "Example",
+      "description": "The scaffolded kitchen-sink example page.",
+      "registryDependencies": [
+        "alert-dialog",
+        "badge",
+        "button",
+        "card",
+        "combobox",
+        "dropdown-menu",
+        "field",
+        "input",
+        "select",
+        "textarea",
+        "example"
+      ],
+      "files": [
+        {
+          "path": "components/componentexample/componentexample.templ",
+          "type": "registry:example"
         }
       ]
     }
