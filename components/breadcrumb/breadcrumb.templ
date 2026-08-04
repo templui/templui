@@ -34,7 +34,6 @@ type SeparatorProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	UseCustom  bool
 }
 
 templ Breadcrumb(props ...Props) {
@@ -149,8 +148,11 @@ templ Separator(props ...SeparatorProps) {
 		}
 		{ p.Attributes... }
 	>
-		if p.UseCustom {
-			{ children... }
+		// The children ?? <ChevronRight/> of the reference: children render
+		// when the caller passed any, the icon fills the default case.
+		{{ childrenHTML, _ := templ.ToGoHTML(ctx, templ.GetChildren(ctx)) }}
+		if childrenHTML != "" {
+			@templ.Raw(childrenHTML)
 		} else {
 			@icon.ChevronRight(icon.Props{Class: "cn-rtl-flip"})
 		}

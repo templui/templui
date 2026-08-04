@@ -92,7 +92,7 @@ A basic breadcrumb with a home link and a components link.
 
 ## Custom separator
 
-Set the `UseCustom` prop on `breadcrumb.Separator` and pass custom children to create a custom separator.
+Pass custom children to `breadcrumb.Separator` to replace the default separator icon.
 
 <ComponentPreview name="breadcrumb-separator" />
 
@@ -159,11 +159,10 @@ The `breadcrumb.Page` component displays the current page in the breadcrumb (non
 
 ### Separator
 
-The `breadcrumb.Separator` component displays a separator between breadcrumb items. Set `UseCustom` and pass custom children to override the default separator icon.
+The `breadcrumb.Separator` component displays a separator between breadcrumb items. Pass custom children to override the default separator icon.
 
 | Prop        | Type     | Default |
 | ----------- | -------- | ------- |
-| `UseCustom` | `bool`   | `false` |
 | `Class`     | `string` | -       |
 
 ### Ellipsis
