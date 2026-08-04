@@ -1069,7 +1069,7 @@ func Create() templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = layouts.BaseLayout("New Project - templui", "Customize everything. Pick your base color, theme, fonts and create your own version of templui.").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layouts.BaseLayout("New Project", "Customize everything. Pick your base color, theme, fonts and create your own version of templui.").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1622,7 +1622,7 @@ func createCustomizer() templ.Component {
 				})
 				templ_7745c5c3_Err = button.Button(button.Props{
 					Variant: button.VariantOutline,
-					Class:   utils.TwMerge(createFooterButtonClass, "min-w-0 flex-1 md:flex-none"),
+					Class:   utils.CN(createFooterButtonClass, "min-w-0 flex-1 md:flex-none"),
 					Attributes: templ.Attributes{
 						"data-tui-create-copy": true,
 						"title":                "--preset b0",
@@ -1655,7 +1655,7 @@ func createCustomizer() templ.Component {
 				})
 				templ_7745c5c3_Err = button.Button(button.Props{
 					Variant:    button.VariantOutline,
-					Class:      utils.TwMerge(createFooterButtonClass, "max-w-20 min-w-0 flex-1 sm:max-w-none md:flex-none"),
+					Class:      utils.CN(createFooterButtonClass, "max-w-20 min-w-0 flex-1 sm:max-w-none md:flex-none"),
 					Attributes: templ.Attributes{"data-tui-create-open-preset": true},
 				}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var63), templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
@@ -1685,7 +1685,7 @@ func createCustomizer() templ.Component {
 				})
 				templ_7745c5c3_Err = button.Button(button.Props{
 					Variant:    button.VariantOutline,
-					Class:      utils.TwMerge(createFooterButtonClass, "max-w-20 min-w-0 flex-1 sm:max-w-none md:flex-none"),
+					Class:      utils.CN(createFooterButtonClass, "max-w-20 min-w-0 flex-1 sm:max-w-none md:flex-none"),
 					Attributes: templ.Attributes{"data-tui-create-shuffle": true},
 				}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var64), templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
@@ -1780,7 +1780,7 @@ func createPickerRow(param, label, value, wrapperClass string) templ.Component {
 			templ_7745c5c3_Var67 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var68 = []any{utils.TwMerge("group/picker relative", wrapperClass)}
+		var templ_7745c5c3_Var68 = []any{utils.CN("group/picker relative", wrapperClass)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var68...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -2022,7 +2022,7 @@ func createMainMenuTrigger() templ.Component {
 			templ_7745c5c3_Var82 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var83 = []any{utils.TwMerge(createTriggerClass, "flex items-center justify-between gap-2 rounded-lg px-1.75 ring-1 ring-foreground/10 focus-visible:ring-1")}
+		var templ_7745c5c3_Var83 = []any{utils.CN(createTriggerClass, "flex items-center justify-between gap-2 rounded-lg px-1.75 ring-1 ring-foreground/10 focus-visible:ring-1")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var83...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -2549,7 +2549,7 @@ func createPickerContent(param, extraClass string) templ.Component {
 			templ_7745c5c3_Var116 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var117 = []any{utils.TwMerge(createContentClass, extraClass)}
+		var templ_7745c5c3_Var117 = []any{utils.CN(createContentClass, extraClass)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var117...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -4107,7 +4107,7 @@ func createCodeDialog() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 178, "Run init inside your Go module to start a new project with this preset. Get the CLI with <code class=\"font-mono\">go install github.com/templui/templui/cmd/templui@latest</code>.")
+							templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 178, "Scaffolds a new templ project with this preset. Get the CLI with <code class=\"font-mono\">go install github.com/templui/templui/cmd/templui@latest</code>.")
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -4145,7 +4145,7 @@ func createCodeDialog() templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = createCommandBox("command", "init", "templui init --preset b0").Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = createCommandBox("command", "init", "templui init -t templ --preset b0").Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -5207,7 +5207,7 @@ func createWelcomeDialog() templ.Component {
 							}()
 						}
 						ctx = templ.InitializeContext(ctx)
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 213, "Customize everything from the ground up. Pick your component library, font, color scheme, and more.")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 213, "Customize everything from the ground up. Pick your style, font, color scheme, and more.")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -5233,7 +5233,7 @@ func createWelcomeDialog() templ.Component {
 							}()
 						}
 						ctx = templ.InitializeContext(ctx)
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 215, "Available for all major React frameworks.")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 215, "Built for Go with templ.")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}

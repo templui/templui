@@ -160,7 +160,7 @@ templ Trigger(props ...TriggerProps) {
 		}
 		disabled?={ s.disabled }
 		class={
-			utils.TwMerge(
+			utils.CN(
 				// 1:1 base/ui/select.tsx SelectTrigger, the look comes from
 				// cn-select-trigger.
 				"cn-select-trigger flex w-fit items-center justify-between whitespace-nowrap outline-none disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center [&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -183,7 +183,7 @@ templ Value(props ...ValueProps) {
 		data-slot="select-value"
 		data-tui-select-value
 		data-tui-select-placeholder={ p.Placeholder }
-		class={ utils.TwMerge("cn-select-value", p.Class) }
+		class={ utils.CN("cn-select-value", p.Class) }
 		{ p.Attributes... }
 	>
 		{ p.Placeholder }
@@ -225,7 +225,7 @@ templ Content(props ...ContentProps) {
 			data-state="closed"
 			role="listbox"
 			class={
-				utils.TwMerge(
+				utils.CN(
 					// 1:1 base/ui/select.tsx SelectContent, the look comes from
 					// cn-select-content (animations key on our data-state attribute).
 					// The --available-height/--anchor-width/--transform-origin
@@ -265,7 +265,7 @@ templ Group(props ...GroupProps) {
 		}
 		role="group"
 		data-slot="select-group"
-		class={ utils.TwMerge("cn-select-group", p.Class) }
+		class={ utils.CN("cn-select-group", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -282,7 +282,7 @@ templ Label(props ...LabelProps) {
 			id={ p.ID }
 		}
 		data-slot="select-label"
-		class={ utils.TwMerge("cn-select-label", p.Class) }
+		class={ utils.CN("cn-select-label", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -320,7 +320,7 @@ templ Item(props ...ItemProps) {
 			aria-disabled="true"
 		}
 		class={
-			utils.TwMerge(
+			utils.CN(
 				// 1:1 base/ui/select.tsx SelectItem, the look comes from
 				// cn-select-item (items highlight via real focus, our JS moves focus
 				// to the item under the pointer like Base UI).
@@ -353,7 +353,7 @@ templ Separator(props ...SeparatorProps) {
 		}
 		role="separator"
 		data-slot="select-separator"
-		class={ utils.TwMerge("cn-select-separator pointer-events-none", p.Class) }
+		class={ utils.CN("cn-select-separator pointer-events-none", p.Class) }
 		{ p.Attributes... }
 	></div>
 }

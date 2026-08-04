@@ -293,7 +293,7 @@ func Provider(props ...ProviderProps) templ.Component {
 		}
 		ctx = context.WithValue(ctx, sidebarIDKey, layoutID)
 		ctx = context.WithValue(ctx, sidebarStateKey, ctxState{collapsed: p.Collapsed})
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var2 = []any{utils.CN(
 			"group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar",
 			p.Class,
 		)}
@@ -386,7 +386,7 @@ func Sidebar(props ...Props) templ.Component {
 		ctx = context.WithValue(ctx, sidebarIDKey, p.ID)
 		ctx = context.WithValue(ctx, sidebarStateKey, ctxState{collapsed: s.collapsed, collapsible: p.Collapsible})
 		if p.Collapsible == CollapsibleNone {
-			var templ_7745c5c3_Var5 = []any{utils.TwMerge(
+			var templ_7745c5c3_Var5 = []any{utils.CN(
 				"flex h-full w-(--sidebar-width) flex-col bg-sidebar text-sidebar-foreground",
 				p.Class,
 			)}
@@ -673,7 +673,7 @@ func Sidebar(props ...Props) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var21 = []any{utils.TwMerge(
+			var templ_7745c5c3_Var21 = []any{utils.CN(
 				"cn-sidebar-gap relative w-(--sidebar-width) bg-transparent",
 				"group-data-[collapsible=offcanvas]:w-0",
 				"group-data-[side=right]:rotate-180",
@@ -704,7 +704,7 @@ func Sidebar(props ...Props) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var23 = []any{utils.TwMerge(
+			var templ_7745c5c3_Var23 = []any{utils.CN(
 				"fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear data-[side=left]:left-0 data-[side=left]:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] data-[side=right]:right-0 data-[side=right]:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] md:flex",
 				utils.IfElse(
 					p.Variant == VariantFloating || p.Variant == VariantInset,
@@ -851,7 +851,7 @@ func Trigger(props ...TriggerProps) templ.Component {
 			ID:      p.ID,
 			Size:    button.SizeIconSm,
 			Variant: button.VariantGhost,
-			Class:   utils.TwMerge("cn-sidebar-trigger", p.Class),
+			Class:   utils.CN("cn-sidebar-trigger", p.Class),
 			Attributes: utils.MergeAttributes(
 				templ.Attributes{
 					"data-sidebar":             "trigger",
@@ -895,7 +895,7 @@ func Rail(props ...RailProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var31 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var31 = []any{utils.CN(
 			"cn-sidebar-rail absolute inset-y-0 z-20 hidden w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2",
 			"in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",
 			"[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
@@ -975,7 +975,7 @@ func Inset(props ...InsetProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var35 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var35 = []any{utils.CN(
 			"cn-sidebar-inset relative flex w-full flex-1 flex-col",
 			p.Class,
 		)}
@@ -1073,7 +1073,7 @@ func Input(props ...InputProps) templ.Component {
 			Name:        p.Name,
 			Value:       p.Value,
 			Placeholder: p.Placeholder,
-			Class:       utils.TwMerge("cn-sidebar-input", p.Class),
+			Class:       utils.CN("cn-sidebar-input", p.Class),
 			Attributes: utils.MergeAttributes(
 				templ.Attributes{"data-slot": "sidebar-input", "data-sidebar": "input"},
 				p.Attributes,
@@ -1111,7 +1111,7 @@ func Header(props ...HeaderProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var40 = []any{utils.TwMerge("cn-sidebar-header flex flex-col", p.Class)}
+		var templ_7745c5c3_Var40 = []any{utils.CN("cn-sidebar-header flex flex-col", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var40...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1201,7 +1201,7 @@ func Footer(props ...FooterProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var44 = []any{utils.TwMerge("cn-sidebar-footer flex flex-col", p.Class)}
+		var templ_7745c5c3_Var44 = []any{utils.CN("cn-sidebar-footer flex flex-col", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var44...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1291,7 +1291,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var48 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var48 = []any{utils.CN(
 			// The base separator classes the tsx inherits from ui/separator,
 			// plus the sidebar override from sidebar.tsx.
 			"shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch",
@@ -1379,7 +1379,7 @@ func Content(props ...ContentProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var52 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var52 = []any{utils.CN(
 			"cn-sidebar-content flex min-h-0 flex-1 flex-col overflow-auto group-data-[collapsible=icon]:overflow-hidden",
 			p.Class,
 		)}
@@ -1472,7 +1472,7 @@ func Group(props ...GroupProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var56 = []any{utils.TwMerge("cn-sidebar-group relative flex w-full min-w-0 flex-col", p.Class)}
+		var templ_7745c5c3_Var56 = []any{utils.CN("cn-sidebar-group relative flex w-full min-w-0 flex-col", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var56...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1562,7 +1562,7 @@ func GroupLabel(props ...GroupLabelProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var60 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var60 = []any{utils.CN(
 			"cn-sidebar-group-label flex shrink-0 items-center outline-hidden [&>svg]:shrink-0",
 			p.Class,
 		)}
@@ -1655,7 +1655,7 @@ func GroupAction(props ...GroupActionProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var64 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var64 = []any{utils.CN(
 			"cn-sidebar-group-action flex aspect-square items-center justify-center outline-hidden transition-transform group-data-[collapsible=icon]:hidden after:absolute after:-inset-2 md:after:hidden [&>svg]:shrink-0",
 			p.Class,
 		)}
@@ -1748,7 +1748,7 @@ func GroupContent(props ...GroupContentProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var68 = []any{utils.TwMerge("cn-sidebar-group-content w-full", p.Class)}
+		var templ_7745c5c3_Var68 = []any{utils.CN("cn-sidebar-group-content w-full", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var68...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1838,7 +1838,7 @@ func Menu(props ...MenuProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var72 = []any{utils.TwMerge("cn-sidebar-menu flex w-full min-w-0 flex-col", p.Class)}
+		var templ_7745c5c3_Var72 = []any{utils.CN("cn-sidebar-menu flex w-full min-w-0 flex-col", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var72...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1928,7 +1928,7 @@ func MenuItem(props ...MenuItemProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var76 = []any{utils.TwMerge("group/menu-item relative", p.Class)}
+		var templ_7745c5c3_Var76 = []any{utils.CN("group/menu-item relative", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var76...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1998,7 +1998,7 @@ func MenuItem(props ...MenuItemProps) templ.Component {
 const menuButtonBaseClasses = "cn-sidebar-menu-button peer/menu-button group/menu-button flex w-full items-center overflow-hidden outline-hidden disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate"
 
 func menuButtonClasses(p MenuButtonProps) string {
-	return utils.TwMerge(
+	return utils.CN(
 		menuButtonBaseClasses,
 		menuButtonVariantClasses(p.Variant),
 		menuButtonSizeClasses(p.Size),
@@ -2406,7 +2406,7 @@ func MenuAction(props ...MenuActionProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var96 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var96 = []any{utils.CN(
 			"cn-sidebar-menu-action flex items-center justify-center outline-hidden transition-transform group-data-[collapsible=icon]:hidden after:absolute after:-inset-2 md:after:hidden [&>svg]:shrink-0",
 			utils.If(p.ShowOnHover, "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 peer-data-active/menu-button:text-sidebar-accent-foreground aria-expanded:opacity-100 md:opacity-0"),
 			p.Class,
@@ -2500,7 +2500,7 @@ func MenuBadge(props ...MenuBadgeProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var100 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var100 = []any{utils.CN(
 			"cn-sidebar-menu-badge flex items-center justify-center tabular-nums select-none group-data-[collapsible=icon]:hidden",
 			p.Class,
 		)}
@@ -2594,7 +2594,7 @@ func MenuSkeleton(props ...MenuSkeletonProps) templ.Component {
 			p = props[0]
 		}
 		width := strconv.Itoa(rand.Intn(40)+50) + "%"
-		var templ_7745c5c3_Var104 = []any{utils.TwMerge("cn-sidebar-menu-skeleton flex items-center", p.Class)}
+		var templ_7745c5c3_Var104 = []any{utils.CN("cn-sidebar-menu-skeleton flex items-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var104...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -2699,7 +2699,7 @@ func MenuSub(props ...MenuSubProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var108 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var108 = []any{utils.CN(
 			"cn-sidebar-menu-sub flex min-w-0 flex-col",
 			p.Class,
 		)}
@@ -2792,7 +2792,7 @@ func MenuSubItem(props ...MenuSubItemProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var112 = []any{utils.TwMerge("group/menu-sub-item relative", p.Class)}
+		var templ_7745c5c3_Var112 = []any{utils.CN("group/menu-sub-item relative", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var112...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -2858,7 +2858,7 @@ func MenuSubItem(props ...MenuSubItemProps) templ.Component {
 }
 
 func menuSubButtonClasses(p MenuSubButtonProps) string {
-	return utils.TwMerge(
+	return utils.CN(
 		"cn-sidebar-menu-sub-button flex min-w-0 -translate-x-px items-center overflow-hidden outline-hidden group-data-[collapsible=icon]:hidden disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:shrink-0",
 		p.Class,
 	)
@@ -2991,7 +2991,7 @@ func MenuSubButton(props ...MenuSubButtonProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			var templ_7745c5c3_Var121 = []any{utils.TwMerge(menuSubButtonClasses(p), "w-full text-left")}
+			var templ_7745c5c3_Var121 = []any{utils.CN(menuSubButtonClasses(p), "w-full text-left")}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var121...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

@@ -67,7 +67,7 @@ func Alert(props ...Props) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var2 = []any{utils.CN(
 			"cn-alert group/alert relative w-full",
 			variantClasses(p.Variant),
 			p.Class,
@@ -162,7 +162,7 @@ func Title(props ...TitleProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var6 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var6 = []any{utils.CN(
 			"cn-alert-title [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground",
 			p.Class,
 		),
@@ -256,7 +256,7 @@ func Description(props ...DescriptionProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var10 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var10 = []any{utils.CN(
 			"cn-alert-description [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground",
 			p.Class,
 		),
@@ -351,7 +351,7 @@ func Action(props ...ActionProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var14 = []any{utils.TwMerge("cn-alert-action", p.Class)}
+		var templ_7745c5c3_Var14 = []any{utils.CN("cn-alert-action", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var14...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

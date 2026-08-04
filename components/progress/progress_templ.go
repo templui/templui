@@ -107,7 +107,7 @@ func Progress(props ...Props) templ.Component {
 			p.Max = 100
 		}
 		ctx = context.WithValue(ctx, stateKey, ctxState{value: p.Value, max: p.Max})
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("cn-progress-root flex flex-wrap gap-3", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.CN("cn-progress-root flex flex-wrap gap-3", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -273,7 +273,7 @@ func Label(props ...LabelProps) templ.Component {
 			p.ID = utils.RandomID()
 		}
 		s := state(ctx)
-		var templ_7745c5c3_Var10 = []any{utils.TwMerge("cn-progress-label", p.Class)}
+		var templ_7745c5c3_Var10 = []any{utils.CN("cn-progress-label", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var10...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -359,7 +359,7 @@ func Value(props ...ValueProps) templ.Component {
 			p = props[0]
 		}
 		s := state(ctx)
-		var templ_7745c5c3_Var14 = []any{utils.TwMerge("cn-progress-value", p.Class)}
+		var templ_7745c5c3_Var14 = []any{utils.CN("cn-progress-value", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var14...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

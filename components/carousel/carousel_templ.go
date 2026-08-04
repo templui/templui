@@ -116,7 +116,7 @@ func Carousel(props ...Props) templ.Component {
 			p.Interval = 5000
 		}
 		ctx = context.WithValue(ctx, orientationKey, p.Orientation)
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("relative", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.CN("relative", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -285,7 +285,7 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var11 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var11 = []any{utils.CN(
 			"flex",
 			utils.IfElse(orientation(ctx) == OrientationHorizontal, "-ml-4", "-mt-4 flex-col"),
 			p.Class,
@@ -357,7 +357,7 @@ func Item(props ...ItemProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var14 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var14 = []any{utils.CN(
 			"min-w-0 shrink-0 grow-0 basis-full",
 			utils.IfElse(orientation(ctx) == OrientationHorizontal, "pl-4", "pt-4"),
 			p.Class,
@@ -478,7 +478,7 @@ func Previous(props ...PreviousProps) templ.Component {
 			ID:      p.ID,
 			Variant: button.VariantOutline,
 			Size:    button.SizeIconSm,
-			Class: utils.TwMerge(
+			Class: utils.CN(
 				"cn-carousel-previous absolute touch-manipulation",
 				utils.IfElse(
 					orientation(ctx) == OrientationHorizontal,
@@ -550,7 +550,7 @@ func Next(props ...NextProps) templ.Component {
 			ID:      p.ID,
 			Variant: button.VariantOutline,
 			Size:    button.SizeIconSm,
-			Class: utils.TwMerge(
+			Class: utils.CN(
 				"cn-carousel-next absolute touch-manipulation",
 				utils.IfElse(
 					orientation(ctx) == OrientationHorizontal,

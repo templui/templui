@@ -300,14 +300,14 @@ templ typesetDocsProse() {
 
 templ typesetDocsCode(extraClass string) {
 	<div class="relative rounded-lg bg-muted/60">
-		<pre class={ utils.TwMerge("scrollbar-none overflow-x-auto p-3 font-mono text-sm leading-relaxed", extraClass) }>{ children... }</pre>
+		<pre class={ utils.CN("scrollbar-none overflow-x-auto p-3 font-mono text-sm leading-relaxed", extraClass) }>{ children... }</pre>
 	</div>
 }
 
 templ typesetDocsCodeAttr(extraClass, attr string) {
 	<div class="relative rounded-lg bg-muted/60">
 		<pre
-			class={ utils.TwMerge("scrollbar-none overflow-x-auto p-3 font-mono text-sm leading-relaxed", extraClass) }
+			class={ utils.CN("scrollbar-none overflow-x-auto p-3 font-mono text-sm leading-relaxed", extraClass) }
 			{ templ.Attributes{attr: true}... }
 		>{ children... }</pre>
 	</div>
@@ -477,14 +477,14 @@ templ typesetCustomizer() {
 		@card.Footer(card.FooterProps{Class: "flex min-w-0 flex-row-reverse gap-2 border-t md:flex-col md:**:[button]:w-full"}) {
 			@button.Button(button.Props{
 				Variant:    button.VariantOutline,
-				Class:      utils.TwMerge(createFooterButtonClass, "min-w-0 flex-1 md:flex-none"),
+				Class:      utils.CN(createFooterButtonClass, "min-w-0 flex-1 md:flex-none"),
 				Attributes: templ.Attributes{"data-tui-typeset-shuffle": true},
 			}) {
 				<span class="w-full truncate text-center font-medium">Shuffle</span>
 			}
 			@button.Button(button.Props{
 				Variant:    button.VariantOutline,
-				Class:      utils.TwMerge(createFooterButtonClass, "min-w-0 flex-1 md:flex-none xl:hidden"),
+				Class:      utils.CN(createFooterButtonClass, "min-w-0 flex-1 md:flex-none xl:hidden"),
 				Attributes: drawer.TriggerFor("typeset-get-code"),
 			}) {
 				Get Code
@@ -526,7 +526,7 @@ templ typesetFontPickerRow(param, label, value string) {
 // typesetOptionPickerRow is an OptionPicker trigger row (option-picker.tsx):
 // label, current option label and a trailing icon.
 templ typesetOptionPickerRow(param, label, value, wrapperClass string) {
-	<div class={ utils.TwMerge("group/picker relative", wrapperClass) }>
+	<div class={ utils.CN("group/picker relative", wrapperClass) }>
 		<button
 			type="button"
 			data-tui-typeset-trigger={ param }
@@ -580,7 +580,7 @@ templ typesetMainMenuTrigger() {
 		data-slot="dropdown-menu-trigger"
 		aria-haspopup="menu"
 		aria-expanded="false"
-		class={ utils.TwMerge(createTriggerClass, "flex items-center justify-between gap-2 rounded-lg px-1.75 ring-1 ring-foreground/10 focus-visible:ring-1") }
+		class={ utils.CN(createTriggerClass, "flex items-center justify-between gap-2 rounded-lg px-1.75 ring-1 ring-foreground/10 focus-visible:ring-1") }
 	>
 		<span class="font-medium">Menu</span>
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5">
@@ -645,7 +645,7 @@ templ typesetPickerContent(param, extraClass string) {
 		data-slot="dropdown-menu-content"
 		role="menu"
 		hidden
-		class={ utils.TwMerge(createContentClass, extraClass) }
+		class={ utils.CN(createContentClass, extraClass) }
 	>
 		{ children... }
 	</div>

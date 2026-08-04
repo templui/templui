@@ -34,7 +34,7 @@ templ ComponentPreviewBlock(entry examples.RegistryEntry, attrs map[string]strin
 	<div
 		data-slot="component-preview"
 		data-not-typeset
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"group relative mt-4 mb-12 flex flex-col overflow-hidden rounded-2xl border",
 			attrs["className"],
 		) }
@@ -42,7 +42,7 @@ templ ComponentPreviewBlock(entry examples.RegistryEntry, attrs map[string]strin
 		<div data-slot="preview">
 			<div
 				data-align={ align }
-				class={ utils.TwMerge(
+				class={ utils.CN(
 					"preview relative flex h-72 w-full justify-center p-10 data-[align=center]:items-center data-[align=end]:items-end data-[align=start]:items-start",
 					attrs["previewClassName"],
 				) }
@@ -359,7 +359,7 @@ templ DocsCodeToggleScript() {
 // MarkdownProse styles raw markdown HTML like shadcn's mdx typography.
 templ MarkdownProse() {
 	<div
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"[&_h2]:mt-12 [&_h2]:scroll-m-24 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:tracking-tight",
 			"[&_h3]:mt-8 [&_h3]:scroll-m-24 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:tracking-tight",
 			"[&_p]:leading-7 [&_p:not(:first-child)]:mt-4 [&_p]:text-sm",
@@ -381,7 +381,7 @@ templ CalloutBlock(class ...string) {
 	if len(class) > 0 {
 		{{ extra = class[0] }}
 	}
-	<div data-not-typeset class={ utils.TwMerge("mt-6 w-auto rounded-2xl border border-surface bg-surface p-4 text-sm text-surface-foreground md:-mx-1 [&_code]:border [&_p]:text-card-foreground/80 [&_p:not(:first-child)]:mt-2", extra) }>
+	<div data-not-typeset class={ utils.CN("mt-6 w-auto rounded-2xl border border-surface bg-surface p-4 text-sm text-surface-foreground md:-mx-1 [&_code]:border [&_p]:text-card-foreground/80 [&_p:not(:first-child)]:mt-2", extra) }>
 		{ children... }
 	</div>
 }

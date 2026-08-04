@@ -82,7 +82,7 @@ func CopyButton(props Props) templ.Component {
 		})
 		templ_7745c5c3_Err = button.Button(button.Props{
 			ID:         p.ID,
-			Class:      utils.TwMerge("h-7 w-7 text-muted-foreground hover:text-accent-foreground", p.Class),
+			Class:      utils.CN("h-7 w-7 text-muted-foreground hover:text-accent-foreground", p.Class),
 			Attributes: p.Attrs,
 			Size:       button.SizeIcon,
 			Variant:    button.VariantGhost,

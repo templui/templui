@@ -16,11 +16,11 @@ import (
 // The kitchen-sink page from calendar-example.tsx. The Multiple section is
 // skipped, the calendar component has no multiple mode.
 templ calendarExampleSection(title string, containerClass string, class string) {
-	<div data-slot="example" class={ utils.TwMerge("mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none", containerClass) }>
+	<div data-slot="example" class={ utils.CN("mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none", containerClass) }>
 		if title != "" {
 			<div class="px-1.5 py-2 text-xs font-medium text-muted-foreground">{ title }</div>
 		}
-		<div data-slot="example-content" class={ utils.TwMerge("flex min-w-0 flex-1 flex-col items-start gap-6 rounded-xl bg-card p-12 text-foreground style-lyra:rounded-none style-sera:rounded-none *:[div:not([class*='w-'])]:w-full", class) }>
+		<div data-slot="example-content" class={ utils.CN("flex min-w-0 flex-1 flex-col items-start gap-6 rounded-xl bg-card p-12 text-foreground style-lyra:rounded-none style-sera:rounded-none *:[div:not([class*='w-'])]:w-full", class) }>
 			{ children... }
 		</div>
 	</div>

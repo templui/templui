@@ -247,7 +247,7 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var8 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var8 = []any{utils.CN(
 			// 1:1 base/ui/popover.tsx PopoverContent, the look comes from
 			// cn-popover-content (animations key on our data-state attribute).
 			// origin-(--transform-origin) becomes our JS variable name.
@@ -324,7 +324,7 @@ func Header(props ...HeaderProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var11 = []any{utils.TwMerge("cn-popover-header", p.Class)}
+		var templ_7745c5c3_Var11 = []any{utils.CN("cn-popover-header", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -414,7 +414,7 @@ func Title(props ...TitleProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var15 = []any{utils.TwMerge("cn-popover-title", p.Class)}
+		var templ_7745c5c3_Var15 = []any{utils.CN("cn-popover-title", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var15...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -504,7 +504,7 @@ func Description(props ...DescriptionProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var19 = []any{utils.TwMerge("cn-popover-description", p.Class)}
+		var templ_7745c5c3_Var19 = []any{utils.CN("cn-popover-description", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var19...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

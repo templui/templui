@@ -49,9 +49,9 @@ type ContentProps struct {
 func mediaClasses(variant MediaVariant) string {
 	base := "cn-empty-media flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0"
 	if variant == MediaVariantIcon {
-		return utils.TwMerge(base, "cn-empty-media-icon")
+		return utils.CN(base, "cn-empty-media-icon")
 	}
-	return utils.TwMerge(base, "cn-empty-media-default")
+	return utils.CN(base, "cn-empty-media-default")
 }
 
 templ Empty(props ...Props) {
@@ -65,7 +65,7 @@ templ Empty(props ...Props) {
 		}
 		data-slot="empty"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-empty flex w-full min-w-0 flex-1 flex-col items-center justify-center text-center text-balance",
 				p.Class,
 			),
@@ -86,7 +86,7 @@ templ Header(props ...HeaderProps) {
 			id={ p.ID }
 		}
 		data-slot="empty-header"
-		class={ utils.TwMerge("cn-empty-header flex max-w-sm flex-col items-center", p.Class) }
+		class={ utils.CN("cn-empty-header flex max-w-sm flex-col items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -107,7 +107,7 @@ templ Media(props ...MediaProps) {
 		}
 		data-slot="empty-icon"
 		data-variant={ string(p.Variant) }
-		class={ utils.TwMerge(mediaClasses(p.Variant), p.Class) }
+		class={ utils.CN(mediaClasses(p.Variant), p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -124,7 +124,7 @@ templ Title(props ...TitleProps) {
 			id={ p.ID }
 		}
 		data-slot="empty-title"
-		class={ utils.TwMerge("cn-empty-title cn-font-heading", p.Class) }
+		class={ utils.CN("cn-empty-title cn-font-heading", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -142,7 +142,7 @@ templ Description(props ...DescriptionProps) {
 		}
 		data-slot="empty-description"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-empty-description text-muted-foreground [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary",
 				p.Class,
 			),
@@ -164,7 +164,7 @@ templ Content(props ...ContentProps) {
 		}
 		data-slot="empty-content"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-empty-content flex w-full max-w-sm min-w-0 flex-col items-center text-balance",
 				p.Class,
 			),

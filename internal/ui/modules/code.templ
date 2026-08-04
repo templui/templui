@@ -34,12 +34,12 @@ templ Code(p CodeProps) {
 	{{ highlightedHTML := GetHighlightedHTML(ctx, p.CodeContent, p.Language) }}
 	<div
 		id={ p.ID }
-		class={ utils.TwMerge("relative code-highlighting-container", p.Class) }
+		class={ utils.CN("relative code-highlighting-container", p.Class) }
 		{ p.Attrs... }
 		data-tui-code-highlighting=""
 	>
 		<div
-			class={ utils.TwMerge(
+			class={ utils.CN(
 			"[&_pre]:block",
 			"[&_pre]:overflow-x-auto",
 			"[&_pre]:overflow-y-auto",

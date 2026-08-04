@@ -51,7 +51,7 @@ templ Collapsible(props ...Props) {
 		data-tui-collapsible
 		data-open?={ p.Open }
 		data-closed?={ !p.Open }
-		class={ utils.TwMerge("", p.Class) }
+		class={ utils.CN("", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -90,7 +90,7 @@ templ Content(props ...ContentProps) {
 		data-open?={ s.open }
 		data-closed?={ !s.open }
 		hidden?={ !s.open }
-		class={ utils.TwMerge("", p.Class) }
+		class={ utils.CN("", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

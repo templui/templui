@@ -101,7 +101,7 @@ func removeCnClasses(str string) string {
 // re-emitted in the JS twMerge order: input order, with the LAST occurrence
 // of a duplicate winning.
 func mergeClasses(newClasses, existing string) string {
-	merged := utils.TwMerge(newClasses, existing)
+	merged := utils.CN(newClasses, existing)
 
 	survivors := map[string]int{}
 	for _, token := range strings.Fields(merged) {

@@ -63,7 +63,7 @@ templ Pagination(props ...Props) {
 		role="navigation"
 		aria-label="pagination"
 		data-slot="pagination"
-		class={ utils.TwMerge("cn-pagination mx-auto flex w-full justify-center", p.Class) }
+		class={ utils.CN("cn-pagination mx-auto flex w-full justify-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -80,7 +80,7 @@ templ Content(props ...ContentProps) {
 			id={ p.ID }
 		}
 		data-slot="pagination-content"
-		class={ utils.TwMerge("cn-pagination-content flex items-center", p.Class) }
+		class={ utils.CN("cn-pagination-content flex items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -117,7 +117,7 @@ templ Link(props ...LinkProps) {
 			Disabled:   true,
 			Size:       button.SizeIcon,
 			Variant:    button.VariantGhost,
-			Class:      utils.TwMerge("cn-pagination-link", p.Class),
+			Class:      utils.CN("cn-pagination-link", p.Class),
 			Attributes: p.Attributes,
 		}) {
 			{ children... }
@@ -138,7 +138,7 @@ templ Link(props ...LinkProps) {
 			Href:       p.Href,
 			Size:       button.SizeIcon,
 			Variant:    button.Variant(buttonVariant(p.IsActive)),
-			Class:      utils.TwMerge("cn-pagination-link", p.Class),
+			Class:      utils.CN("cn-pagination-link", p.Class),
 			Attributes: attrs,
 		}) {
 			{ children... }
@@ -165,7 +165,7 @@ templ Previous(props ...PreviousProps) {
 		Href:       p.Href,
 		Disabled:   p.Disabled,
 		Variant:    button.VariantGhost,
-		Class:      utils.TwMerge("cn-pagination-previous", p.Class),
+		Class:      utils.CN("cn-pagination-previous", p.Class),
 		Attributes: attrs,
 	}) {
 		@icon.ChevronLeft(icon.Props{Class: "cn-rtl-flip", Attributes: templ.Attributes{"data-icon": "inline-start"}})
@@ -192,7 +192,7 @@ templ Next(props ...NextProps) {
 		Href:       p.Href,
 		Disabled:   p.Disabled,
 		Variant:    button.VariantGhost,
-		Class:      utils.TwMerge("cn-pagination-next", p.Class),
+		Class:      utils.CN("cn-pagination-next", p.Class),
 		Attributes: attrs,
 	}) {
 		<span class="cn-pagination-next-text hidden sm:block">{ p.Label }</span>

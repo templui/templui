@@ -102,7 +102,7 @@ type SeparatorProps struct {
 // active style-*.css via the cn-item-* classes.
 func itemClasses(variant Variant, size Size) string {
 	base := "cn-item group/item flex w-full flex-wrap items-center transition-colors duration-100 outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 [a]:transition-colors"
-	return utils.TwMerge(base, variantClasses(variant), sizeClasses(size))
+	return utils.CN(base, variantClasses(variant), sizeClasses(size))
 }
 
 func variantClasses(variant Variant) string {
@@ -165,7 +165,7 @@ func Group(props ...GroupProps) templ.Component {
 			p = props[0]
 		}
 		class := "cn-item-group group/item-group flex w-full flex-col"
-		class = utils.TwMerge(class, p.Class)
+		class = utils.CN(class, p.Class)
 		var templ_7745c5c3_Var2 = []any{class}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
@@ -263,7 +263,7 @@ func Item(props ...Props) templ.Component {
 			p.Size = SizeDefault
 		}
 		if p.Href != "" {
-			var templ_7745c5c3_Var6 = []any{utils.TwMerge(itemClasses(p.Variant, p.Size), p.Class)}
+			var templ_7745c5c3_Var6 = []any{utils.CN(itemClasses(p.Variant, p.Size), p.Class)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -387,7 +387,7 @@ func Item(props ...Props) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			var templ_7745c5c3_Var13 = []any{utils.TwMerge(itemClasses(p.Variant, p.Size), p.Class)}
+			var templ_7745c5c3_Var13 = []any{utils.CN(itemClasses(p.Variant, p.Size), p.Class)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var13...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -508,7 +508,7 @@ func Media(props ...MediaProps) templ.Component {
 			p.Variant = MediaVariantDefault
 		}
 		class := mediaClasses(p.Variant)
-		class = utils.TwMerge(class, p.Class)
+		class = utils.CN(class, p.Class)
 		var templ_7745c5c3_Var19 = []any{class}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var19...)
 		if templ_7745c5c3_Err != nil {
@@ -613,7 +613,7 @@ func Content(props ...ContentProps) templ.Component {
 			p = props[0]
 		}
 		class := "cn-item-content flex flex-1 flex-col [&+[data-slot=item-content]]:flex-none"
-		class = utils.TwMerge(class, p.Class)
+		class = utils.CN(class, p.Class)
 		var templ_7745c5c3_Var24 = []any{class}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var24...)
 		if templ_7745c5c3_Err != nil {
@@ -704,7 +704,7 @@ func Title(props ...TitleProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var28 = []any{utils.TwMerge("cn-item-title line-clamp-1 flex w-fit items-center", p.Class)}
+		var templ_7745c5c3_Var28 = []any{utils.CN("cn-item-title line-clamp-1 flex w-fit items-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var28...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -795,7 +795,7 @@ func Description(props ...DescriptionProps) templ.Component {
 			p = props[0]
 		}
 		class := "cn-item-description line-clamp-2 font-normal [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary"
-		class = utils.TwMerge(class, p.Class)
+		class = utils.CN(class, p.Class)
 		var templ_7745c5c3_Var32 = []any{class}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var32...)
 		if templ_7745c5c3_Err != nil {
@@ -886,7 +886,7 @@ func Actions(props ...ActionsProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var36 = []any{utils.TwMerge("cn-item-actions flex items-center", p.Class)}
+		var templ_7745c5c3_Var36 = []any{utils.CN("cn-item-actions flex items-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var36...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -976,7 +976,7 @@ func Header(props ...HeaderProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var40 = []any{utils.TwMerge("cn-item-header flex basis-full items-center justify-between", p.Class)}
+		var templ_7745c5c3_Var40 = []any{utils.CN("cn-item-header flex basis-full items-center justify-between", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var40...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1066,7 +1066,7 @@ func Footer(props ...FooterProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var44 = []any{utils.TwMerge("cn-item-footer flex basis-full items-center justify-between", p.Class)}
+		var templ_7745c5c3_Var44 = []any{utils.CN("cn-item-footer flex basis-full items-center justify-between", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var44...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1156,7 +1156,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var48 = []any{utils.TwMerge("shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch", "cn-item-separator", p.Class)}
+		var templ_7745c5c3_Var48 = []any{utils.CN("shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch", "cn-item-separator", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var48...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

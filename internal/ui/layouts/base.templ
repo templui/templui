@@ -31,7 +31,7 @@ templ BaseLayout(title, description string) {
 			@components.Scripts()
 			// Plausible Analytics
 			if config.AppConfig.GoEnv == "production" {
-				<script defer data-domain="templui.io" src="https://plausible.axeladrian.com/js/script.js" nonce={ templ.GetNonce(ctx) }></script>
+				<script defer data-domain="v2.templui.io" src="https://plausible.axeladrian.com/js/script.js" nonce={ templ.GetNonce(ctx) }></script>
 			}
 			// Shiki Highlighter Script
 			@modules.CodeHighlightingScript()

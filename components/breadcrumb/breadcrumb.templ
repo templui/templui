@@ -48,7 +48,7 @@ templ Breadcrumb(props ...Props) {
 		}
 		data-slot="breadcrumb"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-breadcrumb",
 				p.Class,
 			),
@@ -71,7 +71,7 @@ templ List(props ...ListProps) {
 		}
 		data-slot="breadcrumb-list"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-breadcrumb-list flex flex-wrap items-center wrap-break-word",
 				p.Class,
 			),
@@ -93,7 +93,7 @@ templ Item(props ...ItemProps) {
 		}
 		data-slot="breadcrumb-item"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-breadcrumb-item inline-flex items-center",
 				p.Class,
 			),
@@ -118,7 +118,7 @@ templ Link(props ...LinkProps) {
 		}
 		data-slot="breadcrumb-link"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-breadcrumb-link",
 				p.Class,
 			),
@@ -142,7 +142,7 @@ templ Separator(props ...SeparatorProps) {
 		role="presentation"
 		aria-hidden="true"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-breadcrumb-separator",
 				p.Class,
 			),
@@ -171,7 +171,7 @@ templ Page(props ...ItemProps) {
 		aria-disabled="true"
 		aria-current="page"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-breadcrumb-page",
 				p.Class,
 			),

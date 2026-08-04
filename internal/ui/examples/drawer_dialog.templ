@@ -71,7 +71,7 @@ templ DrawerDialog() {
 }
 
 templ drawerDialogProfileForm(class string) {
-	<form class={ utils.TwMerge("grid items-start gap-6", class) }>
+	<form class={ utils.CN("grid items-start gap-6", class) }>
 		<div class="grid gap-3">
 			@label.Label(label.Props{For: "drawer-dialog-email"}) {
 				Email

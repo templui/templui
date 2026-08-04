@@ -57,9 +57,9 @@ type ContentProps struct {
 func mediaClasses(variant MediaVariant) string {
 	base := "cn-empty-media flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0"
 	if variant == MediaVariantIcon {
-		return utils.TwMerge(base, "cn-empty-media-icon")
+		return utils.CN(base, "cn-empty-media-icon")
 	}
-	return utils.TwMerge(base, "cn-empty-media-default")
+	return utils.CN(base, "cn-empty-media-default")
 }
 
 func Empty(props ...Props) templ.Component {
@@ -87,7 +87,7 @@ func Empty(props ...Props) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var2 = []any{utils.CN(
 			"cn-empty flex w-full min-w-0 flex-1 flex-col items-center justify-center text-center text-balance",
 			p.Class,
 		),
@@ -181,7 +181,7 @@ func Header(props ...HeaderProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var6 = []any{utils.TwMerge("cn-empty-header flex max-w-sm flex-col items-center", p.Class)}
+		var templ_7745c5c3_Var6 = []any{utils.CN("cn-empty-header flex max-w-sm flex-col items-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -274,7 +274,7 @@ func Media(props ...MediaProps) templ.Component {
 		if p.Variant == "" {
 			p.Variant = MediaVariantDefault
 		}
-		var templ_7745c5c3_Var10 = []any{utils.TwMerge(mediaClasses(p.Variant), p.Class)}
+		var templ_7745c5c3_Var10 = []any{utils.CN(mediaClasses(p.Variant), p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var10...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -377,7 +377,7 @@ func Title(props ...TitleProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var15 = []any{utils.TwMerge("cn-empty-title cn-font-heading", p.Class)}
+		var templ_7745c5c3_Var15 = []any{utils.CN("cn-empty-title cn-font-heading", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var15...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -467,7 +467,7 @@ func Description(props ...DescriptionProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var19 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var19 = []any{utils.CN(
 			"cn-empty-description text-muted-foreground [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary",
 			p.Class,
 		),
@@ -561,7 +561,7 @@ func Content(props ...ContentProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var23 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var23 = []any{utils.CN(
 			"cn-empty-content flex w-full max-w-sm min-w-0 flex-col items-center text-balance",
 			p.Class,
 		),

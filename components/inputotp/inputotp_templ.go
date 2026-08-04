@@ -100,7 +100,7 @@ func InputOTP(props ...Props) templ.Component {
 			p = props[0]
 		}
 		ctx = context.WithValue(ctx, stateKey, ctxState{value: p.Value})
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("cn-input-otp relative flex items-center has-disabled:opacity-50", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.CN("cn-input-otp relative flex items-center has-disabled:opacity-50", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -286,7 +286,7 @@ func Group(props ...GroupProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var10 = []any{utils.TwMerge("cn-input-otp-group flex items-center", p.Class)}
+		var templ_7745c5c3_Var10 = []any{utils.CN("cn-input-otp-group flex items-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var10...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -381,7 +381,7 @@ func Slot(props ...SlotProps) templ.Component {
 		if p.Index >= 0 && p.Index < len(s.value) {
 			char = string(s.value[p.Index])
 		}
-		var templ_7745c5c3_Var14 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var14 = []any{utils.CN(
 			"cn-input-otp-slot relative flex items-center justify-center data-[active=true]:z-10",
 			p.Class,
 		),
@@ -493,7 +493,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var20 = []any{utils.TwMerge("cn-input-otp-separator flex items-center", p.Class)}
+		var templ_7745c5c3_Var20 = []any{utils.CN("cn-input-otp-separator flex items-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var20...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

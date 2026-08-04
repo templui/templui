@@ -65,7 +65,7 @@ templ renderSegment(segment markdown.Segment) {
 		case "Steps":
 			// The shadcn Steps wrapper: a numbered timeline; the div stays
 			// open across the following segments until StepsEnd closes it.
-			@templ.Raw(`<div class="` + utils.TwMerge("steps mb-12 [counter-reset:step] md:ml-4 md:border-l md:pl-8 [&>h3]:step", segment.Attrs["className"]) + `">`)
+			@templ.Raw(`<div class="` + utils.CN("steps mb-12 [counter-reset:step] md:ml-4 md:border-l md:pl-8 [&>h3]:step", segment.Attrs["className"]) + `">`)
 		case "StepsEnd":
 			@templ.Raw("</div>")
 		case "Step":

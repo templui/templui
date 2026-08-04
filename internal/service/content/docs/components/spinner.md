@@ -60,7 +60,7 @@ templ Spinner(props ...Props) {
 		{{ p = props[0] }}
 	}
 	@icon.Loader(icon.Props{
-		Class: utils.TwMerge("size-4 animate-spin", p.Class),
+		Class: utils.CN("size-4 animate-spin", p.Class),
 		Attributes: templ.Attributes{
 			"role":       "status",
 			"aria-label": "Loading",

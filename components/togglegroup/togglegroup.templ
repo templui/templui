@@ -81,7 +81,7 @@ templ ToggleGroup(props ...Props) {
 		data-vertical?={ p.Orientation == OrientationVertical }
 		style={ "--gap: " + strconv.Itoa(spacing) }
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-toggle-group group/toggle-group flex w-fit flex-row items-center gap-[--spacing(var(--gap))] data-vertical:flex-col data-vertical:items-stretch",
 				p.Class,
 			),

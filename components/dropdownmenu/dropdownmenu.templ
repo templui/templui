@@ -158,7 +158,7 @@ type SubContentProps struct {
 // 1:1 base/ui/dropdown-menu.tsx DropdownMenuItem, the look comes from
 // cn-dropdown-menu-item; the inset padding keys on the data-inset attribute.
 func itemClasses(disabled bool) string {
-	return utils.TwMerge(
+	return utils.CN(
 		"cn-dropdown-menu-item group/dropdown-menu-item relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 		// Native <a>/<button> wiring instead of Base UI's div items.
 		"w-full text-left",
@@ -169,7 +169,7 @@ func itemClasses(disabled bool) string {
 // 1:1 base/ui/dropdown-menu.tsx DropdownMenuCheckboxItem/RadioItem, cnClass is
 // cn-dropdown-menu-checkbox-item or cn-dropdown-menu-radio-item.
 func checkItemClasses(cnClass string, disabled bool) string {
-	return utils.TwMerge(
+	return utils.CN(
 		cnClass+" relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 		// Native <button> wiring: Base UI unmounts the indicator when unchecked,
 		// our indicator toggles on the checked state via the group instead.
@@ -227,7 +227,7 @@ templ Content(props ...ContentProps) {
 			role="menu"
 			tabindex="-1"
 			class={
-				utils.TwMerge(
+				utils.CN(
 					// 1:1 base/ui/dropdown-menu.tsx DropdownMenuContent, the look comes
 					// from cn-dropdown-menu-content (animations key on our data-state
 					// attribute). The --available-height/--anchor-width/--transform-origin
@@ -258,7 +258,7 @@ templ Group(props ...GroupProps) {
 		}
 		role="group"
 		data-slot="dropdown-menu-group"
-		class={ utils.TwMerge("", p.Class) }
+		class={ utils.CN("", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -276,7 +276,7 @@ templ Label(props ...LabelProps) {
 		}
 		data-slot="dropdown-menu-label"
 		data-inset?={ p.Inset }
-		class={ utils.TwMerge("cn-dropdown-menu-label", p.Class) }
+		class={ utils.CN("cn-dropdown-menu-label", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -311,7 +311,7 @@ templ Item(props ...ItemProps) {
 				aria-disabled="true"
 			}
 			role="menuitem"
-			class={ utils.TwMerge(itemClasses(p.Disabled), p.Class) }
+			class={ utils.CN(itemClasses(p.Disabled), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -331,7 +331,7 @@ templ Item(props ...ItemProps) {
 			}
 			disabled?={ p.Disabled }
 			role="menuitem"
-			class={ utils.TwMerge(itemClasses(p.Disabled), p.Class) }
+			class={ utils.CN(itemClasses(p.Disabled), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -360,7 +360,7 @@ templ CheckboxItem(props ...CheckboxItemProps) {
 			aria-checked="false"
 		}
 		disabled?={ p.Disabled }
-		class={ utils.TwMerge(checkItemClasses("cn-dropdown-menu-checkbox-item", p.Disabled), p.Class) }
+		class={ utils.CN(checkItemClasses("cn-dropdown-menu-checkbox-item", p.Disabled), p.Class) }
 		{ p.Attributes... }
 	>
 		<span
@@ -385,7 +385,7 @@ templ RadioGroup(props ...RadioGroupProps) {
 		role="group"
 		data-slot="dropdown-menu-radio-group"
 		data-tui-dropdownmenu-radio-group
-		class={ utils.TwMerge("", p.Class) }
+		class={ utils.CN("", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -416,7 +416,7 @@ templ RadioItem(props ...RadioItemProps) {
 			aria-checked="false"
 		}
 		disabled?={ p.Disabled }
-		class={ utils.TwMerge(checkItemClasses("cn-dropdown-menu-radio-item", p.Disabled), p.Class) }
+		class={ utils.CN(checkItemClasses("cn-dropdown-menu-radio-item", p.Disabled), p.Class) }
 		{ p.Attributes... }
 	>
 		<span
@@ -440,7 +440,7 @@ templ Separator(props ...SeparatorProps) {
 		}
 		role="separator"
 		data-slot="dropdown-menu-separator"
-		class={ utils.TwMerge("cn-dropdown-menu-separator", p.Class) }
+		class={ utils.CN("cn-dropdown-menu-separator", p.Class) }
 		{ p.Attributes... }
 	></div>
 }
@@ -455,7 +455,7 @@ templ Shortcut(props ...ShortcutProps) {
 			id={ p.ID }
 		}
 		data-slot="dropdown-menu-shortcut"
-		class={ utils.TwMerge("cn-dropdown-menu-shortcut", p.Class) }
+		class={ utils.CN("cn-dropdown-menu-shortcut", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -473,7 +473,7 @@ templ Sub(props ...SubProps) {
 		}
 		data-slot="dropdown-menu-sub"
 		data-tui-dropdownmenu-sub
-		class={ utils.TwMerge("", p.Class) }
+		class={ utils.CN("", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -497,7 +497,7 @@ templ SubTrigger(props ...SubTriggerProps) {
 		role="menuitem"
 		aria-haspopup="menu"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				// 1:1 base/ui/dropdown-menu.tsx DropdownMenuSubTrigger, the look comes
 				// from cn-dropdown-menu-sub-trigger. Base UI keys the open highlight on
 				// data-popup-open, our JS sets data-state=open, which the data-open
@@ -530,7 +530,7 @@ templ SubContent(props ...SubContentProps) {
 		role="menu"
 		tabindex="-1"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				// 1:1 base/ui/dropdown-menu.tsx DropdownMenuSubContent: the sub content
 				// is the content plus cn-dropdown-menu-sub-content and w-auto, the look
 				// comes from the cn classes (animations key on our data-state attribute).

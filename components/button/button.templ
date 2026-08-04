@@ -75,7 +75,7 @@ templ Button(props ...Props) {
 			if _, ok := p.Attributes["data-slot"]; !ok {
 				data-slot="button"
 			}
-			class={ utils.TwMerge(baseClasses, p.variantClasses(), p.sizeClasses(), p.Class) }
+			class={ utils.CN(baseClasses, p.variantClasses(), p.sizeClasses(), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -88,7 +88,7 @@ templ Button(props ...Props) {
 			if _, ok := p.Attributes["data-slot"]; !ok {
 				data-slot="button"
 			}
-			class={ utils.TwMerge(baseClasses, p.variantClasses(), p.sizeClasses(), p.Class) }
+			class={ utils.CN(baseClasses, p.variantClasses(), p.sizeClasses(), p.Class) }
 			if p.Type != "" {
 				type={ string(p.Type) }
 			}

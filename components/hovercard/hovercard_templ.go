@@ -170,7 +170,7 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var3 = []any{utils.CN(
 			// 1:1 base/ui/hover-card.tsx HoverCardContent, the look comes from
 			// cn-hover-card-content (animations key on our data-state attribute).
 			// origin-(--transform-origin) becomes our JS variable name.

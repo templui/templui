@@ -87,7 +87,7 @@ templ InputGroup(props ...Props) {
 		}
 		role="group"
 		data-slot="input-group"
-		class={ utils.TwMerge("group/input-group cn-input-group relative flex w-full min-w-0 items-center outline-none has-[>textarea]:h-auto", p.Class) }
+		class={ utils.CN("group/input-group cn-input-group relative flex w-full min-w-0 items-center outline-none has-[>textarea]:h-auto", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -115,7 +115,7 @@ templ Input(props ...InputProps) {
 		Value:       p.Value,
 		Placeholder: p.Placeholder,
 		Disabled:    p.Disabled,
-		Class:       utils.TwMerge("cn-input-group-input flex-1", p.Class),
+		Class:       utils.CN("cn-input-group-input flex-1", p.Class),
 		Attributes:  attrs,
 	})
 }
@@ -140,7 +140,7 @@ templ Textarea(props ...TextareaProps) {
 		Placeholder: p.Placeholder,
 		Rows:        p.Rows,
 		Disabled:    p.Disabled,
-		Class:       utils.TwMerge("cn-input-group-textarea flex-1 resize-none", p.Class),
+		Class:       utils.CN("cn-input-group-textarea flex-1 resize-none", p.Class),
 		Attributes:  attrs,
 	})
 }
@@ -172,7 +172,7 @@ templ Addon(props ...AddonProps) {
 		role="group"
 		data-slot="input-group-addon"
 		data-align={ string(p.Align) }
-		class={ utils.TwMerge("cn-input-group-addon flex cursor-text items-center justify-center select-none "+align, p.Class) }
+		class={ utils.CN("cn-input-group-addon flex cursor-text items-center justify-center select-none "+align, p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -218,7 +218,7 @@ templ Button(props ...ButtonProps) {
 		Type:       p.Type,
 		Variant:    p.Variant,
 		Disabled:   p.Disabled,
-		Class:      utils.TwMerge(inputGroupButtonClasses(p.Size), p.Class),
+		Class:      utils.CN(inputGroupButtonClasses(p.Size), p.Class),
 		Attributes: attrs,
 	}) {
 		{ children... }
@@ -234,7 +234,7 @@ templ Text(props ...TextProps) {
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		class={ utils.TwMerge("cn-input-group-text flex items-center [&_svg]:pointer-events-none", p.Class) }
+		class={ utils.CN("cn-input-group-text flex items-center [&_svg]:pointer-events-none", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

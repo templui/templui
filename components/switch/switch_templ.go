@@ -68,7 +68,7 @@ func Switch(props ...Props) templ.Component {
 		if p.Size == "" {
 			p.Size = SizeDefault
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var2 = []any{utils.CN(
 			// 1:1 base/ui/switch.tsx: structure lives here, the look comes from
 			// the active style-*.css via cn-switch.
 			"cn-switch peer group/switch relative inline-flex items-center transition-all outline-none after:absolute after:-inset-x-3 after:-inset-y-2 data-disabled:cursor-not-allowed data-disabled:opacity-50",

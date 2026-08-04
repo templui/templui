@@ -22,7 +22,7 @@ type ChartEntry struct {
 // lazy iframe (ChartIframe), fullWidth entries span the grid.
 templ ChartDisplay(entry ChartEntry) {
 	<div
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"themes-wrapper group relative flex flex-col overflow-hidden rounded-xl transition-all duration-200 ease-in-out hover:z-30",
 			utils.IfElse(entry.FullWidth, "md:col-span-2 lg:col-span-3", ""),
 		) }
@@ -98,7 +98,7 @@ templ chartCopyButton(name, class string) {
 		@button.Button(button.Props{
 			Size:    button.SizeIcon,
 			Variant: button.VariantGhost,
-			Class:   utils.TwMerge("h-7 w-7 rounded-[6px] [&_svg]:h-3.5 [&_svg]:w-3.5", class),
+			Class:   utils.CN("h-7 w-7 rounded-[6px] [&_svg]:h-3.5 [&_svg]:w-3.5", class),
 			Attributes: utils.MergeAttributes(tooltip.Trigger(ctx), templ.Attributes{
 				"data-tui-chart-copy": name,
 				"aria-label":          "Copy code",

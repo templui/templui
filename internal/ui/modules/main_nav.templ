@@ -16,7 +16,7 @@ import (
 // button of the active style, so only the reference's own classes are kept.
 templ MainNav(class string) {
 	{{ path, _ := ctx.Value(ctxkeys.URLPathValue).(string) }}
-	<nav class={ utils.TwMerge("items-center gap-0", class) }>
+	<nav class={ utils.CN("items-center gap-0", class) }>
 		for _, item := range shared.NavItems {
 			@button.Button(button.Props{
 				Variant: button.VariantGhost,

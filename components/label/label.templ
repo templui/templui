@@ -23,7 +23,7 @@ templ Label(props ...Props) {
 		}
 		data-slot="label"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				// 1:1 base/ui/label.tsx: structure lives here, the look comes from
 				// the active style-*.css via cn-label.
 				"cn-label flex items-center select-none group-data-[disabled=true]:pointer-events-none peer-disabled:cursor-not-allowed",

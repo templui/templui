@@ -200,7 +200,7 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var3 = []any{utils.CN(
 			"cn-alert-dialog-content group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 outline-none",
 			p.Class,
 		),
@@ -310,7 +310,7 @@ func Header(props ...HeaderProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var9 = []any{utils.TwMerge("cn-alert-dialog-header", p.Class)}
+		var templ_7745c5c3_Var9 = []any{utils.CN("cn-alert-dialog-header", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var9...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -400,7 +400,7 @@ func Footer(props ...FooterProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var13 = []any{utils.TwMerge("cn-alert-dialog-footer flex flex-col-reverse gap-2 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end", p.Class)}
+		var templ_7745c5c3_Var13 = []any{utils.CN("cn-alert-dialog-footer flex flex-col-reverse gap-2 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var13...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -490,7 +490,7 @@ func Media(props ...MediaProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var17 = []any{utils.TwMerge("cn-alert-dialog-media", p.Class)}
+		var templ_7745c5c3_Var17 = []any{utils.CN("cn-alert-dialog-media", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var17...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -580,7 +580,7 @@ func Title(props ...TitleProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var21 = []any{utils.TwMerge("cn-alert-dialog-title cn-font-heading", p.Class)}
+		var templ_7745c5c3_Var21 = []any{utils.CN("cn-alert-dialog-title cn-font-heading", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var21...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -670,7 +670,7 @@ func Description(props ...DescriptionProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var25 = []any{utils.TwMerge("cn-alert-dialog-description", p.Class)}
+		var templ_7745c5c3_Var25 = []any{utils.CN("cn-alert-dialog-description", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var25...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -789,7 +789,7 @@ func Action(props ...ActionProps) templ.Component {
 			ID:         p.ID,
 			Variant:    p.Variant,
 			Size:       p.Size,
-			Class:      utils.TwMerge("cn-alert-dialog-action", p.Class),
+			Class:      utils.CN("cn-alert-dialog-action", p.Class),
 			Attributes: attrs,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var29), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -858,7 +858,7 @@ func Cancel(props ...CancelProps) templ.Component {
 			ID:         p.ID,
 			Variant:    p.Variant,
 			Size:       p.Size,
-			Class:      utils.TwMerge("cn-alert-dialog-cancel", p.Class),
+			Class:      utils.CN("cn-alert-dialog-cancel", p.Class),
 			Attributes: attrs,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var31), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {

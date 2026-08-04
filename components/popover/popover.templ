@@ -140,7 +140,7 @@ templ Content(props ...ContentProps) {
 			role="dialog"
 			tabindex="-1"
 			class={
-				utils.TwMerge(
+				utils.CN(
 					// 1:1 base/ui/popover.tsx PopoverContent, the look comes from
 					// cn-popover-content (animations key on our data-state attribute).
 					// origin-(--transform-origin) becomes our JS variable name.
@@ -169,7 +169,7 @@ templ Header(props ...HeaderProps) {
 			id={ p.ID }
 		}
 		data-slot="popover-header"
-		class={ utils.TwMerge("cn-popover-header", p.Class) }
+		class={ utils.CN("cn-popover-header", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -186,7 +186,7 @@ templ Title(props ...TitleProps) {
 			id={ p.ID }
 		}
 		data-slot="popover-title"
-		class={ utils.TwMerge("cn-popover-title", p.Class) }
+		class={ utils.CN("cn-popover-title", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -203,7 +203,7 @@ templ Description(props ...DescriptionProps) {
 			id={ p.ID }
 		}
 		data-slot="popover-description"
-		class={ utils.TwMerge("cn-popover-description", p.Class) }
+		class={ utils.CN("cn-popover-description", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

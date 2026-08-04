@@ -16,7 +16,7 @@ import (
 templ MobileNav(class string) {
 	@button.Button(button.Props{
 		Variant: button.VariantGhost,
-		Class: utils.TwMerge(
+		Class: utils.CN(
 			"group/mobile-nav extend-touch-target h-8 touch-manipulation items-center justify-start gap-2.5 p-0! hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 active:bg-transparent dark:hover:bg-transparent",
 			class,
 		),

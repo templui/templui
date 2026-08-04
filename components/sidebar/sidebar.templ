@@ -267,7 +267,7 @@ templ Provider(props ...ProviderProps) {
 	{{ ctx = context.WithValue(ctx, sidebarStateKey, ctxState{collapsed: p.Collapsed}) }}
 	<div
 		data-slot="sidebar-wrapper"
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar",
 			p.Class,
 		) }
@@ -308,7 +308,7 @@ templ Sidebar(props ...Props) {
 		<div
 			id={ p.ID }
 			data-slot="sidebar"
-			class={ utils.TwMerge(
+			class={ utils.CN(
 				"flex h-full w-(--sidebar-width) flex-col bg-sidebar text-sidebar-foreground",
 				p.Class,
 			) }
@@ -361,7 +361,7 @@ templ Sidebar(props ...Props) {
 			<!-- Gap element that keeps the sidebar width in the document flow -->
 			<div
 				data-slot="sidebar-gap"
-				class={ utils.TwMerge(
+				class={ utils.CN(
 					"cn-sidebar-gap relative w-(--sidebar-width) bg-transparent",
 					"group-data-[collapsible=offcanvas]:w-0",
 					"group-data-[side=right]:rotate-180",
@@ -376,7 +376,7 @@ templ Sidebar(props ...Props) {
 				id={ p.ID }
 				data-slot="sidebar-container"
 				data-side={ string(p.Side) }
-				class={ utils.TwMerge(
+				class={ utils.CN(
 					"fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear data-[side=left]:left-0 data-[side=left]:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] data-[side=right]:right-0 data-[side=right]:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] md:flex",
 					utils.IfElse(
 						p.Variant == VariantFloating || p.Variant == VariantInset,
@@ -416,7 +416,7 @@ templ Trigger(props ...TriggerProps) {
 		ID:      p.ID,
 		Size:    button.SizeIconSm,
 		Variant: button.VariantGhost,
-		Class:   utils.TwMerge("cn-sidebar-trigger", p.Class),
+		Class:   utils.CN("cn-sidebar-trigger", p.Class),
 		Attributes: utils.MergeAttributes(
 			templ.Attributes{
 				"data-sidebar":             "trigger",
@@ -448,7 +448,7 @@ templ Rail(props ...RailProps) {
 		aria-label="Toggle Sidebar"
 		tabindex="-1"
 		title="Toggle Sidebar"
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"cn-sidebar-rail absolute inset-y-0 z-20 hidden w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2",
 			"in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",
 			"[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
@@ -471,7 +471,7 @@ templ Inset(props ...InsetProps) {
 			id={ p.ID }
 		}
 		data-slot="sidebar-inset"
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"cn-sidebar-inset relative flex w-full flex-1 flex-col",
 			p.Class,
 		) }
@@ -491,7 +491,7 @@ templ Input(props ...InputProps) {
 		Name:        p.Name,
 		Value:       p.Value,
 		Placeholder: p.Placeholder,
-		Class:       utils.TwMerge("cn-sidebar-input", p.Class),
+		Class:       utils.CN("cn-sidebar-input", p.Class),
 		Attributes: utils.MergeAttributes(
 			templ.Attributes{"data-slot": "sidebar-input", "data-sidebar": "input"},
 			p.Attributes,
@@ -510,7 +510,7 @@ templ Header(props ...HeaderProps) {
 		}
 		data-slot="sidebar-header"
 		data-sidebar="header"
-		class={ utils.TwMerge("cn-sidebar-header flex flex-col", p.Class) }
+		class={ utils.CN("cn-sidebar-header flex flex-col", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -528,7 +528,7 @@ templ Footer(props ...FooterProps) {
 		}
 		data-slot="sidebar-footer"
 		data-sidebar="footer"
-		class={ utils.TwMerge("cn-sidebar-footer flex flex-col", p.Class) }
+		class={ utils.CN("cn-sidebar-footer flex flex-col", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -548,7 +548,7 @@ templ Separator(props ...SeparatorProps) {
 		data-slot="sidebar-separator"
 		data-sidebar="separator"
 		data-orientation="horizontal"
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			// The base separator classes the tsx inherits from ui/separator,
 			// plus the sidebar override from sidebar.tsx.
 			"shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch",
@@ -570,7 +570,7 @@ templ Content(props ...ContentProps) {
 		}
 		data-slot="sidebar-content"
 		data-sidebar="content"
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"cn-sidebar-content flex min-h-0 flex-1 flex-col overflow-auto group-data-[collapsible=icon]:overflow-hidden",
 			p.Class,
 		) }
@@ -591,7 +591,7 @@ templ Group(props ...GroupProps) {
 		}
 		data-slot="sidebar-group"
 		data-sidebar="group"
-		class={ utils.TwMerge("cn-sidebar-group relative flex w-full min-w-0 flex-col", p.Class) }
+		class={ utils.CN("cn-sidebar-group relative flex w-full min-w-0 flex-col", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -609,7 +609,7 @@ templ GroupLabel(props ...GroupLabelProps) {
 		}
 		data-slot="sidebar-group-label"
 		data-sidebar="group-label"
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"cn-sidebar-group-label flex shrink-0 items-center outline-hidden [&>svg]:shrink-0",
 			p.Class,
 		) }
@@ -631,7 +631,7 @@ templ GroupAction(props ...GroupActionProps) {
 		type="button"
 		data-slot="sidebar-group-action"
 		data-sidebar="group-action"
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"cn-sidebar-group-action flex aspect-square items-center justify-center outline-hidden transition-transform group-data-[collapsible=icon]:hidden after:absolute after:-inset-2 md:after:hidden [&>svg]:shrink-0",
 			p.Class,
 		) }
@@ -652,7 +652,7 @@ templ GroupContent(props ...GroupContentProps) {
 		}
 		data-slot="sidebar-group-content"
 		data-sidebar="group-content"
-		class={ utils.TwMerge("cn-sidebar-group-content w-full", p.Class) }
+		class={ utils.CN("cn-sidebar-group-content w-full", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -670,7 +670,7 @@ templ Menu(props ...MenuProps) {
 		}
 		data-slot="sidebar-menu"
 		data-sidebar="menu"
-		class={ utils.TwMerge("cn-sidebar-menu flex w-full min-w-0 flex-col", p.Class) }
+		class={ utils.CN("cn-sidebar-menu flex w-full min-w-0 flex-col", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -688,7 +688,7 @@ templ MenuItem(props ...MenuItemProps) {
 		}
 		data-slot="sidebar-menu-item"
 		data-sidebar="menu-item"
-		class={ utils.TwMerge("group/menu-item relative", p.Class) }
+		class={ utils.CN("group/menu-item relative", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -700,7 +700,7 @@ templ MenuItem(props ...MenuItemProps) {
 const menuButtonBaseClasses = "cn-sidebar-menu-button peer/menu-button group/menu-button flex w-full items-center overflow-hidden outline-hidden disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate"
 
 func menuButtonClasses(p MenuButtonProps) string {
-	return utils.TwMerge(
+	return utils.CN(
 		menuButtonBaseClasses,
 		menuButtonVariantClasses(p.Variant),
 		menuButtonSizeClasses(p.Size),
@@ -810,7 +810,7 @@ templ MenuAction(props ...MenuActionProps) {
 		type="button"
 		data-slot="sidebar-menu-action"
 		data-sidebar="menu-action"
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"cn-sidebar-menu-action flex items-center justify-center outline-hidden transition-transform group-data-[collapsible=icon]:hidden after:absolute after:-inset-2 md:after:hidden [&>svg]:shrink-0",
 			utils.If(p.ShowOnHover, "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 peer-data-active/menu-button:text-sidebar-accent-foreground aria-expanded:opacity-100 md:opacity-0"),
 			p.Class,
@@ -832,7 +832,7 @@ templ MenuBadge(props ...MenuBadgeProps) {
 		}
 		data-slot="sidebar-menu-badge"
 		data-sidebar="menu-badge"
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"cn-sidebar-menu-badge flex items-center justify-center tabular-nums select-none group-data-[collapsible=icon]:hidden",
 			p.Class,
 		) }
@@ -855,7 +855,7 @@ templ MenuSkeleton(props ...MenuSkeletonProps) {
 		}
 		data-slot="sidebar-menu-skeleton"
 		data-sidebar="menu-skeleton"
-		class={ utils.TwMerge("cn-sidebar-menu-skeleton flex items-center", p.Class) }
+		class={ utils.CN("cn-sidebar-menu-skeleton flex items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		if p.ShowIcon {
@@ -885,7 +885,7 @@ templ MenuSub(props ...MenuSubProps) {
 		}
 		data-slot="sidebar-menu-sub"
 		data-sidebar="menu-sub"
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"cn-sidebar-menu-sub flex min-w-0 flex-col",
 			p.Class,
 		) }
@@ -906,7 +906,7 @@ templ MenuSubItem(props ...MenuSubItemProps) {
 		}
 		data-slot="sidebar-menu-sub-item"
 		data-sidebar="menu-sub-item"
-		class={ utils.TwMerge("group/menu-sub-item relative", p.Class) }
+		class={ utils.CN("group/menu-sub-item relative", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -914,7 +914,7 @@ templ MenuSubItem(props ...MenuSubItemProps) {
 }
 
 func menuSubButtonClasses(p MenuSubButtonProps) string {
-	return utils.TwMerge(
+	return utils.CN(
 		"cn-sidebar-menu-sub-button flex min-w-0 -translate-x-px items-center overflow-hidden outline-hidden group-data-[collapsible=icon]:hidden disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:shrink-0",
 		p.Class,
 	)
@@ -953,7 +953,7 @@ templ MenuSubButton(props ...MenuSubButtonProps) {
 			data-sidebar="menu-sub-button"
 			data-size={ string(p.Size) }
 			data-active?={ p.IsActive }
-			class={ utils.TwMerge(menuSubButtonClasses(p), "w-full text-left") }
+			class={ utils.CN(menuSubButtonClasses(p), "w-full text-left") }
 			{ p.Attributes... }
 		>
 			{ children... }

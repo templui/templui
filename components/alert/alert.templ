@@ -46,7 +46,7 @@ templ Alert(props ...Props) {
 		data-slot="alert"
 		role="alert"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-alert group/alert relative w-full",
 				variantClasses(p.Variant),
 				p.Class,
@@ -69,7 +69,7 @@ templ Title(props ...TitleProps) {
 		}
 		data-slot="alert-title"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-alert-title [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground",
 				p.Class,
 			),
@@ -91,7 +91,7 @@ templ Description(props ...DescriptionProps) {
 		}
 		data-slot="alert-description"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-alert-description [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground",
 				p.Class,
 			),
@@ -113,7 +113,7 @@ templ Action(props ...ActionProps) {
 			id={ p.ID }
 		}
 		data-slot="alert-action"
-		class={ utils.TwMerge("cn-alert-action", p.Class) }
+		class={ utils.CN("cn-alert-action", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

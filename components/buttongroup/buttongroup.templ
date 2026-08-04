@@ -55,7 +55,7 @@ templ ButtonGroup(props ...Props) {
 		role="group"
 		data-slot="button-group"
 		data-orientation={ string(p.Orientation) }
-		class={ utils.TwMerge(baseClasses, orientationClasses(p.Orientation), p.Class) }
+		class={ utils.CN(baseClasses, orientationClasses(p.Orientation), p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -72,7 +72,7 @@ templ Text(props ...TextProps) {
 			id={ p.ID }
 		}
 		data-slot="button-group-text"
-		class={ utils.TwMerge("cn-button-group-text flex items-center [&_svg]:pointer-events-none", p.Class) }
+		class={ utils.CN("cn-button-group-text flex items-center [&_svg]:pointer-events-none", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -97,7 +97,7 @@ templ Separator(props ...SeparatorProps) {
 		data-horizontal?={ p.Orientation == OrientationHorizontal }
 		data-vertical?={ p.Orientation == OrientationVertical }
 		aria-orientation={ string(p.Orientation) }
-		class={ utils.TwMerge("shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch", "cn-button-group-separator relative self-stretch data-horizontal:mx-px data-horizontal:w-auto data-vertical:my-px data-vertical:h-auto", p.Class) }
+		class={ utils.CN("shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch", "cn-button-group-separator relative self-stretch data-horizontal:mx-px data-horizontal:w-auto data-vertical:my-px data-vertical:h-auto", p.Class) }
 		{ p.Attributes... }
 	></div>
 }

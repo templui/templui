@@ -47,7 +47,7 @@ func Kbd(props ...Props) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var2 = []any{utils.CN(
 			"cn-kbd pointer-events-none inline-flex items-center justify-center select-none",
 			p.Class,
 		),
@@ -141,7 +141,7 @@ func Group(props ...GroupProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var6 = []any{utils.TwMerge("cn-kbd-group inline-flex items-center", p.Class)}
+		var templ_7745c5c3_Var6 = []any{utils.CN("cn-kbd-group inline-flex items-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

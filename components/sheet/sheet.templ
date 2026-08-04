@@ -158,7 +158,7 @@ templ Content(props ...ContentProps) {
 					data-tui-dialog-disable-click-away="true"
 				}
 				class={
-					utils.TwMerge(
+					utils.CN(
 						"cn-sheet-content data-ending-style:opacity-0 data-starting-style:opacity-0 data-[side=bottom]:data-ending-style:translate-y-[2.5rem] data-[side=bottom]:data-starting-style:translate-y-[2.5rem] data-[side=left]:data-ending-style:translate-x-[-2.5rem] data-[side=left]:data-starting-style:translate-x-[-2.5rem] data-[side=right]:data-ending-style:translate-x-[2.5rem] data-[side=right]:data-starting-style:translate-x-[2.5rem] data-[side=top]:data-ending-style:translate-y-[-2.5rem] data-[side=top]:data-starting-style:translate-y-[-2.5rem]",
 						p.Class,
 					),
@@ -196,7 +196,7 @@ templ Header(props ...HeaderProps) {
 			id={ p.ID }
 		}
 		data-slot="sheet-header"
-		class={ utils.TwMerge("cn-sheet-header flex flex-col", p.Class) }
+		class={ utils.CN("cn-sheet-header flex flex-col", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -213,7 +213,7 @@ templ Footer(props ...FooterProps) {
 			id={ p.ID }
 		}
 		data-slot="sheet-footer"
-		class={ utils.TwMerge("cn-sheet-footer mt-auto flex flex-col", p.Class) }
+		class={ utils.CN("cn-sheet-footer mt-auto flex flex-col", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -231,7 +231,7 @@ templ Title(props ...TitleProps) {
 		}
 		data-slot="sheet-title"
 		data-tui-dialog-title
-		class={ utils.TwMerge("cn-sheet-title cn-font-heading", p.Class) }
+		class={ utils.CN("cn-sheet-title cn-font-heading", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -249,7 +249,7 @@ templ Description(props ...DescriptionProps) {
 		}
 		data-slot="sheet-description"
 		data-tui-dialog-description
-		class={ utils.TwMerge("cn-sheet-description", p.Class) }
+		class={ utils.CN("cn-sheet-description", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

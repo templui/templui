@@ -76,7 +76,7 @@ func ButtonGroup(props ...Props) templ.Component {
 		if p.Orientation == "" {
 			p.Orientation = OrientationHorizontal
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(baseClasses, orientationClasses(p.Orientation), p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.CN(baseClasses, orientationClasses(p.Orientation), p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -179,7 +179,7 @@ func Text(props ...TextProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var7 = []any{utils.TwMerge("cn-button-group-text flex items-center [&_svg]:pointer-events-none", p.Class)}
+		var templ_7745c5c3_Var7 = []any{utils.CN("cn-button-group-text flex items-center [&_svg]:pointer-events-none", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var7...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -272,7 +272,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if p.Orientation == "" {
 			p.Orientation = OrientationVertical
 		}
-		var templ_7745c5c3_Var11 = []any{utils.TwMerge("shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch", "cn-button-group-separator relative self-stretch data-horizontal:mx-px data-horizontal:w-auto data-vertical:my-px data-vertical:h-auto", p.Class)}
+		var templ_7745c5c3_Var11 = []any{utils.CN("shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch", "cn-button-group-separator relative self-stretch data-horizontal:mx-px data-horizontal:w-auto data-vertical:my-px data-vertical:h-auto", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

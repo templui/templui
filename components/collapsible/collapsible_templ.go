@@ -74,7 +74,7 @@ func Collapsible(props ...Props) templ.Component {
 			p.ID = utils.RandomID()
 		}
 		ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: p.Open})
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.CN("", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -177,7 +177,7 @@ func Content(props ...ContentProps) templ.Component {
 			p = props[0]
 		}
 		s := state(ctx)
-		var templ_7745c5c3_Var5 = []any{utils.TwMerge("", p.Class)}
+		var templ_7745c5c3_Var5 = []any{utils.CN("", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var5...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

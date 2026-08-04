@@ -522,7 +522,7 @@ func Input(props ...InputProps) templ.Component {
 			return nil
 		})
 		templ_7745c5c3_Err = inputgroup.InputGroup(inputgroup.Props{
-			Class:      utils.TwMerge("cn-combobox-input w-auto", p.Class),
+			Class:      utils.CN("cn-combobox-input w-auto", p.Class),
 			Attributes: templ.Attributes{"data-tui-combobox-anchor": s.id},
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var8), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -652,7 +652,7 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var20 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var20 = []any{utils.CN(
 			// 1:1 base/ui/combobox.tsx ComboboxContent, the look comes from
 			// cn-combobox-content (animations key on our data-state attribute).
 			// The --available-height/--available-width/--anchor-width/
@@ -755,7 +755,7 @@ func List(props ...ListProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var24 = []any{utils.TwMerge("cn-combobox-list overflow-y-auto overscroll-contain", p.Class)}
+		var templ_7745c5c3_Var24 = []any{utils.CN("cn-combobox-list overflow-y-auto overscroll-contain", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var24...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -845,7 +845,7 @@ func Empty(props ...EmptyProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var28 = []any{utils.TwMerge("cn-combobox-empty", p.Class)}
+		var templ_7745c5c3_Var28 = []any{utils.CN("cn-combobox-empty", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var28...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -935,7 +935,7 @@ func Group(props ...GroupProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var32 = []any{utils.TwMerge("cn-combobox-group", p.Class)}
+		var templ_7745c5c3_Var32 = []any{utils.CN("cn-combobox-group", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var32...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1025,7 +1025,7 @@ func Label(props ...LabelProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var36 = []any{utils.TwMerge("cn-combobox-label", p.Class)}
+		var templ_7745c5c3_Var36 = []any{utils.CN("cn-combobox-label", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var36...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1127,7 +1127,7 @@ func Item(props ...ItemProps) templ.Component {
 		} else {
 			selected = s.value != "" && s.value == p.Value
 		}
-		var templ_7745c5c3_Var40 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var40 = []any{utils.CN(
 			// 1:1 base/ui/combobox.tsx ComboboxItem, the look comes from
 			// cn-combobox-item (the highlight keys on the data-highlighted
 			// attribute our JS sets).
@@ -1288,7 +1288,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var46 = []any{utils.TwMerge("cn-combobox-separator", p.Class)}
+		var templ_7745c5c3_Var46 = []any{utils.CN("cn-combobox-separator", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var46...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1373,7 +1373,7 @@ func Chips(props ...ChipsProps) templ.Component {
 			p = props[0]
 		}
 		s := state(ctx)
-		var templ_7745c5c3_Var50 = []any{utils.TwMerge("cn-combobox-chips", p.Class)}
+		var templ_7745c5c3_Var50 = []any{utils.CN("cn-combobox-chips", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var50...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1520,7 +1520,7 @@ func ChipsInput(props ...ChipsInputProps) templ.Component {
 			p = props[0]
 		}
 		s := state(ctx)
-		var templ_7745c5c3_Var57 = []any{utils.TwMerge("cn-combobox-chip-input min-w-16 flex-1 outline-none", p.Class)}
+		var templ_7745c5c3_Var57 = []any{utils.CN("cn-combobox-chip-input min-w-16 flex-1 outline-none", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var57...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1644,7 +1644,7 @@ func Chip(props ...ChipProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var63 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var63 = []any{utils.CN(
 			"cn-combobox-chip has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50",
 			p.Class,
 		),

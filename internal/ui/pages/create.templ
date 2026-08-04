@@ -388,7 +388,7 @@ templ createCustomizer() {
 			// CopyPreset: the label IS the command (copy-preset.tsx).
 			@button.Button(button.Props{
 				Variant: button.VariantOutline,
-				Class:   utils.TwMerge(createFooterButtonClass, "min-w-0 flex-1 md:flex-none"),
+				Class:   utils.CN(createFooterButtonClass, "min-w-0 flex-1 md:flex-none"),
 				Attributes: templ.Attributes{
 					"data-tui-create-copy": true,
 					"title":                "--preset b0",
@@ -398,7 +398,7 @@ templ createCustomizer() {
 			}
 			@button.Button(button.Props{
 				Variant:    button.VariantOutline,
-				Class:      utils.TwMerge(createFooterButtonClass, "max-w-20 min-w-0 flex-1 sm:max-w-none md:flex-none"),
+				Class:      utils.CN(createFooterButtonClass, "max-w-20 min-w-0 flex-1 sm:max-w-none md:flex-none"),
 				Attributes: templ.Attributes{"data-tui-create-open-preset": true},
 			}) {
 				<span class="hidden md:inline">Open Preset</span>
@@ -406,7 +406,7 @@ templ createCustomizer() {
 			}
 			@button.Button(button.Props{
 				Variant:    button.VariantOutline,
-				Class:      utils.TwMerge(createFooterButtonClass, "max-w-20 min-w-0 flex-1 sm:max-w-none md:flex-none"),
+				Class:      utils.CN(createFooterButtonClass, "max-w-20 min-w-0 flex-1 sm:max-w-none md:flex-none"),
 				Attributes: templ.Attributes{"data-tui-create-shuffle": true},
 			}) {
 				<span class="w-full truncate text-center font-medium">Shuffle</span>
@@ -426,7 +426,7 @@ templ createCustomizer() {
 // group/picker wrapper from the *-picker.tsx components); the children slot is
 // the trailing indicator.
 templ createPickerRow(param, label, value, wrapperClass string) {
-	<div class={ utils.TwMerge("group/picker relative", wrapperClass) }>
+	<div class={ utils.CN("group/picker relative", wrapperClass) }>
 		<button
 			type="button"
 			data-tui-create-trigger={ param }
@@ -482,7 +482,7 @@ templ createMainMenuTrigger() {
 		data-slot="dropdown-menu-trigger"
 		aria-haspopup="menu"
 		aria-expanded="false"
-		class={ utils.TwMerge(createTriggerClass, "flex items-center justify-between gap-2 rounded-lg px-1.75 ring-1 ring-foreground/10 focus-visible:ring-1") }
+		class={ utils.CN(createTriggerClass, "flex items-center justify-between gap-2 rounded-lg px-1.75 ring-1 ring-foreground/10 focus-visible:ring-1") }
 	>
 		<span class="font-medium">Menu</span>
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5">
@@ -553,7 +553,7 @@ templ createPickerContent(param, extraClass string) {
 		data-slot="dropdown-menu-content"
 		role="menu"
 		hidden
-		class={ utils.TwMerge(createContentClass, extraClass) }
+		class={ utils.CN(createContentClass, extraClass) }
 	>
 		{ children... }
 	</div>

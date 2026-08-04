@@ -70,7 +70,7 @@ func Breadcrumb(props ...Props) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var2 = []any{utils.CN(
 			"cn-breadcrumb",
 			p.Class,
 		),
@@ -164,7 +164,7 @@ func List(props ...ListProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var6 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var6 = []any{utils.CN(
 			"cn-breadcrumb-list flex flex-wrap items-center wrap-break-word",
 			p.Class,
 		),
@@ -258,7 +258,7 @@ func Item(props ...ItemProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var10 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var10 = []any{utils.CN(
 			"cn-breadcrumb-item inline-flex items-center",
 			p.Class,
 		),
@@ -352,7 +352,7 @@ func Link(props ...LinkProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var14 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var14 = []any{utils.CN(
 			"cn-breadcrumb-link",
 			p.Class,
 		),
@@ -465,7 +465,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var19 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var19 = []any{utils.CN(
 			"cn-breadcrumb-separator",
 			p.Class,
 		),
@@ -566,7 +566,7 @@ func Page(props ...ItemProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var23 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var23 = []any{utils.CN(
 			"cn-breadcrumb-page",
 			p.Class,
 		),

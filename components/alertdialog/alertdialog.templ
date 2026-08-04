@@ -174,7 +174,7 @@ templ Content(props ...ContentProps) {
 				data-tui-dialog-show-modal="true"
 				data-tui-dialog-disable-click-away="true"
 				class={
-					utils.TwMerge(
+					utils.CN(
 						"cn-alert-dialog-content group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 outline-none",
 						p.Class,
 					),
@@ -197,7 +197,7 @@ templ Header(props ...HeaderProps) {
 			id={ p.ID }
 		}
 		data-slot="alert-dialog-header"
-		class={ utils.TwMerge("cn-alert-dialog-header", p.Class) }
+		class={ utils.CN("cn-alert-dialog-header", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -214,7 +214,7 @@ templ Footer(props ...FooterProps) {
 			id={ p.ID }
 		}
 		data-slot="alert-dialog-footer"
-		class={ utils.TwMerge("cn-alert-dialog-footer flex flex-col-reverse gap-2 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end", p.Class) }
+		class={ utils.CN("cn-alert-dialog-footer flex flex-col-reverse gap-2 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -231,7 +231,7 @@ templ Media(props ...MediaProps) {
 			id={ p.ID }
 		}
 		data-slot="alert-dialog-media"
-		class={ utils.TwMerge("cn-alert-dialog-media", p.Class) }
+		class={ utils.CN("cn-alert-dialog-media", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -249,7 +249,7 @@ templ Title(props ...TitleProps) {
 		}
 		data-slot="alert-dialog-title"
 		data-tui-dialog-title
-		class={ utils.TwMerge("cn-alert-dialog-title cn-font-heading", p.Class) }
+		class={ utils.CN("cn-alert-dialog-title cn-font-heading", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -267,7 +267,7 @@ templ Description(props ...DescriptionProps) {
 		}
 		data-slot="alert-dialog-description"
 		data-tui-dialog-description
-		class={ utils.TwMerge("cn-alert-dialog-description", p.Class) }
+		class={ utils.CN("cn-alert-dialog-description", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -292,7 +292,7 @@ templ Action(props ...ActionProps) {
 		ID:         p.ID,
 		Variant:    p.Variant,
 		Size:       p.Size,
-		Class:      utils.TwMerge("cn-alert-dialog-action", p.Class),
+		Class:      utils.CN("cn-alert-dialog-action", p.Class),
 		Attributes: attrs,
 	}) {
 		{ children... }
@@ -322,7 +322,7 @@ templ Cancel(props ...CancelProps) {
 		ID:         p.ID,
 		Variant:    p.Variant,
 		Size:       p.Size,
-		Class:      utils.TwMerge("cn-alert-dialog-cancel", p.Class),
+		Class:      utils.CN("cn-alert-dialog-cancel", p.Class),
 		Attributes: attrs,
 	}) {
 		{ children... }

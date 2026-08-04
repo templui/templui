@@ -69,7 +69,7 @@ templ RadioGroup(props ...Props) {
 		if p.Disabled {
 			aria-disabled="true"
 		}
-		class={ utils.TwMerge("cn-radio-group w-full", p.Class) }
+		class={ utils.CN("cn-radio-group w-full", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -118,7 +118,7 @@ templ Item(props ...ItemProps) {
 			tabindex="-1"
 		}
 		class={
-			utils.TwMerge(
+			utils.CN(
 				// 1:1 base/ui/radio-group.tsx: structure lives here, the look comes
 				// from the active style-*.css via cn-radio-group-item.
 				"cn-radio-group-item group/radio-group-item peer relative aspect-square shrink-0 border outline-none after:absolute after:-inset-x-3 after:-inset-y-2 disabled:cursor-not-allowed disabled:opacity-50",

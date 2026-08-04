@@ -84,7 +84,7 @@ func Pagination(props ...Props) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("cn-pagination mx-auto flex w-full justify-center", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.CN("cn-pagination mx-auto flex w-full justify-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -174,7 +174,7 @@ func Content(props ...ContentProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var6 = []any{utils.TwMerge("cn-pagination-content flex items-center", p.Class)}
+		var templ_7745c5c3_Var6 = []any{utils.CN("cn-pagination-content flex items-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -384,7 +384,7 @@ func Link(props ...LinkProps) templ.Component {
 				Disabled:   true,
 				Size:       button.SizeIcon,
 				Variant:    button.VariantGhost,
-				Class:      utils.TwMerge("cn-pagination-link", p.Class),
+				Class:      utils.CN("cn-pagination-link", p.Class),
 				Attributes: p.Attributes,
 			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var14), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
@@ -422,7 +422,7 @@ func Link(props ...LinkProps) templ.Component {
 				Href:       p.Href,
 				Size:       button.SizeIcon,
 				Variant:    button.Variant(buttonVariant(p.IsActive)),
-				Class:      utils.TwMerge("cn-pagination-link", p.Class),
+				Class:      utils.CN("cn-pagination-link", p.Class),
 				Attributes: attrs,
 			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var15), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
@@ -505,7 +505,7 @@ func Previous(props ...PreviousProps) templ.Component {
 			Href:       p.Href,
 			Disabled:   p.Disabled,
 			Variant:    button.VariantGhost,
-			Class:      utils.TwMerge("cn-pagination-previous", p.Class),
+			Class:      utils.CN("cn-pagination-previous", p.Class),
 			Attributes: attrs,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var17), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -587,7 +587,7 @@ func Next(props ...NextProps) templ.Component {
 			Href:       p.Href,
 			Disabled:   p.Disabled,
 			Variant:    button.VariantGhost,
-			Class:      utils.TwMerge("cn-pagination-next", p.Class),
+			Class:      utils.CN("cn-pagination-next", p.Class),
 			Attributes: attrs,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var20), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {

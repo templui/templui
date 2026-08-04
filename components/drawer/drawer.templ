@@ -218,7 +218,7 @@ templ Content(props ...ContentProps) {
 				data-tui-drawer-snap-sequential="true"
 			}
 			class={
-				utils.TwMerge(
+				utils.CN(
 					// 1:1 DrawerContent's Drawer.Viewport class. data-[modal=true]
 					// makes the fullscreen viewport swallow outside presses; non
 					// modal drawers stay pointer-events-none so the page keeps
@@ -261,7 +261,7 @@ templ Content(props ...ContentProps) {
 				tabindex="-1"
 				style="--drawer-swipe-progress:0;--nested-drawers:0;--drawer-swipe-strength:1;--drawer-swipe-movement-x:0px;--drawer-swipe-movement-y:0px;--drawer-snap-point-offset:0px"
 				class={
-					utils.TwMerge(
+					utils.CN(
 						// 1:1 base/ui/drawer.tsx DrawerContent popup (Base UI
 						// Drawer.Popup), the look comes from cn-drawer-popup.
 						// Base.
@@ -317,7 +317,7 @@ templ SwipeHandle(props ...HandleProps) {
 	<div
 		data-slot="drawer-swipe-handle"
 		aria-hidden="true"
-		class={ utils.TwMerge("cn-drawer-swipe-handle relative z-10 flex shrink-0 cursor-grab transition-opacity duration-200 group-data-nested-drawer-open/drawer-popup:opacity-0 group-data-nested-drawer-swiping/drawer-popup:opacity-100 group-data-[swipe-direction=left]/drawer-popup:order-last group-data-[swipe-direction=up]/drawer-popup:order-last active:cursor-grabbing", p.Class) }
+		class={ utils.CN("cn-drawer-swipe-handle relative z-10 flex shrink-0 cursor-grab transition-opacity duration-200 group-data-nested-drawer-open/drawer-popup:opacity-0 group-data-nested-drawer-swiping/drawer-popup:opacity-100 group-data-[swipe-direction=left]/drawer-popup:order-last group-data-[swipe-direction=up]/drawer-popup:order-last active:cursor-grabbing", p.Class) }
 		{ p.Attributes... }
 	></div>
 }
@@ -332,7 +332,7 @@ templ Header(props ...HeaderProps) {
 			id={ p.ID }
 		}
 		data-slot="drawer-header"
-		class={ utils.TwMerge("cn-drawer-header-base flex shrink-0 flex-col group-data-[swipe-axis=y]/drawer-popup:text-center", p.Class) }
+		class={ utils.CN("cn-drawer-header-base flex shrink-0 flex-col group-data-[swipe-axis=y]/drawer-popup:text-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -349,7 +349,7 @@ templ Footer(props ...FooterProps) {
 			id={ p.ID }
 		}
 		data-slot="drawer-footer"
-		class={ utils.TwMerge("cn-drawer-footer-base mt-auto flex shrink-0 flex-col", p.Class) }
+		class={ utils.CN("cn-drawer-footer-base mt-auto flex shrink-0 flex-col", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -366,7 +366,7 @@ templ Title(props ...TitleProps) {
 			id={ p.ID }
 		}
 		data-slot="drawer-title"
-		class={ utils.TwMerge("cn-drawer-title cn-font-heading", p.Class) }
+		class={ utils.CN("cn-drawer-title cn-font-heading", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -383,7 +383,7 @@ templ Description(props ...DescriptionProps) {
 			id={ p.ID }
 		}
 		data-slot="drawer-description"
-		class={ utils.TwMerge("cn-drawer-description text-balance", p.Class) }
+		class={ utils.CN("cn-drawer-description text-balance", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

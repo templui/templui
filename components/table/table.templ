@@ -62,7 +62,7 @@ templ Table(props ...Props) {
 				id={ p.ID }
 			}
 			data-slot="table"
-			class={ utils.TwMerge("cn-table", p.Class) }
+			class={ utils.CN("cn-table", p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -80,7 +80,7 @@ templ Header(props ...HeaderProps) {
 			id={ p.ID }
 		}
 		data-slot="table-header"
-		class={ utils.TwMerge("cn-table-header", p.Class) }
+		class={ utils.CN("cn-table-header", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -97,7 +97,7 @@ templ Body(props ...BodyProps) {
 			id={ p.ID }
 		}
 		data-slot="table-body"
-		class={ utils.TwMerge("cn-table-body", p.Class) }
+		class={ utils.CN("cn-table-body", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -114,7 +114,7 @@ templ Footer(props ...FooterProps) {
 			id={ p.ID }
 		}
 		data-slot="table-footer"
-		class={ utils.TwMerge("cn-table-footer", p.Class) }
+		class={ utils.CN("cn-table-footer", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -132,7 +132,7 @@ templ Row(props ...RowProps) {
 		}
 		data-slot="table-row"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-table-row has-aria-expanded:bg-muted/50",
 				utils.If(p.Selected, "data-[tui-table-state-selected]:bg-muted"),
 				p.Class,
@@ -159,7 +159,7 @@ templ Head(props ...HeadProps) {
 			id={ p.ID }
 		}
 		data-slot="table-head"
-		class={ utils.TwMerge("cn-table-head cn-table-head-aria", p.Class) }
+		class={ utils.CN("cn-table-head cn-table-head-aria", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -178,7 +178,7 @@ templ Cell(props ...CellProps) {
 			id={ p.ID }
 		}
 		data-slot="table-cell"
-		class={ utils.TwMerge("cn-table-cell cn-table-cell-aria", p.Class) }
+		class={ utils.CN("cn-table-cell cn-table-cell-aria", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -195,7 +195,7 @@ templ Caption(props ...CaptionProps) {
 			id={ p.ID }
 		}
 		data-slot="table-caption"
-		class={ utils.TwMerge("cn-table-caption", p.Class) }
+		class={ utils.CN("cn-table-caption", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

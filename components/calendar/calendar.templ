@@ -164,7 +164,7 @@ templ Calendar(props ...Props) {
 			data-tui-calendar-booked-dates={ isoList(p.BookedDates) }
 		}
 		class={
-			utils.TwMerge(
+			utils.CN(
 				// 1:1 base/ui/calendar.tsx className + classNames.root. The rtl
 				// chevron flip lives on the icons as cn-rtl-flip (the tsx's extra
 				// rtl:**:[.rdp-button_next>svg] selectors target rdp-* classes our

@@ -67,7 +67,7 @@ templ Card(props ...Props) {
 		}
 		data-slot="card"
 		data-size={ string(p.Size) }
-		class={ utils.TwMerge("cn-card group/card flex flex-col", p.Class) }
+		class={ utils.CN("cn-card group/card flex flex-col", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -85,7 +85,7 @@ templ Header(props ...HeaderProps) {
 		}
 		data-slot="card-header"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-card-header group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]",
 				p.Class,
 			),
@@ -106,7 +106,7 @@ templ Title(props ...TitleProps) {
 			id={ p.ID }
 		}
 		data-slot="card-title"
-		class={ utils.TwMerge("cn-card-title cn-font-heading", p.Class) }
+		class={ utils.CN("cn-card-title cn-font-heading", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -123,7 +123,7 @@ templ Description(props ...DescriptionProps) {
 			id={ p.ID }
 		}
 		data-slot="card-description"
-		class={ utils.TwMerge("cn-card-description", p.Class) }
+		class={ utils.CN("cn-card-description", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -142,7 +142,7 @@ templ Action(props ...ActionProps) {
 		}
 		data-slot="card-action"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-card-action col-start-2 row-span-2 row-start-1 self-start justify-self-end",
 				p.Class,
 			),
@@ -163,7 +163,7 @@ templ Content(props ...ContentProps) {
 			id={ p.ID }
 		}
 		data-slot="card-content"
-		class={ utils.TwMerge("cn-card-content", p.Class) }
+		class={ utils.CN("cn-card-content", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -180,7 +180,7 @@ templ Footer(props ...FooterProps) {
 			id={ p.ID }
 		}
 		data-slot="card-footer"
-		class={ utils.TwMerge("cn-card-footer flex items-center", p.Class) }
+		class={ utils.CN("cn-card-footer flex items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

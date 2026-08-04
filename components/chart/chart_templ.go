@@ -169,7 +169,7 @@ func Container(props ...ContainerProps) templ.Component {
 		// The config travels to the chart root and its children through ctx,
 		// the pendant of shadcn's ChartContext.
 		ctx = context.WithValue(ctx, configCtxKey, p.Config)
-		var templ_7745c5c3_Var3 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var3 = []any{utils.CN(
 			"cn-chart flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
 			p.Class,
 		)}
@@ -2347,7 +2347,7 @@ func legendContent(items []LegendItem, p *LegendProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var32 = []any{utils.TwMerge("flex items-center justify-center gap-4 "+legendPad(p.VerticalAlign), p.Class)}
+		var templ_7745c5c3_Var32 = []any{utils.CN("flex items-center justify-center gap-4 "+legendPad(p.VerticalAlign), p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var32...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

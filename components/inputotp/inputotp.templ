@@ -78,7 +78,7 @@ templ InputOTP(props ...Props) {
 		if p.Pattern != "" {
 			data-tui-inputotp-pattern={ p.Pattern }
 		}
-		class={ utils.TwMerge("cn-input-otp relative flex items-center has-disabled:opacity-50", p.Class) }
+		class={ utils.CN("cn-input-otp relative flex items-center has-disabled:opacity-50", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -118,7 +118,7 @@ templ Group(props ...GroupProps) {
 			id={ p.ID }
 		}
 		data-slot="input-otp-group"
-		class={ utils.TwMerge("cn-input-otp-group flex items-center", p.Class) }
+		class={ utils.CN("cn-input-otp-group flex items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -145,7 +145,7 @@ templ Slot(props ...SlotProps) {
 		data-tui-inputotp-slot
 		data-tui-inputotp-index={ strconv.Itoa(p.Index) }
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-input-otp-slot relative flex items-center justify-center data-[active=true]:z-10",
 				p.Class,
 			),
@@ -172,7 +172,7 @@ templ Separator(props ...SeparatorProps) {
 		}
 		data-slot="input-otp-separator"
 		role="separator"
-		class={ utils.TwMerge("cn-input-otp-separator flex items-center", p.Class) }
+		class={ utils.CN("cn-input-otp-separator flex items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		@icon.Minus()

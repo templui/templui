@@ -141,7 +141,7 @@ templ Slider(props ...Props) {
 		if p.Disabled {
 			data-disabled
 		}
-		class={ utils.TwMerge("data-horizontal:w-full data-vertical:h-full", p.Class) }
+		class={ utils.CN("data-horizontal:w-full data-vertical:h-full", p.Class) }
 		{ p.Attributes... }
 	>
 		if p.Name != "" {

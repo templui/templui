@@ -146,7 +146,7 @@ templ Content(props ...ContentProps) {
 					data-tui-dialog-disable-click-away="true"
 				}
 				class={
-					utils.TwMerge(
+					utils.CN(
 						"cn-dialog-content fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 outline-none",
 						p.Class,
 					),
@@ -184,7 +184,7 @@ templ Header(props ...HeaderProps) {
 			id={ p.ID }
 		}
 		data-slot="dialog-header"
-		class={ utils.TwMerge("cn-dialog-header flex flex-col", p.Class) }
+		class={ utils.CN("cn-dialog-header flex flex-col", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -201,7 +201,7 @@ templ Footer(props ...FooterProps) {
 			id={ p.ID }
 		}
 		data-slot="dialog-footer"
-		class={ utils.TwMerge("cn-dialog-footer flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", p.Class) }
+		class={ utils.CN("cn-dialog-footer flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -221,7 +221,7 @@ templ Title(props ...TitleProps) {
 		}
 		data-slot="dialog-title"
 		data-tui-dialog-title
-		class={ utils.TwMerge("cn-dialog-title cn-font-heading", p.Class) }
+		class={ utils.CN("cn-dialog-title cn-font-heading", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -241,7 +241,7 @@ templ Description(props ...DescriptionProps) {
 		}
 		data-slot="dialog-description"
 		data-tui-dialog-description
-		class={ utils.TwMerge("cn-dialog-description", p.Class) }
+		class={ utils.CN("cn-dialog-description", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

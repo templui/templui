@@ -2,11 +2,11 @@ package utils
 
 import "testing"
 
-// TwMerge must behave like shadcn's cn(): the classes it keeps come out in the
+// CN must behave like shadcn's cn(): the classes it keeps come out in the
 // order they went in, so merging over an already merged string is a no-op. The
 // pairs below are the ones that lose a class as soon as the order is dropped,
 // a shorthand and its longhand: the shorthand has to stay in front.
-func TestTwMergeOrder(t *testing.T) {
+func TestCNOrder(t *testing.T) {
 	tests := []struct {
 		name string
 		in   []string
@@ -141,15 +141,15 @@ func TestTwMergeOrder(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := TwMerge(tt.in...)
+			got := CN(tt.in)
 			if got != tt.want {
-				t.Errorf("TwMerge(%q) = %q, want %q", tt.in, got, tt.want)
+				t.Errorf("CN(%q) = %q, want %q", tt.in, got, tt.want)
 			}
 			// The second pass is the one that used to lose classes: a
 			// component merges its own defaults, a page merges the result
 			// again. Merging merged output has to change nothing.
-			if again := TwMerge(got); again != got {
-				t.Errorf("TwMerge(%q) = %q, want it unchanged", got, again)
+			if again := CN(got); again != got {
+				t.Errorf("CN(%q) = %q, want it unchanged", got, again)
 			}
 		})
 	}
@@ -157,10 +157,30 @@ func TestTwMergeOrder(t *testing.T) {
 
 // The reported failure, spelled out: two passes over a shorthand and its
 // longhand used to end at "p-2".
-func TestTwMergeTwoPassesKeepLonghand(t *testing.T) {
-	first := TwMerge("p-2 pb-11")
-	second := TwMerge(first)
+func TestCNTwoPassesKeepLonghand(t *testing.T) {
+	first := CN("p-2 pb-11")
+	second := CN(first)
 	if second != "p-2 pb-11" {
 		t.Fatalf("second pass = %q, want %q (first pass was %q)", second, "p-2 pb-11", first)
+	}
+}
+
+// TestCNClsxInputs covers the clsx flattening: conditionals, nested lists
+// and empties, like shadcn's cn() accepts.
+func TestCNClsxInputs(t *testing.T) {
+	got := CN(
+		"base",
+		nil,
+		"",
+		[]string{"item-a", "", "item-b"},
+		[]any{"nested", []string{"deep"}},
+		map[string]bool{"on": true, "off": false},
+	)
+	want := "base item-a item-b nested deep on"
+	if got != want {
+		t.Errorf("CN clsx inputs = %q, want %q", got, want)
+	}
+	if got := CN("p-2", map[string]bool{"p-4": true}); got != "p-4" {
+		t.Errorf("CN conditional conflict = %q, want %q", got, "p-4")
 	}
 }

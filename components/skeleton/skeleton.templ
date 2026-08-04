@@ -18,7 +18,7 @@ templ Skeleton(props ...Props) {
 			id={ p.ID }
 		}
 		data-slot="skeleton"
-		class={ utils.TwMerge("cn-skeleton animate-pulse", p.Class) }
+		class={ utils.CN("cn-skeleton animate-pulse", p.Class) }
 		{ p.Attributes... }
 	></div>
 }

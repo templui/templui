@@ -222,7 +222,7 @@ templ Input(props ...InputProps) {
 	}
 	{{ s := state(ctx) }}
 	@inputgroup.InputGroup(inputgroup.Props{
-		Class: utils.TwMerge("cn-combobox-input w-auto", p.Class),
+		Class: utils.CN("cn-combobox-input w-auto", p.Class),
 		Attributes: templ.Attributes{"data-tui-combobox-anchor": s.id},
 	}) {
 		if s.name != "" {
@@ -326,7 +326,7 @@ templ Content(props ...ContentProps) {
 				aria-multiselectable="true"
 			}
 			class={
-				utils.TwMerge(
+				utils.CN(
 					// 1:1 base/ui/combobox.tsx ComboboxContent, the look comes from
 					// cn-combobox-content (animations key on our data-state attribute).
 					// The --available-height/--available-width/--anchor-width/
@@ -359,7 +359,7 @@ templ List(props ...ListProps) {
 		}
 		data-slot="combobox-list"
 		data-tui-combobox-list
-		class={ utils.TwMerge("cn-combobox-list overflow-y-auto overscroll-contain", p.Class) }
+		class={ utils.CN("cn-combobox-list overflow-y-auto overscroll-contain", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -376,7 +376,7 @@ templ Empty(props ...EmptyProps) {
 			id={ p.ID }
 		}
 		data-slot="combobox-empty"
-		class={ utils.TwMerge("cn-combobox-empty", p.Class) }
+		class={ utils.CN("cn-combobox-empty", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -395,7 +395,7 @@ templ Group(props ...GroupProps) {
 		role="group"
 		data-slot="combobox-group"
 		data-tui-combobox-group
-		class={ utils.TwMerge("cn-combobox-group", p.Class) }
+		class={ utils.CN("cn-combobox-group", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -412,7 +412,7 @@ templ Label(props ...LabelProps) {
 			id={ p.ID }
 		}
 		data-slot="combobox-label"
-		class={ utils.TwMerge("cn-combobox-label", p.Class) }
+		class={ utils.CN("cn-combobox-label", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -460,7 +460,7 @@ templ Item(props ...ItemProps) {
 			aria-disabled="true"
 		}
 		class={
-			utils.TwMerge(
+			utils.CN(
 				// 1:1 base/ui/combobox.tsx ComboboxItem, the look comes from
 				// cn-combobox-item (the highlight keys on the data-highlighted
 				// attribute our JS sets).
@@ -491,7 +491,7 @@ templ Separator(props ...SeparatorProps) {
 		}
 		role="separator"
 		data-slot="combobox-separator"
-		class={ utils.TwMerge("cn-combobox-separator", p.Class) }
+		class={ utils.CN("cn-combobox-separator", p.Class) }
 		{ p.Attributes... }
 	></div>
 }
@@ -511,7 +511,7 @@ templ Chips(props ...ChipsProps) {
 		data-slot="combobox-chips"
 		data-tui-combobox-anchor={ s.id }
 		data-tui-combobox-chips
-		class={ utils.TwMerge("cn-combobox-chips", p.Class) }
+		class={ utils.CN("cn-combobox-chips", p.Class) }
 		{ p.Attributes... }
 	>
 		if s.name != "" {
@@ -548,7 +548,7 @@ templ ChipsInput(props ...ChipsInputProps) {
 			placeholder={ p.Placeholder }
 		}
 		disabled?={ s.disabled }
-		class={ utils.TwMerge("cn-combobox-chip-input min-w-16 flex-1 outline-none", p.Class) }
+		class={ utils.CN("cn-combobox-chip-input min-w-16 flex-1 outline-none", p.Class) }
 		{ p.Attributes... }
 	/>
 }
@@ -566,7 +566,7 @@ templ Chip(props ...ChipProps) {
 		data-tui-combobox-chip
 		data-tui-combobox-value={ p.Value }
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-combobox-chip has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50",
 				p.Class,
 			),

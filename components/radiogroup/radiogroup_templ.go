@@ -87,7 +87,7 @@ func RadioGroup(props ...Props) templ.Component {
 			p.Name = utils.RandomID()
 		}
 		ctx = context.WithValue(ctx, stateKey, ctxState{name: p.Name, value: p.Value, disabled: p.Disabled})
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("cn-radio-group w-full", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.CN("cn-radio-group w-full", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -201,7 +201,7 @@ func Item(props ...ItemProps) templ.Component {
 		}
 		checked := p.Checked || (s.value != "" && s.value == p.Value)
 		disabled := p.Disabled || s.disabled
-		var templ_7745c5c3_Var6 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var6 = []any{utils.CN(
 			// 1:1 base/ui/radio-group.tsx: structure lives here, the look comes
 			// from the active style-*.css via cn-radio-group-item.
 			"cn-radio-group-item group/radio-group-item peer relative aspect-square shrink-0 border outline-none after:absolute after:-inset-x-3 after:-inset-y-2 disabled:cursor-not-allowed disabled:opacity-50",

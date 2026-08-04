@@ -103,7 +103,7 @@ templ Carousel(props ...Props) {
 		data-tui-carousel-loop={ strconv.FormatBool(p.Loop) }
 		data-tui-carousel-autoplay={ strconv.FormatBool(p.Autoplay) }
 		data-tui-carousel-interval={ strconv.Itoa(p.Interval) }
-		class={ utils.TwMerge("relative", p.Class) }
+		class={ utils.CN("relative", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -119,7 +119,7 @@ templ Content(props ...ContentProps) {
 		<div
 			data-tui-carousel-track
 			class={
-				utils.TwMerge(
+				utils.CN(
 					"flex",
 					utils.IfElse(orientation(ctx) == OrientationHorizontal, "-ml-4", "-mt-4 flex-col"),
 					p.Class,
@@ -146,7 +146,7 @@ templ Item(props ...ItemProps) {
 		data-slot="carousel-item"
 		data-tui-carousel-item
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"min-w-0 shrink-0 grow-0 basis-full",
 				utils.IfElse(orientation(ctx) == OrientationHorizontal, "pl-4", "pt-4"),
 				p.Class,
@@ -167,7 +167,7 @@ templ Previous(props ...PreviousProps) {
 		ID:      p.ID,
 		Variant: button.VariantOutline,
 		Size:    button.SizeIconSm,
-		Class: utils.TwMerge(
+		Class: utils.CN(
 			"cn-carousel-previous absolute touch-manipulation",
 			utils.IfElse(
 				orientation(ctx) == OrientationHorizontal,
@@ -195,7 +195,7 @@ templ Next(props ...NextProps) {
 		ID:      p.ID,
 		Variant: button.VariantOutline,
 		Size:    button.SizeIconSm,
-		Class: utils.TwMerge(
+		Class: utils.CN(
 			"cn-carousel-next absolute touch-manipulation",
 			utils.IfElse(
 				orientation(ctx) == OrientationHorizontal,

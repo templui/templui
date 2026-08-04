@@ -488,7 +488,7 @@ func processAtRule(doc *document, prelude string, properties *registry.OrderedMa
 }
 
 // processRule is the processRule pendant. @apply statements merge via
-// TwMerge like the reference.
+// CN like the reference.
 func processRule(parent *[]*cssNode, selector string, properties *registry.OrderedMap) {
 	var rule *cssNode
 	for _, node := range *parent {
@@ -515,7 +515,7 @@ func processRule(parent *[]*cssNode, selector string, properties *registry.Order
 				merged := false
 				for _, child := range rule.children {
 					if !child.block && strings.HasPrefix(child.prelude, "@apply ") {
-						child.prelude = "@apply " + templuiutils.TwMerge(strings.TrimPrefix(child.prelude, "@apply "), params)
+						child.prelude = "@apply " + templuiutils.CN(strings.TrimPrefix(child.prelude, "@apply "), params)
 						merged = true
 						break
 					}

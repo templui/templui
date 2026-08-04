@@ -142,7 +142,7 @@ type SubContentProps struct {
 // 1:1 base/ui/context-menu.tsx ContextMenuItem, the look comes from
 // cn-context-menu-item; the inset padding keys on the data-inset attribute.
 func itemClasses(disabled bool) string {
-	return utils.TwMerge(
+	return utils.CN(
 		"cn-context-menu-item group/context-menu-item relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 		// Native <a>/<button> wiring instead of Base UI's div items.
 		"w-full text-left",
@@ -153,7 +153,7 @@ func itemClasses(disabled bool) string {
 // 1:1 base/ui/context-menu.tsx ContextMenuCheckboxItem/RadioItem, cnClass is
 // cn-context-menu-checkbox-item or cn-context-menu-radio-item.
 func checkItemClasses(cnClass string, disabled bool) string {
-	return utils.TwMerge(
+	return utils.CN(
 		cnClass+" relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 		// Native <button> wiring: Base UI unmounts the indicator when unchecked,
 		// our indicator toggles on the checked state via the group instead.
@@ -194,7 +194,7 @@ templ Trigger(props ...TriggerProps) {
 		data-slot="context-menu-trigger"
 		data-tui-contextmenu-trigger
 		data-tui-contextmenu-for={ menuID(ctx) }
-		class={ utils.TwMerge("cn-context-menu-trigger select-none", p.Class) }
+		class={ utils.CN("cn-context-menu-trigger select-none", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -232,7 +232,7 @@ templ Content(props ...ContentProps) {
 			role="menu"
 			tabindex="-1"
 			class={
-				utils.TwMerge(
+				utils.CN(
 					contentClasses,
 					// JS wiring: the positioner wrapper is pointer-events-none, and the
 					// popup stays mounted after animate-out until hidePopover runs.
@@ -277,7 +277,7 @@ templ Item(props ...ItemProps) {
 				aria-disabled="true"
 			}
 			role="menuitem"
-			class={ utils.TwMerge(itemClasses(p.Disabled), p.Class) }
+			class={ utils.CN(itemClasses(p.Disabled), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -295,7 +295,7 @@ templ Item(props ...ItemProps) {
 			}
 			disabled?={ p.Disabled }
 			role="menuitem"
-			class={ utils.TwMerge(itemClasses(p.Disabled), p.Class) }
+			class={ utils.CN(itemClasses(p.Disabled), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -325,7 +325,7 @@ templ CheckboxItem(props ...CheckboxItemProps) {
 			aria-checked="false"
 		}
 		disabled?={ p.Disabled }
-		class={ utils.TwMerge(checkItemClasses("cn-context-menu-checkbox-item", p.Disabled), p.Class) }
+		class={ utils.CN(checkItemClasses("cn-context-menu-checkbox-item", p.Disabled), p.Class) }
 		{ p.Attributes... }
 	>
 		<span class="cn-context-menu-item-indicator pointer-events-none opacity-0 group-data-[state=checked]/cmitem:opacity-100">
@@ -347,7 +347,7 @@ templ RadioGroup(props ...RadioGroupProps) {
 		role="group"
 		data-slot="context-menu-radio-group"
 		data-tui-contextmenu-radio-group
-		class={ utils.TwMerge("", p.Class) }
+		class={ utils.CN("", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -379,7 +379,7 @@ templ RadioItem(props ...RadioItemProps) {
 			aria-checked="false"
 		}
 		disabled?={ p.Disabled }
-		class={ utils.TwMerge(checkItemClasses("cn-context-menu-radio-item", p.Disabled), p.Class) }
+		class={ utils.CN(checkItemClasses("cn-context-menu-radio-item", p.Disabled), p.Class) }
 		{ p.Attributes... }
 	>
 		<span class="cn-context-menu-item-indicator pointer-events-none opacity-0 group-data-[state=checked]/cmitem:opacity-100">
@@ -400,7 +400,7 @@ templ Group(props ...GroupProps) {
 		}
 		role="group"
 		data-slot="context-menu-group"
-		class={ utils.TwMerge("", p.Class) }
+		class={ utils.CN("", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -418,7 +418,7 @@ templ Label(props ...LabelProps) {
 		}
 		data-slot="context-menu-label"
 		data-inset?={ p.Inset }
-		class={ utils.TwMerge("cn-context-menu-label", p.Class) }
+		class={ utils.CN("cn-context-menu-label", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -436,7 +436,7 @@ templ Separator(props ...SeparatorProps) {
 		}
 		role="separator"
 		data-slot="context-menu-separator"
-		class={ utils.TwMerge("cn-context-menu-separator", p.Class) }
+		class={ utils.CN("cn-context-menu-separator", p.Class) }
 		{ p.Attributes... }
 	></div>
 }
@@ -451,7 +451,7 @@ templ Shortcut(props ...ShortcutProps) {
 			id={ p.ID }
 		}
 		data-slot="context-menu-shortcut"
-		class={ utils.TwMerge("cn-context-menu-shortcut", p.Class) }
+		class={ utils.CN("cn-context-menu-shortcut", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -469,7 +469,7 @@ templ Sub(props ...SubProps) {
 		}
 		data-slot="context-menu-sub"
 		data-tui-contextmenu-sub
-		class={ utils.TwMerge("", p.Class) }
+		class={ utils.CN("", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -493,7 +493,7 @@ templ SubTrigger(props ...SubTriggerProps) {
 		role="menuitem"
 		aria-haspopup="menu"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				// 1:1 base/ui/context-menu.tsx ContextMenuSubTrigger, the look comes
 				// from cn-context-menu-sub-trigger (the open highlight keys on our
 				// data-state attribute via the data-open variants inside the cn class).
@@ -525,7 +525,7 @@ templ SubContent(props ...SubContentProps) {
 		role="menu"
 		tabindex="-1"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				// 1:1 base/ui/context-menu.tsx ContextMenuSubContent: the sub content
 				// is the content plus cn-context-menu-subcontent, the look comes from
 				// the cn classes (animations key on our data-state attribute). max-h

@@ -63,7 +63,7 @@ templ Accordion(props ...Props) {
 		data-slot="accordion"
 		data-multiple?={ p.Multiple }
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-accordion flex w-full flex-col",
 				p.Class,
 			),
@@ -88,7 +88,7 @@ templ Item(props ...ItemProps) {
 		data-slot="accordion-item"
 		data-disabled?={ p.Disabled }
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-accordion-item",
 				p.Class,
 			),
@@ -117,7 +117,7 @@ templ Trigger(props ...TriggerProps) {
 				aria-disabled="true"
 			}
 			class={
-				utils.TwMerge(
+				utils.CN(
 					"cn-accordion-trigger group/accordion-trigger relative flex flex-1 items-start justify-between border border-transparent transition-all outline-none aria-disabled:pointer-events-none aria-disabled:opacity-50",
 					p.Class,
 				),
@@ -153,7 +153,7 @@ templ Content(props ...ContentProps) {
 	>
 		<div
 			class={
-				utils.TwMerge(
+				utils.CN(
 					"cn-accordion-content-inner h-(--accordion-panel-height) data-ending-style:h-0 data-starting-style:h-0 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4",
 					p.Class,
 				),

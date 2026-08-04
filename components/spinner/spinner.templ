@@ -30,7 +30,7 @@ templ Spinner(props ...Props) {
 		}
 	}}
 	@icon.LoaderCircle(icon.Props{
-		Class:      utils.TwMerge("size-4 animate-spin", p.Class),
+		Class:      utils.CN("size-4 animate-spin", p.Class),
 		Attributes: attrs,
 	})
 }

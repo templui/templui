@@ -55,7 +55,7 @@ func Checkbox(props ...Props) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var2 = []any{utils.CN(
 			// 1:1 base/ui/checkbox.tsx: structure lives here, the look comes
 			// from the active style-*.css via cn-checkbox.
 			"cn-checkbox peer relative shrink-0 outline-none after:absolute after:-inset-x-3 after:-inset-y-2 disabled:cursor-not-allowed disabled:opacity-50",

@@ -200,7 +200,7 @@ func renderSegment(segment markdown.Segment) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templ.Raw(`<div class="`+utils.TwMerge("steps mb-12 [counter-reset:step] md:ml-4 md:border-l md:pl-8 [&>h3]:step", segment.Attrs["className"])+`">`).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = templ.Raw(`<div class="`+utils.CN("steps mb-12 [counter-reset:step] md:ml-4 md:border-l md:pl-8 [&>h3]:step", segment.Attrs["className"])+`">`).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

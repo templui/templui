@@ -149,7 +149,7 @@ func Slider(props ...Props) templ.Component {
 		for i, v := range p.Values {
 			fs[i] = fraction(v, p.Min, p.Max)
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("data-horizontal:w-full data-vertical:h-full", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.CN("data-horizontal:w-full data-vertical:h-full", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

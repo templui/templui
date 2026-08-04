@@ -122,7 +122,7 @@ templ Container(props ...ContainerProps) {
 		data-slot="chart"
 		data-chart={ chartID }
 		data-tui-chart
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"cn-chart flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
 			p.Class,
 		) }
@@ -1616,7 +1616,7 @@ templ legendContent(items []LegendItem, p *LegendProps) {
 			style="position:absolute;left:0;right:0;bottom:5px"
 		}
 	>
-		<div class={ utils.TwMerge("flex items-center justify-center gap-4 " + legendPad(p.VerticalAlign), p.Class) }>
+		<div class={ utils.CN("flex items-center justify-center gap-4 " + legendPad(p.VerticalAlign), p.Class) }>
 			for _, it := range items {
 				<div class="flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground">
 					if it.Icon != "" && !p.HideIcon {

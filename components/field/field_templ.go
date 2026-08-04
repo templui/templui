@@ -130,7 +130,7 @@ func Set(props ...SetProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("cn-field-set flex flex-col", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.CN("cn-field-set flex flex-col", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -223,7 +223,7 @@ func Legend(props ...LegendProps) templ.Component {
 		if p.Variant == "" {
 			p.Variant = LegendVariantLegend
 		}
-		var templ_7745c5c3_Var6 = []any{utils.TwMerge("cn-field-legend", p.Class)}
+		var templ_7745c5c3_Var6 = []any{utils.CN("cn-field-legend", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -339,7 +339,7 @@ func Group(props ...GroupProps) templ.Component {
 			}
 			attrs[k] = v
 		}
-		var templ_7745c5c3_Var11 = []any{utils.TwMerge("cn-field-group group/field-group @container/field-group flex w-full flex-col", p.Class)}
+		var templ_7745c5c3_Var11 = []any{utils.CN("cn-field-group group/field-group @container/field-group flex w-full flex-col", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -445,7 +445,7 @@ func Field(props ...Props) templ.Component {
 		if p.Orientation == "" {
 			p.Orientation = OrientationVertical
 		}
-		var templ_7745c5c3_Var16 = []any{utils.TwMerge(fieldClasses(p.Orientation), p.Class)}
+		var templ_7745c5c3_Var16 = []any{utils.CN(fieldClasses(p.Orientation), p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var16...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -564,7 +564,7 @@ func Content(props ...ContentProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var21 = []any{utils.TwMerge("cn-field-content group/field-content flex flex-1 flex-col leading-snug", p.Class)}
+		var templ_7745c5c3_Var21 = []any{utils.CN("cn-field-content group/field-content flex flex-1 flex-col leading-snug", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var21...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -654,7 +654,7 @@ func Label(props ...LabelProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var25 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var25 = []any{utils.CN(
 			// 1:1 base/ui/field.tsx FieldLabel: it composes Label, so the
 			// cn-label base string comes first, then the field-label strings.
 			"cn-label flex items-center select-none group-data-[disabled=true]:pointer-events-none peer-disabled:cursor-not-allowed",
@@ -771,7 +771,7 @@ func Title(props ...TitleProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var30 = []any{utils.TwMerge("cn-field-title flex w-fit items-center", p.Class)}
+		var templ_7745c5c3_Var30 = []any{utils.CN("cn-field-title flex w-fit items-center", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var30...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -861,7 +861,7 @@ func Description(props ...DescriptionProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var34 = []any{utils.TwMerge("cn-field-description leading-normal font-normal group-has-data-horizontal/field:text-balance last:mt-0 nth-last-2:-mt-1 [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary", p.Class)}
+		var templ_7745c5c3_Var34 = []any{utils.CN("cn-field-description leading-normal font-normal group-has-data-horizontal/field:text-balance last:mt-0 nth-last-2:-mt-1 [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var34...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -951,7 +951,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var38 = []any{utils.TwMerge("cn-field-separator relative", p.Class)}
+		var templ_7745c5c3_Var38 = []any{utils.CN("cn-field-separator relative", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var38...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1041,7 +1041,7 @@ func Error(props ...ErrorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var42 = []any{utils.TwMerge("cn-field-error font-normal", p.Class)}
+		var templ_7745c5c3_Var42 = []any{utils.CN("cn-field-error font-normal", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var42...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

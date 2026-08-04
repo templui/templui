@@ -107,7 +107,7 @@ templ Set(props ...SetProps) {
 			id={ p.ID }
 		}
 		data-slot="field-set"
-		class={ utils.TwMerge("cn-field-set flex flex-col", p.Class) }
+		class={ utils.CN("cn-field-set flex flex-col", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -128,7 +128,7 @@ templ Legend(props ...LegendProps) {
 		}
 		data-slot="field-legend"
 		data-variant={ string(p.Variant) }
-		class={ utils.TwMerge("cn-field-legend", p.Class) }
+		class={ utils.CN("cn-field-legend", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -160,7 +160,7 @@ templ Group(props ...GroupProps) {
 			id={ p.ID }
 		}
 		data-slot={ slot }
-		class={ utils.TwMerge("cn-field-group group/field-group @container/field-group flex w-full flex-col", p.Class) }
+		class={ utils.CN("cn-field-group group/field-group @container/field-group flex w-full flex-col", p.Class) }
 		{ attrs... }
 	>
 		{ children... }
@@ -188,7 +188,7 @@ templ Field(props ...Props) {
 		if p.Invalid {
 			data-invalid="true"
 		}
-		class={ utils.TwMerge(fieldClasses(p.Orientation), p.Class) }
+		class={ utils.CN(fieldClasses(p.Orientation), p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -205,7 +205,7 @@ templ Content(props ...ContentProps) {
 			id={ p.ID }
 		}
 		data-slot="field-content"
-		class={ utils.TwMerge("cn-field-content group/field-content flex flex-1 flex-col leading-snug", p.Class) }
+		class={ utils.CN("cn-field-content group/field-content flex flex-1 flex-col leading-snug", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -226,7 +226,7 @@ templ Label(props ...LabelProps) {
 		}
 		data-slot="field-label"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				// 1:1 base/ui/field.tsx FieldLabel: it composes Label, so the
 				// cn-label base string comes first, then the field-label strings.
 				"cn-label flex items-center select-none group-data-[disabled=true]:pointer-events-none peer-disabled:cursor-not-allowed",
@@ -251,7 +251,7 @@ templ Title(props ...TitleProps) {
 			id={ p.ID }
 		}
 		data-slot="field-label"
-		class={ utils.TwMerge("cn-field-title flex w-fit items-center", p.Class) }
+		class={ utils.CN("cn-field-title flex w-fit items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -268,7 +268,7 @@ templ Description(props ...DescriptionProps) {
 			id={ p.ID }
 		}
 		data-slot="field-description"
-		class={ utils.TwMerge("cn-field-description leading-normal font-normal group-has-data-horizontal/field:text-balance last:mt-0 nth-last-2:-mt-1 [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary", p.Class) }
+		class={ utils.CN("cn-field-description leading-normal font-normal group-has-data-horizontal/field:text-balance last:mt-0 nth-last-2:-mt-1 [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -285,7 +285,7 @@ templ Separator(props ...SeparatorProps) {
 			id={ p.ID }
 		}
 		data-slot="field-separator"
-		class={ utils.TwMerge("cn-field-separator relative", p.Class) }
+		class={ utils.CN("cn-field-separator relative", p.Class) }
 		{ p.Attributes... }
 	>
 		<div
@@ -313,7 +313,7 @@ templ Error(props ...ErrorProps) {
 		}
 		role="alert"
 		data-slot="field-error"
-		class={ utils.TwMerge("cn-field-error font-normal", p.Class) }
+		class={ utils.CN("cn-field-error font-normal", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

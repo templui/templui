@@ -13,7 +13,7 @@ templ breadcrumbExampleSection(title string, class string) {
 		if title != "" {
 			<div class="px-1.5 py-2 text-xs font-medium text-muted-foreground">{ title }</div>
 		}
-		<div data-slot="example-content" class={ utils.TwMerge("flex min-w-0 flex-1 flex-col items-start gap-6 rounded-xl bg-card p-12 text-foreground style-lyra:rounded-none style-sera:rounded-none *:[div:not([class*='w-'])]:w-full", class) }>
+		<div data-slot="example-content" class={ utils.CN("flex min-w-0 flex-1 flex-col items-start gap-6 rounded-xl bg-card p-12 text-foreground style-lyra:rounded-none style-sera:rounded-none *:[div:not([class*='w-'])]:w-full", class) }>
 			{ children... }
 		</div>
 	</div>

@@ -25,7 +25,7 @@ templ Kbd(props ...Props) {
 		}
 		data-slot="kbd"
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"cn-kbd pointer-events-none inline-flex items-center justify-center select-none",
 				p.Class,
 			),
@@ -46,7 +46,7 @@ templ Group(props ...GroupProps) {
 			id={ p.ID }
 		}
 		data-slot="kbd-group"
-		class={ utils.TwMerge("cn-kbd-group inline-flex items-center", p.Class) }
+		class={ utils.CN("cn-kbd-group inline-flex items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

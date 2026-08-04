@@ -90,7 +90,7 @@ templ Progress(props ...Props) {
 		aria-valuemax={ fmt.Sprintf("%d", p.Max) }
 		aria-valuenow={ fmt.Sprintf("%d", p.Value) }
 		aria-valuetext={ fmt.Sprintf("%d%%", percentage(p.Value, p.Max)) }
-		class={ utils.TwMerge("cn-progress-root flex flex-wrap gap-3", p.Class) }
+		class={ utils.CN("cn-progress-root flex flex-wrap gap-3", p.Class) }
 		{ statusAttr(p.Value, p.Max)... }
 		{ p.Attributes... }
 	>
@@ -129,7 +129,7 @@ templ Label(props ...LabelProps) {
 		data-slot="progress-label"
 		data-tui-progress-part
 		role="presentation"
-		class={ utils.TwMerge("cn-progress-label", p.Class) }
+		class={ utils.CN("cn-progress-label", p.Class) }
 		{ statusAttr(s.value, s.max)... }
 		{ p.Attributes... }
 	>
@@ -151,7 +151,7 @@ templ Value(props ...ValueProps) {
 		data-slot="progress-value"
 		data-tui-progress-part
 		aria-hidden="true"
-		class={ utils.TwMerge("cn-progress-value", p.Class) }
+		class={ utils.CN("cn-progress-value", p.Class) }
 		{ statusAttr(s.value, s.max)... }
 		{ p.Attributes... }
 	>

@@ -34,7 +34,7 @@ templ CodeFigure(p CodeFigureProps) {
 		}
 		<div
 			id={ id }
-			class={ utils.TwMerge(
+			class={ utils.CN(
 				"[&_pre]:no-scrollbar [&_pre]:min-w-0 [&_pre]:overflow-x-auto [&_pre]:overflow-y-auto [&_pre]:py-3.5 [&_pre]:outline-none",
 				utils.IfElse(p.ShowLineNumbers, "[&_pre]:px-0", "[&_pre]:px-4"),
 			) }
@@ -44,7 +44,7 @@ templ CodeFigure(p CodeFigureProps) {
 		>
 			@templ.Raw(highlighted)
 		</div>
-		<div class={ utils.TwMerge("absolute right-2 z-10", utils.IfElse(p.Title != "", "top-1.5", "top-3")) }>
+		<div class={ utils.CN("absolute right-2 z-10", utils.IfElse(p.Title != "", "top-1.5", "top-3")) }>
 			@copybutton.CopyButton(copybutton.Props{
 				TargetID: id,
 				Class:    "size-7 bg-code",

@@ -84,7 +84,7 @@ func Accordion(props ...Props) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var2 = []any{utils.CN(
 			"cn-accordion flex w-full flex-col",
 			p.Class,
 		),
@@ -190,7 +190,7 @@ func Item(props ...ItemProps) templ.Component {
 		}
 		ctx = context.WithValue(ctx, openKey, p.Open)
 		ctx = context.WithValue(ctx, disabledKey, p.Disabled)
-		var templ_7745c5c3_Var6 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var6 = []any{utils.CN(
 			"cn-accordion-item",
 			p.Class,
 		),
@@ -298,7 +298,7 @@ func Trigger(props ...TriggerProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var10 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var10 = []any{utils.CN(
 			"cn-accordion-trigger group/accordion-trigger relative flex flex-1 items-start justify-between border border-transparent transition-all outline-none aria-disabled:pointer-events-none aria-disabled:opacity-50",
 			p.Class,
 		),
@@ -480,7 +480,7 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var16 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var16 = []any{utils.CN(
 			"cn-accordion-content-inner h-(--accordion-panel-height) data-ending-style:h-0 data-starting-style:h-0 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4",
 			p.Class,
 		),

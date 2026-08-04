@@ -42,7 +42,7 @@ func Label(props ...Props) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var2 = []any{utils.CN(
 			// 1:1 base/ui/label.tsx: structure lives here, the look comes from
 			// the active style-*.css via cn-label.
 			"cn-label flex items-center select-none group-data-[disabled=true]:pointer-events-none peer-disabled:cursor-not-allowed",

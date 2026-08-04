@@ -59,7 +59,7 @@ func ComponentPreviewBlock(entry examples.RegistryEntry, attrs map[string]string
 		}
 		_, hideCode := attrs["hideCode"]
 		previewHTML, previewErr := InlinedStyleHTML(ctx, entry.Component, attrs["styleName"])
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var2 = []any{utils.CN(
 			"group relative mt-4 mb-12 flex flex-col overflow-hidden rounded-2xl border",
 			attrs["className"],
 		)}
@@ -84,7 +84,7 @@ func ComponentPreviewBlock(entry examples.RegistryEntry, attrs map[string]string
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var4 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var4 = []any{utils.CN(
 			"preview relative flex h-72 w-full justify-center p-10 data-[align=center]:items-center data-[align=end]:items-end data-[align=start]:items-start",
 			attrs["previewClassName"],
 		)}
@@ -1091,7 +1091,7 @@ func MarkdownProse() templ.Component {
 			templ_7745c5c3_Var37 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var38 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var38 = []any{utils.CN(
 			"[&_h2]:mt-12 [&_h2]:scroll-m-24 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:tracking-tight",
 			"[&_h3]:mt-8 [&_h3]:scroll-m-24 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:tracking-tight",
 			"[&_p]:leading-7 [&_p:not(:first-child)]:mt-4 [&_p]:text-sm",
@@ -1161,7 +1161,7 @@ func CalloutBlock(class ...string) templ.Component {
 		if len(class) > 0 {
 			extra = class[0]
 		}
-		var templ_7745c5c3_Var41 = []any{utils.TwMerge("mt-6 w-auto rounded-2xl border border-surface bg-surface p-4 text-sm text-surface-foreground md:-mx-1 [&_code]:border [&_p]:text-card-foreground/80 [&_p:not(:first-child)]:mt-2", extra)}
+		var templ_7745c5c3_Var41 = []any{utils.CN("mt-6 w-auto rounded-2xl border border-surface bg-surface p-4 text-sm text-surface-foreground md:-mx-1 [&_code]:border [&_p]:text-card-foreground/80 [&_p:not(:first-child)]:mt-2", extra)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var41...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

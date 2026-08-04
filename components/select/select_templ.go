@@ -225,7 +225,7 @@ func Trigger(props ...TriggerProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		var templ_7745c5c3_Var5 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var5 = []any{utils.CN(
 			// 1:1 base/ui/select.tsx SelectTrigger, the look comes from
 			// cn-select-trigger.
 			"cn-select-trigger flex w-fit items-center justify-between whitespace-nowrap outline-none disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center [&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -367,7 +367,7 @@ func Value(props ...ValueProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var11 = []any{utils.TwMerge("cn-select-value", p.Class)}
+		var templ_7745c5c3_Var11 = []any{utils.CN("cn-select-value", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -502,7 +502,7 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var19 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var19 = []any{utils.CN(
 			// 1:1 base/ui/select.tsx SelectContent, the look comes from
 			// cn-select-content (animations key on our data-state attribute).
 			// The --available-height/--anchor-width/--transform-origin
@@ -612,7 +612,7 @@ func Group(props ...GroupProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var22 = []any{utils.TwMerge("cn-select-group", p.Class)}
+		var templ_7745c5c3_Var22 = []any{utils.CN("cn-select-group", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var22...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -702,7 +702,7 @@ func Label(props ...LabelProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var26 = []any{utils.TwMerge("cn-select-label", p.Class)}
+		var templ_7745c5c3_Var26 = []any{utils.CN("cn-select-label", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var26...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -794,7 +794,7 @@ func Item(props ...ItemProps) templ.Component {
 		}
 		s := state(ctx)
 		selected := p.Selected || (s.value != "" && s.value == p.Value)
-		var templ_7745c5c3_Var30 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var30 = []any{utils.CN(
 			// 1:1 base/ui/select.tsx SelectItem, the look comes from
 			// cn-select-item (items highlight via real focus, our JS moves focus
 			// to the item under the pointer like Base UI).
@@ -955,7 +955,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var36 = []any{utils.TwMerge("cn-select-separator pointer-events-none", p.Class)}
+		var templ_7745c5c3_Var36 = []any{utils.CN("cn-select-separator pointer-events-none", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var36...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

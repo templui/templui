@@ -166,7 +166,7 @@ type SubContentProps struct {
 // 1:1 base/ui/dropdown-menu.tsx DropdownMenuItem, the look comes from
 // cn-dropdown-menu-item; the inset padding keys on the data-inset attribute.
 func itemClasses(disabled bool) string {
-	return utils.TwMerge(
+	return utils.CN(
 		"cn-dropdown-menu-item group/dropdown-menu-item relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 		// Native <a>/<button> wiring instead of Base UI's div items.
 		"w-full text-left",
@@ -177,7 +177,7 @@ func itemClasses(disabled bool) string {
 // 1:1 base/ui/dropdown-menu.tsx DropdownMenuCheckboxItem/RadioItem, cnClass is
 // cn-dropdown-menu-checkbox-item or cn-dropdown-menu-radio-item.
 func checkItemClasses(cnClass string, disabled bool) string {
-	return utils.TwMerge(
+	return utils.CN(
 		cnClass+" relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 		// Native <button> wiring: Base UI unmounts the indicator when unchecked,
 		// our indicator toggles on the checked state via the group instead.
@@ -328,7 +328,7 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var8 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var8 = []any{utils.CN(
 			// 1:1 base/ui/dropdown-menu.tsx DropdownMenuContent, the look comes
 			// from cn-dropdown-menu-content (animations key on our data-state
 			// attribute). The --available-height/--anchor-width/--transform-origin
@@ -406,7 +406,7 @@ func Group(props ...GroupProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var11 = []any{utils.TwMerge("", p.Class)}
+		var templ_7745c5c3_Var11 = []any{utils.CN("", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -496,7 +496,7 @@ func Label(props ...LabelProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var15 = []any{utils.TwMerge("cn-dropdown-menu-label", p.Class)}
+		var templ_7745c5c3_Var15 = []any{utils.CN("cn-dropdown-menu-label", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var15...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -600,7 +600,7 @@ func Item(props ...ItemProps) templ.Component {
 			p.Variant = ItemVariantDefault
 		}
 		if p.Href != "" {
-			var templ_7745c5c3_Var19 = []any{utils.TwMerge(itemClasses(p.Disabled), p.Class)}
+			var templ_7745c5c3_Var19 = []any{utils.CN(itemClasses(p.Disabled), p.Class)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var19...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -737,7 +737,7 @@ func Item(props ...ItemProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			var templ_7745c5c3_Var25 = []any{utils.TwMerge(itemClasses(p.Disabled), p.Class)}
+			var templ_7745c5c3_Var25 = []any{utils.CN(itemClasses(p.Disabled), p.Class)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var25...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -867,7 +867,7 @@ func CheckboxItem(props ...CheckboxItemProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var30 = []any{utils.TwMerge(checkItemClasses("cn-dropdown-menu-checkbox-item", p.Disabled), p.Class)}
+		var templ_7745c5c3_Var30 = []any{utils.CN(checkItemClasses("cn-dropdown-menu-checkbox-item", p.Disabled), p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var30...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -986,7 +986,7 @@ func RadioGroup(props ...RadioGroupProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var34 = []any{utils.TwMerge("", p.Class)}
+		var templ_7745c5c3_Var34 = []any{utils.CN("", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var34...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1076,7 +1076,7 @@ func RadioItem(props ...RadioItemProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var38 = []any{utils.TwMerge(checkItemClasses("cn-dropdown-menu-radio-item", p.Disabled), p.Class)}
+		var templ_7745c5c3_Var38 = []any{utils.CN(checkItemClasses("cn-dropdown-menu-radio-item", p.Disabled), p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var38...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1218,7 +1218,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var43 = []any{utils.TwMerge("cn-dropdown-menu-separator", p.Class)}
+		var templ_7745c5c3_Var43 = []any{utils.CN("cn-dropdown-menu-separator", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var43...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1300,7 +1300,7 @@ func Shortcut(props ...ShortcutProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var47 = []any{utils.TwMerge("cn-dropdown-menu-shortcut", p.Class)}
+		var templ_7745c5c3_Var47 = []any{utils.CN("cn-dropdown-menu-shortcut", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var47...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1390,7 +1390,7 @@ func Sub(props ...SubProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var51 = []any{utils.TwMerge("", p.Class)}
+		var templ_7745c5c3_Var51 = []any{utils.CN("", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var51...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1480,7 +1480,7 @@ func SubTrigger(props ...SubTriggerProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var55 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var55 = []any{utils.CN(
 			// 1:1 base/ui/dropdown-menu.tsx DropdownMenuSubTrigger, the look comes
 			// from cn-dropdown-menu-sub-trigger. Base UI keys the open highlight on
 			// data-popup-open, our JS sets data-state=open, which the data-open
@@ -1594,7 +1594,7 @@ func SubContent(props ...SubContentProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var59 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var59 = []any{utils.CN(
 			// 1:1 base/ui/dropdown-menu.tsx DropdownMenuSubContent: the sub content
 			// is the content plus cn-dropdown-menu-sub-content and w-auto, the look
 			// comes from the cn classes (animations key on our data-state attribute).

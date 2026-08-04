@@ -34,7 +34,7 @@ func chartTooltipIndicator(indicator string, nestLabel bool) string {
 templ chartTooltipBox(label string, hideLabel bool, indicator string, class string, payload []chartTooltipItem) {
 	{{ nestLabel := len(payload) == 1 && indicator != "dot" }}
 	<div
-		class={ utils.TwMerge(
+		class={ utils.CN(
 			"grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl transition-all ease-in-out hover:-translate-y-0.5",
 			class,
 		) }

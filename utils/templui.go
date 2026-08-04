@@ -13,7 +13,7 @@ import (
 	twmerge "github.com/Oudwins/tailwind-merge-go"
 )
 
-// TwMerge combines Tailwind classes and resolves conflicts.
+// CN combines Tailwind classes and resolves conflicts (definition below).
 // Example: "bg-red-500 hover:bg-blue-500", "bg-green-500" → "hover:bg-blue-500 bg-green-500"
 // tailwind-merge-go does not understand two pieces of Tailwind v4 syntax yet,
 // so conflicts against such classes were never resolved:
@@ -116,14 +116,52 @@ func twReorder(input, merged string) string {
 	return strings.Join(ordered, " ")
 }
 
-func TwMerge(classes ...string) string {
-	merged := make([]string, len(classes))
-	for i, c := range classes {
+// CN is the cn() pendant of shadcn's lib/utils, twMerge(clsx(...inputs)):
+// it flattens clsx-style inputs - strings, string slices, nested []any and
+// map[string]bool conditionals (false and empty values drop out) - then
+// resolves Tailwind conflicts with the last class winning, in input order.
+func CN(classes ...any) string {
+	flat := flattenClasses(classes)
+	merged := make([]string, len(flat))
+	for i, c := range flat {
 		merged[i] = twMapTokens(twV4Var.ReplaceAllString(c, "-[var($1)]"), twImportantToV3)
 	}
 	input := strings.Join(merged, " ")
 	out := twMapTokens(twReorder(input, twmerge.Merge(merged...)), twImportantToV4)
 	return twV3Var.ReplaceAllString(out, "-($1)")
+}
+
+// flattenClasses is the clsx flattening: the object form is sorted for a
+// stable output because Go maps have no iteration order.
+func flattenClasses(values []any) []string {
+	var out []string
+	for _, v := range values {
+		switch t := v.(type) {
+		case nil:
+		case string:
+			if t != "" {
+				out = append(out, t)
+			}
+		case []string:
+			for _, c := range t {
+				if c != "" {
+					out = append(out, c)
+				}
+			}
+		case []any:
+			out = append(out, flattenClasses(t)...)
+		case map[string]bool:
+			keys := make([]string, 0, len(t))
+			for c, on := range t {
+				if on && c != "" {
+					keys = append(keys, c)
+				}
+			}
+			slices.Sort(keys)
+			out = append(out, keys...)
+		}
+	}
+	return out
 }
 
 // If returns value if condition is true, otherwise the zero value of T.

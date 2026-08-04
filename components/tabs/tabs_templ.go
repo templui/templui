@@ -94,7 +94,7 @@ func Tabs(props ...Props) templ.Component {
 		if p.Orientation == "" {
 			p.Orientation = OrientationHorizontal
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("cn-tabs group/tabs flex data-horizontal:flex-col", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.CN("cn-tabs group/tabs flex data-horizontal:flex-col", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -229,7 +229,7 @@ func List(props ...ListProps) templ.Component {
 			p = props[0]
 		}
 		tabsID := IDFromContext(ctx)
-		var templ_7745c5c3_Var8 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var8 = []any{utils.CN(
 			"cn-tabs-list group/tabs-list inline-flex w-fit items-center justify-center text-muted-foreground group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col",
 			listVariantClasses(p.Variant),
 			p.Class,
@@ -360,7 +360,7 @@ func Trigger(props ...TriggerProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		var templ_7745c5c3_Var14 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var14 = []any{utils.CN(
 			"cn-tabs-trigger relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center whitespace-nowrap text-foreground/60 transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-muted-foreground dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0",
 			"group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent",
 			"data-active:bg-background data-active:text-foreground dark:data-active:border-input dark:data-active:bg-input/30 dark:data-active:text-foreground",
@@ -518,7 +518,7 @@ func Content(props ...ContentProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		var templ_7745c5c3_Var21 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var21 = []any{utils.CN(
 			"cn-tabs-content flex-1 outline-none",
 			utils.If(!tabsIsActive(ctx, p.Value), "hidden"),
 			p.Class,

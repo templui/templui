@@ -89,7 +89,7 @@ templ ThemeSwitcher(props ...ThemeSwitcherProps) {
 	@button.Button(button.Props{
 		Size:    button.SizeIcon,
 		Variant: p.Variant,
-		Class:   utils.TwMerge("group/toggle extend-touch-target size-8", p.Class),
+		Class:   utils.CN("group/toggle extend-touch-target size-8", p.Class),
 		Attributes: templ.Attributes{
 			"data-theme-switcher": "true",
 		},

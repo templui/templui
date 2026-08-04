@@ -40,7 +40,7 @@ templ Separator(props ...Props) {
 		role="separator"
 		aria-orientation={ string(p.Orientation) }
 		class={
-			utils.TwMerge(
+			utils.CN(
 				"shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch",
 				p.Class,
 			),

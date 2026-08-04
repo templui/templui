@@ -136,7 +136,7 @@ func Command(props ...Props) templ.Component {
 			p.ID = utils.RandomID()
 		}
 		ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID})
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge("cn-command flex size-full flex-col overflow-hidden", p.Class)}
+		var templ_7745c5c3_Var2 = []any{utils.CN("cn-command flex size-full flex-col overflow-hidden", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -374,7 +374,7 @@ func Dialog(props ...DialogProps) templ.Component {
 				return nil
 			})
 			templ_7745c5c3_Err = dialog.Content(dialog.ContentProps{
-				Class:           utils.TwMerge("cn-command-dialog top-1/3 translate-y-0 overflow-hidden p-0", p.Class),
+				Class:           utils.CN("cn-command-dialog top-1/3 translate-y-0 overflow-hidden p-0", p.Class),
 				HideCloseButton: !p.ShowCloseButton,
 			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var15), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
@@ -439,7 +439,7 @@ func Input(props ...InputProps) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var18 = []any{utils.TwMerge("cn-command-input outline-hidden disabled:cursor-not-allowed disabled:opacity-50", p.Class)}
+			var templ_7745c5c3_Var18 = []any{utils.CN("cn-command-input outline-hidden disabled:cursor-not-allowed disabled:opacity-50", p.Class)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var18...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -602,7 +602,7 @@ func List(props ...ListProps) templ.Component {
 			p.Label = "Suggestions"
 		}
 		s := state(ctx)
-		var templ_7745c5c3_Var26 = []any{utils.TwMerge("cn-command-list overflow-x-hidden overflow-y-auto", p.Class)}
+		var templ_7745c5c3_Var26 = []any{utils.CN("cn-command-list overflow-x-hidden overflow-y-auto", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var26...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -697,7 +697,7 @@ func Empty(props ...EmptyProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var31 = []any{utils.TwMerge("cn-command-empty", p.Class)}
+		var templ_7745c5c3_Var31 = []any{utils.CN("cn-command-empty", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var31...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -767,7 +767,7 @@ func Group(props ...GroupProps) templ.Component {
 		if p.ID == "" {
 			p.ID = utils.RandomID()
 		}
-		var templ_7745c5c3_Var34 = []any{utils.TwMerge("cn-command-group", p.Class)}
+		var templ_7745c5c3_Var34 = []any{utils.CN("cn-command-group", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var34...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -929,7 +929,7 @@ func Item(props ...ItemProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var42 = []any{utils.TwMerge("cn-command-item group/command-item data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0", p.Class)}
+		var templ_7745c5c3_Var42 = []any{utils.CN("cn-command-item group/command-item data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var42...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1072,7 +1072,7 @@ func Shortcut(props ...ShortcutProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var49 = []any{utils.TwMerge("cn-command-shortcut", p.Class)}
+		var templ_7745c5c3_Var49 = []any{utils.CN("cn-command-shortcut", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var49...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1141,7 +1141,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var52 = []any{utils.TwMerge("cn-command-separator", p.Class)}
+		var templ_7745c5c3_Var52 = []any{utils.CN("cn-command-separator", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var52...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

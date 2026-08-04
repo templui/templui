@@ -150,7 +150,7 @@ type SubContentProps struct {
 // 1:1 base/ui/context-menu.tsx ContextMenuItem, the look comes from
 // cn-context-menu-item; the inset padding keys on the data-inset attribute.
 func itemClasses(disabled bool) string {
-	return utils.TwMerge(
+	return utils.CN(
 		"cn-context-menu-item group/context-menu-item relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 		// Native <a>/<button> wiring instead of Base UI's div items.
 		"w-full text-left",
@@ -161,7 +161,7 @@ func itemClasses(disabled bool) string {
 // 1:1 base/ui/context-menu.tsx ContextMenuCheckboxItem/RadioItem, cnClass is
 // cn-context-menu-checkbox-item or cn-context-menu-radio-item.
 func checkItemClasses(cnClass string, disabled bool) string {
-	return utils.TwMerge(
+	return utils.CN(
 		cnClass+" relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 		// Native <button> wiring: Base UI unmounts the indicator when unchecked,
 		// our indicator toggles on the checked state via the group instead.
@@ -240,7 +240,7 @@ func Trigger(props ...TriggerProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var3 = []any{utils.TwMerge("cn-context-menu-trigger select-none", p.Class)}
+		var templ_7745c5c3_Var3 = []any{utils.CN("cn-context-menu-trigger select-none", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var3...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -405,7 +405,7 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var12 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var12 = []any{utils.CN(
 			contentClasses,
 			// JS wiring: the positioner wrapper is pointer-events-none, and the
 			// popup stays mounted after animate-out until hidePopover runs.
@@ -486,7 +486,7 @@ func Item(props ...ItemProps) templ.Component {
 			p.Variant = ItemVariantDefault
 		}
 		if p.Href != "" {
-			var templ_7745c5c3_Var15 = []any{utils.TwMerge(itemClasses(p.Disabled), p.Class)}
+			var templ_7745c5c3_Var15 = []any{utils.CN(itemClasses(p.Disabled), p.Class)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var15...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -613,7 +613,7 @@ func Item(props ...ItemProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			var templ_7745c5c3_Var21 = []any{utils.TwMerge(itemClasses(p.Disabled), p.Class)}
+			var templ_7745c5c3_Var21 = []any{utils.CN(itemClasses(p.Disabled), p.Class)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var21...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -736,7 +736,7 @@ func CheckboxItem(props ...CheckboxItemProps) templ.Component {
 		if p.ID == "" {
 			p.ID = utils.RandomID()
 		}
-		var templ_7745c5c3_Var26 = []any{utils.TwMerge(checkItemClasses("cn-context-menu-checkbox-item", p.Disabled), p.Class)}
+		var templ_7745c5c3_Var26 = []any{utils.CN(checkItemClasses("cn-context-menu-checkbox-item", p.Disabled), p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var26...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -845,7 +845,7 @@ func RadioGroup(props ...RadioGroupProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var30 = []any{utils.TwMerge("", p.Class)}
+		var templ_7745c5c3_Var30 = []any{utils.CN("", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var30...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -938,7 +938,7 @@ func RadioItem(props ...RadioItemProps) templ.Component {
 		if p.ID == "" {
 			p.ID = utils.RandomID()
 		}
-		var templ_7745c5c3_Var34 = []any{utils.TwMerge(checkItemClasses("cn-context-menu-radio-item", p.Disabled), p.Class)}
+		var templ_7745c5c3_Var34 = []any{utils.CN(checkItemClasses("cn-context-menu-radio-item", p.Disabled), p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var34...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1070,7 +1070,7 @@ func Group(props ...GroupProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var39 = []any{utils.TwMerge("", p.Class)}
+		var templ_7745c5c3_Var39 = []any{utils.CN("", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var39...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1160,7 +1160,7 @@ func Label(props ...LabelProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var43 = []any{utils.TwMerge("cn-context-menu-label", p.Class)}
+		var templ_7745c5c3_Var43 = []any{utils.CN("cn-context-menu-label", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var43...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1260,7 +1260,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var47 = []any{utils.TwMerge("cn-context-menu-separator", p.Class)}
+		var templ_7745c5c3_Var47 = []any{utils.CN("cn-context-menu-separator", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var47...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1342,7 +1342,7 @@ func Shortcut(props ...ShortcutProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var51 = []any{utils.TwMerge("cn-context-menu-shortcut", p.Class)}
+		var templ_7745c5c3_Var51 = []any{utils.CN("cn-context-menu-shortcut", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var51...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1432,7 +1432,7 @@ func Sub(props ...SubProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var55 = []any{utils.TwMerge("", p.Class)}
+		var templ_7745c5c3_Var55 = []any{utils.CN("", p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var55...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1522,7 +1522,7 @@ func SubTrigger(props ...SubTriggerProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var59 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var59 = []any{utils.CN(
 			// 1:1 base/ui/context-menu.tsx ContextMenuSubTrigger, the look comes
 			// from cn-context-menu-sub-trigger (the open highlight keys on our
 			// data-state attribute via the data-open variants inside the cn class).
@@ -1635,7 +1635,7 @@ func SubContent(props ...SubContentProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		var templ_7745c5c3_Var63 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var63 = []any{utils.CN(
 			// 1:1 base/ui/context-menu.tsx ContextMenuSubContent: the sub content
 			// is the content plus cn-context-menu-subcontent, the look comes from
 			// the cn classes (animations key on our data-state attribute). max-h

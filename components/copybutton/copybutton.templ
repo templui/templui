@@ -24,7 +24,7 @@ templ CopyButton(props Props) {
 	>
 		@button.Button(button.Props{
 			ID:         p.ID,
-			Class:      utils.TwMerge("h-7 w-7 text-muted-foreground hover:text-accent-foreground", p.Class),
+			Class:      utils.CN("h-7 w-7 text-muted-foreground hover:text-accent-foreground", p.Class),
 			Attributes: p.Attrs,
 			Size:       button.SizeIcon,
 			Variant:    button.VariantGhost,

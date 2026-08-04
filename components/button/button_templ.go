@@ -92,7 +92,7 @@ func Button(props ...Props) templ.Component {
 			p.Size = SizeDefault
 		}
 		if p.Href != "" && !p.Disabled {
-			var templ_7745c5c3_Var2 = []any{utils.TwMerge(baseClasses, p.variantClasses(), p.sizeClasses(), p.Class)}
+			var templ_7745c5c3_Var2 = []any{utils.CN(baseClasses, p.variantClasses(), p.sizeClasses(), p.Class)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -196,7 +196,7 @@ func Button(props ...Props) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			var templ_7745c5c3_Var7 = []any{utils.TwMerge(baseClasses, p.variantClasses(), p.sizeClasses(), p.Class)}
+			var templ_7745c5c3_Var7 = []any{utils.CN(baseClasses, p.variantClasses(), p.sizeClasses(), p.Class)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var7...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

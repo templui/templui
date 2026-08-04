@@ -154,7 +154,7 @@ func Calendar(props ...Props) templ.Component {
 		if months < 1 {
 			months = 1
 		}
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var2 = []any{utils.CN(
 			// 1:1 base/ui/calendar.tsx className + classNames.root. The rtl
 			// chevron flip lives on the icons as cn-rtl-flip (the tsx's extra
 			// rtl:**:[.rdp-button_next>svg] selectors target rdp-* classes our

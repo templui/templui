@@ -89,7 +89,7 @@ func ToggleGroup(props ...Props) templ.Component {
 			spacing = *p.Spacing
 		}
 		ctx = toggle.WithGroupDefaults(ctx, p.Variant, p.Size, spacing)
-		var templ_7745c5c3_Var2 = []any{utils.TwMerge(
+		var templ_7745c5c3_Var2 = []any{utils.CN(
 			"cn-toggle-group group/toggle-group flex w-fit flex-row items-center gap-[--spacing(var(--gap))] data-vertical:flex-col data-vertical:items-stretch",
 			p.Class,
 		),

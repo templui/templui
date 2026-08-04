@@ -94,7 +94,7 @@ type SeparatorProps struct {
 // active style-*.css via the cn-item-* classes.
 func itemClasses(variant Variant, size Size) string {
 	base := "cn-item group/item flex w-full flex-wrap items-center transition-colors duration-100 outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 [a]:transition-colors"
-	return utils.TwMerge(base, variantClasses(variant), sizeClasses(size))
+	return utils.CN(base, variantClasses(variant), sizeClasses(size))
 }
 
 func variantClasses(variant Variant) string {
@@ -137,7 +137,7 @@ templ Group(props ...GroupProps) {
 		{{ p = props[0] }}
 	}
 	{{ class := "cn-item-group group/item-group flex w-full flex-col" }}
-	{{ class = utils.TwMerge(class, p.Class) }}
+	{{ class = utils.CN(class, p.Class) }}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
@@ -174,7 +174,7 @@ templ Item(props ...Props) {
 			data-slot="item"
 			data-variant={ string(p.Variant) }
 			data-size={ string(p.Size) }
-			class={ utils.TwMerge(itemClasses(p.Variant, p.Size), p.Class) }
+			class={ utils.CN(itemClasses(p.Variant, p.Size), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -187,7 +187,7 @@ templ Item(props ...Props) {
 			data-slot="item"
 			data-variant={ string(p.Variant) }
 			data-size={ string(p.Size) }
-			class={ utils.TwMerge(itemClasses(p.Variant, p.Size), p.Class) }
+			class={ utils.CN(itemClasses(p.Variant, p.Size), p.Class) }
 			{ p.Attributes... }
 		>
 			{ children... }
@@ -204,7 +204,7 @@ templ Media(props ...MediaProps) {
 		{{ p.Variant = MediaVariantDefault }}
 	}
 	{{ class := mediaClasses(p.Variant) }}
-	{{ class = utils.TwMerge(class, p.Class) }}
+	{{ class = utils.CN(class, p.Class) }}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
@@ -224,7 +224,7 @@ templ Content(props ...ContentProps) {
 		{{ p = props[0] }}
 	}
 	{{ class := "cn-item-content flex flex-1 flex-col [&+[data-slot=item-content]]:flex-none" }}
-	{{ class = utils.TwMerge(class, p.Class) }}
+	{{ class = utils.CN(class, p.Class) }}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
@@ -247,7 +247,7 @@ templ Title(props ...TitleProps) {
 			id={ p.ID }
 		}
 		data-slot="item-title"
-		class={ utils.TwMerge("cn-item-title line-clamp-1 flex w-fit items-center", p.Class) }
+		class={ utils.CN("cn-item-title line-clamp-1 flex w-fit items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -260,7 +260,7 @@ templ Description(props ...DescriptionProps) {
 		{{ p = props[0] }}
 	}
 	{{ class := "cn-item-description line-clamp-2 font-normal [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary" }}
-	{{ class = utils.TwMerge(class, p.Class) }}
+	{{ class = utils.CN(class, p.Class) }}
 	<p
 		if p.ID != "" {
 			id={ p.ID }
@@ -283,7 +283,7 @@ templ Actions(props ...ActionsProps) {
 			id={ p.ID }
 		}
 		data-slot="item-actions"
-		class={ utils.TwMerge("cn-item-actions flex items-center", p.Class) }
+		class={ utils.CN("cn-item-actions flex items-center", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -300,7 +300,7 @@ templ Header(props ...HeaderProps) {
 			id={ p.ID }
 		}
 		data-slot="item-header"
-		class={ utils.TwMerge("cn-item-header flex basis-full items-center justify-between", p.Class) }
+		class={ utils.CN("cn-item-header flex basis-full items-center justify-between", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -317,7 +317,7 @@ templ Footer(props ...FooterProps) {
 			id={ p.ID }
 		}
 		data-slot="item-footer"
-		class={ utils.TwMerge("cn-item-footer flex basis-full items-center justify-between", p.Class) }
+		class={ utils.CN("cn-item-footer flex basis-full items-center justify-between", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -338,7 +338,7 @@ templ Separator(props ...SeparatorProps) {
 		data-horizontal
 		role="separator"
 		aria-orientation="horizontal"
-		class={ utils.TwMerge("shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch", "cn-item-separator", p.Class) }
+		class={ utils.CN("shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch", "cn-item-separator", p.Class) }
 		{ p.Attributes... }
 	></div>
 }

@@ -23,7 +23,7 @@ templ AspectRatio(props ...Props) {
 		if p.Ratio != "" {
 			style={ "--ratio: " + p.Ratio }
 		}
-		class={ utils.TwMerge("relative aspect-(--ratio)", p.Class) }
+		class={ utils.CN("relative aspect-(--ratio)", p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

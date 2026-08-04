@@ -56,7 +56,7 @@ func Spinner(props ...Props) templ.Component {
 			attrs[k] = v
 		}
 		templ_7745c5c3_Err = icon.LoaderCircle(icon.Props{
-			Class:      utils.TwMerge("size-4 animate-spin", p.Class),
+			Class:      utils.CN("size-4 animate-spin", p.Class),
 			Attributes: attrs,
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
