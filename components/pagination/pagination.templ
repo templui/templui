@@ -39,7 +39,7 @@ type PreviousProps struct {
 	Attributes templ.Attributes
 	Href       string
 	Disabled   bool
-	Label      string
+	Text      string
 }
 
 type NextProps struct {
@@ -48,7 +48,7 @@ type NextProps struct {
 	Attributes templ.Attributes
 	Href       string
 	Disabled   bool
-	Label      string
+	Text      string
 }
 
 templ Pagination(props ...Props) {
@@ -151,8 +151,8 @@ templ Previous(props ...PreviousProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	if p.Label == "" {
-		{{ p.Label = "Previous" }}
+	if p.Text == "" {
+		{{ p.Text = "Previous" }}
 	}
 	{{
 		attrs := templ.Attributes{"aria-label": "Go to previous page", "data-slot": "pagination-link"}
@@ -169,7 +169,7 @@ templ Previous(props ...PreviousProps) {
 		Attributes: attrs,
 	}) {
 		@icon.ChevronLeft(icon.Props{Class: "cn-rtl-flip", Attributes: templ.Attributes{"data-icon": "inline-start"}})
-		<span class="cn-pagination-previous-text hidden sm:block">{ p.Label }</span>
+		<span class="cn-pagination-previous-text hidden sm:block">{ p.Text }</span>
 	}
 }
 
@@ -178,8 +178,8 @@ templ Next(props ...NextProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	if p.Label == "" {
-		{{ p.Label = "Next" }}
+	if p.Text == "" {
+		{{ p.Text = "Next" }}
 	}
 	{{
 		attrs := templ.Attributes{"aria-label": "Go to next page", "data-slot": "pagination-link"}
@@ -195,7 +195,7 @@ templ Next(props ...NextProps) {
 		Class:      utils.CN("cn-pagination-next", p.Class),
 		Attributes: attrs,
 	}) {
-		<span class="cn-pagination-next-text hidden sm:block">{ p.Label }</span>
+		<span class="cn-pagination-next-text hidden sm:block">{ p.Text }</span>
 		@icon.ChevronRight(icon.Props{Class: "cn-rtl-flip", Attributes: templ.Attributes{"data-icon": "inline-end"}})
 	}
 }

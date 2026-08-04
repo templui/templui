@@ -142,7 +142,7 @@ The `pagination.Previous` component links to the previous page.
 | Prop       | Type     | Default    |
 | ---------- | -------- | ---------- |
 | `Href`     | `string` | -          |
-| `Label`    | `string` | `Previous` |
+| `Text`    | `string` | `Previous` |
 | `Disabled` | `bool`   | `false`    |
 | `Class`    | `string` | -          |
 
@@ -153,7 +153,7 @@ The `pagination.Next` component links to the next page.
 | Prop       | Type     | Default |
 | ---------- | -------- | ------- |
 | `Href`     | `string` | -       |
-| `Label`    | `string` | `Next`  |
+| `Text`    | `string` | `Next`  |
 | `Disabled` | `bool`   | `false` |
 | `Class`    | `string` | -       |
 

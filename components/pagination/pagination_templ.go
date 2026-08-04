@@ -47,7 +47,7 @@ type PreviousProps struct {
 	Attributes templ.Attributes
 	Href       string
 	Disabled   bool
-	Label      string
+	Text       string
 }
 
 type NextProps struct {
@@ -56,7 +56,7 @@ type NextProps struct {
 	Attributes templ.Attributes
 	Href       string
 	Disabled   bool
-	Label      string
+	Text       string
 }
 
 func Pagination(props ...Props) templ.Component {
@@ -458,8 +458,8 @@ func Previous(props ...PreviousProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		if p.Label == "" {
-			p.Label = "Previous"
+		if p.Text == "" {
+			p.Text = "Previous"
 		}
 		attrs := templ.Attributes{"aria-label": "Go to previous page", "data-slot": "pagination-link"}
 		for k, v := range p.Attributes {
@@ -486,9 +486,9 @@ func Previous(props ...PreviousProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var18 string
-			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(p.Label)
+			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(p.Text)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/pagination/pagination.templ`, Line: 172, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/pagination/pagination.templ`, Line: 172, Col: 68}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
@@ -540,8 +540,8 @@ func Next(props ...NextProps) templ.Component {
 		if len(props) > 0 {
 			p = props[0]
 		}
-		if p.Label == "" {
-			p.Label = "Next"
+		if p.Text == "" {
+			p.Text = "Next"
 		}
 		attrs := templ.Attributes{"aria-label": "Go to next page", "data-slot": "pagination-link"}
 		for k, v := range p.Attributes {
@@ -564,9 +564,9 @@ func Next(props ...NextProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var21 string
-			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(p.Label)
+			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(p.Text)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/pagination/pagination.templ`, Line: 198, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/pagination/pagination.templ`, Line: 198, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
