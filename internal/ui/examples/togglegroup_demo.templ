@@ -8,7 +8,7 @@ import (
 templ ToggleGroupDemo() {
 	@togglegroup.ToggleGroup(togglegroup.Props{
 		Variant: togglegroup.VariantOutline,
-		Type:    togglegroup.TypeMultiple,
+		ToggleMultiple: true,
 	}) {
 		@togglegroup.Item(togglegroup.ItemProps{
 			Value:      "bold",

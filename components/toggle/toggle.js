@@ -14,7 +14,7 @@
 
     const group = toggle.closest("[data-tui-toggle-group]");
 
-    if (group && group.getAttribute("data-type") === "single") {
+    if (group && !group.hasAttribute("data-toggle-multiple")) {
       const wasOn = isOn(toggle);
       group
         .querySelectorAll("[data-tui-toggle]")

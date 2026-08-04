@@ -7,13 +7,7 @@ import (
 	"github.com/templui/templui/utils"
 )
 
-type Type string
 type Orientation string
-
-const (
-	TypeSingle   Type = "single"
-	TypeMultiple Type = "multiple"
-)
 
 const (
 	OrientationHorizontal Orientation = "horizontal"
@@ -36,7 +30,8 @@ type Props struct {
 	ID          string
 	Class       string
 	Attributes  templ.Attributes
-	Type        Type
+	// ToggleMultiple allows multiple pressed items (Base UI toggleMultiple).
+	ToggleMultiple bool
 	Variant     Variant
 	Size        Size
 	Orientation Orientation
@@ -49,9 +44,6 @@ templ ToggleGroup(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
-	}
-	if p.Type == "" {
-		{{ p.Type = TypeSingle }}
 	}
 	if p.Orientation == "" {
 		{{ p.Orientation = OrientationHorizontal }}
@@ -68,7 +60,7 @@ templ ToggleGroup(props ...Props) {
 		role="group"
 		data-slot="toggle-group"
 		data-tui-toggle-group
-		data-type={ string(p.Type) }
+		data-toggle-multiple?={ p.ToggleMultiple }
 		if p.Variant != "" {
 			data-variant={ string(p.Variant) }
 		}

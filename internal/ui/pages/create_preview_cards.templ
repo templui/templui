@@ -102,7 +102,7 @@ templ cardUpcomingPayments() {
 		@card.Content(card.ContentProps{Class: "flex flex-col gap-4"}) {
 			@item.Item(item.Props{Variant: item.VariantOutline, Class: "justify-center"}) {
 				// The source preselects today: React.useState(new Date()).
-				@calendar.Calendar(calendar.Props{Value: time.Now(), Class: "w-full [--cell-size:--spacing(8)] md:[--cell-size:--spacing(10)]"})
+				@calendar.Calendar(calendar.Props{Selected: time.Now(), Class: "w-full [--cell-size:--spacing(8)] md:[--cell-size:--spacing(10)]"})
 			}
 			@item.Group(item.GroupProps{Class: "w-full"}) {
 				@upcomingPayment("Netflix Subscription", "Apr 15, 2024", "$19.99")
@@ -701,8 +701,7 @@ templ cardKitchenIsland() {
 			<div class="flex flex-col gap-2">
 				<span class="sr-only">Scenes</span>
 				@togglegroup.ToggleGroup(togglegroup.Props{
-					Type:    togglegroup.TypeSingle,
-					Variant: togglegroup.VariantOutline,
+										Variant: togglegroup.VariantOutline,
 					Spacing: utils.Ptr(1),
 					Class:   "flex-wrap",
 				}) {
@@ -1280,8 +1279,7 @@ templ cardReleaseCatalog() {
 					@inputgroup.Input(inputgroup.InputProps{Placeholder: "Search holdings or tickers..."})
 				}
 				@togglegroup.ToggleGroup(togglegroup.Props{
-					Type:    togglegroup.TypeSingle,
-					Variant: togglegroup.VariantOutline,
+										Variant: togglegroup.VariantOutline,
 					Spacing: utils.Ptr(1),
 				}) {
 					@togglegroup.Item(togglegroup.ItemProps{Value: "stocks"}) {
@@ -1793,8 +1791,7 @@ templ cardRollerShades() {
 		}
 		@card.Footer() {
 			@togglegroup.ToggleGroup(togglegroup.Props{
-				Type:    togglegroup.TypeSingle,
-				Variant: togglegroup.VariantOutline,
+								Variant: togglegroup.VariantOutline,
 				Spacing: utils.Ptr(1),
 				Class:   "w-full",
 			}) {
@@ -3330,7 +3327,7 @@ templ cardInviteTeam() {
 							@selectcomp.Trigger(selectcomp.TriggerProps{Class: "w-24"}) {
 								@selectcomp.Value()
 							}
-							@selectcomp.Content(selectcomp.ContentProps{Position: selectcomp.PositionPopper, Align: selectcomp.AlignEnd}) {
+							@selectcomp.Content(selectcomp.ContentProps{DisableAlignItemWithTrigger: true, Align: selectcomp.AlignEnd}) {
 								@selectcomp.Group() {
 									@selectcomp.Item(selectcomp.ItemProps{Value: "admin", Selected: invite.role == "admin"}) {
 										Admin
@@ -3804,7 +3801,7 @@ templ cardBookAppointment() {
 					@field.Label() {
 						Available on March 18, 2026
 					}
-					@togglegroup.ToggleGroup(togglegroup.Props{Type: togglegroup.TypeSingle, Spacing: utils.Ptr(2)}) {
+					@togglegroup.ToggleGroup(togglegroup.Props{Spacing: utils.Ptr(2)}) {
 						for i, slot := range appointmentSlots {
 							@togglegroup.Item(togglegroup.ItemProps{Value: fmt.Sprintf("slot-%d", i), Pressed: i == 0}) {
 								{ slot }

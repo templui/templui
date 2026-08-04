@@ -8,7 +8,7 @@ import (
 
 templ ToggleGroupVertical() {
 	@togglegroup.ToggleGroup(togglegroup.Props{
-		Type:        togglegroup.TypeMultiple,
+		ToggleMultiple: true,
 		Orientation: togglegroup.OrientationVertical,
 		Spacing:     utils.Ptr(1),
 	}) {

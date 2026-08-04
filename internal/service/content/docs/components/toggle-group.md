@@ -46,7 +46,7 @@ import "github.com/templui/templui/components/togglegroup"
 ```
 
 ```templ showLineNumbers
-@togglegroup.ToggleGroup(togglegroup.Props{Type: togglegroup.TypeSingle}) {
+@togglegroup.ToggleGroup(togglegroup.Props{}) {
 	@togglegroup.Item(togglegroup.ItemProps{Value: "a"}) {
 		A
 	}
@@ -111,7 +111,7 @@ The `togglegroup.ToggleGroup` component wraps its items into a single or multipl
 
 | Prop          | Type                                          | Default      |
 | ------------- | --------------------------------------------- | ------------ |
-| `Type`        | `TypeSingle \| TypeMultiple`                  | `single`     |
+| `ToggleMultiple` | `bool` | `false` |
 | `Variant`     | `VariantDefault \| VariantOutline`            | `default`    |
 | `Size`        | `SizeDefault \| SizeSm \| SizeLg`             | `default`    |
 | `Spacing`     | `*int`                                        | `0`          |

@@ -7,8 +7,7 @@ import (
 templ ToggleGroupSize() {
 	<div class="flex flex-col gap-4">
 		@togglegroup.ToggleGroup(togglegroup.Props{
-			Type:    togglegroup.TypeSingle,
-			Size:    togglegroup.SizeSm,
+						Size:    togglegroup.SizeSm,
 			Variant: togglegroup.VariantOutline,
 		}) {
 			@togglegroup.Item(togglegroup.ItemProps{
@@ -38,8 +37,7 @@ templ ToggleGroupSize() {
 			}
 		}
 		@togglegroup.ToggleGroup(togglegroup.Props{
-			Type:    togglegroup.TypeSingle,
-			Variant: togglegroup.VariantOutline,
+						Variant: togglegroup.VariantOutline,
 		}) {
 			@togglegroup.Item(togglegroup.ItemProps{
 				Value:      "top",

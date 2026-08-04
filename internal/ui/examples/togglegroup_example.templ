@@ -46,7 +46,7 @@ templ ToggleGroupExample() {
 templ toggleGroupExampleBasic() {
 	@toggleGroupExampleSection("Basic") {
 		@togglegroup.ToggleGroup(togglegroup.Props{
-			Type:    togglegroup.TypeMultiple,
+			ToggleMultiple: true,
 			Spacing: utils.Ptr(1),
 		}) {
 			@togglegroup.Item(togglegroup.ItemProps{
@@ -75,8 +75,7 @@ templ toggleGroupExampleOutline() {
 	@toggleGroupExampleSection("Outline") {
 		@togglegroup.ToggleGroup(togglegroup.Props{
 			Variant: togglegroup.VariantOutline,
-			Type:    togglegroup.TypeSingle,
-		}) {
+					}) {
 			@togglegroup.Item(togglegroup.ItemProps{
 				Value:      "all",
 				Pressed:    true,
@@ -98,7 +97,7 @@ templ toggleGroupExampleOutlineWithIcons() {
 	@toggleGroupExampleSection("Outline With Icons") {
 		@togglegroup.ToggleGroup(togglegroup.Props{
 			Variant: togglegroup.VariantOutline,
-			Type:    togglegroup.TypeMultiple,
+			ToggleMultiple: true,
 			Size:    togglegroup.SizeSm,
 		}) {
 			@togglegroup.Item(togglegroup.ItemProps{
@@ -127,8 +126,7 @@ templ toggleGroupExampleSizes() {
 	@toggleGroupExampleSection("Sizes") {
 		<div class="flex flex-col gap-4">
 			@togglegroup.ToggleGroup(togglegroup.Props{
-				Type:    togglegroup.TypeSingle,
-				Size:    togglegroup.SizeSm,
+								Size:    togglegroup.SizeSm,
 				Variant: togglegroup.VariantOutline,
 			}) {
 				@togglegroup.Item(togglegroup.ItemProps{
@@ -158,8 +156,7 @@ templ toggleGroupExampleSizes() {
 				}
 			}
 			@togglegroup.ToggleGroup(togglegroup.Props{
-				Type:    togglegroup.TypeSingle,
-				Variant: togglegroup.VariantOutline,
+								Variant: togglegroup.VariantOutline,
 			}) {
 				@togglegroup.Item(togglegroup.ItemProps{
 					Value:      "top",
@@ -194,8 +191,7 @@ templ toggleGroupExampleSizes() {
 templ toggleGroupExampleSpacing() {
 	@toggleGroupExampleSection("With Spacing") {
 		@togglegroup.ToggleGroup(togglegroup.Props{
-			Type:    togglegroup.TypeSingle,
-			Size:    togglegroup.SizeSm,
+						Size:    togglegroup.SizeSm,
 			Spacing: utils.Ptr(2),
 		}) {
 			@togglegroup.Item(togglegroup.ItemProps{
@@ -230,7 +226,7 @@ templ toggleGroupExampleSpacing() {
 templ toggleGroupExampleWithIcons() {
 	@toggleGroupExampleSection("With Icons") {
 		@togglegroup.ToggleGroup(togglegroup.Props{
-			Type:    togglegroup.TypeMultiple,
+			ToggleMultiple: true,
 			Variant: togglegroup.VariantOutline,
 			Spacing: utils.Ptr(2),
 			Size:    togglegroup.SizeSm,
@@ -266,8 +262,7 @@ templ toggleGroupExampleWithIcons() {
 templ toggleGroupExampleFilter() {
 	@toggleGroupExampleSection("Filter") {
 		@togglegroup.ToggleGroup(togglegroup.Props{
-			Type:    togglegroup.TypeSingle,
-			Variant: togglegroup.VariantOutline,
+						Variant: togglegroup.VariantOutline,
 			Size:    togglegroup.SizeSm,
 		}) {
 			@togglegroup.Item(togglegroup.ItemProps{
@@ -302,8 +297,7 @@ templ toggleGroupExampleFilter() {
 templ toggleGroupExampleDateRange() {
 	@toggleGroupExampleSection("Date Range") {
 		@togglegroup.ToggleGroup(togglegroup.Props{
-			Type:    togglegroup.TypeSingle,
-			Variant: togglegroup.VariantOutline,
+						Variant: togglegroup.VariantOutline,
 			Size:    togglegroup.SizeSm,
 			Spacing: utils.Ptr(2),
 		}) {
@@ -339,8 +333,7 @@ templ toggleGroupExampleDateRange() {
 templ toggleGroupExampleSort() {
 	@toggleGroupExampleSection("Sort") {
 		@togglegroup.ToggleGroup(togglegroup.Props{
-			Type:    togglegroup.TypeSingle,
-			Variant: togglegroup.VariantOutline,
+						Variant: togglegroup.VariantOutline,
 			Size:    togglegroup.SizeSm,
 		}) {
 			@togglegroup.Item(togglegroup.ItemProps{
@@ -399,8 +392,7 @@ templ toggleGroupExampleWithInputAndSelect() {
 				}
 			}
 			@togglegroup.ToggleGroup(togglegroup.Props{
-				Type:    togglegroup.TypeSingle,
-				Variant: togglegroup.VariantOutline,
+								Variant: togglegroup.VariantOutline,
 			}) {
 				@togglegroup.Item(togglegroup.ItemProps{
 					Value:      "grid",
@@ -423,7 +415,7 @@ templ toggleGroupExampleWithInputAndSelect() {
 templ toggleGroupExampleVertical() {
 	@toggleGroupExampleSection("Vertical") {
 		@togglegroup.ToggleGroup(togglegroup.Props{
-			Type:        togglegroup.TypeMultiple,
+			ToggleMultiple: true,
 			Orientation: togglegroup.OrientationVertical,
 			Spacing:     utils.Ptr(1),
 		}) {
@@ -453,8 +445,7 @@ templ toggleGroupExampleVerticalOutline() {
 	@toggleGroupExampleSection("Vertical Outline") {
 		@togglegroup.ToggleGroup(togglegroup.Props{
 			Variant:     togglegroup.VariantOutline,
-			Type:        togglegroup.TypeSingle,
-			Orientation: togglegroup.OrientationVertical,
+						Orientation: togglegroup.OrientationVertical,
 			Size:        togglegroup.SizeSm,
 		}) {
 			@togglegroup.Item(togglegroup.ItemProps{
@@ -490,7 +481,7 @@ templ toggleGroupExampleVerticalOutlineWithIcons() {
 	@toggleGroupExampleSection("Vertical Outline With Icons") {
 		@togglegroup.ToggleGroup(togglegroup.Props{
 			Variant:     togglegroup.VariantOutline,
-			Type:        togglegroup.TypeMultiple,
+			ToggleMultiple: true,
 			Orientation: togglegroup.OrientationVertical,
 			Size:        togglegroup.SizeSm,
 		}) {
@@ -519,8 +510,7 @@ templ toggleGroupExampleVerticalOutlineWithIcons() {
 templ toggleGroupExampleVerticalWithSpacing() {
 	@toggleGroupExampleSection("Vertical With Spacing") {
 		@togglegroup.ToggleGroup(togglegroup.Props{
-			Type:        togglegroup.TypeSingle,
-			Size:        togglegroup.SizeSm,
+						Size:        togglegroup.SizeSm,
 			Orientation: togglegroup.OrientationVertical,
 			Spacing:     utils.Ptr(1),
 		}) {
@@ -562,8 +552,7 @@ templ toggleGroupExampleFontWeightSelector() {
 			}
 			@togglegroup.ToggleGroup(togglegroup.Props{
 				ID:      "toggle-group-example-font-weight",
-				Type:    togglegroup.TypeSingle,
-				Variant: togglegroup.VariantOutline,
+								Variant: togglegroup.VariantOutline,
 				Spacing: utils.Ptr(2),
 				Size:    togglegroup.SizeLg,
 			}) {
