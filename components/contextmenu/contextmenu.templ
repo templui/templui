@@ -201,6 +201,24 @@ templ Trigger(props ...TriggerProps) {
 	</div>
 }
 
+// PortalProps is the reference Portal's surface: the portal node renders
+// no visible element of its own.
+type PortalProps struct {
+	Attributes templ.Attributes
+}
+
+// Portal is 1:1 the reference Portal slot: inert until the script portals
+// the content to <body> at init.
+templ Portal(props ...PortalProps) {
+	{{ var p PortalProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<template data-tui-contextmenu-portal { p.Attributes... }>
+		{ children... }
+	</template>
+}
+
 templ Content(props ...ContentProps) {
 	{{ var p ContentProps }}
 	if len(props) > 0 {
@@ -214,7 +232,7 @@ templ Content(props ...ContentProps) {
 	}
 	// Inert until the script portals it to <body> at init, so the SSRd
 	// content never participates in layout or sibling CSS.
-	<template data-tui-contextmenu-portal>
+	@Portal() {
 	<div
 		id={ menuID(ctx) }
 		data-tui-contextmenu-content
@@ -245,7 +263,7 @@ templ Content(props ...ContentProps) {
 			{ children... }
 		</div>
 	</div>
-	</template>
+	}
 }
 
 templ Item(props ...ItemProps) {

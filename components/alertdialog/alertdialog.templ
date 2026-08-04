@@ -134,6 +134,54 @@ func CloseFor(id string) templ.Attributes {
 	}
 }
 
+// PortalProps is AlertDialogPortal's surface: the portal node renders no
+// visible element of its own.
+type PortalProps struct {
+	Attributes templ.Attributes
+}
+
+// Portal is 1:1 base/ui/alert-dialog.tsx AlertDialogPortal. Inert until the
+// script portals it to <body> at init; it shares the dialog machinery's
+// data attributes because Base UI's AlertDialog composes Dialog.
+templ Portal(props ...PortalProps) {
+	{{ var p PortalProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<template data-tui-dialog-portal>
+		<div data-tui-dialog-root hidden { p.Attributes... }>
+			{ children... }
+		</div>
+	</template>
+}
+
+type OverlayProps struct {
+	ID         string
+	Class      string
+	Attributes templ.Attributes
+}
+
+// Overlay is 1:1 base/ui/alert-dialog.tsx AlertDialogOverlay
+// (AlertDialog.Backdrop): the look comes from cn-alert-dialog-overlay.
+// user-select none is Base UI's inline style on the backdrop.
+templ Overlay(props ...OverlayProps) {
+	{{ var p OverlayProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	<div
+		if p.ID != "" {
+			id={ p.ID }
+		}
+		data-slot="alert-dialog-overlay"
+		data-tui-dialog-backdrop
+		role="presentation"
+		style="user-select: none; -webkit-user-select: none;"
+		class={ utils.CN("cn-alert-dialog-overlay fixed inset-0 isolate z-50", p.Class) }
+		{ p.Attributes... }
+	></div>
+}
+
 templ Content(props ...ContentProps) {
 	{{ var p ContentProps }}
 	if len(props) > 0 {
@@ -143,24 +191,11 @@ templ Content(props ...ContentProps) {
 		{{ p.Size = SizeDefault }}
 	}
 	{{ s := state(ctx) }}
-	// Inert until the script portals it to <body> at init, so the SSRd
-	// content never participates in layout or sibling CSS.
 	// Base UI's AlertDialog is a Dialog with disablePointerDismissal locked
-	// on: a press on the backdrop never closes it (disable-dismissible below),
-	// only Esc and the buttons do.
-	<template data-tui-dialog-portal>
-		<div data-tui-dialog-root hidden>
-			// 1:1 base/ui/alert-dialog.tsx AlertDialogOverlay
-			// (AlertDialog.Backdrop): the look comes from
-			// cn-alert-dialog-overlay. user-select none is Base UI's inline
-			// style on the backdrop.
-			<div
-				data-slot="alert-dialog-overlay"
-				data-tui-dialog-backdrop
-				role="presentation"
-				style="user-select: none; -webkit-user-select: none;"
-				class="cn-alert-dialog-overlay fixed inset-0 isolate z-50"
-			></div>
+	// on: a press on the backdrop never closes it (disable-dismissible on
+	// the popup), only Esc and the buttons do.
+	@Portal() {
+		@Overlay()
 			// 1:1 base/ui/alert-dialog.tsx AlertDialogContent
 			// (AlertDialog.Popup): the look comes from cn-alert-dialog-content.
 			<div
@@ -183,8 +218,7 @@ templ Content(props ...ContentProps) {
 			>
 				{ children... }
 			</div>
-		</div>
-	</template>
+	}
 }
 
 templ Header(props ...HeaderProps) {
