@@ -14,11 +14,13 @@ import (
 	"time"
 )
 
-// DefaultRegistry is the REGISTRY_URL pendant.
-const DefaultRegistry = "https://templui.io"
+// DefaultRegistry is the REGISTRY_URL pendant. It points at the 2.0 beta
+// site until stable, then flips back to templui.io.
+const DefaultRegistry = "https://v2.templui.io"
 
-// SiteURL is the SHADCN_URL pendant, used for docs and /create links.
-const SiteURL = "https://templui.io"
+// SiteURL is the SHADCN_URL pendant, used for docs and /create links. Beta
+// interim like DefaultRegistry.
+const SiteURL = "https://v2.templui.io"
 
 // EnvRegistry is the environment variable that overrides the registry URL,
 // below the --registry flag.

@@ -38,7 +38,7 @@ Options:
   --css <path>                  path to your Tailwind CSS entry file
   -f, --force                   force overwrite of existing configuration
   -s, --silent                  mute output
-  --registry <url>              registry URL (default https://templui.io, env TEMPLUI_REGISTRY)
+  --registry <url>              registry URL (default https://v2.templui.io, env TEMPLUI_REGISTRY)
   -c, --cwd <cwd>               the working directory (default ".")
 ```
 
@@ -65,7 +65,7 @@ Options:
   -o, --overwrite  overwrite existing files
   -p, --path <path>  the path to add the component to
   -s, --silent     mute output
-  --registry <url>  registry URL (default https://templui.io, env TEMPLUI_REGISTRY)
+  --registry <url>  registry URL (default https://v2.templui.io, env TEMPLUI_REGISTRY)
   -c, --cwd <cwd>  the working directory (default ".")
 ```
 
@@ -96,7 +96,7 @@ Options:
   --only <parts>     apply only parts of a preset: theme, font
   -y, --yes          skip confirmation prompt
   -s, --silent       mute output
-  --registry <url>   registry URL (default https://templui.io, env TEMPLUI_REGISTRY)
+  --registry <url>   registry URL (default https://v2.templui.io, env TEMPLUI_REGISTRY)
   -c, --cwd <cwd>    the working directory (default ".")
 ```
 
