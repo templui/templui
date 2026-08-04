@@ -80,9 +80,9 @@ A basic accordion that shows one item at a time. The first item is open by defau
 
 <ComponentPreview name="accordion-basic" align="start" previewClassName="*:data-[slot=accordion]:max-w-sm h-[300px]" />
 
-## Multiple
+## DisableOpenMultiple
 
-Use the `Multiple` prop to allow multiple items to be open at the same time.
+Use the `DisableOpenMultiple` prop to allow multiple items to be open at the same time.
 
 <ComponentPreview name="accordion-multiple" align="start" previewClassName="*:data-[slot=accordion]:max-w-sm h-[450px]" />
 
@@ -112,7 +112,7 @@ The `Accordion` component is the root container that manages which items are ope
 
 | Prop       | Type     | Default |
 | ---------- | -------- | ------- |
-| `Multiple` | `bool`   | `false` |
+| `DisableOpenMultiple` | `bool`   | `false` |
 | `Class`    | `string` | -       |
 
 ### Item

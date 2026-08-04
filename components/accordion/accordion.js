@@ -53,7 +53,7 @@
       closeItem(item);
       return;
     }
-    if (!accordion.hasAttribute("data-multiple")) {
+    if (accordion.hasAttribute("data-disable-open-multiple")) {
       accordion.querySelectorAll('[data-slot="accordion-item"]').forEach((other) => {
         if (other === item) return;
         if (other.closest('[data-slot="accordion"]') !== accordion) return;

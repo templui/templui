@@ -3,7 +3,7 @@ package examples
 import "github.com/templui/templui/components/accordion"
 
 templ AccordionMultiple() {
-	@accordion.Accordion(accordion.Props{Multiple: true, Class: "max-w-lg"}) {
+	@accordion.Accordion(accordion.Props{DisableOpenMultiple: true, Class: "max-w-lg"}) {
 		@accordion.Item(accordion.ItemProps{Open: true}) {
 			@accordion.Trigger() {
 				Notification Settings

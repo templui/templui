@@ -11,7 +11,7 @@ type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	Multiple   bool
+	DisableOpenMultiple   bool
 }
 
 type ItemProps struct {
@@ -61,7 +61,7 @@ templ Accordion(props ...Props) {
 			id={ p.ID }
 		}
 		data-slot="accordion"
-		data-multiple?={ p.Multiple }
+		data-disable-open-multiple?={ p.DisableOpenMultiple }
 		class={
 			utils.CN(
 				"cn-accordion flex w-full flex-col",

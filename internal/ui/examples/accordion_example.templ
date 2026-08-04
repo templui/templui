@@ -64,8 +64,8 @@ templ accordionExampleBasic() {
 }
 
 templ accordionExampleMultiple() {
-	@accordionExampleSection("Multiple", "") {
-		@accordion.Accordion(accordion.Props{Multiple: true, Class: "mx-auto max-w-lg"}) {
+	@accordionExampleSection("DisableOpenMultiple", "") {
+		@accordion.Accordion(accordion.Props{DisableOpenMultiple: true, Class: "mx-auto max-w-lg"}) {
 			@accordion.Item() {
 				@accordion.Trigger() {
 					What are the key considerations when implementing a comprehensive enterprise-level authentication system?
@@ -134,7 +134,7 @@ templ accordionExampleInCard() {
 				}
 			}
 			@card.Content() {
-				@accordion.Accordion(accordion.Props{Multiple: true, Class: "style-maia:rounded-md style-mira:rounded-md"}) {
+				@accordion.Accordion(accordion.Props{DisableOpenMultiple: true, Class: "style-maia:rounded-md style-mira:rounded-md"}) {
 					@accordion.Item(accordion.ItemProps{Open: true}) {
 						@accordion.Trigger() {
 							What subscription plans do you offer?

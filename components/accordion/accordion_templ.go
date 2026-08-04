@@ -16,10 +16,10 @@ import (
 )
 
 type Props struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-	Multiple   bool
+	ID                  string
+	Class               string
+	Attributes          templ.Attributes
+	DisableOpenMultiple bool
 }
 
 type ItemProps struct {
@@ -120,8 +120,8 @@ func Accordion(props ...Props) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if p.Multiple {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, " data-multiple")
+		if p.DisableOpenMultiple {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, " data-disable-open-multiple")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
