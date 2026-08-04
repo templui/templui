@@ -211,16 +211,16 @@ Stack `field.Field` components with `field.Group`. Add `field.Separator` to divi
 
 ## Validation and Errors
 
-- Add `Invalid` to `field.Field` to switch the entire block into an error state.
-- Add `Invalid` on the input itself for assistive technologies.
+- Add `data-invalid` to `field.Field` to switch the entire block into an error state.
+- Add `aria-invalid` on the input itself for assistive technologies.
 - Render `field.Error` immediately after the control or inside `field.Content` to keep error messages aligned with the field.
 
-```templ showLineNumbers /Invalid: true/
-@field.Field(field.Props{Invalid: true}) {
+```templ showLineNumbers /data-invalid/
+@field.Field(field.Props{Attributes: templ.Attributes{"data-invalid": "true"}}) {
 	@field.Label(field.LabelProps{For: "email"}) {
 		Email
 	}
-	@input.Input(input.Props{ID: "email", Type: input.TypeEmail, Attributes: templ.Attributes{"aria-invalid": "true"}})
+	@input.Input(input.Props{ID: "email", Type: "email", Attributes: templ.Attributes{"aria-invalid": "true"}})
 	@field.Error() {
 		Enter a valid email address.
 	}
@@ -292,13 +292,11 @@ Layout wrapper that stacks `field.Field` components and enables container querie
 
 ### Field
 
-The core wrapper for a single field. Provides orientation control, invalid state styling, and spacing.
+The core wrapper for a single field. Provides orientation control and spacing; mark states with `data-invalid` / `data-disabled` attributes.
 
 | Prop          | Type                                                                     | Default               |
 | ------------- | ------------------------------------------------------------------------ | --------------------- |
 | `Orientation` | `OrientationVertical \| OrientationHorizontal \| OrientationResponsive` | `OrientationVertical` |
-| `Invalid`     | `bool`                                                                   | `false`               |
-| `Disabled`    | `bool`                                                                   | `false`               |
 | `Class`       | `string`                                                                 | -                     |
 
 ```templ

@@ -41,8 +41,6 @@ type Props struct {
 	Class       string
 	Attributes  templ.Attributes
 	Orientation Orientation
-	Disabled    bool
-	Invalid     bool
 }
 
 type ContentProps struct {
@@ -182,12 +180,6 @@ templ Field(props ...Props) {
 		role="group"
 		data-slot="field"
 		data-orientation={ string(p.Orientation) }
-		if p.Disabled {
-			data-disabled="true"
-		}
-		if p.Invalid {
-			data-invalid="true"
-		}
 		class={ utils.CN(fieldClasses(p.Orientation), p.Class) }
 		{ p.Attributes... }
 	>

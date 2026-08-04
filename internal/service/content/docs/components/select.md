@@ -119,7 +119,7 @@ A select with many items that scrolls.
 Set the `Invalid` prop on the `field.Field` component and `aria-invalid` on the `selectcomp.Trigger` component to show an error state.
 
 ```templ showLineNumbers /aria-invalid/
-@field.Field(field.Props{Invalid: true}) {
+@field.Field(field.Props{Attributes: templ.Attributes{"data-invalid": "true"}}) {
 	@field.Label() {
 		Fruit
 	}
