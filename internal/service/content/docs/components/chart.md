@@ -424,7 +424,7 @@ Chart comes with the `Tooltip` component and its `TooltipContentProps`, the pend
 | `LabelFormatter` | func(any) string         | Formats the tooltip label.                                     |
 | `Formatter`      | func(value any, name string, item chart.Datum, index int) templ.Component | Replaces a row's default markup, rendered per data row. |
 | `Class`          | string                   | Extra classes for the tooltip content.                         |
-| `LabelClass`     | string                   | Extra classes for the tooltip label.                           |
+| `LabelClassName`     | string                   | Extra classes for the tooltip label.                           |
 | `Color`          | string                   | Overrides the indicator color for every row.                   |
 
 ### Colors

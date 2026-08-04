@@ -323,13 +323,13 @@ type TooltipProps struct {
 
 // TooltipContentProps is the pendant of ChartTooltipContent.
 type TooltipContentProps struct {
-	Indicator     string // "dot" (default), "line", "dashed"
-	LabelKey      string
-	HideLabel     bool
-	HideIndicator bool
-	NameKey       string
-	Class         string // extra content class, e.g. "w-[150px]"
-	LabelClass    string // extra label class, ChartTooltipContent's labelClassName
+	Indicator      string // "dot" (default), "line", "dashed"
+	LabelKey       string
+	HideLabel      bool
+	HideIndicator  bool
+	NameKey        string
+	Class          string // extra content class, e.g. "w-[150px]"
+	LabelClassName string // extra label class, ChartTooltipContent's labelClassName
 	// Color overrides the indicator color for every row, the color prop of
 	// ChartTooltipContent.
 	Color          string
@@ -1883,7 +1883,7 @@ func buildModel(ctx context.Context, st *chartState) Model {
 	if tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
 		m.HasTooltip = true
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color, DefaultIndex: tt.DefaultIndex}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClassName: tt.Content.LabelClassName, Color: tt.Content.Color, DefaultIndex: tt.DefaultIndex}
 		if tt.Content.LabelKey != "" {
 			m.Tooltip.Label = config.Label(tt.Content.LabelKey)
 		}
@@ -2064,7 +2064,7 @@ func buildRadarModel(ctx context.Context, config Config, st *chartState) Model {
 	if tt := st.tooltip; tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
 		m.HasTooltip = true
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClassName: tt.Content.LabelClassName, Color: tt.Content.Color}
 	}
 	return m
 }
@@ -2133,7 +2133,7 @@ func buildRadialModel(ctx context.Context, config Config, st *chartState) Model 
 	if tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
 		m.HasTooltip = true
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClassName: tt.Content.LabelClassName, Color: tt.Content.Color}
 	}
 	return m
 }
@@ -2226,7 +2226,7 @@ func buildPieModel(ctx context.Context, config Config, st *chartState) Model {
 	if tt := st.tooltip; tt != nil {
 		m.Cursor = boolOr(tt.Cursor, true)
 		m.HasTooltip = true
-		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClass: tt.Content.LabelClass, Color: tt.Content.Color}
+		m.Tooltip = TooltipModel{Indicator: tt.Content.Indicator, HideLabel: tt.Content.HideLabel, HideIndicator: tt.Content.HideIndicator, Width: tt.Content.Class, LabelClassName: tt.Content.LabelClassName, Color: tt.Content.Color}
 		if tt.Content.LabelKey != "" {
 			m.Tooltip.Label = config.Label(tt.Content.LabelKey)
 		}
@@ -2613,13 +2613,13 @@ type LabelListModel struct {
 
 // TooltipModel mirrors ChartTooltipContent's props.
 type TooltipModel struct {
-	Indicator     string `json:"indicator,omitempty"` // "dot" (default) | "line" | "dashed"
-	Label         string `json:"label,omitempty"`     // labelKey resolved through the config
-	HideLabel     bool   `json:"hideLabel,omitempty"`
-	HideIndicator bool   `json:"hideIndicator,omitempty"`
-	Width         string `json:"width,omitempty"`      // extra class, e.g. "w-[150px]"
-	LabelClass    string `json:"labelClass,omitempty"` // extra label class, labelClassName
-	Color         string `json:"color,omitempty"`      // indicator color override
+	Indicator      string `json:"indicator,omitempty"` // "dot" (default) | "line" | "dashed"
+	Label          string `json:"label,omitempty"`     // labelKey resolved through the config
+	HideLabel      bool   `json:"hideLabel,omitempty"`
+	HideIndicator  bool   `json:"hideIndicator,omitempty"`
+	Width          string `json:"width,omitempty"`      // extra class, e.g. "w-[150px]"
+	LabelClassName string `json:"labelClass,omitempty"` // extra label class, labelClassName
+	Color          string `json:"color,omitempty"`      // indicator color override
 	// DefaultIndex shows the tooltip on mount at that category.
 	DefaultIndex *int `json:"defaultIndex,omitempty"`
 	// Rows is the formatter markup per series and data row.
