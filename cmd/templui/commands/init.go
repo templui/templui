@@ -71,6 +71,11 @@ func RunInit(opts InitOptions) error {
 		if !ok {
 			return fmt.Errorf("unknown template %q, valid templates: %s", opts.Template, strings.Join(templates.Names(), ", "))
 		}
+		// Scaffolding nests a fresh module; inside an existing one that
+		// pollutes the parent repo (and its embeds/builds).
+		if module, err := utils.ModulePath(cwd); err == nil {
+			return fmt.Errorf("refusing to scaffold inside the Go module %s; run this outside a module or pass a target with --cwd", module)
+		}
 		projectName := opts.ProjectName
 		if projectName == "" {
 			projectName = template.DefaultProjectName
