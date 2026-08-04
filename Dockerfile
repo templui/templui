@@ -41,23 +41,33 @@ RUN ./tailwindcss -i ./assets/css/globals.css -o ./assets/css/output.css --minif
 # so small builders do not OOM, -s -w strips debug info from the binary.
 RUN CGO_ENABLED=0 GOOS=linux go build -p 2 -ldflags="-s -w" -o main ./cmd/docs/main.go
 
+# Shiki deps stage: install the highlighter service's node_modules once.
+FROM node:20-alpine AS shiki
+WORKDIR /shiki
+COPY shiki/package*.json ./
+RUN npm ci --omit=dev
+COPY shiki/server.js ./
+
 # Deploy-Stage
 FROM alpine:3.20.2
 WORKDIR /app
 
-# Install ca-certificates
-RUN apk add --no-cache ca-certificates
+# Install ca-certificates and node for the interim shiki sidecar (dies
+# with the planned build-time highlighting, see CREATE_1TO1_PLAN 2f)
+RUN apk add --no-cache ca-certificates nodejs
 
 # Set environment variable for runtime
 ENV GO_ENV=production
 
-# Copy the binary, version file, and CSS output
+# Copy the binary, version file, CSS output and the shiki service
 COPY --from=build /app/main .
+COPY --from=shiki /shiki /app/shiki
 COPY --from=build /app/version.txt .
 COPY --from=build /app/assets/css/output.css ./assets/css/output.css
 
 # Expose the port
 EXPOSE 8090
 
-# Command to run
-CMD ["./main"]
+# Command to run: the shiki highlighter starts alongside, the Go
+# server stays PID 1 (SHIKI_URL default localhost:3000 just works)
+CMD ["sh", "-c", "node /app/shiki/server.js & exec ./main"]
