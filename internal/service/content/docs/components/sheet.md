@@ -96,7 +96,7 @@ The `sheet.Sheet` component is the root, it carries the id that links trigger an
 | Prop               | Type   | Default |
 | ------------------ | ------ | ------- |
 | `Open`             | `bool` | `false` |
-| `DisableClickAway` | `bool` | `false` |
+| `DisableDismissible` | `bool` | `false` |
 
 ### SheetTrigger
 

@@ -532,7 +532,7 @@
   function handleBackdropClick(backdrop, event) {
     const state = stateOf(backdrop.parentElement?.querySelector("[data-tui-dialog-content]"));
     if (!state || !state.open) return;
-    if (state.popup.hasAttribute("data-tui-dialog-disable-click-away")) return;
+    if (state.popup.hasAttribute("data-tui-dialog-disable-dismissible")) return;
     if (!isTopmost(state)) return;
     if (event.button !== 0) return;
     if (pressStartedInPopup === state.popup) return;

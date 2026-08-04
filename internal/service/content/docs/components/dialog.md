@@ -113,7 +113,7 @@ The `Dialog` component is the root that links trigger, content and close via con
 | Prop               | Type     | Default |
 | ------------------ | -------- | ------- |
 | `Open`             | `bool`   | `false` |
-| `DisableClickAway` | `bool`   | `false` |
+| `DisableDismissible` | `bool`   | `false` |
 
 ### Trigger
 

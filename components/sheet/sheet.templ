@@ -38,8 +38,8 @@ type Props struct {
 	ID string
 	// Open renders the sheet already open on page load.
 	Open bool
-	// DisableClickAway keeps the sheet open when clicking the backdrop.
-	DisableClickAway bool
+	// DisableDismissible keeps the sheet open when clicking the backdrop.
+	DisableDismissible bool
 }
 
 type ContentProps struct {
@@ -85,7 +85,7 @@ templ Sheet(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: p.Open, disableClickAway: p.DisableClickAway}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: p.Open, disableClickAway: p.DisableDismissible}) }}
 	{ children... }
 }
 
@@ -155,7 +155,7 @@ templ Content(props ...ContentProps) {
 				data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
 				data-tui-dialog-show-modal="true"
 				if s.disableClickAway {
-					data-tui-dialog-disable-click-away="true"
+					data-tui-dialog-disable-dismissible="true"
 				}
 				class={
 					utils.CN(

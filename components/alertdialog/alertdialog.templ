@@ -146,7 +146,7 @@ templ Content(props ...ContentProps) {
 	// Inert until the script portals it to <body> at init, so the SSRd
 	// content never participates in layout or sibling CSS.
 	// Base UI's AlertDialog is a Dialog with disablePointerDismissal locked
-	// on: a press on the backdrop never closes it (disable-click-away below),
+	// on: a press on the backdrop never closes it (disable-dismissible below),
 	// only Esc and the buttons do.
 	<template data-tui-dialog-portal>
 		<div data-tui-dialog-root hidden>
@@ -172,7 +172,7 @@ templ Content(props ...ContentProps) {
 				data-size={ string(p.Size) }
 				data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
 				data-tui-dialog-show-modal="true"
-				data-tui-dialog-disable-click-away="true"
+				data-tui-dialog-disable-dismissible="true"
 				class={
 					utils.CN(
 						"cn-alert-dialog-content group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 outline-none",

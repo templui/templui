@@ -1216,7 +1216,7 @@
     // presses reach the page instead — same as before.
     dialog.addEventListener("pointerdown", (event) => {
       if (!dialog.open) return;
-      if (dialog.hasAttribute("data-tui-drawer-disable-click-away")) return;
+      if (dialog.hasAttribute("data-tui-drawer-disable-dismissible")) return;
       const popup = popupOf(dialog);
       const target = event.target instanceof Element ? event.target : null;
       if (popup && target && !popup.contains(target)) closeDrawer(dialog);

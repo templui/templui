@@ -397,7 +397,7 @@ templ drawerExampleNested() {
 
 templ drawerExampleNonModal() {
 	@drawerExampleSection("Non Modal") {
-		@drawer.Drawer(drawer.Props{DisableModal: true, DisableClickAway: true, SwipeDirection: drawer.SwipeDirectionRight}) {
+		@drawer.Drawer(drawer.Props{DisableModal: true, DisableDismissible: true, SwipeDirection: drawer.SwipeDirectionRight}) {
 			@button.Button(button.Props{Variant: button.VariantOutline, Attributes: drawer.Trigger(ctx)}) {
 				Non Modal
 			}
