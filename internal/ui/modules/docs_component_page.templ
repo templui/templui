@@ -188,12 +188,17 @@ const InstallTabTriggerClass = "rounded-none border-0 border-b-2 border-transpar
 // (no breadcrumbs, like shadcn).
 templ DocsPageHeader(title, description, prevHref, nextHref string) {
 	<div class="flex flex-col gap-2">
-		<div class="flex items-start justify-between gap-4">
-			<h1 class="scroll-m-24 text-3xl font-semibold tracking-tight">{ title }</h1>
-			<div class="flex items-center gap-2">
-				@CopyPageMenu()
-				@pagerArrow(prevHref, false)
-				@pagerArrow(nextHref, true)
+		<div class="flex items-center justify-between md:items-start">
+			<h1 class="scroll-m-24 text-3xl font-semibold tracking-tight sm:text-3xl">{ title }</h1>
+			<div class="docs-nav flex items-center gap-2">
+				// The reference hides the copy-page menu below sm.
+				<div class="hidden sm:block">
+					@CopyPageMenu()
+				</div>
+				<div class="ml-auto flex gap-2">
+					@pagerArrow(prevHref, false)
+					@pagerArrow(nextHref, true)
+				</div>
 			</div>
 		</div>
 		<p class="text-[1.05rem] text-muted-foreground sm:text-base sm:text-balance md:max-w-[80%]">{ description }</p>
