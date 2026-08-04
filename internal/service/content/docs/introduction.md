@@ -1,23 +1,66 @@
 ---
 title: "Introduction"
-description: "Welcome to templUI - Beautiful UI components for Go developers."
+description: "templUI is a set of beautifully-designed, accessible components and a code distribution platform. Works with Go, templ and your favorite AI models. Open Source. Open Code."
 order: 1
 ---
 
-## Introduction
+**This is not a component library. It is how you build your component library.**
 
-templUI is a growing collection of beautifully designed components built with templ and Tailwind CSS. You can use it in two ways: install components into your own repo with the CLI, or import component packages directly from `github.com/templui/templui`. Everything is customizable, type-safe, and yours to own.
+You know how most traditional component libraries work: you install a package with `go get`, import the components, and use them in your app.
 
-**Two supported workflows.** Use the CLI if you want the source copied into your app. Use direct imports if you want the simplest setup. Follow our [releases](https://github.com/templui/templui/releases) to see what's new.
+This approach works well until you need to customize a component to fit your design system or require one that isn't included in the library. **Often, you end up wrapping library components, writing workarounds to override styles, or mixing components from different libraries with incompatible APIs.**
 
-## Why templUI
+This is what templUI aims to solve. It is built around the following principles:
 
-Heavily inspired by [shadcn/ui](https://ui.shadcn.com/), templUI brings the same philosophy to Go developers. Use the CLI for full ownership of copied source, or direct imports for a simpler dependency-based workflow.
+- **Open Code:** The top layer of your component code is open for modification.
+- **Composition:** Every component uses a common, composable interface, making them predictable.
+- **Distribution:** A flat-file schema and command-line tool make it easy to distribute components.
+- **Beautiful Defaults:** Carefully chosen default styles, so you get great design out-of-the-box.
+- **AI-Ready:** Open code for LLMs to read, understand, and improve.
 
-Every component is designed to be beautiful by default, fully accessible, and CSP compliant. No magic, no hidden complexity – just clean, customizable code that works.
+## Open Code
 
-## Vision & Roadmap
+templUI hands you the actual component code. You have full control to customize and extend the components to your needs. This means:
 
-templUI embraces Go's philosophy: simple, reliable, and performant. We're building a component library that feels native to Go developers – with server-side rendering at its core and progressive enhancement where it matters.
+- **Full Transparency:** You see exactly how each component is built.
+- **Easy Customization:** Modify any part of a component to fit your design and functionality requirements.
+- **AI Integration:** Access to the code makes it straightforward for LLMs to read, understand, and even improve your components.
 
-Our roadmap focuses on expanding the component library while maintaining our core principles: type safety, zero dependencies, and developer experience. This is the UI toolkit Go developers actually want to use.
+_In a typical library, if you need to change a button's behavior, you have to override styles or wrap the component. With templUI, you simply edit the button code directly._
+
+<Callout className="mt-6">
+
+**How do I pull upstream updates in an Open Code approach?** The behavior core of every component is ported from headless sources like Base UI into its script and kept current by the CLI: fixes arrive through `templui add` and the upgrade command. The topmost layer, the one closest to your design system, is not coupled with that implementation. It stays open for modification.
+
+</Callout>
+
+## Composition
+
+Every component in templUI shares a common, composable interface. **If a component does not exist, we bring it in, make it composable, and adjust its style to match and work with the rest of the design system.**
+
+_A shared, composable interface means it's predictable for both your team and LLMs. You are not learning different APIs for every new component. Even for third-party ones._
+
+## Distribution
+
+templUI is also a code distribution system. It defines a schema for components and a CLI to distribute them.
+
+- **Schema:** A flat-file structure that defines the components, their dependencies, and properties.
+- **CLI:** A command-line tool to distribute and install components across projects.
+
+_You can use the schema to distribute your components to other projects or have AI generate completely new components based on existing schema._
+
+## Beautiful Defaults
+
+templUI comes with a large collection of components that have carefully chosen default styles. They are designed to look good on their own and to work well together as a consistent system:
+
+- **Good Out-of-the-Box:** Your UI has a clean and minimal look without extra work.
+- **Unified Design:** Components naturally fit with one another. Each component is built to match the others, keeping your UI consistent.
+- **Easily Customizable:** If you want to change something, it's simple to override and extend the defaults.
+
+## AI-Ready
+
+The design of templUI makes it easy for AI tools to work with your code. Its open code and consistent API allow AI models to read, understand, and even generate new components.
+
+_An AI model can learn how your components work and suggest improvements or even create new components that integrate with your existing design._
+
+templUI is the templ pendant of [shadcn/ui](https://ui.shadcn.com) and follows its principles. If you prefer plain Go imports without copying code, that exists as a templUI extra: the [Import Workflow](/docs/import-workflow).

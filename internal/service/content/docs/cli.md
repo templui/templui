@@ -162,3 +162,11 @@ templui preset url b2D0wqNxT
 ```shell
 https://templui.io/create?preset=b2D0wqNxT
 ```
+
+## upgrade
+
+The CLI updates itself the Go way:
+
+```shell
+go install github.com/templui/templui/cmd/templui@latest
+```
