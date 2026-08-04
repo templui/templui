@@ -1,114 +1,187 @@
-# Contributing to templUI
+# Contributing
 
-First off, thank you for considering contributing to templUI! We're excited to have you join our community.
+Thanks for your interest in contributing to templui.io. We're happy to have you here.
 
-## Development Setup
+Please take a moment to review this document before submitting your first pull request. We also strongly recommend that you check for open issues and pull requests to see if someone else is working on something similar.
 
-### Prerequisites
+If you need any help, feel free to reach out to [@axadrn](https://x.com/axadrn).
 
-- Go 1.24 or higher
-- Node.js (for Tailwind CSS)
-- [Task](https://taskfile.dev) - Cross-platform task runner
+## About this repository
 
-Install Task:
+This repository is a single Go module.
 
-```bash
-go install github.com/go-task/task/v3/cmd/task@latest
+- We use [Go](https://go.dev) and [templ](https://templ.guide) for development.
+- We use [Task](https://taskfile.dev) as our task runner.
+- We use [Tailwind CSS](https://tailwindcss.com) for styling.
+
+## Structure
+
+This repository is structured as follows:
+
+```
+cmd
+├── docs
+└── templui
+components
+internal
+├── service
+│   └── content
+│       └── docs
+└── ui
+registry.json
 ```
 
-### Development Workflow
+| Path                            | Description                              |
+| ------------------------------- | ---------------------------------------- |
+| `cmd/docs`                      | The server for the docs website.         |
+| `components`                    | The components and their JavaScript.     |
+| `internal/ui`                   | The pages and modules for the website.   |
+| `internal/service/content/docs` | The markdown content for the docs.       |
+| `cmd/templui`                   | The `templui` CLI.                       |
+| `registry.json`                 | The registry for the components.         |
 
-Start the development server:
+## Development
+
+### Fork this repo
+
+You can fork this repo by clicking the fork button in the top right corner of this page.
+
+### Clone on your local machine
+
+```bash
+git clone https://github.com/your-username/templui.git
+```
+
+### Navigate to project directory
+
+```bash
+cd templui
+```
+
+### Create a new Branch
+
+```bash
+git checkout -b my-new-branch
+```
+
+### Install dependencies
+
+```bash
+go mod download
+```
+
+### Run the website
+
+You can use the `task dev` command to start the development process.
 
 ```bash
 task dev
 ```
 
-This runs all watchers in parallel:
+This runs the `templ` watcher and the Tailwind CSS watcher in parallel and serves the website at `http://localhost:8090`.
 
-- `templ` - Template generation with integrated server and hot reload
-- `tailwindcss` - CSS compilation
-- `shiki-highlighter` - Syntax highlighting service
+## Running the CLI Locally
 
-See available tasks:
+To run the CLI locally, you can follow the workflow:
+
+1. Start by running the dev server:
+
+   ```bash
+   task dev
+   ```
+
+2. In another terminal tab, install the CLI from your working tree:
+
+   ```bash
+   go install ./cmd/templui
+   ```
+
+   To test the CLI against your local registry, use a command like:
+
+   ```bash
+   templui <init | add | ...> --registry http://localhost:8090
+   ```
+
+   You can also set the registry via the `TEMPLUI_REGISTRY` environment variable.
+
+This workflow ensures that you are running the most recent version of the registry and testing the CLI properly in your local environment.
+
+## Documentation
+
+The documentation for this project lives on the website. You can run the documentation locally by running the following command:
 
 ```bash
-task --list
+task dev
 ```
 
-### Testing CLI changes against your fork
+Documentation is written using Markdown. You can find the documentation files in the `internal/service/content/docs` directory.
 
-Set `TEMPLUI_REPO` in your shell before running the CLI:
+## Components
+
+We use a registry system for developing components. You can find the source code for the components under `components`. Each component lives in its own directory with a `.templ` file and an optional `.js` file.
 
 ```bash
-task install-templui
-
-# current shell session
-export TEMPLUI_REPO=your-github-user/templui
-templui add@your-branch button
-
-# one command
-TEMPLUI_REPO=your-github-user/templui templui add@your-branch button
+components
+├── button
+│   └── button.templ
+└── dialog
+    ├── dialog.js
+    └── dialog.templ
 ```
 
-## Our Vision and Your Contributions
+When adding or modifying components, please ensure that:
 
-templUI is an open-source project that aims to provide value to the Go community. We want to be transparent about our long-term vision:
+1. You make the changes for every style (`assets/css/styles/style-*.css`).
+2. You update the documentation.
+3. You run `task dev`. The dev server regenerates the registry, so there is no separate build step.
 
-1. We may explore opportunities to monetize aspects of templUI or offer premium services related to it in the future.
-2. All contributions to this repository are subject to the MIT License, which allows for commercial use.
-3. By contributing to templUI, you agree that your contributions may be used in both open-source and potential future commercial aspects of the project.
-4. We value every contribution and will always strive to maintain a strong, open-source core that benefits the entire community.
+## Commit Convention
 
-We believe this approach allows us to sustainably develop and maintain templUI while keeping it open and accessible to all. If you have any questions or concerns about this, please reach out to us before contributing.
+Before you create a Pull Request, please check whether your commits comply with
+the commit conventions used in this repository.
 
-## How Can I Contribute?
+When you create a commit we kindly ask you to follow the convention
+`category(scope or module): message` in your commit message while using one of
+the following categories:
 
-### Reporting Bugs
+- `feat / feature`: all changes that introduce completely new code or new
+  features
+- `fix`: changes that fix a bug (ideally you will additionally reference an
+  issue if present)
+- `refactor`: any code related change that is not a fix nor a feature
+- `docs`: changing existing or creating new documentation (i.e. README, docs for
+  usage of a lib or cli usage)
+- `build`: all changes regarding the build of the software, changes to
+  dependencies or the addition of new dependencies
+- `test`: all changes regarding tests (adding new tests or changing existing
+  ones)
+- `ci`: all changes regarding the configuration of continuous integration (i.e.
+  github actions, ci system)
+- `chore`: all changes to the repository that do not fit into any of the above
+  categories
 
-- Use a clear and descriptive title for the issue to identify the problem.
-- Describe the exact steps which reproduce the problem in as many details as possible.
-- Provide specific examples to demonstrate the steps.
+  e.g. `feat(components): add new prop to the avatar component`
 
-### Suggesting Enhancements
+If you are interested in the detailed specification you can visit
+https://www.conventionalcommits.org/ or check out the
+[Angular Commit Message Guidelines](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines).
 
-- Use a clear and descriptive title for the issue to identify the suggestion.
-- Provide a step-by-step description of the suggested enhancement in as many details as possible.
-- Explain why this enhancement would be useful to most templUI users.
+## Requests for new components
 
-### Pull Requests
+If you have a request for a new component, please open a discussion on GitHub. We'll be happy to help you out.
 
-- Fill in the required template
-- Do not include issue numbers in the PR title
-- Follow the [Go style guide](https://golang.org/doc/effective_go.html)
-- End all files with a newline
-- Avoid platform-dependent code
+## CLI
 
-## Style Guides
+The `templui` package is a CLI for adding components to your project. You can find the documentation for the CLI [here](https://templui.io/docs/cli).
 
-### Git Commit Messages
+Any changes to the CLI should be made in the `cmd/templui` directory. If you can, it would be great if you could add tests for your changes.
 
-- Use the present tense ("Add feature" not "Added feature")
-- Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
-- Limit the first line to 72 characters or less
+## Testing
 
-### Go Style Guide
+Tests are written using [Go's testing package](https://pkg.go.dev/testing). You can run all the tests from the root of the repository.
 
-Follow the official Go style guide and common practices in the Go community.
+```bash
+go test ./...
+```
 
-## Additional Notes
-
-### Issue and Pull Request Labels
-
-This section lists the labels we use to help us track and manage issues and pull requests.
-
-- `bug` - Issues for bugs in the code
-- `enhancement` - Issues for new features or improvements
-- `documentation` - Issues related to documentation
-- `good first issue` - Good for newcomers
-
-## Recognition
-
-We're committed to giving proper credit and recognition to all contributors. Your contributions, whether they're improvements to documentation, bug fixes, or new features, are invaluable to the growth and success of templUI.
-
-Thank you for contributing to templUI and helping make it a great tool for the Go community!
+Please ensure that the tests are passing when submitting a pull request. If you're adding new features, please include tests.
