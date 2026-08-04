@@ -14,7 +14,7 @@ import (
 // module files like shadcn's components (main_nav, mobile_nav, command_menu,
 // github_link, themeswitcher = mode-switcher).
 templ Navbar() {
-	<header class="sticky top-0 z-50 w-full bg-background">
+	<header class="sticky top-(--announcement-height,0px) z-50 w-full bg-background">
 		<div class="container-wrapper px-6 group-has-data-[slot=designer]/layout:max-w-none 3xl:fixed:px-0">
 			// **:data-[slot=separator]:self-center is the one addition to the
 			// reference's class string: its separators come from

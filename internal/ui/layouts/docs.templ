@@ -34,7 +34,7 @@ templ DocsLayout(title, description string, tocItems []modules.TableOfContentsIt
 									</div>
 								}
 							</div>
-							<div class="sticky top-[calc(var(--header-height)+1px)] z-30 ml-auto hidden h-[90svh] w-(--sidebar-width) flex-col gap-4 overflow-hidden overscroll-none pb-8 xl:flex">
+							<div class="sticky top-[calc(var(--header-height)+var(--announcement-height,0px)+1px)] z-30 ml-auto hidden h-[90svh] w-(--sidebar-width) flex-col gap-4 overflow-hidden overscroll-none pb-8 xl:flex">
 								<div class="h-(--top-spacing) shrink-0"></div>
 								@templ.Fragment("toc") {
 									<div class="flex scroll-fade scrollbar-none flex-col gap-8 overflow-y-auto px-8" id="toc-container" hx-swap-oob="true">
