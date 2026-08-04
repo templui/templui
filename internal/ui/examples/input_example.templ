@@ -40,14 +40,14 @@ templ InputExample() {
 
 templ inputExampleBasic() {
 	@inputExampleSection("Basic") {
-		@input.Input(input.Props{Type: input.TypeEmail, Placeholder: "Email"})
+		@input.Input(input.Props{Type: "email", Placeholder: "Email"})
 	}
 }
 
 templ inputExampleInvalid() {
 	@inputExampleSection("Invalid") {
 		@input.Input(input.Props{
-			Type:        input.TypeText,
+			Type:        "text",
 			Placeholder: "Error",
 			Attributes:  templ.Attributes{"aria-invalid": "true"},
 		})
@@ -62,7 +62,7 @@ templ inputExampleWithLabel() {
 			}
 			@input.Input(input.Props{
 				ID:          "input-demo-email",
-				Type:        input.TypeEmail,
+				Type:        "email",
 				Placeholder: "name@example.com",
 			})
 		}
@@ -77,7 +77,7 @@ templ inputExampleWithDescription() {
 			}
 			@input.Input(input.Props{
 				ID:          "input-demo-username",
-				Type:        input.TypeText,
+				Type:        "text",
 				Placeholder: "Enter your username",
 			})
 			@field.Description() {
@@ -95,7 +95,7 @@ templ inputExampleDisabled() {
 			}
 			@input.Input(input.Props{
 				ID:          "input-demo-disabled",
-				Type:        input.TypeEmail,
+				Type:        "email",
 				Placeholder: "Email",
 				Disabled:    true,
 			})
@@ -112,7 +112,7 @@ templ inputExampleTypes() {
 				}
 				@input.Input(input.Props{
 					ID:          "input-demo-password",
-					Type:        input.TypePassword,
+					Type:        "password",
 					Placeholder: "Password",
 				})
 			}
@@ -122,7 +122,7 @@ templ inputExampleTypes() {
 				}
 				@input.Input(input.Props{
 					ID:          "input-demo-tel",
-					Type:        input.TypeTel,
+					Type:        "tel",
 					Placeholder: "+1 (555) 123-4567",
 				})
 			}
@@ -132,7 +132,7 @@ templ inputExampleTypes() {
 				}
 				@input.Input(input.Props{
 					ID:          "input-demo-url",
-					Type:        input.TypeURL,
+					Type:        "url",
 					Placeholder: "https://example.com",
 				})
 			}
@@ -142,7 +142,7 @@ templ inputExampleTypes() {
 				}
 				@input.Input(input.Props{
 					ID:          "input-demo-search",
-					Type:        input.TypeSearch,
+					Type:        "search",
 					Placeholder: "Search",
 				})
 			}
@@ -152,7 +152,7 @@ templ inputExampleTypes() {
 				}
 				@input.Input(input.Props{
 					ID:          "input-demo-number",
-					Type:        input.TypeNumber,
+					Type:        "number",
 					Placeholder: "123",
 				})
 			}
@@ -160,19 +160,19 @@ templ inputExampleTypes() {
 				@field.Label(field.LabelProps{For: "input-demo-date"}) {
 					Date
 				}
-				@input.Input(input.Props{ID: "input-demo-date", Type: input.TypeDate})
+				@input.Input(input.Props{ID: "input-demo-date", Type: "date"})
 			}
 			@field.Field() {
 				@field.Label(field.LabelProps{For: "input-demo-time"}) {
 					Time
 				}
-				@input.Input(input.Props{ID: "input-demo-time", Type: input.TypeTime})
+				@input.Input(input.Props{ID: "input-demo-time", Type: "time"})
 			}
 			@field.Field() {
 				@field.Label(field.LabelProps{For: "input-demo-file"}) {
 					File
 				}
-				@input.Input(input.Props{ID: "input-demo-file", Type: input.TypeFile})
+				@input.Input(input.Props{ID: "input-demo-file", Type: "file"})
 			}
 		</div>
 	}
@@ -182,7 +182,7 @@ templ inputExampleWithSelect() {
 	@inputExampleSection("With Select") {
 		<div class="flex w-full gap-2">
 			@input.Input(input.Props{
-				Type:        input.TypeText,
+				Type:        "text",
 				Placeholder: "Enter amount",
 				Class:       "flex-1",
 			})
@@ -212,7 +212,7 @@ templ inputExampleWithButton() {
 	@inputExampleSection("With Button") {
 		<div class="flex w-full gap-2">
 			@input.Input(input.Props{
-				Type:        input.TypeSearch,
+				Type:        "search",
 				Placeholder: "Search...",
 				Class:       "flex-1",
 			})
@@ -227,7 +227,7 @@ templ inputExampleWithNativeSelect() {
 	@inputExampleSection("With Native Select") {
 		<div class="flex w-full gap-2">
 			@input.Input(input.Props{
-				Type:        input.TypeTel,
+				Type:        "tel",
 				Placeholder: "(555) 123-4567",
 				Class:       "flex-1",
 			})
@@ -259,7 +259,7 @@ templ inputExampleForm() {
 					}
 					@input.Input(input.Props{
 						ID:          "form-name",
-						Type:        input.TypeText,
+						Type:        "text",
 						Placeholder: "Axel Adrian",
 					})
 				}
@@ -269,7 +269,7 @@ templ inputExampleForm() {
 					}
 					@input.Input(input.Props{
 						ID:          "form-email",
-						Type:        input.TypeEmail,
+						Type:        "email",
 						Placeholder: "john@example.com",
 					})
 					@field.Description() {
@@ -283,7 +283,7 @@ templ inputExampleForm() {
 						}
 						@input.Input(input.Props{
 							ID:          "form-phone",
-							Type:        input.TypeTel,
+							Type:        "tel",
 							Placeholder: "+1 (555) 123-4567",
 						})
 					}
@@ -317,7 +317,7 @@ templ inputExampleForm() {
 					}
 					@input.Input(input.Props{
 						ID:          "form-address",
-						Type:        input.TypeText,
+						Type:        "text",
 						Placeholder: "123 Main St",
 					})
 				}

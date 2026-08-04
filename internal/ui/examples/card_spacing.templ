@@ -61,7 +61,7 @@ templ CardSpacing() {
 							}
 							@input.Input(input.Props{
 								ID:          "email-spacing",
-								Type:        input.TypeEmail,
+								Type:        "email",
 								Placeholder: "m@example.com",
 								Attributes:  templ.Attributes{"required": true},
 							})
@@ -77,7 +77,7 @@ templ CardSpacing() {
 							</div>
 							@input.Input(input.Props{
 								ID:         "password-spacing",
-								Type:       input.TypePassword,
+								Type:       "password",
 								Attributes: templ.Attributes{"required": true},
 							})
 						</div>

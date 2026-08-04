@@ -59,7 +59,7 @@ templ inputGroupExampleBasic() {
 					@inputgroup.Input(inputgroup.InputProps{ID: "input-group-02", Placeholder: "Placeholder"})
 				}
 			}
-			@field.Field(field.Props{Disabled: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@field.Label(field.LabelProps{For: "input-disabled-03"}) {
 					Disabled
 				}
@@ -71,7 +71,7 @@ templ inputGroupExampleBasic() {
 					})
 				}
 			}
-			@field.Field(field.Props{Invalid: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-invalid": "true"}}) {
 				@field.Label(field.LabelProps{For: "input-invalid-04"}) {
 					Invalid
 				}
@@ -533,7 +533,7 @@ templ inputGroupExampleWithKbd() {
 					}
 				}
 			}
-			@field.Field(field.Props{Disabled: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@field.Label(field.LabelProps{For: "input-group-29"}) {
 					{ `Loading ("data-disabled="true")` }
 				}
@@ -652,7 +652,7 @@ templ inputGroupExampleTextarea() {
 					This is a description of the input group.
 				}
 			}
-			@field.Field(field.Props{Invalid: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-invalid": "true"}}) {
 				@field.Label(field.LabelProps{For: "textarea-header-footer-14"}) {
 					Invalid
 				}
@@ -667,7 +667,7 @@ templ inputGroupExampleTextarea() {
 					This is a description of the input group.
 				}
 			}
-			@field.Field(field.Props{Disabled: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@field.Label(field.LabelProps{For: "textarea-header-footer-15"}) {
 					Disabled
 				}

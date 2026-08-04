@@ -79,7 +79,7 @@ Use `aria-invalid` to mark the input as invalid. To style the invalid state, set
 
 ## File
 
-Use the `Type: input.TypeFile` prop to create a file input.
+Use the `Type: "file"` prop to create a file input.
 
 <ComponentPreview name="input-file" previewClassName="*:max-w-xs" />
 
@@ -133,7 +133,7 @@ The `Input` component displays a native input element.
 
 | Prop          | Type                                                                        | Default    |
 | ------------- | ---------------------------------------------------------------------------- | ---------- |
-| `Type`        | `TypeText \| TypePassword \| TypeEmail \| TypeNumber \| TypeTel \| ...` | `TypeText` |
+| `Type`        | `string`                                                                    | `""`       |
 | `Name`        | `string`                                                                    | -          |
 | `Value`       | `string`                                                                    | -          |
 | `Placeholder` | `string`                                                                    | -          |

@@ -61,7 +61,7 @@ templ checkboxExampleWithDescription() {
 
 templ checkboxExampleInvalid() {
 	@checkboxExampleSection("Invalid") {
-		@field.Field(field.Props{Orientation: field.OrientationHorizontal, Invalid: true}) {
+		@field.Field(field.Props{Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-invalid": "true"}}) {
 			@checkbox.Checkbox(checkbox.Props{
 				ID:         "checkbox-example-terms-3",
 				Attributes: templ.Attributes{"aria-invalid": "true"},
@@ -101,7 +101,7 @@ templ checkboxExampleWithTitle() {
 				}
 			}
 			@field.Label(field.LabelProps{For: "checkbox-example-toggle-4"}) {
-				@field.Field(field.Props{Orientation: field.OrientationHorizontal, Disabled: true}) {
+				@field.Field(field.Props{Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-disabled": "true"}}) {
 					@checkbox.Checkbox(checkbox.Props{ID: "checkbox-example-toggle-4", Disabled: true})
 					@field.Content() {
 						@field.Title() {

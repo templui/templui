@@ -55,7 +55,7 @@ templ labelExampleWithInput() {
 
 templ labelExampleDisabled() {
 	@labelExampleSection("Disabled") {
-		@field.Field(field.Props{Disabled: true}) {
+		@field.Field(field.Props{Attributes: templ.Attributes{"data-disabled": "true"}}) {
 			@label.Label(label.Props{For: "label-demo-disabled"}) {
 				Disabled
 			}

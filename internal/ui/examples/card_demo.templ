@@ -31,7 +31,7 @@ templ CardDemo() {
 						}
 						@input.Input(input.Props{
 							ID:          "email",
-							Type:        input.TypeEmail,
+							Type:        "email",
 							Placeholder: "m@example.com",
 							Attributes:  templ.Attributes{"required": true},
 						})
@@ -47,7 +47,7 @@ templ CardDemo() {
 						</div>
 						@input.Input(input.Props{
 							ID:         "password",
-							Type:       input.TypePassword,
+							Type:       "password",
 							Attributes: templ.Attributes{"required": true},
 						})
 					</div>

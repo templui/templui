@@ -16,7 +16,7 @@ templ InputForm() {
 				}
 				@input.Input(input.Props{
 					ID:          "form-name",
-					Type:        input.TypeText,
+					Type:        "text",
 					Placeholder: "Axel Adrian",
 					Required:    true,
 				})
@@ -27,7 +27,7 @@ templ InputForm() {
 				}
 				@input.Input(input.Props{
 					ID:          "form-email",
-					Type:        input.TypeEmail,
+					Type:        "email",
 					Placeholder: "john@example.com",
 				})
 				@field.Description() {
@@ -75,7 +75,7 @@ templ InputForm() {
 				}
 				@input.Input(input.Props{
 					ID:          "form-address",
-					Type:        input.TypeText,
+					Type:        "text",
 					Placeholder: "123 Main St",
 				})
 			}

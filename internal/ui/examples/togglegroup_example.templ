@@ -376,7 +376,7 @@ var toggleGroupExampleFilterItems = []toggleGroupExampleFilterItem{
 templ toggleGroupExampleWithInputAndSelect() {
 	@toggleGroupExampleSection("With Input and Select") {
 		<div class="flex items-center gap-2">
-			@input.Input(input.Props{Type: input.TypeSearch, Placeholder: "Search...", Class: "flex-1"})
+			@input.Input(input.Props{Type: "search", Placeholder: "Search...", Class: "flex-1"})
 			@selectcomp.Select(selectcomp.Props{Value: "all"}) {
 				@selectcomp.Trigger(selectcomp.TriggerProps{Class: "w-32"}) {
 					@selectcomp.Value()

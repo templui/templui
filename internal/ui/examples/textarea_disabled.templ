@@ -6,7 +6,7 @@ import (
 )
 
 templ TextareaDisabled() {
-	@field.Field(field.Props{Disabled: true}) {
+	@field.Field(field.Props{Attributes: templ.Attributes{"data-disabled": "true"}}) {
 		@field.Label(field.LabelProps{For: "textarea-disabled"}) {
 			Message
 		}

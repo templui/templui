@@ -208,7 +208,7 @@ func Input(props ...InputProps) templ.Component {
 		}
 		templ_7745c5c3_Err = input.Input(input.Props{
 			ID:          p.ID,
-			Type:        input.Type(p.Type),
+			Type:        p.Type,
 			Name:        p.Name,
 			Value:       p.Value,
 			Placeholder: p.Placeholder,

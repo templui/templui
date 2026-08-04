@@ -2,31 +2,12 @@ package input
 
 import "github.com/templui/templui/utils"
 
-type Type string
-
-const (
-	TypeText     Type = "text"
-	TypePassword Type = "password"
-	TypeEmail    Type = "email"
-	TypeNumber   Type = "number"
-	TypeTel      Type = "tel"
-	TypeURL      Type = "url"
-	TypeSearch   Type = "search"
-	TypeDate     Type = "date"
-	TypeDateTime Type = "datetime-local"
-	TypeTime     Type = "time"
-	TypeFile     Type = "file"
-	TypeColor    Type = "color"
-	TypeWeek     Type = "week"
-	TypeMonth    Type = "month"
-)
-
 type Props struct {
 	ID          string
 	Class       string
 	Attributes  templ.Attributes
 	Name        string
-	Type        Type
+	Type        string
 	Form        string
 	Placeholder string
 	Value       string
@@ -41,9 +22,6 @@ templ Input(props ...Props) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	if p.Type == "" {
-		{{ p.Type = TypeText }}
-	}
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
@@ -52,7 +30,9 @@ templ Input(props ...Props) {
 		if _, hasSlot := p.Attributes["data-slot"]; !hasSlot {
 			data-slot="input"
 		}
-		type={ string(p.Type) }
+		if p.Type != "" {
+			type={ p.Type }
+		}
 		if p.Name != "" {
 			name={ p.Name }
 		}
@@ -62,7 +42,7 @@ templ Input(props ...Props) {
 		if p.Value != "" {
 			value={ p.Value }
 		}
-		if p.Type == TypeFile && p.Accept != "" {
+		if p.Type == "file" && p.Accept != "" {
 			accept={ p.Accept }
 		}
 		if p.Form != "" {

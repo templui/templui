@@ -164,7 +164,7 @@ templ cardExampleLogin() {
 							}
 							@input.Input(input.Props{
 								ID:          "card-example-email",
-								Type:        input.TypeEmail,
+								Type:        "email",
 								Placeholder: "m@example.com",
 								Attributes:  templ.Attributes{"required": true},
 							})
@@ -180,7 +180,7 @@ templ cardExampleLogin() {
 							</div>
 							@input.Input(input.Props{
 								ID:         "card-example-password",
-								Type:       input.TypePassword,
+								Type:       "password",
 								Attributes: templ.Attributes{"required": true},
 							})
 						}

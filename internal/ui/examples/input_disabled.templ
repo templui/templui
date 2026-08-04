@@ -6,13 +6,13 @@ import (
 )
 
 templ InputDisabled() {
-	@field.Field(field.Props{Disabled: true}) {
+	@field.Field(field.Props{Attributes: templ.Attributes{"data-disabled": "true"}}) {
 		@field.Label(field.LabelProps{For: "input-demo-disabled"}) {
 			Email
 		}
 		@input.Input(input.Props{
 			ID:          "input-demo-disabled",
-			Type:        input.TypeEmail,
+			Type:        "email",
 			Placeholder: "Email",
 			Disabled:    true,
 		})

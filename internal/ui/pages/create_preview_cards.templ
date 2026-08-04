@@ -1343,7 +1343,7 @@ templ cardAccountAccess() {
 					@field.Label(field.LabelProps{For: "email-address"}) {
 						Email Address
 					}
-					@input.Input(input.Props{ID: "email-address", Type: input.TypeEmail, Value: "artist@studio.inc"})
+					@input.Input(input.Props{ID: "email-address", Type: "email", Value: "artist@studio.inc"})
 				}
 				@field.Field() {
 					<div class="flex items-center justify-between">
@@ -1354,7 +1354,7 @@ templ cardAccountAccess() {
 							Forgot?
 						</a>
 					</div>
-					@input.Input(input.Props{ID: "current-password", Type: input.TypePassword, Value: "password123"})
+					@input.Input(input.Props{ID: "current-password", Type: "password", Value: "password123"})
 				}
 			}
 		}
@@ -2398,7 +2398,7 @@ templ cardTypographySpecimen() {
 								@field.Label(field.LabelProps{For: "feedback-email"}) {
 									Email
 								}
-								@input.Input(input.Props{ID: "feedback-email", Type: input.TypeEmail, Placeholder: "you@example.com"})
+								@input.Input(input.Props{ID: "feedback-email", Type: "email", Placeholder: "you@example.com"})
 							}
 						</div>
 						@field.Field() {

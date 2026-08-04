@@ -7,7 +7,7 @@ import (
 
 templ RadioGroupDisabled() {
 	@radiogroup.RadioGroup(radiogroup.Props{Value: "option2", Class: "w-fit"}) {
-		@field.Field(field.Props{Orientation: field.OrientationHorizontal, Disabled: true}) {
+		@field.Field(field.Props{Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-disabled": "true"}}) {
 			@radiogroup.Item(radiogroup.ItemProps{ID: "disabled-1", Value: "option1", Disabled: true})
 			@field.Label(field.LabelProps{For: "disabled-1", Class: "font-normal"}) {
 				Disabled

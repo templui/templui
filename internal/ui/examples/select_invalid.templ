@@ -6,7 +6,7 @@ import (
 )
 
 templ SelectInvalid() {
-	@field.Field(field.Props{Invalid: true, Class: "w-full max-w-48"}) {
+	@field.Field(field.Props{ Class: "w-full max-w-48", Attributes: templ.Attributes{"data-invalid": "true"}}) {
 		@field.Label() {
 			Fruit
 		}

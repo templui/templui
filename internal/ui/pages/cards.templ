@@ -712,7 +712,7 @@ templ AccountAccess() {
 					@field.Label(field.LabelProps{For: "email-address"}) {
 						Email Address
 					}
-					@input.Input(input.Props{ID: "email-address", Type: input.TypeEmail, Placeholder: "artist@studio.inc"})
+					@input.Input(input.Props{ID: "email-address", Type: "email", Placeholder: "artist@studio.inc"})
 				}
 				@field.Field() {
 					<div class="flex items-center justify-between">
@@ -723,7 +723,7 @@ templ AccountAccess() {
 							Forgot?
 						</a>
 					</div>
-					@input.Input(input.Props{ID: "current-password", Type: input.TypePassword, Placeholder: "••••••••••••••••••••••••"})
+					@input.Input(input.Props{ID: "current-password", Type: "password", Placeholder: "••••••••••••••••••••••••"})
 				}
 			}
 		}

@@ -6,7 +6,7 @@ import (
 )
 
 templ TextareaInvalid() {
-	@field.Field(field.Props{Invalid: true}) {
+	@field.Field(field.Props{Attributes: templ.Attributes{"data-invalid": "true"}}) {
 		@field.Label(field.LabelProps{For: "textarea-invalid"}) {
 			Message
 		}

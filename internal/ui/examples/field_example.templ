@@ -71,7 +71,7 @@ templ fieldExampleInputFields() {
 				}
 				@input.Input(input.Props{
 					ID:          "input-desc-first",
-					Type:        input.TypeEmail,
+					Type:        "email",
 					Placeholder: "email@example.com",
 				})
 			}
@@ -106,7 +106,7 @@ templ fieldExampleInputFields() {
 				}
 				@input.Input(input.Props{ID: "input-badge", Placeholder: "Enter value"})
 			}
-			@field.Field(field.Props{Invalid: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-invalid": "true"}}) {
 				@field.Label(field.LabelProps{For: "input-invalid"}) {
 					Invalid Input
 				}
@@ -119,7 +119,7 @@ templ fieldExampleInputFields() {
 					This field contains validation errors.
 				}
 			}
-			@field.Field(field.Props{Disabled: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@field.Label(field.LabelProps{For: "input-disabled-field"}) {
 					Disabled Field
 				}
@@ -176,7 +176,7 @@ templ fieldExampleTextareaFields() {
 					Enter your message so it is long enough to test the layout.
 				}
 			}
-			@field.Field(field.Props{Invalid: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-invalid": "true"}}) {
 				@field.Label(field.LabelProps{For: "textarea-invalid"}) {
 					Invalid Textarea
 				}
@@ -189,7 +189,7 @@ templ fieldExampleTextareaFields() {
 					This field contains validation errors.
 				}
 			}
-			@field.Field(field.Props{Disabled: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@field.Label(field.LabelProps{For: "textarea-disabled-field"}) {
 					Disabled Field
 				}
@@ -274,7 +274,7 @@ templ fieldExampleSelectFields() {
 					{"UTC", "utc"}, {"Eastern Time", "est"}, {"Pacific Time", "pst"},
 				})
 			}
-			@field.Field(field.Props{Invalid: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-invalid": "true"}}) {
 				@field.Label(field.LabelProps{For: "select-invalid"}) {
 					Invalid Select
 				}
@@ -283,7 +283,7 @@ templ fieldExampleSelectFields() {
 					This field contains validation errors.
 				}
 			}
-			@field.Field(field.Props{Disabled: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@field.Label(field.LabelProps{For: "select-disabled-field"}) {
 					Disabled Field
 				}
@@ -384,7 +384,7 @@ templ fieldExampleNativeSelectFields() {
 					Native select with grouped options using optgroup.
 				}
 			}
-			@field.Field(field.Props{Invalid: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-invalid": "true"}}) {
 				@field.Label(field.LabelProps{For: "native-select-invalid"}) {
 					Invalid Native Select
 				}
@@ -398,7 +398,7 @@ templ fieldExampleNativeSelectFields() {
 					This field contains validation errors.
 				}
 			}
-			@field.Field(field.Props{Disabled: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@field.Label(field.LabelProps{For: "native-select-disabled-field"}) {
 					Disabled Field
 				}
@@ -483,7 +483,7 @@ templ fieldExampleCheckboxFields() {
 					}
 				}
 			}
-			@field.Field(field.Props{Invalid: true, Orientation: field.OrientationHorizontal}) {
+			@field.Field(field.Props{ Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-invalid": "true"}}) {
 				@checkbox.Checkbox(checkbox.Props{
 					ID:         "checkbox-invalid",
 					Attributes: templ.Attributes{"aria-invalid": "true"},
@@ -492,7 +492,7 @@ templ fieldExampleCheckboxFields() {
 					Invalid checkbox
 				}
 			}
-			@field.Field(field.Props{Disabled: true, Orientation: field.OrientationHorizontal}) {
+			@field.Field(field.Props{ Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@checkbox.Checkbox(checkbox.Props{ID: "checkbox-disabled-field", Disabled: true})
 				@field.Label(field.LabelProps{For: "checkbox-disabled-field"}) {
 					Disabled checkbox
@@ -591,7 +591,7 @@ templ fieldExampleRadioFields() {
 					Invalid Radio Group
 				}
 				@radiogroup.RadioGroup() {
-					@field.Field(field.Props{Invalid: true, Orientation: field.OrientationHorizontal}) {
+					@field.Field(field.Props{ Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-invalid": "true"}}) {
 						@radiogroup.Item(radiogroup.ItemProps{
 							Value:      "invalid1",
 							ID:         "radio-invalid-1",
@@ -601,7 +601,7 @@ templ fieldExampleRadioFields() {
 							Invalid Option 1
 						}
 					}
-					@field.Field(field.Props{Invalid: true, Orientation: field.OrientationHorizontal}) {
+					@field.Field(field.Props{ Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-invalid": "true"}}) {
 						@radiogroup.Item(radiogroup.ItemProps{
 							Value:      "invalid2",
 							ID:         "radio-invalid-2",
@@ -618,13 +618,13 @@ templ fieldExampleRadioFields() {
 					Disabled Radio Group
 				}
 				@radiogroup.RadioGroup(radiogroup.Props{Disabled: true}) {
-					@field.Field(field.Props{Disabled: true, Orientation: field.OrientationHorizontal}) {
+					@field.Field(field.Props{ Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-disabled": "true"}}) {
 						@radiogroup.Item(radiogroup.ItemProps{Value: "disabled1", ID: "radio-disabled-1", Disabled: true})
 						@field.Label(field.LabelProps{For: "radio-disabled-1"}) {
 							Disabled Option 1
 						}
 					}
-					@field.Field(field.Props{Disabled: true, Orientation: field.OrientationHorizontal}) {
+					@field.Field(field.Props{ Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-disabled": "true"}}) {
 						@radiogroup.Item(radiogroup.ItemProps{Value: "disabled2", ID: "radio-disabled-2", Disabled: true})
 						@field.Label(field.LabelProps{For: "radio-disabled-2"}) {
 							Disabled Option 2
@@ -687,7 +687,7 @@ templ fieldExampleSwitchFields() {
 					}
 				}
 			}
-			@field.Field(field.Props{Invalid: true, Orientation: field.OrientationHorizontal}) {
+			@field.Field(field.Props{ Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-invalid": "true"}}) {
 				@field.Content() {
 					@field.Label(field.LabelProps{For: "switch-invalid"}) {
 						Invalid Switch
@@ -701,7 +701,7 @@ templ fieldExampleSwitchFields() {
 					Attributes: templ.Attributes{"aria-invalid": "true"},
 				})
 			}
-			@field.Field(field.Props{Disabled: true, Orientation: field.OrientationHorizontal}) {
+			@field.Field(field.Props{ Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@field.Content() {
 					@field.Label(field.LabelProps{For: "switch-disabled-field"}) {
 						Disabled Switch
@@ -802,7 +802,7 @@ templ fieldExampleSliderFields() {
 					<span data-tui-field-example-color>Red: 10%, Green: 20%, Blue: 70%</span>
 				}
 			}
-			@field.Field(field.Props{Invalid: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-invalid": "true"}}) {
 				@field.Label(field.LabelProps{For: "slider-invalid"}) {
 					Invalid Slider
 				}
@@ -816,7 +816,7 @@ templ fieldExampleSliderFields() {
 					This slider has validation errors.
 				}
 			}
-			@field.Field(field.Props{Disabled: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@field.Label(field.LabelProps{For: "slider-disabled-field"}) {
 					Disabled Slider
 				}
@@ -925,7 +925,7 @@ templ fieldExampleInputOTPFields() {
 					Enter your 4-digit PIN (numbers only).
 				}
 			}
-			@field.Field(field.Props{Invalid: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-invalid": "true"}}) {
 				@field.Label(field.LabelProps{For: "otp-invalid"}) {
 					Invalid OTP
 				}
@@ -943,7 +943,7 @@ templ fieldExampleInputOTPFields() {
 					This OTP field contains validation errors.
 				}
 			}
-			@field.Field(field.Props{Disabled: true}) {
+			@field.Field(field.Props{Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@field.Label(field.LabelProps{For: "otp-disabled-field"}) {
 					Disabled OTP
 				}

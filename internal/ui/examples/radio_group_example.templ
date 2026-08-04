@@ -162,19 +162,19 @@ templ radioGroupExampleGrid() {
 templ radioGroupExampleDisabled() {
 	@radioGroupExampleSection("Disabled") {
 		@radiogroup.RadioGroup(radiogroup.Props{Value: "option2"}) {
-			@field.Field(field.Props{Orientation: field.OrientationHorizontal, Disabled: true}) {
+			@field.Field(field.Props{Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@radiogroup.Item(radiogroup.ItemProps{ID: "disabled-1", Value: "option1", Disabled: true})
 				@field.Label(field.LabelProps{For: "disabled-1", Class: "font-normal"}) {
 					Option 1
 				}
 			}
-			@field.Field(field.Props{Orientation: field.OrientationHorizontal, Disabled: true}) {
+			@field.Field(field.Props{Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@radiogroup.Item(radiogroup.ItemProps{ID: "disabled-2", Value: "option2", Disabled: true})
 				@field.Label(field.LabelProps{For: "disabled-2", Class: "font-normal"}) {
 					Option 2
 				}
 			}
-			@field.Field(field.Props{Orientation: field.OrientationHorizontal, Disabled: true}) {
+			@field.Field(field.Props{Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@radiogroup.Item(radiogroup.ItemProps{ID: "disabled-3", Value: "option3", Disabled: true})
 				@field.Label(field.LabelProps{For: "disabled-3", Class: "font-normal"}) {
 					Option 3
@@ -194,19 +194,19 @@ templ radioGroupExampleInvalid() {
 				Choose how you want to receive notifications.
 			}
 			@radiogroup.RadioGroup(radiogroup.Props{Value: "email"}) {
-				@field.Field(field.Props{Orientation: field.OrientationHorizontal, Invalid: true}) {
+				@field.Field(field.Props{Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-invalid": "true"}}) {
 					@radiogroup.Item(radiogroup.ItemProps{ID: "invalid-email", Value: "email", Attributes: templ.Attributes{"aria-invalid": "true"}})
 					@field.Label(field.LabelProps{For: "invalid-email", Class: "font-normal"}) {
 						Email only
 					}
 				}
-				@field.Field(field.Props{Orientation: field.OrientationHorizontal, Invalid: true}) {
+				@field.Field(field.Props{Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-invalid": "true"}}) {
 					@radiogroup.Item(radiogroup.ItemProps{ID: "invalid-sms", Value: "sms", Attributes: templ.Attributes{"aria-invalid": "true"}})
 					@field.Label(field.LabelProps{For: "invalid-sms", Class: "font-normal"}) {
 						SMS only
 					}
 				}
-				@field.Field(field.Props{Orientation: field.OrientationHorizontal, Invalid: true}) {
+				@field.Field(field.Props{Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-invalid": "true"}}) {
 					@radiogroup.Item(radiogroup.ItemProps{ID: "invalid-both", Value: "both", Attributes: templ.Attributes{"aria-invalid": "true"}})
 					@field.Label(field.LabelProps{For: "invalid-both", Class: "font-normal"}) {
 						Both Email & SMS
