@@ -40,7 +40,7 @@ templui add item
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/components/item"
+import "github.com/templui/templui/v2/components/item"
 ```
 
 ```templ showLineNumbers

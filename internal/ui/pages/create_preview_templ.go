@@ -9,9 +9,9 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/templui/templui/internal/ui/examples"
-	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/utils"
+	"github.com/templui/templui/v2/internal/ui/examples"
+	"github.com/templui/templui/v2/internal/ui/modules"
+	"github.com/templui/templui/v2/utils"
 )
 
 // CreatePreview renders inside the /create iframe. The parent syncs the

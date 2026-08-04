@@ -40,7 +40,7 @@ templui add aspect-ratio
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/components/aspectratio"
+import "github.com/templui/templui/v2/components/aspectratio"
 ```
 
 ```templ showLineNumbers

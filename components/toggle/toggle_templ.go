@@ -12,7 +12,7 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/templui/templui/utils"
+	"github.com/templui/templui/v2/utils"
 )
 
 type Variant string

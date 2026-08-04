@@ -40,7 +40,7 @@ templui add field
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/components/field"
+import "github.com/templui/templui/v2/components/field"
 ```
 
 ```templ showLineNumbers

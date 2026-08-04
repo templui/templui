@@ -13,15 +13,15 @@ import (
 	"net/url"
 	"strings"
 
-	componentsrc "github.com/templui/templui/components"
-	"github.com/templui/templui/components/button"
-	"github.com/templui/templui/components/dropdownmenu"
-	"github.com/templui/templui/components/icon"
-	"github.com/templui/templui/internal/ctxkeys"
-	"github.com/templui/templui/internal/registry"
-	"github.com/templui/templui/internal/shared"
-	"github.com/templui/templui/internal/ui/examples"
-	"github.com/templui/templui/utils"
+	componentsrc "github.com/templui/templui/v2/components"
+	"github.com/templui/templui/v2/components/button"
+	"github.com/templui/templui/v2/components/dropdownmenu"
+	"github.com/templui/templui/v2/components/icon"
+	"github.com/templui/templui/v2/internal/ctxkeys"
+	"github.com/templui/templui/v2/internal/registry"
+	"github.com/templui/templui/v2/internal/shared"
+	"github.com/templui/templui/v2/internal/ui/examples"
+	"github.com/templui/templui/v2/utils"
 )
 
 // Modules for the markdown-based component docs (the shadcn docs shell):

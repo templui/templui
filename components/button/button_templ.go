@@ -8,7 +8,7 @@ package button
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/templui/templui/utils"
+import "github.com/templui/templui/v2/utils"
 
 type Variant string
 type Size string

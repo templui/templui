@@ -40,7 +40,7 @@ templui add empty
 ## Usage
 
 ```go
-import "github.com/templui/templui/components/empty"
+import "github.com/templui/templui/v2/components/empty"
 ```
 
 ```templ

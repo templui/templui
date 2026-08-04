@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/templui/templui/assets"
+	"github.com/templui/templui/v2/assets"
 )
 
 // Theme is the pendant of a registry/themes.ts entry. The values are the

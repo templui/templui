@@ -16,9 +16,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/templui/templui/cmd/templui/registry"
-	"github.com/templui/templui/cmd/templui/utils"
-	"github.com/templui/templui/internal/preset"
+	"github.com/templui/templui/v2/cmd/templui/registry"
+	"github.com/templui/templui/v2/cmd/templui/utils"
+	"github.com/templui/templui/v2/internal/preset"
 )
 
 // ApplyOptions are the flags of templui apply.

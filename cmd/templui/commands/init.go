@@ -18,9 +18,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/templui/templui/cmd/templui/registry"
-	"github.com/templui/templui/cmd/templui/templates"
-	"github.com/templui/templui/cmd/templui/utils"
+	"github.com/templui/templui/v2/cmd/templui/registry"
+	"github.com/templui/templui/v2/cmd/templui/templates"
+	"github.com/templui/templui/v2/cmd/templui/utils"
 )
 
 // InitOptions are the flags of templui init.

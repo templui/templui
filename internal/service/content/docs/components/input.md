@@ -42,7 +42,7 @@ Component scripts are loaded through the shared script bundle, see [JavaScript](
 ## Usage
 
 ```go
-import "github.com/templui/templui/components/input"
+import "github.com/templui/templui/v2/components/input"
 ```
 
 ```templ

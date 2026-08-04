@@ -40,7 +40,7 @@ templui add table
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/components/table"
+import "github.com/templui/templui/v2/components/table"
 ```
 
 ```templ showLineNumbers

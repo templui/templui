@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/templui/templui/utils"
+	"github.com/templui/templui/v2/utils"
 )
 
 type Orientation string

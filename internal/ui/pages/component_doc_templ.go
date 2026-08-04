@@ -9,13 +9,13 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/templui/templui/components/tabs"
-	"github.com/templui/templui/internal/markdown"
-	"github.com/templui/templui/internal/service"
-	"github.com/templui/templui/internal/ui/examples"
-	"github.com/templui/templui/internal/ui/layouts"
-	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/utils"
+	"github.com/templui/templui/v2/components/tabs"
+	"github.com/templui/templui/v2/internal/markdown"
+	"github.com/templui/templui/v2/internal/service"
+	"github.com/templui/templui/v2/internal/ui/examples"
+	"github.com/templui/templui/v2/internal/ui/layouts"
+	"github.com/templui/templui/v2/internal/ui/modules"
+	"github.com/templui/templui/v2/utils"
 )
 
 // PagerLink points to the previous/next component page.

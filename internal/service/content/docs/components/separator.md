@@ -40,7 +40,7 @@ templui add separator
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/components/separator"
+import "github.com/templui/templui/v2/components/separator"
 ```
 
 ```templ showLineNumbers

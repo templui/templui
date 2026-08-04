@@ -40,7 +40,7 @@ templui add button-group
 ## Usage
 
 ```go
-import "github.com/templui/templui/components/buttongroup"
+import "github.com/templui/templui/v2/components/buttongroup"
 ```
 
 ```templ

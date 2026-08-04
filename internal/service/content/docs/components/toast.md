@@ -44,7 +44,7 @@ Component scripts are loaded through the shared script bundle, see [JavaScript](
 Add the `Toaster` component to your base layout.
 
 ```templ showLineNumbers title="layout.templ"
-import "github.com/templui/templui/components/toast"
+import "github.com/templui/templui/v2/components/toast"
 
 templ Layout() {
 	<html lang="en">

@@ -40,7 +40,7 @@ templui add switch
 ## Usage
 
 ```go showLineNumbers
-import switchcomp "github.com/templui/templui/components/switch"
+import switchcomp "github.com/templui/templui/v2/components/switch"
 ```
 
 ```templ showLineNumbers

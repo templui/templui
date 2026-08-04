@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/templui/templui/cmd/templui/registry"
-	"github.com/templui/templui/internal/preset"
+	"github.com/templui/templui/v2/cmd/templui/registry"
+	"github.com/templui/templui/v2/internal/preset"
 )
 
 // DefaultPreset is a DEFAULT_PRESETS entry.

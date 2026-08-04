@@ -9,8 +9,8 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/templui/templui/components/icon"
-	"github.com/templui/templui/utils"
+	"github.com/templui/templui/v2/components/icon"
+	"github.com/templui/templui/v2/utils"
 )
 
 type Props struct {

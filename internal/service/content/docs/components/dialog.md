@@ -44,7 +44,7 @@ Component scripts are loaded through the shared script bundle, see [JavaScript](
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/components/dialog"
+import "github.com/templui/templui/v2/components/dialog"
 ```
 
 ```templ showLineNumbers

@@ -48,7 +48,7 @@ Component scripts are loaded through the shared script bundle, see [JavaScript](
 ## Usage
 
 ```go showLineNumbers
-import selectcomp "github.com/templui/templui/components/select"
+import selectcomp "github.com/templui/templui/v2/components/select"
 ```
 
 ```templ showLineNumbers

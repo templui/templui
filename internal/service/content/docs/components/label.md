@@ -42,7 +42,7 @@ templui add label
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/components/label"
+import "github.com/templui/templui/v2/components/label"
 ```
 
 ```templ showLineNumbers

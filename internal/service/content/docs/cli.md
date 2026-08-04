@@ -7,7 +7,7 @@ order: 7
 The CLI installs the Go way and updates itself the same way:
 
 ```shell
-go install github.com/templui/templui/cmd/templui@latest
+go install github.com/templui/templui/v2/cmd/templui@latest
 ```
 
 ## init
@@ -168,5 +168,5 @@ https://templui.io/create?preset=b2D0wqNxT
 The CLI updates itself the Go way:
 
 ```shell
-go install github.com/templui/templui/cmd/templui@latest
+go install github.com/templui/templui/v2/cmd/templui@latest
 ```

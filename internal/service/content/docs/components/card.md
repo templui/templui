@@ -40,7 +40,7 @@ templui add card
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/components/card"
+import "github.com/templui/templui/v2/components/card"
 ```
 
 ```templ showLineNumbers

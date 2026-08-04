@@ -27,7 +27,7 @@ The same tools as the CLI workflow: see [Installation → Configure templ, Tailw
 ### 1. Add templui
 
 ```shell
-go get github.com/templui/templui@latest
+go get github.com/templui/templui/v2@latest
 ```
 
 You can also just import a component package and run `go mod tidy`.
@@ -37,7 +37,7 @@ You can also just import a component package and run `go mod tidy`.
 Style setup is the same `templui init` as in the [CLI workflow](/docs/installation#run-the-cli): it creates `assets/css/globals.css` and merges your theme variables and base layer into it. Pick a design on [templui.io/create](https://templui.io/create) and pass its preset code, or use one of the named presets:
 
 ```shell
-go install github.com/templui/templui/cmd/templui@latest
+go install github.com/templui/templui/v2/cmd/templui@latest
 templui init
 ```
 
@@ -67,7 +67,7 @@ tasks:
     desc: Watch Tailwind CSS changes
     cmds:
       - |
-        TEMPLUI_PATH="$(go list -mod=mod -m -f {{`'{{.Dir}}'`}} github.com/templui/templui)" && \
+        TEMPLUI_PATH="$(go list -mod=mod -m -f {{`'{{.Dir}}'`}} github.com/templui/templui/v2)" && \
         printf '%s\n' \
           "@import \"$TEMPLUI_PATH/assets/css/tw-animate.css\";" \
           "@import \"$TEMPLUI_PATH/assets/css/shadcn-tailwind.css\";" \
@@ -100,7 +100,7 @@ Components carry `cn-*` classes; the style class on `<body>` picks which of the 
 ### 5. Import and use a component
 
 ```go
-import "github.com/templui/templui/components/button"
+import "github.com/templui/templui/v2/components/button"
 ```
 
 ```templ

@@ -11,10 +11,10 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"context"
 
-	"github.com/templui/templui/components/dialog"
-	"github.com/templui/templui/components/icon"
-	"github.com/templui/templui/components/inputgroup"
-	"github.com/templui/templui/utils"
+	"github.com/templui/templui/v2/components/dialog"
+	"github.com/templui/templui/v2/components/icon"
+	"github.com/templui/templui/v2/components/inputgroup"
+	"github.com/templui/templui/v2/utils"
 )
 
 type ctxKey string

@@ -44,7 +44,7 @@ templui add icon
 ## Usage
 
 ```go
-import "github.com/templui/templui/components/icon"
+import "github.com/templui/templui/v2/components/icon"
 ```
 
 ```templ

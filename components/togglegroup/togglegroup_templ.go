@@ -11,8 +11,8 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"strconv"
 
-	"github.com/templui/templui/components/toggle"
-	"github.com/templui/templui/utils"
+	"github.com/templui/templui/v2/components/toggle"
+	"github.com/templui/templui/v2/utils"
 )
 
 type Orientation string

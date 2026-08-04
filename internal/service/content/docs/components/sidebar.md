@@ -50,7 +50,7 @@ Component scripts are loaded through the shared script bundle, see [JavaScript](
 ## Usage
 
 ```templ showLineNumbers title="layout.templ"
-import "github.com/templui/templui/components/sidebar"
+import "github.com/templui/templui/v2/components/sidebar"
 
 templ Layout() {
 	@sidebar.Provider() {

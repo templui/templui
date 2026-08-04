@@ -40,7 +40,7 @@ templui add pagination
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/components/pagination"
+import "github.com/templui/templui/v2/components/pagination"
 ```
 
 ```templ showLineNumbers

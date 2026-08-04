@@ -12,7 +12,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/templui/templui/utils"
+	"github.com/templui/templui/v2/utils"
 )
 
 type ctxKey string

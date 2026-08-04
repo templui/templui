@@ -6,7 +6,7 @@
 // registryItemSchema field names are kept):
 //
 //	dependencies:            npm packages -> the Go module. shadcn@latest
-//	                         becomes github.com/templui/templui@latest; the
+//	                         becomes github.com/templui/templui/v2@latest; the
 //	                         class-variance-authority, @base-ui/react and
 //	                         icon packages have no pendant (variants, DOM
 //	                         behavior and lucide icons are compiled into the
@@ -28,14 +28,14 @@ package registryapi
 import (
 	"fmt"
 
-	"github.com/templui/templui/internal/shared"
+	"github.com/templui/templui/v2/internal/shared"
 )
 
 // moduleVersion is the SHADCN_VERSION pendant for the Go module dependency.
 const moduleVersion = "latest"
 
 // ModuleDependency is the Go pendant of the shadcn@latest npm dependency.
-const ModuleDependency = "github.com/templui/templui@" + moduleVersion
+const ModuleDependency = "github.com/templui/templui/v2@" + moduleVersion
 
 // Item is the registryItemSchema pendant. The field order matches the JSON
 // key order of the live ui.shadcn.com routes ($schema, extends, name,

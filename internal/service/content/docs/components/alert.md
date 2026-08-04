@@ -40,7 +40,7 @@ templui add alert
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/components/alert"
+import "github.com/templui/templui/v2/components/alert"
 ```
 
 ```templ showLineNumbers

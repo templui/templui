@@ -40,7 +40,7 @@ templui add spinner
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/components/spinner"
+import "github.com/templui/templui/v2/components/spinner"
 ```
 
 ```templ showLineNumbers
