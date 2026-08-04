@@ -68,16 +68,23 @@ templ IndexPage() {
 				<div class="container-wrapper flex-1 p-0">
 					<div class="container overflow-hidden md:px-0 lg:max-w-none">
 						// Below md the reference swaps the card wall for a
-						// screenshot pair (/images/full-light.png,
-						// /images/full-dark.png). We have no such pair yet, so
-						// the existing readme screenshot stands in for both.
+						// screenshot pair of its own wall; we use the reference
+						// pair as-is (both in the DOM, CSS class switches like
+						// their dark:hidden/dark:block Image pair).
 						<section class="-mx-4 w-[140vw] overflow-hidden md:hidden">
 							<img
-								src="/assets/img/readme.png"
-								width="2718"
-								height="1466"
+								src="/assets/img/full-light.png"
+								width="2560"
+								height="2764"
 								alt="Dashboard"
-								class="block h-auto w-full"
+								class="block h-auto w-full dark:hidden"
+							/>
+							<img
+								src="/assets/img/full-dark.png"
+								width="2560"
+								height="2764"
+								alt="Dashboard"
+								class="hidden h-auto w-full dark:block"
 							/>
 						</section>
 						<section class="hidden md:block">
