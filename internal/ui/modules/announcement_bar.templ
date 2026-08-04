@@ -2,15 +2,15 @@ package modules
 
 import "github.com/templui/templui/components/icon"
 
+// AnnouncementBar announces the 2.0 beta, the inverse of the beta site's
+// switch-to-stable bar. The goilerplate promo it replaces lives in git
+// history and returns after the 2.0 launch window.
 templ AnnouncementBar() {
 	<div class="relative z-50 flex items-center justify-center bg-muted border-b px-4 py-1 text-center">
 		<div class="inline-flex items-center gap-2 text-sm flex-wrap justify-center">
-			@icon.Rocket(icon.Props{Class: "size-4"})
-			<span class="text-muted-foreground">Ship faster with</span>
-			<a href="https://goilerplate.com" target="_blank" rel="noopener" class="font-semibold text-foreground hover:text-foreground transition-colors">goilerplate</a>
-			<span class="text-muted-foreground">•</span>
-			<a href="https://goilerplate.com" target="_blank" rel="noopener" class="group inline-flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
-				Get it now for <span class="font-semibold text-foreground">$99</span> instead of <span class="line-through">$199</span>
+			<span class="text-muted-foreground">The templui 2.0 beta is now available.</span>
+			<a href="https://v2.templui.io" class="group inline-flex items-center gap-1 font-semibold text-foreground transition-colors">
+				Try it
 				@icon.ArrowRight(icon.Props{Class: "size-3.5 transition-transform group-hover:translate-x-0.5"})
 			</a>
 		</div>
