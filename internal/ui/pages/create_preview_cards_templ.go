@@ -1642,7 +1642,7 @@ func cardPayoutThreshold() templ.Component {
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = slider.Slider(slider.Props{ID: "min-payout", Min: 50, Max: 10000, Step: 50, Values: []float64{2500}}).Render(ctx, templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = slider.Slider(slider.Props{ID: "min-payout", Min: 50, Max: 10000, Step: 50, Value: []float64{2500}}).Render(ctx, templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -4476,7 +4476,7 @@ func cardKitchenIsland() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Err = slider.Slider(slider.Props{Values: []float64{90}, Max: 100, Class: "w-full"}).Render(ctx, templ_7745c5c3_Buffer)
+							templ_7745c5c3_Err = slider.Slider(slider.Props{Value: []float64{90}, Max: 100, Class: "w-full"}).Render(ctx, templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -4590,7 +4590,7 @@ func cardKitchenIsland() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Err = slider.Slider(slider.Props{Values: []float64{70}, Max: 100}).Render(ctx, templ_7745c5c3_Buffer)
+							templ_7745c5c3_Err = slider.Slider(slider.Props{Value: []float64{70}, Max: 100}).Render(ctx, templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -4704,7 +4704,7 @@ func cardKitchenIsland() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Err = slider.Slider(slider.Props{Values: []float64{30}, Max: 100}).Render(ctx, templ_7745c5c3_Buffer)
+							templ_7745c5c3_Err = slider.Slider(slider.Props{Value: []float64{30}, Max: 100}).Render(ctx, templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -4818,7 +4818,7 @@ func cardKitchenIsland() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Err = slider.Slider(slider.Props{Values: []float64{0}, Max: 100}).Render(ctx, templ_7745c5c3_Buffer)
+							templ_7745c5c3_Err = slider.Slider(slider.Props{Value: []float64{0}, Max: 100}).Render(ctx, templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -11059,7 +11059,7 @@ func cardRollerShades() templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = slider.Slider(slider.Props{Values: []float64{50}, Max: 100, Class: "flex-1"}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = slider.Slider(slider.Props{Value: []float64{50}, Max: 100, Class: "flex-1"}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -14410,7 +14410,7 @@ func cardUIElements(suffix string) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = slider.Slider(slider.Props{Values: []float64{500}, Max: 1000, Min: 0, Step: 10, Class: "flex-1", Attributes: templ.Attributes{"aria-label": "Slider"}}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = slider.Slider(slider.Props{Value: []float64{500}, Max: 1000, Min: 0, Step: 10, Class: "flex-1", Attributes: templ.Attributes{"aria-label": "Slider"}}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

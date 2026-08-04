@@ -243,7 +243,7 @@ templ cardPayoutThreshold() {
 						}
 						<span data-payout-amount class="text-2xl font-semibold tabular-nums">$2500.00</span>
 					</div>
-					@slider.Slider(slider.Props{ID: "min-payout", Min: 50, Max: 10000, Step: 50, Values: []float64{2500}})
+					@slider.Slider(slider.Props{ID: "min-payout", Min: 50, Max: 10000, Step: 50, Value: []float64{2500}})
 					<div class="flex items-center justify-between">
 						@field.Description() {
 							$50 (MIN)
@@ -731,7 +731,7 @@ templ cardKitchenIsland() {
 						}
 					}
 					@item.Actions(item.ActionsProps{Class: "flex-1"}) {
-						@slider.Slider(slider.Props{Values: []float64{90}, Max: 100, Class: "w-full"})
+						@slider.Slider(slider.Props{Value: []float64{90}, Max: 100, Class: "w-full"})
 					}
 				}
 				@item.Item(item.Props{Size: item.SizeSm, Variant: item.VariantOutline}) {
@@ -744,7 +744,7 @@ templ cardKitchenIsland() {
 						}
 					}
 					@item.Actions(item.ActionsProps{Class: "flex-1"}) {
-						@slider.Slider(slider.Props{Values: []float64{70}, Max: 100})
+						@slider.Slider(slider.Props{Value: []float64{70}, Max: 100})
 					}
 				}
 				@item.Item(item.Props{Size: item.SizeSm, Variant: item.VariantOutline}) {
@@ -757,7 +757,7 @@ templ cardKitchenIsland() {
 						}
 					}
 					@item.Actions(item.ActionsProps{Class: "flex-1"}) {
-						@slider.Slider(slider.Props{Values: []float64{30}, Max: 100})
+						@slider.Slider(slider.Props{Value: []float64{30}, Max: 100})
 					}
 				}
 				@item.Item(item.Props{Size: item.SizeSm, Variant: item.VariantOutline}) {
@@ -770,7 +770,7 @@ templ cardKitchenIsland() {
 						}
 					}
 					@item.Actions(item.ActionsProps{Class: "flex-1"}) {
-						@slider.Slider(slider.Props{Values: []float64{0}, Max: 100})
+						@slider.Slider(slider.Props{Value: []float64{0}, Max: 100})
 					}
 				}
 			}
@@ -1787,7 +1787,7 @@ templ cardRollerShades() {
 			</div>
 			<div class="flex items-center gap-3">
 				<span class="text-xs font-medium tracking-wider text-muted-foreground uppercase">Open</span>
-				@slider.Slider(slider.Props{Values: []float64{50}, Max: 100, Class: "flex-1"})
+				@slider.Slider(slider.Props{Value: []float64{50}, Max: 100, Class: "flex-1"})
 				<span class="text-xs font-medium tracking-wider text-muted-foreground uppercase">Close</span>
 			</div>
 		}
@@ -2532,7 +2532,7 @@ templ cardUIElements(suffix string) {
 					}
 				}
 			</div>
-			@slider.Slider(slider.Props{Values: []float64{500}, Max: 1000, Min: 0, Step: 10, Class: "flex-1", Attributes: templ.Attributes{"aria-label": "Slider"}})
+			@slider.Slider(slider.Props{Value: []float64{500}, Max: 1000, Min: 0, Step: 10, Class: "flex-1", Attributes: templ.Attributes{"aria-label": "Slider"}})
 			@field.Group() {
 				@field.Field() {
 					@inputgroup.InputGroup() {
