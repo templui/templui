@@ -140,14 +140,22 @@
   document.addEventListener("mouseout", (e) => {
     const from = e.target.closest("[data-tui-hovercard-trigger], [data-tui-hovercard-content]");
     if (!from) return;
-    if (e.relatedTarget) {
-      const to = e.relatedTarget.closest("[data-tui-hovercard-trigger], [data-tui-hovercard-content]");
-      if (to) return; // moving between trigger and card
-    }
     const content = from.hasAttribute("data-tui-hovercard-content")
       ? from
       : contentFor(from);
-    if (content) scheduleClose(content);
+    if (!content) return;
+    if (e.relatedTarget) {
+      const to = e.relatedTarget.closest("[data-tui-hovercard-trigger], [data-tui-hovercard-content]");
+      // Only moving between THIS card's trigger and popup keeps it open;
+      // landing on another instance must still close this one.
+      if (to) {
+        const toContent = to.hasAttribute("data-tui-hovercard-content")
+          ? to
+          : contentFor(to);
+        if (toContent === content) return;
+      }
+    }
+    scheduleClose(content);
   });
 
   document.addEventListener("keydown", (e) => {
