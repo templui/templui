@@ -1,9 +1,9 @@
 ---
 title: "Introduction"
-description: "How templUI distributes code through a registry."
+description: "How templui distributes code through a registry."
 ---
 
-templUI distributes its code through a registry. The registry allows the `templui` CLI to install components, the shared `utils` package, themes and presets into any project — everything `init`, `add` and `apply` install comes from it over HTTP.
+templui distributes its code through a registry. The registry allows the `templui` CLI to install components, the shared `utils` package, themes and presets into any project — everything `init`, `add` and `apply` install comes from it over HTTP.
 
 <Callout>
 

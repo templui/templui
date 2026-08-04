@@ -19,7 +19,7 @@ type File struct {
 }
 
 // Item is a registry item in shadcn's registry-item.json schema (the fields
-// templUI uses).
+// templui uses).
 type Item struct {
 	Name                 string   `json:"name"`
 	Type                 string   `json:"type"`

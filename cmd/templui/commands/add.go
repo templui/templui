@@ -1,5 +1,5 @@
 // The add command, the pendant of src/commands/add.ts, with the shared
-// install pipeline of src/utils/add-components.ts inlined below (templUI has
+// install pipeline of src/utils/add-components.ts inlined below (templui has
 // no monorepo/workspace split, so one pipeline is enough).
 //
 // Dropped npm-only options: -y/--yes (this add never prompts), --dry-run/

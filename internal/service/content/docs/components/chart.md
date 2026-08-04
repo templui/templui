@@ -30,7 +30,7 @@ templ MyChart() {
 }
 ```
 
-The chart elements mirror the Recharts composition one to one. This means you're not locked into a templUI abstraction: shadcn and Recharts chart examples translate directly, element for element.
+The chart elements mirror the Recharts composition one to one. This means you're not locked into a templui abstraction: shadcn and Recharts chart examples translate directly, element for element.
 
 The runtime watches the DOM, so charts arriving through htmx or Datastar swaps render out of the box, with no framework specific wiring.
 

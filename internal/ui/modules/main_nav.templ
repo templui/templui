@@ -10,8 +10,8 @@ import (
 )
 
 // MainNav is the pendant of shadcn's components/main-nav.tsx: ghost sm
-// buttons over the nav items, data-active on the current path. data-new is
-// omitted, templUI has no PAGES_NEW. The reference imports its Button from
+// buttons over the nav items, data-active on the current path and data-new
+// from PagesNew like their PAGES_NEW. The reference imports its Button from
 // registry/new-york-v4 (the site's own legacy family); ours is the styled
 // button of the active style, so only the reference's own classes are kept.
 templ MainNav(class string) {
@@ -27,6 +27,7 @@ templ MainNav(class string) {
 				Class: "px-2.5 relative items-center",
 				Attributes: templ.Attributes{
 					"data-active": strconv.FormatBool(path == item.Href),
+					"data-new":    strconv.FormatBool(shared.PageIsNew(item.Href)),
 				},
 			}) {
 				{ item.Text }

@@ -23,7 +23,7 @@ Choose the setup that matches your starting point.
   </a>
   <a href="#existing-project" class="flex w-full flex-col items-start gap-1 rounded-2xl bg-surface p-6 text-sm text-surface-foreground transition-colors hover:bg-surface/80 sm:p-10 md:p-6">
     <div class="font-medium">Existing Project</div>
-    <div class="leading-relaxed text-muted-foreground">Configure templUI manually in an existing templ project.</div>
+    <div class="leading-relaxed text-muted-foreground">Configure templui manually in an existing templ project.</div>
   </a>
 </div>
 
@@ -56,6 +56,38 @@ templui init --preset [CODE]
 ```
 
 The exact command will include the preset code that encodes your selected options such as your style, base color and fonts.
+
+### Create Taskfile
+
+templ and Tailwind run as watchers; a `Taskfile.yml` in your project root wires them into one dev command:
+
+```yaml
+version: "3"
+
+tasks:
+  templ:
+    desc: Run templ with integrated server and hot reload
+    cmds:
+      - templ generate --watch --proxy="http://localhost:8090" --cmd="go run ./main.go" --open-browser=false
+
+  tailwind:
+    desc: Watch Tailwind CSS changes
+    cmds:
+      - "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch"
+
+  dev:
+    desc: Start development server with hot reload
+    cmds:
+      - task --parallel tailwind templ
+```
+
+Run everything with:
+
+```shell
+task dev
+```
+
+Adjust the `--proxy` port (default: 8090) if your app uses a different port. templ's dev server runs at http://localhost:7331
 
 ### Add Components
 
@@ -117,6 +149,38 @@ templui init --preset b2D0wqNxT
 templui init --preset vega
 ```
 
+### Create Taskfile
+
+templ and Tailwind run as watchers; a `Taskfile.yml` in your project root wires them into one dev command:
+
+```yaml
+version: "3"
+
+tasks:
+  templ:
+    desc: Run templ with integrated server and hot reload
+    cmds:
+      - templ generate --watch --proxy="http://localhost:8090" --cmd="go run ./main.go" --open-browser=false
+
+  tailwind:
+    desc: Watch Tailwind CSS changes
+    cmds:
+      - "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch"
+
+  dev:
+    desc: Start development server with hot reload
+    cmds:
+      - task --parallel tailwind templ
+```
+
+Run everything with:
+
+```shell
+task dev
+```
+
+Adjust the `--proxy` port (default: 8090) if your app uses a different port. templ's dev server runs at http://localhost:7331
+
 ### Add Components
 
 Add the `Card` component to your project:
@@ -170,7 +234,7 @@ go mod init myapp
 
 ### Configure templ, Tailwind CSS and Task
 
-If you're adding templUI to an existing templ app, make sure templ, Tailwind CSS and Task are installed first:
+If you're adding templui to an existing templ app, make sure templ, Tailwind CSS and Task are installed first:
 
 ```shell
 go install github.com/a-h/templ/cmd/templ@latest
@@ -183,7 +247,7 @@ Import aliases need no configuration: Go resolves imports through the `module` p
 
 ### Run the CLI
 
-Run the `templui` init command to set up templUI in your project:
+Run the `templui` init command to set up templui in your project:
 
 ```shell
 go install github.com/templui/templui/cmd/templui@latest
@@ -254,7 +318,7 @@ After adding components, run `templ generate` and `go mod tidy`.
 
 ## JavaScript
 
-templUI ships all component behavior as one script bundle. The setup is a one-time step in your app, no per-component script tags.
+templui ships all component behavior as one script bundle. The setup is a one-time step in your app, no per-component script tags.
 
 Render the script tag once in your layout `<head>`:
 
@@ -304,14 +368,14 @@ func setupAssetsRoutes(mux *http.ServeMux) {
 
   mux.Handle("GET /assets/", http.StripPrefix("/assets/", assetHandler))
 
-  // templUI component script bundle
+  // templui component script bundle
   mux.Handle("GET /components/templui.js", components.ScriptsHandler())
 }
 ```
 
 Your Go app must serve `/assets/...` so the browser can load `assets/css/output.css`, fonts, images, and local files. The `/components/templui.js` route serves the script bundle that `@components.Scripts()` loads.
 
-> **📝 Note:** templUI also works as a plain Go module dependency without copying any source. That is a templUI extra outside this page, see [Import Workflow](/docs/import-workflow).
+> **📝 Note:** templui also works as a plain Go module dependency without copying any source. That is a templui extra outside this page, see [Import Workflow](/docs/import-workflow).
 
 ## Component Props
 

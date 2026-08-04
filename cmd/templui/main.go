@@ -5,7 +5,7 @@
 // Reference commands without a pendant-meaningful equivalent are dropped:
 // diff/docs/view/search/migrate/eject/info/build/mcp/registry (they cover
 // npm registries, React codemods and MCP servers). shadcn has no plain
-// `list` either, so templUI's old list command is gone; upgrade is
+// `list` either, so templui's old list command is gone; upgrade is
 // `go install github.com/templui/templui/cmd/templui@latest`.
 package main
 

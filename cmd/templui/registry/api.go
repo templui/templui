@@ -1,5 +1,5 @@
 // The pendant of shadcn/src/registry/api.ts and constants.ts: URL building
-// and item fetching against the templUI registry.
+// and item fetching against the templui registry.
 package registry
 
 import (

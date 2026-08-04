@@ -24,7 +24,7 @@ See the [CLI section](/docs/cli) for more information.
 
 ## $schema
 
-The `$schema` identifies the templUI `components.json` format. `templui init` writes it for you.
+The `$schema` identifies the templui `components.json` format. `templui init` writes it for you.
 
 ```json title="components.json"
 {
@@ -76,7 +76,7 @@ This is used to generate the default theme tokens for your components.
 
 ### tailwind.cssVariables
 
-We use CSS variables for theming. templUI components always theme through CSS variables, so `init` writes `true`.
+We use CSS variables for theming. templui components always theme through CSS variables, so `init` writes `true`.
 
 ```json title="components.json"
 {
@@ -90,7 +90,7 @@ For more information, see the [theming docs](/docs/theming).
 
 ## iconLibrary
 
-The icon library of your preset. templUI currently ships `lucide`.
+The icon library of your preset. templui currently ships `lucide`.
 
 ```json title="components.json"
 {

@@ -1,10 +1,10 @@
 // The init command, the pendant of src/commands/init.ts reduced to the
-// templUI feature set: fetch the registry:base item for a preset (or the
+// templui feature set: fetch the registry:base item for a preset (or the
 // defaults), write components.json, merge the theme CSS into the user's
 // Tailwind entry file and install the utils lib item.
 //
 // Dropped npm-only options, all without a Go pendant: --template (framework
-// scaffolds), --base (component library selection; templUI ships one
+// scaffolds), --base (component library selection; templui ships one
 // implementation), --monorepo, --cssVariables/--rtl/--pointer toggles beyond
 // what a preset encodes, --defaults/-y prompt shortcuts (this init does not
 // prompt for design choices), and the interactive preset picker.
@@ -57,7 +57,7 @@ func RunInit(opts InitOptions) error {
 	}
 	registryURL := registry.Resolve(opts.Registry)
 
-	// Preflight: a Go module is the templUI pendant of a framework project.
+	// Preflight: a Go module is the templui pendant of a framework project.
 	module, err := utils.ModulePath(cwd)
 	if err != nil {
 		return err

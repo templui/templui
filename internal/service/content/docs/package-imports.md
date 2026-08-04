@@ -1,6 +1,6 @@
 ---
 title: "Package Imports"
-description: "Configure templUI with Go import paths."
+description: "Configure templui with Go import paths."
 ---
 
 The `templui` CLI uses Go import paths for installing components and rewriting imports.
@@ -37,7 +37,7 @@ Alias paths are Go import paths and must live under the `module` path of your `g
 
 ## Module Imports
 
-In the import workflow, components are imported directly from the templUI module. No `components.json` and no aliases are needed:
+In the import workflow, components are imported directly from the templui module. No `components.json` and no aliases are needed:
 
 ```go
 import "github.com/templui/templui/components/button"

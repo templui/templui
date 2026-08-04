@@ -35,7 +35,7 @@ The `registry-item.json` schema is used to define registry items. It is the shap
 
 ### $schema
 
-The `$schema` property identifies the templUI `registry-item.json` format.
+The `$schema` property identifies the templui `registry-item.json` format.
 
 ```json title="registry-item.json"
 {
@@ -45,7 +45,7 @@ The `$schema` property identifies the templUI `registry-item.json` format.
 
 ### name
 
-The name of the item. This is used to identify the item in the registry. It should be unique for your registry. In the templUI registry it is the kebab-case component name and doubles as the docs slug.
+The name of the item. This is used to identify the item in the registry. It should be unique for your registry. In the templui registry it is the kebab-case component name and doubles as the docs slug.
 
 ```json title="registry-item.json"
 {
@@ -109,7 +109,7 @@ Use `@version` to specify the version, e.g. `@latest`.
 
 Used for registry dependencies. Each entry is an item address, resolved recursively by the CLI.
 
-- For templUI registry items such as `button`, `icon`, `utils`, etc use the name eg. `["button", "icon"]`.
+- For templui registry items such as `button`, `icon`, `utils`, etc use the name eg. `["button", "icon"]`.
 - For custom registry items use the URL of the registry item eg. `["https://example.com/r/styles/base-nova/button.json"]`.
 
 ```json title="registry-item.json"
@@ -226,7 +226,7 @@ The `config` property of a `registry:base` item carries the design system config
 
 ### categories
 
-Use `categories` to organize your registry item. The templUI catalog uses them to group components.
+Use `categories` to organize your registry item. The templui catalog uses them to group components.
 
 ```json title="registry-item.json"
 {

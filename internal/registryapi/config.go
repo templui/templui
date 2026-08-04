@@ -3,10 +3,10 @@
 // app/(app)/(create)/lib/parse-config.ts and lib/preset-query.ts.
 //
 // Deliberate differences from the npm original, all documented inline:
-//   - BASES is ["base"]: templUI has exactly one Go implementation of every
+//   - BASES is ["base"]: templui has exactly one Go implementation of every
 //     component, so the radix/aria bases of shadcn have no pendant here.
 //   - template is ignored: shadcn's next/vite/laravel app templates have no
-//     templUI pendant (a consumer project is any Go module).
+//     templui pendant (a consumer project is any Go module).
 //   - item (the preview item name of the /create UI) is not part of the
 //     config; no build function reads it.
 package registryapi
@@ -24,14 +24,14 @@ const DefaultRadiusValue = "0.625rem"
 // PointerCursorSelector is the POINTER_CURSOR_SELECTOR pendant.
 const PointerCursorSelector = `button:not(:disabled), [role="button"]:not(:disabled)`
 
-// Bases: templUI ships one implementation, so only "base" exists (shadcn:
+// Bases: templui ships one implementation, so only "base" exists (shadcn:
 // base | aria | radix).
 var Bases = []string{"base"}
 
 // Styles in registry/styles.tsx order (also the /init enum error order).
 var Styles = []string{"vega", "nova", "maia", "lyra", "mira", "luma", "sera", "rhea"}
 
-// IconLibraryNames in shadcn/icons iconLibraries key order. templUI compiles
+// IconLibraryNames in shadcn/icons iconLibraries key order. templui compiles
 // lucide icons into the icon component; the other names are accepted for
 // preset code parity but carry no package dependency (documented in
 // BuildRegistryBase).

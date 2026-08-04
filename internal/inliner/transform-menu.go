@@ -2,7 +2,7 @@
 // for the default menuColor: cn-menu-target and cn-menu-translucent are
 // removed ("Otherwise, removes both cn-menu-target and cn-menu-translucent").
 // The inverted/translucent menu colors are a shadcn install-time option that
-// templUI does not expose, so only the default branch is ported.
+// templui does not expose, so only the default branch is ported.
 package inliner
 
 // transformMenu ports the default-menuColor branch of transformMenu.

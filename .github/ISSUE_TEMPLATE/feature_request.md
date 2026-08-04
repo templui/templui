@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest a new feature or improvement for templUI
+about: Suggest a new feature or improvement for templui
 title: "[Feature] "
 labels: enhancement
 ---
@@ -13,7 +13,7 @@ Describe the feature or improvement you'd like to propose.
 
 ## Why is it useful?
 
-Explain how it helps you or improves templUI.
+Explain how it helps you or improves templui.
 
 ---
 

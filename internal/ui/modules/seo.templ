@@ -2,7 +2,7 @@ package modules
 
 // SEO is a simple module for all important SEO tags
 templ SEO(title, description, path string) {
-	{{ title = title + " - templUI" }}
+	{{ title = title + " - templui" }}
 	@templ.Fragment("title") {
 		<title hx-swap-oob="true">{ title }</title>
 	}
@@ -11,7 +11,7 @@ templ SEO(title, description, path string) {
 	<meta charset="UTF-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	// Author
-	<meta name="author" content="templUI"/>
+	<meta name="author" content="templui"/>
 	// Robots Tags
 	<meta name="robots" content="index, follow"/>
 	// Canonical URL
@@ -24,14 +24,14 @@ templ SEO(title, description, path string) {
 	<meta property="og:image" content="https://templui.io/assets/img/social-preview.png"/>
 	<meta property="og:image:width" content="1200"/>
 	<meta property="og:image:height" content="630"/>
-	<meta property="og:image:alt" content="templUI - Modern UI components for Go"/>
-	<meta property="og:site_name" content="templUI"/>
+	<meta property="og:image:alt" content="templui - Modern UI components for Go"/>
+	<meta property="og:site_name" content="templui"/>
 	// Twitter Card
 	<meta name="twitter:card" content="summary_large_image"/>
 	<meta name="twitter:title" content={ title }/>
 	<meta name="twitter:description" content={ description }/>
 	<meta name="twitter:image" content="https://templui.io/assets/img/social-preview.png"/>
-	<meta name="twitter:image:alt" content="templUI - Modern UI components for Go"/>
+	<meta name="twitter:image:alt" content="templui - Modern UI components for Go"/>
 	// Favicon - Minimal but comprehensive support
 	// Note: Some files are served from root URLs (e.g., /favicon.ico) for Safari compatibility.
 	// Safari often ignores HTML favicon tags and looks directly in the root directory.

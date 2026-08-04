@@ -1,6 +1,6 @@
 // update_files.go ports update-files.ts: resolve target paths, transform
 // content and write files with created/updated/skipped accounting. The
-// transformer pendant is the import rewrite the old templUI CLI already had:
+// transformer pendant is the import rewrite the old templui CLI already had:
 // github.com/templui/templui/{components,utils}/... imports become the user's
 // own module paths.
 package updaters

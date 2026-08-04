@@ -365,7 +365,7 @@ func TestBuildStyleItem(t *testing.T) {
 		t.Error("unknown style returned an item")
 	}
 	if item, _ := BuildStyleItem("radix-nova", "button"); item != nil {
-		t.Error("radix base must 404, templUI has only base-*")
+		t.Error("radix base must 404, templui has only base-*")
 	}
 	if item, _ := BuildStyleItem("base-nova", "bogus"); item != nil {
 		t.Error("unknown component returned an item")

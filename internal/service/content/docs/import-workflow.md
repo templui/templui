@@ -1,9 +1,9 @@
 ---
 title: "Import Workflow"
-description: "Use templUI as a plain Go module dependency."
+description: "Use templui as a plain Go module dependency."
 ---
 
-> **📝 Note:** This page is a templUI extra, not part of the shadcn-parity docs. The standard workflow is the [CLI](/docs/installation): it copies component source into your app so you own and edit it, exactly like shadcn. The import workflow instead consumes templUI like any Go library — no copied files, updates via `go get`, customization by wrapping components rather than editing them.
+> **📝 Note:** This page is a templui extra, not part of the shadcn-parity docs. The standard workflow is the [CLI](/docs/installation): it copies component source into your app so you own and edit it, exactly like shadcn. The import workflow instead consumes templui like any Go library — no copied files, updates via `go get`, customization by wrapping components rather than editing them.
 
 ## Quickstart
 
@@ -24,7 +24,7 @@ The same tools as the CLI workflow: see [Installation → Configure templ, Tailw
 
 ## Setup
 
-### 1. Add templUI
+### 1. Add templui
 
 ```shell
 go get github.com/templui/templui@latest
@@ -48,7 +48,7 @@ Then add one line to `assets/css/input.css`, right after the tailwindcss import:
 @import "./sources.generated.css";
 ```
 
-`sources.generated.css` is written by the `tailwind` task in the next step: it pulls the component styles (`style-nova.css`), the shared `shadcn/tailwind.css` layer and the `tw-animate-css` utilities straight from the templUI module and registers the `.templ` sources for scanning.
+`sources.generated.css` is written by the `tailwind` task in the next step: it pulls the component styles (`style-nova.css`), the shared `shadcn/tailwind.css` layer and the `tw-animate-css` utilities straight from the templui module and registers the `.templ` sources for scanning.
 
 > **💡 Tip:** For custom themes and color palettes, see the [theming docs](/docs/theming).
 

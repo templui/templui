@@ -8,11 +8,11 @@
 //	style:                 kept 1:1 ("base-<style>", e.g. "base-nova")
 //	tailwind.css:          kept 1:1 (the user's Tailwind entry file)
 //	tailwind.baseColor:    kept 1:1
-//	tailwind.cssVariables: kept 1:1 (always true; templUI has no inline-theme
+//	tailwind.cssVariables: kept 1:1 (always true; templui has no inline-theme
 //	                       mode)
-//	tailwind.config:       dropped; Tailwind v4 has no config file and templUI
+//	tailwind.config:       dropped; Tailwind v4 has no config file and templui
 //	                       is v4-only (shadcn keeps "" for v3 compat)
-//	tailwind.prefix:       dropped; templUI components ship unprefixed classes
+//	tailwind.prefix:       dropped; templui components ship unprefixed classes
 //	rsc, tsx:              dropped; React Server Components and TypeScript
 //	                       have no Go pendant
 //	iconLibrary:           kept 1:1
@@ -22,8 +22,8 @@
 //	                       ("<module>/components"); shadcn stores a tsconfig
 //	                       alias ("@/components")
 //	aliases.utils:         Go pendant: "<module>/utils"
-//	aliases.ui/lib/hooks:  dropped; templUI has no separate ui/lib/hooks dirs
-//	registries:            dropped; there are no third-party templUI
+//	aliases.ui/lib/hooks:  dropped; templui has no separate ui/lib/hooks dirs
+//	registries:            dropped; there are no third-party templui
 //	                       registries (the --registry flag and
 //	                       TEMPLUI_REGISTRY env cover local dev)
 package utils

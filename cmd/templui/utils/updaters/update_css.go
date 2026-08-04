@@ -1,6 +1,6 @@
 // Package updaters is the pendant of shadcn/src/utils/updaters:
 // update_css.go ports update-css-vars.ts and update-css.ts (the Tailwind v4
-// path; templUI is v4-only). Instead of postcss the file is parsed into a
+// path; templui is v4-only). Instead of postcss the file is parsed into a
 // small CSS node tree and re-rendered, so user formatting is normalized to
 // the CLI's 2-space style.
 package updaters
@@ -403,7 +403,7 @@ func updateTheme(doc *document, cssVars *registry.ItemVars) {
 }
 
 // transformCss is the transformCss/updateCssPlugin pendant for the shapes the
-// templUI registry serves: @import statements, at-rule blocks (@layer base)
+// templui registry serves: @import statements, at-rule blocks (@layer base)
 // with nested rules, declarations and bodiless at-rules (@apply).
 func transformCss(doc *document, css *registry.OrderedMap) {
 	for _, key := range css.Keys {

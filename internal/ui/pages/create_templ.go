@@ -140,7 +140,7 @@ var createFontsSerif = []createOption{
 	{Value: "instrument-serif", Label: "Instrument Serif"},
 }
 
-// shadcn/icons libraries order. Only lucide ships in templUI.
+// shadcn/icons libraries order. Only lucide ships in templui.
 var createIconLibraries = []createOption{
 	{Value: "lucide", Label: "Lucide"},
 	{Value: "tabler", Label: "Tabler Icons", Disabled: true},
@@ -1069,7 +1069,7 @@ func Create() templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = layouts.BaseLayout("New Project - templUI", "Customize everything. Pick your base color, theme, fonts and create your own version of templUI.").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layouts.BaseLayout("New Project - templui", "Customize everything. Pick your base color, theme, fonts and create your own version of templui.").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -5181,7 +5181,7 @@ func createWelcomeDialog() templ.Component {
 							}()
 						}
 						ctx = templ.InitializeContext(ctx)
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 211, "Build your own templUI")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 211, "Build your own templui")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}

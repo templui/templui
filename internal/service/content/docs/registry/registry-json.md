@@ -1,6 +1,6 @@
 ---
 title: "registry.json"
-description: "Schema for the templUI component registry."
+description: "Schema for the templui component registry."
 ---
 
 The `registry.json` schema is used to define the component registry. It is the source catalog the registry server serves verbatim at `/r/registry.json`.
@@ -35,7 +35,7 @@ The `registry.json` schema is used to define the component registry. It is the s
 
 <Callout>
 
-**Note:** templUI has no pendant of shadcn's `include` composition. The registry is a single flat `registry.json` — every item is defined in the root file.
+**Note:** templui has no pendant of shadcn's `include` composition. The registry is a single flat `registry.json` — every item is defined in the root file.
 
 </Callout>
 
@@ -43,7 +43,7 @@ The `registry.json` schema is used to define the component registry. It is the s
 
 ### $schema
 
-The `$schema` property identifies the templUI `registry.json` format.
+The `$schema` property identifies the templui `registry.json` format.
 
 ```json title="registry.json"
 {

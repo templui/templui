@@ -5,7 +5,7 @@
 // the transformer is a no-op and transformCleanup strips the marker.
 //
 // The physical→logical class mappings of transform-rtl.ts (RTL_MAPPINGS etc.)
-// are not ported here: templUI's components already carry logical utilities
+// are not ported here: templui's components already carry logical utilities
 // where they matter, and the task of this package is the style inlining.
 package inliner
 

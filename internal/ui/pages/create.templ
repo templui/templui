@@ -133,7 +133,7 @@ var createFontsSerif = []createOption{
 	{Value: "instrument-serif", Label: "Instrument Serif"},
 }
 
-// shadcn/icons libraries order. Only lucide ships in templUI.
+// shadcn/icons libraries order. Only lucide ships in templui.
 var createIconLibraries = []createOption{
 	{Value: "lucide", Label: "Lucide"},
 	{Value: "tabler", Label: "Tabler Icons", Disabled: true},
@@ -151,7 +151,7 @@ var createOtherRadii = []createOption{
 }
 
 templ Create() {
-	@layouts.BaseLayout("New Project - templUI", "Customize everything. Pick your base color, theme, fonts and create your own version of templUI.") {
+	@layouts.BaseLayout("New Project - templui", "Customize everything. Pick your base color, theme, fonts and create your own version of templui.") {
 		@modules.AnnouncementBar()
 		@modules.Navbar()
 		<link rel="stylesheet" href={ utils.ScriptURL("/assets/css/create-fonts.css") }/>
@@ -1082,7 +1082,7 @@ templ createWelcomeDialog() {
 			</div>
 			@dialog.Header(dialog.HeaderProps{Class: "gap-1 p-4"}) {
 				@dialog.Title(dialog.TitleProps{Class: "text-left text-base"}) {
-					Build your own templUI
+					Build your own templui
 				}
 				@dialog.Description(dialog.DescriptionProps{Class: "text-left leading-relaxed text-foreground"}) {
 					Customize everything from the ground up. Pick your component library, font, color scheme, and more.

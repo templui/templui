@@ -28,7 +28,7 @@ func isDevelopment() bool {
 	return os.Getenv("GO_ENV") != "production"
 }
 
-// StyleNames returns the routable style names: templUI's single base
+// StyleNames returns the routable style names: templui's single base
 // prefixed onto every style (base-vega .. base-rhea).
 func StyleNames() []string {
 	out := make([]string, len(Styles))

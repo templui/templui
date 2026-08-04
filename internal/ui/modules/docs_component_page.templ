@@ -289,7 +289,7 @@ templ claudeBrandIcon() {
 // the doc page itself (View as Markdown is the one that links the .md).
 func docsPromptURL(ctx context.Context, base string) string {
 	path, _ := ctx.Value(ctxkeys.URLPathValue).(string)
-	prompt := "I'm looking at this templUI documentation: https://templui.io" + path + ".\nHelp me understand how to use it. Be ready to explain concepts, give examples, or help debug based on it.\n  "
+	prompt := "I'm looking at this templui documentation: https://templui.io" + path + ".\nHelp me understand how to use it. Be ready to explain concepts, give examples, or help debug based on it.\n  "
 	return base + "?q=" + url.QueryEscape(prompt)
 }
 

@@ -3,7 +3,7 @@ title: "Changelog"
 description: "Latest updates and announcements."
 ---
 
-Latest updates and announcements for templUI.
+Latest updates and announcements for templui.
 
 ## June 2026 - Hover Card
 
