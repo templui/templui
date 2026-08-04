@@ -8,7 +8,10 @@ import (
 
 // SEO is a simple module for all important SEO tags
 templ SEO(title, description, path string) {
-	// The one title template, applied once (their "%s - shadcn/ui").
+	// The one title template, applied once (their "%s - shadcn/ui"). The
+	// og/twitter titles keep the RAW title - the reference sets them
+	// explicitly without the suffix.
+	{{ rawTitle := strings.TrimSuffix(title, " - templui") }}
 	if !strings.HasSuffix(title, " - templui") {
 		{{ title = title + " - templui" }}
 	}
@@ -26,7 +29,7 @@ templ SEO(title, description, path string) {
 	// Canonical URL
 	<link rel="canonical" href={ shared.BaseURL() + path }/>
 	// OpenGraph Tags
-	<meta property="og:title" content={ title }/>
+	<meta property="og:title" content={ rawTitle }/>
 	<meta property="og:description" content={ description }/>
 	<meta property="og:type" content="website"/>
 	<meta property="og:url" content={ shared.BaseURL() + path }/>
@@ -37,7 +40,7 @@ templ SEO(title, description, path string) {
 	<meta property="og:site_name" content="templui"/>
 	// Twitter Card
 	<meta name="twitter:card" content="summary_large_image"/>
-	<meta name="twitter:title" content={ title }/>
+	<meta name="twitter:title" content={ rawTitle }/>
 	<meta name="twitter:description" content={ description }/>
 	<meta name="twitter:image" content={ shared.BaseURL() + "/assets/img/social-preview.png" }/>
 	<meta name="twitter:image:alt" content="templui - shadcn/ui for templ"/>

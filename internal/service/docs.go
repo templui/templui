@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/templui/templui/internal/markdown"
+	"github.com/templui/templui/internal/shared"
 	"github.com/templui/templui/internal/ui/modules"
 	"github.com/templui/templui/internal/ui/examples"
 )
@@ -16,12 +17,17 @@ var contentFS embed.FS
 
 // readContent prefers the on-disk source in development, so markdown edits
 // show up on reload without recompiling the embedded copy. Falls back to
-// the embed for built binaries.
+// the embed for built binaries. Self-referencing templui.io URLs are rebased
+// onto BaseURL, so rendered pages and raw .md exports link the running origin.
 func readContent(path string) ([]byte, error) {
 	if b, err := os.ReadFile(filepath.Join("internal/service", path)); err == nil {
-		return b, nil
+		return shared.Rebase(b), nil
 	}
-	return contentFS.ReadFile(path)
+	b, err := contentFS.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return shared.Rebase(b), nil
 }
 
 type DocsService struct {

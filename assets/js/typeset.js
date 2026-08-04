@@ -97,7 +97,6 @@
   var locks = new Set(); // use-locks.tsx, shuffle only
   var openPickerParam = null;
   var rawCss = null; // fetched /typeset.css for the copy button
-  var packageManager = "pnpm";
   var isMac = MAC_REGEX.test(navigator.platform || navigator.userAgent);
 
   // use-history.tsx: entries of settled param snapshots.
@@ -309,10 +308,10 @@
   function previewSrc(p) {
     var sp = new URLSearchParams();
     PARAM_KEYS.forEach(function (key) {
-      if (p[key] !== DEFAULTS[key]) sp.set(key, p[key]);
+      if (key !== "item" && p[key] !== DEFAULTS[key]) sp.set(key, p[key]);
     });
     var query = sp.toString();
-    return "/typeset/preview" + (query ? "?" + query : "");
+    return "/preview/typeset/" + (p.item || DEFAULTS.item) + (query ? "?" + query : "");
   }
 
   // Overrides never contain item, so the reload branch is only ever driven by
@@ -585,16 +584,14 @@
     );
   }
 
-  // getFontsourceCommand / getFontsourceCss.
-  function fontsCommand() {
-    return (
-      "npm install " +
-      pickedFonts()
-        .map(function (f) {
-          return f.dependency;
-        })
-        .join(" ")
-    );
+  // getFontsourceCss, over Fontsource's CDN: same files as the npm
+  // packages, no package manager needed (the templ pendant of their
+  // fontsource branch).
+  function fontsourceCDN(dependency) {
+    if (dependency.indexOf("@fontsource-variable/") === 0) {
+      return "https://cdn.jsdelivr.net/fontsource/css/" + dependency.slice("@fontsource-variable/".length) + ":vf@latest/wght.css";
+    }
+    return "https://cdn.jsdelivr.net/fontsource/css/" + dependency.slice("@fontsource/".length) + "@latest/index.css";
   }
 
   function fontsCss() {
@@ -604,7 +601,7 @@
     ]
       .concat(
         fonts.map(function (f) {
-          return '@import "' + f.dependency + '";';
+          return '@import "' + fontsourceCDN(f.dependency) + '";';
         })
       )
       .concat([
@@ -620,26 +617,9 @@
       .join("\n");
   }
 
-  // Same transforms the docs code pipeline uses (docs-panel.tsx
-  // getCommandForPackageManager).
-  function commandForPackageManager(pm, command) {
-    if (pm === "pnpm") {
-      return command.replace("npm install", "pnpm add").replace("npx", "pnpm dlx");
-    }
-    if (pm === "yarn") {
-      return command.replace("npm install", "yarn add").replace("npx", "yarn dlx");
-    }
-    if (pm === "bun") {
-      return command.replace("npm install", "bun add").replace("npx", "bunx --bun");
-    }
-    return command;
-  }
-
   function fontStep() {
     return (
-      "Install the fonts:\n\n" +
-      fontsCommand() +
-      "\n\nThen import them in the main CSS file:\n\n" +
+      "Load the fonts from Fontsource's CDN (no package manager needed) by importing them in the main CSS file:\n\n" +
       fontsCss()
     );
   }
@@ -647,7 +627,8 @@
   // The install prompt (docs-panel.tsx), with the templ/Go surfaces in step 5
   // where shadcn lists the React ones.
   function promptText() {
-    var origin = window.location.origin;
+    var baseEl = document.querySelector("[data-tui-typeset-base]");
+    var origin = (baseEl && baseEl.getAttribute("data-tui-typeset-base")) || window.location.origin;
     return (
       "Install templui/typeset in this project.\n\n" +
       "Typeset is a single stylesheet that styles rendered markdown: wrap the output in a `typeset` container and everything inside (headings, lists, tables, code, blockquotes, math) is styled. Everything outside is untouched.\n\n" +
@@ -676,17 +657,7 @@
     setAllText("[data-tui-typeset-preset-code]", presetBlock());
     setAllText("[data-tui-typeset-usage-code]", usageBlock());
     setAllText("[data-tui-typeset-fonts-css]", fontsCss());
-    setAllText(
-      "[data-tui-typeset-fonts-command]",
-      commandForPackageManager(packageManager, fontsCommand())
-    );
     setAllText("[data-tui-typeset-prompt]", promptText());
-    document.querySelectorAll("[data-tui-typeset-pm]").forEach(function (button) {
-      button.setAttribute(
-        "data-active",
-        String(button.getAttribute("data-tui-typeset-pm") === packageManager)
-      );
-    });
     document.querySelectorAll("[data-tui-typeset-copy-css]").forEach(function (button) {
       button.disabled = rawCss === null;
     });
@@ -1065,13 +1036,6 @@
       var pill = e.target.closest("[data-tui-typeset-fixture]");
       if (pill) {
         setParams({ item: pill.getAttribute("data-tui-typeset-fixture") });
-        return;
-      }
-
-      var pm = e.target.closest("[data-tui-typeset-pm]");
-      if (pm) {
-        packageManager = pm.getAttribute("data-tui-typeset-pm");
-        renderDocs();
         return;
       }
 

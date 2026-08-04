@@ -1,16 +1,14 @@
-# templui Components
+# templui
 
-> templ-based UI components for Go. Open source. Customizable. Accessible.
+> templui is a collection of beautifully-designed, accessible components and a code distribution platform for Go. It is built with Go, templ, Tailwind CSS, and vanilla JavaScript ports of Base UI behavior. It works with any Go web stack and pairs with htmx or plain server-side rendering. Open Source. Open Code. AI-Ready. It also comes with a command-line tool to install and manage components and a registry system to publish and distribute code.
 
 ## Overview
 
-templui is a collection of beautifully designed, accessible UI components built with templ and Go.
-Components are designed to be composable, customizable, and easy to integrate into your Go projects.
-
-- [Introduction](https://templui.io/docs/introduction): Core principles and getting started guide
-- [Installation](https://templui.io/docs/installation): Installation and setup guide
-- [Components](https://templui.io/docs/components): Component overview and catalog
-- [GitHub](https://github.com/templui/templui): Source code and issue tracker
+- [Introduction](https://templui.io/docs/introduction): Core principles and getting started guide.
+- [CLI](https://templui.io/docs/cli): Command-line tool for installing and managing components.
+- [Installation](https://templui.io/docs/installation): Installation and setup guide.
+- [Components](https://templui.io/docs/components): Component overview and catalog.
+- [GitHub](https://github.com/templui/templui): Source code and issue tracker.
 
 ## Form & Input
 

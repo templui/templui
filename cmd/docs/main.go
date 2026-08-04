@@ -55,36 +55,23 @@ func main() {
 		),
 	)
 
-	mux.HandleFunc("GET /sitemap.xml", func(w http.ResponseWriter, r *http.Request) {
-		content, err := static.Files.ReadFile("sitemap.xml")
-		if err != nil {
-			http.Error(w, "Sitemap not found", http.StatusNotFound)
-			return
+	// The static artifacts are generated with the default origin baked in;
+	// rebased onto BASE_URL at serve time so the beta deploy links itself.
+	serveStaticRebased := func(name, contentType string) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			content, err := static.Files.ReadFile(name)
+			if err != nil {
+				http.Error(w, name+" not found", http.StatusNotFound)
+				return
+			}
+			content = shared.Rebase(content)
+			w.Header().Set("Content-Type", contentType)
+			w.Write(content)
 		}
-
-		w.Header().Set("Content-Type", "application/xml")
-		w.Write(content)
-	})
-
-	mux.HandleFunc("GET /robots.txt", func(w http.ResponseWriter, r *http.Request) {
-		content, err := static.Files.ReadFile("robots.txt")
-		if err != nil {
-			http.Error(w, "Robots.txt not found", http.StatusNotFound)
-			return
-		}
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write(content)
-	})
-
-	mux.HandleFunc("GET /llms.txt", func(w http.ResponseWriter, r *http.Request) {
-		content, err := static.Files.ReadFile("llms.txt")
-		if err != nil {
-			http.Error(w, "llms.txt not found", http.StatusNotFound)
-			return
-		}
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		w.Write(content)
-	})
+	}
+	mux.HandleFunc("GET /sitemap.xml", serveStaticRebased("sitemap.xml", "application/xml"))
+	mux.HandleFunc("GET /robots.txt", serveStaticRebased("robots.txt", "text/plain"))
+	mux.HandleFunc("GET /llms.txt", serveStaticRebased("llms.txt", "text/plain; charset=utf-8"))
 
 	mux.Handle("GET /{$}", templ.Handler(pages.IndexPage()))
 	mux.Handle("GET /docs", http.RedirectHandler("/docs/introduction", http.StatusSeeOther))
@@ -99,11 +86,9 @@ func main() {
 		}
 	}))
 	mux.Handle("GET /typeset", htmxHandler(pages.Typeset()))
-	mux.Handle("GET /typeset/preview", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		item := r.URL.Query().Get("item")
-		if item == "" {
-			item = "docs"
-		}
+	// The reference URL shape: /preview/typeset/{name}?<non-default knobs>.
+	mux.Handle("GET /preview/typeset/{name}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		item := r.PathValue("name")
 		if !pages.TypesetFixtureExists(item) {
 			http.NotFound(w, r)
 			return
@@ -112,6 +97,21 @@ func main() {
 		if err := pages.TypesetPreview(item, params).Render(r.Context(), w); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+	}))
+	// The old query shape redirects permanently, like the reference redirects
+	// its legacy view URLs.
+	mux.Handle("GET /typeset/preview", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		item := q.Get("item")
+		if item == "" {
+			item = "docs"
+		}
+		q.Del("item")
+		target := "/preview/typeset/" + item
+		if enc := q.Encode(); enc != "" {
+			target += "?" + enc
+		}
+		http.Redirect(w, r, target, http.StatusMovedPermanently)
 	}))
 	// Raw stylesheet for the typeset Get Code button, the pendant of shadcn's
 	// app/typeset.css/route.ts: read fresh on every request so the copy is

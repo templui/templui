@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/templui/templui/components/button"
+	"github.com/templui/templui/internal/shared"
 	"github.com/templui/templui/components/card"
 	"github.com/templui/templui/components/drawer"
 	"github.com/templui/templui/components/field"
@@ -104,11 +105,9 @@ const typesetDefaultPreset = `/* globals.css */
 
 const typesetDefaultUsage = "<div class=\"typeset typeset-docs max-w-[37em]\">\n\t@templ.Raw(content)\n</div>"
 
-const typesetDefaultFontsCommand = "pnpm add @fontsource-variable/geist @fontsource-variable/geist-mono"
-
 const typesetDefaultFontsCss = `/* globals.css */
-@import "@fontsource-variable/geist";
-@import "@fontsource-variable/geist-mono";
+@import "https://cdn.jsdelivr.net/fontsource/css/geist:vf@latest/wght.css";
+@import "https://cdn.jsdelivr.net/fontsource/css/geist-mono:vf@latest/wght.css";
 
 :root {
   --font-geist: 'Geist Variable', sans-serif;
@@ -209,7 +208,9 @@ templ Typeset() {
 // typesetDocsPanel is the pendant of docs-panel.tsx TypesetDocsPanel: the
 // xl-only install panel plus the docs link.
 templ typesetDocsPanel() {
-	<div class="hidden w-88 flex-col items-start gap-3 xl:flex 2xl:w-104">
+	// data-tui-typeset-base: the canonical origin for the copyable prompt
+	// links (never the request host, which may be a dev proxy).
+	<div class="hidden w-88 flex-col items-start gap-3 xl:flex 2xl:w-104" data-tui-typeset-base={ shared.BaseURL() }>
 		<div class="isolate flex max-h-[calc(100vh-16rem)] w-full flex-col overflow-hidden rounded-2xl bg-background ring-1 ring-foreground/10">
 			@typesetDocsContent()
 		</div>
@@ -253,9 +254,8 @@ templ typesetDocsContent() {
 					}
 				}
 				@typesetDocsSection("2. Add the fonts") {
-					@typesetDocsCommand()
 					@typesetDocsProse() {
-						Then import them in your CSS file:
+						Load the fonts from Fontsource's CDN by importing them in your CSS file:
 					}
 					@typesetDocsCodeAttr("", "data-tui-typeset-fonts-css") {
 						{ typesetDefaultFontsCss }
@@ -310,24 +310,6 @@ templ typesetDocsCodeAttr(extraClass, attr string) {
 			class={ utils.CN("scrollbar-none overflow-x-auto p-3 font-mono text-sm leading-relaxed", extraClass) }
 			{ templ.Attributes{attr: true}... }
 		>{ children... }</pre>
-	</div>
-}
-
-// typesetDocsCommand is docs-panel.tsx DocsCommand: the install command with
-// the package manager switcher row.
-templ typesetDocsCommand() {
-	<div class="rounded-lg bg-muted/60">
-		<div class="flex items-center gap-3 px-3 pt-2">
-			for _, pm := range []string{"pnpm", "npm", "yarn", "bun"} {
-				<button
-					type="button"
-					data-tui-typeset-pm={ pm }
-					data-active={ utils.IfElse(pm == "pnpm", "true", "false") }
-					class="font-mono text-xs text-muted-foreground transition-colors hover:text-foreground data-[active=true]:text-foreground"
-				>{ pm }</button>
-			}
-		</div>
-		<pre class="scrollbar-none overflow-x-auto p-3 font-mono text-xs leading-relaxed" data-tui-typeset-fonts-command>{ typesetDefaultFontsCommand }</pre>
 	</div>
 }
 

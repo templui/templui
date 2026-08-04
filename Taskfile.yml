@@ -4,6 +4,10 @@ tasks:
   # Development Tools
   templ:
     desc: Run templ with integrated server and hot reload
+    env:
+      # Rebases every self-referencing templui.io URL (docs, llms.txt,
+      # sitemap, robots) onto the local origin, see shared.Rebase.
+      BASE_URL: http://localhost:8090
     cmds:
       - go tool templ generate --watch --proxy="http://localhost:8090" --cmd="go run ./cmd/docs/main.go" --open-browser=false
 
