@@ -173,7 +173,7 @@ Open drawers from inside another drawer. Parent drawers stay mounted and stack b
 
 ## Non Modal
 
-Set `DisableModal` to allow interaction with the rest of the page while the drawer is open. Combine with `DisableClickAway` to prevent the drawer from closing on outside presses.
+Set `DisableModal` to allow interaction with the rest of the page while the drawer is open. Combine with `DisableDismissible` to prevent the drawer from closing on outside presses.
 
 <ComponentPreview styleName="base-rhea" name="drawer-non-modal" />
 
@@ -200,7 +200,7 @@ The `drawer.Drawer` component is the root, it carries the id and options that li
 | Prop                     | Type                                                     | Default         |
 | ------------------------ | -------------------------------------------------------- | --------------- |
 | `Open`                   | `bool`                                                   | `false`         |
-| `DisableClickAway`       | `bool`                                                   | `false`         |
+| `DisableDismissible`       | `bool`                                                   | `false`         |
 | `DisableModal`           | `bool`                                                   | `false`         |
 | `SwipeDirection`              | `SwipeDirectionDown \| SwipeDirectionUp \| SwipeDirectionLeft \| SwipeDirectionRight` | `SwipeDirectionDown` |
 | `ShowSwipeHandle`        | `bool`                                                   | `false`         |

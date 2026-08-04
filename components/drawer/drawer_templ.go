@@ -54,9 +54,9 @@ type Props struct {
 	ID string
 	// Open renders the drawer already open on page load.
 	Open bool
-	// DisableClickAway keeps the drawer open when clicking the backdrop
+	// DisableDismissible keeps the drawer open when clicking the backdrop
 	// (Base UI's disablePointerDismissal).
-	DisableClickAway bool
+	DisableDismissible bool
 	// DisableModal opens the drawer without backdrop, focus trap and body
 	// scroll lock (Base UI's modal={false}).
 	DisableModal bool
@@ -80,7 +80,7 @@ type ContentProps struct {
 	Attributes templ.Attributes
 }
 
-type HandleProps struct {
+type SwipeHandleProps struct {
 	Class      string
 	Attributes templ.Attributes
 }
@@ -153,7 +153,7 @@ func Drawer(props ...Props) templ.Component {
 				snapJSON = string(b)
 			}
 		}
-		ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, parentID: parentID, open: p.Open, disableClickAway: p.DisableClickAway, disableModal: p.DisableModal, direction: p.SwipeDirection, showSwipeHandle: p.ShowSwipeHandle, snapJSON: snapJSON, snapSequential: p.SnapToSequentialPoints})
+		ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, parentID: parentID, open: p.Open, disableClickAway: p.DisableDismissible, disableModal: p.DisableModal, direction: p.SwipeDirection, showSwipeHandle: p.ShowSwipeHandle, snapJSON: snapJSON, snapSequential: p.SnapToSequentialPoints})
 		templ_7745c5c3_Err = templ_7745c5c3_Var1.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -351,7 +351,7 @@ func Content(props ...ContentProps) templ.Component {
 			}
 		}
 		if s.disableClickAway {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, " data-tui-drawer-disable-click-away=\"true\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, " data-tui-drawer-disable-dismissible=\"true\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -534,7 +534,7 @@ func Content(props ...ContentProps) templ.Component {
 // SwipeHandle is the drag handle bar. Content renders it automatically when
 // ShowSwipeHandle is set on the Drawer root; it is exported for custom
 // compositions like the reference's DrawerSwipeHandle.
-func SwipeHandle(props ...HandleProps) templ.Component {
+func SwipeHandle(props ...SwipeHandleProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -555,7 +555,7 @@ func SwipeHandle(props ...HandleProps) templ.Component {
 			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var p HandleProps
+		var p SwipeHandleProps
 		if len(props) > 0 {
 			p = props[0]
 		}
