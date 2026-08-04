@@ -10,7 +10,6 @@ import (
 type Type string
 
 const (
-	TypeDefault Type = ""
 	TypeSuccess Type = "success"
 	TypeInfo    Type = "info"
 	TypeWarning Type = "warning"
@@ -96,6 +95,6 @@ templ Toast(props ...Props) {
 		if p.Description != "" {
 			data-tui-toast-description={ p.Description }
 		}
-		class={ utils.If(p.Class != "", p.Class) }
+		class={ p.Class }
 	></div>
 }
