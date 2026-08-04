@@ -360,6 +360,12 @@
   }
 }
 
+/* Reference globals.css utility: a blend-mode border overlay, used by the
+   command menu's theme swatches and the color pages. */
+@utility border-ghost {
+  @apply relative after:absolute after:inset-0 after:border after:border-border after:mix-blend-darken dark:after:mix-blend-lighten;
+}
+
 /* Touch targets on coarse pointers grow past the visual box (the header's
    mode switcher and the mobile nav trigger use it). */
 @utility extend-touch-target {
