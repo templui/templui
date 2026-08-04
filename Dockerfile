@@ -2,6 +2,11 @@
 FROM golang:1.24 AS build
 WORKDIR /app
 
+# Dependency layer: re-downloads only when go.mod/go.sum change, every
+# other deploy reuses the cached modules.
+COPY go.mod go.sum ./
+RUN go mod download
+
 # Copy the source code
 COPY . .
 
@@ -32,8 +37,9 @@ RUN ARCH=$(uname -m) && \
 # Generate Tailwind CSS output (the 2.0 entry file is globals.css)
 RUN ./tailwindcss -i ./assets/css/globals.css -o ./assets/css/output.css --minify
 
-# Build the application as a static binary
-RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/docs/main.go
+# Build the application as a static binary. -p 2 caps compile parallelism
+# so small builders do not OOM, -s -w strips debug info from the binary.
+RUN CGO_ENABLED=0 GOOS=linux go build -p 2 -ldflags="-s -w" -o main ./cmd/docs/main.go
 
 # Deploy-Stage
 FROM alpine:3.20.2
