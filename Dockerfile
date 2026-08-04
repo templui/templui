@@ -40,6 +40,7 @@ RUN ./tailwindcss -i ./assets/css/globals.css -o ./assets/css/output.css --minif
 # Build the application as a static binary. -p 2 caps compile parallelism
 # so small builders do not OOM, -s -w strips debug info from the binary.
 RUN CGO_ENABLED=0 GOOS=linux go build -p 2 -ldflags="-s -w" -o main ./cmd/docs/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -p 2 -ldflags="-s -w" -o highlight-gen ./cmd/highlight-gen/main.go
 
 # Shiki deps stage: install the highlighter service's node_modules once.
 FROM node:20-alpine AS shiki
@@ -48,26 +49,38 @@ COPY shiki/package*.json ./
 RUN npm ci --omit=dev
 COPY shiki/server.js ./
 
+# Highlight stage (CREATE_1TO1_PLAN 2f): the only place node ever runs.
+# The crawler renders every sitemap page against the live shiki service and
+# bakes the resulting highlight cache into a file the runtime loads instead.
+FROM node:20-alpine AS highlight
+WORKDIR /app
+COPY --from=shiki /shiki /app/shiki
+COPY --from=build /app/main /app/highlight-gen ./
+COPY --from=build /app/version.txt .
+COPY --from=build /app/assets/css/output.css ./assets/css/output.css
+# GO_ENV=production so pages render exactly like the deploy; SHIKI_URL keeps
+# the service reachable despite production mode; HIGHLIGHT_DUMP mounts the
+# dump route the generator reads at the end.
+RUN node /app/shiki/server.js & \
+  GO_ENV=production HIGHLIGHT_DUMP=1 SHIKI_URL=http://localhost:3000/highlight ./main & \
+  ./highlight-gen -server http://localhost:8090 -out /app/highlight-cache.json.gz
+
 # Deploy-Stage
 FROM alpine:3.20.2
 WORKDIR /app
 
-# Install ca-certificates and node for the interim shiki sidecar (dies
-# with the planned build-time highlighting, see CREATE_1TO1_PLAN 2f)
-RUN apk add --no-cache ca-certificates nodejs
+RUN apk add --no-cache ca-certificates
 
 # Set environment variable for runtime
 ENV GO_ENV=production
 
-# Copy the binary, version file, CSS output and the shiki service
+# Copy the binary, version file, CSS output and the baked highlight cache
 COPY --from=build /app/main .
-COPY --from=shiki /shiki /app/shiki
 COPY --from=build /app/version.txt .
 COPY --from=build /app/assets/css/output.css ./assets/css/output.css
+COPY --from=highlight /app/highlight-cache.json.gz ./assets/highlight-cache.json.gz
 
 # Expose the port
 EXPOSE 8090
 
-# Command to run: the shiki highlighter starts alongside, the Go
-# server stays PID 1 (SHIKI_URL default localhost:3000 just works)
-CMD ["sh", "-c", "node /app/shiki/server.js & exec ./main"]
+CMD ["./main"]

@@ -18,6 +18,7 @@ import (
 	"github.com/templui/templui/internal/service"
 	"github.com/templui/templui/internal/shared"
 	"github.com/templui/templui/internal/ui/charts"
+	"github.com/templui/templui/internal/ui/modules"
 	"github.com/templui/templui/internal/ui/examples"
 	"github.com/templui/templui/internal/ui/pages"
 	"github.com/templui/templui/static"
@@ -132,6 +133,18 @@ func main() {
 		w.Write(css)
 	})
 
+	// Build-time highlight generator hook (cmd/highlight-gen): after the
+	// crawler warmed every page, it fetches the accumulated shiki cache
+	// here. Only mounted when the generator run asks for it.
+	if os.Getenv("HIGHLIGHT_DUMP") == "1" {
+		mux.HandleFunc("GET /debug/highlight-cache", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			if err := modules.DumpHighlightCache(w); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		})
+	}
+
 	// Registry server, the pendant of shadcn's /init route and static
 	// r/styles registry: /init returns the registry:base item for a design
 	// system config (?preset=<code> or individual params, ?only=theme|font
@@ -244,8 +257,12 @@ func main() {
 	// All unmatched routes will fall through to this catch-all
 	mux.HandleFunc("/{path...}", notFoundHandler)
 
-	log.Println("Server is running on http://localhost:8090")
-	http.ListenAndServe(":8090", wrappedMux)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8090"
+	}
+	log.Println("Server is running on http://localhost:" + port)
+	http.ListenAndServe(":"+port, wrappedMux)
 }
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
