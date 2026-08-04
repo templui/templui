@@ -90,7 +90,7 @@ templ selectExampleSides() {
 					@selectcomp.Trigger(selectcomp.TriggerProps{Class: "w-28 capitalize"}) {
 						@selectcomp.Value(selectcomp.ValueProps{Placeholder: side})
 					}
-					@selectcomp.Content(selectcomp.ContentProps{Position: selectcomp.PositionPopper}) {
+					@selectcomp.Content(selectcomp.ContentProps{DisableAlignItemWithTrigger: true}) {
 						@selectcomp.Group() {
 							for _, fruit := range selectExampleFruits[:3] {
 								@selectcomp.Item(selectcomp.ItemProps{Value: fruit.Value}) {
@@ -334,7 +334,7 @@ templ selectExampleItemAligned() {
 			@selectcomp.Trigger() {
 				@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a fruit"})
 			}
-			@selectcomp.Content(selectcomp.ContentProps{Position: selectcomp.PositionItemAligned}) {
+			@selectcomp.Content(selectcomp.ContentProps{}) {
 				@selectcomp.Group() {
 					@selectcomp.Item(selectcomp.ItemProps{Value: "apple"}) {
 						Apple

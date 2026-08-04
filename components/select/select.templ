@@ -14,18 +14,6 @@ const (
 	SizeSm      Size = "sm"
 )
 
-type Position string
-
-const (
-	// PositionItemAligned overlays the menu so the selected item sits on top
-	// of the trigger (like a native macOS select). This is the default,
-	// matching shadcn (Base UI's alignItemWithTrigger). Falls back to popper
-	// automatically when there is not enough room.
-	PositionItemAligned Position = "item-aligned"
-	// PositionPopper opens the menu below/above the trigger like a dropdown.
-	PositionPopper Position = "popper"
-)
-
 type Align string
 
 const (
@@ -80,9 +68,10 @@ type ValueProps struct {
 type ContentProps struct {
 	Class      string
 	Attributes templ.Attributes
-	// Position: 'item-aligned' (default, selected item overlays the trigger)
-	// or 'popper' (regular dropdown below the trigger).
-	Position Position
+		// DisableAlignItemWithTrigger opens the popup below the trigger like a
+	// dropdown instead of overlaying the selected item (Base UI
+	// alignItemWithTrigger, default true).
+	DisableAlignItemWithTrigger bool
 	// Align along the trigger edge in popper mode. Defaults to center.
 	Align Align
 }
@@ -195,9 +184,6 @@ templ Content(props ...ContentProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	if p.Position == "" {
-		{{ p.Position = PositionItemAligned }}
-	}
 	if p.Align == "" {
 		{{ p.Align = AlignCenter }}
 	}
@@ -208,7 +194,7 @@ templ Content(props ...ContentProps) {
 	<div
 		id={ s.id }
 		data-tui-select-content
-		data-tui-select-position={ string(p.Position) }
+		data-tui-select-disable-align-item-with-trigger?={ p.DisableAlignItemWithTrigger }
 		data-tui-select-align={ string(p.Align) }
 		data-state="closed"
 		popover="manual"
@@ -217,10 +203,10 @@ templ Content(props ...ContentProps) {
 		<div
 			data-slot="select-content"
 			data-tui-select-popup
-			if p.Position == PositionItemAligned {
-				data-align-trigger="true"
-			} else {
+			if p.DisableAlignItemWithTrigger {
 				data-align-trigger="false"
+			} else {
+				data-align-trigger="true"
 			}
 			data-state="closed"
 			role="listbox"

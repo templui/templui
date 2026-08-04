@@ -94,7 +94,7 @@ selectcomp.Select
 
 ## Align Item With Trigger
 
-Use `Position` on `selectcomp.Content` to control whether the selected item aligns with the trigger. With `PositionItemAligned` (default), the popup positions so the selected item appears over the trigger. With `PositionPopper`, the popup aligns to the trigger edge.
+By default the popup positions so the selected item appears over the trigger (Base UI's `alignItemWithTrigger`). Set `DisableAlignItemWithTrigger` on `selectcomp.Content` to open it below the trigger edge like a dropdown instead.
 
 <ComponentPreview name="select-align-item" />
 
@@ -167,7 +167,7 @@ The `selectcomp.Content` component is the listbox popup.
 
 | Prop       | Type                                       | Default               |
 | ---------- | ------------------------------------------ | --------------------- |
-| `Position` | `PositionItemAligned \| PositionPopper`    | `PositionItemAligned` |
+| `DisableAlignItemWithTrigger` | `bool` | `false` |
 | `Align`    | `AlignStart \| AlignCenter \| AlignEnd`    | `AlignCenter`         |
 | `Class`    | `string`                                   | -                     |
 

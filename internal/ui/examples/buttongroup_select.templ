@@ -15,7 +15,7 @@ templ ButtonGroupSelect() {
 				@selectcomp.Trigger(selectcomp.TriggerProps{Class: "font-mono"}) {
 					@selectcomp.Value(selectcomp.ValueProps{Placeholder: "$"})
 				}
-				@selectcomp.Content(selectcomp.ContentProps{Position: selectcomp.PositionPopper, Align: selectcomp.AlignStart}) {
+				@selectcomp.Content(selectcomp.ContentProps{DisableAlignItemWithTrigger: true, Align: selectcomp.AlignStart}) {
 					@selectcomp.Group() {
 						@selectcomp.Item(selectcomp.ItemProps{
 						Value:    "$",

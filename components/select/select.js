@@ -51,7 +51,7 @@
   }
 
   function isAlignMode(content) {
-    return (content.getAttribute("data-tui-select-position") || "item-aligned") !== "popper";
+    return !content.hasAttribute("data-tui-select-disable-align-item-with-trigger");
   }
 
   function setState(content, state) {
