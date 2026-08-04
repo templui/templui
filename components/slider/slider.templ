@@ -18,9 +18,9 @@ type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	// Values are the initial thumb values, one thumb per value. Nil renders
+	// Value are the initial thumb values, one thumb per value. Nil renders
 	// a thumb at Min and one at Max (Base UI's default).
-	Values []float64
+	Value []float64
 	Min    float64
 	// Max defaults to 100.
 	Max float64
@@ -113,13 +113,13 @@ templ Slider(props ...Props) {
 	if p.Orientation == "" {
 		{{ p.Orientation = OrientationHorizontal }}
 	}
-	if p.Values == nil {
-		{{ p.Values = []float64{p.Min, p.Max} }}
+	if p.Value == nil {
+		{{ p.Value = []float64{p.Min, p.Max} }}
 	}
 	{{
 		vertical := p.Orientation == OrientationVertical
-		fs := make([]float64, len(p.Values))
-		for i, v := range p.Values {
+		fs := make([]float64, len(p.Value))
+		for i, v := range p.Value {
 			fs[i] = fraction(v, p.Min, p.Max)
 		}
 	}}
@@ -145,7 +145,7 @@ templ Slider(props ...Props) {
 		{ p.Attributes... }
 	>
 		if p.Name != "" {
-			for _, v := range p.Values {
+			for _, v := range p.Value {
 				<input type="hidden" name={ p.Name } value={ fmtF(v) } data-tui-slider-input aria-hidden="true" tabindex="-1"/>
 			}
 		}
@@ -171,7 +171,7 @@ templ Slider(props ...Props) {
 					style={ indicatorStyle(fs, vertical) }
 				></div>
 			</div>
-			for i, v := range p.Values {
+			for i, v := range p.Value {
 				// The thumb's disabled:* classes are dead CSS on a div, exactly
 				// like in shadcn's thumb: only the control dims to 50%.
 				<div

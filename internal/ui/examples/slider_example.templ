@@ -32,19 +32,19 @@ templ SliderExample() {
 
 templ sliderExampleBasic() {
 	@sliderExampleSection("Basic") {
-		@slider.Slider(slider.Props{Values: []float64{50}, Max: 100, Step: 1})
+		@slider.Slider(slider.Props{Value: []float64{50}, Max: 100, Step: 1})
 	}
 }
 
 templ sliderExampleRange() {
 	@sliderExampleSection("Range") {
-		@slider.Slider(slider.Props{Values: []float64{25, 50}, Max: 100, Step: 5})
+		@slider.Slider(slider.Props{Value: []float64{25, 50}, Max: 100, Step: 5})
 	}
 }
 
 templ sliderExampleMultiple() {
 	@sliderExampleSection("Multiple Thumbs") {
-		@slider.Slider(slider.Props{Values: []float64{10, 20, 70}, Max: 100, Step: 10})
+		@slider.Slider(slider.Props{Value: []float64{10, 20, 70}, Max: 100, Step: 10})
 	}
 }
 
@@ -52,14 +52,14 @@ templ sliderExampleVertical() {
 	@sliderExampleSection("Vertical") {
 		<div class="flex items-center gap-6">
 			@slider.Slider(slider.Props{
-				Values:      []float64{50},
+				Value:      []float64{50},
 				Max:         100,
 				Step:        1,
 				Orientation: slider.OrientationVertical,
 				Class:       "h-40",
 			})
 			@slider.Slider(slider.Props{
-				Values:      []float64{25},
+				Value:      []float64{25},
 				Max:         100,
 				Step:        1,
 				Orientation: slider.OrientationVertical,
@@ -81,7 +81,7 @@ templ sliderExampleControlled() {
 			</div>
 			@slider.Slider(slider.Props{
 				ID:     "slider-demo-temperature",
-				Values: []float64{0.3, 0.7},
+				Value: []float64{0.3, 0.7},
 				Min:    0,
 				Max:    1,
 				Step:   0.1,
@@ -100,6 +100,6 @@ templ sliderExampleControlled() {
 
 templ sliderExampleDisabled() {
 	@sliderExampleSection("Disabled") {
-		@slider.Slider(slider.Props{Values: []float64{50}, Max: 100, Step: 1, Disabled: true})
+		@slider.Slider(slider.Props{Value: []float64{50}, Max: 100, Step: 1, Disabled: true})
 	}
 }

@@ -48,7 +48,7 @@ import "github.com/templui/templui/components/slider"
 ```
 
 ```templ showLineNumbers
-@slider.Slider(slider.Props{Values: []float64{33}, Max: 100, Step: 1})
+@slider.Slider(slider.Props{Value: []float64{33}, Max: 100, Step: 1})
 ```
 
 ## Range
@@ -87,7 +87,7 @@ The `Slider` component renders one draggable thumb per value on a shared track.
 
 | Prop          | Type                                             | Default                 |
 | ------------- | ------------------------------------------------ | ----------------------- |
-| `Values`      | `[]float64`                                      | `[Min, Max]`            |
+| `Value`      | `[]float64`                                      | `[Min, Max]`            |
 | `Min`         | `float64`                                        | `0`                     |
 | `Max`         | `float64`                                        | `100`                   |
 | `Step`        | `float64`                                        | `1`                     |

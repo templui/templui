@@ -26,10 +26,10 @@ type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	// Values are the initial thumb values, one thumb per value. Nil renders
+	// Value are the initial thumb values, one thumb per value. Nil renders
 	// a thumb at Min and one at Max (Base UI's default).
-	Values []float64
-	Min    float64
+	Value []float64
+	Min   float64
 	// Max defaults to 100.
 	Max float64
 	// Step defaults to 1.
@@ -141,12 +141,12 @@ func Slider(props ...Props) templ.Component {
 		if p.Orientation == "" {
 			p.Orientation = OrientationHorizontal
 		}
-		if p.Values == nil {
-			p.Values = []float64{p.Min, p.Max}
+		if p.Value == nil {
+			p.Value = []float64{p.Min, p.Max}
 		}
 		vertical := p.Orientation == OrientationVertical
-		fs := make([]float64, len(p.Values))
-		for i, v := range p.Values {
+		fs := make([]float64, len(p.Value))
+		for i, v := range p.Value {
 			fs[i] = fraction(v, p.Min, p.Max)
 		}
 		var templ_7745c5c3_Var2 = []any{utils.CN("data-horizontal:w-full data-vertical:h-full", p.Class)}
@@ -270,7 +270,7 @@ func Slider(props ...Props) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if p.Name != "" {
-			for _, v := range p.Values {
+			for _, v := range p.Value {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<input type=\"hidden\" name=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -369,7 +369,7 @@ func Slider(props ...Props) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for i, v := range p.Values {
+		for i, v := range p.Value {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "  <div data-slot=\"slider-thumb\" data-tui-slider-thumb role=\"slider\" tabindex=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
