@@ -64,7 +64,7 @@ templui add chart
 
 <Step>Add the following colors to your CSS file</Step>
 
-```css title="assets/css/input.css" showLineNumbers
+```css title="assets/css/globals.css" showLineNumbers
 @layer base {
   :root {
     --chart-1: oklch(0.646 0.222 41.116);
@@ -318,7 +318,7 @@ Charts have built-in support for theming. You can use css variables (recommended
 
 <Step>Define your colors in your css file</Step>
 
-```css title="assets/css/input.css" showLineNumbers
+```css title="assets/css/globals.css" showLineNumbers
 @layer base {
   :root {
     --chart-1: oklch(0.646 0.222 41.116);

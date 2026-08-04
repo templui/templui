@@ -34,14 +34,14 @@ You can also just import a component package and run `go mod tidy`.
 
 ### 2. Initialize Styles
 
-Style setup is the same `templui init` as in the [CLI workflow](/docs/installation#run-the-cli): it creates `assets/css/input.css` and merges your theme variables and base layer into it. Pick a design on [templui.io/create](https://templui.io/create) and pass its preset code, or use one of the named presets:
+Style setup is the same `templui init` as in the [CLI workflow](/docs/installation#run-the-cli): it creates `assets/css/globals.css` and merges your theme variables and base layer into it. Pick a design on [templui.io/create](https://templui.io/create) and pass its preset code, or use one of the named presets:
 
 ```shell
 go install github.com/templui/templui/cmd/templui@latest
 templui init
 ```
 
-Then add one line to `assets/css/input.css`, right after the tailwindcss import:
+Then add one line to `assets/css/globals.css`, right after the tailwindcss import:
 
 ```css
 @import "tailwindcss";
@@ -75,7 +75,7 @@ tasks:
           '@source "./**/*.templ";' \
           "@source \"$TEMPLUI_PATH/components/**/*.templ\";" \
           > ./assets/css/sources.generated.css && \
-        tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch
+        tailwindcss -i ./assets/css/globals.css -o ./assets/css/output.css --watch
 
   dev:
     desc: Start development server with hot reload

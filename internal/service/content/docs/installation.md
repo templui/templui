@@ -206,7 +206,7 @@ go install github.com/templui/templui/cmd/templui@latest
 templui init
 ```
 
-Init writes `components.json`, merges your theme CSS variables and base layer into your Tailwind entry file (detected, or created at `assets/css/input.css`), vendors `tw-animate.css` and `shadcn-tailwind.css` next to it, and installs the shared `utils` package. See the [CLI docs](/docs/cli) for all flags, updating with `--overwrite` and applying presets.
+Init writes `components.json`, merges your theme CSS variables and base layer into your Tailwind entry file (detected, or created at `assets/css/globals.css`), vendors `tw-animate.css` and `shadcn-tailwind.css` next to it, and installs the shared `utils` package. See the [CLI docs](/docs/cli) for all flags, updating with `--overwrite` and applying presets.
 
 ### Create Taskfile
 
@@ -224,7 +224,7 @@ tasks:
   tailwind:
     desc: Watch Tailwind CSS changes
     cmds:
-      - "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch"
+      - "tailwindcss -i ./assets/css/globals.css -o ./assets/css/output.css --watch"
 
   dev:
     desc: Start development server with hot reload

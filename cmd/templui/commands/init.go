@@ -219,5 +219,5 @@ func resolveTailwindCSSPath(cwd, cssFlag string, existing *utils.RawConfig) stri
 	if found := utils.FindTailwindCSS(cwd); found != "" && !strings.Contains(found, "output") {
 		return found
 	}
-	return "assets/css/input.css"
+	return "assets/css/globals.css"
 }

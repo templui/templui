@@ -52,12 +52,12 @@ See the [installation section](/docs/installation) for how to set up Tailwind CS
 
 ### tailwind.css
 
-Path to the CSS file that imports Tailwind CSS into your project, relative to your project root. `init` detects it, or creates `assets/css/input.css`; override with `--css`.
+Path to the CSS file that imports Tailwind CSS into your project, relative to your project root. `init` detects it, or creates `assets/css/globals.css`; override with `--css`.
 
 ```json title="components.json"
 {
   "tailwind": {
-    "css": "assets/css/input.css"
+    "css": "assets/css/globals.css"
   }
 }
 ```

@@ -24,7 +24,7 @@ To use CSS variables for theming, set `tailwind.cssVariables` to `true` in your 
 {
   "style": "base-nova",
   "tailwind": {
-    "css": "assets/css/input.css",
+    "css": "assets/css/globals.css",
     "baseColor": "neutral",
     "cssVariables": true
   }
