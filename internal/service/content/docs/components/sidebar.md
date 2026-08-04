@@ -133,7 +133,7 @@ The `sidebar.Provider` component provides the sidebar context to the `sidebar.Si
 
 | Name        | Type   | Description                             |
 | ----------- | ------ | --------------------------------------- |
-| `Collapsed` | `bool` | Default collapsed state of the sidebar. |
+| `DisableDefaultOpen` | `bool` | Default collapsed state of the sidebar. |
 
 ### Width
 
@@ -438,10 +438,10 @@ The `sidebar.Rail` component is used to render a rail within a `sidebar.Sidebar`
 
 ## Controlled Sidebar
 
-Use the `Collapsed` prop on `sidebar.Provider` to render the sidebar collapsed on the server. The `sidebar_state` cookie carries the last state, so the server can render the sidebar the way the user left it.
+Use the `DisableDefaultOpen` prop on `sidebar.Provider` to render the sidebar collapsed on the server. The `sidebar_state` cookie carries the last state, so the server can render the sidebar the way the user left it.
 
 ```templ showLineNumbers
-@sidebar.Provider(sidebar.ProviderProps{Collapsed: collapsedFromCookie})
+@sidebar.Provider(sidebar.ProviderProps{DisableDefaultOpen: collapsedFromCookie})
 ```
 
 ```go showLineNumbers

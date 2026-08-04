@@ -107,9 +107,9 @@ type ProviderProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	// Collapsed renders the sidebar collapsed on page load, the zero-value
+	// DisableDefaultOpen renders the sidebar collapsed on page load, the zero-value
 	// inversion of SidebarProvider's defaultOpen (true).
-	Collapsed bool
+	DisableDefaultOpen bool
 }
 
 type TriggerProps struct {
@@ -264,7 +264,7 @@ templ Provider(props ...ProviderProps) {
 		{{ layoutID = utils.RandomID() }}
 	}
 	{{ ctx = context.WithValue(ctx, sidebarIDKey, layoutID) }}
-	{{ ctx = context.WithValue(ctx, sidebarStateKey, ctxState{collapsed: p.Collapsed}) }}
+	{{ ctx = context.WithValue(ctx, sidebarStateKey, ctxState{collapsed: p.DisableDefaultOpen}) }}
 	<div
 		data-slot="sidebar-wrapper"
 		class={ utils.CN(
