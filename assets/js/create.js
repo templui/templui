@@ -29,7 +29,9 @@
   var MAC_REGEX = /Mac|iPhone|iPad|iPod/;
   var PRESET_FLAG_PATTERN = /^--preset\b\s+(.+)$/i;
   var PREVIEW_OVERRIDE_DEBOUNCE_MS = 50;
-  var WELCOME_STORAGE_KEY = "shadcn-create-welcome-dialog";
+  // Our own persistence carries our name; only the key differs from the
+  // reference ("shadcn-create-welcome-dialog").
+  var WELCOME_STORAGE_KEY = "templui-create-welcome-dialog";
   var DEFAULT_ITEM = "preview-02";
 
   // lib/search-params.ts DESIGN_SYSTEM_KEYS.
