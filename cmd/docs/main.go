@@ -9,19 +9,19 @@ import (
 
 	"github.com/a-h/templ"
 
-	"github.com/templui/templui/assets"
-	"github.com/templui/templui/components"
-	"github.com/templui/templui/internal/config"
-	"github.com/templui/templui/internal/middleware"
-	"github.com/templui/templui/internal/registry"
-	"github.com/templui/templui/internal/registryapi"
-	"github.com/templui/templui/internal/service"
-	"github.com/templui/templui/internal/shared"
-	"github.com/templui/templui/internal/ui/charts"
-	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/examples"
-	"github.com/templui/templui/internal/ui/pages"
-	"github.com/templui/templui/static"
+	"github.com/templui/templui/v2/assets"
+	"github.com/templui/templui/v2/components"
+	"github.com/templui/templui/v2/internal/config"
+	"github.com/templui/templui/v2/internal/middleware"
+	"github.com/templui/templui/v2/internal/registry"
+	"github.com/templui/templui/v2/internal/registryapi"
+	"github.com/templui/templui/v2/internal/service"
+	"github.com/templui/templui/v2/internal/shared"
+	"github.com/templui/templui/v2/internal/ui/charts"
+	"github.com/templui/templui/v2/internal/ui/modules"
+	"github.com/templui/templui/v2/internal/ui/examples"
+	"github.com/templui/templui/v2/internal/ui/pages"
+	"github.com/templui/templui/v2/static"
 )
 
 // htmxHandler wraps a templ component to support HTMX fragment requests
@@ -187,6 +187,47 @@ func main() {
 			w.Write(source)
 		})
 	}
+
+	// Changelog: the overview inlines the latest entries, each entry has its
+	// own page (the reference's per-entry directory), and rss.xml feeds them.
+	mux.Handle("GET /docs/changelog", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		entries, err := docsService.GetChangelogPages()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		htmxHandler(pages.Changelog(entries)).ServeHTTP(w, r)
+	}))
+	mux.Handle("GET /docs/changelog/{slug}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		slug := r.PathValue("slug")
+		// {slug}.md is not a valid mux pattern, so the raw-markdown export
+		// shares this route via the suffix.
+		if raw, ok := strings.CutSuffix(slug, ".md"); ok {
+			source, err := docsService.GetChangelogPageSource(raw)
+			if err != nil {
+				http.NotFound(w, r)
+				return
+			}
+			w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
+			w.Write(source)
+			return
+		}
+		entry, err := docsService.GetChangelogPage(slug)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		htmxHandler(pages.ChangelogEntry(entry)).ServeHTTP(w, r)
+	}))
+	mux.HandleFunc("GET /rss.xml", func(w http.ResponseWriter, r *http.Request) {
+		entries, err := docsService.GetChangelogPages()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/rss+xml; charset=utf-8")
+		fmt.Fprint(w, pages.ChangelogRSS(shared.BaseURL(), entries))
+	})
 
 	for _, slug := range shared.DocSlugs {
 		mux.Handle("GET /docs/"+slug, markdownDocsHandler(slug))

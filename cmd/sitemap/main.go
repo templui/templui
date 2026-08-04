@@ -16,9 +16,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/templui/templui/internal/registry"
-	"github.com/templui/templui/internal/shared"
-	"github.com/templui/templui/internal/ui/pages"
+	"github.com/templui/templui/v2/internal/registry"
+	"github.com/templui/templui/v2/internal/shared"
+	"github.com/templui/templui/v2/internal/ui/pages"
 )
 
 // URL is an entry in the sitemap.
@@ -43,6 +43,18 @@ func routes() []string {
 
 	for _, slug := range shared.DocSlugs {
 		out = append(out, "/docs/"+slug)
+	}
+
+	// Changelog: the overview plus one page per entry (the reference's
+	// per-entry directory).
+	out = append(out, "/docs/changelog")
+	entries, err := os.ReadDir("internal/service/content/docs/changelog")
+	if err == nil {
+		for _, entry := range entries {
+			if name, ok := strings.CutSuffix(entry.Name(), ".md"); ok {
+				out = append(out, "/docs/changelog/"+name)
+			}
+		}
 	}
 
 	for _, comp := range registry.Components() {

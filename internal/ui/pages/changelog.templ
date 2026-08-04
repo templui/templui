@@ -1,0 +1,145 @@
+package pages
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/templui/templui/v2/components/button"
+	"github.com/templui/templui/v2/components/icon"
+	"github.com/templui/templui/v2/internal/service"
+	"github.com/templui/templui/v2/internal/ui/layouts"
+	"github.com/templui/templui/v2/internal/ui/modules"
+)
+
+// The changelog overview, the pendant of app/(app)/docs/changelog/page.tsx:
+// the latest entries rendered in full, older ones as a More Updates card
+// grid, and the right rail listing the entries instead of a heading TOC.
+
+const changelogLatestPages = 5
+
+// changelogTOC mirrors the reference's On This Page rail: one link per
+// entry (ours anchor to the inlined articles).
+func changelogTOC(entries []*service.ChangelogPage) []modules.TableOfContentsItem {
+	items := make([]modules.TableOfContentsItem, 0, len(entries))
+	for i, entry := range entries {
+		if i >= changelogLatestPages {
+			items = append(items, modules.TableOfContentsItem{ID: "more-updates", Text: "More Updates"})
+			break
+		}
+		items = append(items, modules.TableOfContentsItem{ID: entry.Slug, Text: entry.Title})
+	}
+	return items
+}
+
+// changelogDateAndTitle splits "August 2026 - templui 2.0" like the
+// reference's data.title.split(" - ").
+func changelogDateAndTitle(title string) (string, string) {
+	parts := strings.SplitN(title, " - ", 2)
+	if len(parts) < 2 {
+		return "", title
+	}
+	return parts[0], parts[1]
+}
+
+templ Changelog(entries []*service.ChangelogPage) {
+	@layouts.DocsLayout(
+		"Changelog",
+		"Latest updates and announcements.",
+		changelogTOC(entries),
+	) {
+		@modules.DocsCodeToggleScript()
+		<div class="flex w-full flex-1 flex-col gap-6">
+			<div class="flex flex-col gap-2">
+				<div class="flex items-center justify-between">
+					<h1 class="scroll-m-24 text-4xl font-semibold tracking-tight sm:text-3xl">Changelog</h1>
+					@button.Button(button.Props{Variant: button.VariantSecondary, Size: button.SizeSm, Href: "/rss.xml", Target: "_blank"}) {
+						@icon.Rss()
+						RSS
+					}
+				</div>
+				<p class="text-[1.05rem] text-muted-foreground sm:text-base sm:text-balance md:max-w-[80%]">Latest updates and announcements.</p>
+			</div>
+			<div class="w-full flex-1 pb-16 sm:pb-0">
+				for i, entry := range entries {
+					if i < changelogLatestPages {
+						<article class="mb-12 border-b pb-12">
+							<h2 id={ entry.Slug } class="font-heading scroll-m-24 text-xl font-semibold tracking-tight">
+								<a href={ templ.SafeURL("/docs/changelog/" + entry.Slug) } class="no-underline">{ entry.Title }</a>
+							</h2>
+							<div class="typeset mt-6 *:first:mt-0">
+								for _, segment := range entry.Segments {
+									@renderSegment(segment)
+								}
+							</div>
+						</article>
+					}
+				}
+				if len(entries) > changelogLatestPages {
+					<div id="more-updates" class="mb-24 scroll-mt-24">
+						<h2 class="mb-6 font-heading text-xl font-semibold tracking-tight">More Updates</h2>
+						<div class="grid auto-rows-fr gap-3 sm:grid-cols-2">
+							for i, entry := range entries {
+								if i >= changelogLatestPages {
+									{{ date, title := changelogDateAndTitle(entry.Title) }}
+									<a
+										href={ templ.SafeURL("/docs/changelog/" + entry.Slug) }
+										class="flex w-full flex-col rounded-2xl bg-surface px-4 py-3 text-surface-foreground transition-colors hover:bg-surface/80"
+									>
+										<span class="text-xs text-muted-foreground">{ date }</span>
+										<span class="text-sm font-medium">{ title }</span>
+									</a>
+								}
+							}
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	}
+}
+
+// ChangelogEntry renders one entry page under /docs/changelog/<slug>.
+templ ChangelogEntry(entry *service.ChangelogPage) {
+	@layouts.DocsLayout(
+		entry.Title,
+		entry.Description,
+		entry.TOC,
+	) {
+		@modules.DocsCodeToggleScript()
+		<div class="flex w-full flex-1 flex-col gap-6">
+			@modules.DocsPageHeader(entry.Title, entry.Description, "", "")
+			<div class="typeset w-full flex-1 pb-16 sm:pb-0">
+				for _, segment := range entry.Segments {
+					@renderSegment(segment)
+				}
+			</div>
+			@modules.DocsPager("Changelog", "/docs/changelog", "", "")
+		</div>
+	}
+}
+
+// ChangelogRSS is the rss.xml body, the pendant of app/rss.xml/route.ts.
+func ChangelogRSS(base string, entries []*service.ChangelogPage) string {
+	var items strings.Builder
+	for _, entry := range entries {
+		link := base + "/docs/changelog/" + entry.Slug
+		fmt.Fprintf(&items, `    <item>
+      <title><![CDATA[%s]]></title>
+      <link>%s</link>
+      <guid>%s</guid>
+      <description><![CDATA[%s]]></description>
+      <pubDate>%s</pubDate>
+    </item>
+`, entry.Title, link, link, entry.Description, entry.Date.UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT"))
+	}
+	return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>templui Changelog</title>
+    <link>` + base + `</link>
+    <description>Latest updates and announcements.</description>
+    <language>en-us</language>
+    <atom:link href="` + base + `/rss.xml" rel="self" type="application/rss+xml"/>
+` + items.String() + `  </channel>
+</rss>`
+}

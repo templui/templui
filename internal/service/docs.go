@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
+	"time"
 
-	"github.com/templui/templui/internal/markdown"
-	"github.com/templui/templui/internal/shared"
-	"github.com/templui/templui/internal/ui/modules"
-	"github.com/templui/templui/internal/ui/examples"
+	"github.com/templui/templui/v2/internal/markdown"
+	"github.com/templui/templui/v2/internal/shared"
+	"github.com/templui/templui/v2/internal/ui/modules"
+	"github.com/templui/templui/v2/internal/ui/examples"
 )
 
 //go:embed all:content/docs
@@ -148,4 +151,87 @@ func (s *DocsService) GetComponentPageSource(slug string) ([]byte, error) {
 		}
 		return code, true
 	}), nil
+}
+
+// ChangelogPage is one changelog entry, the pendant of lib/changelog.ts's
+// ChangelogPageData: an entry file under content/docs/changelog/ with
+// title/description/date frontmatter.
+type ChangelogPage struct {
+	Slug        string
+	Title       string
+	Description string
+	Date        time.Time
+	Segments    []markdown.Segment
+	TOC         []modules.TableOfContentsItem
+}
+
+// GetChangelogPages returns all changelog entries sorted by date descending,
+// the pendant of getChangelogPages.
+func (s *DocsService) GetChangelogPages() ([]*ChangelogPage, error) {
+	// Disk first like readContent, so new entries appear in dev without a
+	// rebuild; the embed serves built binaries.
+	entries, err := os.ReadDir("internal/service/content/docs/changelog")
+	if err != nil {
+		entries2, err2 := contentFS.ReadDir("content/docs/changelog")
+		if err2 != nil {
+			return nil, err2
+		}
+		pages := make([]*ChangelogPage, 0, len(entries2))
+		for _, entry := range entries2 {
+			if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".md") {
+				continue
+			}
+			page, err := s.GetChangelogPage(strings.TrimSuffix(entry.Name(), ".md"))
+			if err != nil {
+				return nil, err
+			}
+			pages = append(pages, page)
+		}
+		sort.Slice(pages, func(i, j int) bool { return pages[i].Date.After(pages[j].Date) })
+		return pages, nil
+	}
+	pages := make([]*ChangelogPage, 0, len(entries))
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".md") {
+			continue
+		}
+		page, err := s.GetChangelogPage(strings.TrimSuffix(entry.Name(), ".md"))
+		if err != nil {
+			return nil, err
+		}
+		pages = append(pages, page)
+	}
+	sort.Slice(pages, func(i, j int) bool { return pages[i].Date.After(pages[j].Date) })
+	return pages, nil
+}
+
+// GetChangelogPage loads one changelog entry by slug.
+func (s *DocsService) GetChangelogPage(slug string) (*ChangelogPage, error) {
+	content, err := readContent(filepath.Join("content/docs/changelog", slug+".md"))
+	if err != nil {
+		return nil, err
+	}
+	segments, meta, toc, err := s.parser.ParseSegments(content)
+	if err != nil {
+		return nil, err
+	}
+	page := &ChangelogPage{Slug: slug, Segments: segments, TOC: toc}
+	if title, ok := meta["title"].(string); ok {
+		page.Title = title
+	}
+	if desc, ok := meta["description"].(string); ok {
+		page.Description = desc
+	}
+	switch d := meta["date"].(type) {
+	case string:
+		page.Date, _ = time.Parse("2006-01-02", d)
+	case time.Time:
+		page.Date = d
+	}
+	return page, nil
+}
+
+// GetChangelogPageSource returns the raw markdown of a changelog entry.
+func (s *DocsService) GetChangelogPageSource(slug string) ([]byte, error) {
+	return readContent(filepath.Join("content/docs/changelog", slug+".md"))
 }

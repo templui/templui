@@ -1,11 +1,11 @@
 package pages
 
 import (
-	"github.com/templui/templui/components/badge"
-	"github.com/templui/templui/components/button"
-	"github.com/templui/templui/components/icon"
-	"github.com/templui/templui/internal/ui/layouts"
-	"github.com/templui/templui/internal/ui/modules"
+	"github.com/templui/templui/v2/components/badge"
+	"github.com/templui/templui/v2/components/button"
+	"github.com/templui/templui/v2/components/icon"
+	"github.com/templui/templui/v2/internal/ui/layouts"
+	"github.com/templui/templui/v2/internal/ui/modules"
 )
 
 // IndexPage is the 1:1 pendant of shadcn's homepage,
@@ -43,8 +43,8 @@ templ IndexPage() {
 						<div class="container flex flex-col items-center gap-2 px-6 py-8 text-center md:py-16 lg:py-20 xl:gap-4">
 							// Announcement: their badge links to the newest
 							// changelog entry, so ours names ours.
-							@badge.Badge(badge.Props{Variant: badge.VariantSecondary, Class: "bg-muted", Href: "/docs/changelog"}) {
-								Hover Card is now available
+							@badge.Badge(badge.Props{Variant: badge.VariantSecondary, Class: "bg-muted", Href: "/docs/changelog/2026-08-templui-2-0"}) {
+								templui 2.0 is now available
 								@icon.ArrowRight()
 							}
 							// PageHeaderHeading with the page's max-w-4xl.

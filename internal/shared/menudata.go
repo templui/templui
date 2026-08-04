@@ -4,14 +4,14 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/templui/templui/internal/registry"
+	"github.com/templui/templui/v2/internal/registry"
 )
 
 // DocSlugs are the markdown-authored docs pages served under /docs/<slug>
 // (and their raw markdown under /docs/<slug>.md). cmd/docs registers the
 // routes from this list and cmd/sitemap generates the sitemap from it.
 var DocSlugs = []string{
-	"introduction", "installation", "components-json", "package-imports", "theming", "typeset", "dark-mode", "cli", "changelog", "import-workflow",
+	"introduction", "installation", "components-json", "package-imports", "theming", "typeset", "dark-mode", "cli", "import-workflow",
 	"utils/scroll-fade", "utils/shimmer",
 	"registry", "registry/getting-started", "registry/registry-json", "registry/registry-item-json",
 }
