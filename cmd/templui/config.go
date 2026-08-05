@@ -64,7 +64,7 @@ func loadConfig() (Config, error) {
 		for _, field := range missingFields {
 			errorMsg.WriteString(fmt.Sprintf("   • %s\n", field))
 		}
-		errorMsg.WriteString("\n🔧 To fix this, run: templui -f init")
+		errorMsg.WriteString("\n🔧 To fix this, run: templui --force init")
 		return config, fmt.Errorf("%s", errorMsg.String())
 	}
 
