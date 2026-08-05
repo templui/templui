@@ -21,6 +21,15 @@ func getVersion() string {
 			return info.Main.Version
 		}
 
+		// go get -tool / tool-directive builds: the binary's main module is
+		// the user's module, templui itself shows up as a dependency with
+		// the real version (#591).
+		for _, dep := range info.Deps {
+			if dep.Path == "github.com/templui/templui" && dep.Version != "" && dep.Version != "(devel)" {
+				return dep.Version
+			}
+		}
+
 		// Dev mode: Show Git commit + dirty flag
 		var revision, modified string
 		for _, setting := range info.Settings {
