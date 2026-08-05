@@ -24,8 +24,15 @@ type Dataset struct {
 }
 
 type Options struct {
-	Responsive bool `json:"responsive,omitempty"`
-	Legend     bool `json:"legend,omitempty"`
+	// Responsive is tri-state: nil keeps Chart.js' default (true), an
+	// explicit false via chart.Bool(false) turns it off (#592).
+	Responsive *bool `json:"responsive,omitempty"`
+	Legend     bool  `json:"legend,omitempty"`
+}
+
+// Bool returns a pointer for tri-state option fields.
+func Bool(v bool) *bool {
+	return &v
 }
 
 type Data struct {

@@ -110,7 +110,10 @@ import "./chartjs.js";
     return {
       ...chartConfig,
       options: {
-        responsive: true,
+        responsive:
+          chartConfig.options && chartConfig.options.responsive !== undefined
+            ? chartConfig.options.responsive
+            : true,
         maintainAspectRatio: false,
         interaction: {
           intersect: isComplexChart,
