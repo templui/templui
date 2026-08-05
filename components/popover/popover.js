@@ -3,6 +3,17 @@ import "./floating_ui_dom.js";
 
 (function () {
   "use strict";
+  // Safari/iOS < 17 does not know the :popover-open selector and throws a
+  // SyntaxError DOMException on matches() instead of returning false (#583).
+  function matchesPopoverOpen(el) {
+    if (!el) return false;
+    try {
+      return matchesPopoverOpen(el);
+    } catch (e) {
+      return false;
+    }
+  }
+
 
   const floatingCleanups = new WeakMap();
   const hoverTimeouts = new WeakMap();
@@ -65,7 +76,7 @@ import "./floating_ui_dom.js";
     // Use the native popover state as source of truth: the data-attribute is
     // only a CSS hook for fade animations and can drift when something else
     // (e.g. DatePicker) closes via content.hidePopover() directly.
-    return getContent(root)?.matches(":popover-open") === true;
+    return matchesPopoverOpen(getContent(root)) === true;
   }
 
   function isOpen(id) {
@@ -92,7 +103,7 @@ import "./floating_ui_dom.js";
     clearTimeout(content._tuiPopoverCloseTimeout);
     content._tuiPopoverCloseTimeout = null;
 
-    if (!content.matches(":popover-open")) {
+    if (!matchesPopoverOpen(content)) {
       try {
         content.showPopover();
       } catch {
@@ -112,13 +123,13 @@ import "./floating_ui_dom.js";
     content._tuiPopoverCloseTimeout = null;
     content.setAttribute("data-tui-popover-open", "false");
 
-    if (!content.matches(":popover-open")) {
+    if (!matchesPopoverOpen(content)) {
       return;
     }
 
     content._tuiPopoverCloseTimeout = setTimeout(() => {
       content._tuiPopoverCloseTimeout = null;
-      if (content.matches(":popover-open")) {
+      if (matchesPopoverOpen(content)) {
         try {
           content.hidePopover();
         } catch {
@@ -357,7 +368,7 @@ import "./floating_ui_dom.js";
     (event) => {
       getRoots().forEach((root) => {
         const content = getContent(root);
-        if (!content?.matches(":popover-open")) {
+        if (!matchesPopoverOpen(content)) {
           pointerDownInside.delete(root);
           return;
         }
@@ -399,7 +410,7 @@ import "./floating_ui_dom.js";
       const content = getContent(currentRoot);
       if (
         !content ||
-        !content.matches(":popover-open") ||
+        !matchesPopoverOpen(content) ||
         content.getAttribute("data-tui-popover-disable-clickaway") === "true"
       ) {
         return;
@@ -446,7 +457,7 @@ import "./floating_ui_dom.js";
       contentRoot &&
       isHoverRoot(contentRoot) &&
       !content.contains(event.relatedTarget) &&
-      content.matches(":popover-open")
+      matchesPopoverOpen(content)
     ) {
       const timeouts = hoverTimeouts.get(contentRoot) || {};
       clearTimeout(timeouts.leave);
@@ -476,7 +487,7 @@ import "./floating_ui_dom.js";
       contentRoot &&
       isHoverRoot(contentRoot) &&
       !content.contains(event.relatedTarget) &&
-      content.matches(":popover-open")
+      matchesPopoverOpen(content)
     ) {
       const movingToTrigger = getTriggers(contentRoot).some((item) =>
         item.contains(event.relatedTarget),
@@ -504,7 +515,7 @@ import "./floating_ui_dom.js";
       const content = getContent(root);
       if (
         content &&
-        content.matches(":popover-open") &&
+        matchesPopoverOpen(content) &&
         content.getAttribute("data-tui-popover-disable-esc") !== "true"
       ) {
         closeRoot(root);
