@@ -111,7 +111,7 @@ func main() {
 - [CLI](https://templui.io/docs/cli): Command-line tool for installing and managing components.
 - [Installation](https://templui.io/docs/installation): Installation and setup guide.
 - [Components](https://templui.io/docs/components): Component overview and catalog.
-- [GitHub](https://github.com/templui/templui): Source code and issue tracker.
+- [GitHub](https://github.com/axadrn/shadcn-templ): Source code and issue tracker.
 
 `)
 

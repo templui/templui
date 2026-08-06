@@ -40,7 +40,7 @@ templui add item
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/v2/components/item"
+import "github.com/axadrn/shadcn-templ/v2/components/item"
 ```
 
 ```templ showLineNumbers

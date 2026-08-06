@@ -6,7 +6,7 @@
 // diff/docs/view/search/migrate/eject/info/build/mcp/registry (they cover
 // npm registries, React codemods and MCP servers). shadcn has no plain
 // `list` either, so templui's old list command is gone; upgrade is
-// `go install github.com/templui/templui/v2/cmd/templui@latest`.
+// `go install github.com/axadrn/shadcn-templ/v2/cmd/templui@latest`.
 package main
 
 import (
@@ -15,7 +15,7 @@ import (
 	"os"
 	"runtime/debug"
 
-	"github.com/templui/templui/v2/cmd/templui/commands"
+	"github.com/axadrn/shadcn-templ/v2/cmd/templui/commands"
 )
 
 // version is detected from build info (module version for go install,

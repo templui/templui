@@ -16,9 +16,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/templui/templui/v2/cmd/templui/registry"
-	"github.com/templui/templui/v2/cmd/templui/utils"
-	"github.com/templui/templui/v2/internal/preset"
+	"github.com/axadrn/shadcn-templ/v2/cmd/templui/registry"
+	"github.com/axadrn/shadcn-templ/v2/cmd/templui/utils"
+	"github.com/axadrn/shadcn-templ/v2/internal/preset"
 )
 
 // ApplyOptions are the flags of templui apply.

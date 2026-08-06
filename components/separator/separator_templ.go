@@ -8,7 +8,7 @@ package separator
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/templui/templui/v2/utils"
+import "github.com/axadrn/shadcn-templ/v2/utils"
 
 type Orientation string
 

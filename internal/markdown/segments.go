@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/templui/templui/v2/internal/ui/modules"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/modules"
 	"github.com/yuin/goldmark/parser"
 	"go.abhg.dev/goldmark/frontmatter"
 )

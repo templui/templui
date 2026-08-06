@@ -12,7 +12,7 @@ body:
     attributes:
       value: |
         #### If you aren't sure this is a bug or not, please open a discussion instead:
-        - [Discussions](https://github.com/templui/templui/discussions/new?category=general)
+        - [Discussions](https://github.com/axadrn/shadcn-templ/discussions/new?category=general)
 
   - type: textarea
     id: bug-description
@@ -77,7 +77,7 @@ body:
     id: terms
     attributes:
       label: Before submitting
-      description: By submitting this issue, you agree to follow our [Contributing Guidelines](https://github.com/templui/templui/blob/main/CONTRIBUTING.md).
+      description: By submitting this issue, you agree to follow our [Contributing Guidelines](https://github.com/axadrn/shadcn-templ/blob/main/CONTRIBUTING.md).
       options:
         - label: I've made research efforts and searched the documentation
           required: true

@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"log"
 
-	templui "github.com/templui/templui/v2"
+	templui "github.com/axadrn/shadcn-templ/v2"
 )
 
 // File is one files[] entry of a registry item.

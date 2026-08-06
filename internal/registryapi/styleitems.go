@@ -12,12 +12,12 @@ import (
 	"strings"
 	"sync"
 
-	templui "github.com/templui/templui/v2"
-	"github.com/templui/templui/v2/assets"
-	"github.com/templui/templui/v2/internal/shared"
-	"github.com/templui/templui/v2/components"
-	"github.com/templui/templui/v2/internal/inliner"
-	"github.com/templui/templui/v2/internal/registry"
+	templui "github.com/axadrn/shadcn-templ/v2"
+	"github.com/axadrn/shadcn-templ/v2/assets"
+	"github.com/axadrn/shadcn-templ/v2/internal/shared"
+	"github.com/axadrn/shadcn-templ/v2/components"
+	"github.com/axadrn/shadcn-templ/v2/internal/inliner"
+	"github.com/axadrn/shadcn-templ/v2/internal/registry"
 )
 
 // isDevelopment mirrors components/scripts.go: outside production every

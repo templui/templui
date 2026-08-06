@@ -40,7 +40,7 @@ templui add breadcrumb
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/v2/components/breadcrumb"
+import "github.com/axadrn/shadcn-templ/v2/components/breadcrumb"
 ```
 
 ```templ showLineNumbers

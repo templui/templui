@@ -40,7 +40,7 @@ templui add empty
 ## Usage
 
 ```go
-import "github.com/templui/templui/v2/components/empty"
+import "github.com/axadrn/shadcn-templ/v2/components/empty"
 ```
 
 ```templ

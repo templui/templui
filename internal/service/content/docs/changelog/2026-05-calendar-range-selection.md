@@ -8,4 +8,4 @@ The [Calendar](/docs/components/calendar) component now supports range selection
 
 The calendar selection event was renamed from `calendar-date-selected` to `calendar-selected` with a unified payload for both modes — update any direct listeners (breaking change).
 
-Released in [v1.11.0](https://github.com/templui/templui/releases/tag/v1.11.0).
+Released in [v1.11.0](https://github.com/axadrn/shadcn-templ/releases/tag/v1.11.0).

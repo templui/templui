@@ -40,7 +40,7 @@ templui add skeleton
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/v2/components/skeleton"
+import "github.com/axadrn/shadcn-templ/v2/components/skeleton"
 ```
 
 ```templ showLineNumbers

@@ -16,7 +16,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/templui/templui/v2/utils"
+	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
 // Config is the pendant of shadcn's ChartConfig: label and color per

@@ -1,6 +1,6 @@
 package modules
 
-import "github.com/templui/templui/v2/components/tabs"
+import "github.com/axadrn/shadcn-templ/v2/components/tabs"
 
 type ComponentUsageProps struct {
 	ComponentName string
@@ -13,7 +13,7 @@ templ ComponentUsage(props ComponentUsageProps) {
 			componentAlias = "switchcomp"
 		}
 
-		componentImportLine := `"` + "github.com/templui/templui/v2/components/" + props.ComponentName + `"`
+		componentImportLine := `"` + "github.com/axadrn/shadcn-templ/v2/components/" + props.ComponentName + `"`
 		if componentAlias != props.ComponentName {
 			componentImportLine = componentAlias + " " + componentImportLine
 		}

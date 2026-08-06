@@ -11,9 +11,9 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"context"
 
-	"github.com/templui/templui/v2/components/button"
-	"github.com/templui/templui/v2/components/icon"
-	"github.com/templui/templui/v2/utils"
+	"github.com/axadrn/shadcn-templ/v2/components/button"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
 type ctxKey string

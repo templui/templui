@@ -32,8 +32,8 @@ jobs:
           platforms: linux/arm64
           push: true
           tags: |
-            ghcr.io/templui/templui:v2
-            ghcr.io/templui/templui:${{ github.sha }}
+            ghcr.io/axadrn/shadcn-templ:v2
+            ghcr.io/axadrn/shadcn-templ:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

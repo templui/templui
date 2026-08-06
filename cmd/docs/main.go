@@ -9,19 +9,19 @@ import (
 
 	"github.com/a-h/templ"
 
-	"github.com/templui/templui/v2/assets"
-	"github.com/templui/templui/v2/components"
-	"github.com/templui/templui/v2/internal/config"
-	"github.com/templui/templui/v2/internal/middleware"
-	"github.com/templui/templui/v2/internal/registry"
-	"github.com/templui/templui/v2/internal/registryapi"
-	"github.com/templui/templui/v2/internal/service"
-	"github.com/templui/templui/v2/internal/shared"
-	"github.com/templui/templui/v2/internal/ui/charts"
-	"github.com/templui/templui/v2/internal/ui/modules"
-	"github.com/templui/templui/v2/internal/ui/examples"
-	"github.com/templui/templui/v2/internal/ui/pages"
-	"github.com/templui/templui/v2/static"
+	"github.com/axadrn/shadcn-templ/v2/assets"
+	"github.com/axadrn/shadcn-templ/v2/components"
+	"github.com/axadrn/shadcn-templ/v2/internal/config"
+	"github.com/axadrn/shadcn-templ/v2/internal/middleware"
+	"github.com/axadrn/shadcn-templ/v2/internal/registry"
+	"github.com/axadrn/shadcn-templ/v2/internal/registryapi"
+	"github.com/axadrn/shadcn-templ/v2/internal/service"
+	"github.com/axadrn/shadcn-templ/v2/internal/shared"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/charts"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/modules"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/examples"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/pages"
+	"github.com/axadrn/shadcn-templ/v2/static"
 )
 
 // htmxHandler wraps a templ component to support HTMX fragment requests

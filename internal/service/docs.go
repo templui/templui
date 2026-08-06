@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/templui/templui/v2/internal/markdown"
-	"github.com/templui/templui/v2/internal/shared"
-	"github.com/templui/templui/v2/internal/ui/modules"
-	"github.com/templui/templui/v2/internal/ui/examples"
+	"github.com/axadrn/shadcn-templ/v2/internal/markdown"
+	"github.com/axadrn/shadcn-templ/v2/internal/shared"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/modules"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/examples"
 )
 
 //go:embed all:content/docs

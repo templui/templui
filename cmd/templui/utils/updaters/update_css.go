@@ -11,8 +11,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/templui/templui/v2/cmd/templui/registry"
-	templuiutils "github.com/templui/templui/v2/utils"
+	"github.com/axadrn/shadcn-templ/v2/cmd/templui/registry"
+	templuiutils "github.com/axadrn/shadcn-templ/v2/utils"
 )
 
 // cssNode is one CSS construct: a declaration, a semicolon statement

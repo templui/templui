@@ -20,7 +20,7 @@ RUN templ generate
 RUN apt-get update && apt-get install -y curl wget && rm -rf /var/lib/apt/lists/*
 
 # Get the latest version from GitHub API and save it to version.txt
-RUN curl -s https://api.github.com/repos/templui/templui/releases/latest | grep tag_name | cut -d '"' -f 4 > version.txt || echo "unknown" > version.txt
+RUN curl -s https://api.github.com/repos/axadrn/shadcn-templ/releases/latest | grep tag_name | cut -d '"' -f 4 > version.txt || echo "unknown" > version.txt
 
 # Install Tailwind CSS standalone CLI
 RUN ARCH=$(uname -m) && \

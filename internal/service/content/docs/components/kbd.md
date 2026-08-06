@@ -40,7 +40,7 @@ templui add kbd
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/v2/components/kbd"
+import "github.com/axadrn/shadcn-templ/v2/components/kbd"
 ```
 
 ```templ showLineNumbers

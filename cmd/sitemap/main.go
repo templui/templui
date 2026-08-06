@@ -16,9 +16,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/templui/templui/v2/internal/registry"
-	"github.com/templui/templui/v2/internal/shared"
-	"github.com/templui/templui/v2/internal/ui/pages"
+	"github.com/axadrn/shadcn-templ/v2/internal/registry"
+	"github.com/axadrn/shadcn-templ/v2/internal/shared"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/pages"
 )
 
 // URL is an entry in the sitemap.

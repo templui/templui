@@ -41,8 +41,8 @@ templui add radio-group
 
 ```go showLineNumbers
 import (
-	"github.com/templui/templui/v2/components/label"
-	"github.com/templui/templui/v2/components/radio"
+	"github.com/axadrn/shadcn-templ/v2/components/label"
+	"github.com/axadrn/shadcn-templ/v2/components/radio"
 )
 ```
 

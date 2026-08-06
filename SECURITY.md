@@ -6,4 +6,4 @@ We will investigate all legitimate reports and do our best to quickly fix the pr
 
 Our preference is that you make use of GitHub's private vulnerability reporting feature to disclose potential security vulnerabilities in our Open Source Software.
 
-To do this, please visit the security tab of the repository and click the [Report a vulnerability](https://github.com/templui/templui/security/advisories/new) button.
+To do this, please visit the security tab of the repository and click the [Report a vulnerability](https://github.com/axadrn/shadcn-templ/security/advisories/new) button.

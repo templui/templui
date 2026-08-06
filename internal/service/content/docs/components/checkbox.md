@@ -40,7 +40,7 @@ templui add checkbox
 ## Usage
 
 ```go
-import "github.com/templui/templui/v2/components/checkbox"
+import "github.com/axadrn/shadcn-templ/v2/components/checkbox"
 ```
 
 ```templ

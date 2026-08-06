@@ -47,7 +47,7 @@ Component scripts are loaded through the shared script bundle, see [JavaScript](
 import (
 	"time"
 
-	"github.com/templui/templui/v2/components/calendar"
+	"github.com/axadrn/shadcn-templ/v2/components/calendar"
 )
 ```
 

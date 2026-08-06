@@ -40,7 +40,7 @@ Alias paths are Go import paths and must live under the `module` path of your `g
 In the import workflow, components are imported directly from the templui module. No `components.json` and no aliases are needed:
 
 ```go
-import "github.com/templui/templui/v2/components/button"
+import "github.com/axadrn/shadcn-templ/v2/components/button"
 ```
 
 See the [installation guide](/docs/installation) for the full setup of both workflows.
@@ -80,7 +80,7 @@ The `components` alias is the import path components install under. The `utils` 
 templui add button
 ```
 
-The CLI resolves registry dependencies recursively and rewrites all imports — `github.com/templui/templui/v2/components/...` and `github.com/templui/templui/v2/utils` — to your aliases.
+The CLI resolves registry dependencies recursively and rewrites all imports — `github.com/axadrn/shadcn-templ/v2/components/...` and `github.com/axadrn/shadcn-templ/v2/utils` — to your aliases.
 
 </Steps>
 

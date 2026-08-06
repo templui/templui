@@ -12,44 +12,44 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/templui/templui/v2/components/accordion"
-	"github.com/templui/templui/v2/components/alert"
-	"github.com/templui/templui/v2/components/alertdialog"
-	"github.com/templui/templui/v2/components/avatar"
-	"github.com/templui/templui/v2/components/badge"
-	"github.com/templui/templui/v2/components/breadcrumb"
-	"github.com/templui/templui/v2/components/button"
-	"github.com/templui/templui/v2/components/buttongroup"
-	"github.com/templui/templui/v2/components/calendar"
-	"github.com/templui/templui/v2/components/card"
-	"github.com/templui/templui/v2/components/chart"
-	"github.com/templui/templui/v2/components/checkbox"
-	"github.com/templui/templui/v2/components/combobox"
-	"github.com/templui/templui/v2/components/dialog"
-	"github.com/templui/templui/v2/components/dropdownmenu"
-	"github.com/templui/templui/v2/components/empty"
-	"github.com/templui/templui/v2/components/field"
-	"github.com/templui/templui/v2/components/icon"
-	"github.com/templui/templui/v2/components/input"
-	"github.com/templui/templui/v2/components/inputgroup"
-	"github.com/templui/templui/v2/components/item"
-	"github.com/templui/templui/v2/components/kbd"
-	"github.com/templui/templui/v2/components/label"
-	"github.com/templui/templui/v2/components/progress"
-	"github.com/templui/templui/v2/components/radiogroup"
-	selectcomp "github.com/templui/templui/v2/components/select"
-	"github.com/templui/templui/v2/components/separator"
-	"github.com/templui/templui/v2/components/sidebar"
-	"github.com/templui/templui/v2/components/skeleton"
-	"github.com/templui/templui/v2/components/slider"
-	"github.com/templui/templui/v2/components/spinner"
-	switchcomp "github.com/templui/templui/v2/components/switch"
-	"github.com/templui/templui/v2/components/table"
-	"github.com/templui/templui/v2/components/tabs"
-	"github.com/templui/templui/v2/components/textarea"
-	"github.com/templui/templui/v2/components/togglegroup"
-	"github.com/templui/templui/v2/components/tooltip"
-	"github.com/templui/templui/v2/utils"
+	"github.com/axadrn/shadcn-templ/v2/components/accordion"
+	"github.com/axadrn/shadcn-templ/v2/components/alert"
+	"github.com/axadrn/shadcn-templ/v2/components/alertdialog"
+	"github.com/axadrn/shadcn-templ/v2/components/avatar"
+	"github.com/axadrn/shadcn-templ/v2/components/badge"
+	"github.com/axadrn/shadcn-templ/v2/components/breadcrumb"
+	"github.com/axadrn/shadcn-templ/v2/components/button"
+	"github.com/axadrn/shadcn-templ/v2/components/buttongroup"
+	"github.com/axadrn/shadcn-templ/v2/components/calendar"
+	"github.com/axadrn/shadcn-templ/v2/components/card"
+	"github.com/axadrn/shadcn-templ/v2/components/chart"
+	"github.com/axadrn/shadcn-templ/v2/components/checkbox"
+	"github.com/axadrn/shadcn-templ/v2/components/combobox"
+	"github.com/axadrn/shadcn-templ/v2/components/dialog"
+	"github.com/axadrn/shadcn-templ/v2/components/dropdownmenu"
+	"github.com/axadrn/shadcn-templ/v2/components/empty"
+	"github.com/axadrn/shadcn-templ/v2/components/field"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/input"
+	"github.com/axadrn/shadcn-templ/v2/components/inputgroup"
+	"github.com/axadrn/shadcn-templ/v2/components/item"
+	"github.com/axadrn/shadcn-templ/v2/components/kbd"
+	"github.com/axadrn/shadcn-templ/v2/components/label"
+	"github.com/axadrn/shadcn-templ/v2/components/progress"
+	"github.com/axadrn/shadcn-templ/v2/components/radiogroup"
+	selectcomp "github.com/axadrn/shadcn-templ/v2/components/select"
+	"github.com/axadrn/shadcn-templ/v2/components/separator"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+	"github.com/axadrn/shadcn-templ/v2/components/skeleton"
+	"github.com/axadrn/shadcn-templ/v2/components/slider"
+	"github.com/axadrn/shadcn-templ/v2/components/spinner"
+	switchcomp "github.com/axadrn/shadcn-templ/v2/components/switch"
+	"github.com/axadrn/shadcn-templ/v2/components/table"
+	"github.com/axadrn/shadcn-templ/v2/components/tabs"
+	"github.com/axadrn/shadcn-templ/v2/components/textarea"
+	"github.com/axadrn/shadcn-templ/v2/components/togglegroup"
+	"github.com/axadrn/shadcn-templ/v2/components/tooltip"
+	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
 // Ports of shadcn's preview card walls, card by card: the preview-02 cards
@@ -16390,7 +16390,7 @@ func cardCodespaces() templ.Component {
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
-									templ_7745c5c3_Err = cloneURLInputGroup("https-url", "https://github.com/templui/templui.git").Render(ctx, templ_7745c5c3_Buffer)
+									templ_7745c5c3_Err = cloneURLInputGroup("https-url", "https://github.com/axadrn/shadcn-templ.git").Render(ctx, templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
@@ -16482,7 +16482,7 @@ func cardCodespaces() templ.Component {
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
-									templ_7745c5c3_Err = cloneURLInputGroup("ssh-url", "git@github.com:templui/templui.git").Render(ctx, templ_7745c5c3_Buffer)
+									templ_7745c5c3_Err = cloneURLInputGroup("ssh-url", "git@github.com:axadrn/shadcn-templ.git").Render(ctx, templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
@@ -16574,7 +16574,7 @@ func cardCodespaces() templ.Component {
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
-									templ_7745c5c3_Err = cloneURLInputGroup("cli-command", "gh repo clone templui/templui").Render(ctx, templ_7745c5c3_Buffer)
+									templ_7745c5c3_Err = cloneURLInputGroup("cli-command", "gh repo clone axadrn/shadcn-templ").Render(ctx, templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}

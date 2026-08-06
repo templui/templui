@@ -40,7 +40,7 @@ templui add button
 ## Usage
 
 ```go
-import "github.com/templui/templui/v2/components/button"
+import "github.com/axadrn/shadcn-templ/v2/components/button"
 ```
 
 ```templ

@@ -8,4 +8,4 @@ The [Slider](/docs/components/slider) component gained a `Range` component for s
 
 [Dialog](/docs/components/dialog) gained optional modal mode via `DisableModal` on `dialog.Content`, allowing the native backdrop to be disabled for dialogs that contain nested overlays.
 
-Released in [v1.10.0](https://github.com/templui/templui/releases/tag/v1.10.0).
+Released in [v1.10.0](https://github.com/axadrn/shadcn-templ/releases/tag/v1.10.0).

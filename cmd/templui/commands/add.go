@@ -13,9 +13,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/templui/templui/v2/cmd/templui/registry"
-	"github.com/templui/templui/v2/cmd/templui/utils"
-	"github.com/templui/templui/v2/cmd/templui/utils/updaters"
+	"github.com/axadrn/shadcn-templ/v2/cmd/templui/registry"
+	"github.com/axadrn/shadcn-templ/v2/cmd/templui/utils"
+	"github.com/axadrn/shadcn-templ/v2/cmd/templui/utils/updaters"
 )
 
 // AddOptions are the flags of templui add.

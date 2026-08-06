@@ -48,7 +48,7 @@ Component scripts are loaded through the shared script bundle, see [JavaScript](
 ## Usage
 
 ```go showLineNumbers
-import "github.com/templui/templui/v2/components/popover"
+import "github.com/axadrn/shadcn-templ/v2/components/popover"
 ```
 
 ```templ showLineNumbers

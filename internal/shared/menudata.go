@@ -4,7 +4,7 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/templui/templui/v2/internal/registry"
+	"github.com/axadrn/shadcn-templ/v2/internal/registry"
 )
 
 // DocSlugs are the markdown-authored docs pages served under /docs/<slug>

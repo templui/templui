@@ -12,7 +12,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/templui/templui/v2/utils"
+	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
 type ctxKey string

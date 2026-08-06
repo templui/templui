@@ -1,9 +1,9 @@
 package modules
 
 import (
-	"github.com/templui/templui/v2/components/badge"
-	"github.com/templui/templui/v2/components/breadcrumb"
-	"github.com/templui/templui/v2/internal/ui/icons"
+	"github.com/axadrn/shadcn-templ/v2/components/badge"
+	"github.com/axadrn/shadcn-templ/v2/components/breadcrumb"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/icons"
 	"strings"
 )
 
@@ -58,7 +58,7 @@ templ PageWrapper(p PageWrapperProps) {
 		<div class="flex gap-2 items-baseline">
 			{{
 				componentName := strings.ToLower(strings.ReplaceAll(p.Name, " ", ""))
-				srcURL := templ.SafeURL("https://github.com/templui/templui/tree/main/components/" + componentName)
+				srcURL := templ.SafeURL("https://github.com/axadrn/shadcn-templ/tree/main/components/" + componentName)
 			}}
 			if !p.HideSource {
 				<a href={ templ.SafeURL(srcURL) } target="_blank" class="flex">

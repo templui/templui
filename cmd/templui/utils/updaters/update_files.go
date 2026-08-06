@@ -1,7 +1,7 @@
 // update_files.go ports update-files.ts: resolve target paths, transform
 // content and write files with created/updated/skipped accounting. The
 // transformer pendant is the import rewrite the old templui CLI already had:
-// github.com/templui/templui/v2/{components,utils}/... imports become the user's
+// github.com/axadrn/shadcn-templ/v2/{components,utils}/... imports become the user's
 // own module paths.
 package updaters
 
@@ -12,8 +12,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/templui/templui/v2/cmd/templui/registry"
-	"github.com/templui/templui/v2/cmd/templui/utils"
+	"github.com/axadrn/shadcn-templ/v2/cmd/templui/registry"
+	"github.com/axadrn/shadcn-templ/v2/cmd/templui/utils"
 )
 
 // UpdateFilesOptions mirrors the update-files.ts options the CLI uses.
@@ -145,7 +145,7 @@ func resolveFilePath(file registry.ItemFile, config *utils.Config, pathOverride 
 	}
 }
 
-var templuiImportRe = regexp.MustCompile(`"github\.com/templui/templui/([^"]+)"`)
+var templuiImportRe = regexp.MustCompile(`"github\.com/axadrn/shadcn-templ/([^"]+)"`)
 
 // transformContent rewrites module imports and the package clause for Go and
 // templ sources; other files (component .js) ship verbatim.
@@ -155,7 +155,7 @@ func transformContent(file registry.ItemFile, config *utils.Config) string {
 	}
 
 	content := templuiImportRe.ReplaceAllStringFunc(file.Content, func(match string) string {
-		repoPath := strings.Trim(strings.TrimPrefix(match, `"github.com/templui/templui/v2/`), `"`)
+		repoPath := strings.Trim(strings.TrimPrefix(match, `"github.com/axadrn/shadcn-templ/v2/`), `"`)
 		switch {
 		case strings.HasPrefix(repoPath, "components/"):
 			return `"` + config.Aliases.Components + `/` + strings.TrimPrefix(repoPath, "components/") + `"`

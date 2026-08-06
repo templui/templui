@@ -17,7 +17,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/templui/templui/v2/internal/inliner"
+	"github.com/axadrn/shadcn-templ/v2/internal/inliner"
 )
 
 var styleNames = []string{"vega", "nova", "lyra", "maia", "mira", "luma", "sera", "rhea"}

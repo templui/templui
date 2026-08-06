@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/templui/templui/v2/internal/shared"
+	"github.com/axadrn/shadcn-templ/v2/internal/shared"
 )
 
 func TestVarsOrder(t *testing.T) {

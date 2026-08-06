@@ -1,4 +1,4 @@
-module github.com/templui/templui/v2
+module github.com/axadrn/shadcn-templ/v2
 
 go 1.24
 

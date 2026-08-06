@@ -9,20 +9,20 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/templui/templui/v2/components/alertdialog"
-	"github.com/templui/templui/v2/components/button"
-	"github.com/templui/templui/v2/components/card"
-	"github.com/templui/templui/v2/components/command"
-	"github.com/templui/templui/v2/components/dialog"
-	"github.com/templui/templui/v2/components/drawer"
-	"github.com/templui/templui/v2/components/field"
-	"github.com/templui/templui/v2/components/icon"
-	"github.com/templui/templui/v2/components/input"
-	"github.com/templui/templui/v2/components/radiogroup"
-	"github.com/templui/templui/v2/components/togglegroup"
-	"github.com/templui/templui/v2/internal/ui/layouts"
-	"github.com/templui/templui/v2/internal/ui/modules"
-	"github.com/templui/templui/v2/utils"
+	"github.com/axadrn/shadcn-templ/v2/components/alertdialog"
+	"github.com/axadrn/shadcn-templ/v2/components/button"
+	"github.com/axadrn/shadcn-templ/v2/components/card"
+	"github.com/axadrn/shadcn-templ/v2/components/command"
+	"github.com/axadrn/shadcn-templ/v2/components/dialog"
+	"github.com/axadrn/shadcn-templ/v2/components/drawer"
+	"github.com/axadrn/shadcn-templ/v2/components/field"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/input"
+	"github.com/axadrn/shadcn-templ/v2/components/radiogroup"
+	"github.com/axadrn/shadcn-templ/v2/components/togglegroup"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/layouts"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/modules"
+	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
 // The /create designer, 1:1 pendant of shadcn's app/(app)/(create)/create:
@@ -4107,7 +4107,7 @@ func createCodeDialog() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 178, "Scaffolds a new templ project with this preset. Get the CLI with <code class=\"font-mono\">go install github.com/templui/templui/v2/cmd/templui@latest</code>.")
+							templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 178, "Scaffolds a new templ project with this preset. Get the CLI with <code class=\"font-mono\">go install github.com/axadrn/shadcn-templ/v2/cmd/templui@latest</code>.")
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}

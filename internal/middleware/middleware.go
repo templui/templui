@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/templui/templui/v2/internal/config"
-	"github.com/templui/templui/v2/internal/ctxkeys"
+	"github.com/axadrn/shadcn-templ/v2/internal/config"
+	"github.com/axadrn/shadcn-templ/v2/internal/ctxkeys"
 )
 
 func CacheControlMiddleware(next http.Handler) http.Handler {
@@ -77,7 +77,7 @@ func getGitHubStars() int {
 
 	// Fetch fresh data
 	client := &http.Client{Timeout: 5 * time.Second}
-	req, err := http.NewRequest("GET", "https://api.github.com/repos/templui/templui", nil)
+	req, err := http.NewRequest("GET", "https://api.github.com/repos/axadrn/shadcn-templ", nil)
 	if err != nil {
 		return githubStarsCache.stars
 	}

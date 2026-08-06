@@ -14,7 +14,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/templui/templui/v2/internal/inliner"
+	"github.com/axadrn/shadcn-templ/v2/internal/inliner"
 )
 
 func main() {

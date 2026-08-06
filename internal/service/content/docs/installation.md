@@ -44,7 +44,7 @@ Open [templui/create](/create) and build your preset visually. Choose your style
 Click `Get Code`, choose your project tab, and copy the generated command. Install the CLI first if you do not have it yet:
 
 ```shell
-go install github.com/templui/templui/v2/cmd/templui@latest
+go install github.com/axadrn/shadcn-templ/v2/cmd/templui@latest
 ```
 
 The generated command will look similar to this:
@@ -112,7 +112,7 @@ After adding components, run `templ generate` and `go mod tidy`.
 Run the `init` command to scaffold a new templ project. Configure your project with flags: preset, base color, and more:
 
 ```shell
-go install github.com/templui/templui/v2/cmd/templui@latest
+go install github.com/axadrn/shadcn-templ/v2/cmd/templui@latest
 templui init -t templ
 ```
 
@@ -202,7 +202,7 @@ Import aliases need no configuration: Go resolves imports through the `module` p
 Run the `templui` init command to set up templui in your project:
 
 ```shell
-go install github.com/templui/templui/v2/cmd/templui@latest
+go install github.com/axadrn/shadcn-templ/v2/cmd/templui@latest
 templui init
 ```
 
