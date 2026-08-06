@@ -1,12 +1,11 @@
 # Off-host build for v1, the same pattern as the v2 branch: GitHub's
 # free ARM runners build the image, ghcr.io stores it, Dokploy only
-# pulls (Provider: Docker). Triggers on main today and on v1 after
-# the branch flip.
-name: deploy
+# pulls (Provider: Docker).
+name: deploy-v1
 
 on:
   push:
-    branches: [main, v1]
+    branches: [v1]
 
 permissions:
   contents: read
