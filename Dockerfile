@@ -1,5 +1,5 @@
 # Build-Stage
-FROM golang:1.24 AS build
+FROM golang:1.26 AS build
 WORKDIR /app
 
 # Dependency layer: re-downloads only when go.mod/go.sum change, every
