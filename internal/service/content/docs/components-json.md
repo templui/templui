@@ -24,11 +24,11 @@ See the [CLI section](/docs/cli) for more information.
 
 ## $schema
 
-The `$schema` identifies the templui `components.json` format. `shadcn-templ init` writes it for you.
+The `$schema` identifies the shadcn-templ `components.json` format. `shadcn-templ init` writes it for you.
 
 ```json title="components.json"
 {
-  "$schema": "https://templui.io/schema/components.json"
+  "$schema": "https://shadcn-templ.com/schema/components.json"
 }
 ```
 
@@ -76,7 +76,7 @@ This is used to generate the default theme tokens for your components.
 
 ### tailwind.cssVariables
 
-We use CSS variables for theming. templui components always theme through CSS variables, so `init` writes `true`.
+We use CSS variables for theming. shadcn-templ components always theme through CSS variables, so `init` writes `true`.
 
 ```json title="components.json"
 {
@@ -90,7 +90,7 @@ For more information, see the [theming docs](/docs/theming).
 
 ## iconLibrary
 
-The icon library of your preset. templui currently ships `lucide`.
+The icon library of your preset. shadcn-templ currently ships `lucide`.
 
 ```json title="components.json"
 {

@@ -5,7 +5,7 @@
 // Reference commands without a pendant-meaningful equivalent are dropped:
 // diff/docs/view/search/migrate/eject/info/build/mcp/registry (they cover
 // npm registries, React codemods and MCP servers). shadcn has no plain
-// `list` either, so the old templui list command is gone; upgrade is
+// `list` either, so the old shadcn-templ list command is gone; upgrade is
 // `go install github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ@latest`.
 package main
 
@@ -60,7 +60,7 @@ Usage:
   shadcn-templ preset url <code>
   shadcn-templ -v, --version
 
-The registry defaults to ` + "https://templui.io" + ` and can be overridden with
+The registry defaults to ` + "https://shadcn-templ.com" + ` and can be overridden with
 --registry or the SHADCN_TEMPL_REGISTRY environment variable.`
 
 // parseFlags parses a FlagSet over args, collecting positional arguments

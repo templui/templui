@@ -136,7 +136,7 @@ func chartsFor(chartType string) []modules.ChartEntry {
 templ Charts(chartType string) {
 	@layouts.BaseLayout(
 		"Beautiful Charts & Graphs",
-		"A collection of ready-to-use chart components built with templui. From basic charts to rich data displays, copy and paste into your apps.",
+		"A collection of ready-to-use chart components built with shadcn-templ. From basic charts to rich data displays, copy and paste into your apps.",
 	) {
 		@modules.AnnouncementBar()
 		<div class="sticky top-0 z-40 bg-background">
@@ -154,7 +154,7 @@ templ Charts(chartType string) {
 						Beautiful Charts & Graphs
 					</h1>
 					<p class="max-w-4xl text-base text-balance text-foreground sm:text-lg">
-						A collection of ready-to-use chart components built with templui. From basic charts to rich data displays, copy and paste into your apps.
+						A collection of ready-to-use chart components built with shadcn-templ. From basic charts to rich data displays, copy and paste into your apps.
 					</p>
 					<div class="flex w-full items-center justify-center gap-2 pt-2 **:data-[slot=button]:shadow-none">
 						@button.Button(button.Props{Class: "px-3", Href: "#charts"}) {

@@ -630,7 +630,7 @@
     var baseEl = document.querySelector("[data-tui-typeset-base]");
     var origin = (baseEl && baseEl.getAttribute("data-tui-typeset-base")) || window.location.origin;
     return (
-      "Install templui/typeset in this project.\n\n" +
+      "Install shadcn-templ/typeset in this project.\n\n" +
       "Typeset is a single stylesheet that styles rendered markdown: wrap the output in a `typeset` container and everything inside (headings, lists, tables, code, blockquotes, math) is styled. Everything outside is untouched.\n\n" +
       "1. Download " + origin + "/typeset.css and save it as typeset.css next to the project's main CSS file (where Tailwind is imported). If the file already exists, replace it with the downloaded copy.\n\n" +
       '2. Import it in the main CSS file, after the Tailwind import:\n\n@import "./typeset.css";\n\n' +

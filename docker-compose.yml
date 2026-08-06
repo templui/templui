@@ -17,7 +17,7 @@ services:
       - shiki-service # Ensures shiki-service starts first
     restart: unless-stopped
     networks:
-      - templui-net
+      - shadcn-templ-net
       - dokploy-network
     # Resource limits
     deploy:
@@ -36,7 +36,7 @@ services:
     # No 'ports' section here -> port 3000 is only internally accessible
     restart: unless-stopped
     networks:
-      - templui-net
+      - shadcn-templ-net
     # Resource limits
     deploy:
       resources:
@@ -48,7 +48,7 @@ services:
     #   NODE_ENV: production
 
 networks:
-  templui-net:
+  shadcn-templ-net:
     driver: bridge
   dokploy-network:
     external: true

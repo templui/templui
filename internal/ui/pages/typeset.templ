@@ -228,7 +228,7 @@ templ typesetDocsPanel() {
 // typesetDocsContent is docs-panel.tsx TypesetDocsContent: the Docs/Prompt
 // tabs with the four install steps. It renders twice (panel + get-code
 // drawer); typeset.js updates every instance. shadcn's framework Select
-// (Next.js vs Vite font loading) has no templui counterpart, so the
+// (Next.js vs Vite font loading) has no shadcn-templ counterpart, so the
 // fontsource variant is the one shown, like /create dropped the CLI tabs.
 templ typesetDocsContent() {
 	@tabs.Tabs(tabs.Props{DefaultValue: "docs", Class: "min-h-0 flex-1 flex-col gap-0"}) {

@@ -75,7 +75,7 @@ RUN apk add --no-cache ca-certificates
 # self-referencing absolute URL (canonical, og:url, AI prompt links);
 # beta interim like the CLI defaults, flips back at stable.
 ENV GO_ENV=production
-ENV BASE_URL=https://v2.templui.io
+ENV BASE_URL=https://shadcn-templ.com
 
 # Copy the binary, version file, CSS output and the baked highlight cache
 COPY --from=build /app/main .

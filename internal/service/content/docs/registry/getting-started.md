@@ -1,13 +1,13 @@
 ---
 title: "Getting Started"
-description: "How the templui registry is served and how to run your own."
+description: "How the shadcn-templ registry is served and how to run your own."
 ---
 
-This guide documents how the templui registry works: the `registry.json` catalog, the endpoints the server exposes, and how to test a registry with the CLI. If you serve the same JSON shapes from your own server, the `templui` CLI can install from it.
+This guide documents how the shadcn-templ registry works: the `registry.json` catalog, the endpoints the server exposes, and how to test a registry with the CLI. If you serve the same JSON shapes from your own server, the `shadcn-templ` CLI can install from it.
 
 <Callout>
 
-**Note:** templui has no pendant of the `shadcn build` command or `include` composition. The registry is a single flat `registry.json`, served verbatim, and the item endpoints are built from it at request time.
+**Note:** shadcn-templ has no pendant of the `shadcn build` command or `include` composition. The registry is a single flat `registry.json`, served verbatim, and the item endpoints are built from it at request time.
 
 </Callout>
 
@@ -23,13 +23,13 @@ The `registry.json` is the entry point for the registry. It contains the registr
 
 It is served verbatim at `/r/registry.json`. The CLI fetches it to resolve `--all` and to list component names.
 
-Here's an excerpt of the templui `registry.json` file:
+Here's an excerpt of the shadcn-templ `registry.json` file:
 
 ```json title="registry.json"
 {
-  "$schema": "https://templui.io/schema/registry.json",
-  "name": "templui",
-  "homepage": "https://templui.io",
+  "$schema": "https://shadcn-templ.com/schema/registry.json",
+  "name": "shadcn-templ",
+  "homepage": "https://shadcn-templ.com",
   "items": [
     {
       "name": "accordion",
@@ -67,7 +67,7 @@ The registry is served from these endpoints:
 | `/init`                           | The `registry:base` item for a design system config (`?preset=<code>`, or individual params; `?only=theme\|font` for the partial item). |
 | `/assets/css/{name}.css`          | The vendored stylesheets (`tw-animate.css`, `shadcn-tailwind.css`) that the base item's `css` block imports.   |
 
-The `{style}` segment is templui's base prefixed onto a style name: `base-vega`, `base-nova`, `base-maia`, `base-lyra`, `base-mira`, `base-luma`, `base-sera`, `base-rhea`.
+The `{style}` segment is shadcn-templ's base prefixed onto a style name: `base-vega`, `base-nova`, `base-maia`, `base-lyra`, `base-mira`, `base-luma`, `base-sera`, `base-rhea`.
 
 ## Test your registry
 
@@ -109,7 +109,7 @@ shadcn-templ add http://localhost:8090/r/styles/base-nova/button.json
 
 Here are some guidelines to follow when adding items to a registry.
 
-- The item `name` is kebab-case and must be unique for your registry. In the templui registry it doubles as the docs slug.
+- The item `name` is kebab-case and must be unique for your registry. In the shadcn-templ registry it doubles as the docs slug.
 - It is recommended to add a proper `title` and `description` to your registry item. This helps LLMs understand the component and its purpose.
 - Make sure to list all registry dependencies in `registryDependencies`. A registry dependency is an item name such as `button`, or the URL of a registry item.
 - For every file, specify the `path` and `type` of the file. The install path is derived from `path` and the consumer's `components.json` aliases.

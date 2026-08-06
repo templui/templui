@@ -1,15 +1,15 @@
 ---
 title: "registry.json"
-description: "Schema for the templui component registry."
+description: "Schema for the shadcn-templ component registry."
 ---
 
 The `registry.json` schema is used to define the component registry. It is the source catalog the registry server serves verbatim at `/r/registry.json`.
 
 ```json title="registry.json"
 {
-  "$schema": "https://templui.io/schema/registry.json",
-  "name": "templui",
-  "homepage": "https://templui.io",
+  "$schema": "https://shadcn-templ.com/schema/registry.json",
+  "name": "shadcn-templ",
+  "homepage": "https://shadcn-templ.com",
   "items": [
     {
       "name": "accordion",
@@ -35,7 +35,7 @@ The `registry.json` schema is used to define the component registry. It is the s
 
 <Callout>
 
-**Note:** templui has no pendant of shadcn's `include` composition. The registry is a single flat `registry.json` — every item is defined in the root file.
+**Note:** shadcn-templ has no pendant of shadcn's `include` composition. The registry is a single flat `registry.json` — every item is defined in the root file.
 
 </Callout>
 
@@ -43,11 +43,11 @@ The `registry.json` schema is used to define the component registry. It is the s
 
 ### $schema
 
-The `$schema` property identifies the templui `registry.json` format.
+The `$schema` property identifies the shadcn-templ `registry.json` format.
 
 ```json title="registry.json"
 {
-  "$schema": "https://templui.io/schema/registry.json"
+  "$schema": "https://shadcn-templ.com/schema/registry.json"
 }
 ```
 
@@ -57,7 +57,7 @@ The `name` property is used to specify the name of your registry. This is used f
 
 ```json title="registry.json"
 {
-  "name": "templui"
+  "name": "shadcn-templ"
 }
 ```
 
@@ -67,7 +67,7 @@ The homepage of your registry. This is used for metadata.
 
 ```json title="registry.json"
 {
-  "homepage": "https://templui.io"
+  "homepage": "https://shadcn-templ.com"
 }
 ```
 

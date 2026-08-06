@@ -1,5 +1,5 @@
 // The pendant of shadcn/src/registry/api.ts and constants.ts: URL building
-// and item fetching against the templui registry.
+// and item fetching against the shadcn-templ registry.
 package registry
 
 import (
@@ -15,12 +15,12 @@ import (
 )
 
 // DefaultRegistry is the REGISTRY_URL pendant. It points at the 2.0 beta
-// site until stable, then flips back to templui.io.
-const DefaultRegistry = "https://v2.templui.io"
+// site until stable, then flips back to shadcn-templ.com.
+const DefaultRegistry = "https://shadcn-templ.com"
 
 // SiteURL is the SHADCN_URL pendant, used for docs and /create links. Beta
 // interim like DefaultRegistry.
-const SiteURL = "https://v2.templui.io"
+const SiteURL = "https://shadcn-templ.com"
 
 // EnvRegistry is the environment variable that overrides the registry URL,
 // below the --registry flag.

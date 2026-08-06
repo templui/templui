@@ -1,7 +1,7 @@
-// Package templui exposes the repo-root registry.json, the pendant of
+// Package shadcntempl exposes the repo-root registry.json, the pendant of
 // shadcn's app-root registry file (registry.json schema), and the utils
 // sources the registry:lib item serves.
-package templui
+package shadcntempl
 
 import "embed"
 

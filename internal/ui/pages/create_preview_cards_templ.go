@@ -16052,7 +16052,7 @@ func cardCodespaces() templ.Component {
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 627, " <div class=\"p-1.5 text-xs text-muted-foreground\">Codespace usage for this repository is paid for by <span class=\"font-medium\">templui</span>.</div>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 627, " <div class=\"p-1.5 text-xs text-muted-foreground\">Codespace usage for this repository is paid for by <span class=\"font-medium\">shadcn-templ</span>.</div>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}

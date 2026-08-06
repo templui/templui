@@ -1,6 +1,6 @@
 // update_files.go ports update-files.ts: resolve target paths, transform
 // content and write files with created/updated/skipped accounting. The
-// transformer pendant is the import rewrite the old templui CLI already had:
+// transformer pendant is the import rewrite the old shadcn-templ CLI already had:
 // github.com/axadrn/shadcn-templ/v2/{components,utils}/... imports become the user's
 // own module paths.
 package updaters
@@ -122,8 +122,8 @@ func printFileSummary(verb string, files []string, suffix string) {
 
 // resolveFilePath is the resolveFilePath pendant: registry paths map onto the
 // configured directories by type ("components/button/button.templ" ->
-// <components dir>/button/button.templ, "utils/templui.go" -> <utils dir>/
-// templui.go).
+// <components dir>/button/button.templ, "utils/shadcn-templ.go" -> <utils dir>/
+// shadcn-templ.go).
 func resolveFilePath(file registry.ItemFile, config *utils.Config, pathOverride string) (string, error) {
 	switch {
 	case strings.HasPrefix(file.Path, "components/"):
@@ -145,7 +145,7 @@ func resolveFilePath(file registry.ItemFile, config *utils.Config, pathOverride 
 	}
 }
 
-var templuiImportRe = regexp.MustCompile(`"github\.com/axadrn/shadcn-templ/([^"]+)"`)
+var moduleImportRe = regexp.MustCompile(`"github\.com/axadrn/shadcn-templ/([^"]+)"`)
 
 // transformContent rewrites module imports and the package clause for Go and
 // templ sources; other files (component .js) ship verbatim.
@@ -154,7 +154,7 @@ func transformContent(file registry.ItemFile, config *utils.Config) string {
 		return file.Content
 	}
 
-	content := templuiImportRe.ReplaceAllStringFunc(file.Content, func(match string) string {
+	content := moduleImportRe.ReplaceAllStringFunc(file.Content, func(match string) string {
 		repoPath := strings.Trim(strings.TrimPrefix(match, `"github.com/axadrn/shadcn-templ/v2/`), `"`)
 		switch {
 		case strings.HasPrefix(repoPath, "components/"):

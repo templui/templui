@@ -1,4 +1,4 @@
-// Copy button for markdown code blocks - styled like templui CopyButton component
+// Copy button for markdown code blocks - styled like shadcn-templ CopyButton component
 (function() {
   'use strict';
 

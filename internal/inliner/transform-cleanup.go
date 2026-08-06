@@ -6,7 +6,7 @@
 // transformFont resolves them afterwards.
 //
 // Deviation: the reference works on a tsx AST and never sees comments, and
-// shadcn's sources carry no cn-* prose. templui's component comments document
+// shadcn's sources carry no cn-* prose. shadcn-templ's component comments document
 // the cn mechanism ("the look comes from the active style-*.css via the
 // cn-button-* classes"), so cleanupComments also drops those references —
 // the distribution output must be free of cn-*.

@@ -1,5 +1,5 @@
 /**
- * templUI chart - client renderer.
+ * shadcn-templ chart - client renderer.
  *
  * The server emits the chart model as JSON; this module is the pendant of
  * Recharts in the browser and draws everything. It is a literal port of
@@ -2037,7 +2037,7 @@ document.addEventListener("click", (e) => {
   });
 });
 
-// Setup on load and on mutations, the templUI convention: init is
+// Setup on load and on mutations, the shadcn-templ convention: init is
 // idempotent (every panel carries its own init flag), so any inserted
 // node just re-runs the full scan, no matter what put it into the DOM.
 if (document.readyState === "loading") {

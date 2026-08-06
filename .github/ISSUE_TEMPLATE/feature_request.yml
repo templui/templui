@@ -1,5 +1,5 @@
 name: "Feature request"
-description: Create a feature request for templui
+description: Create a feature request for shadcn-templ
 title: '[feat]: '
 labels: ['area: request']
 body:

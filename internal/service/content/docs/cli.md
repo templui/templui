@@ -1,6 +1,6 @@
 ---
 title: "CLI"
-description: "Use the templui CLI to add components to your project."
+description: "Use the shadcn-templ CLI to add components to your project."
 order: 7
 ---
 
@@ -20,7 +20,7 @@ The `init` command writes `components.json`, adds the shared `utils` package, me
 shadcn-templ init
 ```
 
-Pick a design on [templui.io/create](/create) and pass its preset code or URL, or use one of the named presets (`nova`, `vega`, `maia`, `lyra`, `mira`, `luma`, `sera`, `rhea`):
+Pick a design on [shadcn-templ.com/create](/create) and pass its preset code or URL, or use one of the named presets (`nova`, `vega`, `maia`, `lyra`, `mira`, `luma`, `sera`, `rhea`):
 
 ```shell
 shadcn-templ init --preset b2D0wqNxT
@@ -38,7 +38,7 @@ Options:
   --css <path>                  path to your Tailwind CSS entry file
   -f, --force                   force overwrite of existing configuration
   -s, --silent                  mute output
-  --registry <url>              registry URL (default https://v2.templui.io, env SHADCN_TEMPL_REGISTRY)
+  --registry <url>              registry URL (default https://shadcn-templ.com, env SHADCN_TEMPL_REGISTRY)
   -c, --cwd <cwd>               the working directory (default ".")
 ```
 
@@ -65,7 +65,7 @@ Options:
   -o, --overwrite  overwrite existing files
   -p, --path <path>  the path to add the component to
   -s, --silent     mute output
-  --registry <url>  registry URL (default https://v2.templui.io, env SHADCN_TEMPL_REGISTRY)
+  --registry <url>  registry URL (default https://shadcn-templ.com, env SHADCN_TEMPL_REGISTRY)
   -c, --cwd <cwd>  the working directory (default ".")
 ```
 
@@ -96,7 +96,7 @@ Options:
   --only <parts>     apply only parts of a preset: theme, font
   -y, --yes          skip confirmation prompt
   -s, --silent       mute output
-  --registry <url>   registry URL (default https://v2.templui.io, env SHADCN_TEMPL_REGISTRY)
+  --registry <url>   registry URL (default https://shadcn-templ.com, env SHADCN_TEMPL_REGISTRY)
   -c, --cwd <cwd>    the working directory (default ".")
 ```
 
@@ -160,7 +160,7 @@ shadcn-templ preset url b2D0wqNxT
 ```
 
 ```shell
-https://templui.io/create?preset=b2D0wqNxT
+https://shadcn-templ.com/create?preset=b2D0wqNxT
 ```
 
 ## upgrade

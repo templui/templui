@@ -6,7 +6,7 @@ order: 4
 
 <Callout>
 
-Want to build your theme visually? Use [templui Create](/create) to preview colors, radius, fonts, and icons, then generate a preset for your project.
+Want to build your theme visually? Use [shadcn-templ Create](/create) to preview colors, radius, fonts, and icons, then generate a preset for your project.
 
 </Callout>
 
@@ -143,7 +143,7 @@ You can now use `bg-warning` and `text-warning-foreground` in your components.
 
 ## Base Colors
 
-`tailwind.baseColor` controls the default token values generated for your project when you run `init` or use a preset. Pick one on [templui Create](/create) to generate a theme with it.
+`tailwind.baseColor` controls the default token values generated for your project when you run `init` or use a preset. Pick one on [shadcn-templ Create](/create) to generate a theme with it.
 
 The available base colors are: **Neutral**, **Stone**, **Zinc**, **Mauve**, **Olive**, **Mist**, and **Taupe**.
 

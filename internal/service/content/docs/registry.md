@@ -1,9 +1,9 @@
 ---
 title: "Introduction"
-description: "How templui distributes code through a registry."
+description: "How shadcn-templ distributes code through a registry."
 ---
 
-templui distributes its code through a registry. The registry allows the `templui` CLI to install components, the shared `utils` package, themes and presets into any project — everything `init`, `add` and `apply` install comes from it over HTTP.
+shadcn-templ distributes its code through a registry. The registry allows the `shadcn-templ` CLI to install components, the shared `utils` package, themes and presets into any project — everything `init`, `add` and `apply` install comes from it over HTTP.
 
 <Callout>
 
@@ -11,7 +11,7 @@ templui distributes its code through a registry. The registry allows the `templu
 
 </Callout>
 
-The official registry is served at `https://templui.io`. The next sections document how it is served, the schema of the registry catalog, and the specification of registry items.
+The official registry is served at `https://shadcn-templ.com`. The next sections document how it is served, the schema of the registry catalog, and the specification of registry items.
 
 - [Getting Started](/docs/registry/getting-started) — How the registry is served and how to run your own
 - [registry.json](/docs/registry/registry-json) — Schema specification for the registry catalog

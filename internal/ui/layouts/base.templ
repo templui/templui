@@ -17,9 +17,6 @@ templ BaseLayout(title, description string) {
 	// toc) offsets against it.
 	<html lang="en" class="[--announcement-height:calc(var(--spacing)*10)] [--header-height:calc(var(--spacing)*14)] lg:[--header-height:calc(var(--spacing)*16)]">
 		<head>
-			// 2.0 beta (v2.templui.io): keep search engines out. REMOVE at the 2.0 release
-			// (tracked in COMMIT_PLAN.md, "Pre-Release / Beta").
-			<meta name="robots" content="noindex"/>
 			// Google
 			<meta name="google-site-verification" content="lcKF60IRUofKfZpOIYKOD7xyvrL220KpjmGjJcflde4"/>
 			// SEO
@@ -31,7 +28,7 @@ templ BaseLayout(title, description string) {
 			@components.Scripts()
 			// Plausible Analytics
 			if config.AppConfig.GoEnv == "production" {
-				<script defer data-domain="v2.templui.io" src="https://plausible.axeladrian.com/js/script.js" nonce={ templ.GetNonce(ctx) }></script>
+				<script defer data-domain="shadcn-templ.com" src="https://plausible.axeladrian.com/js/script.js" nonce={ templ.GetNonce(ctx) }></script>
 			}
 			// Shiki Highlighter Script
 			@modules.CodeHighlightingScript()

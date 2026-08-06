@@ -27,7 +27,7 @@ body:
     id: components-affected
     attributes:
       label: Affected component/components
-      description: Which templui components are affected?
+      description: Which shadcn-templ components are affected?
       placeholder: ex. Button, Checkbox...
     validations:
       required: true

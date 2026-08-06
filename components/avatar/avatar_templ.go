@@ -163,7 +163,7 @@ func Avatar(props ...Props) templ.Component {
 	})
 }
 
-// Image keeps the absolute/opacity classes as templui infra: the image sits
+// Image keeps the absolute/opacity classes as shadcn-templ infra: the image sits
 // above the fallback and fades in once avatar.js flags it loaded.
 func Image(props ...ImageProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {

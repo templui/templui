@@ -77,17 +77,17 @@ func bundle() ([]byte, []byte, string) {
 // caches, path hashes never are.
 func scriptsSrc() string {
 	_, _, hash := bundle()
-	return "/components/templui-" + hash + ".js"
+	return "/components/shadcn-templ-" + hash + ".js"
 }
 
 // ScriptsHandler serves the component JS bundle. Mount it on
 // GET /components/{bundle}: it answers the current hashed name
-// (templui-<hash>.js) and the plain templui.js alias, 404s anything else.
+// (shadcn-templ-<hash>.js) and the plain shadcn-templ.js alias, 404s anything else.
 func ScriptsHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		js, gz, hash := bundle()
 		base := r.URL.Path[strings.LastIndex(r.URL.Path, "/")+1:]
-		if base != "templui.js" && base != "templui-"+hash+".js" {
+		if base != "shadcn-templ.js" && base != "shadcn-templ-"+hash+".js" {
 			http.NotFound(w, r)
 			return
 		}

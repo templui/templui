@@ -1,11 +1,11 @@
 // The init command, the pendant of src/commands/init.ts reduced to the
-// templui feature set: fetch the registry:base item for a preset (or the
+// shadcn-templ feature set: fetch the registry:base item for a preset (or the
 // defaults), write components.json, merge the theme CSS into the user's
 // Tailwind entry file and install the utils lib item. --template scaffolds a
 // new project from an embedded template first, like their init -t next.
 //
 // Dropped npm-only options, all without a Go pendant: --base (component
-// library selection; templui ships one implementation), --monorepo,
+// library selection; shadcn-templ ships one implementation), --monorepo,
 // --cssVariables/--rtl/--pointer toggles beyond what a preset encodes,
 // --defaults/-y prompt shortcuts (this init does not prompt for design
 // choices), and the interactive preset picker.
@@ -89,7 +89,7 @@ func RunInit(opts InitOptions) error {
 		scaffolded = true
 	}
 
-	// Preflight: a Go module is the templui pendant of a framework project.
+	// Preflight: a Go module is the shadcn-templ pendant of a framework project.
 	module, err := utils.ModulePath(cwd)
 	if err != nil {
 		return err

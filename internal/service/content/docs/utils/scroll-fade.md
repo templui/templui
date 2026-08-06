@@ -10,7 +10,7 @@ If your project was set up with `shadcn-templ init`, you already have `scroll-fa
 Otherwise, vendor the stylesheet next to your Tailwind entry file:
 
 ```shell
-curl -o assets/css/shadcn-tailwind.css https://templui.io/assets/css/shadcn-tailwind.css
+curl -o assets/css/shadcn-tailwind.css https://shadcn-templ.com/assets/css/shadcn-tailwind.css
 ```
 
 Then import the shared utilities in your Tailwind entry file:

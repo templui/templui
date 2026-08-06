@@ -66,6 +66,6 @@ func setupAssetsRoutes(mux *http.ServeMux) {
 	})
 	mux.Handle("GET /assets/", http.StripPrefix("/assets/", assetHandler))
 
-	// The component JS bundle (hashed name plus the templui.js alias).
+	// The component JS bundle (hashed name plus the shadcn-templ.js alias).
 	mux.Handle("GET /components/{bundle}", components.ScriptsHandler())
 }

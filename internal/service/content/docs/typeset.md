@@ -8,7 +8,7 @@ You render markdown and get back plain unstyled HTML: headings, paragraphs, list
 
 You do it for your blog. Then you do it again for the docs. Then again for the chat app. Every time you're fighting the same thing: sizing and spacing.
 
-To fix this, shadcn created **shadcn/typeset**, and templui ships it. It's one CSS file that styles everything inside a `typeset` container. The file lives in your project, so you can change it directly when you need to.
+To fix this, shadcn created **shadcn/typeset**, and shadcn-templ ships it. It's one CSS file that styles everything inside a `typeset` container. The file lives in your project, so you can change it directly when you need to.
 
 A typeset is just a small preset class. You can have multiple typesets in your app, for different contexts.
 
@@ -23,7 +23,7 @@ A typeset is just a small preset class. You can have multiple typesets in your a
 }
 ```
 
-[Build your typeset](/typeset) in the typeset builder. It generates the `typeset.css` file templui ships, with your picks baked into the preset.
+[Build your typeset](/typeset) in the typeset builder. It generates the `typeset.css` file shadcn-templ ships, with your picks baked into the preset.
 
 ---
 
@@ -46,7 +46,7 @@ So they sat down and condensed everything into three controls: size, leading, an
 
 ## Building Your Typeset
 
-templui ships the stylesheet as `assets/css/typeset.css`. If you want to tune it visually first, use the [typeset builder](/typeset): pick your fonts and rhythm, preview them on docs, chat, articles, and other real content, then copy the generated `typeset.css` and preset class into your project.
+shadcn-templ ships the stylesheet as `assets/css/typeset.css`. If you want to tune it visually first, use the [typeset builder](/typeset): pick your fonts and rhythm, preview them on docs, chat, articles, and other real content, then copy the generated `typeset.css` and preset class into your project.
 
 Put `typeset.css` next to your main CSS file and import it after Tailwind:
 

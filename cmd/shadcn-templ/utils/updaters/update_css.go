@@ -1,6 +1,6 @@
 // Package updaters is the pendant of shadcn/src/utils/updaters:
 // update_css.go ports update-css-vars.ts and update-css.ts (the Tailwind v4
-// path; templui is v4-only). Instead of postcss the file is parsed into a
+// path; shadcn-templ is v4-only). Instead of postcss the file is parsed into a
 // small CSS node tree and re-rendered, so user formatting is normalized to
 // the CLI's 2-space style.
 package updaters
@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/registry"
-	templuiutils "github.com/axadrn/shadcn-templ/v2/utils"
+	moduleutils "github.com/axadrn/shadcn-templ/v2/utils"
 )
 
 // cssNode is one CSS construct: a declaration, a semicolon statement
@@ -403,7 +403,7 @@ func updateTheme(doc *document, cssVars *registry.ItemVars) {
 }
 
 // transformCss is the transformCss/updateCssPlugin pendant for the shapes the
-// templui registry serves: @import statements, at-rule blocks (@layer base)
+// shadcn-templ registry serves: @import statements, at-rule blocks (@layer base)
 // with nested rules, declarations and bodiless at-rules (@apply).
 func transformCss(doc *document, css *registry.OrderedMap) {
 	for _, key := range css.Keys {
@@ -515,7 +515,7 @@ func processRule(parent *[]*cssNode, selector string, properties *registry.Order
 				merged := false
 				for _, child := range rule.children {
 					if !child.block && strings.HasPrefix(child.prelude, "@apply ") {
-						child.prelude = "@apply " + templuiutils.CN(strings.TrimPrefix(child.prelude, "@apply "), params)
+						child.prelude = "@apply " + moduleutils.CN(strings.TrimPrefix(child.prelude, "@apply "), params)
 						merged = true
 						break
 					}

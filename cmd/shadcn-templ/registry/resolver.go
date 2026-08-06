@@ -23,7 +23,7 @@ func ResolveTree(registryURL, style string, namesOrURLs []string) (*Tree, error)
 		}
 		visited[nameOrURL] = true
 
-		// The templui registry has no font items; collect font-* deps for the
+		// The shadcn-templ registry has no font items; collect font-* deps for the
 		// post-install note instead of fetching them (shadcn installs
 		// fontsource npm packages here, which have no Go pendant).
 		if strings.HasPrefix(nameOrURL, "font-") {

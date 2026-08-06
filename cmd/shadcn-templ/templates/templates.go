@@ -29,7 +29,7 @@ type Template struct {
 	TemplateDir        string
 }
 
-// Templates is the templates map of src/templates/index.ts. templUI ships
+// Templates is the templates map of src/templates/index.ts. shadcn-templ ships
 // one stack, so one entry; more templates are more map entries.
 var Templates = map[string]Template{
 	"templ": {

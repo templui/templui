@@ -20,7 +20,7 @@ var contentFS embed.FS
 
 // readContent prefers the on-disk source in development, so markdown edits
 // show up on reload without recompiling the embedded copy. Falls back to
-// the embed for built binaries. Self-referencing templui.io URLs are rebased
+// the embed for built binaries. Self-referencing shadcn-templ.com URLs are rebased
 // onto BaseURL, so rendered pages and raw .md exports link the running origin.
 func readContent(path string) ([]byte, error) {
 	if b, err := os.ReadFile(filepath.Join("internal/service", path)); err == nil {

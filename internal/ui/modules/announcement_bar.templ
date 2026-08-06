@@ -4,15 +4,16 @@ import "github.com/axadrn/shadcn-templ/v2/components/icon"
 
 // AnnouncementBar is the v3.shadcn.com version banner ported 1:1: the
 // muted sticky strip above the shell, permanently visible (no dismiss).
-// The 2.0 beta points at the stable v1 docs; main carries the inverse
-// bar pointing at the beta. The goilerplate promo this replaces returns
-// after stable (its markup lives in git history).
+// The 2.0 beta carries the rebrand message and points at the stable
+// templUI v1 docs (templui.io stays the v1 home until stable). The
+// goilerplate promo this replaces returns after stable (its markup
+// lives in git history).
 templ AnnouncementBar() {
 	<div class="bg-muted text-muted-foreground sticky top-0 z-[100] flex h-10 items-center justify-center gap-2 px-4 text-sm">
-		<span class="hidden sm:inline">You are viewing the templui 2.0 beta docs.</span>
-		<span class="sm:hidden">templui 2.0 beta.</span>
+		<span class="hidden sm:inline">templUI is now shadcn-templ. You are viewing the 2.0 beta docs.</span>
+		<span class="sm:hidden">shadcn-templ 2.0 beta.</span>
 		<a class="text-primary flex items-center gap-1 underline" href="https://templui.io">
-			Switch to stable
+			Switch to templUI v1
 			@icon.ArrowRight(icon.Props{Class: "size-3"})
 		</a>
 	</div>

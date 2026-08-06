@@ -1,22 +1,9 @@
 ---
 title: "Import Workflow"
-description: "Use templui as a plain Go module dependency."
+description: "Use shadcn-templ as a plain Go module dependency."
 ---
 
-> **📝 Note:** This page is a templui extra, not part of the shadcn-parity docs. The standard workflow is the [CLI](/docs/installation): it copies component source into your app so you own and edit it, exactly like shadcn. The import workflow instead consumes templui like any Go library — no copied files, updates via `go get`, customization by wrapping components rather than editing them.
-
-## Quickstart
-
-Start fast with [`templui/templui-quickstart`](https://github.com/templui/templui-quickstart):
-
-```shell
-git clone https://github.com/templui/templui-quickstart.git myapp
-rm -rf myapp/.git
-cd myapp
-cp .env.example .env
-go mod tidy
-task dev
-```
+> **⚠️ Experimental:** This workflow may not survive to 2.0 stable. The supported path is the [CLI](/docs/installation), which copies component source into your app so you own and edit it, exactly like shadcn. The import workflow instead consumes shadcn-templ like any Go library: no copied files, updates via `go get`, customization by wrapping components rather than editing them. If you rely on it, [say so](https://github.com/axadrn/shadcn-templ/discussions). Real-world usage decides whether it ships in stable.
 
 ## Prerequisites
 
@@ -24,7 +11,7 @@ The same tools as the CLI workflow: see [Installation → Configure templ, Tailw
 
 ## Setup
 
-### 1. Add templui
+### 1. Add shadcn-templ
 
 ```shell
 go get github.com/axadrn/shadcn-templ/v2@latest
@@ -34,7 +21,7 @@ You can also just import a component package and run `go mod tidy`.
 
 ### 2. Initialize Styles
 
-Style setup is the same `shadcn-templ init` as in the [CLI workflow](/docs/installation#run-the-cli): it creates `assets/css/globals.css` and merges your theme variables and base layer into it. Pick a design on [templui.io/create](https://templui.io/create) and pass its preset code, or use one of the named presets:
+Style setup is the same `shadcn-templ init` as in the [CLI workflow](/docs/installation#run-the-cli): it creates `assets/css/globals.css` and merges your theme variables and base layer into it. Pick a design on [shadcn-templ.com/create](https://shadcn-templ.com/create) and pass its preset code, or use one of the named presets:
 
 ```shell
 go install github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ@latest
@@ -48,7 +35,7 @@ Then add one line to `assets/css/globals.css`, right after the tailwindcss impor
 @import "./sources.generated.css";
 ```
 
-`sources.generated.css` is written by the `tailwind` task in the next step: it pulls the component styles (`style-nova.css`), the shared `shadcn/tailwind.css` layer and the `tw-animate-css` utilities straight from the templui module and registers the `.templ` sources for scanning.
+`sources.generated.css` is written by the `tailwind` task in the next step: it pulls the component styles (`style-nova.css`), the shared `shadcn/tailwind.css` layer and the `tw-animate-css` utilities straight from the shadcn-templ module and registers the `.templ` sources for scanning.
 
 > **💡 Tip:** For custom themes and color palettes, see the [theming docs](/docs/theming).
 
@@ -67,13 +54,13 @@ tasks:
     desc: Watch Tailwind CSS changes
     cmds:
       - |
-        TEMPLUI_PATH="$(go list -mod=mod -m -f {{`'{{.Dir}}'`}} github.com/axadrn/shadcn-templ/v2)" && \
+        SHADCN_TEMPL_PATH="$(go list -mod=mod -m -f {{`'{{.Dir}}'`}} github.com/axadrn/shadcn-templ/v2)" && \
         printf '%s\n' \
-          "@import \"$TEMPLUI_PATH/assets/css/tw-animate.css\";" \
-          "@import \"$TEMPLUI_PATH/assets/css/shadcn-tailwind.css\";" \
-          "@import \"$TEMPLUI_PATH/assets/css/styles/style-nova.css\" layer(base);" \
+          "@import \"$SHADCN_TEMPL_PATH/assets/css/tw-animate.css\";" \
+          "@import \"$SHADCN_TEMPL_PATH/assets/css/shadcn-tailwind.css\";" \
+          "@import \"$SHADCN_TEMPL_PATH/assets/css/styles/style-nova.css\" layer(base);" \
           '@source "./**/*.templ";' \
-          "@source \"$TEMPLUI_PATH/components/**/*.templ\";" \
+          "@source \"$SHADCN_TEMPL_PATH/components/**/*.templ\";" \
           > ./assets/css/sources.generated.css && \
         tailwindcss -i ./assets/css/globals.css -o ./assets/css/output.css --watch
 
@@ -91,7 +78,7 @@ task dev
 
 ### 4. Activate a style
 
-Components carry `cn-*` classes; the style class on `<body>` picks which of the eight styles renders them (`style-nova`, `style-vega`, `style-maia`, `style-lyra`, `style-mira`, `style-luma`, `style-sera`, `style-rhea`). Use the style from your `components.json` (init writes it, `nova` by default) and import the matching `style-<name>.css` in the `tailwind` task above — the snippets use `style-nova`:
+Components carry `cn-*` classes; the style class on `<body>` picks which of the eight styles renders them (`style-nova`, `style-vega`, `style-maia`, `style-lyra`, `style-mira`, `style-luma`, `style-sera`, `style-rhea`). Use the style from your `components.json` (init writes it, `nova` by default) and import the matching `style-<name>.css` in the `tailwind` task above (the snippets use `style-nova`):
 
 ```templ
 <body class="style-nova">
@@ -112,5 +99,3 @@ import "github.com/axadrn/shadcn-templ/v2/components/button"
 ## JavaScript and Assets
 
 The script bundle and asset serving are identical in both workflows: see [Installation → JavaScript](/docs/installation#javascript) and [Installation → Serve Assets](/docs/installation#serve-assets).
-
-For a complete import-based app setup, see [`templui/templui-quickstart`](https://github.com/templui/templui-quickstart).

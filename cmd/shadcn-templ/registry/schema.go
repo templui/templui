@@ -1,6 +1,6 @@
 // Package registry is the pendant of shadcn/src/registry: the registry-item
 // schema (schema.ts), the HTTP fetchers (api.ts) and the dependency tree
-// resolver (resolver.ts), reduced to what the templui registry serves.
+// resolver (resolver.ts), reduced to what the shadcn-templ registry serves.
 package registry
 
 import (
@@ -163,7 +163,7 @@ type ItemConfig struct {
 	} `json:"tailwind"`
 }
 
-// Item is the registryItemSchema pendant, reduced to the fields the templui
+// Item is the registryItemSchema pendant, reduced to the fields the shadcn-templ
 // registry serves.
 type Item struct {
 	Schema               string      `json:"$schema"`
@@ -192,7 +192,7 @@ type Tree struct {
 	// HasThemeItem reports a registry:theme/style/base item in the payload,
 	// the shouldOverwriteCssVars trigger.
 	HasThemeItem bool
-	// FontDependencies are font-* registryDependencies. The templui registry
+	// FontDependencies are font-* registryDependencies. The shadcn-templ registry
 	// has no font items (shadcn installs fontsource npm packages, which have
 	// no Go pendant), so the CLI collects them and prints instructions.
 	FontDependencies []string

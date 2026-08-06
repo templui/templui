@@ -133,7 +133,7 @@ var createFontsSerif = []createOption{
 	{Value: "instrument-serif", Label: "Instrument Serif"},
 }
 
-// shadcn/icons libraries order. Only lucide ships in templui.
+// shadcn/icons libraries order. Only lucide ships in shadcn-templ.
 var createIconLibraries = []createOption{
 	{Value: "lucide", Label: "Lucide"},
 	{Value: "tabler", Label: "Tabler Icons", Disabled: true},
@@ -151,7 +151,7 @@ var createOtherRadii = []createOption{
 }
 
 templ Create() {
-	@layouts.BaseLayout("New Project", "Customize everything. Pick your base color, theme, fonts and create your own version of templui.") {
+	@layouts.BaseLayout("New Project", "Customize everything. Pick your base color, theme, fonts and create your own version of shadcn-templ.") {
 		@modules.AnnouncementBar()
 		@modules.Navbar()
 		<link rel="stylesheet" href={ utils.ScriptURL("/assets/css/create-fonts.css") }/>
@@ -782,7 +782,7 @@ var createApplyModes = []struct{ Value, Title, Description string }{
 // grid, the Base component-library grid and the pointer/monorepo/RTL switches
 // (shadcn-templ init scaffolds no frameworks and takes no such flags), and the
 // package manager Tabs (Go has exactly one toolchain), so each command
-// renders in a single box with a static "templui" label where the pm TabsList
+// renders in a single box with a static "shadcn-templ" label where the pm TabsList
 // sits. The commands are the real CLI: `shadcn-templ init --preset <code>` and
 // `shadcn-templ apply --preset <code> [--only theme|font]`.
 templ createCodeDialog() {
@@ -907,13 +907,13 @@ templ createApplyModeGrid() {
 
 // createCommandBox is the command Tabs pendant reduced to the single Go
 // runner: the reference header row keeps its layout (pm TabsList left, icon
-// copy button right) with a static "templui" label in the TabsList slot, the
+// copy button right) with a static "shadcn-templ" label in the TabsList slot, the
 // command sits in the bg-popover content row. create.js keeps the command
 // text live with the current preset code (data-tui-create-command).
 templ createCommandBox(target, command, initial string) {
 	<div class="w-full min-w-0 overflow-hidden rounded-xl border-0 ring-1 ring-border">
 		<div class="flex items-center gap-2 py-1 pr-1.5 pl-3">
-			<div class="min-w-0 truncate font-mono text-sm text-muted-foreground">templui</div>
+			<div class="min-w-0 truncate font-mono text-sm text-muted-foreground">shadcn-templ</div>
 			@createCopyIconButton(target, "Copy command")
 		</div>
 		<div class="relative overflow-hidden border-t bg-popover p-3">
@@ -1082,7 +1082,7 @@ templ createWelcomeDialog() {
 			</div>
 			@dialog.Header(dialog.HeaderProps{Class: "gap-1 p-4"}) {
 				@dialog.Title(dialog.TitleProps{Class: "text-left text-base"}) {
-					Build your own templui
+					Build your own shadcn-templ
 				}
 				@dialog.Description(dialog.DescriptionProps{Class: "text-left leading-relaxed text-foreground"}) {
 					Customize everything from the ground up. Pick your style, font, color scheme, and more.

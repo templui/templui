@@ -60,7 +60,7 @@ var defaultPresets = map[string]DefaultPreset{
 	"rhea": {"Rhea", "Lucide / Inter", standardPreset("rhea", "lucide", "inter")},
 }
 
-// initURLOptions are the resolveInitUrl options the templui CLI uses. The
+// initURLOptions are the resolveInitUrl options the shadcn-templ CLI uses. The
 // npm-only template option (next/vite/laravel scaffolds) has no Go pendant
 // and is dropped.
 type initURLOptions struct {
@@ -69,11 +69,11 @@ type initURLOptions struct {
 }
 
 // resolveInitURL is the resolveInitUrl pendant, pointed at the configured
-// registry instead of SHADCN_URL. The track param is dropped: the templui
+// registry instead of SHADCN_URL. The track param is dropped: the shadcn-templ
 // /init route has no usage tracking.
 func resolveInitURL(registryURL string, config preset.Config, rtl bool, options initURLOptions) string {
 	params := url.Values{}
-	// templui ships a single component implementation, so base is always
+	// shadcn-templ ships a single component implementation, so base is always
 	// "base" (shadcn: base | radix | aria).
 	params.Set("base", "base")
 	params.Set("style", config.Style)

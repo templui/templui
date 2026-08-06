@@ -31,7 +31,7 @@ func changelogTOC(entries []*service.ChangelogPage) []modules.TableOfContentsIte
 	return items
 }
 
-// changelogDateAndTitle splits "August 2026 - templui 2.0" like the
+// changelogDateAndTitle splits "August 2026 - shadcn-templ 2.0" like the
 // reference's data.title.split(" - ").
 func changelogDateAndTitle(title string) (string, string) {
 	parts := strings.SplitN(title, " - ", 2)
@@ -135,7 +135,7 @@ func ChangelogRSS(base string, entries []*service.ChangelogPage) string {
 	return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>templui Changelog</title>
+    <title>shadcn-templ Changelog</title>
     <link>` + base + `</link>
     <description>Latest updates and announcements.</description>
     <language>en-us</language>

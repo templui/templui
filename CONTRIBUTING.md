@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in contributing to templui.io. We're happy to have you here.
+Thanks for your interest in contributing to shadcn-templ.com. We're happy to have you here.
 
 Please take a moment to review this document before submitting your first pull request. We also strongly recommend that you check for open issues and pull requests to see if someone else is working on something similar.
 
@@ -21,7 +21,7 @@ This repository is structured as follows:
 ```
 cmd
 ├── docs
-└── templui
+└── shadcn-templ
 components
 internal
 ├── service
@@ -37,7 +37,7 @@ registry.json
 | `components`                    | The components and their JavaScript.     |
 | `internal/ui`                   | The pages and modules for the website.   |
 | `internal/service/content/docs` | The markdown content for the docs.       |
-| `cmd/shadcn-templ`                   | The `templui` CLI.                       |
+| `cmd/shadcn-templ`                   | The `shadcn-templ` CLI.                       |
 | `registry.json`                 | The registry for the components.         |
 
 ## Development
@@ -49,13 +49,13 @@ You can fork this repo by clicking the fork button in the top right corner of th
 ### Clone on your local machine
 
 ```bash
-git clone https://github.com/your-username/templui.git
+git clone https://github.com/your-username/shadcn-templ.git
 ```
 
 ### Navigate to project directory
 
 ```bash
-cd templui
+cd shadcn-templ
 ```
 
 ### Create a new Branch
@@ -99,7 +99,7 @@ To run the CLI locally, you can follow the workflow:
    To test the CLI against your local registry, use a command like:
 
    ```bash
-   templui <init | add | ...> --registry http://localhost:8090
+   shadcn-templ <init | add | ...> --registry http://localhost:8090
    ```
 
    You can also set the registry via the `SHADCN_TEMPL_REGISTRY` environment variable.
@@ -172,7 +172,7 @@ If you have a request for a new component, please open a discussion on GitHub. W
 
 ## CLI
 
-The `templui` package is a CLI for adding components to your project. You can find the documentation for the CLI [here](https://templui.io/docs/cli).
+The `shadcn-templ` package is a CLI for adding components to your project. You can find the documentation for the CLI [here](https://shadcn-templ.com/docs/cli).
 
 Any changes to the CLI should be made in the `cmd/shadcn-templ` directory. If you can, it would be great if you could add tests for your changes.
 

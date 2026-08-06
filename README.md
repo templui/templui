@@ -1,4 +1,4 @@
-# templui
+# shadcn-templ
 
 shadcn/ui for templ. A set of beautifully designed components that you can customize, extend, and build on. Start here then make it your own. Open Source. Open Code. **Use this to build your own component library.**
 
@@ -6,7 +6,7 @@ shadcn/ui for templ. A set of beautifully designed components that you can custo
 
 ## Documentation
 
-Visit https://templui.io/docs to view the documentation.
+Visit https://shadcn-templ.com/docs to view the documentation.
 
 ## Contributing
 

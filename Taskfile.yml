@@ -5,7 +5,7 @@ tasks:
   templ:
     desc: Run templ with integrated server and hot reload
     env:
-      # Rebases every self-referencing templui.io URL (docs, llms.txt,
+      # Rebases every self-referencing shadcn-templ.com URL (docs, llms.txt,
       # sitemap, robots) onto the local origin, see shared.Rebase.
       BASE_URL: http://localhost:8090
     cmds:
@@ -50,7 +50,7 @@ tasks:
   generate-sitemap:
     desc: Generate sitemap.xml
     cmds:
-      - go run ./cmd/sitemap/main.go --baseurl="https://templui.io" --output="./static/sitemap.xml"
+      - go run ./cmd/sitemap/main.go --baseurl="https://shadcn-templ.com" --output="./static/sitemap.xml"
 
   generate-icons:
     desc: Generate icon definitions
@@ -72,7 +72,7 @@ tasks:
     cmds:
       - go install ./cmd/compinstall
 
-  install-templui:
-    desc: Install templui CLI from the current local checkout
+  install-shadcn-templ:
+    desc: Install shadcn-templ CLI from the current local checkout
     cmds:
       - go install ./cmd/shadcn-templ

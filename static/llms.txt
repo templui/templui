@@ -1,81 +1,81 @@
-# templui
+# shadcn-templ
 
-> templui is a collection of beautifully-designed, accessible components and a code distribution platform for Go. It is built with Go, templ, Tailwind CSS, and vanilla JavaScript ports of Base UI behavior. It works with any Go web stack and pairs with htmx or plain server-side rendering. Open Source. Open Code. AI-Ready. It also comes with a command-line tool to install and manage components and a registry system to publish and distribute code.
+> shadcn-templ is a collection of beautifully-designed, accessible components and a code distribution platform for Go. It is built with Go, templ, Tailwind CSS, and vanilla JavaScript ports of Base UI behavior. It works with any Go web stack and pairs with htmx or plain server-side rendering. Open Source. Open Code. AI-Ready. It also comes with a command-line tool to install and manage components and a registry system to publish and distribute code.
 
 ## Overview
 
-- [Introduction](https://templui.io/docs/introduction): Core principles and getting started guide.
-- [CLI](https://templui.io/docs/cli): Command-line tool for installing and managing components.
-- [Installation](https://templui.io/docs/installation): Installation and setup guide.
-- [Components](https://templui.io/docs/components): Component overview and catalog.
+- [Introduction](https://shadcn-templ.com/docs/introduction): Core principles and getting started guide.
+- [CLI](https://shadcn-templ.com/docs/cli): Command-line tool for installing and managing components.
+- [Installation](https://shadcn-templ.com/docs/installation): Installation and setup guide.
+- [Components](https://shadcn-templ.com/docs/components): Component overview and catalog.
 - [GitHub](https://github.com/axadrn/shadcn-templ): Source code and issue tracker.
 
 ## Form & Input
 
-- [Button](https://templui.io/docs/components/button): Button component with multiple variants.
-- [Calendar](https://templui.io/docs/components/calendar): Calendar component for date selection.
-- [Checkbox](https://templui.io/docs/components/checkbox): Checkbox input component.
-- [Combobox](https://templui.io/docs/components/combobox): An input with a filterable list of options.
-- [Date Picker](https://templui.io/docs/components/date-picker): A date picker pattern composed of the Calendar, Popover and Button components.
-- [Field](https://templui.io/docs/components/field): Compose accessible form fields with labels, descriptions and errors.
-- [Input](https://templui.io/docs/components/input): Text input component.
-- [Input Group](https://templui.io/docs/components/input-group): An input with leading or trailing addons — icons, text or buttons.
-- [Input OTP](https://templui.io/docs/components/input-otp): One-time password input component.
-- [Label](https://templui.io/docs/components/label): Form label component.
-- [Radio Group](https://templui.io/docs/components/radio-group): A set of checkable buttons, known as radio buttons, where no more than one of the buttons can be checked at a time.
-- [Select](https://templui.io/docs/components/select): Displays a list of options for the user to pick from, triggered by a button.
-- [Slider](https://templui.io/docs/components/slider): Slider input component.
-- [Switch](https://templui.io/docs/components/switch): Toggle switch component.
-- [Textarea](https://templui.io/docs/components/textarea): Multi-line text input component.
-- [Toggle](https://templui.io/docs/components/toggle): Two-state button, optionally grouped into a segmented control.
-- [Toggle Group](https://templui.io/docs/components/toggle-group): A set of toggles grouped into a segmented control with single or multiple selection.
+- [Button](https://shadcn-templ.com/docs/components/button): Button component with multiple variants.
+- [Calendar](https://shadcn-templ.com/docs/components/calendar): Calendar component for date selection.
+- [Checkbox](https://shadcn-templ.com/docs/components/checkbox): Checkbox input component.
+- [Combobox](https://shadcn-templ.com/docs/components/combobox): An input with a filterable list of options.
+- [Date Picker](https://shadcn-templ.com/docs/components/date-picker): A date picker pattern composed of the Calendar, Popover and Button components.
+- [Field](https://shadcn-templ.com/docs/components/field): Compose accessible form fields with labels, descriptions and errors.
+- [Input](https://shadcn-templ.com/docs/components/input): Text input component.
+- [Input Group](https://shadcn-templ.com/docs/components/input-group): An input with leading or trailing addons — icons, text or buttons.
+- [Input OTP](https://shadcn-templ.com/docs/components/input-otp): One-time password input component.
+- [Label](https://shadcn-templ.com/docs/components/label): Form label component.
+- [Radio Group](https://shadcn-templ.com/docs/components/radio-group): A set of checkable buttons, known as radio buttons, where no more than one of the buttons can be checked at a time.
+- [Select](https://shadcn-templ.com/docs/components/select): Displays a list of options for the user to pick from, triggered by a button.
+- [Slider](https://shadcn-templ.com/docs/components/slider): Slider input component.
+- [Switch](https://shadcn-templ.com/docs/components/switch): Toggle switch component.
+- [Textarea](https://shadcn-templ.com/docs/components/textarea): Multi-line text input component.
+- [Toggle](https://shadcn-templ.com/docs/components/toggle): Two-state button, optionally grouped into a segmented control.
+- [Toggle Group](https://shadcn-templ.com/docs/components/toggle-group): A set of toggles grouped into a segmented control with single or multiple selection.
 
 ## Layout & Navigation
 
-- [Accordion](https://templui.io/docs/components/accordion): Collapsible accordion component.
-- [Breadcrumb](https://templui.io/docs/components/breadcrumb): Breadcrumb navigation component.
-- [Button Group](https://templui.io/docs/components/button-group): Group related buttons together with shared borders.
-- [Item](https://templui.io/docs/components/item): A flexible row for lists — media, title, description and actions.
-- [Pagination](https://templui.io/docs/components/pagination): Pagination component for lists and tables.
-- [Separator](https://templui.io/docs/components/separator): Visual divider between content sections.
-- [Sidebar](https://templui.io/docs/components/sidebar): Collapsible sidebar component for app layouts.
-- [Tabs](https://templui.io/docs/components/tabs): Tabbed interface component.
+- [Accordion](https://shadcn-templ.com/docs/components/accordion): Collapsible accordion component.
+- [Breadcrumb](https://shadcn-templ.com/docs/components/breadcrumb): Breadcrumb navigation component.
+- [Button Group](https://shadcn-templ.com/docs/components/button-group): Group related buttons together with shared borders.
+- [Item](https://shadcn-templ.com/docs/components/item): A flexible row for lists — media, title, description and actions.
+- [Pagination](https://shadcn-templ.com/docs/components/pagination): Pagination component for lists and tables.
+- [Separator](https://shadcn-templ.com/docs/components/separator): Visual divider between content sections.
+- [Sidebar](https://shadcn-templ.com/docs/components/sidebar): Collapsible sidebar component for app layouts.
+- [Tabs](https://shadcn-templ.com/docs/components/tabs): Tabbed interface component.
 
 ## Overlays & Dialogs
 
-- [Alert Dialog](https://templui.io/docs/components/alert-dialog): A modal dialog that interrupts the user with important content and expects a response.
-- [Command](https://templui.io/docs/components/command): Fast, composable command menu.
-- [Context Menu](https://templui.io/docs/components/context-menu): Menu shown at the cursor on right click, with actions and shortcuts.
-- [Dialog](https://templui.io/docs/components/dialog): Modal dialog component.
-- [Drawer](https://templui.io/docs/components/drawer): A panel that slides in from the edge of the screen and can be swiped away.
-- [Dropdown Menu](https://templui.io/docs/components/dropdown-menu): Displays a menu of actions or options triggered by a button.
-- [Hover Card](https://templui.io/docs/components/hover-card): Displays rich content in a card when hovering over a trigger. Uses Popover for the popup.
-- [Popover](https://templui.io/docs/components/popover): Floating popover component using the browser popover API and Floating UI positioning.
-- [Sheet](https://templui.io/docs/components/sheet): Slide-out panel component (drawer).
-- [Tooltip](https://templui.io/docs/components/tooltip): Tooltip component for additional context.
+- [Alert Dialog](https://shadcn-templ.com/docs/components/alert-dialog): A modal dialog that interrupts the user with important content and expects a response.
+- [Command](https://shadcn-templ.com/docs/components/command): Fast, composable command menu.
+- [Context Menu](https://shadcn-templ.com/docs/components/context-menu): Menu shown at the cursor on right click, with actions and shortcuts.
+- [Dialog](https://shadcn-templ.com/docs/components/dialog): Modal dialog component.
+- [Drawer](https://shadcn-templ.com/docs/components/drawer): A panel that slides in from the edge of the screen and can be swiped away.
+- [Dropdown Menu](https://shadcn-templ.com/docs/components/dropdown-menu): Displays a menu of actions or options triggered by a button.
+- [Hover Card](https://shadcn-templ.com/docs/components/hover-card): Displays rich content in a card when hovering over a trigger. Uses Popover for the popup.
+- [Popover](https://shadcn-templ.com/docs/components/popover): Floating popover component using the browser popover API and Floating UI positioning.
+- [Sheet](https://shadcn-templ.com/docs/components/sheet): Slide-out panel component (drawer).
+- [Tooltip](https://shadcn-templ.com/docs/components/tooltip): Tooltip component for additional context.
 
 ## Feedback & Status
 
-- [Alert](https://templui.io/docs/components/alert): Alert component for messages and notifications.
-- [Badge](https://templui.io/docs/components/badge): Badge component for labels and status indicators.
-- [Empty](https://templui.io/docs/components/empty): Placeholder for empty states — no results, first-run or offline screens.
-- [Progress](https://templui.io/docs/components/progress): Progress bar component.
-- [Skeleton](https://templui.io/docs/components/skeleton): Skeleton loading placeholder.
-- [Spinner](https://templui.io/docs/components/spinner): Animated loading indicator built from a spinning icon.
-- [Toast](https://templui.io/docs/components/toast): A succinct message that is displayed temporarily.
+- [Alert](https://shadcn-templ.com/docs/components/alert): Alert component for messages and notifications.
+- [Badge](https://shadcn-templ.com/docs/components/badge): Badge component for labels and status indicators.
+- [Empty](https://shadcn-templ.com/docs/components/empty): Placeholder for empty states — no results, first-run or offline screens.
+- [Progress](https://shadcn-templ.com/docs/components/progress): Progress bar component.
+- [Skeleton](https://shadcn-templ.com/docs/components/skeleton): Skeleton loading placeholder.
+- [Spinner](https://shadcn-templ.com/docs/components/spinner): Animated loading indicator built from a spinning icon.
+- [Toast](https://shadcn-templ.com/docs/components/toast): A succinct message that is displayed temporarily.
 
 ## Display & Media
 
-- [Aspect Ratio](https://templui.io/docs/components/aspect-ratio): Container that maintains aspect ratio.
-- [Avatar](https://templui.io/docs/components/avatar): Avatar component for user profiles.
-- [Card](https://templui.io/docs/components/card): Card container component.
-- [Carousel](https://templui.io/docs/components/carousel): Carousel component with navigation controls.
-- [Chart](https://templui.io/docs/components/chart): Beautiful charts. Composable chart elements with a Recharts compatible client renderer.
-- [Kbd](https://templui.io/docs/components/kbd): Displays a keyboard key or shortcut.
-- [Table](https://templui.io/docs/components/table): Table component for displaying data.
+- [Aspect Ratio](https://shadcn-templ.com/docs/components/aspect-ratio): Container that maintains aspect ratio.
+- [Avatar](https://shadcn-templ.com/docs/components/avatar): Avatar component for user profiles.
+- [Card](https://shadcn-templ.com/docs/components/card): Card container component.
+- [Carousel](https://shadcn-templ.com/docs/components/carousel): Carousel component with navigation controls.
+- [Chart](https://shadcn-templ.com/docs/components/chart): Beautiful charts. Composable chart elements with a Recharts compatible client renderer.
+- [Kbd](https://shadcn-templ.com/docs/components/kbd): Displays a keyboard key or shortcut.
+- [Table](https://shadcn-templ.com/docs/components/table): Table component for displaying data.
 
 ## Misc
 
-- [Collapsible](https://templui.io/docs/components/collapsible): Collapsible container component.
-- [Icon](https://templui.io/docs/components/icon): SVG icon component library.
+- [Collapsible](https://shadcn-templ.com/docs/components/collapsible): Collapsible container component.
+- [Icon](https://shadcn-templ.com/docs/components/icon): SVG icon component library.
 

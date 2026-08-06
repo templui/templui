@@ -6,7 +6,7 @@ order: 2
 
 <Callout className="mb-6 border-emerald-600 bg-emerald-100 dark:border-emerald-400 dark:bg-emerald-900">
 
-**Recommended for new projects:** Use [templui/create](/create) to build your preset visually and generate the right setup command.
+**Recommended for new projects:** Use [shadcn-templ/create](/create) to build your preset visually and generate the right setup command.
 
 </Callout>
 
@@ -14,7 +14,7 @@ Choose the setup that matches your starting point.
 
 <div class="mt-6 grid gap-4 sm:grid-cols-3 sm:gap-6" data-not-typeset>
   <a href="#scaffold-with-create" class="flex w-full flex-col items-start gap-1 rounded-2xl bg-surface p-6 text-sm text-surface-foreground transition-colors hover:bg-surface/80 sm:p-10 md:p-6">
-    <div class="font-medium">Use templui/create</div>
+    <div class="font-medium">Use shadcn-templ/create</div>
     <div class="leading-relaxed text-muted-foreground">Build your preset and generate a templ project command.</div>
   </a>
   <a href="#scaffold-with-cli" class="flex w-full flex-col items-start gap-1 rounded-2xl bg-surface p-6 text-sm text-surface-foreground transition-colors hover:bg-surface/80 sm:p-10 md:p-6">
@@ -23,21 +23,21 @@ Choose the setup that matches your starting point.
   </a>
   <a href="#existing-project" class="flex w-full flex-col items-start gap-1 rounded-2xl bg-surface p-6 text-sm text-surface-foreground transition-colors hover:bg-surface/80 sm:p-10 md:p-6">
     <div class="font-medium">Existing Project</div>
-    <div class="leading-relaxed text-muted-foreground">Configure templui manually in an existing templ project.</div>
+    <div class="leading-relaxed text-muted-foreground">Configure shadcn-templ manually in an existing templ project.</div>
   </a>
 </div>
 
 <div id="scaffold-with-create" class="scroll-mt-24"></div>
 
-## Use templui/create
+## Use shadcn-templ/create
 
 <Steps>
 
 ### Build Your Preset
 
-Open [templui/create](/create) and build your preset visually. Choose your style, colors, fonts, icons, and more.
+Open [shadcn-templ/create](/create) and build your preset visually. Choose your style, colors, fonts, icons, and more.
 
-<a href="/create" target="_blank" rel="noopener noreferrer" data-not-typeset class="cn-button group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none cn-button-variant-default cn-button-size-sm mt-6 no-underline!">Open templui/create</a>
+<a href="/create" target="_blank" rel="noopener noreferrer" data-not-typeset class="cn-button group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none cn-button-variant-default cn-button-size-sm mt-6 no-underline!">Open shadcn-templ/create</a>
 
 ### Create Project
 
@@ -116,7 +116,7 @@ go install github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ@latest
 shadcn-templ init -t templ
 ```
 
-Pick a design on [templui/create](/create) and pass its preset code, or use one of the named presets (`nova`, `vega`, `maia`, `lyra`, `mira`, `luma`, `sera`, `rhea`):
+Pick a design on [shadcn-templ/create](/create) and pass its preset code, or use one of the named presets (`nova`, `vega`, `maia`, `lyra`, `mira`, `luma`, `sera`, `rhea`):
 
 ```shell
 shadcn-templ init -t templ --preset b2D0wqNxT
@@ -186,7 +186,7 @@ go mod init myapp
 
 ### Configure templ, Tailwind CSS and Task
 
-If you're adding templui to an existing templ app, make sure templ, Tailwind CSS and Task are installed first:
+If you're adding shadcn-templ to an existing templ app, make sure templ, Tailwind CSS and Task are installed first:
 
 ```shell
 go install github.com/a-h/templ/cmd/templ@latest
@@ -199,7 +199,7 @@ Import aliases need no configuration: Go resolves imports through the `module` p
 
 ### Run the CLI
 
-Run the `templui` init command to set up templui in your project:
+Run the `shadcn-templ` init command to set up shadcn-templ in your project:
 
 ```shell
 go install github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ@latest
@@ -270,7 +270,7 @@ After adding components, run `templ generate` and `go mod tidy`.
 
 ## JavaScript
 
-templui ships all component behavior as one script bundle. The setup is a one-time step in your app, no per-component script tags.
+shadcn-templ ships all component behavior as one script bundle. The setup is a one-time step in your app, no per-component script tags.
 
 Render the script tag once in your layout `<head>`:
 
@@ -287,7 +287,7 @@ import "your-app/components"
 Mount the route the script tag points at:
 
 ```go
-mux.Handle("GET /components/templui.js", components.ScriptsHandler())
+mux.Handle("GET /components/shadcn-templ.js", components.ScriptsHandler())
 ```
 
 The bundle is the concatenation of every `components/*/*.js` file. In production (`GO_ENV=production`) it is built once from the embedded files and served with immutable caching; in development it is rebuilt from the local `components` directory on every request, so edits to copied component scripts hot-reload.
@@ -320,14 +320,14 @@ func setupAssetsRoutes(mux *http.ServeMux) {
 
   mux.Handle("GET /assets/", http.StripPrefix("/assets/", assetHandler))
 
-  // templui component script bundle
-  mux.Handle("GET /components/templui.js", components.ScriptsHandler())
+  // shadcn-templ component script bundle
+  mux.Handle("GET /components/shadcn-templ.js", components.ScriptsHandler())
 }
 ```
 
-Your Go app must serve `/assets/...` so the browser can load `assets/css/output.css`, fonts, images, and local files. The `/components/templui.js` route serves the script bundle that `@components.Scripts()` loads.
+Your Go app must serve `/assets/...` so the browser can load `assets/css/output.css`, fonts, images, and local files. The `/components/shadcn-templ.js` route serves the script bundle that `@components.Scripts()` loads.
 
-> **📝 Note:** templui also works as a plain Go module dependency without copying any source. That is a templui extra outside this page, see [Import Workflow](/docs/import-workflow).
+> **📝 Note:** shadcn-templ also works as a plain Go module dependency without copying any source. That is a shadcn-templ extra outside this page, see [Import Workflow](/docs/import-workflow).
 
 ## Component Props
 

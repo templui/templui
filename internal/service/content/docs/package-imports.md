@@ -1,9 +1,9 @@
 ---
 title: "Package Imports"
-description: "Configure templui with Go import paths."
+description: "Configure shadcn-templ with Go import paths."
 ---
 
-The `templui` CLI uses Go import paths for installing components and rewriting imports.
+The `shadcn-templ` CLI uses Go import paths for installing components and rewriting imports.
 
 Go resolves imports through the `module` path in your `go.mod`, so there is no separate alias configuration like path mappings in other ecosystems. The CLI derives your import paths from `go.mod` and stores them as `aliases` in `components.json`.
 
@@ -37,7 +37,7 @@ Alias paths are Go import paths and must live under the `module` path of your `g
 
 ## Module Imports
 
-In the import workflow, components are imported directly from the templui module. No `components.json` and no aliases are needed:
+In the import workflow, components are imported directly from the shadcn-templ module. No `components.json` and no aliases are needed:
 
 ```go
 import "github.com/axadrn/shadcn-templ/v2/components/button"

@@ -24,7 +24,7 @@ type SideLink struct {
 }
 
 // NavItems is the pendant of siteConfig.navItems in shadcn's lib/config.ts,
-// reduced to the pages templui has (no Blocks, no Directory).
+// reduced to the pages shadcn-templ has (no Blocks, no Directory).
 var NavItems = []SideLink{
 	{Text: "Home", Href: "/"},
 	{Text: "Docs", Href: "/docs/installation"},
@@ -37,7 +37,7 @@ var NavItems = []SideLink{
 // TopLevelSections is the 1:1 pendant of TOP_LEVEL_SECTIONS in shadcn's
 // docs-sidebar.tsx (mobile-nav.tsx duplicates it verbatim; one Go slice
 // serves both modules): same entries, same order, minus Skills, which has no
-// templui page yet. Their Introduction href is the /docs index page; ours
+// shadcn-templ page yet. Their Introduction href is the /docs index page; ours
 // lives at /docs/introduction.
 var TopLevelSections = []SideLink{
 	{Text: "Introduction", Href: "/docs/introduction"},
@@ -52,7 +52,7 @@ var TopLevelSections = []SideLink{
 
 // ExcludedSidebarSections is the EXCLUDED_SECTIONS pendant: doc tree folders
 // the sidebar does not render as groups. shadcn lists installation,
-// dark-mode, changelog and rtl there - all folders templui does not have, so
+// dark-mode, changelog and rtl there - all folders shadcn-templ does not have, so
 // the map is empty until one of them grows a section.
 var ExcludedSidebarSections = map[string]bool{}
 
@@ -67,7 +67,7 @@ var ExcludedSidebarPages = map[string]bool{
 
 // PagesNew is the PAGES_NEW pendant of shadcn's lib/docs.ts: docs URLs that
 // render the blue "New" dot in the sidebar, the mobile nav and the components
-// list. Ours marks what templui 2.0 adds over v1: components without a v1
+// list. Ours marks what shadcn-templ 2.0 adds over v1: components without a v1
 // predecessor (renames like dropdown -> dropdown-menu, radio -> radio-group,
 // selectbox -> select do not count, date picker became a pattern page) and
 // the new docs pages. Curated by hand like the reference: a PR that adds a
@@ -124,7 +124,7 @@ func loadComponentsFromRegistry() []SideLink {
 var Sections = []Section{
 	// Group order is the reference's root meta.json tree order: components
 	// first, then the (root) Get Started folder, then utils and registry
-	// (react, helpers and forms have no templui pages yet).
+	// (react, helpers and forms have no shadcn-templ pages yet).
 	{
 		Title: "Components",
 		Links: loadComponentsFromRegistry(),
@@ -218,7 +218,7 @@ var Sections = []Section{
 			},
 		},
 	},
-	// templui extra, deliberately its own section at the bottom: the import
+	// shadcn-templ extra, deliberately its own section at the bottom: the import
 	// workflow lives outside the shadcn-parity chapters.
 	{
 		Title: "Go Module",

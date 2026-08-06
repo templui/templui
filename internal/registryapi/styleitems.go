@@ -12,7 +12,7 @@ import (
 	"strings"
 	"sync"
 
-	templui "github.com/axadrn/shadcn-templ/v2"
+	shadcntempl "github.com/axadrn/shadcn-templ/v2"
 	"github.com/axadrn/shadcn-templ/v2/assets"
 	"github.com/axadrn/shadcn-templ/v2/internal/shared"
 	"github.com/axadrn/shadcn-templ/v2/components"
@@ -26,7 +26,7 @@ func isDevelopment() bool {
 	return os.Getenv("GO_ENV") != "production"
 }
 
-// StyleNames returns the routable style names: templui's single base
+// StyleNames returns the routable style names: shadcn-templ's single base
 // prefixed onto every style (base-vega .. base-rhea).
 func StyleNames() []string {
 	out := make([]string, len(Styles))
@@ -89,14 +89,14 @@ func styleMapFor(bare string) (inliner.StyleMap, error) {
 }
 
 // componentSource reads a registry file path ("components/button/button.templ",
-// "utils/templui.go") from disk in development, from the embeds in
+// "utils/shadcntempl.go") from disk in development, from the embeds in
 // production.
 func componentSource(filePath string) ([]byte, error) {
 	if isDevelopment() {
 		return os.ReadFile("./" + filePath)
 	}
 	if strings.HasPrefix(filePath, "utils/") {
-		return templui.UtilsFiles.ReadFile(filePath)
+		return shadcntempl.UtilsFiles.ReadFile(filePath)
 	}
 	return components.TemplFiles.ReadFile(strings.TrimPrefix(filePath, "components/"))
 }

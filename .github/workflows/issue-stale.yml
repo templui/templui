@@ -9,7 +9,7 @@ on:
 jobs:
   stale:
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'templui'
+    if: github.repository_owner == 'shadcn-templ'
     steps:
       - uses: actions/stale@v9
         id: issue-stale

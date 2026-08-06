@@ -31,7 +31,7 @@
   var PREVIEW_OVERRIDE_DEBOUNCE_MS = 50;
   // Our own persistence carries our name; only the key differs from the
   // reference ("shadcn-create-welcome-dialog").
-  var WELCOME_STORAGE_KEY = "templui-create-welcome-dialog";
+  var WELCOME_STORAGE_KEY = "shadcn-templ-create-welcome-dialog";
   var DEFAULT_ITEM = "preview-02";
 
   // lib/search-params.ts DESIGN_SYSTEM_KEYS.

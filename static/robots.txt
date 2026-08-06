@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://templui.io/sitemap.xml
+Sitemap: https://shadcn-templ.com/sitemap.xml

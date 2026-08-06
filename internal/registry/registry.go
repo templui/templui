@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"log"
 
-	templui "github.com/axadrn/shadcn-templ/v2"
+	shadcntempl "github.com/axadrn/shadcn-templ/v2"
 )
 
 // File is one files[] entry of a registry item.
@@ -19,7 +19,7 @@ type File struct {
 }
 
 // Item is a registry item in shadcn's registry-item.json schema (the fields
-// templui uses).
+// shadcn-templ uses).
 type Item struct {
 	Name                 string   `json:"name"`
 	Type                 string   `json:"type"`
@@ -57,7 +57,7 @@ func Get() *Registry {
 	}
 
 	var r Registry
-	err := json.Unmarshal(templui.RegistryJSON, &r)
+	err := json.Unmarshal(shadcntempl.RegistryJSON, &r)
 	if err != nil {
 		log.Printf("Error parsing registry.json: %v", err)
 		return &Registry{} // Return empty registry on error
@@ -70,7 +70,7 @@ func Get() *Registry {
 // JSON returns the raw registry.json bytes, served verbatim on
 // GET /r/registry.json.
 func JSON() []byte {
-	return templui.RegistryJSON
+	return shadcntempl.RegistryJSON
 }
 
 // Components returns the registry:ui items.

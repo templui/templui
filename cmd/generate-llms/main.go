@@ -101,16 +101,16 @@ func main() {
 	var output strings.Builder
 
 	// Header
-	output.WriteString(`# templui
+	output.WriteString(`# shadcn-templ
 
-> templui is a collection of beautifully-designed, accessible components and a code distribution platform for Go. It is built with Go, templ, Tailwind CSS, and vanilla JavaScript ports of Base UI behavior. It works with any Go web stack and pairs with htmx or plain server-side rendering. Open Source. Open Code. AI-Ready. It also comes with a command-line tool to install and manage components and a registry system to publish and distribute code.
+> shadcn-templ is a collection of beautifully-designed, accessible components and a code distribution platform for Go. It is built with Go, templ, Tailwind CSS, and vanilla JavaScript ports of Base UI behavior. It works with any Go web stack and pairs with htmx or plain server-side rendering. Open Source. Open Code. AI-Ready. It also comes with a command-line tool to install and manage components and a registry system to publish and distribute code.
 
 ## Overview
 
-- [Introduction](https://templui.io/docs/introduction): Core principles and getting started guide.
-- [CLI](https://templui.io/docs/cli): Command-line tool for installing and managing components.
-- [Installation](https://templui.io/docs/installation): Installation and setup guide.
-- [Components](https://templui.io/docs/components): Component overview and catalog.
+- [Introduction](https://shadcn-templ.com/docs/introduction): Core principles and getting started guide.
+- [CLI](https://shadcn-templ.com/docs/cli): Command-line tool for installing and managing components.
+- [Installation](https://shadcn-templ.com/docs/installation): Installation and setup guide.
+- [Components](https://shadcn-templ.com/docs/components): Component overview and catalog.
 - [GitHub](https://github.com/axadrn/shadcn-templ): Source code and issue tracker.
 
 `)
@@ -126,7 +126,7 @@ func main() {
 		output.WriteString(fmt.Sprintf("## %s\n\n", categoryName))
 
 		for _, comp := range items {
-			docURL := fmt.Sprintf("https://templui.io/docs/components/%s", comp.Name)
+			docURL := fmt.Sprintf("https://shadcn-templ.com/docs/components/%s", comp.Name)
 			output.WriteString(fmt.Sprintf("- [%s](%s): %s\n", comp.Title, docURL, comp.Description))
 		}
 		output.WriteString("\n")

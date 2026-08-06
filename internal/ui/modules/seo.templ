@@ -11,9 +11,9 @@ templ SEO(title, description, path string) {
 	// The one title template, applied once (their "%s - shadcn/ui"). The
 	// og/twitter titles keep the RAW title - the reference sets them
 	// explicitly without the suffix.
-	{{ rawTitle := strings.TrimSuffix(title, " - templui") }}
-	if !strings.HasSuffix(title, " - templui") {
-		{{ title = title + " - templui" }}
+	{{ rawTitle := strings.TrimSuffix(title, " - shadcn-templ") }}
+	if !strings.HasSuffix(title, " - shadcn-templ") {
+		{{ title = title + " - shadcn-templ" }}
 	}
 	@templ.Fragment("title") {
 		<title hx-swap-oob="true">{ title }</title>
@@ -23,7 +23,7 @@ templ SEO(title, description, path string) {
 	<meta charset="UTF-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	// Author
-	<meta name="author" content="templui"/>
+	<meta name="author" content="shadcn-templ"/>
 	// Robots Tags
 	<meta name="robots" content="index, follow"/>
 	// Canonical URL
@@ -36,14 +36,14 @@ templ SEO(title, description, path string) {
 	<meta property="og:image" content={ shared.BaseURL() + "/assets/img/social-preview.png" }/>
 	<meta property="og:image:width" content="1200"/>
 	<meta property="og:image:height" content="630"/>
-	<meta property="og:image:alt" content="templui - shadcn/ui for templ"/>
-	<meta property="og:site_name" content="templui"/>
+	<meta property="og:image:alt" content="shadcn-templ - shadcn/ui for templ"/>
+	<meta property="og:site_name" content="shadcn-templ"/>
 	// Twitter Card
 	<meta name="twitter:card" content="summary_large_image"/>
 	<meta name="twitter:title" content={ rawTitle }/>
 	<meta name="twitter:description" content={ description }/>
 	<meta name="twitter:image" content={ shared.BaseURL() + "/assets/img/social-preview.png" }/>
-	<meta name="twitter:image:alt" content="templui - shadcn/ui for templ"/>
+	<meta name="twitter:image:alt" content="shadcn-templ - shadcn/ui for templ"/>
 	// Favicon - Minimal but comprehensive support
 	// Note: Some files are served from root URLs (e.g., /favicon.ico) for Safari compatibility.
 	// Safari often ignores HTML favicon tags and looks directly in the root directory.

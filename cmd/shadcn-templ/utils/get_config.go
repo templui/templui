@@ -4,15 +4,15 @@
 // components.json field mapping against shadcn's schema (every dropped npm
 // field documented):
 //
-//	$schema:               https://templui.io/schema/components.json
+//	$schema:               https://shadcn-templ.com/schema/components.json
 //	style:                 kept 1:1 ("base-<style>", e.g. "base-nova")
 //	tailwind.css:          kept 1:1 (the user's Tailwind entry file)
 //	tailwind.baseColor:    kept 1:1
-//	tailwind.cssVariables: kept 1:1 (always true; templui has no inline-theme
+//	tailwind.cssVariables: kept 1:1 (always true; shadcn-templ has no inline-theme
 //	                       mode)
-//	tailwind.config:       dropped; Tailwind v4 has no config file and templui
+//	tailwind.config:       dropped; Tailwind v4 has no config file and shadcn-templ
 //	                       is v4-only (shadcn keeps "" for v3 compat)
-//	tailwind.prefix:       dropped; templui components ship unprefixed classes
+//	tailwind.prefix:       dropped; shadcn-templ components ship unprefixed classes
 //	rsc, tsx:              dropped; React Server Components and TypeScript
 //	                       have no Go pendant
 //	iconLibrary:           kept 1:1
@@ -22,8 +22,8 @@
 //	                       ("<module>/components"); shadcn stores a tsconfig
 //	                       alias ("@/components")
 //	aliases.utils:         Go pendant: "<module>/utils"
-//	aliases.ui/lib/hooks:  dropped; templui has no separate ui/lib/hooks dirs
-//	registries:            dropped; there are no third-party templui
+//	aliases.ui/lib/hooks:  dropped; shadcn-templ has no separate ui/lib/hooks dirs
+//	registries:            dropped; there are no third-party shadcn-templ
 //	                       registries (the --registry flag and
 //	                       SHADCN_TEMPL_REGISTRY env cover local dev)
 package utils
@@ -38,7 +38,7 @@ import (
 )
 
 // SchemaURL is the $schema value of components.json.
-const SchemaURL = "https://templui.io/schema/components.json"
+const SchemaURL = "https://shadcn-templ.com/schema/components.json"
 
 // Tailwind is the tailwind block of components.json.
 type Tailwind struct {

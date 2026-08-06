@@ -6,7 +6,7 @@
 // shadcn splits the work in two places: the registry build runs transformStyle
 // (= transformStyleMap) per style, and the CLI install pipeline later resolves
 // the allowlisted markers (transformRtl, transformMenu, transformCleanup,
-// transformFont). templui has no separate install step, so TransformStyle
+// transformFont). shadcn-templ has no separate install step, so TransformStyle
 // composes both into one pass and Options carries what shadcn reads from the
 // project config (config.rtl, config.menuColor default, --font-heading
 // support).

@@ -23,7 +23,7 @@
     today: "rounded-(--cell-radius) bg-muted text-foreground data-[selected=true]:rounded-none",
     outside: "text-muted-foreground aria-selected:text-muted-foreground",
     disabled: "text-muted-foreground opacity-50",
-    // templUI extension, no shadcn slot or cn- class for booked days exists.
+    // shadcn-templ extension, no shadcn slot or cn- class for booked days exists.
     booked: "[&>button]:line-through opacity-100",
   };
 
