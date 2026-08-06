@@ -2,14 +2,14 @@ package modules
 
 import "github.com/templui/templui/components/icon"
 
-// AnnouncementBar announces the 2.0 beta, the inverse of the beta site's
-// switch-to-stable bar. The goilerplate promo it replaces lives in git
-// history and returns after the 2.0 launch window.
+// AnnouncementBar carries the rebrand message, the inverse of the beta
+// site's switch-to-v1 bar. The goilerplate promo it replaces lives in
+// git history and returns after the 2.0 launch window.
 templ AnnouncementBar() {
 	<div class="relative z-50 flex items-center justify-center bg-muted border-b px-4 py-1 text-center">
 		<div class="inline-flex items-center gap-2 text-sm flex-wrap justify-center">
-			<span class="text-muted-foreground">The templui 2.0 beta is now available.</span>
-			<a href="https://v2.templui.io" class="group inline-flex items-center gap-1 font-semibold text-foreground transition-colors">
+			<span class="text-muted-foreground">templUI is now shadcn-templ. The 2.0 beta is available.</span>
+			<a href="https://shadcn-templ.com" class="group inline-flex items-center gap-1 font-semibold text-foreground transition-colors">
 				Try it
 				@icon.ArrowRight(icon.Props{Class: "size-3.5 transition-transform group-hover:translate-x-0.5"})
 			</a>
