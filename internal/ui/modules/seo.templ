@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"net/url"
 	"strings"
 
 	"github.com/axadrn/shadcn-templ/v2/internal/shared"
@@ -33,16 +34,18 @@ templ SEO(title, description, path string) {
 	<meta property="og:description" content={ description }/>
 	<meta property="og:type" content="website"/>
 	<meta property="og:url" content={ shared.BaseURL() + path }/>
-	<meta property="og:image" content={ shared.BaseURL() + "/assets/img/social-preview.png" }/>
+	// Dynamic per-page image, the pendant of the reference's
+	// `/og?title=${encodeURIComponent(...)}` metadata urls.
+	<meta property="og:image" content={ shared.BaseURL() + "/og?title=" + url.QueryEscape(rawTitle) + "&description=" + url.QueryEscape(description) }/>
 	<meta property="og:image:width" content="1200"/>
-	<meta property="og:image:height" content="630"/>
+	<meta property="og:image:height" content="628"/>
 	<meta property="og:image:alt" content="shadcn-templ - shadcn/ui for templ"/>
 	<meta property="og:site_name" content="shadcn-templ"/>
 	// Twitter Card
 	<meta name="twitter:card" content="summary_large_image"/>
 	<meta name="twitter:title" content={ rawTitle }/>
 	<meta name="twitter:description" content={ description }/>
-	<meta name="twitter:image" content={ shared.BaseURL() + "/assets/img/social-preview.png" }/>
+	<meta name="twitter:image" content={ shared.BaseURL() + "/og?title=" + url.QueryEscape(rawTitle) + "&description=" + url.QueryEscape(description) }/>
 	<meta name="twitter:image:alt" content="shadcn-templ - shadcn/ui for templ"/>
 	// Favicon - Minimal but comprehensive support
 	// Note: Some files are served from root URLs (e.g., /favicon.ico) for Safari compatibility.

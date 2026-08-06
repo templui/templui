@@ -13,6 +13,7 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components"
 	"github.com/axadrn/shadcn-templ/v2/internal/config"
 	"github.com/axadrn/shadcn-templ/v2/internal/middleware"
+	"github.com/axadrn/shadcn-templ/v2/internal/og"
 	"github.com/axadrn/shadcn-templ/v2/internal/registry"
 	"github.com/axadrn/shadcn-templ/v2/internal/registryapi"
 	"github.com/axadrn/shadcn-templ/v2/internal/service"
@@ -333,6 +334,9 @@ func SetupAssetsRoutes(mux *http.ServeMux) {
 
 	// Component JS bundle
 	mux.Handle("GET /components/{bundle}", components.ScriptsHandler())
+
+	// Per-page open-graph image, the pendant of app/og/route.tsx
+	mux.Handle("GET /og", og.Handler())
 
 	// Safari Favicon Compatibility
 	// Safari often ignores HTML favicon tags and looks for files in the root directory.
