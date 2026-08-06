@@ -16,7 +16,7 @@ description: A panel that slides in from the edge of the screen and can be swipe
 <TabsContent value="cli">
 
 ```bash
-templui add drawer
+shadcn-templ add drawer
 ```
 
 </TabsContent>

@@ -741,13 +741,13 @@
   // no package manager variants (the CLI installs via go install) and one
   // template (-t templ scaffolds the runnable project like their -t next).
   function initCommand() {
-    return "templui init -t templ --preset " + getPresetCode(params);
+    return "shadcn-templ init -t templ --preset " + getPresetCode(params);
   }
 
   function applyCommand() {
     var onlyFlag =
       applyMode === "theme" ? " --only theme" : applyMode === "font" ? " --only font" : "";
-    return "templui apply --preset " + getPresetCode(params) + onlyFlag;
+    return "shadcn-templ apply --preset " + getPresetCode(params) + onlyFlag;
   }
 
   function copyTargetText(target) {

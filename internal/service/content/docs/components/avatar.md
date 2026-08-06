@@ -16,7 +16,7 @@ description: An image element with a fallback for representing the user.
 <TabsContent value="cli">
 
 ```bash
-templui add avatar
+shadcn-templ add avatar
 ```
 
 </TabsContent>

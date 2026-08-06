@@ -16,7 +16,7 @@ description: A window overlaid on either the primary window or another dialog wi
 <TabsContent value="cli">
 
 ```bash
-templui add dialog
+shadcn-templ add dialog
 ```
 
 </TabsContent>

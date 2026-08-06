@@ -10,8 +10,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/utils"
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/utils/updaters"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/utils"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/utils/updaters"
 	"github.com/axadrn/shadcn-templ/v2/internal/preset"
 )
 

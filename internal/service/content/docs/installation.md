@@ -44,13 +44,13 @@ Open [templui/create](/create) and build your preset visually. Choose your style
 Click `Get Code`, choose your project tab, and copy the generated command. Install the CLI first if you do not have it yet:
 
 ```shell
-go install github.com/axadrn/shadcn-templ/v2/cmd/templui@latest
+go install github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ@latest
 ```
 
 The generated command will look similar to this:
 
 ```shell
-templui init -t templ --preset [CODE]
+shadcn-templ init -t templ --preset [CODE]
 ```
 
 The exact command will include the preset code that encodes your selected options such as your style, base color and fonts.
@@ -70,7 +70,7 @@ task dev
 Add the `Card` component to your project:
 
 ```shell
-templui add card
+shadcn-templ add card
 ```
 
 The command above will add the `Card` component to your project. You can then import it like this:
@@ -112,15 +112,15 @@ After adding components, run `templ generate` and `go mod tidy`.
 Run the `init` command to scaffold a new templ project. Configure your project with flags: preset, base color, and more:
 
 ```shell
-go install github.com/axadrn/shadcn-templ/v2/cmd/templui@latest
-templui init -t templ
+go install github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ@latest
+shadcn-templ init -t templ
 ```
 
 Pick a design on [templui/create](/create) and pass its preset code, or use one of the named presets (`nova`, `vega`, `maia`, `lyra`, `mira`, `luma`, `sera`, `rhea`):
 
 ```shell
-templui init -t templ --preset b2D0wqNxT
-templui init -t templ --preset vega
+shadcn-templ init -t templ --preset b2D0wqNxT
+shadcn-templ init -t templ --preset vega
 ```
 
 ### Run the App
@@ -138,7 +138,7 @@ task dev
 Add the `Card` component to your project:
 
 ```shell
-templui add card
+shadcn-templ add card
 ```
 
 The command above will add the `Card` component to your project. You can then import it like this:
@@ -202,8 +202,8 @@ Import aliases need no configuration: Go resolves imports through the `module` p
 Run the `templui` init command to set up templui in your project:
 
 ```shell
-go install github.com/axadrn/shadcn-templ/v2/cmd/templui@latest
-templui init
+go install github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ@latest
+shadcn-templ init
 ```
 
 Init writes `components.json`, merges your theme CSS variables and base layer into your Tailwind entry file (detected, or created at `assets/css/globals.css`), vendors `tw-animate.css` and `shadcn-tailwind.css` next to it, and installs the shared `utils` package. See the [CLI docs](/docs/cli) for all flags, updating with `--overwrite` and applying presets.
@@ -245,7 +245,7 @@ Adjust the `--proxy` port (default: 8090) if your app uses a different port. tem
 You can now start adding components to your project.
 
 ```shell
-templui add button
+shadcn-templ add button
 ```
 
 The command above will add the `Button` component to your project. You can then import it like this:

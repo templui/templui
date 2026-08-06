@@ -16,7 +16,7 @@ description: A modal dialog that interrupts the user with important content and 
 <TabsContent value="cli">
 
 ```bash
-templui add alert-dialog
+shadcn-templ add alert-dialog
 ```
 
 </TabsContent>

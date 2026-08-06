@@ -17,14 +17,14 @@ We use it to understand how your project is set up and how to generate component
 You can create a `components.json` file in your project by running the following command:
 
 ```shell
-templui init
+shadcn-templ init
 ```
 
 See the [CLI section](/docs/cli) for more information.
 
 ## $schema
 
-The `$schema` identifies the templui `components.json` format. `templui init` writes it for you.
+The `$schema` identifies the templui `components.json` format. `shadcn-templ init` writes it for you.
 
 ```json title="components.json"
 {
@@ -34,7 +34,7 @@ The `$schema` identifies the templui `components.json` format. `templui init` wr
 
 ## style
 
-The style for your components. `init` writes it from your preset (`base-nova`, `base-vega`, ...), and `templui add` fetches every component pre-compiled for this style.
+The style for your components. `init` writes it from your preset (`base-nova`, `base-vega`, ...), and `shadcn-templ add` fetches every component pre-compiled for this style.
 
 ```json title="components.json"
 {
@@ -42,7 +42,7 @@ The style for your components. `init` writes it from your preset (`base-nova`, `
 }
 ```
 
-To change the style of an existing project, apply a new preset with `templui apply`.
+To change the style of an existing project, apply a new preset with `shadcn-templ apply`.
 
 ## tailwind
 
@@ -100,7 +100,7 @@ The icon library of your preset. templui currently ships `lucide`.
 
 ## rtl
 
-Whether your components install with RTL (right-to-left) support. Written from your preset; `templui apply` requests RTL-compiled components from the registry when it is `true`.
+Whether your components install with RTL (right-to-left) support. Written from your preset; `shadcn-templ apply` requests RTL-compiled components from the registry when it is `true`.
 
 ```json title="components.json"
 {
@@ -110,7 +110,7 @@ Whether your components install with RTL (right-to-left) support. Written from y
 
 ## menuColor
 
-The menu appearance of your preset: `default`, `default-translucent`, `inverted` or `inverted-translucent`. Written from your preset and used by `templui preset resolve` to reconstruct your preset code.
+The menu appearance of your preset: `default`, `default-translucent`, `inverted` or `inverted-translucent`. Written from your preset and used by `shadcn-templ preset resolve` to reconstruct your preset code.
 
 ```json title="components.json"
 {
@@ -120,7 +120,7 @@ The menu appearance of your preset: `default`, `default-translucent`, `inverted`
 
 ## menuAccent
 
-The menu accent of your preset: `subtle` or `bold`. Written from your preset and used by `templui preset resolve` to reconstruct your preset code.
+The menu accent of your preset: `subtle` or `bold`. Written from your preset and used by `shadcn-templ preset resolve` to reconstruct your preset code.
 
 ```json title="components.json"
 {

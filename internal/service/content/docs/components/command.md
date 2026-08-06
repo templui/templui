@@ -20,7 +20,7 @@ The `Command` component is a native templ and vanilla JavaScript port of the [`c
 <TabsContent value="cli">
 
 ```bash
-templui add command
+shadcn-templ add command
 ```
 
 </TabsContent>

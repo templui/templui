@@ -16,7 +16,7 @@ description: Use the Empty component to display a empty state.
 <TabsContent value="cli">
 
 ```bash
-templui add empty
+shadcn-templ add empty
 ```
 
 </TabsContent>

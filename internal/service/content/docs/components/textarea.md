@@ -16,7 +16,7 @@ description: Displays a form textarea or a component that looks like a textarea.
 <TabsContent value="cli">
 
 ```bash
-templui add textarea
+shadcn-templ add textarea
 ```
 
 </TabsContent>

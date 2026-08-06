@@ -16,7 +16,7 @@ description: Combine labels, controls, and help text to compose accessible form 
 <TabsContent value="cli">
 
 ```bash
-templui add field
+shadcn-templ add field
 ```
 
 </TabsContent>

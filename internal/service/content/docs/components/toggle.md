@@ -16,7 +16,7 @@ description: A two-state button that can be either on or off.
 <TabsContent value="cli">
 
 ```bash
-templui add toggle
+shadcn-templ add toggle
 ```
 
 </TabsContent>

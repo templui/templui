@@ -18,12 +18,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/registry"
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/templates"
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/utils"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/registry"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/templates"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/utils"
 )
 
-// InitOptions are the flags of templui init.
+// InitOptions are the flags of shadcn-templ init.
 type InitOptions struct {
 	Cwd         string
 	Preset      string
@@ -55,7 +55,7 @@ func NewInitFlagSet(opts *InitOptions) *flag.FlagSet {
 	return fs
 }
 
-// RunInit executes templui init.
+// RunInit executes shadcn-templ init.
 func RunInit(opts InitOptions) error {
 	cwd, err := filepath.Abs(opts.Cwd)
 	if err != nil {

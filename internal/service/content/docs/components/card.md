@@ -16,7 +16,7 @@ description: Displays a card with header, content, and footer.
 <TabsContent value="cli">
 
 ```bash
-templui add card
+shadcn-templ add card
 ```
 
 </TabsContent>

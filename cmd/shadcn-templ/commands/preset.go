@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/registry"
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/utils"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/registry"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/utils"
 	"github.com/axadrn/shadcn-templ/v2/internal/preset"
 )
 
@@ -142,7 +142,7 @@ func printJSON(v any) error {
 	return nil
 }
 
-// RunPresetDecode executes templui preset decode <code>.
+// RunPresetDecode executes shadcn-templ preset decode <code>.
 func RunPresetDecode(code string, jsonOut bool) error {
 	result, err := decodePresetCode(code)
 	if err != nil {
@@ -163,7 +163,7 @@ func RunPresetDecode(code string, jsonOut bool) error {
 	return nil
 }
 
-// RunPresetURL executes templui preset url <code>.
+// RunPresetURL executes shadcn-templ preset url <code>.
 func RunPresetURL(code string) error {
 	result, err := decodePresetCode(code)
 	if err != nil {
@@ -173,7 +173,7 @@ func RunPresetURL(code string) error {
 	return nil
 }
 
-// PresetResolveOptions are the flags of templui preset resolve.
+// PresetResolveOptions are the flags of shadcn-templ preset resolve.
 type PresetResolveOptions struct {
 	Cwd  string
 	JSON bool
@@ -188,7 +188,7 @@ func NewPresetResolveFlagSet(opts *PresetResolveOptions) *flag.FlagSet {
 	return fs
 }
 
-// RunPresetResolve executes templui preset resolve.
+// RunPresetResolve executes shadcn-templ preset resolve.
 func RunPresetResolve(opts PresetResolveOptions) error {
 	cwd, err := filepath.Abs(opts.Cwd)
 	if err != nil {

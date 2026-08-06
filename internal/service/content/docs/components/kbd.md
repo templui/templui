@@ -16,7 +16,7 @@ description: Used to display textual user input from keyboard.
 <TabsContent value="cli">
 
 ```bash
-templui add kbd
+shadcn-templ add kbd
 ```
 
 </TabsContent>

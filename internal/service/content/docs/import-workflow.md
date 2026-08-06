@@ -34,11 +34,11 @@ You can also just import a component package and run `go mod tidy`.
 
 ### 2. Initialize Styles
 
-Style setup is the same `templui init` as in the [CLI workflow](/docs/installation#run-the-cli): it creates `assets/css/globals.css` and merges your theme variables and base layer into it. Pick a design on [templui.io/create](https://templui.io/create) and pass its preset code, or use one of the named presets:
+Style setup is the same `shadcn-templ init` as in the [CLI workflow](/docs/installation#run-the-cli): it creates `assets/css/globals.css` and merges your theme variables and base layer into it. Pick a design on [templui.io/create](https://templui.io/create) and pass its preset code, or use one of the named presets:
 
 ```shell
-go install github.com/axadrn/shadcn-templ/v2/cmd/templui@latest
-templui init
+go install github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ@latest
+shadcn-templ init
 ```
 
 Then add one line to `assets/css/globals.css`, right after the tailwindcss import:

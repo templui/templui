@@ -20,7 +20,7 @@ The carousel component is built using native templ and vanilla JavaScript, no ex
 <TabsContent value="cli">
 
 ```bash
-templui add carousel
+shadcn-templ add carousel
 ```
 
 </TabsContent>

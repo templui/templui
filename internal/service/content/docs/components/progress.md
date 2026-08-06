@@ -16,7 +16,7 @@ description: Displays an indicator showing the completion progress of a task, ty
 <TabsContent value="cli">
 
 ```bash
-templui add progress
+shadcn-templ add progress
 ```
 
 </TabsContent>

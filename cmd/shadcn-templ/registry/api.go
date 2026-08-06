@@ -24,9 +24,9 @@ const SiteURL = "https://v2.templui.io"
 
 // EnvRegistry is the environment variable that overrides the registry URL,
 // below the --registry flag.
-const EnvRegistry = "TEMPLUI_REGISTRY"
+const EnvRegistry = "SHADCN_TEMPL_REGISTRY"
 
-// Resolve returns the registry base URL: --registry flag > TEMPLUI_REGISTRY
+// Resolve returns the registry base URL: --registry flag > SHADCN_TEMPL_REGISTRY
 // env > default.
 func Resolve(flagValue string) string {
 	if flagValue != "" {

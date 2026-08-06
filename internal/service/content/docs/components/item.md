@@ -16,7 +16,7 @@ description: A versatile component that you can use to display any content.
 <TabsContent value="cli">
 
 ```bash
-templui add item
+shadcn-templ add item
 ```
 
 </TabsContent>

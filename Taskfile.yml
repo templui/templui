@@ -75,4 +75,4 @@ tasks:
   install-templui:
     desc: Install templui CLI from the current local checkout
     cmds:
-      - go install ./cmd/templui
+      - go install ./cmd/shadcn-templ

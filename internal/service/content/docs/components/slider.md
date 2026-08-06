@@ -16,7 +16,7 @@ description: An input where the user selects a value from within a given range.
 <TabsContent value="cli">
 
 ```bash
-templui add slider
+shadcn-templ add slider
 ```
 
 </TabsContent>

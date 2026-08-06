@@ -13,12 +13,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/registry"
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/utils"
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/utils/updaters"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/registry"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/utils"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/utils/updaters"
 )
 
-// AddOptions are the flags of templui add.
+// AddOptions are the flags of shadcn-templ add.
 type AddOptions struct {
 	Cwd       string
 	Overwrite bool
@@ -45,7 +45,7 @@ func NewAddFlagSet(opts *AddOptions) *flag.FlagSet {
 	return fs
 }
 
-// RunAdd executes templui add.
+// RunAdd executes shadcn-templ add.
 func RunAdd(components []string, opts AddOptions) error {
 	cwd, err := filepath.Abs(opts.Cwd)
 	if err != nil {
@@ -58,7 +58,7 @@ func RunAdd(components []string, opts AddOptions) error {
 		return err
 	}
 	if config == nil {
-		return fmt.Errorf("no %s found at %s. Run 'templui init' first", utils.ConfigFileName, cwd)
+		return fmt.Errorf("no %s found at %s. Run 'shadcn-templ init' first", utils.ConfigFileName, cwd)
 	}
 
 	if opts.All {
@@ -71,7 +71,7 @@ func RunAdd(components []string, opts AddOptions) error {
 		}
 	}
 	if len(components) == 0 {
-		return fmt.Errorf("no components specified. Usage: templui add <component>... (or --all)")
+		return fmt.Errorf("no components specified. Usage: shadcn-templ add <component>... (or --all)")
 	}
 
 	return addComponents(components, config, registryURL, addComponentsOptions{

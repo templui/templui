@@ -16,7 +16,7 @@ description: A set of two-state buttons that can be toggled on or off.
 <TabsContent value="cli">
 
 ```bash
-templui add toggle-group
+shadcn-templ add toggle-group
 ```
 
 </TabsContent>

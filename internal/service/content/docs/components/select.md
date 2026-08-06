@@ -16,7 +16,7 @@ description: Displays a list of options for the user to pick from, triggered by 
 <TabsContent value="cli">
 
 ```bash
-templui add select
+shadcn-templ add select
 ```
 
 </TabsContent>

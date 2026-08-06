@@ -16,7 +16,7 @@ description: Displays content within a desired ratio.
 <TabsContent value="cli">
 
 ```bash
-templui add aspect-ratio
+shadcn-templ add aspect-ratio
 ```
 
 </TabsContent>

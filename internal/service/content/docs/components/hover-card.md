@@ -16,7 +16,7 @@ description: For sighted users to preview content available behind a link.
 <TabsContent value="cli">
 
 ```bash
-templui add hover-card
+shadcn-templ add hover-card
 ```
 
 </TabsContent>

@@ -31,7 +31,7 @@ import (
 
 <Callout className="mt-6">
 
-Alias paths are Go import paths and must live under the `module` path of your `go.mod`. `templui init` derives them for you.
+Alias paths are Go import paths and must live under the `module` path of your `go.mod`. `shadcn-templ init` derives them for you.
 
 </Callout>
 
@@ -61,7 +61,7 @@ module your-app
 
 ### Configure `components.json`
 
-Run `templui init` to write `components.json`. It derives the aliases from your `go.mod` module path.
+Run `shadcn-templ init` to write `components.json`. It derives the aliases from your `go.mod` module path.
 
 ```json title="components.json"
 {
@@ -77,7 +77,7 @@ The `components` alias is the import path components install under. The `utils` 
 ### Add components
 
 ```shell
-templui add button
+shadcn-templ add button
 ```
 
 The CLI resolves registry dependencies recursively and rewrites all imports — `github.com/axadrn/shadcn-templ/v2/components/...` and `github.com/axadrn/shadcn-templ/v2/utils` — to your aliases.
@@ -92,4 +92,4 @@ If Go cannot resolve an import after adding components, check that:
 - you ran `templ generate` and `go mod tidy` after adding
 - the component directory exists under the path the `components` alias points to
 
-If a component is installed but its imports still point at the wrong module path, fix the `aliases` in `components.json` and re-run `templui add <component> --overwrite`.
+If a component is installed but its imports still point at the wrong module path, fix the `aliases` in `components.json` and re-run `shadcn-templ add <component> --overwrite`.

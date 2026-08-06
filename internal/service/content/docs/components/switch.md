@@ -16,7 +16,7 @@ description: A control that allows the user to toggle between checked and not ch
 <TabsContent value="cli">
 
 ```bash
-templui add switch
+shadcn-templ add switch
 ```
 
 </TabsContent>

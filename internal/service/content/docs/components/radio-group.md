@@ -16,7 +16,7 @@ description: A set of checkable buttons, known as radio buttons, where no more t
 <TabsContent value="cli">
 
 ```bash
-templui add radio-group
+shadcn-templ add radio-group
 ```
 
 </TabsContent>

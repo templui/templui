@@ -16,7 +16,7 @@ description: Displays a menu to the user, such as a set of actions or functions,
 <TabsContent value="cli">
 
 ```bash
-templui add dropdown-menu
+shadcn-templ add dropdown-menu
 ```
 
 </TabsContent>

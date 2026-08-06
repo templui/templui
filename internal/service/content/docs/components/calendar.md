@@ -16,7 +16,7 @@ description: A calendar component that allows users to select a date or a range 
 <TabsContent value="cli">
 
 ```bash
-templui add calendar
+shadcn-templ add calendar
 ```
 
 </TabsContent>

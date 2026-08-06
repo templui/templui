@@ -16,7 +16,7 @@ description: An indicator that can be used to show a loading state.
 <TabsContent value="cli">
 
 ```bash
-templui add spinner
+shadcn-templ add spinner
 ```
 
 </TabsContent>

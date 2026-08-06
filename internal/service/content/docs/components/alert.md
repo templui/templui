@@ -16,7 +16,7 @@ description: Displays a callout for user attention.
 <TabsContent value="cli">
 
 ```bash
-templui add alert
+shadcn-templ add alert
 ```
 
 </TabsContent>

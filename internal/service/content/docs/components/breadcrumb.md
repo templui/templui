@@ -16,7 +16,7 @@ description: Displays the path to the current resource using a hierarchy of link
 <TabsContent value="cli">
 
 ```bash
-templui add breadcrumb
+shadcn-templ add breadcrumb
 ```
 
 </TabsContent>

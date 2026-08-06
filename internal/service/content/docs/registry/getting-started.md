@@ -75,12 +75,12 @@ After your registry is being served, test it with the same CLI commands that oth
 
 ### Using `--registry`
 
-Point the CLI at the registry base URL. The `TEMPLUI_REGISTRY` environment variable works the same way, below the flag.
+Point the CLI at the registry base URL. The `SHADCN_TEMPL_REGISTRY` environment variable works the same way, below the flag.
 
 #### Initialize a project
 
 ```shell
-templui init --preset nova --registry http://localhost:8090
+shadcn-templ init --preset nova --registry http://localhost:8090
 ```
 
 #### Add an item
@@ -88,13 +88,13 @@ templui init --preset nova --registry http://localhost:8090
 To test the install flow, run `add` from a project where you want to install the item.
 
 ```shell
-templui add button --registry http://localhost:8090
+shadcn-templ add button --registry http://localhost:8090
 ```
 
 #### Apply a preset
 
 ```shell
-templui apply nova --registry http://localhost:8090
+shadcn-templ apply nova --registry http://localhost:8090
 ```
 
 ### Using URL
@@ -102,7 +102,7 @@ templui apply nova --registry http://localhost:8090
 Item URLs work directly, bypassing the configured style resolution.
 
 ```shell
-templui add http://localhost:8090/r/styles/base-nova/button.json
+shadcn-templ add http://localhost:8090/r/styles/base-nova/button.json
 ```
 
 ## Guidelines

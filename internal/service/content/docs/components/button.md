@@ -16,7 +16,7 @@ description: Displays a button or a component that looks like a button.
 <TabsContent value="cli">
 
 ```bash
-templui add button
+shadcn-templ add button
 ```
 
 </TabsContent>

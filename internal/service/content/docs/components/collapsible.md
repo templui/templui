@@ -16,7 +16,7 @@ description: An interactive component which expands/collapses a panel.
 <TabsContent value="cli">
 
 ```bash
-templui add collapsible
+shadcn-templ add collapsible
 ```
 
 </TabsContent>

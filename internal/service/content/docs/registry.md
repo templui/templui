@@ -7,7 +7,7 @@ templui distributes its code through a registry. The registry allows the `templu
 
 <Callout>
 
-**Note:** The registry is a set of plain JSON endpoints. Any server that serves the same JSON shapes works as a registry — the CLI can be pointed at it with `--registry` or the `TEMPLUI_REGISTRY` environment variable.
+**Note:** The registry is a set of plain JSON endpoints. Any server that serves the same JSON shapes works as a registry — the CLI can be pointed at it with `--registry` or the `SHADCN_TEMPL_REGISTRY` environment variable.
 
 </Callout>
 

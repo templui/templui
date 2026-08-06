@@ -16,7 +16,7 @@ description: Pagination with page navigation, next and previous links.
 <TabsContent value="cli">
 
 ```bash
-templui add pagination
+shadcn-templ add pagination
 ```
 
 </TabsContent>

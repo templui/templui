@@ -16,7 +16,7 @@ description: A succinct message that is displayed temporarily.
 <TabsContent value="cli">
 
 ```bash
-templui add toast
+shadcn-templ add toast
 ```
 
 </TabsContent>

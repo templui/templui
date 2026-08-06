@@ -25,7 +25,7 @@
 //	aliases.ui/lib/hooks:  dropped; templui has no separate ui/lib/hooks dirs
 //	registries:            dropped; there are no third-party templui
 //	                       registries (the --registry flag and
-//	                       TEMPLUI_REGISTRY env cover local dev)
+//	                       SHADCN_TEMPL_REGISTRY env cover local dev)
 package utils
 
 import (

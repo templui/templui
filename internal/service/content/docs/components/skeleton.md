@@ -16,7 +16,7 @@ description: Use to show a placeholder while content is loading.
 <TabsContent value="cli">
 
 ```bash
-templui add skeleton
+shadcn-templ add skeleton
 ```
 
 </TabsContent>

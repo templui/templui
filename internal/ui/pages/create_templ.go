@@ -3854,7 +3854,7 @@ func createResetDialog() templ.Component {
 }
 
 // APPLY_MODES verbatim from project-form.tsx: the radio driving the
-// `templui apply --preset <code> [--only theme|font]` command.
+// `shadcn-templ apply --preset <code> [--only theme|font]` command.
 var createApplyModes = []struct{ Value, Title, Description string }{
 	{"full", "Full preset", "Everything from the preset, including components, theme, and fonts."},
 	{"theme", "Theme only", "Theme tokens only, like colors, radii, and shadows. Components stay as they are."},
@@ -3867,11 +3867,11 @@ var createApplyModes = []struct{ Value, Title, Description string }{
 //
 // Deliberate omissions against the tsx, all npm-only: the framework template
 // grid, the Base component-library grid and the pointer/monorepo/RTL switches
-// (templui init scaffolds no frameworks and takes no such flags), and the
+// (shadcn-templ init scaffolds no frameworks and takes no such flags), and the
 // package manager Tabs (Go has exactly one toolchain), so each command
 // renders in a single box with a static "templui" label where the pm TabsList
-// sits. The commands are the real CLI: `templui init --preset <code>` and
-// `templui apply --preset <code> [--only theme|font]`.
+// sits. The commands are the real CLI: `shadcn-templ init --preset <code>` and
+// `shadcn-templ apply --preset <code> [--only theme|font]`.
 func createCodeDialog() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -4107,7 +4107,7 @@ func createCodeDialog() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 178, "Scaffolds a new templ project with this preset. Get the CLI with <code class=\"font-mono\">go install github.com/axadrn/shadcn-templ/v2/cmd/templui@latest</code>.")
+							templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 178, "Scaffolds a new templ project with this preset. Get the CLI with <code class=\"font-mono\">go install github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ@latest</code>.")
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -4145,7 +4145,7 @@ func createCodeDialog() templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = createCommandBox("command", "init", "templui init -t templ --preset b0").Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = createCommandBox("command", "init", "shadcn-templ init -t templ --preset b0").Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -4275,7 +4275,7 @@ func createCodeDialog() templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = createCommandBox("apply", "apply", "templui apply --preset b0").Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = createCommandBox("apply", "apply", "shadcn-templ apply --preset b0").Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

@@ -16,7 +16,7 @@ description: Displays rich content in a portal, triggered by a button.
 <TabsContent value="cli">
 
 ```bash
-templui add popover
+shadcn-templ add popover
 ```
 
 </TabsContent>

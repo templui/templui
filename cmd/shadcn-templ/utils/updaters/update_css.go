@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/registry"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/registry"
 	templuiutils "github.com/axadrn/shadcn-templ/v2/utils"
 )
 

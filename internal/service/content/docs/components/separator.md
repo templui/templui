@@ -16,7 +16,7 @@ description: Visually or semantically separates content.
 <TabsContent value="cli">
 
 ```bash
-templui add separator
+shadcn-templ add separator
 ```
 
 </TabsContent>

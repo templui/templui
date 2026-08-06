@@ -16,7 +16,7 @@ description: A popup that displays information related to an element when the el
 <TabsContent value="cli">
 
 ```bash
-templui add tooltip
+shadcn-templ add tooltip
 ```
 
 </TabsContent>

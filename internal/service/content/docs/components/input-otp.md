@@ -20,7 +20,7 @@ The `InputOTP` component is a native templ and vanilla JavaScript implementation
 <TabsContent value="cli">
 
 ```bash
-templui add input-otp
+shadcn-templ add input-otp
 ```
 
 </TabsContent>

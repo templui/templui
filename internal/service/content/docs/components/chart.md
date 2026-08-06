@@ -47,7 +47,7 @@ The runtime watches the DOM, so charts arriving through htmx or Datastar swaps r
 <TabsContent value="cli">
 
 ```bash
-templui add chart
+shadcn-templ add chart
 ```
 
 </TabsContent>

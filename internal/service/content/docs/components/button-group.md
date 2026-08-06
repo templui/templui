@@ -16,7 +16,7 @@ description: A container that groups related buttons together with consistent st
 <TabsContent value="cli">
 
 ```bash
-templui add button-group
+shadcn-templ add button-group
 ```
 
 </TabsContent>

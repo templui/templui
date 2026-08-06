@@ -12,8 +12,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/registry"
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/utils"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/registry"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/utils"
 )
 
 // UpdateFilesOptions mirrors the update-files.ts options the CLI uses.

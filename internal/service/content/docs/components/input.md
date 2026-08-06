@@ -16,7 +16,7 @@ description: Displays a form input field or a component that looks like an input
 <TabsContent value="cli">
 
 ```bash
-templui add input
+shadcn-templ add input
 ```
 
 </TabsContent>

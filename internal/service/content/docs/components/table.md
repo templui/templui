@@ -16,7 +16,7 @@ description: A responsive table component.
 <TabsContent value="cli">
 
 ```bash
-templui add table
+shadcn-templ add table
 ```
 
 </TabsContent>

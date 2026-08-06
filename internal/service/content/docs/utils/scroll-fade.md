@@ -5,7 +5,7 @@ description: "Utilities for adding a fade effect to the edges of a scroll contai
 
 ## Installation
 
-If your project was set up with `templui init`, you already have `scroll-fade`. It ships in the vendored `shadcn-tailwind.css`, which the CLI imports in your Tailwind entry file.
+If your project was set up with `shadcn-templ init`, you already have `scroll-fade`. It ships in the vendored `shadcn-tailwind.css`, which the CLI imports in your Tailwind entry file.
 
 Otherwise, vendor the stylesheet next to your Tailwind entry file:
 

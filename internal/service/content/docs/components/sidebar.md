@@ -22,7 +22,7 @@ Customizable.
 <TabsContent value="cli">
 
 ```bash
-templui add sidebar
+shadcn-templ add sidebar
 ```
 
 </TabsContent>

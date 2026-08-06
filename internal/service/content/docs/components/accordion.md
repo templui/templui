@@ -16,7 +16,7 @@ description: A vertically stacked set of interactive headings that each reveal a
 <TabsContent value="cli">
 
 ```bash
-templui add accordion
+shadcn-templ add accordion
 ```
 
 </TabsContent>

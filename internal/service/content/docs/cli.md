@@ -7,7 +7,7 @@ order: 7
 The CLI installs the Go way and updates itself the same way:
 
 ```shell
-go install github.com/axadrn/shadcn-templ/v2/cmd/templui@latest
+go install github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ@latest
 ```
 
 ## init
@@ -17,20 +17,20 @@ Use the `init` command to initialize configuration and dependencies for an exist
 The `init` command writes `components.json`, adds the shared `utils` package, merges the theme CSS variables into your Tailwind entry file and vendors the shared stylesheets next to it. A `go.mod` is required.
 
 ```shell
-templui init
+shadcn-templ init
 ```
 
 Pick a design on [templui.io/create](/create) and pass its preset code or URL, or use one of the named presets (`nova`, `vega`, `maia`, `lyra`, `mira`, `luma`, `sera`, `rhea`):
 
 ```shell
-templui init --preset b2D0wqNxT
+shadcn-templ init --preset b2D0wqNxT
 ```
 
 **Options**
 
 ```shell
 Usage:
-  templui init [--preset <code|url|name>] [--base-color <color>] [--css <path>] [--force] [--silent] [--registry <url>]
+  shadcn-templ init [--preset <code|url|name>] [--base-color <color>] [--css <path>] [--force] [--silent] [--registry <url>]
 
 Options:
   -p, --preset <code|url|name>  use a preset configuration (code, URL or name)
@@ -38,7 +38,7 @@ Options:
   --css <path>                  path to your Tailwind CSS entry file
   -f, --force                   force overwrite of existing configuration
   -s, --silent                  mute output
-  --registry <url>              registry URL (default https://v2.templui.io, env TEMPLUI_REGISTRY)
+  --registry <url>              registry URL (default https://v2.templui.io, env SHADCN_TEMPL_REGISTRY)
   -c, --cwd <cwd>               the working directory (default ".")
 ```
 
@@ -47,7 +47,7 @@ Options:
 Use the `add` command to add components and dependencies to your project.
 
 ```shell
-templui add [component]
+shadcn-templ add [component]
 ```
 
 The CLI resolves registry dependencies recursively (for example `alert-dialog` pulls in `button` and `dialog`) and rewrites all imports to your module. After adding, run `templ generate` and `go mod tidy` to complete the install.
@@ -58,14 +58,14 @@ Existing files are never overwritten silently; re-run with `--overwrite` to upda
 
 ```shell
 Usage:
-  templui add <components...|url> [--all] [--overwrite] [--path <path>] [--silent] [--registry <url>]
+  shadcn-templ add <components...|url> [--all] [--overwrite] [--path <path>] [--silent] [--registry <url>]
 
 Options:
   -a, --all        add all available components
   -o, --overwrite  overwrite existing files
   -p, --path <path>  the path to add the component to
   -s, --silent     mute output
-  --registry <url>  registry URL (default https://v2.templui.io, env TEMPLUI_REGISTRY)
+  --registry <url>  registry URL (default https://v2.templui.io, env SHADCN_TEMPL_REGISTRY)
   -c, --cwd <cwd>  the working directory (default ".")
 ```
 
@@ -74,13 +74,13 @@ Options:
 Use the `apply` command to apply a preset to an existing project.
 
 ```shell
-templui apply b2D0wqNxT
+shadcn-templ apply b2D0wqNxT
 ```
 
 Without `--only` this rewrites your `components.json`, your CSS variables and re-installs every installed component in the new style. You can apply only the theme or fonts from a preset without reinstalling components:
 
 ```shell
-templui apply b2D0wqNxT --only theme
+shadcn-templ apply b2D0wqNxT --only theme
 ```
 
 Supported values for `--only` are `theme` and `font`, also combined as `--only theme,font`.
@@ -89,14 +89,14 @@ Supported values for `--only` are `theme` and `font`, also combined as `--only t
 
 ```shell
 Usage:
-  templui apply <preset> [--only theme|font] [--yes] [--silent] [--registry <url>]
+  shadcn-templ apply <preset> [--only theme|font] [--yes] [--silent] [--registry <url>]
 
 Options:
   --preset <preset>  preset configuration to apply
   --only <parts>     apply only parts of a preset: theme, font
   -y, --yes          skip confirmation prompt
   -s, --silent       mute output
-  --registry <url>   registry URL (default https://v2.templui.io, env TEMPLUI_REGISTRY)
+  --registry <url>   registry URL (default https://v2.templui.io, env SHADCN_TEMPL_REGISTRY)
   -c, --cwd <cwd>    the working directory (default ".")
 ```
 
@@ -105,7 +105,7 @@ Options:
 Use the `preset` command to inspect preset codes and resolve the preset for an existing project.
 
 ```shell
-templui preset decode b2D0wqNxT
+shadcn-templ preset decode b2D0wqNxT
 ```
 
 ### preset decode
@@ -113,14 +113,14 @@ templui preset decode b2D0wqNxT
 Use `preset decode` to decode a preset code and print the design it encodes.
 
 ```shell
-templui preset decode b2D0wqNxT
+shadcn-templ preset decode b2D0wqNxT
 ```
 
 **Options**
 
 ```shell
 Usage:
-  templui preset decode <code>
+  shadcn-templ preset decode <code>
 
 Options:
   --json  output as JSON
@@ -131,20 +131,20 @@ Options:
 Use `preset resolve` to resolve the preset from the current project, reconstructed from `components.json` and your Tailwind entry file.
 
 ```shell
-templui preset resolve
+shadcn-templ preset resolve
 ```
 
 The `preset info` command is an alias for `preset resolve`:
 
 ```shell
-templui preset info
+shadcn-templ preset info
 ```
 
 **Options**
 
 ```shell
 Usage:
-  templui preset resolve [--json]
+  shadcn-templ preset resolve [--json]
 
 Options:
   --json           output as JSON
@@ -156,7 +156,7 @@ Options:
 Use `preset url` to print the create URL for a preset code.
 
 ```shell
-templui preset url b2D0wqNxT
+shadcn-templ preset url b2D0wqNxT
 ```
 
 ```shell
@@ -168,5 +168,5 @@ https://templui.io/create?preset=b2D0wqNxT
 The CLI updates itself the Go way:
 
 ```shell
-go install github.com/axadrn/shadcn-templ/v2/cmd/templui@latest
+go install github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ@latest
 ```

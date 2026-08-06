@@ -16,7 +16,7 @@ description: Displays a menu located at the pointer, triggered by a right click 
 <TabsContent value="cli">
 
 ```bash
-templui add context-menu
+shadcn-templ add context-menu
 ```
 
 </TabsContent>

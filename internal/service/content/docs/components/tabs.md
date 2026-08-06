@@ -16,7 +16,7 @@ description: A set of layered sections of content—known as tab panels—that a
 <TabsContent value="cli">
 
 ```bash
-templui add tabs
+shadcn-templ add tabs
 ```
 
 </TabsContent>

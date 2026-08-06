@@ -16,7 +16,7 @@ description: A wrapper for Lucide Icons that is primarily styled with Tailwind u
 <TabsContent value="cli">
 
 ```bash
-templui add icon
+shadcn-templ add icon
 ```
 
 </TabsContent>

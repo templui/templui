@@ -16,12 +16,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/registry"
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/utils"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/registry"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/utils"
 	"github.com/axadrn/shadcn-templ/v2/internal/preset"
 )
 
-// ApplyOptions are the flags of templui apply.
+// ApplyOptions are the flags of shadcn-templ apply.
 type ApplyOptions struct {
 	Cwd      string
 	Preset   string
@@ -76,13 +76,13 @@ func parseApplyOnlyParts(value string) ([]string, error) {
 		}
 	}
 	if len(parts) == 0 || invalid {
-		return nil, fmt.Errorf("invalid value for --only: %s.\nUse one or more of: %s.\nExample: templui apply <preset> --only theme,font",
+		return nil, fmt.Errorf("invalid value for --only: %s.\nUse one or more of: %s.\nExample: shadcn-templ apply <preset> --only theme,font",
 			value, strings.Join(applyOnlyValues, ", "))
 	}
 	return parts, nil
 }
 
-// RunApply executes templui apply.
+// RunApply executes shadcn-templ apply.
 func RunApply(positional []string, opts ApplyOptions) error {
 	cwd, err := filepath.Abs(opts.Cwd)
 	if err != nil {
@@ -93,7 +93,7 @@ func RunApply(positional []string, opts ApplyOptions) error {
 	// Positional preset vs --preset, the resolveApplyPreset pendant.
 	presetArg := opts.Preset
 	if len(positional) > 1 {
-		return fmt.Errorf("too many arguments. Usage: templui apply <preset>")
+		return fmt.Errorf("too many arguments. Usage: shadcn-templ apply <preset>")
 	}
 	if len(positional) == 1 {
 		positionalPreset := strings.TrimSpace(positional[0])
@@ -107,14 +107,14 @@ func RunApply(positional []string, opts ApplyOptions) error {
 	var only []string
 	if opts.OnlySet {
 		if opts.Only == "" {
-			return fmt.Errorf("missing value for --only.\nUse one or more of: %s.\nExample: templui apply <preset> --only theme,font", strings.Join(applyOnlyValues, ", "))
+			return fmt.Errorf("missing value for --only.\nUse one or more of: %s.\nExample: shadcn-templ apply <preset> --only theme,font", strings.Join(applyOnlyValues, ", "))
 		}
 		only, err = parseApplyOnlyParts(opts.Only)
 		if err != nil {
 			return err
 		}
 		if presetArg == "" {
-			return fmt.Errorf("missing preset for --only.\nUse: templui apply <preset> --only theme,font")
+			return fmt.Errorf("missing preset for --only.\nUse: shadcn-templ apply <preset> --only theme,font")
 		}
 	}
 
@@ -123,14 +123,14 @@ func RunApply(positional []string, opts ApplyOptions) error {
 		return err
 	}
 	if config == nil {
-		return fmt.Errorf("no %s found at %s. Run 'templui init' first", utils.ConfigFileName, cwd)
+		return fmt.Errorf("no %s found at %s. Run 'shadcn-templ init' first", utils.ConfigFileName, cwd)
 	}
 
 	// No preset: point at the preset builder, the promptToOpenPresetBuilder
 	// pendant without the browser open.
 	if presetArg == "" {
 		fmt.Printf("\n  Build your custom preset on %s/create\n", registry.SiteURL)
-		fmt.Println("  Then run templui apply --preset <preset> with the preset code or preset URL.")
+		fmt.Println("  Then run shadcn-templ apply --preset <preset> with the preset code or preset URL.")
 		return nil
 	}
 

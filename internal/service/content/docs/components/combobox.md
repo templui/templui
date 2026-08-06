@@ -16,7 +16,7 @@ description: Autocomplete input with a list of suggestions.
 <TabsContent value="cli">
 
 ```bash
-templui add combobox
+shadcn-templ add combobox
 ```
 
 </TabsContent>

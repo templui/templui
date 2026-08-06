@@ -30,7 +30,7 @@ _In a typical library, if you need to change a button's behavior, you have to ov
 
 <Callout className="mt-6">
 
-**How do I pull upstream updates in an Open Code approach?** The behavior core of every component is ported from headless sources like Base UI into its script and kept current by the CLI: fixes arrive through `templui add` and the upgrade command. The topmost layer, the one closest to your design system, is not coupled with that implementation. It stays open for modification.
+**How do I pull upstream updates in an Open Code approach?** The behavior core of every component is ported from headless sources like Base UI into its script and kept current by the CLI: fixes arrive through `shadcn-templ add` and the upgrade command. The topmost layer, the one closest to your design system, is not coupled with that implementation. It stays open for modification.
 
 </Callout>
 

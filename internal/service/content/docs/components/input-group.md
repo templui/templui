@@ -16,7 +16,7 @@ description: Display additional information or actions to an input or textarea.
 <TabsContent value="cli">
 
 ```bash
-templui add input-group
+shadcn-templ add input-group
 ```
 
 </TabsContent>

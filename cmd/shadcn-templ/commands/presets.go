@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/registry"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/registry"
 	"github.com/axadrn/shadcn-templ/v2/internal/preset"
 )
 

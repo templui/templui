@@ -16,7 +16,7 @@ description: Displays a badge or a component that looks like a badge.
 <TabsContent value="cli">
 
 ```bash
-templui add badge
+shadcn-templ add badge
 ```
 
 </TabsContent>

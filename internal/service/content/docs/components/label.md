@@ -16,7 +16,7 @@ description: Renders an accessible label associated with controls.
 <TabsContent value="cli">
 
 ```bash
-templui add label
+shadcn-templ add label
 ```
 
 </TabsContent>

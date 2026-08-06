@@ -1,12 +1,12 @@
-// The templui CLI, the pendant of shadcn/src/index.ts: command wiring for
+// The shadcn-templ CLI, the pendant of shadcn/src/index.ts: command wiring for
 // init, add, apply and preset. Commands live in ./commands, one file per
 // command like the reference.
 //
 // Reference commands without a pendant-meaningful equivalent are dropped:
 // diff/docs/view/search/migrate/eject/info/build/mcp/registry (they cover
 // npm registries, React codemods and MCP servers). shadcn has no plain
-// `list` either, so templui's old list command is gone; upgrade is
-// `go install github.com/axadrn/shadcn-templ/v2/cmd/templui@latest`.
+// `list` either, so the old templui list command is gone; upgrade is
+// `go install github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ@latest`.
 package main
 
 import (
@@ -15,7 +15,7 @@ import (
 	"os"
 	"runtime/debug"
 
-	"github.com/axadrn/shadcn-templ/v2/cmd/templui/commands"
+	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/commands"
 )
 
 // version is detected from build info (module version for go install,
@@ -49,19 +49,19 @@ func version() string {
 	return "dev"
 }
 
-const usage = `templui - add components and dependencies to your project
+const usage = `shadcn-templ - add components and dependencies to your project
 
 Usage:
-  templui init [name] [--template <templ>] [--preset <code|url|name>] [--base-color <color>] [--css <path>] [--force] [--silent] [--registry <url>]
-  templui add <components...|url> [--all] [--overwrite] [--path <path>] [--silent] [--registry <url>]
-  templui apply <preset> [--only theme|font] [--yes] [--silent] [--registry <url>]
-  templui preset decode <code> [--json]
-  templui preset resolve [--json]
-  templui preset url <code>
-  templui -v, --version
+  shadcn-templ init [name] [--template <templ>] [--preset <code|url|name>] [--base-color <color>] [--css <path>] [--force] [--silent] [--registry <url>]
+  shadcn-templ add <components...|url> [--all] [--overwrite] [--path <path>] [--silent] [--registry <url>]
+  shadcn-templ apply <preset> [--only theme|font] [--yes] [--silent] [--registry <url>]
+  shadcn-templ preset decode <code> [--json]
+  shadcn-templ preset resolve [--json]
+  shadcn-templ preset url <code>
+  shadcn-templ -v, --version
 
 The registry defaults to ` + "https://templui.io" + ` and can be overridden with
---registry or the TEMPLUI_REGISTRY environment variable.`
+--registry or the SHADCN_TEMPL_REGISTRY environment variable.`
 
 // parseFlags parses a FlagSet over args, collecting positional arguments
 // even when they are interleaved with flags.
@@ -90,7 +90,7 @@ func main() {
 	var err error
 	switch args[0] {
 	case "-v", "--version", "version":
-		fmt.Printf("templui %s\n", version())
+		fmt.Printf("shadcn-templ %s\n", version())
 	case "-h", "--help", "help":
 		fmt.Println(usage)
 	case "init":
@@ -136,7 +136,7 @@ func main() {
 // runPreset dispatches the preset subcommands (decode, resolve, url).
 func runPreset(args []string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("usage: templui preset <decode|resolve|url>")
+		return fmt.Errorf("usage: shadcn-templ preset <decode|resolve|url>")
 	}
 
 	switch args[0] {
@@ -148,7 +148,7 @@ func runPreset(args []string) error {
 			return err
 		}
 		if len(positional) != 1 {
-			return fmt.Errorf("usage: templui preset decode <code>")
+			return fmt.Errorf("usage: shadcn-templ preset decode <code>")
 		}
 		return commands.RunPresetDecode(positional[0], *jsonOut)
 	case "resolve", "info":
@@ -160,7 +160,7 @@ func runPreset(args []string) error {
 		return commands.RunPresetResolve(opts)
 	case "url":
 		if len(args) != 2 {
-			return fmt.Errorf("usage: templui preset url <code>")
+			return fmt.Errorf("usage: shadcn-templ preset url <code>")
 		}
 		return commands.RunPresetURL(args[1])
 	default:

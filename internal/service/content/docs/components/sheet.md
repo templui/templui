@@ -16,7 +16,7 @@ description: Extends the Dialog component to display content that complements th
 <TabsContent value="cli">
 
 ```bash
-templui add sheet
+shadcn-templ add sheet
 ```
 
 </TabsContent>
