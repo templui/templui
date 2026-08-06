@@ -1,0 +1,592 @@
+package dashboard01
+
+import (
+	"fmt"
+
+	"github.com/axadrn/shadcn-templ/v2/components/badge"
+	"github.com/axadrn/shadcn-templ/v2/components/button"
+	"github.com/axadrn/shadcn-templ/v2/components/chart"
+	"github.com/axadrn/shadcn-templ/v2/components/checkbox"
+	"github.com/axadrn/shadcn-templ/v2/components/drawer"
+	"github.com/axadrn/shadcn-templ/v2/components/dropdownmenu"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/input"
+	"github.com/axadrn/shadcn-templ/v2/components/label"
+	selectcomp "github.com/axadrn/shadcn-templ/v2/components/select"
+	"github.com/axadrn/shadcn-templ/v2/components/separator"
+	"github.com/axadrn/shadcn-templ/v2/components/table"
+	"github.com/axadrn/shadcn-templ/v2/components/tabs"
+)
+
+// dataTablePageSize is the pendant of the pagination state's pageSize.
+const dataTablePageSize = 10
+
+// dataTableHideableColumns are the columns the Customize Columns menu
+// lists in the tsx: every accessor column that can hide.
+var dataTableHideableColumns = []string{"type", "status", "target", "limit", "reviewer"}
+
+var dataTableViews = []struct {
+	Value string
+	Label string
+}{
+	{"outline", "Outline"},
+	{"past-performance", "Past Performance"},
+	{"key-personnel", "Key Personnel"},
+	{"focus-documents", "Focus Documents"},
+}
+
+func dataTablePageCount(data []Item) int {
+	return (len(data) + dataTablePageSize - 1) / dataTablePageSize
+}
+
+func dataTableFirstPage(data []Item) []Item {
+	if len(data) > dataTablePageSize {
+		return data[:dataTablePageSize]
+	}
+	return data
+}
+
+templ DataTable(data []Item) {
+	@tabs.Tabs(tabs.Props{
+		DefaultValue: "outline",
+		Class:        "w-full flex-col justify-start gap-6",
+	}) {
+		<div class="flex items-center justify-between px-4 lg:px-6">
+			@label.Label(label.Props{For: "view-selector", Class: "sr-only"}) {
+				View
+			}
+			// The view select is static: it mirrors the tabs but does not
+			// switch them (the tsx does not wire it to the tabs either).
+			@selectcomp.Select(selectcomp.Props{Value: "outline"}) {
+				@selectcomp.Trigger(selectcomp.TriggerProps{
+					Class: "flex w-fit @4xl/main:hidden",
+					Size:  selectcomp.SizeSm,
+					ID:    "view-selector",
+				}) {
+					@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a view"})
+				}
+				@selectcomp.Content() {
+					for _, view := range dataTableViews {
+						@selectcomp.Item(selectcomp.ItemProps{Value: view.Value}) {
+							{ view.Label }
+						}
+					}
+				}
+			}
+			@tabs.List(tabs.ListProps{Class: "hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:bg-muted-foreground/30 **:data-[slot=badge]:px-1 @4xl/main:flex"}) {
+				@tabs.Trigger(tabs.TriggerProps{Value: "outline"}) {
+					Outline
+				}
+				@tabs.Trigger(tabs.TriggerProps{Value: "past-performance"}) {
+					Past Performance
+					@badge.Badge(badge.Props{Variant: badge.VariantSecondary}) {
+						3
+					}
+				}
+				@tabs.Trigger(tabs.TriggerProps{Value: "key-personnel"}) {
+					Key Personnel
+					@badge.Badge(badge.Props{Variant: badge.VariantSecondary}) {
+						2
+					}
+				}
+				@tabs.Trigger(tabs.TriggerProps{Value: "focus-documents"}) {
+					Focus Documents
+				}
+			}
+			<div class="flex items-center gap-2">
+				@dropdownmenu.DropdownMenu() {
+					@button.Button(button.Props{
+						Variant:    button.VariantOutline,
+						Size:       button.SizeSm,
+						Attributes: dropdownmenu.Trigger(ctx),
+					}) {
+						@icon.Columns2()
+						<span class="hidden lg:inline">Customize Columns</span>
+						<span class="lg:hidden">Columns</span>
+						@icon.ChevronDown()
+					}
+					@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignEnd, Class: "w-56"}) {
+						// Column visibility toggling is React table state and is
+						// omitted: the items render checked but do not hide columns.
+						for _, column := range dataTableHideableColumns {
+							@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{
+								Class:   "capitalize",
+								Checked: true,
+							}) {
+								{ column }
+							}
+						}
+					}
+				}
+				@button.Button(button.Props{Variant: button.VariantOutline, Size: button.SizeSm}) {
+					@icon.Plus()
+					<span class="hidden lg:inline">Add Section</span>
+				}
+			</div>
+		</div>
+		@tabs.Content(tabs.ContentProps{
+			Value: "outline",
+			Class: "relative flex flex-col gap-4 overflow-auto px-4 lg:px-6",
+		}) {
+			<div class="overflow-hidden rounded-lg border">
+				// The dnd-kit DndContext/SortableContext drag&drop reordering
+				// is omitted: the rows render statically in data order.
+				@table.Table() {
+					@table.Header(table.HeaderProps{Class: "sticky top-0 z-10 bg-muted"}) {
+						@table.Row() {
+							@table.Head()
+							@table.Head() {
+								<div class="flex items-center justify-center">
+									@checkbox.Checkbox(checkbox.Props{
+										Attributes: templ.Attributes{"aria-label": "Select all"},
+									})
+								</div>
+							}
+							@table.Head() {
+								Header
+							}
+							@table.Head() {
+								Section Type
+							}
+							@table.Head() {
+								Status
+							}
+							@table.Head() {
+								<div class="w-full text-right">Target</div>
+							}
+							@table.Head() {
+								<div class="w-full text-right">Limit</div>
+							}
+							@table.Head() {
+								Reviewer
+							}
+							@table.Head()
+						}
+					}
+					@table.Body(table.BodyProps{Class: "**:data-[slot=table-cell]:first:w-8"}) {
+						if len(data) > 0 {
+							// The first page of rows; pagination clicks are React
+							// state and are omitted.
+							for _, item := range dataTableFirstPage(data) {
+								@dataTableRow(item)
+							}
+						} else {
+							@table.Row() {
+								@table.Cell(table.CellProps{
+									Class:      "h-24 text-center",
+									Attributes: templ.Attributes{"colspan": "9"},
+								}) {
+									No results.
+								}
+							}
+						}
+					}
+				}
+			</div>
+			<div class="flex items-center justify-between px-4">
+				<div class="hidden flex-1 text-sm text-muted-foreground lg:flex">
+					// Row selection is React table state and is omitted: the
+					// count renders statically.
+					0 of { fmt.Sprint(len(data)) } row(s) selected.
+				</div>
+				<div class="flex w-full items-center gap-8 lg:w-fit">
+					<div class="hidden items-center gap-2 lg:flex">
+						@label.Label(label.Props{For: "rows-per-page", Class: "text-sm font-medium"}) {
+							Rows per page
+						}
+						// The tsx passes side="top" to the SelectContent; the
+						// templ select has no side prop, the content aligns to
+						// the trigger.
+						@selectcomp.Select(selectcomp.Props{Value: "10"}) {
+							@selectcomp.Trigger(selectcomp.TriggerProps{
+								Size:  selectcomp.SizeSm,
+								Class: "w-20",
+								ID:    "rows-per-page",
+							}) {
+								@selectcomp.Value(selectcomp.ValueProps{Placeholder: "10"})
+							}
+							@selectcomp.Content() {
+								for _, pageSize := range []string{"10", "20", "30", "40", "50"} {
+									@selectcomp.Item(selectcomp.ItemProps{Value: pageSize}) {
+										{ pageSize }
+									}
+								}
+							}
+						}
+					</div>
+					<div class="flex w-fit items-center justify-center text-sm font-medium">
+						Page 1 of { fmt.Sprint(dataTablePageCount(data)) }
+					</div>
+					<div class="ml-auto flex items-center gap-2 lg:ml-0">
+						@button.Button(button.Props{
+							Variant:  button.VariantOutline,
+							Class:    "hidden h-8 w-8 p-0 lg:flex",
+							Disabled: true,
+						}) {
+							<span class="sr-only">Go to first page</span>
+							@icon.ChevronsLeft()
+						}
+						@button.Button(button.Props{
+							Variant:  button.VariantOutline,
+							Class:    "size-8",
+							Size:     button.SizeIcon,
+							Disabled: true,
+						}) {
+							<span class="sr-only">Go to previous page</span>
+							@icon.ChevronLeft()
+						}
+						@button.Button(button.Props{
+							Variant: button.VariantOutline,
+							Class:   "size-8",
+							Size:    button.SizeIcon,
+						}) {
+							<span class="sr-only">Go to next page</span>
+							@icon.ChevronRight()
+						}
+						@button.Button(button.Props{
+							Variant: button.VariantOutline,
+							Class:   "hidden size-8 lg:flex",
+							Size:    button.SizeIcon,
+						}) {
+							<span class="sr-only">Go to last page</span>
+							@icon.ChevronsRight()
+						}
+					</div>
+				</div>
+			</div>
+		}
+		@tabs.Content(tabs.ContentProps{
+			Value: "past-performance",
+			Class: "flex flex-col px-4 lg:px-6",
+		}) {
+			<div class="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
+		}
+		@tabs.Content(tabs.ContentProps{Value: "key-personnel", Class: "flex flex-col px-4 lg:px-6"}) {
+			<div class="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
+		}
+		@tabs.Content(tabs.ContentProps{
+			Value: "focus-documents",
+			Class: "flex flex-col px-4 lg:px-6",
+		}) {
+			<div class="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
+		}
+	}
+}
+
+templ dataTableRow(item Item) {
+	@table.Row(table.RowProps{Class: "relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"}) {
+		@table.Cell() {
+			// The drag handle renders statically, dnd-kit sorting is omitted.
+			@button.Button(button.Props{
+				Variant: button.VariantGhost,
+				Size:    button.SizeIcon,
+				Class:   "size-7 text-muted-foreground hover:bg-transparent",
+			}) {
+				@icon.GripVertical(icon.Props{Class: "size-3 text-muted-foreground"})
+				<span class="sr-only">Drag to reorder</span>
+			}
+		}
+		@table.Cell() {
+			<div class="flex items-center justify-center">
+				@checkbox.Checkbox(checkbox.Props{
+					Attributes: templ.Attributes{"aria-label": "Select row"},
+				})
+			</div>
+		}
+		@table.Cell() {
+			@dataTableCellViewer(item)
+		}
+		@table.Cell() {
+			<div class="w-32">
+				@badge.Badge(badge.Props{Variant: badge.VariantOutline, Class: "px-1.5 text-muted-foreground"}) {
+					{ item.SectionType }
+				}
+			</div>
+		}
+		@table.Cell() {
+			@badge.Badge(badge.Props{Variant: badge.VariantOutline, Class: "px-1.5 text-muted-foreground"}) {
+				if item.Status == "Done" {
+					@icon.CircleCheck(icon.Props{Class: "fill-green-500 dark:fill-green-400"})
+				} else {
+					@icon.LoaderCircle()
+				}
+				{ item.Status }
+			}
+		}
+		@table.Cell() {
+			// The onSubmit toast.promise ("Saving …" / "Done") is omitted:
+			// the form renders statically.
+			<form>
+				@label.Label(label.Props{For: fmt.Sprintf("%d-target", item.ID), Class: "sr-only"}) {
+					Target
+				}
+				@input.Input(input.Props{
+					Class: "h-8 w-16 border-transparent bg-transparent text-right shadow-none hover:bg-input/30 focus-visible:border focus-visible:bg-background dark:bg-transparent dark:hover:bg-input/30 dark:focus-visible:bg-input/30",
+					Value: item.Target,
+					ID:    fmt.Sprintf("%d-target", item.ID),
+				})
+			</form>
+		}
+		@table.Cell() {
+			// The onSubmit toast.promise ("Saving …" / "Done") is omitted:
+			// the form renders statically.
+			<form>
+				@label.Label(label.Props{For: fmt.Sprintf("%d-limit", item.ID), Class: "sr-only"}) {
+					Limit
+				}
+				@input.Input(input.Props{
+					Class: "h-8 w-16 border-transparent bg-transparent text-right shadow-none hover:bg-input/30 focus-visible:border focus-visible:bg-background dark:bg-transparent dark:hover:bg-input/30 dark:focus-visible:bg-input/30",
+					Value: item.Limit,
+					ID:    fmt.Sprintf("%d-limit", item.ID),
+				})
+			</form>
+		}
+		@table.Cell() {
+			if item.Reviewer != "Assign reviewer" {
+				{ item.Reviewer }
+			} else {
+				@label.Label(label.Props{For: fmt.Sprintf("%d-reviewer", item.ID), Class: "sr-only"}) {
+					Reviewer
+				}
+				@selectcomp.Select() {
+					@selectcomp.Trigger(selectcomp.TriggerProps{
+						Class: "w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate",
+						Size:  selectcomp.SizeSm,
+						ID:    fmt.Sprintf("%d-reviewer", item.ID),
+					}) {
+						@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Assign reviewer"})
+					}
+					@selectcomp.Content(selectcomp.ContentProps{Align: selectcomp.AlignEnd}) {
+						@selectcomp.Item(selectcomp.ItemProps{Value: "Eddie Lake"}) {
+							Eddie Lake
+						}
+						@selectcomp.Item(selectcomp.ItemProps{Value: "Jamik Tashpulatov"}) {
+							Jamik Tashpulatov
+						}
+					}
+				}
+			}
+		}
+		@table.Cell() {
+			@dropdownmenu.DropdownMenu() {
+				@button.Button(button.Props{
+					Variant:    button.VariantGhost,
+					Class:      "flex size-8 text-muted-foreground data-[state=open]:bg-muted",
+					Size:       button.SizeIcon,
+					Attributes: dropdownmenu.Trigger(ctx),
+				}) {
+					@icon.EllipsisVertical()
+					<span class="sr-only">Open menu</span>
+				}
+				@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignEnd, Class: "w-32"}) {
+					@dropdownmenu.Item() {
+						Edit
+					}
+					@dropdownmenu.Item() {
+						Make a copy
+					}
+					@dropdownmenu.Item() {
+						Favorite
+					}
+					@dropdownmenu.Separator()
+					@dropdownmenu.Item(dropdownmenu.ItemProps{Variant: dropdownmenu.ItemVariantDestructive}) {
+						Delete
+					}
+				}
+			}
+		}
+	}
+}
+
+var dataTableCellViewerChartData = []chart.Datum{
+	{"month": "January", "desktop": 186, "mobile": 80},
+	{"month": "February", "desktop": 305, "mobile": 200},
+	{"month": "March", "desktop": 237, "mobile": 120},
+	{"month": "April", "desktop": 73, "mobile": 190},
+	{"month": "May", "desktop": 209, "mobile": 130},
+	{"month": "June", "desktop": 214, "mobile": 140},
+}
+
+var dataTableCellViewerChartConfig = chart.Config{
+	{Key: "desktop", Label: "Desktop", Color: "var(--primary)"},
+	{Key: "mobile", Label: "Mobile", Color: "var(--primary)"},
+}
+
+// dataTableCellViewerMonthShort is the tsx tickFormatter: value.slice(0, 3).
+func dataTableCellViewerMonthShort(v any) string {
+	s, _ := v.(string)
+	if len(s) > 3 {
+		return s[:3]
+	}
+	return s
+}
+
+templ dataTableCellViewer(item Item) {
+	// direction={isMobile ? "bottom" : "right"}: the useIsMobile switch is
+	// omitted, the drawer always opens from the right.
+	@drawer.Drawer(drawer.Props{SwipeDirection: drawer.SwipeDirectionRight}) {
+		@button.Button(button.Props{
+			Variant:    button.VariantLink,
+			Class:      "w-fit px-0 text-left text-foreground",
+			Attributes: drawer.Trigger(ctx),
+		}) {
+			{ item.Header }
+		}
+		@drawer.Content() {
+			@drawer.Header(drawer.HeaderProps{Class: "gap-1"}) {
+				@drawer.Title() {
+					{ item.Header }
+				}
+				@drawer.Description() {
+					Showing total visitors for the last 6 months
+				}
+			}
+			<div class="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
+				// The tsx renders the chart section only when !isMobile; the
+				// useIsMobile switch is omitted, it always renders.
+				@chart.Container(chart.ContainerProps{Config: dataTableCellViewerChartConfig}) {
+					@chart.AreaChart(chart.AreaChartProps{
+						AccessibilityLayer: true,
+						Data:               dataTableCellViewerChartData,
+						Margin:             &chart.Margin{Left: 0, Right: 10},
+					}) {
+						@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
+						@chart.XAxis(chart.XAxisProps{
+							DataKey:       "month",
+							TickMargin:    8,
+							TickFormatter: dataTableCellViewerMonthShort,
+							Hide:          true,
+						})
+						@chart.Tooltip(chart.TooltipProps{
+							Cursor:  chart.Bool(false),
+							Content: chart.TooltipContentProps{Indicator: "dot"},
+						})
+						@chart.Area(chart.AreaProps{
+							DataKey:     "mobile",
+							Type:        chart.CurveNatural,
+							Fill:        "var(--color-mobile)",
+							FillOpacity: 0.6,
+							Stroke:      "var(--color-mobile)",
+							StackID:     "a",
+						})
+						@chart.Area(chart.AreaProps{
+							DataKey:     "desktop",
+							Type:        chart.CurveNatural,
+							Fill:        "var(--color-desktop)",
+							FillOpacity: 0.4,
+							Stroke:      "var(--color-desktop)",
+							StackID:     "a",
+						})
+					}
+				}
+				@separator.Separator()
+				<div class="grid gap-2">
+					<div class="flex gap-2 leading-none font-medium">
+						Trending up by 5.2% this month
+						@icon.TrendingUp(icon.Props{Class: "size-4"})
+					</div>
+					<div class="text-muted-foreground">
+						Showing total visitors for the last 6 months. This is just
+						some random text to test the layout. It spans multiple lines
+						and should wrap around.
+					</div>
+				</div>
+				@separator.Separator()
+				<form class="flex flex-col gap-4">
+					<div class="flex flex-col gap-3">
+						@label.Label(label.Props{For: "header"}) {
+							Header
+						}
+						@input.Input(input.Props{ID: "header", Value: item.Header})
+					</div>
+					<div class="grid grid-cols-2 gap-4">
+						<div class="flex flex-col gap-3">
+							@label.Label(label.Props{For: "type"}) {
+								Type
+							}
+							@selectcomp.Select(selectcomp.Props{Value: item.SectionType}) {
+								@selectcomp.Trigger(selectcomp.TriggerProps{ID: "type", Class: "w-full"}) {
+									@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a type"})
+								}
+								@selectcomp.Content() {
+									for _, sectionType := range []string{"Table of Contents", "Executive Summary", "Technical Approach", "Design", "Capabilities", "Focus Documents", "Narrative", "Cover Page"} {
+										@selectcomp.Item(selectcomp.ItemProps{Value: sectionType}) {
+											{ sectionType }
+										}
+									}
+								}
+							}
+						</div>
+						<div class="flex flex-col gap-3">
+							@label.Label(label.Props{For: "status"}) {
+								Status
+							}
+							@selectcomp.Select(selectcomp.Props{Value: item.Status}) {
+								@selectcomp.Trigger(selectcomp.TriggerProps{ID: "status", Class: "w-full"}) {
+									@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a status"})
+								}
+								@selectcomp.Content() {
+									@selectcomp.Item(selectcomp.ItemProps{Value: "Done"}) {
+										Done
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "In Progress"}) {
+										In Progress
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "Not Started"}) {
+										Not Started
+									}
+								}
+							}
+						</div>
+					</div>
+					<div class="grid grid-cols-2 gap-4">
+						<div class="flex flex-col gap-3">
+							@label.Label(label.Props{For: "target"}) {
+								Target
+							}
+							@input.Input(input.Props{ID: "target", Value: item.Target})
+						</div>
+						<div class="flex flex-col gap-3">
+							@label.Label(label.Props{For: "limit"}) {
+								Limit
+							}
+							@input.Input(input.Props{ID: "limit", Value: item.Limit})
+						</div>
+					</div>
+					<div class="flex flex-col gap-3">
+						@label.Label(label.Props{For: "reviewer"}) {
+							Reviewer
+						}
+						@selectcomp.Select(selectcomp.Props{Value: item.Reviewer}) {
+							@selectcomp.Trigger(selectcomp.TriggerProps{ID: "reviewer", Class: "w-full"}) {
+								@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a reviewer"})
+							}
+							@selectcomp.Content() {
+								@selectcomp.Item(selectcomp.ItemProps{Value: "Eddie Lake"}) {
+									Eddie Lake
+								}
+								@selectcomp.Item(selectcomp.ItemProps{Value: "Jamik Tashpulatov"}) {
+									Jamik Tashpulatov
+								}
+								@selectcomp.Item(selectcomp.ItemProps{Value: "Emily Whalen"}) {
+									Emily Whalen
+								}
+							}
+						}
+					</div>
+				</form>
+			</div>
+			@drawer.Footer() {
+				@button.Button() {
+					Submit
+				}
+				@button.Button(button.Props{
+					Variant:    button.VariantOutline,
+					Attributes: drawer.Close(ctx),
+				}) {
+					Done
+				}
+			}
+		}
+	}
+}

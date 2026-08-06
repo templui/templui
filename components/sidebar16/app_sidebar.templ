@@ -1,0 +1,102 @@
+package sidebar16
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+var data = struct {
+	User         User
+	NavMain      []NavMainItem
+	NavSecondary []NavSecondaryItem
+	Projects     []Project
+}{
+	User: User{
+		Name:   "Axel Adrian",
+		Email:  "m@example.com",
+		Avatar: "https://github.com/axadrn.png",
+	},
+	NavMain: []NavMainItem{
+		{
+			Title: "Playground", URL: "#", Icon: icon.SquareTerminal, IsActive: true,
+			Items: []NavMainSubItem{
+				{Title: "History", URL: "#"},
+				{Title: "Starred", URL: "#"},
+				{Title: "Settings", URL: "#"},
+			},
+		},
+		{
+			Title: "Models", URL: "#", Icon: icon.Bot,
+			Items: []NavMainSubItem{
+				{Title: "Genesis", URL: "#"},
+				{Title: "Explorer", URL: "#"},
+				{Title: "Quantum", URL: "#"},
+			},
+		},
+		{
+			Title: "Documentation", URL: "#", Icon: icon.BookOpen,
+			Items: []NavMainSubItem{
+				{Title: "Introduction", URL: "#"},
+				{Title: "Get Started", URL: "#"},
+				{Title: "Tutorials", URL: "#"},
+				{Title: "Changelog", URL: "#"},
+			},
+		},
+		{
+			Title: "Settings", URL: "#", Icon: icon.Settings2,
+			Items: []NavMainSubItem{
+				{Title: "General", URL: "#"},
+				{Title: "Team", URL: "#"},
+				{Title: "Billing", URL: "#"},
+				{Title: "Limits", URL: "#"},
+			},
+		},
+	},
+	NavSecondary: []NavSecondaryItem{
+		{Title: "Support", URL: "#", Icon: icon.LifeBuoy},
+		{Title: "Feedback", URL: "#", Icon: icon.Send},
+	},
+	Projects: []Project{
+		{Name: "Design Engineering", URL: "#", Icon: icon.Frame},
+		{Name: "Sales & Marketing", URL: "#", Icon: icon.ChartPie},
+		{Name: "Travel", URL: "#", Icon: icon.Map},
+	},
+}
+
+templ AppSidebar(props ...sidebar.Props) {
+	{{ var p sidebar.Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Class == "" {
+		{{ p.Class = "top-(--header-height) h-[calc(100svh-var(--header-height))]!" }}
+	}
+	@sidebar.Sidebar(p) {
+		@sidebar.Header() {
+			@sidebar.Menu() {
+				@sidebar.MenuItem() {
+					@sidebar.MenuButton(sidebar.MenuButtonProps{
+						Size: sidebar.MenuButtonSizeLg,
+						Href: "#",
+					}) {
+						<div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+							@icon.Command(icon.Props{Class: "size-4"})
+						</div>
+						<div class="grid flex-1 text-left text-sm leading-tight">
+							<span class="truncate font-medium">Acme Inc</span>
+							<span class="truncate text-xs">Enterprise</span>
+						</div>
+					}
+				}
+			}
+		}
+		@sidebar.Content() {
+			@NavMain(data.NavMain)
+			@NavProjects(data.Projects)
+			@NavSecondary(data.NavSecondary, sidebar.GroupProps{Class: "mt-auto"})
+		}
+		@sidebar.Footer() {
+			@NavUser(data.User)
+		}
+	}
+}

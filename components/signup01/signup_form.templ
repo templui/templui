@@ -1,0 +1,74 @@
+package signup01
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/button"
+	"github.com/axadrn/shadcn-templ/v2/components/card"
+	"github.com/axadrn/shadcn-templ/v2/components/field"
+	"github.com/axadrn/shadcn-templ/v2/components/input"
+)
+
+templ SignupForm() {
+	@card.Card() {
+		@card.Header() {
+			@card.Title() {
+				Create an account
+			}
+			@card.Description() {
+				Enter your information below to create your account
+			}
+		}
+		@card.Content() {
+			<form>
+				@field.Group() {
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "name"}) {
+							Full Name
+						}
+						@input.Input(input.Props{ID: "name", Type: "text", Placeholder: "John Doe", Required: true})
+					}
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "email"}) {
+							Email
+						}
+						@input.Input(input.Props{ID: "email", Type: "email", Placeholder: "m@example.com", Required: true})
+						@field.Description() {
+							We'll use this to contact you. We will not share your email
+							with anyone else.
+						}
+					}
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "password"}) {
+							Password
+						}
+						@input.Input(input.Props{ID: "password", Type: "password", Required: true})
+						@field.Description() {
+							Must be at least 8 characters long.
+						}
+					}
+					@field.Field() {
+						@field.Label(field.LabelProps{For: "confirm-password"}) {
+							Confirm Password
+						}
+						@input.Input(input.Props{ID: "confirm-password", Type: "password", Required: true})
+						@field.Description() {
+							Please confirm your password.
+						}
+					}
+					@field.Group() {
+						@field.Field() {
+							@button.Button(button.Props{Type: button.TypeSubmit}) {
+								Create Account
+							}
+							@button.Button(button.Props{Variant: button.VariantOutline, Type: button.TypeButton}) {
+								Sign up with Google
+							}
+							@field.Description(field.DescriptionProps{Class: "px-6 text-center"}) {
+								Already have an account? <a href="#">Sign in</a>
+							}
+						}
+					}
+				}
+			</form>
+		}
+	}
+}

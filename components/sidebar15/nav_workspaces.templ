@@ -1,0 +1,69 @@
+package sidebar15
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/collapsible"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+type Workspace struct {
+	Name  string
+	Emoji string
+	Pages []WorkspacePage
+}
+
+type WorkspacePage struct {
+	Name  string
+	URL   string
+	Emoji string
+}
+
+templ NavWorkspaces(workspaces []Workspace) {
+	@sidebar.Group() {
+		@sidebar.GroupLabel() {
+			Workspaces
+		}
+		@sidebar.GroupContent() {
+			@sidebar.Menu() {
+				for _, workspace := range workspaces {
+					@collapsible.Collapsible() {
+						@sidebar.MenuItem() {
+							@sidebar.MenuButton(sidebar.MenuButtonProps{Href: "#"}) {
+								<span>{ workspace.Emoji }</span>
+								<span>{ workspace.Name }</span>
+							}
+							@sidebar.MenuAction(sidebar.MenuActionProps{
+								Class:       "left-2 bg-sidebar-accent text-sidebar-accent-foreground data-[state=open]:rotate-90",
+								ShowOnHover: true,
+								Attributes:  collapsible.Trigger(ctx),
+							}) {
+								@icon.ChevronRight()
+							}
+							@sidebar.MenuAction(sidebar.MenuActionProps{ShowOnHover: true}) {
+								@icon.Plus()
+							}
+							@collapsible.Content() {
+								@sidebar.MenuSub() {
+									for _, page := range workspace.Pages {
+										@sidebar.MenuSubItem() {
+											@sidebar.MenuSubButton(sidebar.MenuSubButtonProps{Href: "#"}) {
+												<span>{ page.Emoji }</span>
+												<span>{ page.Name }</span>
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				@sidebar.MenuItem() {
+					@sidebar.MenuButton(sidebar.MenuButtonProps{Class: "text-sidebar-foreground/70"}) {
+						@icon.Ellipsis()
+						<span>More</span>
+					}
+				}
+			}
+		}
+	}
+}

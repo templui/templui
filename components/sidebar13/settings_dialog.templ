@@ -1,0 +1,103 @@
+package sidebar13
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/breadcrumb"
+	"github.com/axadrn/shadcn-templ/v2/components/button"
+	"github.com/axadrn/shadcn-templ/v2/components/dialog"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+type navItem struct {
+	Name string
+	Icon func(...icon.Props) templ.Component
+}
+
+var data = struct {
+	Nav []navItem
+}{
+	Nav: []navItem{
+		{Name: "Notifications", Icon: icon.Bell},
+		{Name: "Navigation", Icon: icon.Menu},
+		{Name: "Home", Icon: icon.House},
+		{Name: "Appearance", Icon: icon.Paintbrush},
+		{Name: "Messages & media", Icon: icon.MessageCircle},
+		{Name: "Language & region", Icon: icon.Globe},
+		{Name: "Accessibility", Icon: icon.Keyboard},
+		{Name: "Mark as read", Icon: icon.Check},
+		{Name: "Audio & video", Icon: icon.Video},
+		{Name: "Connected accounts", Icon: icon.Link},
+		{Name: "Privacy & visibility", Icon: icon.Lock},
+		{Name: "Advanced", Icon: icon.Settings},
+	},
+}
+
+templ SettingsDialog() {
+	// Open renders the dialog already open, the pendant of the
+	// React.useState(true) initial open state.
+	@dialog.Dialog(dialog.Props{Open: true}) {
+		@button.Button(button.Props{
+			Size:       button.SizeSm,
+			Attributes: dialog.Trigger(ctx),
+		}) {
+			Open Dialog
+		}
+		@dialog.Content(dialog.ContentProps{Class: "overflow-hidden p-0 md:max-h-[500px] md:max-w-[700px] lg:max-w-[800px]"}) {
+			@dialog.Title(dialog.TitleProps{Class: "sr-only"}) {
+				Settings
+			}
+			@dialog.Description(dialog.DescriptionProps{Class: "sr-only"}) {
+				Customize your settings here.
+			}
+			@sidebar.Provider(sidebar.ProviderProps{Class: "items-start"}) {
+				@sidebar.Sidebar(sidebar.Props{Collapsible: sidebar.CollapsibleNone, Class: "hidden md:flex"}) {
+					@sidebar.Content() {
+						@sidebar.Group() {
+							@sidebar.GroupContent() {
+								@sidebar.Menu() {
+									for _, item := range data.Nav {
+										@sidebar.MenuItem() {
+											@sidebar.MenuButton(sidebar.MenuButtonProps{
+												Href:     "#",
+												IsActive: item.Name == "Messages & media",
+											}) {
+												@item.Icon()
+												<span>{ item.Name }</span>
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				<main class="flex h-[480px] flex-1 flex-col overflow-hidden">
+					<header class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+						<div class="flex items-center gap-2 px-4">
+							@breadcrumb.Breadcrumb() {
+								@breadcrumb.List() {
+									@breadcrumb.Item(breadcrumb.ItemProps{Class: "hidden md:block"}) {
+										@breadcrumb.Link(breadcrumb.LinkProps{Href: "#"}) {
+											Settings
+										}
+									}
+									@breadcrumb.Separator(breadcrumb.SeparatorProps{Class: "hidden md:block"})
+									@breadcrumb.Item() {
+										@breadcrumb.Page() {
+											Messages & media
+										}
+									}
+								}
+							}
+						</div>
+					</header>
+					<div class="flex flex-1 flex-col gap-4 overflow-y-auto p-4 pt-0">
+						for range 10 {
+							<div class="aspect-video max-w-3xl rounded-xl bg-muted/50"></div>
+						}
+					</div>
+				</main>
+			}
+		}
+	}
+}

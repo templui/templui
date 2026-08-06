@@ -1,0 +1,89 @@
+package sidebar07
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+// This is sample data.
+var data = struct {
+	User     User
+	Teams    []Team
+	NavMain  []NavMainItem
+	Projects []Project
+}{
+	User: User{
+		Name:   "Axel Adrian",
+		Email:  "m@example.com",
+		Avatar: "https://github.com/axadrn.png",
+	},
+	Teams: []Team{
+		{Name: "Acme Inc", Logo: icon.GalleryVerticalEnd, Plan: "Enterprise"},
+		{Name: "Acme Corp.", Logo: icon.AudioWaveform, Plan: "Startup"},
+		{Name: "Evil Corp.", Logo: icon.Command, Plan: "Free"},
+	},
+	NavMain: []NavMainItem{
+		{
+			Title: "Playground", URL: "#", Icon: icon.SquareTerminal, IsActive: true,
+			Items: []NavMainSubItem{
+				{Title: "History", URL: "#"},
+				{Title: "Starred", URL: "#"},
+				{Title: "Settings", URL: "#"},
+			},
+		},
+		{
+			Title: "Models", URL: "#", Icon: icon.Bot,
+			Items: []NavMainSubItem{
+				{Title: "Genesis", URL: "#"},
+				{Title: "Explorer", URL: "#"},
+				{Title: "Quantum", URL: "#"},
+			},
+		},
+		{
+			Title: "Documentation", URL: "#", Icon: icon.BookOpen,
+			Items: []NavMainSubItem{
+				{Title: "Introduction", URL: "#"},
+				{Title: "Get Started", URL: "#"},
+				{Title: "Tutorials", URL: "#"},
+				{Title: "Changelog", URL: "#"},
+			},
+		},
+		{
+			Title: "Settings", URL: "#", Icon: icon.Settings2,
+			Items: []NavMainSubItem{
+				{Title: "General", URL: "#"},
+				{Title: "Team", URL: "#"},
+				{Title: "Billing", URL: "#"},
+				{Title: "Limits", URL: "#"},
+			},
+		},
+	},
+	Projects: []Project{
+		{Name: "Design Engineering", URL: "#", Icon: icon.Frame},
+		{Name: "Sales & Marketing", URL: "#", Icon: icon.ChartPie},
+		{Name: "Travel", URL: "#", Icon: icon.Map},
+	},
+}
+
+templ AppSidebar(props ...sidebar.Props) {
+	{{ var p sidebar.Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Collapsible == "" {
+		{{ p.Collapsible = sidebar.CollapsibleIcon }}
+	}
+	@sidebar.Sidebar(p) {
+		@sidebar.Header() {
+			@TeamSwitcher(data.Teams)
+		}
+		@sidebar.Content() {
+			@NavMain(data.NavMain)
+			@NavProjects(data.Projects)
+		}
+		@sidebar.Footer() {
+			@NavUser(data.User)
+		}
+		@sidebar.Rail()
+	}
+}

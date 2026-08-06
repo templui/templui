@@ -1,0 +1,110 @@
+package sidebar15
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+// This is sample data.
+var sidebarLeftData = struct {
+	Teams        []Team
+	NavMain      []NavMainItem
+	NavSecondary []NavSecondaryItem
+	Favorites    []Favorite
+	Workspaces   []Workspace
+}{
+	Teams: []Team{
+		{Name: "Acme Inc", Logo: icon.Command, Plan: "Enterprise"},
+		{Name: "Acme Corp.", Logo: icon.AudioWaveform, Plan: "Startup"},
+		{Name: "Evil Corp.", Logo: icon.Command, Plan: "Free"},
+	},
+	NavMain: []NavMainItem{
+		{Title: "Search", URL: "#", Icon: icon.Search},
+		{Title: "Ask AI", URL: "#", Icon: icon.Sparkles},
+		{Title: "Home", URL: "#", Icon: icon.House, IsActive: true},
+		{Title: "Inbox", URL: "#", Icon: icon.Inbox, Badge: "10"},
+	},
+	NavSecondary: []NavSecondaryItem{
+		{Title: "Calendar", URL: "#", Icon: icon.Calendar},
+		{Title: "Settings", URL: "#", Icon: icon.Settings2},
+		{Title: "Templates", URL: "#", Icon: icon.Blocks},
+		{Title: "Trash", URL: "#", Icon: icon.Trash2},
+		{Title: "Help", URL: "#", Icon: icon.MessageCircleQuestionMark},
+	},
+	Favorites: []Favorite{
+		{Name: "Project Management & Task Tracking", URL: "#", Emoji: "📊"},
+		{Name: "Family Recipe Collection & Meal Planning", URL: "#", Emoji: "🍳"},
+		{Name: "Fitness Tracker & Workout Routines", URL: "#", Emoji: "💪"},
+		{Name: "Book Notes & Reading List", URL: "#", Emoji: "📚"},
+		{Name: "Sustainable Gardening Tips & Plant Care", URL: "#", Emoji: "🌱"},
+		{Name: "Language Learning Progress & Resources", URL: "#", Emoji: "🗣️"},
+		{Name: "Home Renovation Ideas & Budget Tracker", URL: "#", Emoji: "🏠"},
+		{Name: "Personal Finance & Investment Portfolio", URL: "#", Emoji: "💰"},
+		{Name: "Movie & TV Show Watchlist with Reviews", URL: "#", Emoji: "🎬"},
+		{Name: "Daily Habit Tracker & Goal Setting", URL: "#", Emoji: "✅"},
+	},
+	Workspaces: []Workspace{
+		{
+			Name: "Personal Life Management", Emoji: "🏠",
+			Pages: []WorkspacePage{
+				{Name: "Daily Journal & Reflection", URL: "#", Emoji: "📔"},
+				{Name: "Health & Wellness Tracker", URL: "#", Emoji: "🍏"},
+				{Name: "Personal Growth & Learning Goals", URL: "#", Emoji: "🌟"},
+			},
+		},
+		{
+			Name: "Professional Development", Emoji: "💼",
+			Pages: []WorkspacePage{
+				{Name: "Career Objectives & Milestones", URL: "#", Emoji: "🎯"},
+				{Name: "Skill Acquisition & Training Log", URL: "#", Emoji: "🧠"},
+				{Name: "Networking Contacts & Events", URL: "#", Emoji: "🤝"},
+			},
+		},
+		{
+			Name: "Creative Projects", Emoji: "🎨",
+			Pages: []WorkspacePage{
+				{Name: "Writing Ideas & Story Outlines", URL: "#", Emoji: "✍️"},
+				{Name: "Art & Design Portfolio", URL: "#", Emoji: "🖼️"},
+				{Name: "Music Composition & Practice Log", URL: "#", Emoji: "🎵"},
+			},
+		},
+		{
+			Name: "Home Management", Emoji: "🏡",
+			Pages: []WorkspacePage{
+				{Name: "Household Budget & Expense Tracking", URL: "#", Emoji: "💰"},
+				{Name: "Home Maintenance Schedule & Tasks", URL: "#", Emoji: "🔧"},
+				{Name: "Family Calendar & Event Planning", URL: "#", Emoji: "📅"},
+			},
+		},
+		{
+			Name: "Travel & Adventure", Emoji: "🧳",
+			Pages: []WorkspacePage{
+				{Name: "Trip Planning & Itineraries", URL: "#", Emoji: "🗺️"},
+				{Name: "Travel Bucket List & Inspiration", URL: "#", Emoji: "🌎"},
+				{Name: "Travel Journal & Photo Gallery", URL: "#", Emoji: "📸"},
+			},
+		},
+	},
+}
+
+templ SidebarLeft(props ...sidebar.Props) {
+	{{ var p sidebar.Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.Class == "" {
+		{{ p.Class = "border-r-0" }}
+	}
+	@sidebar.Sidebar(p) {
+		@sidebar.Header() {
+			@TeamSwitcher(sidebarLeftData.Teams)
+			@NavMain(sidebarLeftData.NavMain)
+		}
+		@sidebar.Content() {
+			@NavFavorites(sidebarLeftData.Favorites)
+			@NavWorkspaces(sidebarLeftData.Workspaces)
+			@NavSecondary(sidebarLeftData.NavSecondary, sidebar.GroupProps{Class: "mt-auto"})
+		}
+		@sidebar.Rail()
+	}
+}

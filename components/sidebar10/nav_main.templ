@@ -1,0 +1,19 @@
+package sidebar10
+
+import "github.com/axadrn/shadcn-templ/v2/components/sidebar"
+
+templ NavMain(items []NavItem) {
+	@sidebar.Menu() {
+		for _, item := range items {
+			@sidebar.MenuItem() {
+				@sidebar.MenuButton(sidebar.MenuButtonProps{
+					Href:     item.URL,
+					IsActive: item.IsActive,
+				}) {
+					@item.Icon()
+					<span>{ item.Title }</span>
+				}
+			}
+		}
+	}
+}

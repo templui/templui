@@ -1,0 +1,30 @@
+package sidebar15
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+type NavMainItem struct {
+	Title    string
+	URL      string
+	Icon     func(...icon.Props) templ.Component
+	IsActive bool
+	Badge    string
+}
+
+templ NavMain(items []NavMainItem) {
+	@sidebar.Menu() {
+		for _, item := range items {
+			@sidebar.MenuItem() {
+				@sidebar.MenuButton(sidebar.MenuButtonProps{
+					Href:     item.URL,
+					IsActive: item.IsActive,
+				}) {
+					@item.Icon()
+					<span>{ item.Title }</span>
+				}
+			}
+		}
+	}
+}

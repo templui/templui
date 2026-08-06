@@ -89,9 +89,12 @@ The following types are used:
 | ---------------- | --------------------------------------------------------------------------------- |
 | `registry:ui`    | Use for UI components. Installed under the `components` alias.                    |
 | `registry:lib`   | Use for lib and utils, e.g. the shared `utils` package.                           |
+| `registry:block` | Use for blocks: multi-file items such as `sidebar-07` or `login-01`.              |
 | `registry:style` | The style index item at `/r/styles/{style}/index.json`, resolved first by the CLI. |
 | `registry:theme` | Use for themes: CSS variables without files.                                      |
 | `registry:base`  | The design system item served by `/init`.                                         |
+
+Inside a block's `files` list the per-file types `registry:page`, `registry:component` and `registry:file` are used; a file with a `target` installs onto that path relative to the project root.
 
 ### dependencies
 

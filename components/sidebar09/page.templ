@@ -1,0 +1,47 @@
+package sidebar09
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/breadcrumb"
+	"github.com/axadrn/shadcn-templ/v2/components/separator"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+templ Page() {
+	@sidebar.Provider(sidebar.ProviderProps{
+		// The tsx's style={{"--sidebar-width": "350px"}}; --sidebar-width-icon
+		// rides along because the style attribute replaces the provider default
+		// wholesale instead of merging like React does.
+		Attributes: templ.Attributes{"style": "--sidebar-width: 350px; --sidebar-width-icon: 3rem;"},
+	}) {
+		@AppSidebar()
+		@sidebar.Inset() {
+			<header class="sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4">
+				@sidebar.Trigger(sidebar.TriggerProps{Class: "-ml-1"})
+				@separator.Separator(separator.Props{
+					Orientation: separator.OrientationVertical,
+					Class:       "mr-2 data-[orientation=vertical]:h-4",
+				})
+				@breadcrumb.Breadcrumb() {
+					@breadcrumb.List() {
+						@breadcrumb.Item(breadcrumb.ItemProps{Class: "hidden md:block"}) {
+							@breadcrumb.Link(breadcrumb.LinkProps{Href: "#"}) {
+								All Inboxes
+							}
+						}
+						@breadcrumb.Separator(breadcrumb.SeparatorProps{Class: "hidden md:block"})
+						@breadcrumb.Item() {
+							@breadcrumb.Page() {
+								Inbox
+							}
+						}
+					}
+				}
+			</header>
+			<div class="flex flex-1 flex-col gap-4 p-4">
+				for i := 0; i < 24; i++ {
+					<div class="aspect-video h-12 w-full rounded-lg bg-muted/50"></div>
+				}
+			</div>
+		}
+	}
+}

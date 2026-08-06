@@ -1,0 +1,116 @@
+package sidebar14
+
+import "github.com/axadrn/shadcn-templ/v2/components/sidebar"
+
+// This is sample data.
+type navItem struct {
+	Title string
+	URL   string
+	Items []navSubItem
+}
+
+type navSubItem struct {
+	Title    string
+	URL      string
+	IsActive bool
+}
+
+var data = struct {
+	NavMain []navItem
+}{
+	NavMain: []navItem{
+		{
+			Title: "Getting Started", URL: "#",
+			Items: []navSubItem{
+				{Title: "Installation", URL: "#"},
+				{Title: "Project Structure", URL: "#"},
+			},
+		},
+		{
+			Title: "Build Your Application", URL: "#",
+			Items: []navSubItem{
+				{Title: "Routing", URL: "#"},
+				{Title: "Data Fetching", URL: "#", IsActive: true},
+				{Title: "Rendering", URL: "#"},
+				{Title: "Caching", URL: "#"},
+				{Title: "Styling", URL: "#"},
+				{Title: "Optimizing", URL: "#"},
+				{Title: "Configuring", URL: "#"},
+				{Title: "Testing", URL: "#"},
+				{Title: "Authentication", URL: "#"},
+				{Title: "Deploying", URL: "#"},
+				{Title: "Upgrading", URL: "#"},
+				{Title: "Examples", URL: "#"},
+			},
+		},
+		{
+			Title: "API Reference", URL: "#",
+			Items: []navSubItem{
+				{Title: "Components", URL: "#"},
+				{Title: "File Conventions", URL: "#"},
+				{Title: "Functions", URL: "#"},
+				{Title: "next.config.js Options", URL: "#"},
+				{Title: "CLI", URL: "#"},
+				{Title: "Edge Runtime", URL: "#"},
+			},
+		},
+		{
+			Title: "Architecture", URL: "#",
+			Items: []navSubItem{
+				{Title: "Accessibility", URL: "#"},
+				{Title: "Fast Refresh", URL: "#"},
+				{Title: "Next.js Compiler", URL: "#"},
+				{Title: "Supported Browsers", URL: "#"},
+				{Title: "Turbopack", URL: "#"},
+			},
+		},
+		{
+			Title: "Community", URL: "#",
+			Items: []navSubItem{
+				{Title: "Contribution Guide", URL: "#"},
+			},
+		},
+	},
+}
+
+templ AppSidebar(props ...sidebar.Props) {
+	{{ var p sidebar.Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@sidebar.Sidebar(p) {
+		@sidebar.Content() {
+			@sidebar.Group() {
+				@sidebar.GroupLabel() {
+					Table of Contents
+				}
+				@sidebar.GroupContent() {
+					@sidebar.Menu() {
+						for _, item := range data.NavMain {
+							@sidebar.MenuItem() {
+								@sidebar.MenuButton(sidebar.MenuButtonProps{Href: item.URL, Class: "font-medium"}) {
+									{ item.Title }
+								}
+								if len(item.Items) > 0 {
+									@sidebar.MenuSub() {
+										for _, subItem := range item.Items {
+											@sidebar.MenuSubItem() {
+												@sidebar.MenuSubButton(sidebar.MenuSubButtonProps{
+													Href:     subItem.URL,
+													IsActive: subItem.IsActive,
+												}) {
+													{ subItem.Title }
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		@sidebar.Rail()
+	}
+}

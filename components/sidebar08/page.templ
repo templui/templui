@@ -1,0 +1,64 @@
+package sidebar08
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/breadcrumb"
+	"github.com/axadrn/shadcn-templ/v2/components/separator"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+templ Page() {
+	@sidebar.Provider() {
+		@AppSidebar()
+		@sidebar.Inset() {
+			<header class="flex h-16 shrink-0 items-center gap-2">
+				<div class="flex items-center gap-2 px-4">
+					@sidebar.Trigger(sidebar.TriggerProps{Class: "-ml-1"})
+					@separator.Separator(separator.Props{
+						Orientation: separator.OrientationVertical,
+						Class:       "mr-2 data-[orientation=vertical]:h-4",
+					})
+					@breadcrumb.Breadcrumb() {
+						@breadcrumb.List() {
+							@breadcrumb.Item(breadcrumb.ItemProps{Class: "hidden md:block"}) {
+								@breadcrumb.Link(breadcrumb.LinkProps{Href: "#"}) {
+									Build Your Application
+								}
+							}
+							@breadcrumb.Separator(breadcrumb.SeparatorProps{Class: "hidden md:block"})
+							@breadcrumb.Item() {
+								@breadcrumb.Page() {
+									Data Fetching
+								}
+							}
+						}
+					}
+				</div>
+			</header>
+			<div class="flex flex-1 flex-col gap-4 p-4 pt-0">
+				<div class="grid auto-rows-min gap-4 md:grid-cols-3">
+					<div class="aspect-video rounded-xl bg-muted/50"></div>
+					<div class="aspect-video rounded-xl bg-muted/50"></div>
+					<div class="aspect-video rounded-xl bg-muted/50"></div>
+				</div>
+				<div class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min"></div>
+			</div>
+		}
+	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		(() => {
+			// side={isMobile ? "bottom" : "right"} pendant: the menus flip to
+			// bottom below md, like useSidebar's isMobile.
+			const mq = window.matchMedia("(max-width: 767px)");
+			const applySides = () => {
+				document.querySelectorAll("[data-sidebar08-menu]").forEach((menu) => {
+					menu.setAttribute("data-tui-dropdownmenu-side", mq.matches ? "bottom" : "right");
+					if (menu.getAttribute("data-sidebar08-menu") === "project") {
+						menu.setAttribute("data-tui-dropdownmenu-align", mq.matches ? "end" : "start");
+					}
+				});
+			};
+			applySides();
+			mq.addEventListener("change", applySides);
+		})();
+	</script>
+}

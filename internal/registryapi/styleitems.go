@@ -152,6 +152,7 @@ func BuildStyleItem(styleName, name string) (*Item, error) {
 			Path:    file.Path,
 			Content: content,
 			Type:    file.Type,
+			Target:  file.Target,
 		})
 	}
 
@@ -165,6 +166,15 @@ func BuildStyleItem(styleName, name string) (*Item, error) {
 	if def.Type == "registry:ui" {
 		item.Meta = &ItemMeta{
 			Links: ItemLinks{Docs: shared.BaseURL() + "/docs/components/" + def.Name},
+		}
+	}
+	// Block items ship their description, categories and preview height, the
+	// shape of shadcn's served registry:block items.
+	if def.Type == "registry:block" {
+		item.Description = def.Description
+		item.Categories = def.Categories
+		if def.Meta != nil && def.Meta.IframeHeight != "" {
+			item.Meta = &ItemMeta{IframeHeight: def.Meta.IframeHeight}
 		}
 	}
 

@@ -1,0 +1,61 @@
+package sidebar15
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+// This is sample data.
+var sidebarRightData = struct {
+	User      User
+	Calendars []Calendar
+}{
+	User: User{
+		Name:   "Axel Adrian",
+		Email:  "m@example.com",
+		Avatar: "https://github.com/axadrn.png",
+	},
+	Calendars: []Calendar{
+		{Name: "My Calendars", Items: []string{"Personal", "Work", "Family"}},
+		{Name: "Favorites", Items: []string{"Holidays", "Birthdays"}},
+		{Name: "Other", Items: []string{"Travel", "Reminders", "Deadlines"}},
+	},
+}
+
+templ SidebarRight(props ...sidebar.Props) {
+	{{ var p sidebar.Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	// The explicit ID keeps this sidebar's element id distinct from the
+	// left sidebar, which takes the provider's id for its trigger.
+	if p.ID == "" {
+		{{ p.ID = "sidebar15-right" }}
+	}
+	if p.Collapsible == "" {
+		{{ p.Collapsible = sidebar.CollapsibleNone }}
+	}
+	if p.Class == "" {
+		{{ p.Class = "sticky top-0 hidden h-svh border-l lg:flex" }}
+	}
+	@sidebar.Sidebar(p) {
+		@sidebar.Header(sidebar.HeaderProps{Class: "h-16 border-b border-sidebar-border"}) {
+			@NavUser(sidebarRightData.User)
+		}
+		@sidebar.Content() {
+			@DatePicker()
+			@sidebar.Separator(sidebar.SeparatorProps{Class: "mx-0"})
+			@Calendars(sidebarRightData.Calendars)
+		}
+		@sidebar.Footer() {
+			@sidebar.Menu() {
+				@sidebar.MenuItem() {
+					@sidebar.MenuButton() {
+						@icon.Plus()
+						<span>New Calendar</span>
+					}
+				}
+			}
+		}
+	}
+}

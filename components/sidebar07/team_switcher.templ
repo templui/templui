@@ -1,0 +1,86 @@
+package sidebar07
+
+import (
+	"strconv"
+
+	"github.com/axadrn/shadcn-templ/v2/components/dropdownmenu"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+type Team struct {
+	Name string
+	Logo func(...icon.Props) templ.Component
+	Plan string
+}
+
+func teamLogoHidden(i int) string {
+	if i == 0 {
+		return ""
+	}
+	return " hidden"
+}
+
+templ TeamSwitcher(teams []Team) {
+	if len(teams) > 0 {
+		@sidebar.Menu() {
+			@sidebar.MenuItem() {
+				@dropdownmenu.DropdownMenu(dropdownmenu.Props{ID: "sidebar07-team-menu"}) {
+					@sidebar.MenuButton(sidebar.MenuButtonProps{
+						Size:       sidebar.MenuButtonSizeLg,
+						Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+						Attributes: dropdownmenu.Trigger(ctx),
+					}) {
+						<div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+							// All logos render up front, the page script toggles them on
+							// team switch (the pendant of React swapping activeTeam.logo).
+							for i, team := range teams {
+								@team.Logo(icon.Props{
+									Class:      "size-4" + teamLogoHidden(i),
+									Attributes: templ.Attributes{"data-sidebar07-team-logo": strconv.Itoa(i)},
+								})
+							}
+						</div>
+						<div class="grid flex-1 text-left text-sm leading-tight">
+							<span class="truncate font-medium" data-sidebar07-team-name>{ teams[0].Name }</span>
+							<span class="truncate text-xs" data-sidebar07-team-plan>{ teams[0].Plan }</span>
+						</div>
+						@icon.ChevronsUpDown(icon.Props{Class: "ml-auto"})
+					}
+					@dropdownmenu.Content(dropdownmenu.ContentProps{
+						Class:      "w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg",
+						Align:      dropdownmenu.AlignStart,
+						Side:       dropdownmenu.SideRight,
+						SideOffset: 4,
+						Attributes: templ.Attributes{"data-sidebar07-menu": "team"},
+					}) {
+						@dropdownmenu.Label(dropdownmenu.LabelProps{Class: "text-xs text-muted-foreground"}) {
+							Teams
+						}
+						for i, team := range teams {
+							@dropdownmenu.Item(dropdownmenu.ItemProps{
+								Class:      "gap-2 p-2",
+								Attributes: templ.Attributes{"data-sidebar07-team-index": strconv.Itoa(i)},
+							}) {
+								<div class="flex size-6 items-center justify-center rounded-md border">
+									@team.Logo(icon.Props{Class: "size-3.5 shrink-0"})
+								</div>
+								{ team.Name }
+								@dropdownmenu.Shortcut() {
+									⌘{ strconv.Itoa(i + 1) }
+								}
+							}
+						}
+						@dropdownmenu.Separator()
+						@dropdownmenu.Item(dropdownmenu.ItemProps{Class: "gap-2 p-2"}) {
+							<div class="flex size-6 items-center justify-center rounded-md border bg-transparent">
+								@icon.Plus(icon.Props{Class: "size-4"})
+							</div>
+							<div class="font-medium text-muted-foreground">Add team</div>
+						}
+					}
+				}
+			}
+		}
+	}
+}

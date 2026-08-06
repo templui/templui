@@ -24,11 +24,12 @@ type SideLink struct {
 }
 
 // NavItems is the pendant of siteConfig.navItems in shadcn's lib/config.ts,
-// reduced to the pages shadcn-templ has (no Blocks, no Directory).
+// reduced to the pages shadcn-templ has (no Directory).
 var NavItems = []SideLink{
 	{Text: "Home", Href: "/"},
 	{Text: "Docs", Href: "/docs/installation"},
 	{Text: "Components", Href: "/docs/components"},
+	{Text: "Blocks", Href: "/blocks"},
 	{Text: "Charts", Href: "/charts/area"},
 	{Text: "Typeset", Href: "/typeset"},
 	{Text: "Create", Href: "/create"},

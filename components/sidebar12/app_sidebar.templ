@@ -1,0 +1,43 @@
+package sidebar12
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+// This is sample data.
+var user = User{
+	Name:   "Axel Adrian",
+	Email:  "m@example.com",
+	Avatar: "https://github.com/axadrn.png",
+}
+
+var calendars = []Calendar{
+	{Name: "My Calendars", Items: []string{"Personal", "Work", "Family"}},
+	{Name: "Favorites", Items: []string{"Holidays", "Birthdays"}},
+	{Name: "Other", Items: []string{"Travel", "Reminders", "Deadlines"}},
+}
+
+templ AppSidebar() {
+	@sidebar.Sidebar() {
+		@sidebar.Header(sidebar.HeaderProps{Class: "h-16 border-b border-sidebar-border"}) {
+			@NavUser(user)
+		}
+		@sidebar.Content() {
+			@DatePicker()
+			@sidebar.Separator(sidebar.SeparatorProps{Class: "mx-0"})
+			@Calendars(calendars)
+		}
+		@sidebar.Footer() {
+			@sidebar.Menu() {
+				@sidebar.MenuItem() {
+					@sidebar.MenuButton() {
+						@icon.Plus()
+						<span>New Calendar</span>
+					}
+				}
+			}
+		}
+		@sidebar.Rail()
+	}
+}

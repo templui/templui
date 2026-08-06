@@ -1,0 +1,42 @@
+package sidebar02
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/breadcrumb"
+	"github.com/axadrn/shadcn-templ/v2/components/separator"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+templ Page() {
+	@sidebar.Provider() {
+		@AppSidebar()
+		@sidebar.Inset() {
+			<header class="sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
+				@sidebar.Trigger(sidebar.TriggerProps{Class: "-ml-1"})
+				@separator.Separator(separator.Props{
+					Orientation: separator.OrientationVertical,
+					Class:       "mr-2 h-4",
+				})
+				@breadcrumb.Breadcrumb() {
+					@breadcrumb.List() {
+						@breadcrumb.Item(breadcrumb.ItemProps{Class: "hidden md:block"}) {
+							@breadcrumb.Link(breadcrumb.LinkProps{Href: "#"}) {
+								Build Your Application
+							}
+						}
+						@breadcrumb.Separator(breadcrumb.SeparatorProps{Class: "hidden md:block"})
+						@breadcrumb.Item() {
+							@breadcrumb.Page() {
+								Data Fetching
+							}
+						}
+					}
+				}
+			</header>
+			<div class="flex flex-1 flex-col gap-4 p-4">
+				for i := 0; i < 24; i++ {
+					<div class="aspect-video h-12 w-full rounded-lg bg-muted/50"></div>
+				}
+			</div>
+		}
+	}
+}

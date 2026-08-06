@@ -1,0 +1,63 @@
+package sidebar08
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/collapsible"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+type NavMainItem struct {
+	Title    string
+	URL      string
+	Icon     func(...icon.Props) templ.Component
+	IsActive bool
+	Items    []NavMainSubItem
+}
+
+type NavMainSubItem struct {
+	Title string
+	URL   string
+}
+
+templ NavMain(items []NavMainItem) {
+	@sidebar.Group() {
+		@sidebar.GroupLabel() {
+			Platform
+		}
+		@sidebar.Menu() {
+			for _, item := range items {
+				@collapsible.Collapsible(collapsible.Props{Open: item.IsActive}) {
+					@sidebar.MenuItem() {
+						@sidebar.MenuButton(sidebar.MenuButtonProps{
+							Href:    item.URL,
+							Tooltip: item.Title,
+						}) {
+							@item.Icon()
+							<span>{ item.Title }</span>
+						}
+						if len(item.Items) > 0 {
+							@sidebar.MenuAction(sidebar.MenuActionProps{
+								Class:      "data-[state=open]:rotate-90",
+								Attributes: collapsible.Trigger(ctx),
+							}) {
+								@icon.ChevronRight()
+								<span class="sr-only">Toggle</span>
+							}
+							@collapsible.Content() {
+								@sidebar.MenuSub() {
+									for _, subItem := range item.Items {
+										@sidebar.MenuSubItem() {
+											@sidebar.MenuSubButton(sidebar.MenuSubButtonProps{Href: subItem.URL}) {
+												<span>{ subItem.Title }</span>
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,36 @@
+package sidebar06
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/button"
+	"github.com/axadrn/shadcn-templ/v2/components/card"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+templ SidebarOptInForm() {
+	@card.Card(card.Props{Class: "gap-2 py-4 shadow-none"}) {
+		@card.Header(card.HeaderProps{Class: "px-4"}) {
+			@card.Title(card.TitleProps{Class: "text-sm"}) {
+				Subscribe to our newsletter
+			}
+			@card.Description() {
+				Opt-in to receive updates and news about the sidebar.
+			}
+		}
+		@card.Content(card.ContentProps{Class: "px-4"}) {
+			<form>
+				<div class="grid gap-2.5">
+					@sidebar.Input(sidebar.InputProps{
+						Placeholder: "Email",
+						Attributes:  templ.Attributes{"type": "email"},
+					})
+					@button.Button(button.Props{
+						Class: "w-full bg-sidebar-primary text-sidebar-primary-foreground shadow-none",
+						Size:  button.SizeSm,
+					}) {
+						Subscribe
+					}
+				</div>
+			</form>
+		}
+	}
+}

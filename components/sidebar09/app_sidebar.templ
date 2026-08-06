@@ -1,0 +1,216 @@
+package sidebar09
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/label"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+	switchcomp "github.com/axadrn/shadcn-templ/v2/components/switch"
+)
+
+// This is sample data
+type navItem struct {
+	Title    string
+	URL      string
+	Icon     func(...icon.Props) templ.Component
+	IsActive bool
+}
+
+type mail struct {
+	Name    string
+	Email   string
+	Subject string
+	Date    string
+	Teaser  string
+}
+
+var user = User{
+	Name:   "Axel Adrian",
+	Email:  "m@example.com",
+	Avatar: "https://github.com/axadrn.png",
+}
+
+var navMain = []navItem{
+	{Title: "Inbox", URL: "#", Icon: icon.Inbox, IsActive: true},
+	{Title: "Drafts", URL: "#", Icon: icon.File, IsActive: false},
+	{Title: "Sent", URL: "#", Icon: icon.Send, IsActive: false},
+	{Title: "Junk", URL: "#", Icon: icon.ArchiveX, IsActive: false},
+	{Title: "Trash", URL: "#", Icon: icon.Trash2, IsActive: false},
+}
+
+var mails = []mail{
+	{
+		Name:    "William Smith",
+		Email:   "williamsmith@example.com",
+		Subject: "Meeting Tomorrow",
+		Date:    "09:34 AM",
+		Teaser:  "Hi team, just a reminder about our meeting tomorrow at 10 AM.\nPlease come prepared with your project updates.",
+	},
+	{
+		Name:    "Alice Smith",
+		Email:   "alicesmith@example.com",
+		Subject: "Re: Project Update",
+		Date:    "Yesterday",
+		Teaser:  "Thanks for the update. The progress looks great so far.\nLet's schedule a call to discuss the next steps.",
+	},
+	{
+		Name:    "Bob Johnson",
+		Email:   "bobjohnson@example.com",
+		Subject: "Weekend Plans",
+		Date:    "2 days ago",
+		Teaser:  "Hey everyone! I'm thinking of organizing a team outing this weekend.\nWould you be interested in a hiking trip or a beach day?",
+	},
+	{
+		Name:    "Emily Davis",
+		Email:   "emilydavis@example.com",
+		Subject: "Re: Question about Budget",
+		Date:    "2 days ago",
+		Teaser:  "I've reviewed the budget numbers you sent over.\nCan we set up a quick call to discuss some potential adjustments?",
+	},
+	{
+		Name:    "Michael Wilson",
+		Email:   "michaelwilson@example.com",
+		Subject: "Important Announcement",
+		Date:    "1 week ago",
+		Teaser:  "Please join us for an all-hands meeting this Friday at 3 PM.\nWe have some exciting news to share about the company's future.",
+	},
+	{
+		Name:    "Sarah Brown",
+		Email:   "sarahbrown@example.com",
+		Subject: "Re: Feedback on Proposal",
+		Date:    "1 week ago",
+		Teaser:  "Thank you for sending over the proposal. I've reviewed it and have some thoughts.\nCould we schedule a meeting to discuss my feedback in detail?",
+	},
+	{
+		Name:    "David Lee",
+		Email:   "davidlee@example.com",
+		Subject: "New Project Idea",
+		Date:    "1 week ago",
+		Teaser:  "I've been brainstorming and came up with an interesting project concept.\nDo you have time this week to discuss its potential impact and feasibility?",
+	},
+	{
+		Name:    "Olivia Wilson",
+		Email:   "oliviawilson@example.com",
+		Subject: "Vacation Plans",
+		Date:    "1 week ago",
+		Teaser:  "Just a heads up that I'll be taking a two-week vacation next month.\nI'll make sure all my projects are up to date before I leave.",
+	},
+	{
+		Name:    "James Martin",
+		Email:   "jamesmartin@example.com",
+		Subject: "Re: Conference Registration",
+		Date:    "1 week ago",
+		Teaser:  "I've completed the registration for the upcoming tech conference.\nLet me know if you need any additional information from my end.",
+	},
+	{
+		Name:    "Sophia White",
+		Email:   "sophiawhite@example.com",
+		Subject: "Team Dinner",
+		Date:    "1 week ago",
+		Teaser:  "To celebrate our recent project success, I'd like to organize a team dinner.\nAre you available next Friday evening? Please let me know your preferences.",
+	},
+}
+
+templ AppSidebar() {
+	// Note: I'm using state to show active item.
+	// IRL you should use the url/router.
+	@sidebar.Sidebar(sidebar.Props{
+		Collapsible: sidebar.CollapsibleIcon,
+		// [&_[data-tui-sidebar-content]]:flex-row is shadcn-templ wiring: the
+		// templ sidebar nests the children one wrapper deeper than the tsx, so
+		// the *:data-[sidebar=sidebar]:flex-row alone does not reach them.
+		Class: "overflow-hidden *:data-[sidebar=sidebar]:flex-row [&_[data-tui-sidebar-content]]:flex-row",
+	}) {
+		// This is the first sidebar
+		// We disable collapsible and adjust width to icon.
+		// This will make the sidebar appear as icons.
+		@sidebar.Sidebar(sidebar.Props{
+			ID:          "sidebar09-icon-sidebar",
+			Collapsible: sidebar.CollapsibleNone,
+			Class:       "w-[calc(var(--sidebar-width-icon)+1px)]! border-r",
+		}) {
+			@sidebar.Header() {
+				@sidebar.Menu() {
+					@sidebar.MenuItem() {
+						@sidebar.MenuButton(sidebar.MenuButtonProps{
+							Size:  sidebar.MenuButtonSizeLg,
+							Class: "md:h-8 md:p-0",
+							Href:  "#",
+						}) {
+							<div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+								@icon.Command(icon.Props{Class: "size-4"})
+							</div>
+							<div class="grid flex-1 text-left text-sm leading-tight">
+								<span class="truncate font-medium">Acme Inc</span>
+								<span class="truncate text-xs">Enterprise</span>
+							</div>
+						}
+					}
+				}
+			}
+			@sidebar.Content() {
+				@sidebar.Group() {
+					@sidebar.GroupContent(sidebar.GroupContentProps{Class: "px-1.5 md:px-0"}) {
+						@sidebar.Menu() {
+							for _, item := range navMain {
+								@sidebar.MenuItem() {
+									@sidebar.MenuButton(sidebar.MenuButtonProps{
+										Tooltip:  item.Title,
+										IsActive: item.IsActive,
+										Class:    "px-2.5 md:px-2",
+									}) {
+										@item.Icon()
+										<span>{ item.Title }</span>
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			@sidebar.Footer() {
+				@NavUser(user)
+			}
+		}
+		// This is the second sidebar
+		// We disable collapsible and let it fill remaining space
+		@sidebar.Sidebar(sidebar.Props{
+			ID:          "sidebar09-mail-sidebar",
+			Collapsible: sidebar.CollapsibleNone,
+			Class:       "hidden flex-1 md:flex",
+		}) {
+			@sidebar.Header(sidebar.HeaderProps{Class: "gap-3.5 border-b p-4"}) {
+				<div class="flex w-full items-center justify-between">
+					<div class="text-base font-medium text-foreground">
+						{ navMain[0].Title }
+					</div>
+					@label.Label(label.Props{Class: "flex items-center gap-2 text-sm"}) {
+						<span>Unreads</span>
+						@switchcomp.Switch(switchcomp.Props{Class: "shadow-none"})
+					}
+				</div>
+				@sidebar.Input(sidebar.InputProps{Placeholder: "Type to search..."})
+			}
+			@sidebar.Content() {
+				@sidebar.Group(sidebar.GroupProps{Class: "px-0"}) {
+					@sidebar.GroupContent() {
+						for _, mail := range mails {
+							<a
+								href="#"
+								class="flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+							>
+								<div class="flex w-full items-center gap-2">
+									<span>{ mail.Name }</span>
+									<span class="ml-auto text-xs">{ mail.Date }</span>
+								</div>
+								<span class="font-medium">{ mail.Subject }</span>
+								<span class="line-clamp-2 w-[260px] text-xs whitespace-break-spaces">
+									{ mail.Teaser }
+								</span>
+							</a>
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,40 @@
+package sidebar14
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/breadcrumb"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+templ Page() {
+	@sidebar.Provider() {
+		@sidebar.Inset() {
+			<header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+				@breadcrumb.Breadcrumb() {
+					@breadcrumb.List() {
+						@breadcrumb.Item(breadcrumb.ItemProps{Class: "hidden md:block"}) {
+							@breadcrumb.Link(breadcrumb.LinkProps{Href: "#"}) {
+								Build Your Application
+							}
+						}
+						@breadcrumb.Separator(breadcrumb.SeparatorProps{Class: "hidden md:block"})
+						@breadcrumb.Item() {
+							@breadcrumb.Page() {
+								Data Fetching
+							}
+						}
+					}
+				}
+				@sidebar.Trigger(sidebar.TriggerProps{Class: "-mr-1 ml-auto rotate-180"})
+			</header>
+			<div class="flex flex-1 flex-col gap-4 p-4">
+				<div class="grid auto-rows-min gap-4 md:grid-cols-3">
+					<div class="aspect-video rounded-xl bg-muted/50"></div>
+					<div class="aspect-video rounded-xl bg-muted/50"></div>
+					<div class="aspect-video rounded-xl bg-muted/50"></div>
+				</div>
+				<div class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min"></div>
+			</div>
+		}
+		@AppSidebar(sidebar.Props{Side: sidebar.SideRight})
+	}
+}

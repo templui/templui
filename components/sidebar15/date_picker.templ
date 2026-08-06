@@ -1,0 +1,14 @@
+package sidebar15
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/calendar"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+templ DatePicker() {
+	@sidebar.Group(sidebar.GroupProps{Class: "px-0"}) {
+		@sidebar.GroupContent() {
+			@calendar.Calendar(calendar.Props{Class: "[&_[role=gridcell]]:w-[33px] [&_[role=gridcell].bg-accent]:bg-sidebar-primary [&_[role=gridcell].bg-accent]:text-sidebar-primary-foreground"})
+		}
+	}
+}

@@ -120,12 +120,19 @@ func printFileSummary(verb string, files []string, suffix string) {
 	}
 }
 
-// resolveFilePath is the resolveFilePath pendant: registry paths map onto the
-// configured directories by type ("components/button/button.templ" ->
-// <components dir>/button/button.templ, "utils/shadcn-templ.go" -> <utils dir>/
-// shadcn-templ.go).
+// resolveFilePath is the resolveFilePath pendant: an explicit target wins
+// (shadcn resolves block pages onto their target path), then registry paths
+// map onto the configured directories by type
+// ("components/button/button.templ" -> <components dir>/button/button.templ,
+// "utils/shadcn-templ.go" -> <utils dir>/shadcn-templ.go).
 func resolveFilePath(file registry.ItemFile, config *utils.Config, pathOverride string) (string, error) {
 	switch {
+	case file.Target != "":
+		base := config.ResolvedPaths.Cwd
+		if pathOverride != "" {
+			base = filepath.Join(config.ResolvedPaths.Cwd, filepath.FromSlash(pathOverride))
+		}
+		return filepath.Join(base, filepath.FromSlash(file.Target)), nil
 	case strings.HasPrefix(file.Path, "components/"):
 		base := config.ResolvedPaths.Components
 		if pathOverride != "" {

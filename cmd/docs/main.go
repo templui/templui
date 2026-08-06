@@ -18,6 +18,7 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/internal/registryapi"
 	"github.com/axadrn/shadcn-templ/v2/internal/service"
 	"github.com/axadrn/shadcn-templ/v2/internal/shared"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/blocks"
 	"github.com/axadrn/shadcn-templ/v2/internal/ui/charts"
 	"github.com/axadrn/shadcn-templ/v2/internal/ui/modules"
 	"github.com/axadrn/shadcn-templ/v2/internal/ui/examples"
@@ -73,6 +74,9 @@ func main() {
 	mux.HandleFunc("GET /sitemap.xml", serveStaticRebased("sitemap.xml", "application/xml"))
 	mux.HandleFunc("GET /robots.txt", serveStaticRebased("robots.txt", "text/plain"))
 	mux.HandleFunc("GET /llms.txt", serveStaticRebased("llms.txt", "text/plain; charset=utf-8"))
+	// The block image placeholder, the pendant of shadcn's
+	// public/placeholder.svg: block sources reference it root-relative.
+	mux.HandleFunc("GET /placeholder.svg", serveStaticRebased("placeholder.svg", "image/svg+xml"))
 
 	// JSON schemas behind the $schema URLs in components.json and
 	// registry.json, the pendant of ui.shadcn.com/schema/*.json.
@@ -260,15 +264,40 @@ func main() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}))
-	mux.Handle("GET /view/{name}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		name := r.PathValue("name")
-		if charts.Component(name) == nil {
+	// Blocks gallery, the pendant of shadcn's /blocks pages: /blocks shows
+	// the featured list, /blocks/{category} one registry category.
+	mux.Handle("GET /blocks", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := pages.Blocks("").Render(r.Context(), w); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}))
+	mux.Handle("GET /blocks/{category}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		category := r.PathValue("category")
+		if !pages.BlockCategories[category] {
 			http.NotFound(w, r)
 			return
 		}
-		if err := pages.ChartView(name).Render(r.Context(), w); err != nil {
+		if err := pages.Blocks(category).Render(r.Context(), w); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+	}))
+	// /view/{name} serves charts and blocks standalone, like shadcn's
+	// (view)/view route resolves both through the registry index.
+	mux.Handle("GET /view/{name}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		name := r.PathValue("name")
+		if charts.Component(name) != nil {
+			if err := pages.ChartView(name).Render(r.Context(), w); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			return
+		}
+		if blocks.Component(name) != nil {
+			if err := pages.BlockView(name).Render(r.Context(), w); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			return
+		}
+		http.NotFound(w, r)
 	}))
 	mux.Handle("GET /preview/{name}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		entry, ok := examples.Registry[r.PathValue("name")]

@@ -1,0 +1,121 @@
+package sidebar02
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/collapsible"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+// This is sample data.
+type navItem struct {
+	Title string
+	URL   string
+	Items []navSubItem
+}
+
+type navSubItem struct {
+	Title    string
+	URL      string
+	IsActive bool
+}
+
+var versions = []string{"1.0.1", "1.1.0-alpha", "2.0.0-beta1"}
+
+var navMain = []navItem{
+	{
+		Title: "Getting Started", URL: "#",
+		Items: []navSubItem{
+			{Title: "Installation", URL: "#"},
+			{Title: "Project Structure", URL: "#"},
+		},
+	},
+	{
+		Title: "Build Your Application", URL: "#",
+		Items: []navSubItem{
+			{Title: "Routing", URL: "#"},
+			{Title: "Data Fetching", URL: "#", IsActive: true},
+			{Title: "Rendering", URL: "#"},
+			{Title: "Caching", URL: "#"},
+			{Title: "Styling", URL: "#"},
+			{Title: "Optimizing", URL: "#"},
+			{Title: "Configuring", URL: "#"},
+			{Title: "Testing", URL: "#"},
+			{Title: "Authentication", URL: "#"},
+			{Title: "Deploying", URL: "#"},
+			{Title: "Upgrading", URL: "#"},
+			{Title: "Examples", URL: "#"},
+		},
+	},
+	{
+		Title: "API Reference", URL: "#",
+		Items: []navSubItem{
+			{Title: "Components", URL: "#"},
+			{Title: "File Conventions", URL: "#"},
+			{Title: "Functions", URL: "#"},
+			{Title: "next.config.js Options", URL: "#"},
+			{Title: "CLI", URL: "#"},
+			{Title: "Edge Runtime", URL: "#"},
+		},
+	},
+	{
+		Title: "Architecture", URL: "#",
+		Items: []navSubItem{
+			{Title: "Accessibility", URL: "#"},
+			{Title: "Fast Refresh", URL: "#"},
+			{Title: "Next.js Compiler", URL: "#"},
+			{Title: "Supported Browsers", URL: "#"},
+			{Title: "Turbopack", URL: "#"},
+		},
+	},
+	{
+		Title: "Community", URL: "#",
+		Items: []navSubItem{
+			{Title: "Contribution Guide", URL: "#"},
+		},
+	},
+}
+
+templ AppSidebar() {
+	@sidebar.Sidebar() {
+		@sidebar.Header() {
+			@VersionSwitcher(versions, versions[0])
+			@SearchForm()
+		}
+		@sidebar.Content(sidebar.ContentProps{Class: "gap-0"}) {
+			// We create a collapsible SidebarGroup for each parent.
+			for _, item := range navMain {
+				@collapsible.Collapsible(collapsible.Props{
+					Open:  true,
+					Class: "group/collapsible",
+				}) {
+					@sidebar.Group() {
+						@sidebar.GroupLabel(sidebar.GroupLabelProps{
+							Class:      "group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+							Attributes: collapsible.Trigger(ctx),
+						}) {
+							{ item.Title }
+							@icon.ChevronRight(icon.Props{Class: "ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90"})
+						}
+						@collapsible.Content() {
+							@sidebar.GroupContent() {
+								@sidebar.Menu() {
+									for _, subItem := range item.Items {
+										@sidebar.MenuItem() {
+											@sidebar.MenuButton(sidebar.MenuButtonProps{
+												Href:     subItem.URL,
+												IsActive: subItem.IsActive,
+											}) {
+												{ subItem.Title }
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		@sidebar.Rail()
+	}
+}

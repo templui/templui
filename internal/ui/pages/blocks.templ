@@ -1,0 +1,303 @@
+package pages
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/button"
+	"github.com/axadrn/shadcn-templ/v2/internal/registry"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/blocks"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/layouts"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/modules"
+	"github.com/axadrn/shadcn-templ/v2/utils"
+)
+
+// The blocks gallery, the pendant of shadcn's /blocks pages: page header,
+// the category nav and one BlockViewer per block.
+
+// blocksCategory mirrors lib/categories.ts registryCategories.
+type blocksCategory struct {
+	Name   string
+	Slug   string
+	Hidden bool
+}
+
+var blocksCategories = []blocksCategory{
+	{"Sidebar", "sidebar", false},
+	{"Dashboard", "dashboard", true},
+	{"Authentication", "authentication", true},
+	{"Login", "login", false},
+	{"Signup", "signup", false},
+}
+
+// BlockCategories are the routable /blocks/{category} slugs; hidden
+// categories route too, like generateStaticParams over all
+// registryCategories.
+var BlockCategories = map[string]bool{
+	"sidebar": true, "dashboard": true, "authentication": true,
+	"login": true, "signup": true,
+}
+
+// featuredBlocks is FEATURED_BLOCKS of app/(app)/blocks/page.tsx.
+var featuredBlocks = []string{
+	"dashboard-01",
+	"sidebar-07",
+	"sidebar-03",
+	"login-03",
+	"login-04",
+}
+
+// blocksFor resolves the gallery entries: the featured list on /blocks,
+// the category's registry:block items otherwise.
+func blocksFor(category string) []modules.BlockEntry {
+	var items []registry.Item
+	if category == "" {
+		for _, name := range featuredBlocks {
+			if it := registry.Find(name); it != nil {
+				items = append(items, *it)
+			}
+		}
+	} else {
+		items = registry.Blocks(category)
+	}
+
+	entries := make([]modules.BlockEntry, 0, len(items))
+	for _, it := range items {
+		entry := modules.BlockEntry{
+			Name:        it.Name,
+			Description: it.Description,
+		}
+		if it.Meta != nil {
+			entry.IframeHeight = it.Meta.IframeHeight
+		}
+		for _, f := range blocks.Files(it) {
+			entry.Files = append(entry.Files, modules.BlockFile{Path: f.Path, Content: f.Content})
+		}
+		entries = append(entries, entry)
+	}
+	return entries
+}
+
+const blocksTitle = "Building Blocks for the Web"
+const blocksDescription = "Clean, modern building blocks. Copy and paste into your apps. Built with Go and templ. Open Source. Free forever."
+
+templ Blocks(category string) {
+	@layouts.BaseLayout(blocksTitle, blocksDescription) {
+		@modules.AnnouncementBar()
+		<div class="sticky top-0 z-40 bg-background">
+			@modules.Navbar()
+		</div>
+		<section class="border-grid">
+			<div class="container-wrapper">
+				<div class="container mx-auto flex flex-col items-center gap-2 px-6 py-8 text-center md:py-16 lg:py-20 xl:gap-4">
+					<h1 class="leading-tighter max-w-3xl text-3xl font-semibold tracking-tight text-balance text-primary lg:leading-[1.1] lg:font-semibold xl:text-5xl xl:tracking-tighter">
+						{ blocksTitle }
+					</h1>
+					<p class="max-w-4xl text-base text-balance text-foreground sm:text-lg">
+						{ blocksDescription }
+					</p>
+					<div class="flex w-full items-center justify-center gap-2 pt-2 **:data-[slot=button]:shadow-none">
+						@button.Button(button.Props{Size: button.SizeSm, Class: "px-3", Href: "#blocks"}) {
+							Browse Blocks
+						}
+						@button.Button(button.Props{Variant: button.VariantGhost, Size: button.SizeSm, Class: "px-3", Href: "/docs/components"}) {
+							View Components
+						}
+					</div>
+				</div>
+			</div>
+		</section>
+		<div id="blocks-page">
+			<div id="blocks" class="container-wrapper scroll-mt-24">
+				<div class="container mx-auto flex items-center justify-between gap-4 px-4 py-4">
+					<div class="relative overflow-hidden">
+						<div class="max-w-[600px] overflow-x-auto no-scrollbar lg:max-w-none">
+							<div class="flex items-center">
+								@blocksNavLink("Featured", "", category)
+								for _, c := range blocksCategories {
+									if !c.Hidden {
+										@blocksNavLink(c.Name, c.Slug, category)
+									}
+								}
+							</div>
+						</div>
+					</div>
+					@button.Button(button.Props{
+						Variant: button.VariantSecondary,
+						Size:    button.SizeSm,
+						Class:   "mr-7 hidden shadow-none lg:flex",
+						Href:    "/blocks/sidebar",
+					}) {
+						Browse all blocks
+					}
+				</div>
+			</div>
+			<div class="container-wrapper flex-1 section-soft md:py-12">
+				<div class="container mx-auto px-4 pb-6">
+					<div class="flex flex-col gap-12 md:gap-24">
+						for _, entry := range blocksFor(category) {
+							@modules.BlockViewer(entry)
+						}
+						if category == "" {
+							<div class="container-wrapper">
+								<div class="container flex justify-center py-6">
+									@button.Button(button.Props{Variant: button.VariantOutline, Href: "/blocks/sidebar"}) {
+										Browse more blocks
+									}
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+		@modules.Footer()
+		@blocksPageScript()
+	}
+}
+
+// blocksNavLink is the BlocksNavLink pendant, with the charts nav's HTMX
+// swap on the gallery container.
+templ blocksNavLink(name, slug, active string) {
+	{{ href := "/blocks" + utils.IfElse(slug == "", "", "/"+slug) }}
+	<a
+		href={ templ.SafeURL(href + "#blocks") }
+		hx-get={ href }
+		hx-select="#blocks-page"
+		hx-target="#blocks-page"
+		hx-swap="outerHTML"
+		hx-push-url={ href }
+		data-active={ utils.IfElse(slug == active, "true", "false") }
+		class="flex h-7 shrink-0 items-center justify-center px-4 text-center text-base font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:text-primary"
+	>
+		{ name }
+	</a>
+}
+
+// BlockView is the /view/{name} pendant for blocks: the block's page
+// component standalone, the target of the gallery iframes.
+templ BlockView(name string) {
+	@layouts.BaseLayout(name, "") {
+		@blocks.Component(name)
+	}
+}
+
+// blocksPageScript wires the viewer interactions that React state carries
+// in block-viewer.tsx: view tabs, viewport toggles, the resize handle,
+// refresh, the add command copy, file tree switching and file copy.
+templ blocksPageScript() {
+	<script nonce={ templ.GetNonce(ctx) }>
+		(() => {
+			const wrapperOf = (el) => el.closest("[data-tui-block-wrapper]");
+
+			// Copy feedback: swap the idle icon for the check for two
+			// seconds, the useCopyToClipboard pendant.
+			const flash = (btn, idleSel, doneSel) => {
+				const idle = btn.querySelector(idleSel);
+				const done = btn.querySelector(doneSel);
+				if (!idle || !done) return;
+				idle.classList.add("hidden");
+				done.classList.remove("hidden");
+				setTimeout(() => {
+					idle.classList.remove("hidden");
+					done.classList.add("hidden");
+				}, 2000);
+			};
+
+			document.addEventListener("click", (e) => {
+				if (!(e.target instanceof Element)) return;
+
+				// View tabs: Preview / Code set the wrapper's data-view.
+				const viewBtn = e.target.closest("[data-tui-block-set-view]");
+				if (viewBtn) {
+					wrapperOf(viewBtn)?.setAttribute("data-view", viewBtn.getAttribute("data-tui-block-set-view"));
+					return;
+				}
+
+				// Viewport toggles resize the panel and switch to preview.
+				const sizeBtn = e.target.closest("[data-tui-block-size]");
+				if (sizeBtn) {
+					const wrapper = wrapperOf(sizeBtn);
+					if (!wrapper) return;
+					wrapper.setAttribute("data-view", "preview");
+					const panel = wrapper.querySelector("[data-tui-block-panel]");
+					if (panel) panel.style.width = sizeBtn.getAttribute("data-tui-block-size");
+					return;
+				}
+
+				// Refresh reloads the preview iframe.
+				const refreshBtn = e.target.closest("[data-tui-block-refresh]");
+				if (refreshBtn) {
+					const frame = wrapperOf(refreshBtn)?.querySelector("[data-tui-block-iframe]");
+					if (frame) frame.src = frame.src;
+					return;
+				}
+
+				// The CLI add command copy button.
+				const addBtn = e.target.closest("[data-tui-block-add]");
+				if (addBtn) {
+					navigator.clipboard.writeText(addBtn.getAttribute("data-tui-block-add"));
+					flash(addBtn, "[data-tui-block-add-idle]", "[data-tui-block-add-done]");
+					return;
+				}
+
+				// File tree folders collapse/expand.
+				const folderBtn = e.target.closest("[data-tui-block-folder-trigger]");
+				if (folderBtn) {
+					folderBtn.closest("[data-tui-block-folder]")?.toggleAttribute("data-closed");
+					return;
+				}
+
+				// File tree leaves switch the active code pane.
+				const fileBtn = e.target.closest("[data-tui-block-file]");
+				if (fileBtn) {
+					const wrapper = wrapperOf(fileBtn);
+					if (!wrapper) return;
+					const path = fileBtn.getAttribute("data-tui-block-file");
+					wrapper.querySelectorAll("[data-tui-block-file]").forEach((b) => {
+						b.setAttribute("data-active", b === fileBtn ? "true" : "false");
+					});
+					wrapper.querySelectorAll("[data-tui-block-file-pane]").forEach((p) => {
+						p.classList.toggle("hidden", p.getAttribute("data-tui-block-file-pane") !== path);
+					});
+					return;
+				}
+
+				// The per-file copy button in the code figcaption.
+				const copyBtn = e.target.closest("[data-tui-block-copy-file]");
+				if (copyBtn) {
+					const wrapper = wrapperOf(copyBtn);
+					const path = copyBtn.getAttribute("data-tui-block-copy-file");
+					const source = wrapper?.querySelector(`[data-tui-block-file-source="${CSS.escape(path)}"]`);
+					if (source) navigator.clipboard.writeText(source.value);
+					flash(copyBtn, "[data-tui-block-copy-idle]", "[data-tui-block-copy-done]");
+					return;
+				}
+			});
+
+			// The resize handle, the react-resizable-panels pendant: drag
+			// sets the panel width between 30% and 100% of the canvas.
+			let drag = null;
+			document.addEventListener("pointerdown", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const handle = e.target.closest("[data-tui-block-handle]");
+				if (!handle) return;
+				const canvas = handle.closest("[data-tui-block-resizable]");
+				const panel = canvas?.querySelector("[data-tui-block-panel]");
+				if (!canvas || !panel) return;
+				drag = { canvas, panel };
+				// Iframes swallow pointermove; fence them during the drag.
+				canvas.querySelectorAll("iframe").forEach((f) => (f.style.pointerEvents = "none"));
+				e.preventDefault();
+			});
+			document.addEventListener("pointermove", (e) => {
+				if (!drag) return;
+				const rect = drag.canvas.getBoundingClientRect();
+				const pct = ((e.clientX - rect.left) / rect.width) * 100;
+				drag.panel.style.width = Math.min(100, Math.max(30, pct)) + "%";
+			});
+			document.addEventListener("pointerup", () => {
+				if (!drag) return;
+				drag.canvas.querySelectorAll("iframe").forEach((f) => (f.style.pointerEvents = ""));
+				drag = null;
+			});
+		})();
+	</script>
+}

@@ -8,14 +8,18 @@ package registry
 import (
 	"encoding/json"
 	"log"
+	"slices"
 
 	shadcntempl "github.com/axadrn/shadcn-templ/v2"
 )
 
-// File is one files[] entry of a registry item.
+// File is one files[] entry of a registry item. Target is the explicit
+// install path of block pages (shadcn's target field); empty for the
+// components-dir mapped files.
 type File struct {
-	Path string `json:"path"`
-	Type string `json:"type"`
+	Path   string `json:"path"`
+	Type   string `json:"type"`
+	Target string `json:"target,omitempty"`
 }
 
 // Item is a registry item in shadcn's registry-item.json schema (the fields
@@ -29,6 +33,13 @@ type Item struct {
 	RegistryDependencies []string `json:"registryDependencies,omitempty"`
 	Files                []File   `json:"files"`
 	Categories           []string `json:"categories,omitempty"`
+	Meta                 *Meta    `json:"meta,omitempty"`
+}
+
+// Meta is the freeform meta block of an item; blocks carry the iframe
+// height of their /blocks preview (shadcn's meta.iframeHeight).
+type Meta struct {
+	IframeHeight string `json:"iframeHeight,omitempty"`
 }
 
 // FilePaths returns the path of every file of the item.
@@ -84,15 +95,36 @@ func Components() []Item {
 	return out
 }
 
-// Find returns the installable item (registry:ui, registry:lib or
-// registry:example, e.g. the
+// Find returns the installable item (registry:ui, registry:lib,
+// registry:example or registry:block, e.g. the
 // utils lib item) with the given name, or nil.
 func Find(name string) *Item {
 	items := Get().Items
 	for i := range items {
-		if (items[i].Type == "registry:ui" || items[i].Type == "registry:lib" || items[i].Type == "registry:example") && items[i].Name == name {
-			return &items[i]
+		switch items[i].Type {
+		case "registry:ui", "registry:lib", "registry:example", "registry:block":
+			if items[i].Name == name {
+				return &items[i]
+			}
 		}
 	}
 	return nil
+}
+
+// Blocks returns the registry:block items, optionally filtered by category,
+// in registry.json order - the pendant of lib/blocks.ts getAllBlocks.
+func Blocks(categories ...string) []Item {
+	var out []Item
+	for _, it := range Get().Items {
+		if it.Type != "registry:block" {
+			continue
+		}
+		if len(categories) > 0 && !slices.ContainsFunc(it.Categories, func(c string) bool {
+			return slices.Contains(categories, c)
+		}) {
+			continue
+		}
+		out = append(out, it)
+	}
+	return out
 }

@@ -1,0 +1,90 @@
+package sidebar09
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/avatar"
+	"github.com/axadrn/shadcn-templ/v2/components/dropdownmenu"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+type User struct {
+	Name   string
+	Email  string
+	Avatar string
+}
+
+templ NavUser(user User) {
+	@sidebar.Menu() {
+		@sidebar.MenuItem() {
+			@dropdownmenu.DropdownMenu() {
+				@sidebar.MenuButton(sidebar.MenuButtonProps{
+					Size:       sidebar.MenuButtonSizeLg,
+					Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground md:h-8 md:p-0",
+					Attributes: dropdownmenu.Trigger(ctx),
+				}) {
+					@avatar.Avatar(avatar.Props{Class: "h-8 w-8 rounded-lg"}) {
+						@avatar.Image(avatar.ImageProps{Src: user.Avatar, Alt: user.Name})
+						@avatar.Fallback(avatar.FallbackProps{Class: "rounded-lg"}) {
+							AA
+						}
+					}
+					<div class="grid flex-1 text-left text-sm leading-tight">
+						<span class="truncate font-medium">{ user.Name }</span>
+						<span class="truncate text-xs">{ user.Email }</span>
+					</div>
+					@icon.ChevronsUpDown(icon.Props{Class: "ml-auto size-4"})
+				}
+				// side={isMobile ? "bottom" : "right"} renders the desktop
+				// default; the menu flips on its own when there is no room.
+				@dropdownmenu.Content(dropdownmenu.ContentProps{
+					Class:      "w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg",
+					Side:       dropdownmenu.SideRight,
+					Align:      dropdownmenu.AlignEnd,
+					SideOffset: 4,
+				}) {
+					@dropdownmenu.Label(dropdownmenu.LabelProps{Class: "p-0 font-normal"}) {
+						<div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+							@avatar.Avatar(avatar.Props{Class: "h-8 w-8 rounded-lg"}) {
+								@avatar.Image(avatar.ImageProps{Src: user.Avatar, Alt: user.Name})
+								@avatar.Fallback(avatar.FallbackProps{Class: "rounded-lg"}) {
+									AA
+								}
+							}
+							<div class="grid flex-1 text-left text-sm leading-tight">
+								<span class="truncate font-medium">{ user.Name }</span>
+								<span class="truncate text-xs">{ user.Email }</span>
+							</div>
+						</div>
+					}
+					@dropdownmenu.Separator()
+					@dropdownmenu.Group() {
+						@dropdownmenu.Item() {
+							@icon.Sparkles()
+							Upgrade to Pro
+						}
+					}
+					@dropdownmenu.Separator()
+					@dropdownmenu.Group() {
+						@dropdownmenu.Item() {
+							@icon.BadgeCheck()
+							Account
+						}
+						@dropdownmenu.Item() {
+							@icon.CreditCard()
+							Billing
+						}
+						@dropdownmenu.Item() {
+							@icon.Bell()
+							Notifications
+						}
+					}
+					@dropdownmenu.Separator()
+					@dropdownmenu.Item() {
+						@icon.LogOut()
+						Log out
+					}
+				}
+			}
+		}
+	}
+}

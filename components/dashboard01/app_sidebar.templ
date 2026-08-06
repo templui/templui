@@ -1,0 +1,117 @@
+package dashboard01
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+type User struct {
+	Name   string
+	Email  string
+	Avatar string
+}
+
+type NavItem struct {
+	Title string
+	URL   string
+	Icon  func(...icon.Props) templ.Component
+}
+
+type NavCloudSubItem struct {
+	Title string
+	URL   string
+}
+
+type NavCloudItem struct {
+	Title    string
+	Icon     func(...icon.Props) templ.Component
+	IsActive bool
+	URL      string
+	Items    []NavCloudSubItem
+}
+
+type DocumentItem struct {
+	Name string
+	URL  string
+	Icon func(...icon.Props) templ.Component
+}
+
+var appSidebarUser = User{
+	Name:   "Axel Adrian",
+	Email:  "m@example.com",
+	Avatar: "https://github.com/axadrn.png",
+}
+
+var appSidebarNavMain = []NavItem{
+	{Title: "Dashboard", URL: "#", Icon: icon.LayoutDashboard},
+	{Title: "Lifecycle", URL: "#", Icon: icon.TableOfContents},
+	{Title: "Analytics", URL: "#", Icon: icon.ChartColumn},
+	{Title: "Projects", URL: "#", Icon: icon.Folder},
+	{Title: "Team", URL: "#", Icon: icon.Users},
+}
+
+// The pendant of the tsx data.navClouds: like in the tsx it is defined but
+// never rendered by AppSidebar (kept anonymous so linters stay quiet).
+var _ = []NavCloudItem{
+	{
+		Title: "Capture", Icon: icon.Camera, IsActive: true, URL: "#",
+		Items: []NavCloudSubItem{
+			{Title: "Active Proposals", URL: "#"},
+			{Title: "Archived", URL: "#"},
+		},
+	},
+	{
+		Title: "Proposal", Icon: icon.FileText, URL: "#",
+		Items: []NavCloudSubItem{
+			{Title: "Active Proposals", URL: "#"},
+			{Title: "Archived", URL: "#"},
+		},
+	},
+	{
+		Title: "Prompts", Icon: icon.FileCode, URL: "#",
+		Items: []NavCloudSubItem{
+			{Title: "Active Proposals", URL: "#"},
+			{Title: "Archived", URL: "#"},
+		},
+	},
+}
+
+var appSidebarNavSecondary = []NavItem{
+	{Title: "Settings", URL: "#", Icon: icon.Settings},
+	{Title: "Get Help", URL: "#", Icon: icon.CircleQuestionMark},
+	{Title: "Search", URL: "#", Icon: icon.Search},
+}
+
+var appSidebarDocuments = []DocumentItem{
+	{Name: "Data Library", URL: "#", Icon: icon.Database},
+	{Name: "Reports", URL: "#", Icon: icon.ClipboardList},
+	{Name: "Word Assistant", URL: "#", Icon: icon.FileType},
+}
+
+templ AppSidebar() {
+	@sidebar.Sidebar(sidebar.Props{Collapsible: sidebar.CollapsibleOffcanvas, Variant: sidebar.VariantInset}) {
+		@sidebar.Header() {
+			@sidebar.Menu() {
+				@sidebar.MenuItem() {
+					@sidebar.MenuButton(sidebar.MenuButtonProps{
+						Class: "data-[slot=sidebar-menu-button]:p-1.5!",
+						Href:  "#",
+					}) {
+						// IconInnerShadowTop has no lucide pendant, LoaderCircle is
+						// the closest circle-with-arc shape.
+						@icon.LoaderCircle(icon.Props{Class: "size-5!"})
+						<span class="text-base font-semibold">Acme Inc.</span>
+					}
+				}
+			}
+		}
+		@sidebar.Content() {
+			@NavMain(appSidebarNavMain)
+			@NavDocuments(appSidebarDocuments)
+			@NavSecondary(appSidebarNavSecondary, "mt-auto")
+		}
+		@sidebar.Footer() {
+			@NavUser(appSidebarUser)
+		}
+	}
+}
