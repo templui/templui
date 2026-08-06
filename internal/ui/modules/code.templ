@@ -2,7 +2,10 @@ package modules
 
 import (
 	"bytes"
+	"compress/gzip"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"github.com/templui/templui/components/copybutton"
 	"github.com/templui/templui/utils"
@@ -94,7 +97,62 @@ var (
 	// For production, a more robust cache (e.g., with LRU) would be advisable
 	cache      = make(map[string]string)
 	cacheMutex sync.RWMutex
+
+	// bakedCache is the build-time highlight cache (cmd/highlight-gen):
+	// hashed cache key -> highlighted HTML. In the production image it
+	// replaces the node shiki service entirely.
+	bakedCache map[string]string
+	bakedOnce  sync.Once
 )
+
+// bakedCachePath is overridable so the generator stage can point elsewhere.
+func bakedCachePath() string {
+	if p := os.Getenv("HIGHLIGHT_CACHE"); p != "" {
+		return p
+	}
+	return "assets/highlight-cache.json.gz"
+}
+
+func loadBakedCache() {
+	bakedOnce.Do(func() {
+		f, err := os.Open(bakedCachePath())
+		if err != nil {
+			return // no baked cache: dev mode, the live service handles it
+		}
+		defer f.Close()
+		zr, err := gzip.NewReader(f)
+		if err != nil {
+			log.Printf("WARN: highlight cache unreadable: %v", err)
+			return
+		}
+		defer zr.Close()
+		var m map[string]string
+		if err := json.NewDecoder(zr).Decode(&m); err != nil {
+			log.Printf("WARN: highlight cache undecodable: %v", err)
+			return
+		}
+		bakedCache = m
+		log.Printf("INFO: highlight cache loaded (%d entries)", len(m))
+	})
+}
+
+func hashCacheKey(key string) string {
+	sum := sha256.Sum256([]byte(key))
+	return hex.EncodeToString(sum[:])
+}
+
+// DumpHighlightCache serializes the runtime cache with hashed keys - the
+// build-time generator (cmd/highlight-gen) fetches it after crawling all
+// pages against the live shiki service.
+func DumpHighlightCache(w io.Writer) error {
+	cacheMutex.RLock()
+	defer cacheMutex.RUnlock()
+	m := make(map[string]string, len(cache))
+	for k, v := range cache {
+		m[hashCacheKey(k)] = v
+	}
+	return json.NewEncoder(w).Encode(m)
+}
 
 // GetHighlightedHTML calls the Shiki service and returns HTML.
 // Returns HTML-escaped original code on errors.
@@ -120,6 +178,23 @@ func GetHighlightedHTML(ctx context.Context, codeContent string, language string
 		return cachedValue
 	}
 	cacheMutex.RUnlock()
+
+	// Baked build-time cache: a hit always wins (the key hashes the code
+	// content, so a stale file can never serve wrong HTML - changed code
+	// is a new key). On a miss the environment decides: production has no
+	// node service, so log and serve plain code instead of dialing a dead
+	// URL; development always falls through to the live service.
+	loadBakedCache()
+	if baked, ok := bakedCache[hashCacheKey(cacheKey)]; ok {
+		cacheMutex.Lock()
+		cache[cacheKey] = baked
+		cacheMutex.Unlock()
+		return baked
+	}
+	if os.Getenv("GO_ENV") == "production" && os.Getenv("SHIKI_URL") == "" {
+		log.Printf("WARN: highlight cache miss for lang %s (%d bytes), serving plain code", language, len(codeContent))
+		return html.EscapeString(codeContent)
+	}
 
 	// log.Println("Shiki Cache Miss for lang:", language)
 

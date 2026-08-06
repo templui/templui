@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/templui/templui/internal/config"
 	"github.com/templui/templui/internal/middleware"
 	"github.com/templui/templui/internal/service"
+	"github.com/templui/templui/internal/ui/modules"
 	"github.com/templui/templui/internal/ui/pages"
 	"github.com/templui/templui/static"
 )
@@ -100,6 +102,18 @@ func main() {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.Write(content)
 	})
+
+	// Build-time highlight generator hook (cmd/highlight-gen): after the
+	// crawler warmed every page, it fetches the accumulated shiki cache
+	// here. Only mounted when the generator run asks for it.
+	if os.Getenv("HIGHLIGHT_DUMP") == "1" {
+		mux.HandleFunc("GET /debug/highlight-cache", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			if err := modules.DumpHighlightCache(w); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		})
+	}
 
 	mux.Handle("GET /{$}", templ.Handler(pages.Landing()))
 	mux.Handle("GET /docs", http.RedirectHandler("/docs/introduction", http.StatusSeeOther))

@@ -31,6 +31,29 @@ RUN ./tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --minify
 
 # Build the application as a static binary
 RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/docs/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o highlight-gen ./cmd/highlight-gen/main.go
+
+# Shiki deps stage: install the highlighter service's node_modules once.
+FROM node:20-alpine AS shiki
+WORKDIR /shiki
+COPY shiki/package*.json ./
+RUN npm ci --omit=dev
+COPY shiki/server.js ./
+
+# Highlight stage: the only place node ever runs. The crawler renders every
+# sitemap page against the live shiki service and bakes the resulting
+# highlight cache into a file the runtime loads instead.
+FROM node:20-alpine AS highlight
+WORKDIR /app
+COPY --from=shiki /shiki /app/shiki
+COPY --from=build /app/main /app/highlight-gen ./
+COPY --from=build /app/assets/css/output.css ./assets/css/output.css
+# GO_ENV=production so pages render exactly like the deploy; SHIKI_URL keeps
+# the service reachable despite production mode; HIGHLIGHT_DUMP mounts the
+# dump route the generator reads at the end.
+RUN node /app/shiki/server.js & \
+  GO_ENV=production HIGHLIGHT_DUMP=1 SHIKI_URL=http://localhost:3000/highlight ./main & \
+  ./highlight-gen -server http://localhost:8090 -out /app/highlight-cache.json.gz
 
 # Deploy-Stage
 FROM alpine:3.20.2
@@ -42,9 +65,10 @@ RUN apk add --no-cache ca-certificates
 # Set environment variable for runtime
 ENV GO_ENV=production
 
-# Copy the binary and CSS output
+# Copy the binary, CSS output and the baked highlight cache
 COPY --from=build /app/main .
 COPY --from=build /app/assets/css/output.css ./assets/css/output.css
+COPY --from=highlight /app/highlight-cache.json.gz ./assets/highlight-cache.json.gz
 
 # Expose the port
 EXPOSE 8090
