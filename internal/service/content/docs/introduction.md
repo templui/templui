@@ -64,3 +64,7 @@ The design of shadcn-templ makes it easy for AI tools to work with your code. It
 _An AI model can learn how your components work and suggest improvements or even create new components that integrate with your existing design._
 
 shadcn-templ is the templ pendant of [shadcn/ui](https://ui.shadcn.com) and follows its principles. If you prefer plain Go imports without copying code, that exists as a shadcn-templ extra: the [Import Workflow](/docs/import-workflow).
+
+## Credits
+
+shadcn-templ is an unofficial, community-led port of shadcn/ui for Go and templ. We are not affiliated with [shadcn](https://x.com/shadcn), but we did get his blessing before creating this project. The designs, methodology and API surface are his work. The vanilla JavaScript ports of [Base UI](https://base-ui.com) behavior and the Go/[templ](https://templ.guide) implementation are ours.
