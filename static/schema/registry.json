@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://shadcn-templ.com/schema/registry.json",
+  "title": "shadcn-templ registry.json",
+  "description": "A shadcn-templ registry of components, examples and libraries.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the registry."
+    },
+    "homepage": {
+      "type": "string",
+      "description": "The homepage of the registry."
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "https://shadcn-templ.com/schema/registry-item.json"
+      }
+    }
+  },
+  "required": ["name", "homepage", "items"]
+}

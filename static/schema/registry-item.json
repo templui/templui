@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://shadcn-templ.com/schema/registry-item.json",
+  "title": "shadcn-templ registry item",
+  "description": "A single item in a shadcn-templ registry.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "description": "The kebab-case name of the item, used by the CLI (shadcn-templ add <name>)."
+    },
+    "type": {
+      "type": "string",
+      "enum": ["registry:ui", "registry:lib", "registry:example"]
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "meta": {
+      "type": "object",
+      "description": "Freeform metadata, present in served style items."
+    },
+    "registryDependencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Names of other registry items this item needs."
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Go module dependencies (go get paths)."
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["registry:ui", "registry:lib", "registry:example"]
+          },
+          "content": {
+            "type": "string",
+            "description": "Inlined file content, present in served style items."
+          },
+          "target": {
+            "type": "string"
+          }
+        },
+        "required": ["path", "type"]
+      }
+    }
+  },
+  "required": ["name", "type", "files"]
+}

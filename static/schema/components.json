@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://shadcn-templ.com/schema/components.json",
+  "title": "shadcn-templ components.json",
+  "description": "Configuration for the shadcn-templ CLI, the pendant of shadcn's schema.json.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "style": {
+      "type": "string",
+      "enum": [
+        "base-vega",
+        "base-nova",
+        "base-maia",
+        "base-lyra",
+        "base-mira",
+        "base-luma",
+        "base-sera",
+        "base-rhea"
+      ]
+    },
+    "tailwind": {
+      "type": "object",
+      "properties": {
+        "css": {
+          "type": "string"
+        },
+        "baseColor": {
+          "type": "string"
+        },
+        "cssVariables": {
+          "type": "boolean"
+        }
+      },
+      "required": ["css", "baseColor", "cssVariables"]
+    },
+    "rtl": {
+      "type": "boolean"
+    },
+    "iconLibrary": {
+      "type": "string"
+    },
+    "menuColor": {
+      "type": "string",
+      "enum": [
+        "default",
+        "inverted",
+        "default-translucent",
+        "inverted-translucent"
+      ]
+    },
+    "menuAccent": {
+      "type": "string",
+      "enum": ["subtle", "bold"]
+    },
+    "aliases": {
+      "type": "object",
+      "properties": {
+        "components": {
+          "type": "string"
+        },
+        "utils": {
+          "type": "string"
+        }
+      },
+      "required": ["components", "utils"]
+    }
+  },
+  "required": ["style", "tailwind", "aliases"]
+}

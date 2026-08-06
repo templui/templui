@@ -74,6 +74,12 @@ func main() {
 	mux.HandleFunc("GET /robots.txt", serveStaticRebased("robots.txt", "text/plain"))
 	mux.HandleFunc("GET /llms.txt", serveStaticRebased("llms.txt", "text/plain; charset=utf-8"))
 
+	// JSON schemas behind the $schema URLs in components.json and
+	// registry.json, the pendant of ui.shadcn.com/schema/*.json.
+	for _, s := range []string{"components.json", "registry.json", "registry-item.json"} {
+		mux.HandleFunc("GET /schema/"+s, serveStaticRebased("schema/"+s, "application/json"))
+	}
+
 	mux.Handle("GET /{$}", templ.Handler(pages.IndexPage()))
 	mux.Handle("GET /docs", http.RedirectHandler("/docs/introduction", http.StatusSeeOther))
 	mux.Handle("GET /docs/getting-started", http.RedirectHandler("/docs/introduction", http.StatusSeeOther))
