@@ -6,7 +6,7 @@ name: deploy
 
 on:
   push:
-    branches: [v2]
+    branches: [v2, main]
 
 permissions:
   contents: read
@@ -40,5 +40,4 @@ jobs:
       # Dokploy pulls the fresh image; the URL is the app's deploy
       # webhook (Deployments tab) stored as a repo secret.
       - name: Trigger Dokploy deploy
-        if: ${{ github.ref == 'refs/heads/v2' }}
         run: curl -fsS -X POST "${{ secrets.DOKPLOY_WEBHOOK_URL }}"
