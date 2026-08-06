@@ -14,9 +14,6 @@ RUN templ generate
 # Install build dependencies
 RUN apt-get update && apt-get install -y curl wget && rm -rf /var/lib/apt/lists/*
 
-# Get the latest version from GitHub API and save it to version.txt
-RUN curl -s https://api.github.com/repos/templui/templui/releases/latest | grep tag_name | cut -d '"' -f 4 > version.txt || echo "unknown" > version.txt
-
 # Install Tailwind CSS standalone CLI
 RUN ARCH=$(uname -m) && \
   if [ "$ARCH" = "x86_64" ]; then \
@@ -45,9 +42,8 @@ RUN apk add --no-cache ca-certificates
 # Set environment variable for runtime
 ENV GO_ENV=production
 
-# Copy the binary, version file, and CSS output
+# Copy the binary and CSS output
 COPY --from=build /app/main .
-COPY --from=build /app/version.txt .
 COPY --from=build /app/assets/css/output.css ./assets/css/output.css
 
 # Expose the port
