@@ -661,6 +661,12 @@
     if (e.button !== 0 || !(e.target instanceof Element)) return;
     const trigger = e.target.closest("[data-tui-select-trigger]");
     if (trigger) {
+      // Touch opens on the click that fires at release (Base UI opens on
+      // the compat mousedown, which for touch also fires post-touchend).
+      // Opening at press would put the aligned popup under the still-down
+      // finger, and the tap's click, hit-tested at the release point,
+      // would land on the item above the trigger and instantly commit it.
+      if (e.pointerType === "touch") return;
       pressedTriggers.add(trigger);
       // Keep the browser from focusing the trigger button, focus lives on
       // the selected item while the listbox is open (Base UI focus scope).
