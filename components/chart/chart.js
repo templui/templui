@@ -1803,6 +1803,13 @@ function initPanel(script) {
     // The points this panel drew are what the next visible panel morphs
     // from, Recharts' previousPointsRef.
     if (state.points) container._tuiActivePoints = state.points;
+    // Recharts renders the cursor and the active dots from the tooltip
+    // state on every pass, so a hover keeps its overlays through the
+    // entrance animation even though each frame rebuilds the surface.
+    if (state.activeIndex != null) {
+      showCursor(panel, m, state, state.activeIndex);
+      showActiveDots(panel, m, state, state.activeIndex);
+    }
     // The default tooltip waits for the first real layout of a panel that
     // mounted hidden.
     if (state.onFirstRender && state.geom) {
@@ -1920,6 +1927,7 @@ function initPanel(script) {
       resolveTooltip();
       return;
     }
+    state.activeIndex = i;
     showCursor(panel, m, state, i);
     showActiveDots(panel, m, state, i);
     // getActiveCoordinate: the category axis snaps to its tick and the
@@ -1979,6 +1987,7 @@ function initPanel(script) {
       const g = state.geom;
       if (!g || !g.cats || di < 0 || di > g.cats.length - 1) return;
       const dep = (g.plotY + g.H) / 2;
+      state.activeIndex = di;
       showCursor(panel, m, state, di);
       showActiveDots(panel, m, state, di);
       positionTooltip(null, g.vertical ? dep : g.cats[di], g.vertical ? g.cats[di] : dep, di);
@@ -2002,6 +2011,7 @@ function initPanel(script) {
     const i = Math.min(Math.max(state.keyboard.index, 0), g.cats.length - 1);
     const rect = panel.getBoundingClientRect();
     const e = { clientX: rect.left + g.cats[i], clientY: rect.top + g.plotY + g.H / 2 };
+    state.activeIndex = i;
     showCursor(panel, m, state, i);
     showActiveDots(panel, m, state, i);
     positionTooltip(e, g.cats[i], null, i);
@@ -2017,6 +2027,7 @@ function initPanel(script) {
       spoofKeyboard();
       return;
     }
+    state.activeIndex = null;
     wrapper.style.visibility = "hidden";
     hideCursor(panel);
   }
