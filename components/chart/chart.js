@@ -1892,7 +1892,14 @@ function initPanel(script) {
     return Math.max(0, Math.min(g.n - 1, Math.round((chartX - g.plotX) / step)));
   };
 
-  panel.addEventListener("pointermove", (e) => {
+  // parseEventsOfWrapper: the tooltip listens to mouse events, and an axis
+  // tooltip additionally to touchmove, whose handleTouchMove feeds the
+  // changed touch into the mouse handler. A touch tap shows the tooltip
+  // through the browser's compatibility mousemove and it stays until a tap
+  // elsewhere fires mouseleave; a finger dragged across the plot keeps
+  // scrubbing through touchmove even while the page scrolls. An item
+  // tooltip (pie) attaches no wrapper touch events.
+  const handleMouseMove = (e) => {
     if (m.kind === "pie") {
       const sector = e.target.closest(".recharts-sector");
       const idx = sector ? parseInt(sector.getAttribute("data-tui-chart-sector") || "-1", 10) : -1;
@@ -1923,7 +1930,15 @@ function initPanel(script) {
     }
     const snap = g ? g.cats[i] : null;
     positionTooltip(e, g && g.vertical ? null : snap, g && g.vertical ? snap : null, i);
-  });
+  };
+  panel.addEventListener("mousemove", handleMouseMove);
+  if (m.kind !== "pie") {
+    panel.addEventListener("touchmove", (e) => {
+      if (e.changedTouches != null && e.changedTouches.length > 0) {
+        handleMouseMove(e.changedTouches[0]);
+      }
+    });
+  }
 
   function positionTooltip(e, snapX, snapY, i, pieIndex = 0) {
     const wasHidden = wrapper.style.visibility !== "visible";
@@ -1949,7 +1964,7 @@ function initPanel(script) {
     wrapper.style.transform = `translate(${tx}px, ${ty}px)`;
   }
 
-  panel.addEventListener("pointerleave", () => {
+  panel.addEventListener("mouseleave", () => {
     wrapper.style.visibility = "hidden";
     hideCursor(panel);
   });
