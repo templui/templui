@@ -1866,6 +1866,18 @@ function initPanel(script) {
 
   const wrapper = tooltipWrapper(container);
 
+  // TooltipBoundingBox: Escape dismisses the tooltip box at its current
+  // coordinate; the cursor and the active dots stay up, and the box comes
+  // back as soon as the coordinate changes.
+  state.dismissed = false;
+  state.dismissedAt = { x: 0, y: 0 };
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    state.dismissed = true;
+    state.dismissedAt = state.tooltipCoord || { x: 0, y: 0 };
+    wrapper.style.visibility = "hidden";
+  });
+
   // Like Recharts' inRange: the tooltip only activates while the pointer
   // is inside the plot rectangle, not over the axis labels below.
   const activeIndexAt = (chartX, chartY) => {
@@ -1959,6 +1971,15 @@ function initPanel(script) {
     const prect = panel.getBoundingClientRect();
     const px = snapX != null ? snapX + (prect.left - crect.left) : e.clientX - crect.left;
     const py = snapY != null ? snapY + (prect.top - crect.top) : e.clientY - crect.top;
+    // A dismissed tooltip stays hidden until its coordinate changes.
+    if (state.dismissed) {
+      if (px === state.dismissedAt.x && py === state.dismissedAt.y) {
+        wrapper.style.visibility = "hidden";
+      } else {
+        state.dismissed = false;
+      }
+    }
+    state.tooltipCoord = { x: px, y: py };
     const tx = tooltipTranslate(px, tw, 0, crect.width);
     const ty = tooltipTranslate(py, th, 0, crect.height);
     if (wasHidden) {
