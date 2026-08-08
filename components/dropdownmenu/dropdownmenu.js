@@ -256,7 +256,9 @@
     document.body.style.paddingRight = "";
   }
 
-  function open(content, trigger, focusFirst) {
+  // focusOn: "first" or "last" lands focus on that item once the menu is in
+  // place, anything falsy focuses the popup. `true` still means "first".
+  function open(content, trigger, focusOn) {
     allContents().forEach((c) => {
       if (c !== content) close(c);
     });
@@ -289,8 +291,9 @@
       // The guard is the same one the reference uses: do not pull focus back
       // into a popup that closed while the frames were queued.
       const stillOpen = () => isOpen(content);
-      if (focusFirst) {
-        enqueueFocus(itemsIn(popup)[0] || popup, stillOpen);
+      if (focusOn) {
+        const items = itemsIn(popup);
+        enqueueFocus((focusOn === "last" ? items[items.length - 1] : items[0]) || popup, stillOpen);
       } else {
         enqueueFocus(popup, stillOpen);
       }
@@ -326,7 +329,7 @@
     allContents().forEach((content) => close(content, refocusTrigger));
   }
 
-  function requestOpenChange(content, nextOpen, focusFirst, refocusTrigger) {
+  function requestOpenChange(content, nextOpen, focusOn, refocusTrigger) {
     if (!content || isOpen(content) === nextOpen) return;
     const accepted = content.dispatchEvent(
       new CustomEvent("dropdownmenu-open-change", {
@@ -337,7 +340,7 @@
     );
     if (!accepted || content.hasAttribute("data-tui-dropdownmenu-controlled")) return;
     const trigger = triggerFor(content);
-    if (nextOpen && trigger) open(content, trigger, focusFirst);
+    if (nextOpen && trigger) open(content, trigger, focusOn);
     else if (!nextOpen) close(content, refocusTrigger);
   }
 
@@ -567,11 +570,35 @@
   // Pointer interactions toggle and dismiss on PRESS, exactly like Base UI.
   // Click is never used for open/close, so the stray click the browser fires
   // on <body> after the menu opened over the trigger is naturally harmless.
-  function toggle(trigger, focusFirst) {
+  function toggle(trigger, focusOn) {
     const content = contentFor(trigger);
     if (!content) return;
-    requestOpenChange(content, !isOpen(content), focusFirst);
+    requestOpenChange(content, !isOpen(content), focusOn);
   }
+
+  // The menu-button pattern: ArrowDown opens on the first item, ArrowUp on
+  // the last. Only the arrows are taken here — Enter and Space arrive as the
+  // detail-0 click a native button synthesises and are handled there, the way
+  // useClick and useListNavigation split it in the reference.
+  const OPEN_KEYS = { ArrowDown: "first", ArrowUp: "last" };
+  document.addEventListener("keydown", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const focusOn = OPEN_KEYS[e.key];
+    if (!focusOn) return;
+    const trigger = e.target.closest("[data-tui-dropdownmenu-trigger]");
+    if (!trigger || trigger.disabled) return;
+    const content = contentFor(trigger);
+    // Already open: leave it to the handlers that navigate and close.
+    if (!content || isOpen(content)) return;
+    e.preventDefault(); // the arrows would otherwise scroll the page
+    // Opening consumes the key. Without this the navigation handler below
+    // sees the menu already open in the same dispatch and walks the highlight
+    // a second time, so ArrowDown would land on the second item.
+    e.stopImmediatePropagation();
+    // Through requestOpenChange, not open, so a controlled menu still gets to
+    // veto the open and the change event still fires.
+    requestOpenChange(content, true, focusOn);
+  });
 
   document.addEventListener("pointerdown", (e) => {
     if (e.button !== 0 || !(e.target instanceof Element)) return;
