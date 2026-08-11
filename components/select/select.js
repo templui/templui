@@ -450,15 +450,26 @@
     clearTimeout(content._tuiHide);
     portal(content);
     lockScroll(); // Base UI's select is modal by default: no page scroll while open
-    if (!content.matches(":popover-open")) {
-      content.showPopover(); // native top layer
-    }
+    // z-index portal like shadcn (no native top layer); re-append
+    // keeps paint order = open order.
+    document.body.appendChild(content);
+    content.hidden = false;
 
     // Position it invisibly first, then play the enter animation in place.
     content.style.visibility = "hidden";
     const finish = () => {
+      // The popup transitions `all` (duration-100), so clearing the
+      // measuring visibility would animate visibility itself - and in
+      // background tabs and throttled iframes that transition freezes at
+      // its hidden start value. Flip with transitions suppressed.
+      const popup = popupFor(content);
+      if (popup) popup.style.transitionProperty = "none";
       content.style.visibility = "";
-      if (!content.matches(":popover-open")) return;
+      if (popup) {
+        void popup.offsetWidth;
+        popup.style.transitionProperty = "";
+      }
+      if (content.hidden) return;
       setState(content, "open");
       trigger.setAttribute("aria-expanded", "true");
       // Base UI moves focus to the selected item when the listbox opens.
@@ -471,7 +482,7 @@
   }
 
   function close(content) {
-    if (!content.matches(":popover-open")) return;
+    if (content.hidden) return;
     stopArrowScroll();
     content.style.visibility = "";
     setState(content, "closed");
@@ -483,12 +494,12 @@
     // immediately instead of waiting for one.
     const popup = popupFor(content);
     if (popup && popup.getAttribute("data-align-trigger") === "true") {
-      content.hidePopover();
+      content.hidden = true;
       return;
     }
     content._tuiHide = setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
-        content.hidePopover();
+      if (content.getAttribute("data-state") === "closed" && !content.hidden) {
+        content.hidden = true;
       }
     }, EXIT_MS);
   }
