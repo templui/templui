@@ -14,10 +14,11 @@ import (
 
 	shadcntempl "github.com/axadrn/shadcn-templ/v2"
 	"github.com/axadrn/shadcn-templ/v2/assets"
-	"github.com/axadrn/shadcn-templ/v2/internal/shared"
+	"github.com/axadrn/shadcn-templ/v2/blocks"
 	"github.com/axadrn/shadcn-templ/v2/components"
 	"github.com/axadrn/shadcn-templ/v2/internal/inliner"
 	"github.com/axadrn/shadcn-templ/v2/internal/registry"
+	"github.com/axadrn/shadcn-templ/v2/internal/shared"
 )
 
 // isDevelopment mirrors components/scripts.go: outside production every
@@ -89,14 +90,17 @@ func styleMapFor(bare string) (inliner.StyleMap, error) {
 }
 
 // componentSource reads a registry file path ("components/button/button.templ",
-// "utils/shadcntempl.go") from disk in development, from the embeds in
-// production.
+// "blocks/sidebar07/page.templ", "utils/shadcntempl.go") from disk in
+// development, from the embeds in production.
 func componentSource(filePath string) ([]byte, error) {
 	if isDevelopment() {
 		return os.ReadFile("./" + filePath)
 	}
 	if strings.HasPrefix(filePath, "utils/") {
 		return shadcntempl.UtilsFiles.ReadFile(filePath)
+	}
+	if strings.HasPrefix(filePath, "blocks/") {
+		return blocks.TemplFiles.ReadFile(strings.TrimPrefix(filePath, "blocks/"))
 	}
 	return components.TemplFiles.ReadFile(strings.TrimPrefix(filePath, "components/"))
 }

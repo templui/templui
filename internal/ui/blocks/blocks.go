@@ -9,34 +9,34 @@ import (
 
 	"github.com/a-h/templ"
 
-	"github.com/axadrn/shadcn-templ/v2/components"
-	"github.com/axadrn/shadcn-templ/v2/components/dashboard01"
-	"github.com/axadrn/shadcn-templ/v2/components/login01"
-	"github.com/axadrn/shadcn-templ/v2/components/login02"
-	"github.com/axadrn/shadcn-templ/v2/components/login03"
-	"github.com/axadrn/shadcn-templ/v2/components/login04"
-	"github.com/axadrn/shadcn-templ/v2/components/login05"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar01"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar02"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar03"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar04"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar05"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar06"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar07"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar08"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar09"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar10"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar11"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar12"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar13"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar14"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar15"
-	"github.com/axadrn/shadcn-templ/v2/components/sidebar16"
-	"github.com/axadrn/shadcn-templ/v2/components/signup01"
-	"github.com/axadrn/shadcn-templ/v2/components/signup02"
-	"github.com/axadrn/shadcn-templ/v2/components/signup03"
-	"github.com/axadrn/shadcn-templ/v2/components/signup04"
-	"github.com/axadrn/shadcn-templ/v2/components/signup05"
+	blocksfs "github.com/axadrn/shadcn-templ/v2/blocks"
+	"github.com/axadrn/shadcn-templ/v2/blocks/dashboard01"
+	"github.com/axadrn/shadcn-templ/v2/blocks/login01"
+	"github.com/axadrn/shadcn-templ/v2/blocks/login02"
+	"github.com/axadrn/shadcn-templ/v2/blocks/login03"
+	"github.com/axadrn/shadcn-templ/v2/blocks/login04"
+	"github.com/axadrn/shadcn-templ/v2/blocks/login05"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar01"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar02"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar03"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar04"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar05"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar06"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar07"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar08"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar09"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar10"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar11"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar12"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar13"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar14"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar15"
+	"github.com/axadrn/shadcn-templ/v2/blocks/sidebar16"
+	"github.com/axadrn/shadcn-templ/v2/blocks/signup01"
+	"github.com/axadrn/shadcn-templ/v2/blocks/signup02"
+	"github.com/axadrn/shadcn-templ/v2/blocks/signup03"
+	"github.com/axadrn/shadcn-templ/v2/blocks/signup04"
+	"github.com/axadrn/shadcn-templ/v2/blocks/signup05"
 	"github.com/axadrn/shadcn-templ/v2/internal/registry"
 )
 
@@ -116,7 +116,7 @@ func isDevelopment() bool {
 }
 
 // Files reads the sources of a block's registry files, from disk in
-// development and the components embed in production (the
+// development and the blocks embed in production (the
 // registryapi.componentSource split).
 func Files(item registry.Item) []File {
 	out := make([]File, 0, len(item.Files))
@@ -126,7 +126,7 @@ func Files(item registry.Item) []File {
 		if isDevelopment() {
 			src, err = os.ReadFile("./" + f.Path)
 		} else {
-			src, err = components.TemplFiles.ReadFile(strings.TrimPrefix(f.Path, "components/"))
+			src, err = blocksfs.TemplFiles.ReadFile(strings.TrimPrefix(f.Path, "blocks/"))
 		}
 		if err != nil {
 			continue

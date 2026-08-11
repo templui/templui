@@ -626,7 +626,7 @@
       "name": "input-group",
       "type": "registry:ui",
       "title": "Input Group",
-      "description": "An input with leading or trailing addons — icons, text or buttons.",
+      "description": "An input with leading or trailing addons \u2014 icons, text or buttons.",
       "files": [
         {
           "path": "components/inputgroup/inputgroup.templ",
@@ -645,7 +645,7 @@
       "name": "item",
       "type": "registry:ui",
       "title": "Item",
-      "description": "A flexible row for lists — media, title, description and actions.",
+      "description": "A flexible row for lists \u2014 media, title, description and actions.",
       "files": [
         {
           "path": "components/item/item.templ",
@@ -660,7 +660,7 @@
       "name": "empty",
       "type": "registry:ui",
       "title": "Empty",
-      "description": "Placeholder for empty states — no results, first-run or offline screens.",
+      "description": "Placeholder for empty states \u2014 no results, first-run or offline screens.",
       "files": [
         {
           "path": "components/empty/empty.templ",
@@ -1089,47 +1089,51 @@
       ],
       "files": [
         {
-          "path": "components/dashboard01/page.templ",
+          "path": "blocks/dashboard01/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/dashboard01/data.go",
+          "path": "blocks/dashboard01/data.go",
           "type": "registry:component"
         },
         {
-          "path": "components/dashboard01/app_sidebar.templ",
+          "path": "blocks/dashboard01/app_sidebar.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/dashboard01/chart_area_interactive.templ",
+          "path": "blocks/dashboard01/chart_area_interactive.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/dashboard01/data_table.templ",
+          "path": "blocks/dashboard01/data_table.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/dashboard01/nav_documents.templ",
+          "path": "blocks/dashboard01/data_table.go",
           "type": "registry:component"
         },
         {
-          "path": "components/dashboard01/nav_main.templ",
+          "path": "blocks/dashboard01/nav_documents.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/dashboard01/nav_secondary.templ",
+          "path": "blocks/dashboard01/nav_main.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/dashboard01/nav_user.templ",
+          "path": "blocks/dashboard01/nav_secondary.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/dashboard01/section_cards.templ",
+          "path": "blocks/dashboard01/nav_user.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/dashboard01/site_header.templ",
+          "path": "blocks/dashboard01/section_cards.templ",
+          "type": "registry:component"
+        },
+        {
+          "path": "blocks/dashboard01/site_header.templ",
           "type": "registry:component"
         }
       ],
@@ -1153,19 +1157,19 @@
       ],
       "files": [
         {
-          "path": "components/sidebar01/page.templ",
+          "path": "blocks/sidebar01/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar01/app_sidebar.templ",
+          "path": "blocks/sidebar01/app_sidebar.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar01/search_form.templ",
+          "path": "blocks/sidebar01/search_form.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar01/version_switcher.templ",
+          "path": "blocks/sidebar01/version_switcher.templ",
           "type": "registry:component"
         }
       ],
@@ -1187,19 +1191,19 @@
       ],
       "files": [
         {
-          "path": "components/sidebar02/page.templ",
+          "path": "blocks/sidebar02/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar02/app_sidebar.templ",
+          "path": "blocks/sidebar02/app_sidebar.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar02/search_form.templ",
+          "path": "blocks/sidebar02/search_form.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar02/version_switcher.templ",
+          "path": "blocks/sidebar02/version_switcher.templ",
           "type": "registry:component"
         }
       ],
@@ -1218,11 +1222,11 @@
       ],
       "files": [
         {
-          "path": "components/sidebar03/page.templ",
+          "path": "blocks/sidebar03/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar03/app_sidebar.templ",
+          "path": "blocks/sidebar03/app_sidebar.templ",
           "type": "registry:component"
         }
       ],
@@ -1242,11 +1246,11 @@
       ],
       "files": [
         {
-          "path": "components/sidebar04/page.templ",
+          "path": "blocks/sidebar04/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar04/app_sidebar.templ",
+          "path": "blocks/sidebar04/app_sidebar.templ",
           "type": "registry:component"
         }
       ],
@@ -1268,15 +1272,15 @@
       ],
       "files": [
         {
-          "path": "components/sidebar05/page.templ",
+          "path": "blocks/sidebar05/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar05/app_sidebar.templ",
+          "path": "blocks/sidebar05/app_sidebar.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar05/search_form.templ",
+          "path": "blocks/sidebar05/search_form.templ",
           "type": "registry:component"
         }
       ],
@@ -1298,19 +1302,19 @@
       ],
       "files": [
         {
-          "path": "components/sidebar06/page.templ",
+          "path": "blocks/sidebar06/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar06/app_sidebar.templ",
+          "path": "blocks/sidebar06/app_sidebar.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar06/nav_main.templ",
+          "path": "blocks/sidebar06/nav_main.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar06/sidebar_opt_in_form.templ",
+          "path": "blocks/sidebar06/sidebar_opt_in_form.templ",
           "type": "registry:component"
         }
       ],
@@ -1333,27 +1337,27 @@
       ],
       "files": [
         {
-          "path": "components/sidebar07/page.templ",
+          "path": "blocks/sidebar07/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar07/app_sidebar.templ",
+          "path": "blocks/sidebar07/app_sidebar.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar07/nav_main.templ",
+          "path": "blocks/sidebar07/nav_main.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar07/nav_projects.templ",
+          "path": "blocks/sidebar07/nav_projects.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar07/nav_user.templ",
+          "path": "blocks/sidebar07/nav_user.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar07/team_switcher.templ",
+          "path": "blocks/sidebar07/team_switcher.templ",
           "type": "registry:component"
         }
       ],
@@ -1376,27 +1380,27 @@
       ],
       "files": [
         {
-          "path": "components/sidebar08/page.templ",
+          "path": "blocks/sidebar08/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar08/app_sidebar.templ",
+          "path": "blocks/sidebar08/app_sidebar.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar08/nav_main.templ",
+          "path": "blocks/sidebar08/nav_main.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar08/nav_projects.templ",
+          "path": "blocks/sidebar08/nav_projects.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar08/nav_secondary.templ",
+          "path": "blocks/sidebar08/nav_secondary.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar08/nav_user.templ",
+          "path": "blocks/sidebar08/nav_user.templ",
           "type": "registry:component"
         }
       ],
@@ -1421,15 +1425,15 @@
       ],
       "files": [
         {
-          "path": "components/sidebar09/page.templ",
+          "path": "blocks/sidebar09/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar09/app_sidebar.templ",
+          "path": "blocks/sidebar09/app_sidebar.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar09/nav_user.templ",
+          "path": "blocks/sidebar09/nav_user.templ",
           "type": "registry:component"
         }
       ],
@@ -1452,35 +1456,35 @@
       ],
       "files": [
         {
-          "path": "components/sidebar10/page.templ",
+          "path": "blocks/sidebar10/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar10/app_sidebar.templ",
+          "path": "blocks/sidebar10/app_sidebar.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar10/nav_actions.templ",
+          "path": "blocks/sidebar10/nav_actions.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar10/nav_favorites.templ",
+          "path": "blocks/sidebar10/nav_favorites.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar10/nav_main.templ",
+          "path": "blocks/sidebar10/nav_main.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar10/nav_secondary.templ",
+          "path": "blocks/sidebar10/nav_secondary.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar10/nav_workspaces.templ",
+          "path": "blocks/sidebar10/nav_workspaces.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar10/team_switcher.templ",
+          "path": "blocks/sidebar10/team_switcher.templ",
           "type": "registry:component"
         }
       ],
@@ -1501,11 +1505,11 @@
       ],
       "files": [
         {
-          "path": "components/sidebar11/page.templ",
+          "path": "blocks/sidebar11/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar11/app_sidebar.templ",
+          "path": "blocks/sidebar11/app_sidebar.templ",
           "type": "registry:component"
         }
       ],
@@ -1529,23 +1533,23 @@
       ],
       "files": [
         {
-          "path": "components/sidebar12/page.templ",
+          "path": "blocks/sidebar12/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar12/app_sidebar.templ",
+          "path": "blocks/sidebar12/app_sidebar.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar12/calendars.templ",
+          "path": "blocks/sidebar12/calendars.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar12/date_picker.templ",
+          "path": "blocks/sidebar12/date_picker.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar12/nav_user.templ",
+          "path": "blocks/sidebar12/nav_user.templ",
           "type": "registry:component"
         }
       ],
@@ -1566,11 +1570,11 @@
       ],
       "files": [
         {
-          "path": "components/sidebar13/page.templ",
+          "path": "blocks/sidebar13/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar13/settings_dialog.templ",
+          "path": "blocks/sidebar13/settings_dialog.templ",
           "type": "registry:component"
         }
       ],
@@ -1589,11 +1593,11 @@
       ],
       "files": [
         {
-          "path": "components/sidebar14/page.templ",
+          "path": "blocks/sidebar14/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar14/app_sidebar.templ",
+          "path": "blocks/sidebar14/app_sidebar.templ",
           "type": "registry:component"
         }
       ],
@@ -1618,47 +1622,47 @@
       ],
       "files": [
         {
-          "path": "components/sidebar15/page.templ",
+          "path": "blocks/sidebar15/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar15/calendars.templ",
+          "path": "blocks/sidebar15/calendars.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar15/date_picker.templ",
+          "path": "blocks/sidebar15/date_picker.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar15/nav_favorites.templ",
+          "path": "blocks/sidebar15/nav_favorites.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar15/nav_main.templ",
+          "path": "blocks/sidebar15/nav_main.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar15/nav_secondary.templ",
+          "path": "blocks/sidebar15/nav_secondary.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar15/nav_user.templ",
+          "path": "blocks/sidebar15/nav_user.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar15/nav_workspaces.templ",
+          "path": "blocks/sidebar15/nav_workspaces.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar15/sidebar_left.templ",
+          "path": "blocks/sidebar15/sidebar_left.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar15/sidebar_right.templ",
+          "path": "blocks/sidebar15/sidebar_right.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar15/team_switcher.templ",
+          "path": "blocks/sidebar15/team_switcher.templ",
           "type": "registry:component"
         }
       ],
@@ -1683,35 +1687,35 @@
       ],
       "files": [
         {
-          "path": "components/sidebar16/page.templ",
+          "path": "blocks/sidebar16/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/sidebar16/app_sidebar.templ",
+          "path": "blocks/sidebar16/app_sidebar.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar16/nav_main.templ",
+          "path": "blocks/sidebar16/nav_main.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar16/nav_projects.templ",
+          "path": "blocks/sidebar16/nav_projects.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar16/nav_secondary.templ",
+          "path": "blocks/sidebar16/nav_secondary.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar16/nav_user.templ",
+          "path": "blocks/sidebar16/nav_user.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar16/search_form.templ",
+          "path": "blocks/sidebar16/search_form.templ",
           "type": "registry:component"
         },
         {
-          "path": "components/sidebar16/site_header.templ",
+          "path": "blocks/sidebar16/site_header.templ",
           "type": "registry:component"
         }
       ],
@@ -1733,11 +1737,11 @@
       ],
       "files": [
         {
-          "path": "components/login01/page.templ",
+          "path": "blocks/login01/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/login01/login_form.templ",
+          "path": "blocks/login01/login_form.templ",
           "type": "registry:component"
         }
       ],
@@ -1758,11 +1762,11 @@
       ],
       "files": [
         {
-          "path": "components/login02/page.templ",
+          "path": "blocks/login02/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/login02/login_form.templ",
+          "path": "blocks/login02/login_form.templ",
           "type": "registry:component"
         }
       ],
@@ -1784,11 +1788,11 @@
       ],
       "files": [
         {
-          "path": "components/login03/page.templ",
+          "path": "blocks/login03/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/login03/login_form.templ",
+          "path": "blocks/login03/login_form.templ",
           "type": "registry:component"
         }
       ],
@@ -1810,11 +1814,11 @@
       ],
       "files": [
         {
-          "path": "components/login04/page.templ",
+          "path": "blocks/login04/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/login04/login_form.templ",
+          "path": "blocks/login04/login_form.templ",
           "type": "registry:component"
         }
       ],
@@ -1835,11 +1839,11 @@
       ],
       "files": [
         {
-          "path": "components/login05/page.templ",
+          "path": "blocks/login05/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/login05/login_form.templ",
+          "path": "blocks/login05/login_form.templ",
           "type": "registry:component"
         }
       ],
@@ -1860,11 +1864,11 @@
       ],
       "files": [
         {
-          "path": "components/signup01/page.templ",
+          "path": "blocks/signup01/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/signup01/signup_form.templ",
+          "path": "blocks/signup01/signup_form.templ",
           "type": "registry:component"
         }
       ],
@@ -1885,11 +1889,11 @@
       ],
       "files": [
         {
-          "path": "components/signup02/page.templ",
+          "path": "blocks/signup02/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/signup02/signup_form.templ",
+          "path": "blocks/signup02/signup_form.templ",
           "type": "registry:component"
         }
       ],
@@ -1911,11 +1915,11 @@
       ],
       "files": [
         {
-          "path": "components/signup03/page.templ",
+          "path": "blocks/signup03/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/signup03/signup_form.templ",
+          "path": "blocks/signup03/signup_form.templ",
           "type": "registry:component"
         }
       ],
@@ -1937,11 +1941,11 @@
       ],
       "files": [
         {
-          "path": "components/signup04/page.templ",
+          "path": "blocks/signup04/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/signup04/signup_form.templ",
+          "path": "blocks/signup04/signup_form.templ",
           "type": "registry:component"
         }
       ],
@@ -1961,11 +1965,11 @@
       ],
       "files": [
         {
-          "path": "components/signup05/page.templ",
+          "path": "blocks/signup05/page.templ",
           "type": "registry:page"
         },
         {
-          "path": "components/signup05/signup_form.templ",
+          "path": "blocks/signup05/signup_form.templ",
           "type": "registry:component"
         }
       ],

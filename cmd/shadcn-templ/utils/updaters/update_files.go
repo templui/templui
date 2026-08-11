@@ -139,6 +139,14 @@ func resolveFilePath(file registry.ItemFile, config *utils.Config, pathOverride 
 			base = filepath.Join(config.ResolvedPaths.Cwd, filepath.FromSlash(pathOverride))
 		}
 		return filepath.Join(base, filepath.FromSlash(strings.TrimPrefix(file.Path, "components/"))), nil
+	case strings.HasPrefix(file.Path, "blocks/"):
+		// Blocks install under <components dir>/blocks/, mirroring the
+		// repo's ui/blocks sibling split.
+		base := config.ResolvedPaths.Components
+		if pathOverride != "" {
+			base = filepath.Join(config.ResolvedPaths.Cwd, filepath.FromSlash(pathOverride))
+		}
+		return filepath.Join(base, "blocks", filepath.FromSlash(strings.TrimPrefix(file.Path, "blocks/"))), nil
 	case strings.HasPrefix(file.Path, "utils/"):
 		return filepath.Join(config.ResolvedPaths.Utils, filepath.FromSlash(strings.TrimPrefix(file.Path, "utils/"))), nil
 	case file.Type == "registry:lib":
@@ -166,6 +174,8 @@ func transformContent(file registry.ItemFile, config *utils.Config) string {
 		switch {
 		case strings.HasPrefix(repoPath, "components/"):
 			return `"` + config.Aliases.Components + `/` + strings.TrimPrefix(repoPath, "components/") + `"`
+		case strings.HasPrefix(repoPath, "blocks/"):
+			return `"` + config.Aliases.Components + `/blocks/` + strings.TrimPrefix(repoPath, "blocks/") + `"`
 		case repoPath == "utils":
 			return `"` + config.Aliases.Utils + `"`
 		case strings.HasPrefix(repoPath, "utils/"):
