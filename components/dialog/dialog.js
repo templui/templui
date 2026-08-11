@@ -611,7 +611,6 @@
       closeType: "",
       undoMarkOthers: null,
       finishToken: null,
-      hadTriggers: triggersFor(popup).length > 0,
     };
     dialogs.set(popup, state);
 
@@ -706,6 +705,7 @@
         if (parentPopup?.id) root.setAttribute("data-tui-dialog-parent", parentPopup.id);
         const stale = document.getElementById(popup.id);
         if (stale) destroyDialog(stale);
+        root._tuiPortalOwner = tpl.parentElement;
         document.body.appendChild(root);
         lifted = true;
       }
@@ -716,7 +716,7 @@
     if (lifted) liftTemplates();
   }
 
-  function initDialogs() {
+  function init() {
     liftTemplates();
     document.querySelectorAll("body > [data-tui-dialog-root]").forEach((root) => {
       const popup = root.querySelector("[data-tui-dialog-content]");
@@ -725,15 +725,14 @@
         return;
       }
 
-      // Remove portaled leftovers whose page content got swapped out: a
-      // dialog that had triggers when it was lifted (or gained some later)
-      // but lost all of them to a swap. A dialog that never had triggers is
-      // driven programmatically (window.tui.dialog.open) and stays alive.
+      // The unmount half of the React portal pendant: the dialog lives as
+      // long as its SSR declaration site (_tuiPortalOwner) stays in the
+      // document. Ownership keeps trigger-less programmatic dialogs
+      // (dialog.TriggerFor, the command menu) alive and judges swaps
+      // without mid-swap trigger heuristics.
       const state = dialogs.get(popup);
-      const hasTriggers = triggersFor(popup).length > 0;
       if (state) {
-        if (hasTriggers) state.hadTriggers = true;
-        else if (state.hadTriggers) destroyDialog(popup);
+        if (root._tuiPortalOwner && !root._tuiPortalOwner.isConnected) destroyDialog(popup);
         return;
       }
 
@@ -768,9 +767,9 @@
   });
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => initDialogs());
+    document.addEventListener("DOMContentLoaded", () => init());
   } else {
-    initDialogs();
+    init();
   }
 
   // Initialize dialogs added later (e.g. swapped in via htmx), so a
@@ -778,7 +777,7 @@
   // whose source got swapped out of the DOM (releasing the scroll lock and
   // the aria-hidden marking).
   new MutationObserver(() => {
-    initDialogs();
+    init();
     unlockScroll();
   }).observe(document.body, {
     childList: true,

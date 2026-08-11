@@ -105,7 +105,7 @@
     render(root);
   }
 
-  function initAll() {
+  function init() {
     roots().forEach(initRoot);
   }
 
@@ -196,12 +196,12 @@
   });
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initAll);
+    document.addEventListener("DOMContentLoaded", init);
   } else {
-    initAll();
+    init();
   }
-  new MutationObserver(() => initAll()).observe(document.documentElement, {
-    childList: true,
-    subtree: true,
-  });
+  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
+  // does not fire in hidden tabs or throttled iframes): swapped-in markup
+  // wires itself.
+  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
 })();

@@ -1230,6 +1230,7 @@
   // Moves the drawer to <body>, the pendant of the reference's DrawerPortal.
   function portal(dialog) {
     if (dialog.parentElement !== document.body) {
+      if (!dialog._tuiPortalOwner) dialog._tuiPortalOwner = dialog.parentElement;
       document.body.appendChild(dialog);
     }
   }
@@ -1245,21 +1246,21 @@
       if (content) {
         const stale = content.id && document.getElementById(content.id);
         if (stale) stale.remove();
+        content._tuiPortalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
       tpl.remove();
     }
   }
 
-  function initDrawers(root = document) {
+  function init(root = document) {
     liftTemplates();
-    // Remove portaled leftovers whose trigger got swapped out of the page.
-    // A drawer that never had triggers is driven programmatically
-    // (window.tui.drawer.open) and stays alive.
+    // The unmount half of the React portal pendant: a drawer lives as long
+    // as its SSR declaration site (_tuiPortalOwner) stays in the document.
+    // Ownership keeps programmatic drawers (window.tui.drawer.open) alive
+    // and judges swaps without mid-swap trigger heuristics.
     document.querySelectorAll("body > dialog[data-tui-drawer-content]").forEach((dialog) => {
-      if (triggersFor(dialog).length) {
-        dialog.dataset.tuiDrawerHadTriggers = "true";
-      } else if (!dialog.open && dialog.dataset.tuiDrawerHadTriggers === "true") {
+      if (dialog._tuiPortalOwner && !dialog._tuiPortalOwner.isConnected) {
         unwatchSnapResize(dialog);
         dialog.remove();
       }
@@ -1295,16 +1296,16 @@
   });
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => initDrawers());
+    document.addEventListener("DOMContentLoaded", () => init());
   } else {
-    initDrawers();
+    init();
   }
 
   // Initialize drawers added later (e.g. swapped in via htmx), so a
   // server-rendered drawer with Open true still gets showModal(). Also
   // release the scroll lock if an open drawer got swapped out of the DOM.
   new MutationObserver(() => {
-    initDrawers();
+    init();
     unlockScroll();
   }).observe(document.body, {
     childList: true,

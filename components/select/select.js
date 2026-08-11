@@ -78,13 +78,17 @@
     return "calc(100% + " + SIDE_OFFSET + "px) " + centerY;
   }
 
-  // Moves the content to <body> (shadcn portals it the same way). Also removes
-  // contents whose trigger is gone (leftovers from swapped-out pages).
+  // Moves the content to <body> (shadcn portals it the same way).
+  // The unmount half of the React portal pendant: a portaled content lives
+  // as long as its SSR declaration site (_tuiPortalOwner) stays in the
+  // document. Trigger-presence heuristics judged mid-swap moments wrongly -
+  // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
     document.querySelectorAll("body > [data-tui-select-content]").forEach((c) => {
-      if (c !== content && !triggerFor(c)) c.remove();
+      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) c.remove();
     });
     if (content.parentElement !== document.body) {
+      if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
       document.body.appendChild(content);
     }
   }
@@ -536,13 +540,14 @@
       if (content) {
         const stale = document.getElementById(content.id);
         if (stale) stale.remove();
+        content._tuiPortalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
       tpl.remove();
     });
   }
 
-  function syncTriggers() {
+  function init() {
     liftTemplates();
     document.querySelectorAll("[data-tui-select-trigger]").forEach((trigger) => {
       const content = contentFor(trigger);
@@ -559,29 +564,16 @@
     });
   }
 
-  let syncQueued = false;
-  function queueSync() {
-    if (syncQueued) return;
-    syncQueued = true;
-    requestAnimationFrame(() => {
-      syncQueued = false;
-      syncTriggers();
-    });
-  }
-
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", syncTriggers);
+    document.addEventListener("DOMContentLoaded", init);
   } else {
-    syncTriggers();
+    init();
   }
-  new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      if (m.addedNodes.length) {
-        queueSync();
-        break;
-      }
-    }
-  }).observe(document.documentElement, { childList: true, subtree: true });
+  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
+  // does not fire in hidden tabs or throttled iframes): swapped-in markup
+  // lifts and wires itself, removals release portaled content through the
+  // ownership sweep.
+  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
 
   // ----- events -------------------------------------------------------------
 

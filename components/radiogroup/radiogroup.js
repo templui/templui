@@ -206,9 +206,13 @@
     });
   }
 
-  document.addEventListener("DOMContentLoaded", init);
-  new MutationObserver(init).observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
+  // does not fire in hidden tabs or throttled iframes): swapped-in markup
+  // wires itself.
+  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
 })();

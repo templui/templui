@@ -29,13 +29,17 @@
     return "calc(100% + " + sideOffset + "px) " + centerY;
   }
 
-  // Moves the content to <body> (shadcn portals it the same way). Also removes
-  // contents whose trigger is gone (leftovers from swapped-out pages).
+  // Moves the content to <body> (shadcn portals it the same way).
+  // The unmount half of the React portal pendant: a portaled content lives
+  // as long as its SSR declaration site (_tuiPortalOwner) stays in the
+  // document. Trigger-presence heuristics judged mid-swap moments wrongly -
+  // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
     document.querySelectorAll("body > [data-tui-hovercard-content]").forEach((c) => {
-      if (c !== content && !triggerFor(c)) c.remove();
+      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) c.remove();
     });
     if (content.parentElement !== document.body) {
+      if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
       document.body.appendChild(content);
     }
   }
@@ -170,6 +174,7 @@
       if (content) {
         const stale = document.getElementById(content.id);
         if (stale) stale.remove();
+        content._tuiPortalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
       tpl.remove();
@@ -178,36 +183,23 @@
 
   // Portal all contents up front (React portals on mount too). Runs on load
   // and whenever new cards appear in the DOM.
-  function initCards() {
+  function init() {
     liftTemplates();
     allContents().forEach((content) => {
       if (triggerFor(content)) portal(content);
     });
   }
 
-  let initQueued = false;
-  function queueInit() {
-    if (initQueued) return;
-    initQueued = true;
-    requestAnimationFrame(() => {
-      initQueued = false;
-      initCards();
-    });
-  }
-
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initCards);
+    document.addEventListener("DOMContentLoaded", init);
   } else {
-    initCards();
+    init();
   }
-  new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      if (m.addedNodes.length) {
-        queueInit();
-        break;
-      }
-    }
-  }).observe(document.documentElement, { childList: true, subtree: true });
+  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
+  // does not fire in hidden tabs or throttled iframes): swapped-in markup
+  // lifts and wires itself, removals release portaled content through the
+  // ownership sweep.
+  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
 
   // Keep open cards anchored while scrolling or resizing.
   function repositionOpen() {

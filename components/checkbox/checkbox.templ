@@ -13,7 +13,11 @@ type Props struct {
 	Value      string
 	Disabled   bool
 	Checked    bool
-	Form       string
+	// Indeterminate renders the mixed state (Base UI's indeterminate prop):
+	// aria-checked="mixed", data-indeterminate and a visible indicator. A
+	// user click leaves the mixed state like the native input does.
+	Indeterminate bool
+	Form          string
 }
 
 // Checkbox is the vanilla port of Base UI's Checkbox.Root
@@ -31,7 +35,15 @@ templ Checkbox(props ...Props) {
 		data-slot="checkbox"
 		data-tui-checkbox
 		role="checkbox"
-		if p.Checked {
+		if p.Indeterminate {
+			aria-checked="mixed"
+			data-indeterminate
+			if p.Checked {
+				data-checked
+			} else {
+				data-unchecked
+			}
+		} else if p.Checked {
 			aria-checked="true"
 			data-checked
 		} else {
@@ -60,10 +72,15 @@ templ Checkbox(props ...Props) {
 		// indicator), checkbox.js keeps it in sync.
 		<span
 			data-slot="checkbox-indicator"
+			if p.Indeterminate {
+				data-indeterminate
+			}
 			if p.Checked {
 				data-checked
 			} else {
 				data-unchecked
+			}
+			if !p.Checked && !p.Indeterminate {
 				hidden
 			}
 			class="cn-checkbox-indicator grid place-content-center text-current transition-none"

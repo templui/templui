@@ -45,13 +45,19 @@
 
   function sync(root, input) {
     const checked = input.checked;
-    root.setAttribute("aria-checked", String(checked));
+    // The input's indeterminate IDL property is the source of truth for the
+    // mixed state (Base UI's indeterminate prop): a user click clears it
+    // natively, scripts set it and dispatch change.
+    const indeterminate = input.indeterminate;
+    root.setAttribute("aria-checked", indeterminate ? "mixed" : String(checked));
+    root.toggleAttribute("data-indeterminate", indeterminate);
     root.toggleAttribute("data-checked", checked);
     root.toggleAttribute("data-unchecked", !checked);
     const indicator = root.querySelector('[data-slot="checkbox-indicator"]');
     if (indicator) {
       // Base UI unmounts the indicator while unchecked; we toggle [hidden].
-      indicator.hidden = !checked;
+      indicator.hidden = !checked && !indeterminate;
+      indicator.toggleAttribute("data-indeterminate", indeterminate);
       indicator.toggleAttribute("data-checked", checked);
       indicator.toggleAttribute("data-unchecked", !checked);
     }
@@ -134,6 +140,11 @@
     root.setAttribute("data-tui-checkbox-initialized", "");
     const input = inputOf(root);
     if (!input) return;
+    // SSR'd mixed state: the input element has no indeterminate attribute,
+    // so the root's data-indeterminate seeds the IDL property.
+    if (root.hasAttribute("data-indeterminate")) {
+      input.indeterminate = true;
+    }
     // The clicks dispatched on the hidden input are an implementation detail
     // and must not reach ancestors, which already receive the original click
     // (CheckboxRoot's input onClick).
@@ -160,9 +171,10 @@
     document.querySelectorAll("[data-tui-checkbox]").forEach(setup);
   }
 
-  document.addEventListener("DOMContentLoaded", init);
-  new MutationObserver(init).observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
 })();
