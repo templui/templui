@@ -15,6 +15,7 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/chart"
 	selectcomp "github.com/axadrn/shadcn-templ/v2/components/select"
 	"github.com/axadrn/shadcn-templ/v2/components/togglegroup"
+	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
 // The pendant of chart-area-interactive.tsx.
@@ -287,7 +288,7 @@ func ChartAreaInteractive() templ.Component {
 								var templ_7745c5c3_Var9 string
 								templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(rng.Label)
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 167, Col: 18}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 171, Col: 18}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 								if templ_7745c5c3_Err != nil {
@@ -303,7 +304,10 @@ func ChartAreaInteractive() templ.Component {
 						return nil
 					})
 					templ_7745c5c3_Err = togglegroup.ToggleGroup(togglegroup.Props{
-						Variant:    togglegroup.VariantOutline,
+						Variant: togglegroup.VariantOutline,
+						// Spacing 0 is the joined bar of the TSX ToggleGroup default;
+						// px-4! beats the joined mode's px-2 like upstream.
+						Spacing:    utils.Ptr(0),
 						Class:      "hidden *:data-[slot=toggle-group-item]:px-4! @[767px]/card:flex",
 						Attributes: templ.Attributes{"data-tui-chart-range-toggle": "dashboard01-area-interactive"},
 					}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var7), templ_7745c5c3_Buffer)
@@ -368,34 +372,52 @@ func ChartAreaInteractive() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							for _, rng := range chartAreaInteractiveRanges {
-								templ_7745c5c3_Var13 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-									templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-									templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-									if !templ_7745c5c3_IsBuffer {
-										defer func() {
-											templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-											if templ_7745c5c3_Err == nil {
-												templ_7745c5c3_Err = templ_7745c5c3_BufErr
-											}
-										}()
-									}
-									ctx = templ.InitializeContext(ctx)
-									var templ_7745c5c3_Var14 string
-									templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(rng.Label)
-									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 182, Col: 19}
-									}
-									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+							templ_7745c5c3_Var13 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+								templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+								templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+								if !templ_7745c5c3_IsBuffer {
+									defer func() {
+										templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+										if templ_7745c5c3_Err == nil {
+											templ_7745c5c3_Err = templ_7745c5c3_BufErr
+										}
+									}()
+								}
+								ctx = templ.InitializeContext(ctx)
+								for _, rng := range chartAreaInteractiveRanges {
+									templ_7745c5c3_Var14 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+										templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+										templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+										if !templ_7745c5c3_IsBuffer {
+											defer func() {
+												templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+												if templ_7745c5c3_Err == nil {
+													templ_7745c5c3_Err = templ_7745c5c3_BufErr
+												}
+											}()
+										}
+										ctx = templ.InitializeContext(ctx)
+										var templ_7745c5c3_Var15 string
+										templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(rng.Label)
+										if templ_7745c5c3_Err != nil {
+											return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 187, Col: 20}
+										}
+										_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+										if templ_7745c5c3_Err != nil {
+											return templ_7745c5c3_Err
+										}
+										return nil
+									})
+									templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: rng.Key, Class: "rounded-lg"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var14), templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
-									return nil
-								})
-								templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: rng.Key, Class: "rounded-lg"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var13), templ_7745c5c3_Buffer)
-								if templ_7745c5c3_Err != nil {
-									return templ_7745c5c3_Err
 								}
+								return nil
+							})
+							templ_7745c5c3_Err = selectcomp.Group().Render(templ.WithChildren(ctx, templ_7745c5c3_Var13), templ_7745c5c3_Buffer)
+							if templ_7745c5c3_Err != nil {
+								return templ_7745c5c3_Err
 							}
 							return nil
 						})
@@ -425,7 +447,7 @@ func ChartAreaInteractive() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var15 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_Var16 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 				if !templ_7745c5c3_IsBuffer {
@@ -437,7 +459,7 @@ func ChartAreaInteractive() templ.Component {
 					}()
 				}
 				ctx = templ.InitializeContext(ctx)
-				templ_7745c5c3_Var16 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+				templ_7745c5c3_Var17 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 					templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 					templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 					if !templ_7745c5c3_IsBuffer {
@@ -458,12 +480,12 @@ func ChartAreaInteractive() templ.Component {
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						var templ_7745c5c3_Var17 string
-						templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(rng.Key)
+						var templ_7745c5c3_Var18 string
+						templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(rng.Key)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 194, Col: 40}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 200, Col: 40}
 						}
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -481,7 +503,7 @@ func ChartAreaInteractive() templ.Component {
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Var18 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+						templ_7745c5c3_Var19 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 							templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 							templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 							if !templ_7745c5c3_IsBuffer {
@@ -493,7 +515,7 @@ func ChartAreaInteractive() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Var19 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+							templ_7745c5c3_Var20 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 								templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 								templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 								if !templ_7745c5c3_IsBuffer {
@@ -505,7 +527,7 @@ func ChartAreaInteractive() templ.Component {
 									}()
 								}
 								ctx = templ.InitializeContext(ctx)
-								templ_7745c5c3_Var20 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+								templ_7745c5c3_Var21 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 									templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 									templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 									if !templ_7745c5c3_IsBuffer {
@@ -523,7 +545,7 @@ func ChartAreaInteractive() templ.Component {
 									}
 									return nil
 								})
-								templ_7745c5c3_Err = chart.LinearGradient(chart.LinearGradientProps{ID: "fillDesktop", X1: "0", Y1: "0", X2: "0", Y2: "1"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var20), templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = chart.LinearGradient(chart.LinearGradientProps{ID: "fillDesktop", X1: "0", Y1: "0", X2: "0", Y2: "1"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var21), templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -531,7 +553,7 @@ func ChartAreaInteractive() templ.Component {
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
-								templ_7745c5c3_Var21 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+								templ_7745c5c3_Var22 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 									templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 									templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 									if !templ_7745c5c3_IsBuffer {
@@ -549,13 +571,13 @@ func ChartAreaInteractive() templ.Component {
 									}
 									return nil
 								})
-								templ_7745c5c3_Err = chart.LinearGradient(chart.LinearGradientProps{ID: "fillMobile", X1: "0", Y1: "0", X2: "0", Y2: "1"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var21), templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = chart.LinearGradient(chart.LinearGradientProps{ID: "fillMobile", X1: "0", Y1: "0", X2: "0", Y2: "1"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var22), templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
 								return nil
 							})
-							templ_7745c5c3_Err = chart.Defs().Render(templ.WithChildren(ctx, templ_7745c5c3_Var19), templ_7745c5c3_Buffer)
+							templ_7745c5c3_Err = chart.Defs().Render(templ.WithChildren(ctx, templ_7745c5c3_Var20), templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -626,7 +648,7 @@ func ChartAreaInteractive() templ.Component {
 						})
 						templ_7745c5c3_Err = chart.AreaChart(chart.AreaChartProps{
 							Data: chartAreaInteractiveFilteredData(rng.Days),
-						}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var18), templ_7745c5c3_Buffer)
+						}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var19), templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -637,13 +659,13 @@ func ChartAreaInteractive() templ.Component {
 					}
 					return nil
 				})
-				templ_7745c5c3_Err = chart.Container(chart.ContainerProps{ID: "dashboard01-area-interactive", Config: chartAreaInteractiveConfig, Class: "aspect-auto h-[250px] w-full"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var16), templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = chart.Container(chart.ContainerProps{ID: "dashboard01-area-interactive", Config: chartAreaInteractiveConfig, Class: "aspect-auto h-[250px] w-full"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var17), templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				return nil
 			})
-			templ_7745c5c3_Err = card.Content(card.ContentProps{Class: "px-2 pt-4 sm:px-6 sm:pt-6"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var15), templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = card.Content(card.ContentProps{Class: "px-2 pt-4 sm:px-6 sm:pt-6"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var16), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -657,16 +679,16 @@ func ChartAreaInteractive() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var22 string
-		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
+		var templ_7745c5c3_Var23 string
+		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 242, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 248, Col: 36}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\">\n\t\t// The toggle group pendant of onValueChange={setTimeRange}: the\n\t\t// select is handled by chart.js, this covers the toggle group.\n\t\tdocument.addEventListener(\"toggle-change\", (e) => {\n\t\t\tif (!(e.target instanceof Element)) return;\n\t\t\tconst group = e.target.closest(\"[data-tui-chart-range-toggle]\");\n\t\t\tif (!group) return;\n\t\t\tconst value = e.detail && e.detail.value;\n\t\t\tif (!value) return;\n\t\t\tconst chartEl = group.closest(\"[data-slot=card]\");\n\t\t\tif (!chartEl) return;\n\t\t\tchartEl.querySelectorAll(\"[data-tui-chart-range]\").forEach((el) => {\n\t\t\t\tel.hidden = el.getAttribute(\"data-tui-chart-range\") !== value;\n\t\t\t});\n\t\t});\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\">\n\t\t(() => {\n\t\t\t// The two range controls share one state like the TSX's timeRange:\n\t\t\t// a toggle pick forwards to the matching select item, so select.js\n\t\t\t// stays the single owner of value, trigger label and the\n\t\t\t// select-change event chart.js flips the panels on.\n\t\t\tif (window.__tuiDashboard01ChartRange) return;\n\t\t\twindow.__tuiDashboard01ChartRange = true;\n\n\t\t\tdocument.addEventListener(\"toggle-change\", (e) => {\n\t\t\t\tif (!(e.target instanceof Element)) return;\n\t\t\t\tconst group = e.target.closest(\"[data-tui-chart-range-toggle]\");\n\t\t\t\tif (!group) return;\n\t\t\t\tconst value = e.detail && e.detail.value;\n\t\t\t\tif (!value) return;\n\t\t\t\t// Single-select groups allow unpressing the active item; a\n\t\t\t\t// time range must stay active, so re-press it.\n\t\t\t\tconst toggle = e.target.closest(\"[data-tui-toggle]\");\n\t\t\t\tif (toggle && e.detail.pressed === false) {\n\t\t\t\t\ttoggle.setAttribute(\"data-state\", \"on\");\n\t\t\t\t\ttoggle.setAttribute(\"aria-pressed\", \"true\");\n\t\t\t\t}\n\t\t\t\tconst card = group.closest(\"[data-slot=card]\");\n\t\t\t\tconst trigger = card && card.querySelector(\"[data-tui-chart-range-select]\");\n\t\t\t\tconst content = trigger && document.getElementById(trigger.getAttribute(\"aria-controls\"));\n\t\t\t\tconst item = content && content.querySelector('[data-tui-select-item][data-tui-select-value=\"' + value + '\"]');\n\t\t\t\tif (item) item.click();\n\t\t\t});\n\n\t\t\t// A pick in the mobile select presses the matching toggle;\n\t\t\t// chart.js flips the panels on the same select-change.\n\t\t\tdocument.addEventListener(\"select-change\", (e) => {\n\t\t\t\tif (!(e.target instanceof Element)) return;\n\t\t\t\tconst trigger = e.target.closest(\"[data-tui-chart-range-select]\");\n\t\t\t\tif (!trigger) return;\n\t\t\t\tconst card = trigger.closest(\"[data-slot=card]\");\n\t\t\t\tconst group = card && card.querySelector(\"[data-tui-chart-range-toggle]\");\n\t\t\t\tif (!group) return;\n\t\t\t\tgroup.querySelectorAll(\"[data-tui-toggle]\").forEach((t) => {\n\t\t\t\t\tconst on = t.getAttribute(\"data-tui-toggle-value\") === e.detail.value;\n\t\t\t\t\tt.setAttribute(\"data-state\", on ? \"on\" : \"off\");\n\t\t\t\t\tt.setAttribute(\"aria-pressed\", String(on));\n\t\t\t\t});\n\t\t\t\tgroup.setAttribute(\"data-tui-toggle-group-value\", e.detail.value);\n\t\t\t});\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

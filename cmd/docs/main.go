@@ -10,6 +10,7 @@ import (
 	"github.com/a-h/templ"
 
 	"github.com/axadrn/shadcn-templ/v2/assets"
+	"github.com/axadrn/shadcn-templ/v2/blocks/dashboard01"
 	"github.com/axadrn/shadcn-templ/v2/components"
 	"github.com/axadrn/shadcn-templ/v2/internal/config"
 	"github.com/axadrn/shadcn-templ/v2/internal/middleware"
@@ -20,8 +21,8 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/internal/shared"
 	"github.com/axadrn/shadcn-templ/v2/internal/ui/blocks"
 	"github.com/axadrn/shadcn-templ/v2/internal/ui/charts"
-	"github.com/axadrn/shadcn-templ/v2/internal/ui/modules"
 	"github.com/axadrn/shadcn-templ/v2/internal/ui/examples"
+	"github.com/axadrn/shadcn-templ/v2/internal/ui/modules"
 	"github.com/axadrn/shadcn-templ/v2/internal/ui/pages"
 	"github.com/axadrn/shadcn-templ/v2/static"
 )
@@ -292,6 +293,27 @@ func main() {
 			return
 		}
 		if blocks.Component(name) != nil {
+			// Blocks with URL-driven state (dashboard-01's pagination) read
+			// the request from the render context, the same wiring a user
+			// project mounts (see dashboard01.WithRequest).
+			r = r.WithContext(dashboard01.WithRequest(r.Context(), r))
+			// ?fragment= serves just that templ fragment of the block, the
+			// server half of the htmx partial updates. Pagination swaps
+			// (data-table) push the clean URL back via HX-Push-Url; drawer
+			// fragments leave the URL alone.
+			if f := r.URL.Query().Get("fragment"); f != "" {
+				if f == "data-table" && r.Header.Get("HX-Request") == "true" {
+					q := r.URL.Query()
+					q.Del("fragment")
+					clean := r.URL.Path
+					if enc := q.Encode(); enc != "" {
+						clean += "?" + enc
+					}
+					w.Header().Set("HX-Push-Url", clean)
+				}
+				templ.Handler(pages.BlockView(name), templ.WithFragments(f)).ServeHTTP(w, r)
+				return
+			}
 			if err := pages.BlockView(name).Render(r.Context(), w); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}

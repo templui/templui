@@ -14,8 +14,10 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/label"
 	selectcomp "github.com/axadrn/shadcn-templ/v2/components/select"
 	"github.com/axadrn/shadcn-templ/v2/components/separator"
+	"github.com/axadrn/shadcn-templ/v2/components/skeleton"
 	"github.com/axadrn/shadcn-templ/v2/components/table"
 	"github.com/axadrn/shadcn-templ/v2/components/tabs"
+	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
 // dataTablePageSize is the pendant of the pagination state's pageSize.
@@ -35,21 +37,19 @@ var dataTableViews = []struct {
 	{"focus-documents", "Focus Documents"},
 }
 
-func dataTablePageCount(data []Item) int {
-	return (len(data) + dataTablePageSize - 1) / dataTablePageSize
-}
-
-func dataTableFirstPage(data []Item) []Item {
-	if len(data) > dataTablePageSize {
-		return data[:dataTablePageSize]
-	}
-	return data
-}
-
 templ DataTable(data []Item) {
+	// Pagination state lives in the URL (see data_table.go); the window,
+	// page count and button states are computed server-side.
+	{{ page, size := dataTablePageParams(ctx, len(data)) }}
+	{{ pageCount := dataTablePageCount(len(data), size) }}
+	// The swappable fragment: a fragment-aware handler (?fragment=data-table
+	// + templ.WithFragments) renders just this container for the script's
+	// partial updates; everywhere else the wrapper is transparent.
+	@templ.Fragment("data-table") {
 	@tabs.Tabs(tabs.Props{
 		DefaultValue: "outline",
 		Class:        "w-full flex-col justify-start gap-6",
+		Attributes:   templ.Attributes{"data-dashboard01-table": ""},
 	}) {
 		<div class="flex items-center justify-between px-4 lg:px-6">
 			@label.Label(label.Props{For: "view-selector", Class: "sr-only"}) {
@@ -66,9 +66,11 @@ templ DataTable(data []Item) {
 					@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a view"})
 				}
 				@selectcomp.Content() {
-					for _, view := range dataTableViews {
-						@selectcomp.Item(selectcomp.ItemProps{Value: view.Value}) {
-							{ view.Label }
+					@selectcomp.Group() {
+						for _, view := range dataTableViews {
+							@selectcomp.Item(selectcomp.ItemProps{Value: view.Value}) {
+								{ view.Label }
+							}
 						}
 					}
 				}
@@ -106,12 +108,14 @@ templ DataTable(data []Item) {
 						@icon.ChevronDown()
 					}
 					@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignEnd, Class: "w-56"}) {
-						// Column visibility toggling is React table state and is
-						// omitted: the items render checked but do not hide columns.
-						for _, column := range dataTableHideableColumns {
+						// The columnVisibility pendant: dataTableScript toggles
+						// the column's cells; the attribute carries the cell
+						// index (after the drag, select and header columns).
+						for i, column := range dataTableHideableColumns {
 							@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{
-								Class:   "capitalize",
-								Checked: true,
+								Class:      "capitalize",
+								Checked:    true,
+								Attributes: templ.Attributes{"data-dashboard01-column": fmt.Sprint(i + 3)},
 							}) {
 								{ column }
 							}
@@ -130,7 +134,8 @@ templ DataTable(data []Item) {
 		}) {
 			<div class="overflow-hidden rounded-lg border">
 				// The dnd-kit DndContext/SortableContext drag&drop reordering
-				// is omitted: the rows render statically in data order.
+				// is omitted: the rows render statically in data order. Bring
+				// your own dnd (e.g. SortableJS on the tbody) if you need it.
 				@table.Table() {
 					@table.Header(table.HeaderProps{Class: "sticky top-0 z-10 bg-muted"}) {
 						@table.Row() {
@@ -165,10 +170,8 @@ templ DataTable(data []Item) {
 					}
 					@table.Body(table.BodyProps{Class: "**:data-[slot=table-cell]:first:w-8"}) {
 						if len(data) > 0 {
-							// The first page of rows; pagination clicks are React
-							// state and are omitted.
-							for _, item := range dataTableFirstPage(data) {
-								@dataTableRow(item)
+							for _, item := range dataTablePageWindow(data, page, size) {
+								@dataTableRow(item, page, size)
 							}
 						} else {
 							@table.Row() {
@@ -185,68 +188,98 @@ templ DataTable(data []Item) {
 			</div>
 			<div class="flex items-center justify-between px-4">
 				<div class="hidden flex-1 text-sm text-muted-foreground lg:flex">
-					// Row selection is React table state and is omitted: the
-					// count renders statically.
-					0 of { fmt.Sprint(len(data)) } row(s) selected.
+					// Selection is view-local UI state (the tsx keeps it in
+					// React memory); dataTableScript keeps the count live. It
+					// resets on a page navigation.
+					<span data-dashboard01-selected-count>0</span>
+					&nbsp;of { fmt.Sprint(len(data)) } row(s) selected.
 				</div>
 				<div class="flex w-full items-center gap-8 lg:w-fit">
-					<div class="hidden items-center gap-2 lg:flex">
+					// The rows-per-page pick is declarative htmx: the select
+					// syncs its hidden input[name=size], whose change event
+					// bubbles to this wrapper and fetches page one with the
+					// new size (the setPageSize pendant, reset like tanstack).
+					<div
+						class="hidden items-center gap-2 lg:flex"
+						hx-get="?page=1&fragment=data-table"
+						hx-trigger="change"
+						hx-include="input[name='size']"
+						hx-target="[data-dashboard01-table]"
+						hx-swap="outerHTML"
+					>
 						@label.Label(label.Props{For: "rows-per-page", Class: "text-sm font-medium"}) {
 							Rows per page
 						}
 						// The tsx passes side="top" to the SelectContent; the
 						// templ select has no side prop, the content aligns to
 						// the trigger.
-						@selectcomp.Select(selectcomp.Props{Value: "10"}) {
+						@selectcomp.Select(selectcomp.Props{Value: fmt.Sprint(size), Name: "size"}) {
 							@selectcomp.Trigger(selectcomp.TriggerProps{
 								Size:  selectcomp.SizeSm,
 								Class: "w-20",
 								ID:    "rows-per-page",
 							}) {
-								@selectcomp.Value(selectcomp.ValueProps{Placeholder: "10"})
+								@selectcomp.Value(selectcomp.ValueProps{Placeholder: fmt.Sprint(size)})
 							}
 							@selectcomp.Content() {
-								for _, pageSize := range []string{"10", "20", "30", "40", "50"} {
-									@selectcomp.Item(selectcomp.ItemProps{Value: pageSize}) {
-										{ pageSize }
+								@selectcomp.Group() {
+									for _, pageSize := range dataTablePageSizes {
+										@selectcomp.Item(selectcomp.ItemProps{Value: fmt.Sprint(pageSize)}) {
+											{ fmt.Sprint(pageSize) }
+										}
 									}
 								}
 							}
 						}
 					</div>
 					<div class="flex w-fit items-center justify-center text-sm font-medium">
-						Page 1 of { fmt.Sprint(dataTablePageCount(data)) }
+						Page { fmt.Sprint(page) } of { fmt.Sprint(pageCount) }
 					</div>
 					<div class="ml-auto flex items-center gap-2 lg:ml-0">
+						// The nav buttons are links onto the page's own URL
+						// (?page=&size=), disabled states computed server-side -
+						// the setPageIndex/getCanPreviousPage pendant. htmx
+						// swaps just the data-table fragment; without JS the
+						// links navigate normally.
 						@button.Button(button.Props{
-							Variant:  button.VariantOutline,
-							Class:    "hidden h-8 w-8 p-0 lg:flex",
-							Disabled: true,
+							Variant:    button.VariantOutline,
+							Class:      "hidden h-8 w-8 p-0 lg:flex",
+							Href:       dataTablePageHref(1, size),
+							Disabled:   page == 1,
+							Attributes: dataTableHxAttrs(dataTablePageHref(1, size)),
 						}) {
 							<span class="sr-only">Go to first page</span>
 							@icon.ChevronsLeft()
 						}
 						@button.Button(button.Props{
-							Variant:  button.VariantOutline,
-							Class:    "size-8",
-							Size:     button.SizeIcon,
-							Disabled: true,
+							Variant:    button.VariantOutline,
+							Class:      "size-8",
+							Size:       button.SizeIcon,
+							Href:       dataTablePageHref(page-1, size),
+							Disabled:   page == 1,
+							Attributes: dataTableHxAttrs(dataTablePageHref(page-1, size)),
 						}) {
 							<span class="sr-only">Go to previous page</span>
 							@icon.ChevronLeft()
 						}
 						@button.Button(button.Props{
-							Variant: button.VariantOutline,
-							Class:   "size-8",
-							Size:    button.SizeIcon,
+							Variant:    button.VariantOutline,
+							Class:      "size-8",
+							Size:       button.SizeIcon,
+							Href:       dataTablePageHref(page+1, size),
+							Disabled:   page == pageCount,
+							Attributes: dataTableHxAttrs(dataTablePageHref(page+1, size)),
 						}) {
 							<span class="sr-only">Go to next page</span>
 							@icon.ChevronRight()
 						}
 						@button.Button(button.Props{
-							Variant: button.VariantOutline,
-							Class:   "hidden size-8 lg:flex",
-							Size:    button.SizeIcon,
+							Variant:    button.VariantOutline,
+							Class:      "hidden size-8 lg:flex",
+							Size:       button.SizeIcon,
+							Href:       dataTablePageHref(pageCount, size),
+							Disabled:   page == pageCount,
+							Attributes: dataTableHxAttrs(dataTablePageHref(pageCount, size)),
 						}) {
 							<span class="sr-only">Go to last page</span>
 							@icon.ChevronsRight()
@@ -271,9 +304,88 @@ templ DataTable(data []Item) {
 			<div class="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
 		}
 	}
+	}
+	@dataTableScript()
 }
 
-templ dataTableRow(item Item) {
+// dataTableScript covers the two interactions that stay client-side: row
+// selection (view-local UI state, like the tsx's rowSelection) and the
+// rows-per-page pick (the custom select needs JS anyway; it navigates like
+// the nav links). Everything else is the URL.
+templ dataTableScript() {
+	<script nonce={ templ.GetNonce(ctx) }>
+		(() => {
+			if (window.__tuiDashboard01DataTable) return;
+			window.__tuiDashboard01DataTable = true;
+
+			// Pagination and rows-per-page are htmx-driven (see the hx-*
+			// attributes on the nav links and the rows-per-page wrapper);
+			// this script only covers the view-local UI state below.
+
+			// Column visibility (the tsx's columnVisibility state): the
+			// Customize Columns checkbox items hide/show their column's
+			// cells. The dropdown content is portaled to <body>, so the
+			// table is resolved directly (one instance per page).
+			document.addEventListener("dropdownmenu-checked-change", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const item = e.target.closest("[data-dashboard01-column]");
+				if (!item) return;
+				const root = document.querySelector("[data-dashboard01-table]");
+				if (!root) return;
+				const index = parseInt(item.getAttribute("data-dashboard01-column"), 10);
+				const show = item.getAttribute("data-state") === "checked";
+				root.querySelectorAll("thead tr, tbody tr").forEach((row) => {
+					const cell = row.children[index];
+					if (cell) cell.hidden = !show;
+				});
+			});
+
+			// Row selection: the header checkbox toggles the page's rows and
+			// mirrors them as checked/indeterminate (the checkbox component
+			// renders the mixed state natively); selected rows tint via
+			// data-state and the footer count stays live.
+			let syncing = false;
+			document.addEventListener("change", (e) => {
+				if (syncing || !(e.target instanceof Element)) return;
+				if (!e.target.matches("[data-tui-checkbox-input]")) return;
+				const root = e.target.closest("[data-dashboard01-table]");
+				if (!root) return;
+				const all = root.querySelector("thead [data-tui-checkbox-input]");
+				const rows = [...root.querySelectorAll("tbody [data-tui-checkbox-input]")];
+				if (!all || rows.length === 0) return;
+
+				syncing = true;
+				if (e.target === all) {
+					// toggleAllPageRowsSelected pendant.
+					rows.forEach((input) => {
+						if (input.checked !== all.checked) {
+							input.checked = all.checked;
+							input.dispatchEvent(new Event("change", { bubbles: true }));
+						}
+					});
+				}
+				const checked = rows.filter((input) => input.checked).length;
+				rows.forEach((input) => {
+					const row = input.closest("tr");
+					if (!row) return;
+					if (input.checked) row.setAttribute("data-state", "selected");
+					else row.removeAttribute("data-state");
+				});
+				// getIsAllPageRowsSelected / getIsSomePageRowsSelected pendant;
+				// checkbox.js paints the mixed state off input.indeterminate.
+				all.checked = checked === rows.length;
+				all.indeterminate = checked > 0 && checked < rows.length;
+				all.dispatchEvent(new Event("change", { bubbles: true }));
+				syncing = false;
+
+				const count = root.querySelector("[data-dashboard01-selected-count]");
+				if (count) count.textContent = String(checked);
+			});
+		})();
+	</script>
+}
+
+templ dataTableRow(item Item, page, size int) {
 	@table.Row(table.RowProps{Class: "relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"}) {
 		@table.Cell() {
 			// The drag handle renders statically, dnd-kit sorting is omitted.
@@ -294,7 +406,7 @@ templ dataTableRow(item Item) {
 			</div>
 		}
 		@table.Cell() {
-			@dataTableCellViewer(item)
+			@dataTableCellViewer(item, page, size)
 		}
 		@table.Cell() {
 			<div class="w-32">
@@ -357,11 +469,13 @@ templ dataTableRow(item Item) {
 						@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Assign reviewer"})
 					}
 					@selectcomp.Content(selectcomp.ContentProps{Align: selectcomp.AlignEnd}) {
-						@selectcomp.Item(selectcomp.ItemProps{Value: "Eddie Lake"}) {
-							Eddie Lake
-						}
-						@selectcomp.Item(selectcomp.ItemProps{Value: "Jamik Tashpulatov"}) {
-							Jamik Tashpulatov
+						@selectcomp.Group() {
+							@selectcomp.Item(selectcomp.ItemProps{Value: "Eddie Lake"}) {
+								Eddie Lake
+							}
+							@selectcomp.Item(selectcomp.ItemProps{Value: "Jamik Tashpulatov"}) {
+								Jamik Tashpulatov
+							}
 						}
 					}
 				}
@@ -421,14 +535,22 @@ func dataTableCellViewerMonthShort(v any) string {
 	return s
 }
 
-templ dataTableCellViewer(item Item) {
+templ dataTableCellViewer(item Item, page, size int) {
 	// direction={isMobile ? "bottom" : "right"}: the useIsMobile switch is
 	// omitted, the drawer always opens from the right.
 	@drawer.Drawer(drawer.Props{SwipeDirection: drawer.SwipeDirectionRight}) {
+		// The drawer body lazy-loads on first open: React mounts drawer
+		// children on open, the htmx pendant fetches this row's templ
+		// fragment once - so the page never ships 68 hidden charts.
 		@button.Button(button.Props{
-			Variant:    button.VariantLink,
-			Class:      "w-fit px-0 text-left text-foreground",
-			Attributes: drawer.Trigger(ctx),
+			Variant: button.VariantLink,
+			Class:   "w-fit px-0 text-left text-foreground",
+			Attributes: utils.MergeAttributes(drawer.Trigger(ctx), templ.Attributes{
+				"hx-get":     dataTablePageHref(page, size) + "&fragment=" + dataTableDrawerFragment(item.ID),
+				"hx-trigger": "click once",
+				"hx-target":  "#" + dataTableDrawerBodyID(item.ID),
+				"hx-swap":    "innerHTML",
+			}),
 		}) {
 			{ item.Header }
 		}
@@ -441,10 +563,39 @@ templ dataTableCellViewer(item Item) {
 					Showing total visitors for the last 6 months
 				}
 			}
-			<div class="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
-				// The tsx renders the chart section only when !isMobile; the
-				// useIsMobile switch is omitted, it always renders.
-				@chart.Container(chart.ContainerProps{Config: dataTableCellViewerChartConfig}) {
+			<div class="flex flex-col gap-4 overflow-y-auto px-4 text-sm" id={ dataTableDrawerBodyID(item.ID) }>
+				if dataTableDrawerRequested(ctx, item.ID) {
+					@templ.Fragment(dataTableDrawerFragment(item.ID)) {
+						@dataTableDrawerBody(item)
+					}
+				} else {
+					// The skeleton the fragment swap replaces on first open.
+					@skeleton.Skeleton(skeleton.Props{Class: "aspect-video w-full"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-2/3"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-40 w-full"})
+				}
+			</div>
+			@drawer.Footer() {
+				@button.Button() {
+					Submit
+				}
+				@button.Button(button.Props{
+					Variant:    button.VariantOutline,
+					Attributes: drawer.Close(ctx),
+				}) {
+					Done
+				}
+			}
+		}
+	}
+}
+
+// dataTableDrawerBody is the drawer's heavy content (chart, trend, form),
+// rendered only for its own fragment request.
+templ dataTableDrawerBody(item Item) {
+	// The tsx renders the chart section only when !isMobile; the
+	// useIsMobile switch is omitted, it always renders.
+	@chart.Container(chart.ContainerProps{Config: dataTableCellViewerChartConfig}) {
 					@chart.AreaChart(chart.AreaChartProps{
 						AccessibilityLayer: true,
 						Data:               dataTableCellViewerChartData,
@@ -509,9 +660,11 @@ templ dataTableCellViewer(item Item) {
 									@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a type"})
 								}
 								@selectcomp.Content() {
-									for _, sectionType := range []string{"Table of Contents", "Executive Summary", "Technical Approach", "Design", "Capabilities", "Focus Documents", "Narrative", "Cover Page"} {
-										@selectcomp.Item(selectcomp.ItemProps{Value: sectionType}) {
-											{ sectionType }
+									@selectcomp.Group() {
+										for _, sectionType := range []string{"Table of Contents", "Executive Summary", "Technical Approach", "Design", "Capabilities", "Focus Documents", "Narrative", "Cover Page"} {
+											@selectcomp.Item(selectcomp.ItemProps{Value: sectionType}) {
+												{ sectionType }
+											}
 										}
 									}
 								}
@@ -526,14 +679,16 @@ templ dataTableCellViewer(item Item) {
 									@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a status"})
 								}
 								@selectcomp.Content() {
-									@selectcomp.Item(selectcomp.ItemProps{Value: "Done"}) {
-										Done
-									}
-									@selectcomp.Item(selectcomp.ItemProps{Value: "In Progress"}) {
-										In Progress
-									}
-									@selectcomp.Item(selectcomp.ItemProps{Value: "Not Started"}) {
-										Not Started
+									@selectcomp.Group() {
+										@selectcomp.Item(selectcomp.ItemProps{Value: "Done"}) {
+											Done
+										}
+										@selectcomp.Item(selectcomp.ItemProps{Value: "In Progress"}) {
+											In Progress
+										}
+										@selectcomp.Item(selectcomp.ItemProps{Value: "Not Started"}) {
+											Not Started
+										}
 									}
 								}
 							}
@@ -562,31 +717,19 @@ templ dataTableCellViewer(item Item) {
 								@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a reviewer"})
 							}
 							@selectcomp.Content() {
-								@selectcomp.Item(selectcomp.ItemProps{Value: "Eddie Lake"}) {
-									Eddie Lake
-								}
-								@selectcomp.Item(selectcomp.ItemProps{Value: "Jamik Tashpulatov"}) {
-									Jamik Tashpulatov
-								}
-								@selectcomp.Item(selectcomp.ItemProps{Value: "Emily Whalen"}) {
-									Emily Whalen
+								@selectcomp.Group() {
+									@selectcomp.Item(selectcomp.ItemProps{Value: "Eddie Lake"}) {
+										Eddie Lake
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "Jamik Tashpulatov"}) {
+										Jamik Tashpulatov
+									}
+									@selectcomp.Item(selectcomp.ItemProps{Value: "Emily Whalen"}) {
+										Emily Whalen
+									}
 								}
 							}
 						}
 					</div>
 				</form>
-			</div>
-			@drawer.Footer() {
-				@button.Button() {
-					Submit
-				}
-				@button.Button(button.Props{
-					Variant:    button.VariantOutline,
-					Attributes: drawer.Close(ctx),
-				}) {
-					Done
-				}
-			}
-		}
-	}
 }

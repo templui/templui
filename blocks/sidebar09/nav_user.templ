@@ -22,8 +22,12 @@ templ NavUser(user User) {
 					Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground md:h-8 md:p-0",
 					Attributes: dropdownmenu.Trigger(ctx),
 				}) {
-					@avatar.Avatar(avatar.Props{Class: "h-8 w-8 rounded-lg"}) {
-						@avatar.Image(avatar.ImageProps{Src: user.Avatar, Alt: user.Name})
+					// after:rounded-lg + the rounded-lg on Image go beyond the TSX classes:
+					// shadcn's avatar root clips via overflow-hidden, ours rounds image and
+					// ring themselves (cn-avatar-image, after:rounded-full), so the square
+					// override has to reach both.
+					@avatar.Avatar(avatar.Props{Class: "h-8 w-8 rounded-lg after:rounded-lg"}) {
+						@avatar.Image(avatar.ImageProps{Src: user.Avatar, Alt: user.Name, Class: "rounded-lg"})
 						@avatar.Fallback(avatar.FallbackProps{Class: "rounded-lg"}) {
 							AA
 						}
@@ -44,8 +48,8 @@ templ NavUser(user User) {
 				}) {
 					@dropdownmenu.Label(dropdownmenu.LabelProps{Class: "p-0 font-normal"}) {
 						<div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-							@avatar.Avatar(avatar.Props{Class: "h-8 w-8 rounded-lg"}) {
-								@avatar.Image(avatar.ImageProps{Src: user.Avatar, Alt: user.Name})
+							@avatar.Avatar(avatar.Props{Class: "h-8 w-8 rounded-lg after:rounded-lg"}) {
+								@avatar.Image(avatar.ImageProps{Src: user.Avatar, Alt: user.Name, Class: "rounded-lg"})
 								@avatar.Fallback(avatar.FallbackProps{Class: "rounded-lg"}) {
 									AA
 								}
