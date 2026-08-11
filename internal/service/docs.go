@@ -235,3 +235,67 @@ func (s *DocsService) GetChangelogPage(slug string) (*ChangelogPage, error) {
 func (s *DocsService) GetChangelogPageSource(slug string) ([]byte, error) {
 	return readContent(filepath.Join("content/docs/changelog", slug+".md"))
 }
+
+// The components overview is a templ page, not a markdown file, so its title
+// and description live here: the page and the exported markdown read the same
+// two strings and cannot drift apart.
+const (
+	ComponentsIndexTitle       = "Components"
+	ComponentsIndexDescription = "Here you can find all the components available in the library. We are working on adding more components."
+)
+
+// ComponentsIndexSource builds the markdown of the components overview for the
+// exported /docs/components.md, the pendant of the reference's export of
+// content/docs/components/index.mdx: frontmatter, then the New Components and
+// All Components lists in the order the page renders them, every entry an
+// absolute link carrying the description from the component doc's frontmatter.
+// The reference closes with a pointer to its registry directory; shadcn-templ
+// has no directory page, so that section stays out, like the nav is without it.
+func (s *DocsService) ComponentsIndexSource() []byte {
+	var b strings.Builder
+	fmt.Fprintf(&b, "---\ntitle: %s\ndescription: %s\n---\n", ComponentsIndexTitle, ComponentsIndexDescription)
+	b.WriteString("\n## New Components\n\n")
+	s.writeComponentList(&b, true)
+	b.WriteString("\n## All Components\n\n")
+	s.writeComponentList(&b, false)
+	return []byte(b.String())
+}
+
+// writeComponentList writes one list of component links, the markdown pendant
+// of the page's componentsGrid: onlyNew keeps the PagesNew members, like the
+// grid's New Components pass.
+func (s *DocsService) writeComponentList(b *strings.Builder, onlyNew bool) {
+	base := shared.BaseURL()
+	for _, section := range shared.Sections {
+		if section.Title != "Components" {
+			continue
+		}
+		for _, link := range section.Links {
+			if onlyNew && !shared.PageIsNew(link.Href) {
+				continue
+			}
+			title, description := s.componentMeta(strings.TrimPrefix(link.Href, "/docs/components/"))
+			if title == "" {
+				title = link.Text
+			}
+			fmt.Fprintf(b, "- [%s](%s%s)", title, base, link.Href)
+			if description != "" {
+				fmt.Fprintf(b, ": %s", description)
+			}
+			b.WriteString("\n")
+		}
+	}
+}
+
+// componentMeta reads a component doc's frontmatter title and description
+// without parsing its body.
+func (s *DocsService) componentMeta(slug string) (title, description string) {
+	source, err := readContent(filepath.Join("content/docs/components", slug+".md"))
+	if err != nil {
+		return "", ""
+	}
+	meta := s.parser.Frontmatter(source)
+	title, _ = meta["title"].(string)
+	description, _ = meta["description"].(string)
+	return title, description
+}

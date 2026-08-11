@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"github.com/axadrn/shadcn-templ/v2/internal/service"
 	"github.com/axadrn/shadcn-templ/v2/internal/shared"
 	"github.com/axadrn/shadcn-templ/v2/internal/ui/layouts"
 	"github.com/axadrn/shadcn-templ/v2/internal/ui/modules"
@@ -13,15 +14,15 @@ import (
 // the blue dot (components-list.tsx showNewIndicator).
 templ ComponentsOverview(prev, next PagerLink) {
 	@layouts.DocsLayout(
-		"Components",
-		"Here you can find all the components available in the library. We are working on adding more components.",
+		service.ComponentsIndexTitle,
+		service.ComponentsIndexDescription,
 		[]modules.TableOfContentsItem{
 			{ID: "new-components", Text: "New Components"},
 			{ID: "all-components", Text: "All Components"},
 		},
 	) {
 		<div class="flex w-full flex-1 flex-col gap-6">
-			@modules.DocsPageHeader("Components", "Here you can find all the components available in the library. We are working on adding more components.", prev.Href, next.Href)
+			@modules.DocsPageHeader(service.ComponentsIndexTitle, service.ComponentsIndexDescription, prev.Href, next.Href)
 			<div class="typeset w-full flex-1 pb-16 sm:pb-0">
 				<h2 id="new-components">New Components</h2>
 				@componentsGrid(true, false)

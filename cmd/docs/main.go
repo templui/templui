@@ -195,6 +195,15 @@ func main() {
 		})
 	}
 
+	// The components overview and the changelog have no page of their own in
+	// DocSlugs, but their copy-page menu links a .md all the same: the overview
+	// exports the generated component index, the changelog its intro page.
+	mux.Handle("GET /docs/components.md", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
+		w.Write(docsService.ComponentsIndexSource())
+	}))
+	mux.Handle("GET /docs/changelog.md", markdownSourceHandler("changelog"))
+
 	// Changelog: the overview inlines the latest entries, each entry has its
 	// own page (the reference's per-entry directory), and rss.xml feeds them.
 	mux.Handle("GET /docs/changelog", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
