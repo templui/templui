@@ -64,6 +64,8 @@
     // Menu button tooltips only show while collapsed to icons.
     const tooltipsDisabled = !(collapsed && mode === "icon");
     wrapper.querySelectorAll("[data-tui-tooltip-trigger]").forEach((trigger) => {
+      // An explicit tooltip.hidden pendant pins the state.
+      if (trigger.hasAttribute("data-tui-sidebar-tooltip-fixed")) return;
       trigger.toggleAttribute("data-tui-tooltip-disabled", tooltipsDisabled);
     });
 
