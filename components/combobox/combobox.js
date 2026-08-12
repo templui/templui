@@ -239,9 +239,10 @@
     });
     clearTimeout(content._tuiHide);
     portal(content);
-    if (!content.matches(":popover-open")) {
-      content.showPopover(); // native top layer
-    }
+    // z-index portal like shadcn (no native top layer); re-append
+    // keeps paint order = open order.
+    document.body.appendChild(content);
+    content.hidden = false;
 
     applyFilter(content, "");
     // Base UI highlights the current selection on open, else (with
@@ -255,8 +256,13 @@
     // Position it invisibly first, then play the enter animation in place.
     content.style.visibility = "hidden";
     const finish = () => {
+      // duration-100 transitions `all`; a visibility transition would
+      // freeze at hidden in background tabs - flip suppressed.
+      content.style.transitionProperty = "none";
       content.style.visibility = "";
-      if (!content.matches(":popover-open")) return;
+      void content.offsetWidth;
+      content.style.transitionProperty = "";
+      if (content.hidden) return;
       setState(content, "open");
       setExpanded(content, true);
     };
@@ -264,7 +270,7 @@
   }
 
   function close(content) {
-    if (!content.matches(":popover-open")) return;
+    if (content.hidden) return;
     content.style.visibility = "";
     setState(content, "closed");
     setExpanded(content, false);
@@ -277,8 +283,8 @@
     }
     clearTimeout(content._tuiHide);
     content._tuiHide = setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
-        content.hidePopover();
+      if (content.getAttribute("data-state") === "closed" && !content.hidden) {
+        content.hidden = true;
       }
     }, EXIT_MS);
   }

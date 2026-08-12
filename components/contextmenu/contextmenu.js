@@ -175,9 +175,10 @@
     clearTimeout(content._tuiHide);
     portal(content);
     lockScroll();
-    if (!content.matches(":popover-open")) {
-      content.showPopover(); // native top layer
-    }
+    // z-index portal like shadcn (no native top layer); re-append
+    // keeps paint order = open order.
+    document.body.appendChild(content);
+    content.hidden = false;
 
     if (alreadyOpen) {
       // Right-click somewhere else while open: move over to the new spot.
@@ -190,8 +191,13 @@
     // at the cursor.
     content.style.visibility = "hidden";
     positionMenu(content, x, y).then(() => {
-      if (!content.matches(":popover-open")) return; // closed meanwhile
+      if (content.hidden) return; // closed meanwhile
+      // duration-100 transitions `all`; a visibility transition would
+      // freeze at hidden in background tabs - flip suppressed.
+      content.style.transitionProperty = "none";
       content.style.visibility = "";
+      void content.offsetWidth;
+      content.style.transitionProperty = "";
       setState(content, "open");
       const popup = popupFor(content);
       if (popup) popup.focus({ preventScroll: true });
@@ -199,13 +205,13 @@
   }
 
   function close(content) {
-    if (!content.matches(":popover-open")) return;
+    if (content.hidden) return;
     setState(content, "closed");
     content.querySelectorAll("[data-tui-contextmenu-sub]").forEach(closeSubNow);
     clearTimeout(content._tuiHide);
     content._tuiHide = setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
-        content.hidePopover();
+      if (content.getAttribute("data-state") === "closed" && !content.hidden) {
+        content.hidden = true;
       }
     }, EXIT_MS);
     unlockScroll();
@@ -256,7 +262,12 @@
       );
       content.offsetHeight; // flush styles before re-enabling transitions
       content.style.transition = "";
+      // duration-100 transitions `all`; a visibility transition would
+      // freeze at hidden in background tabs - flip suppressed.
+      content.style.transitionProperty = "none";
       content.style.visibility = "";
+      void content.offsetWidth;
+      content.style.transitionProperty = "";
       content.setAttribute("data-state", "open");
       trigger.setAttribute("data-state", "open");
       if (focusFirst) focusItem(itemsIn(content)[0] || content);

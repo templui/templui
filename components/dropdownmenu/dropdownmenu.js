@@ -170,15 +170,21 @@
     clearTimeout(content._tuiHide);
     portal(content);
     lockScroll();
-    if (!content.matches(":popover-open")) {
-      content.showPopover(); // native top layer
-    }
+    // z-index portal like shadcn (no native top layer); re-append
+    // keeps paint order = open order.
+    document.body.appendChild(content);
+    content.hidden = false;
 
     // Position it invisibly first, then play the enter animation in place.
     content.style.visibility = "hidden";
     const finish = () => {
+      // duration-100 transitions `all`; a visibility transition would
+      // freeze at hidden in background tabs - flip suppressed.
+      content.style.transitionProperty = "none";
       content.style.visibility = "";
-      if (!content.matches(":popover-open")) return;
+      void content.offsetWidth;
+      content.style.transitionProperty = "";
+      if (content.hidden) return;
       setState(content, "open");
       trigger.setAttribute("aria-expanded", "true");
       const popup = popupFor(content);
@@ -193,7 +199,7 @@
   }
 
   function close(content, refocusTrigger) {
-    if (!content.matches(":popover-open")) return;
+    if (content.hidden) return;
     setState(content, "closed");
     content.querySelectorAll("[data-tui-dropdownmenu-sub]").forEach(closeSubNow);
     const trigger = triggerFor(content);
@@ -203,8 +209,8 @@
     }
     clearTimeout(content._tuiHide);
     content._tuiHide = setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
-        content.hidePopover();
+      if (content.getAttribute("data-state") === "closed" && !content.hidden) {
+        content.hidden = true;
       }
     }, EXIT_MS);
     unlockScroll();
@@ -255,7 +261,12 @@
       );
       content.offsetHeight; // flush styles before re-enabling transitions
       content.style.transition = "";
+      // duration-100 transitions `all`; a visibility transition would
+      // freeze at hidden in background tabs - flip suppressed.
+      content.style.transitionProperty = "none";
       content.style.visibility = "";
+      void content.offsetWidth;
+      content.style.transitionProperty = "";
       content.setAttribute("data-state", "open");
       trigger.setAttribute("data-state", "open");
       if (focusFirst) focusItem(itemsIn(content)[0] || content);

@@ -123,15 +123,21 @@
     });
     clearTimeout(content._tuiHide);
     portal(content);
-    if (!content.matches(":popover-open")) {
-      content.showPopover(); // native top layer
-    }
+    // z-index portal like shadcn (no native top layer); re-append
+    // keeps paint order = open order.
+    document.body.appendChild(content);
+    content.hidden = false;
 
     // Position it invisibly first, then play the enter animation in place.
     content.style.visibility = "hidden";
     const finish = () => {
+      // duration-100 transitions `all`; a visibility transition would
+      // freeze at hidden in background tabs - flip suppressed.
+      content.style.transitionProperty = "none";
       content.style.visibility = "";
-      if (!content.matches(":popover-open")) return;
+      void content.offsetWidth;
+      content.style.transitionProperty = "";
+      if (content.hidden) return;
       setState(content, "open");
       const trigger = triggerFor(content);
       if (trigger) trigger.setAttribute("aria-expanded", "true");
@@ -148,7 +154,7 @@
   // dismiss: focus follows the outside press instead of the trigger.
   function close(content, returnFocus) {
     if (typeof content === "string") content = document.getElementById(content);
-    if (!content || !content.matches(":popover-open")) return;
+    if (!content || content.hidden) return;
     if (returnFocus !== false && content.contains(document.activeElement)) {
       const focusTrigger = triggerFor(content);
       if (focusTrigger) focusTrigger.focus({ preventScroll: true });
@@ -159,8 +165,8 @@
     if (trigger) trigger.setAttribute("aria-expanded", "false");
     clearTimeout(content._tuiHide);
     content._tuiHide = setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
-        content.hidePopover();
+      if (content.getAttribute("data-state") === "closed" && !content.hidden) {
+        content.hidden = true;
       }
     }, EXIT_MS);
   }

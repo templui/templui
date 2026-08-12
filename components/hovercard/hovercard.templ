@@ -127,7 +127,8 @@ templ Content(props ...ContentProps) {
 		data-tui-hovercard-delay={ strconv.Itoa(d.open) }
 		data-tui-hovercard-close-delay={ strconv.Itoa(d.close) }
 		data-state="closed"
-		popover="manual"
+		hidden
+		data-tui-portal
 		class={
 			utils.CN(
 				// 1:1 base/ui/hover-card.tsx HoverCardContent, the look comes from
