@@ -120,7 +120,7 @@ func RunInit(opts InitOptions) error {
 	}
 
 	// Fetch the registry:base item; its config block seeds components.json.
-	baseItem, err := registry.GetItem(registryURL, "", initURL)
+	baseItem, err := registry.GetItem(registryURL, "", initURL, nil)
 	if err != nil {
 		return err
 	}

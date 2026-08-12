@@ -114,7 +114,7 @@ var (
 // one style. Returns (nil, nil) when style or component are unknown (the 404
 // case). Results are cached per style+name in production and rebuilt on
 // every call in development.
-func BuildStyleItem(styleName, name string) (*Item, error) {
+func BuildStyleItem(styleName, name string, opts inliner.Options) (*Item, error) {
 	bare, ok := splitStyleName(styleName)
 	if !ok {
 		return nil, nil
@@ -124,7 +124,7 @@ func BuildStyleItem(styleName, name string) (*Item, error) {
 		return nil, nil
 	}
 
-	cacheKey := styleName + "/" + name
+	cacheKey := fmt.Sprintf("%s/%s/%s/%t", styleName, name, opts.MenuColor, opts.RTL)
 	if !isDevelopment() {
 		itemMu.Lock()
 		cached, ok := itemCache[cacheKey]
@@ -147,7 +147,7 @@ func BuildStyleItem(styleName, name string) (*Item, error) {
 		}
 		content := string(src)
 		if strings.HasSuffix(file.Path, ".templ") {
-			content, err = inliner.TransformStyle(content, styleMap, inliner.Options{})
+			content, err = inliner.TransformStyle(content, styleMap, opts)
 			if err != nil {
 				return nil, fmt.Errorf("registryapi: inline %s for %s: %w", file.Path, styleName, err)
 			}

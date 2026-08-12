@@ -7,6 +7,7 @@
 package commands
 
 import (
+	"net/url"
 	"flag"
 	"fmt"
 	"path/filepath"
@@ -109,7 +110,16 @@ type addComponentsOptions struct {
 // write the files and update the CSS last.
 func addComponents(components []string, config *utils.Config, registryURL string, options addComponentsOptions) error {
 	logf(options.Silent, "Checking registry.\n")
-	tree, err := registry.ResolveTree(registryURL, config.Style, components)
+	// The config half of shadcn's install transformers (transform-menu.ts,
+	// transform-rtl.ts): sent along, resolved by the registry at serve time.
+	query := url.Values{}
+	if config.MenuColor != "" && config.MenuColor != "default" {
+		query.Set("menuColor", config.MenuColor)
+	}
+	if config.RTL != nil && *config.RTL {
+		query.Set("rtl", "true")
+	}
+	tree, err := registry.ResolveTree(registryURL, config.Style, query, components)
 	if err != nil {
 		return err
 	}

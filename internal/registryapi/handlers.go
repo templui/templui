@@ -3,6 +3,9 @@
 package registryapi
 
 import (
+	"slices"
+
+	"github.com/axadrn/shadcn-templ/v2/internal/inliner"
 	"bytes"
 	"encoding/json"
 	"log"
@@ -88,7 +91,14 @@ func StylesHandler() http.Handler {
 			return
 		}
 
-		item, err := BuildStyleItem(styleName, name)
+		// The install-config half of shadcn's CLI transformers: the CLI
+		// sends its components.json menuColor/rtl, the markers resolve here
+		// (shadcn-templ has no separate install step).
+		opts := inliner.Options{RTL: r.URL.Query().Get("rtl") == "true"}
+		if menuColor := r.URL.Query().Get("menuColor"); slices.Contains(MenuColors, menuColor) {
+			opts.MenuColor = menuColor
+		}
+		item, err := BuildStyleItem(styleName, name, opts)
 		if err != nil {
 			log.Printf("registryapi: build %s/%s: %v", styleName, name, err)
 			writeJSON(w, http.StatusInternalServerError, errorBody{Error: err.Error()})

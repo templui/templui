@@ -6,12 +6,13 @@
 package registry
 
 import (
+	"net/url"
 	"strings"
 )
 
 // ResolveTree fetches every requested item (name or URL) plus its
 // registryDependencies recursively and merges them into a Tree.
-func ResolveTree(registryURL, style string, namesOrURLs []string) (*Tree, error) {
+func ResolveTree(registryURL, style string, query url.Values, namesOrURLs []string) (*Tree, error) {
 	var payload []*Item
 	visited := map[string]bool{}
 	var fontDeps []string
@@ -31,7 +32,7 @@ func ResolveTree(registryURL, style string, namesOrURLs []string) (*Tree, error)
 			return nil
 		}
 
-		item, err := GetItem(registryURL, style, nameOrURL)
+		item, err := GetItem(registryURL, style, nameOrURL, query)
 		if err != nil {
 			return err
 		}

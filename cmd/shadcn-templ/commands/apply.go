@@ -189,7 +189,7 @@ func RunApply(positional []string, opts ApplyOptions) error {
 	}
 
 	// Fetch the (partial) registry:base item and patch components.json.
-	baseItem, err := registry.GetItem(registryURL, "", initURL)
+	baseItem, err := registry.GetItem(registryURL, "", initURL, nil)
 	if err != nil {
 		return err
 	}
