@@ -126,7 +126,7 @@ templ Portal(props ...PortalProps) {
 		{{ p = props[0] }}
 	}
 	<template data-tui-dialog-portal>
-		<div data-tui-dialog-root hidden { p.Attributes... }>
+		<div data-tui-dialog-root data-tui-portal hidden { p.Attributes... }>
 			{ children... }
 		</div>
 	</template>

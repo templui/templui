@@ -513,8 +513,62 @@
     unwatchSnapResize(dialog);
     updateState(dialog, false);
     unlockScroll();
+    syncInert();
+    // Return focus to where the drawer was opened from, if focus is still
+    // ours to give back.
+    if (
+      dialog._tuiPreviousFocus?.isConnected &&
+      (dialog.contains(document.activeElement) || document.activeElement === document.body)
+    ) {
+      dialog._tuiPreviousFocus.focus({ preventScroll: true });
+    }
+    delete dialog._tuiPreviousFocus;
     syncStack();
   }
+
+  // The hand-built half of showModal's modality: while a modal drawer is
+  // open, every body-level sibling is inert - except the surfaces carrying
+  // the shared data-tui-portal marker (floating popups, dialogs, the
+  // toaster). inert removes the rest from tab order and the accessibility
+  // tree: floating-ui's markOthers-with-inert pendant, without knowing any
+  // component by name.
+  function syncInert() {
+    const anyModalOpen = Array.from(
+      document.querySelectorAll("body > dialog[data-tui-drawer-content]"),
+    ).some(
+      (d) =>
+        d.open &&
+        d.getAttribute("data-modal") === "true" &&
+        // A closing drawer no longer counts (Base UI removes markOthers at
+        // dismiss start, not after the exit transition).
+        !popupOf(d)?.hasAttribute("data-ending-style"),
+    );
+    for (const node of document.body.children) {
+      if (node.localName === "script" || node.matches("[data-tui-portal]")) continue;
+      node.toggleAttribute("inert", anyModalOpen);
+    }
+  }
+
+  // showModal's Escape lives here now. Capture phase: while a floating
+  // popup is visibly open (inside or outside the drawer), its own Escape
+  // handler closes it and the drawer stays.
+  const OPEN_POPUP_SELECTOR = '[data-tui-portal][data-state="open"]:not([hidden]):not(dialog)';
+
+  document.addEventListener(
+    "keydown",
+    (e) => {
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      if (document.querySelector(OPEN_POPUP_SELECTOR)) return;
+      const open = Array.from(
+        document.querySelectorAll("body > dialog[data-tui-drawer-content]"),
+      ).filter((d) => d.open && !d.hasAttribute("data-tui-drawer-disable-dismissible"));
+      // The deepest open drawer dismisses first (a parent with an open
+      // nested drawer stays).
+      const top = open.find((d) => !hasOpenNested(d));
+      if (top) closeDrawer(top);
+    },
+    true,
+  );
 
   function openDrawer(target) {
     const dialog = getDrawer(target);
@@ -533,11 +587,16 @@
       // below transition the panel in (450ms cubic-bezier(0.22,1,0.36,1)).
       setPartsAttr(dialog, "data-starting-style", true);
       try {
+        // Modal drawers open non-modally too: shadcn/Base UI never use the
+        // native top layer (it would stack above the z-index portaled
+        // popups). Modality - scroll lock, inert siblings, focus - is
+        // built by hand, like Base UI does.
+        dialog.show();
         if (dialog.getAttribute("data-tui-dialog-show-modal") === "true") {
-          dialog.showModal();
           lockScroll();
-        } else {
-          dialog.show();
+          dialog._tuiPreviousFocus = document.activeElement;
+          syncInert();
+          (popupOf(dialog) || dialog).focus({ preventScroll: true });
         }
       } catch {
         setPartsAttr(dialog, "data-starting-style", false);
@@ -584,6 +643,14 @@
     if (overlay) overlay.style.setProperty("--drawer-swipe-strength", String(value));
     setPartsAttr(dialog, "data-ending-style", true);
     updateState(dialog, false);
+    syncInert();
+    if (
+      dialog._tuiPreviousFocus?.isConnected &&
+      (dialog.contains(document.activeElement) || document.activeElement === document.body)
+    ) {
+      dialog._tuiPreviousFocus.focus({ preventScroll: true });
+    }
+    delete dialog._tuiPreviousFocus;
     // The stack treats a closing drawer as closed (Base UI flips `open`
     // before the exit transition), so the parent starts scaling forward now.
     syncStack();
@@ -1255,6 +1322,9 @@
 
   function init(root = document) {
     liftTemplates();
+    // Self-healing modality: recompute the inert siblings on every DOM
+    // change, so a swap or a missed close event never leaves stale inert.
+    syncInert();
     // The unmount half of the React portal pendant: a drawer lives as long
     // as its SSR declaration site (_tuiPortalOwner) stays in the document.
     // Ownership keeps programmatic drawers (window.tui.drawer.open) alive
