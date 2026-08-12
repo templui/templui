@@ -5,6 +5,7 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/label"
 	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
 	switchcomp "github.com/axadrn/shadcn-templ/v2/components/switch"
+	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
 // This is sample data
@@ -154,9 +155,13 @@ templ AppSidebar() {
 							for _, item := range navMain {
 								@sidebar.MenuItem() {
 									@sidebar.MenuButton(sidebar.MenuButtonProps{
-										Tooltip:  item.Title,
-										IsActive: item.IsActive,
-										Class:    "px-2.5 md:px-2",
+										Tooltip: item.Title,
+										// tooltip={{ children, hidden: false }} forces the
+										// tooltip in every sidebar state.
+										TooltipHidden: utils.Ptr(false),
+										IsActive:      item.IsActive,
+										Class:         "px-2.5 md:px-2",
+										Attributes:    templ.Attributes{"data-sidebar09-nav": item.Title},
 									}) {
 										@item.Icon()
 										<span>{ item.Title }</span>
@@ -180,7 +185,7 @@ templ AppSidebar() {
 		}) {
 			@sidebar.Header(sidebar.HeaderProps{Class: "gap-3.5 border-b p-4"}) {
 				<div class="flex w-full items-center justify-between">
-					<div class="text-base font-medium text-foreground">
+					<div class="text-base font-medium text-foreground" data-sidebar09-active-title>
 						{ navMain[0].Title }
 					</div>
 					@label.Label(label.Props{Class: "flex items-center gap-2 text-sm"}) {
@@ -192,7 +197,7 @@ templ AppSidebar() {
 			}
 			@sidebar.Content() {
 				@sidebar.Group(sidebar.GroupProps{Class: "px-0"}) {
-					@sidebar.GroupContent() {
+					@sidebar.GroupContent(sidebar.GroupContentProps{Attributes: templ.Attributes{"data-sidebar09-mails": ""}}) {
 						for _, mail := range mails {
 							<a
 								href="#"
@@ -200,6 +205,7 @@ templ AppSidebar() {
 							>
 								<div class="flex w-full items-center gap-2">
 									<span>{ mail.Name }</span>
+									{ " " }
 									<span class="ml-auto text-xs">{ mail.Date }</span>
 								</div>
 								<span class="font-medium">{ mail.Subject }</span>

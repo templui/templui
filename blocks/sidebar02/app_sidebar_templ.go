@@ -202,7 +202,7 @@ func AppSidebar() templ.Component {
 								var templ_7745c5c3_Var8 string
 								templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(item.Title)
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar02/app_sidebar.templ`, Line: 96, Col: 19}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar02/app_sidebar.templ`, Line: 97, Col: 19}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 								if templ_7745c5c3_Err != nil {
@@ -289,7 +289,7 @@ func AppSidebar() templ.Component {
 													var templ_7745c5c3_Var14 string
 													templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(subItem.Title)
 													if templ_7745c5c3_Err != nil {
-														return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar02/app_sidebar.templ`, Line: 108, Col: 27}
+														return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar02/app_sidebar.templ`, Line: 109, Col: 27}
 													}
 													_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 													if templ_7745c5c3_Err != nil {
@@ -338,8 +338,9 @@ func AppSidebar() templ.Component {
 						return nil
 					})
 					templ_7745c5c3_Err = collapsible.Collapsible(collapsible.Props{
-						Open:  true,
-						Class: "group/collapsible",
+						Open:       true,
+						Class:      "group/collapsible",
+						Attributes: templ.Attributes{"title": item.Title},
 					}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err

@@ -29,13 +29,11 @@ templ NavFavorites(favorites []Favorite) {
 							@icon.Ellipsis()
 							<span class="sr-only">More</span>
 						}
-						// side={isMobile ? "bottom" : "right"} / align renders the
-						// desktop default; the menu flips on its own when there is
-						// no room.
 						@dropdownmenu.Content(dropdownmenu.ContentProps{
-							Class: "w-56 rounded-lg",
-							Side:  dropdownmenu.SideRight,
-							Align: dropdownmenu.AlignStart,
+							Class:      "w-56 rounded-lg",
+							Side:       dropdownmenu.SideRight,
+							Align:      dropdownmenu.AlignStart,
+							Attributes: templ.Attributes{"data-sidebar10-menu": "favorites"},
 						}) {
 							@dropdownmenu.Item() {
 								@icon.StarOff(icon.Props{Class: "text-muted-foreground"})

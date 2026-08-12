@@ -37,4 +37,48 @@ templ Page() {
 			</div>
 		}
 	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		(() => {
+			// Team switching, the pendant of the TeamSwitcher's activeTeam React state.
+			document.addEventListener("click", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const item = e.target.closest("#sidebar10-team-menu [data-sidebar10-team-index]");
+				if (!item) return;
+				const i = item.getAttribute("data-sidebar10-team-index");
+				const name = item.textContent.trim().replace(/⌘\d$/, "").trim();
+				document.querySelectorAll("[data-sidebar10-team-logo]").forEach((logo) => {
+					logo.classList.toggle("hidden", logo.getAttribute("data-sidebar10-team-logo") !== i);
+				});
+				const nameEl = document.querySelector("[data-sidebar10-team-name]");
+				if (nameEl) nameEl.textContent = name;
+			});
+
+			// side={isMobile ? "bottom" : "right"} / align pendant: the
+			// favorites menu flips below md, like useSidebar's isMobile.
+			const mq = window.matchMedia("(max-width: 767px)");
+			const applySides = () => {
+				document.querySelectorAll("[data-sidebar10-menu]").forEach((menu) => {
+					menu.setAttribute("data-tui-dropdownmenu-side", mq.matches ? "bottom" : "right");
+					menu.setAttribute("data-tui-dropdownmenu-align", mq.matches ? "end" : "start");
+				});
+			};
+			// The portals lift with the deferred bundle, so the initial pass
+			// waits for DOM ready (matchMedia changes keep it live after).
+			if (document.readyState === "loading") {
+				document.addEventListener("DOMContentLoaded", applySides);
+			} else {
+				applySides();
+			}
+			mq.addEventListener("change", applySides);
+
+			// The isOpen/useEffect pendant: the actions popover opens once on
+			// mount as the demo flourish.
+			const openActions = () => window.tui?.popover?.open("sidebar10-actions-popover");
+			if (document.readyState === "loading") {
+				document.addEventListener("DOMContentLoaded", openActions);
+			} else {
+				openActions();
+			}
+		})();
+	</script>
 }

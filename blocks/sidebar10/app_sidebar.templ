@@ -3,6 +3,7 @@ package sidebar10
 import (
 	"github.com/axadrn/shadcn-templ/v2/components/icon"
 	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
 // This is sample data.
@@ -115,8 +116,13 @@ var workspaces = []Workspace{
 	},
 }
 
-templ AppSidebar() {
-	@sidebar.Sidebar(sidebar.Props{Class: "border-r-0"}) {
+templ AppSidebar(props ...sidebar.Props) {
+	{{ p := sidebar.Props{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ p.Class = utils.CN("border-r-0", p.Class) }}
+	@sidebar.Sidebar(p) {
 		@sidebar.Header() {
 			@TeamSwitcher(teams)
 			@NavMain(navMain)

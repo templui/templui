@@ -241,6 +241,23 @@ func Page() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<script nonce=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/page.templ`, Line: 47, Col: 36}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\">\n\t\t(() => {\n\t\t\t// The activeItem/setMails/setOpen pendant: a picked inbox item\n\t\t\t// activates itself, retitles the mail sidebar, reshuffles the\n\t\t\t// mail list to a random 5-10 slice and expands the sidebar.\n\t\t\tdocument.addEventListener(\"click\", (e) => {\n\t\t\t\tif (!(e.target instanceof Element)) return;\n\t\t\t\tconst btn = e.target.closest(\"[data-sidebar09-nav]\");\n\t\t\t\tif (!btn) return;\n\t\t\t\tdocument.querySelectorAll(\"[data-sidebar09-nav]\").forEach((el) => {\n\t\t\t\t\tel.toggleAttribute(\"data-active\", el === btn);\n\t\t\t\t});\n\t\t\t\tconst title = document.querySelector(\"[data-sidebar09-active-title]\");\n\t\t\t\tif (title) title.textContent = btn.getAttribute(\"data-sidebar09-nav\");\n\t\t\t\tconst list = document.querySelector(\"[data-sidebar09-mails]\");\n\t\t\t\tif (list) {\n\t\t\t\t\tconst items = [...list.children];\n\t\t\t\t\titems.sort(() => Math.random() - 0.5);\n\t\t\t\t\tconst count = Math.max(5, Math.floor(Math.random() * 10) + 1);\n\t\t\t\t\titems.forEach((item, i) => {\n\t\t\t\t\t\tlist.appendChild(item);\n\t\t\t\t\t\titem.hidden = i >= count;\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t\twindow.tui.sidebar.setOpen(true, \"sidebar09-icon-sidebar\");\n\t\t\t});\n\n\t\t\t// side={isMobile ? \"bottom\" : \"right\"} pendant: the user menu\n\t\t\t// flips to bottom below md, like useSidebar's isMobile.\n\t\t\tconst mq = window.matchMedia(\"(max-width: 767px)\");\n\t\t\tconst applySides = () => {\n\t\t\t\tdocument.querySelectorAll(\"[data-sidebar09-menu]\").forEach((menu) => {\n\t\t\t\t\tmenu.setAttribute(\"data-tui-dropdownmenu-side\", mq.matches ? \"bottom\" : \"right\");\n\t\t\t\t});\n\t\t\t};\n\t\t\t// The portals lift with the deferred bundle, so the initial pass\n\t\t\t// waits for DOM ready (matchMedia changes keep it live after).\n\t\t\tif (document.readyState === \"loading\") {\n\t\t\t\tdocument.addEventListener(\"DOMContentLoaded\", applySides);\n\t\t\t} else {\n\t\t\t\tapplySides();\n\t\t\t}\n\t\t\tmq.addEventListener(\"change\", applySides);\n\t\t})();\n\t</script>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		return nil
 	})
 }

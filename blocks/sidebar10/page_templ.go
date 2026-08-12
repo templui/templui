@@ -182,6 +182,23 @@ func Page() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<script nonce=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar10/page.templ`, Line: 40, Col: 36}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\">\n\t\t(() => {\n\t\t\t// Team switching, the pendant of the TeamSwitcher's activeTeam React state.\n\t\t\tdocument.addEventListener(\"click\", (e) => {\n\t\t\t\tif (!(e.target instanceof Element)) return;\n\t\t\t\tconst item = e.target.closest(\"#sidebar10-team-menu [data-sidebar10-team-index]\");\n\t\t\t\tif (!item) return;\n\t\t\t\tconst i = item.getAttribute(\"data-sidebar10-team-index\");\n\t\t\t\tconst name = item.textContent.trim().replace(/⌘\\d$/, \"\").trim();\n\t\t\t\tdocument.querySelectorAll(\"[data-sidebar10-team-logo]\").forEach((logo) => {\n\t\t\t\t\tlogo.classList.toggle(\"hidden\", logo.getAttribute(\"data-sidebar10-team-logo\") !== i);\n\t\t\t\t});\n\t\t\t\tconst nameEl = document.querySelector(\"[data-sidebar10-team-name]\");\n\t\t\t\tif (nameEl) nameEl.textContent = name;\n\t\t\t});\n\n\t\t\t// side={isMobile ? \"bottom\" : \"right\"} / align pendant: the\n\t\t\t// favorites menu flips below md, like useSidebar's isMobile.\n\t\t\tconst mq = window.matchMedia(\"(max-width: 767px)\");\n\t\t\tconst applySides = () => {\n\t\t\t\tdocument.querySelectorAll(\"[data-sidebar10-menu]\").forEach((menu) => {\n\t\t\t\t\tmenu.setAttribute(\"data-tui-dropdownmenu-side\", mq.matches ? \"bottom\" : \"right\");\n\t\t\t\t\tmenu.setAttribute(\"data-tui-dropdownmenu-align\", mq.matches ? \"end\" : \"start\");\n\t\t\t\t});\n\t\t\t};\n\t\t\t// The portals lift with the deferred bundle, so the initial pass\n\t\t\t// waits for DOM ready (matchMedia changes keep it live after).\n\t\t\tif (document.readyState === \"loading\") {\n\t\t\t\tdocument.addEventListener(\"DOMContentLoaded\", applySides);\n\t\t\t} else {\n\t\t\t\tapplySides();\n\t\t\t}\n\t\t\tmq.addEventListener(\"change\", applySides);\n\n\t\t\t// The isOpen/useEffect pendant: the actions popover opens once on\n\t\t\t// mount as the demo flourish.\n\t\t\tconst openActions = () => window.tui?.popover?.open(\"sidebar10-actions-popover\");\n\t\t\tif (document.readyState === \"loading\") {\n\t\t\t\tdocument.addEventListener(\"DOMContentLoaded\", openActions);\n\t\t\t} else {\n\t\t\t\topenActions();\n\t\t\t}\n\t\t})();\n\t</script>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		return nil
 	})
 }

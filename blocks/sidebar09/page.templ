@@ -44,4 +44,49 @@ templ Page() {
 			</div>
 		}
 	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		(() => {
+			// The activeItem/setMails/setOpen pendant: a picked inbox item
+			// activates itself, retitles the mail sidebar, reshuffles the
+			// mail list to a random 5-10 slice and expands the sidebar.
+			document.addEventListener("click", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const btn = e.target.closest("[data-sidebar09-nav]");
+				if (!btn) return;
+				document.querySelectorAll("[data-sidebar09-nav]").forEach((el) => {
+					el.toggleAttribute("data-active", el === btn);
+				});
+				const title = document.querySelector("[data-sidebar09-active-title]");
+				if (title) title.textContent = btn.getAttribute("data-sidebar09-nav");
+				const list = document.querySelector("[data-sidebar09-mails]");
+				if (list) {
+					const items = [...list.children];
+					items.sort(() => Math.random() - 0.5);
+					const count = Math.max(5, Math.floor(Math.random() * 10) + 1);
+					items.forEach((item, i) => {
+						list.appendChild(item);
+						item.hidden = i >= count;
+					});
+				}
+				window.tui.sidebar.setOpen(true, "sidebar09-icon-sidebar");
+			});
+
+			// side={isMobile ? "bottom" : "right"} pendant: the user menu
+			// flips to bottom below md, like useSidebar's isMobile.
+			const mq = window.matchMedia("(max-width: 767px)");
+			const applySides = () => {
+				document.querySelectorAll("[data-sidebar09-menu]").forEach((menu) => {
+					menu.setAttribute("data-tui-dropdownmenu-side", mq.matches ? "bottom" : "right");
+				});
+			};
+			// The portals lift with the deferred bundle, so the initial pass
+			// waits for DOM ready (matchMedia changes keep it live after).
+			if (document.readyState === "loading") {
+				document.addEventListener("DOMContentLoaded", applySides);
+			} else {
+				applySides();
+			}
+			mq.addEventListener("change", applySides);
+		})();
+	</script>
 }

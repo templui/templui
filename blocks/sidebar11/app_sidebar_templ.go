@@ -55,7 +55,7 @@ var treeData = []any{
 	"README.md",
 }
 
-func AppSidebar() templ.Component {
+func AppSidebar(props ...sidebar.Props) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -76,6 +76,10 @@ func AppSidebar() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		var p sidebar.Props
+		if len(props) > 0 {
+			p = props[0]
+		}
 		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -198,7 +202,7 @@ func AppSidebar() templ.Component {
 										var templ_7745c5c3_Var10 string
 										templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(item.File)
 										if templ_7745c5c3_Err != nil {
-											return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar11/app_sidebar.templ`, Line: 63, Col: 20}
+											return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar11/app_sidebar.templ`, Line: 67, Col: 20}
 										}
 										_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 										if templ_7745c5c3_Err != nil {
@@ -229,7 +233,7 @@ func AppSidebar() templ.Component {
 										var templ_7745c5c3_Var12 string
 										templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(item.State)
 										if templ_7745c5c3_Err != nil {
-											return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar11/app_sidebar.templ`, Line: 66, Col: 21}
+											return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar11/app_sidebar.templ`, Line: 70, Col: 21}
 										}
 										_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 										if templ_7745c5c3_Err != nil {
@@ -372,7 +376,7 @@ func AppSidebar() templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = sidebar.Sidebar().Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = sidebar.Sidebar(p).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -440,7 +444,7 @@ func tree(item any) templ.Component {
 				var templ_7745c5c3_Var19 string
 				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar11/app_sidebar.templ`, Line: 112, Col: 9}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar11/app_sidebar.templ`, Line: 116, Col: 9}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 				if templ_7745c5c3_Err != nil {
@@ -511,7 +515,7 @@ func tree(item any) templ.Component {
 						var templ_7745c5c3_Var23 string
 						templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar11/app_sidebar.templ`, Line: 125, Col: 11}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar11/app_sidebar.templ`, Line: 129, Col: 11}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 						if templ_7745c5c3_Err != nil {

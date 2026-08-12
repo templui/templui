@@ -47,8 +47,12 @@ var treeData = []any{
 	"README.md",
 }
 
-templ AppSidebar() {
-	@sidebar.Sidebar() {
+templ AppSidebar(props ...sidebar.Props) {
+	{{ var p sidebar.Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@sidebar.Sidebar(p) {
 		@sidebar.Content() {
 			@sidebar.Group() {
 				@sidebar.GroupLabel() {

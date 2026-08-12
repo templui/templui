@@ -13,6 +13,7 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/label"
 	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
 	switchcomp "github.com/axadrn/shadcn-templ/v2/components/switch"
+	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
 // This is sample data
@@ -343,7 +344,7 @@ func AppSidebar() templ.Component {
 											var templ_7745c5c3_Var14 string
 											templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(item.Title)
 											if templ_7745c5c3_Err != nil {
-												return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/app_sidebar.templ`, Line: 162, Col: 28}
+												return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/app_sidebar.templ`, Line: 167, Col: 28}
 											}
 											_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 											if templ_7745c5c3_Err != nil {
@@ -356,9 +357,13 @@ func AppSidebar() templ.Component {
 											return nil
 										})
 										templ_7745c5c3_Err = sidebar.MenuButton(sidebar.MenuButtonProps{
-											Tooltip:  item.Title,
-											IsActive: item.IsActive,
-											Class:    "px-2.5 md:px-2",
+											Tooltip: item.Title,
+											// tooltip={{ children, hidden: false }} forces the
+											// tooltip in every sidebar state.
+											TooltipHidden: utils.Ptr(false),
+											IsActive:      item.IsActive,
+											Class:         "px-2.5 md:px-2",
+											Attributes:    templ.Attributes{"data-sidebar09-nav": item.Title},
 										}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var13), templ_7745c5c3_Buffer)
 										if templ_7745c5c3_Err != nil {
 											return templ_7745c5c3_Err
@@ -458,14 +463,14 @@ func AppSidebar() templ.Component {
 						}()
 					}
 					ctx = templ.InitializeContext(ctx)
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"flex w-full items-center justify-between\"><div class=\"text-base font-medium text-foreground\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"flex w-full items-center justify-between\"><div class=\"text-base font-medium text-foreground\" data-sidebar09-active-title>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var18 string
 					templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(navMain[0].Title)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/app_sidebar.templ`, Line: 184, Col: 24}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/app_sidebar.templ`, Line: 189, Col: 24}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 					if templ_7745c5c3_Err != nil {
@@ -563,59 +568,72 @@ func AppSidebar() templ.Component {
 								var templ_7745c5c3_Var23 string
 								templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(mail.Name)
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/app_sidebar.templ`, Line: 202, Col: 26}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/app_sidebar.templ`, Line: 207, Col: 26}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
-								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</span> <span class=\"ml-auto text-xs\">")
+								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</span> ")
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
 								var templ_7745c5c3_Var24 string
-								templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(mail.Date)
+								templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(" ")
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/app_sidebar.templ`, Line: 203, Col: 50}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/app_sidebar.templ`, Line: 208, Col: 14}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
-								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</span></div><span class=\"font-medium\">")
+								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, " <span class=\"ml-auto text-xs\">")
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
 								var templ_7745c5c3_Var25 string
-								templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(mail.Subject)
+								templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(mail.Date)
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/app_sidebar.templ`, Line: 205, Col: 48}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/app_sidebar.templ`, Line: 209, Col: 50}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
-								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</span> <span class=\"line-clamp-2 w-[260px] text-xs whitespace-break-spaces\">")
+								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</span></div><span class=\"font-medium\">")
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
 								var templ_7745c5c3_Var26 string
-								templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(mail.Teaser)
+								templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(mail.Subject)
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/app_sidebar.templ`, Line: 207, Col: 22}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/app_sidebar.templ`, Line: 211, Col: 48}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
-								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</span></a>")
+								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</span> <span class=\"line-clamp-2 w-[260px] text-xs whitespace-break-spaces\">")
+								if templ_7745c5c3_Err != nil {
+									return templ_7745c5c3_Err
+								}
+								var templ_7745c5c3_Var27 string
+								templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(mail.Teaser)
+								if templ_7745c5c3_Err != nil {
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/app_sidebar.templ`, Line: 213, Col: 22}
+								}
+								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
+								if templ_7745c5c3_Err != nil {
+									return templ_7745c5c3_Err
+								}
+								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</span></a>")
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
 							}
 							return nil
 						})
-						templ_7745c5c3_Err = sidebar.GroupContent().Render(templ.WithChildren(ctx, templ_7745c5c3_Var22), templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = sidebar.GroupContent(sidebar.GroupContentProps{Attributes: templ.Attributes{"data-sidebar09-mails": ""}}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var22), templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}

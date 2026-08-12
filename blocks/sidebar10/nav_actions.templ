@@ -48,8 +48,6 @@ templ NavActions() {
 		}) {
 			@icon.Star()
 		}
-		// The isOpen React state opens the popover on mount as a demo flourish;
-		// here it renders closed and opens on click via the popover script.
 		@popover.Popover() {
 			@button.Button(button.Props{
 				Variant:    button.VariantGhost,
@@ -60,6 +58,7 @@ templ NavActions() {
 				@icon.Ellipsis()
 			}
 			@popover.Content(popover.ContentProps{
+				ID:    "sidebar10-actions-popover",
 				Class: "w-56 overflow-hidden rounded-lg p-0",
 				Align: popover.AlignEnd,
 			}) {

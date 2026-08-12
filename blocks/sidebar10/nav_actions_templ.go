@@ -247,7 +247,7 @@ func NavActions() templ.Component {
 													var templ_7745c5c3_Var13 string
 													templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(item.Label)
 													if templ_7745c5c3_Err != nil {
-														return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar10/nav_actions.templ`, Line: 80, Col: 31}
+														return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar10/nav_actions.templ`, Line: 79, Col: 31}
 													}
 													_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 													if templ_7745c5c3_Err != nil {
@@ -308,6 +308,7 @@ func NavActions() templ.Component {
 				return nil
 			})
 			templ_7745c5c3_Err = popover.Content(popover.ContentProps{
+				ID:    "sidebar10-actions-popover",
 				Class: "w-56 overflow-hidden rounded-lg p-0",
 				Align: popover.AlignEnd,
 			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)

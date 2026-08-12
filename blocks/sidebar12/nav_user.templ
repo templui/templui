@@ -38,13 +38,12 @@ templ NavUser(user User) {
 					</div>
 					@icon.ChevronsUpDown(icon.Props{Class: "ml-auto size-4"})
 				}
-				// side={isMobile ? "bottom" : "right"} renders the desktop
-				// default; the menu flips on its own when there is no room.
 				@dropdownmenu.Content(dropdownmenu.ContentProps{
 					Class:      "w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg",
 					Side:       dropdownmenu.SideRight,
 					Align:      dropdownmenu.AlignStart,
 					SideOffset: 4,
+					Attributes: templ.Attributes{"data-sidebar12-menu": "user"},
 				}) {
 					@dropdownmenu.Label(dropdownmenu.LabelProps{Class: "p-0 font-normal"}) {
 						<div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">

@@ -184,6 +184,23 @@ func Page() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<script nonce=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar12/page.templ`, Line: 38, Col: 36}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\">\n\t\t(() => {\n\t\t\t// side={isMobile ? \"bottom\" : \"right\"} pendant: the user menu\n\t\t\t// flips to bottom below md, like useSidebar's isMobile.\n\t\t\tconst mq = window.matchMedia(\"(max-width: 767px)\");\n\t\t\tconst applySides = () => {\n\t\t\t\tdocument.querySelectorAll(\"[data-sidebar12-menu]\").forEach((menu) => {\n\t\t\t\t\tmenu.setAttribute(\"data-tui-dropdownmenu-side\", mq.matches ? \"bottom\" : \"right\");\n\t\t\t\t});\n\t\t\t};\n\t\t\t// The portals lift with the deferred bundle, so the initial pass\n\t\t\t// waits for DOM ready (matchMedia changes keep it live after).\n\t\t\tif (document.readyState === \"loading\") {\n\t\t\t\tdocument.addEventListener(\"DOMContentLoaded\", applySides);\n\t\t\t} else {\n\t\t\t\tapplySides();\n\t\t\t}\n\t\t\tmq.addEventListener(\"change\", applySides);\n\t\t})();\n\t</script>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		return nil
 	})
 }

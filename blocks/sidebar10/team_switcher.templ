@@ -10,19 +10,24 @@ import (
 
 templ TeamSwitcher(teams []Team) {
 	if len(teams) > 0 {
-		// The activeTeam React state renders its server default: the first team.
-		{{ activeTeam := teams[0] }}
 		@sidebar.Menu() {
 			@sidebar.MenuItem() {
-				@dropdownmenu.DropdownMenu() {
+				@dropdownmenu.DropdownMenu(dropdownmenu.Props{ID: "sidebar10-team-menu"}) {
 					@sidebar.MenuButton(sidebar.MenuButtonProps{
 						Class:      "w-fit px-1.5",
 						Attributes: dropdownmenu.Trigger(ctx),
 					}) {
 						<div class="flex aspect-square size-5 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-							@activeTeam.Logo(icon.Props{Class: "size-3"})
+							// All logos render up front, the page script toggles them on
+							// team switch (the pendant of React swapping activeTeam.logo).
+							for i, team := range teams {
+								@team.Logo(icon.Props{
+									Class:      "size-3" + teamLogoHidden(i),
+									Attributes: templ.Attributes{"data-sidebar10-team-logo": strconv.Itoa(i)},
+								})
+							}
 						</div>
-						<span class="truncate font-medium">{ activeTeam.Name }</span>
+						<span class="truncate font-medium" data-sidebar10-team-name>{ teams[0].Name }</span>
 						@icon.ChevronDown(icon.Props{Class: "opacity-50"})
 					}
 					@dropdownmenu.Content(dropdownmenu.ContentProps{
@@ -35,7 +40,10 @@ templ TeamSwitcher(teams []Team) {
 							Teams
 						}
 						for i, team := range teams {
-							@dropdownmenu.Item(dropdownmenu.ItemProps{Class: "gap-2 p-2"}) {
+							@dropdownmenu.Item(dropdownmenu.ItemProps{
+								Class:      "gap-2 p-2",
+								Attributes: templ.Attributes{"data-sidebar10-team-index": strconv.Itoa(i)},
+							}) {
 								<div class="flex size-6 items-center justify-center rounded-xs border">
 									@team.Logo(icon.Props{Class: "size-4 shrink-0"})
 								</div>
@@ -57,4 +65,13 @@ templ TeamSwitcher(teams []Team) {
 			}
 		}
 	}
+}
+
+// teamLogoHidden hides every logo except the active one, the SSR half of the
+// page script's team switch.
+func teamLogoHidden(i int) string {
+	if i == 0 {
+		return ""
+	}
+	return " hidden"
 }

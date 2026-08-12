@@ -186,7 +186,7 @@ func NavUser(user User) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "   ")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, " ")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -273,7 +273,7 @@ func NavUser(user User) templ.Component {
 							var templ_7745c5c3_Var14 string
 							templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(user.Name)
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar12/nav_user.templ`, Line: 58, Col: 54}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar12/nav_user.templ`, Line: 57, Col: 54}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 							if templ_7745c5c3_Err != nil {
@@ -286,7 +286,7 @@ func NavUser(user User) templ.Component {
 							var templ_7745c5c3_Var15 string
 							templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(user.Email)
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar12/nav_user.templ`, Line: 59, Col: 51}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar12/nav_user.templ`, Line: 58, Col: 51}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 							if templ_7745c5c3_Err != nil {
@@ -519,6 +519,7 @@ func NavUser(user User) templ.Component {
 						Side:       dropdownmenu.SideRight,
 						Align:      dropdownmenu.AlignStart,
 						SideOffset: 4,
+						Attributes: templ.Attributes{"data-sidebar12-menu": "user"},
 					}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var10), templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
