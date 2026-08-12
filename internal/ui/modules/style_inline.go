@@ -54,6 +54,14 @@ func resolveStyleMap(styleName string) inliner.StyleMap {
 	return styleMaps["nova"]
 }
 
+// InlineSiteHTML compiles the class attributes of a full site page for the
+// site's style (nova) - the delivery half of shadcn's build: the browser
+// never sees raw cn-* classes, and the menu config markers resolve to the
+// default, exactly like a shadcn install.
+func InlineSiteHTML(html string) string {
+	return inliner.InlineHTML(html, resolveStyleMap("nova"), inliner.Options{})
+}
+
 // InlinedStyleHTML renders component and compiles its class attributes for
 // the named style ("base-rhea", "rhea", "" for the default).
 func InlinedStyleHTML(ctx context.Context, component templ.Component, styleName string) (string, error) {

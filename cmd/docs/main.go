@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"net/http"
@@ -41,6 +42,63 @@ func htmxHandler(component templ.Component) http.Handler {
 	})
 }
 
+// inlineDelivery is the site's pendant of shadcn's build-time class
+// transform: every HTML page is delivered through the same inliner that
+// compiles the registry and the docs previews. The browser never sees raw
+// cn-* classes, and the menu config markers resolve like a default
+// install - exactly what shadcn's site build produces.
+func inlineDelivery(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Assets and the script bundle are never HTML - skip the buffer.
+		// The create designer stays raw: its preview JS is the live
+		// transformer (create-preview.js toggles the cn-menu-* markers per
+		// picked menuColor), exactly like shadcn's designer.
+		if strings.HasPrefix(r.URL.Path, "/assets/") ||
+			strings.HasPrefix(r.URL.Path, "/components/") ||
+			r.URL.Path == "/create" ||
+			strings.HasPrefix(r.URL.Path, "/create/") {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		buf := &bufferedResponse{header: make(http.Header), status: http.StatusOK}
+		next.ServeHTTP(buf, r)
+
+		body := buf.body.Bytes()
+		// Handlers that render straight to the writer never set a
+		// Content-Type - sniff like net/http does before deciding.
+		contentType := buf.header.Get("Content-Type")
+		if contentType == "" {
+			contentType = http.DetectContentType(body)
+		}
+		if strings.HasPrefix(contentType, "text/html") {
+			body = []byte(modules.InlineSiteHTML(string(body)))
+		}
+		for key, values := range buf.header {
+			if key == "Content-Length" {
+				continue
+			}
+			w.Header()[key] = values
+		}
+		w.WriteHeader(buf.status)
+		w.Write(body)
+	})
+}
+
+// bufferedResponse captures a handler's response so inlineDelivery can
+// transform the HTML before it goes out.
+type bufferedResponse struct {
+	header http.Header
+	status int
+	body   bytes.Buffer
+}
+
+func (b *bufferedResponse) Header() http.Header { return b.header }
+
+func (b *bufferedResponse) WriteHeader(status int) { b.status = status }
+
+func (b *bufferedResponse) Write(p []byte) (int, error) { return b.body.Write(p) }
+
 func main() {
 	mux := http.NewServeMux()
 	config.LoadConfig()
@@ -53,7 +111,7 @@ func main() {
 	wrappedMux := middleware.WithURLPathValue(
 		middleware.CacheControlMiddleware(
 			middleware.GitHubStarsMiddleware(
-				mux,
+				inlineDelivery(mux),
 			),
 		),
 	)
