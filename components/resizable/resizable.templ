@@ -1,0 +1,249 @@
+package resizable
+
+import (
+	"context"
+	"encoding/json"
+	"strconv"
+
+	"github.com/axadrn/shadcn-templ/v2/utils"
+)
+
+type Orientation string
+
+const (
+	OrientationHorizontal Orientation = "horizontal"
+	OrientationVertical   Orientation = "vertical"
+)
+
+type groupContextKey string
+
+const groupKey groupContextKey = "resizableGroup"
+
+type groupState struct {
+	id            string
+	orientation   Orientation
+	disabled      bool
+	disableCursor bool
+}
+
+func groupFromContext(ctx context.Context) groupState {
+	if state, ok := ctx.Value(groupKey).(groupState); ok {
+		return state
+	}
+	return groupState{orientation: OrientationHorizontal}
+}
+
+// PanelGroupProps mirror react-resizable-panels Group props that have a
+// server-renderable pendant. Layout changes are exposed by resizable.js as
+// resizable-layout-change and resizable-layout-changed DOM events.
+type PanelGroupProps struct {
+	ID                      string
+	Class                   string
+	Style                   string
+	Attributes              templ.Attributes
+	Orientation             Orientation
+	DefaultLayout           map[string]float64
+	Disabled                bool
+	DisableCursor           bool
+	ResizeTargetMinimumSize ResizeTargetMinimumSize
+}
+
+type ResizeTargetMinimumSize struct {
+	Coarse int
+	Fine   int
+}
+
+func defaultLayoutJSON(layout map[string]float64) string {
+	if len(layout) == 0 {
+		return ""
+	}
+	value, err := json.Marshal(layout)
+	if err != nil {
+		return ""
+	}
+	return string(value)
+}
+
+// PanelGroup wraps a direct sequence of Panel and Handle components.
+templ PanelGroup(props ...PanelGroupProps) {
+	{{ var p PanelGroupProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	if p.Orientation == "" {
+		{{ p.Orientation = OrientationHorizontal }}
+	}
+	if p.ResizeTargetMinimumSize.Coarse <= 0 {
+		{{ p.ResizeTargetMinimumSize.Coarse = 20 }}
+	}
+	if p.ResizeTargetMinimumSize.Fine <= 0 {
+		{{ p.ResizeTargetMinimumSize.Fine = 10 }}
+	}
+	{{ ctx = context.WithValue(ctx, groupKey, groupState{id: p.ID, orientation: p.Orientation, disabled: p.Disabled, disableCursor: p.DisableCursor}) }}
+	<div
+		{ p.Attributes... }
+		id={ p.ID }
+		data-testid={ p.ID }
+		data-slot="resizable-panel-group"
+		data-tui-resizable-group
+		data-group
+		data-orientation={ string(p.Orientation) }
+		data-resize-target-coarse={ strconv.Itoa(p.ResizeTargetMinimumSize.Coarse) }
+		data-resize-target-fine={ strconv.Itoa(p.ResizeTargetMinimumSize.Fine) }
+		if layout := defaultLayoutJSON(p.DefaultLayout); layout != "" {
+			data-default-layout={ layout }
+		}
+		if p.DisableCursor {
+			data-disable-cursor
+		}
+		if p.Disabled {
+			data-disabled
+		}
+		class={ utils.CN("cn-resizable-panel-group flex h-full w-full aria-[orientation=vertical]:flex-col", p.Class) }
+		style={ "height:100%;width:100%;overflow:hidden;" + p.Style + ";display:flex;flex-direction:" + map[bool]string{true: "column", false: "row"}[p.Orientation == OrientationVertical] + ";flex-wrap:nowrap;touch-action:" + map[bool]string{true: "pan-x", false: "pan-y"}[p.Orientation == OrientationVertical] + ";" }
+	>
+		{ children... }
+	</div>
+}
+
+type PanelProps struct {
+	ID                  string
+	Class               string
+	Style               string
+	Attributes          templ.Attributes
+	DefaultSize         string
+	MinSize             string
+	MaxSize             string
+	CollapsedSize       string
+	Collapsible         bool
+	Disabled            bool
+	GroupResizeBehavior GroupResizeBehavior
+}
+
+type GroupResizeBehavior string
+
+const (
+	PreserveRelativeSize GroupResizeBehavior = "preserve-relative-size"
+	PreservePixelSize    GroupResizeBehavior = "preserve-pixel-size"
+)
+
+// Panel is a direct PanelGroup child. Like react-resizable-panels v4, the
+// sizing styles live on an internal flex item while Class and Style apply to
+// a full-size content element so consumer styles cannot break the layout.
+templ Panel(props ...PanelProps) {
+	{{ var p PanelProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	if p.MinSize == "" {
+		{{ p.MinSize = "0%" }}
+	}
+	if p.MaxSize == "" {
+		{{ p.MaxSize = "100%" }}
+	}
+	if p.CollapsedSize == "" {
+		{{ p.CollapsedSize = "0%" }}
+	}
+	if p.GroupResizeBehavior == "" {
+		{{ p.GroupResizeBehavior = PreserveRelativeSize }}
+	}
+	{{ group := groupFromContext(ctx) }}
+	<div
+		{ p.Attributes... }
+		id={ p.ID }
+		data-testid={ p.ID }
+		data-slot="resizable-panel"
+		data-tui-resizable-panel
+		data-panel
+		data-tui-resizable-group-id={ group.id }
+		if p.DefaultSize != "" {
+			data-default-size={ p.DefaultSize }
+		}
+		data-min-size={ p.MinSize }
+		data-max-size={ p.MaxSize }
+		data-collapsed-size={ p.CollapsedSize }
+		data-group-resize-behavior={ string(p.GroupResizeBehavior) }
+		if p.Collapsible {
+			data-collapsible
+		}
+		if p.Disabled {
+			data-disabled
+		}
+		if p.DefaultSize != "" {
+			style={ "min-height:0;max-height:100%;height:auto;min-width:0;max-width:100%;width:auto;border:none;border-width:0;padding:0;margin:0;display:flex;flex-basis:" + p.DefaultSize + ";overflow:visible;" }
+		} else {
+			style="min-height:0;max-height:100%;height:auto;min-width:0;max-width:100%;width:auto;border:none;border-width:0;padding:0;margin:0;display:flex;flex-grow:1;flex-basis:0;flex-shrink:1;overflow:visible;"
+		}
+	>
+		<div
+			data-tui-resizable-panel-content
+			class={ p.Class }
+			style={ "max-height:100%;max-width:100%;flex-grow:1;overflow:auto;" + p.Style + ";touch-action:" + map[bool]string{true: "pan-x", false: "pan-y"}[group.orientation == OrientationVertical] + ";" }
+		>
+			{ children... }
+		</div>
+	</div>
+}
+
+type HandleProps struct {
+	ID                 string
+	Class              string
+	Style              string
+	Attributes         templ.Attributes
+	WithHandle         bool
+	Disabled           bool
+	DisableDoubleClick bool
+}
+
+// Handle is react-resizable-panels' Separator and shadcn's
+// ResizableHandle. resizable.js supplies the neighboring-panel ARIA values.
+templ Handle(props ...HandleProps) {
+	{{ var p HandleProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	if p.ID == "" {
+		{{ p.ID = utils.RandomID() }}
+	}
+	{{ group := groupFromContext(ctx) }}
+	{{ separatorOrientation := OrientationVertical }}
+	if group.orientation == OrientationVertical {
+		{{ separatorOrientation = OrientationHorizontal }}
+	}
+	<div
+		{ p.Attributes... }
+		id={ p.ID }
+		data-testid={ p.ID }
+		data-slot="resizable-handle"
+		data-tui-resizable-handle
+		data-separator={ map[bool]string{true: "disabled", false: "inactive"}[p.Disabled] }
+		data-tui-resizable-group-id={ group.id }
+		role="separator"
+		aria-orientation={ string(separatorOrientation) }
+		if p.Disabled {
+			aria-disabled="true"
+		} else {
+			tabindex="0"
+		}
+		if p.DisableDoubleClick {
+			data-disable-double-click
+		}
+		class={
+			utils.CN(
+				"cn-resizable-handle relative flex w-px items-center justify-center bg-border ring-offset-background after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full aria-[orientation=horizontal]:after:left-0 aria-[orientation=horizontal]:after:h-1 aria-[orientation=horizontal]:after:w-full aria-[orientation=horizontal]:after:translate-x-0 aria-[orientation=horizontal]:after:-translate-y-1/2 [&[aria-orientation=horizontal]>div]:rotate-90",
+				p.Class,
+			),
+		}
+		style={ "flex-basis:auto;" + map[bool]string{true: "cursor:not-allowed;", false: ""}[p.Disabled && !group.disableCursor] + p.Style + ";flex-grow:0;flex-shrink:0;touch-action:none;" }
+	>
+		if p.WithHandle {
+			<div class="cn-resizable-handle-icon z-10 flex shrink-0"></div>
+		}
+	</div>
+}

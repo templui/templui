@@ -89,6 +89,7 @@ var PagesNew = []string{
 	"/docs/components/input-group",
 	"/docs/components/item",
 	"/docs/components/kbd",
+	"/docs/components/resizable",
 	"/docs/components/spinner",
 	"/docs/components/toggle",
 	"/docs/components/toggle-group",

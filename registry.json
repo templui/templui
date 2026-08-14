@@ -792,6 +792,25 @@
       ]
     },
     {
+      "name": "resizable",
+      "type": "registry:ui",
+      "title": "Resizable",
+      "description": "Accessible resizable panel groups and layouts with keyboard support.",
+      "files": [
+        {
+          "path": "components/resizable/resizable.templ",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/resizable/resizable.js",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": [
+        "layout-navigation"
+      ]
+    },
+    {
       "name": "select",
       "type": "registry:ui",
       "title": "Select",
