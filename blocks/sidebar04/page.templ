@@ -18,7 +18,7 @@ templ Page() {
 				@sidebar.Trigger(sidebar.TriggerProps{Class: "-ml-1"})
 				@separator.Separator(separator.Props{
 					Orientation: separator.OrientationVertical,
-					Class:       "mr-2 data-[orientation=vertical]:h-4",
+					Class:       "mr-2 data-vertical:h-4 data-vertical:self-auto",
 				})
 				@breadcrumb.Breadcrumb() {
 					@breadcrumb.List() {

@@ -14,7 +14,7 @@ templ SiteHeader() {
 			@sidebar.Trigger(sidebar.TriggerProps{Class: "h-8 w-8"})
 			@separator.Separator(separator.Props{
 				Orientation: separator.OrientationVertical,
-				Class:       "mr-2 h-4",
+				Class:       "mr-2 data-vertical:h-4 data-vertical:self-auto",
 			})
 			@breadcrumb.Breadcrumb(breadcrumb.Props{Class: "hidden sm:block"}) {
 				@breadcrumb.List() {

@@ -45,7 +45,7 @@ func SiteHeader() templ.Component {
 		}
 		templ_7745c5c3_Err = separator.Separator(separator.Props{
 			Orientation: separator.OrientationVertical,
-			Class:       "mx-2 data-[orientation=vertical]:h-4",
+			Class:       "mx-2 h-4 data-vertical:self-auto",
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

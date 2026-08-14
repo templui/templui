@@ -1,6 +1,9 @@
 package blocks
 
 import (
+	"bytes"
+	"context"
+	"strings"
 	"testing"
 
 	"github.com/axadrn/shadcn-templ/v2/internal/registry"
@@ -42,5 +45,32 @@ func TestEveryRegistryBlockHasViewerData(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestVerticalBlockSeparatorsUseBaseUIAlignment(t *testing.T) {
+	for _, item := range registry.Blocks() {
+		component := Component(item.Name)
+		if component == nil {
+			continue
+		}
+
+		var output bytes.Buffer
+		if err := component.Render(context.Background(), &output); err != nil {
+			t.Fatalf("%s: render: %v", item.Name, err)
+		}
+
+		for _, fragment := range strings.Split(output.String(), "<div")[1:] {
+			tag, _, _ := strings.Cut(fragment, ">")
+			if !strings.Contains(tag, `data-slot="separator"`) || !strings.Contains(tag, `data-orientation="vertical"`) {
+				continue
+			}
+			if strings.Contains(tag, `data-[orientation=vertical]`) {
+				t.Fatalf("%s: vertical separator still uses a Radix orientation selector: %s", item.Name, tag)
+			}
+			if !strings.Contains(tag, `data-vertical:self-auto`) {
+				t.Fatalf("%s: compact vertical separator is missing the Base UI alignment override: %s", item.Name, tag)
+			}
+		}
 	}
 }
