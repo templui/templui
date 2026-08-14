@@ -23,9 +23,28 @@
   }
 
   function setState(content, state) {
-    content.setAttribute("data-state", state);
+    const open = state === "open";
+    content.toggleAttribute("data-open", open);
+    content.toggleAttribute("data-closed", !open);
     const popup = popupFor(content);
-    if (popup) popup.setAttribute("data-state", state);
+    if (popup) {
+      popup.toggleAttribute("data-open", open);
+      popup.toggleAttribute("data-closed", !open);
+    }
+  }
+
+  function setTransitionAttribute(content, name, present) {
+    content.toggleAttribute(name, present);
+    const popup = popupFor(content);
+    if (popup) popup.toggleAttribute(name, present);
+  }
+
+  function startTransition(content) {
+    setTransitionAttribute(content, "data-ending-style", false);
+    setTransitionAttribute(content, "data-starting-style", true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setTransitionAttribute(content, "data-starting-style", false));
+    });
   }
 
   function setSide(content, side) {
@@ -104,7 +123,7 @@
       const popup = popupFor(content);
       if (popup) {
         popup.style.setProperty(
-          "--tui-popover-transform-origin",
+          "--transform-origin",
           anchorOrigin(result, trigger.getBoundingClientRect(), sideOffset),
         );
       }
@@ -112,7 +131,7 @@
   }
 
   function isOpen(content) {
-    return content.getAttribute("data-state") === "open";
+    return content.hasAttribute("data-open");
   }
 
   function open(content) {
@@ -139,8 +158,13 @@
       content.style.transitionProperty = "";
       if (content.hidden) return;
       setState(content, "open");
+      startTransition(content);
       const trigger = triggerFor(content);
-      if (trigger) trigger.setAttribute("aria-expanded", "true");
+      if (trigger) {
+        trigger.setAttribute("aria-expanded", "true");
+        trigger.setAttribute("data-popup-open", "");
+        trigger.setAttribute("data-pressed", "");
+      }
       // Base UI moves focus into the popup when it opens.
       const popup = popupFor(content);
       if (popup && !content.contains(document.activeElement)) {
@@ -160,13 +184,20 @@
       if (focusTrigger) focusTrigger.focus({ preventScroll: true });
     }
     content.style.visibility = "";
+    setTransitionAttribute(content, "data-starting-style", false);
     setState(content, "closed");
+    setTransitionAttribute(content, "data-ending-style", true);
     const trigger = triggerFor(content);
-    if (trigger) trigger.setAttribute("aria-expanded", "false");
+    if (trigger) {
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.removeAttribute("data-popup-open");
+      trigger.removeAttribute("data-pressed");
+    }
     clearTimeout(content._tuiHide);
     content._tuiHide = setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed" && !content.hidden) {
+      if (content.hasAttribute("data-closed") && !content.hidden) {
         content.hidden = true;
+        setTransitionAttribute(content, "data-ending-style", false);
       }
     }, EXIT_MS);
   }
@@ -226,6 +257,7 @@
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeAll();
   });
+
 
   // Page scroll or resize: keep open popovers attached to their trigger.
   window.addEventListener(

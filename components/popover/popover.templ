@@ -129,7 +129,7 @@ templ Content(props ...ContentProps) {
 		if p.AlignOffset != 0 {
 			data-tui-popover-align-offset={ strconv.Itoa(p.AlignOffset) }
 		}
-		data-state="closed"
+		data-closed
 		hidden
 		data-tui-portal
 		class="pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
@@ -137,15 +137,14 @@ templ Content(props ...ContentProps) {
 		<div
 			data-slot="popover-content"
 			data-tui-popover-popup
-			data-state="closed"
+			data-closed
 			role="dialog"
 			tabindex="-1"
 			class={
 				utils.CN(
 					// 1:1 base/ui/popover.tsx PopoverContent, the look comes from
-					// cn-popover-content (animations key on our data-state attribute).
-					// origin-(--transform-origin) becomes our JS variable name.
-					"cn-popover-content cn-popover-content-logical z-50 w-72 origin-(--tui-popover-transform-origin) outline-hidden",
+					// cn-popover-content and Base UI's standard transform-origin variable.
+					"cn-popover-content cn-popover-content-logical z-50 w-72 origin-(--transform-origin) outline-hidden",
 					// JS wiring: the positioner wrapper is pointer-events-none, and the
 					// popup stays mounted after animate-out until hidePopover runs.
 					"pointer-events-auto data-closed:fill-mode-forwards",

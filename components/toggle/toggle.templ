@@ -133,9 +133,7 @@ templ Toggle(props ...Props) {
 		}
 		aria-pressed={ strconv.FormatBool(p.Pressed) }
 		if p.Pressed {
-			data-state="on"
-		} else {
-			data-state="off"
+			data-pressed
 		}
 		disabled?={ p.Disabled }
 		class={ utils.CN(map[string]bool{groupItemClasses(): inGroup}, baseClasses, variantClasses(p.Variant), sizeClasses(p.Size), p.Class) }

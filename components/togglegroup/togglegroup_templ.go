@@ -118,7 +118,7 @@ func ToggleGroup(props ...Props) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if p.ToggleMultiple {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, " data-toggle-multiple")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, " data-multiple")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

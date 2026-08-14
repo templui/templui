@@ -26,9 +26,38 @@
   }
 
   function setState(content, state) {
-    content.setAttribute("data-state", state);
+    const open = state === "open";
+    content.toggleAttribute("data-open", open);
+    content.toggleAttribute("data-closed", !open);
     const popup = popupFor(content);
-    if (popup) popup.setAttribute("data-state", state);
+    if (popup) {
+      popup.toggleAttribute("data-open", open);
+      popup.toggleAttribute("data-closed", !open);
+    }
+  }
+
+  function isOpen(el) {
+    return !!el && el.hasAttribute("data-open");
+  }
+
+  function setTransitionAttribute(content, name, present) {
+    content.toggleAttribute(name, present);
+    const popup = popupFor(content);
+    if (popup) popup.toggleAttribute(name, present);
+  }
+
+  function startTransition(content) {
+    setTransitionAttribute(content, "data-ending-style", false);
+    setTransitionAttribute(content, "data-starting-style", true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setTransitionAttribute(content, "data-starting-style", false));
+    });
+  }
+
+  function setChecked(item, checked) {
+    item.toggleAttribute("data-checked", checked);
+    item.toggleAttribute("data-unchecked", !checked);
+    item.setAttribute("aria-checked", checked ? "true" : "false");
   }
 
   function setSide(content, side) {
@@ -85,11 +114,11 @@
           padding: COLLISION_PADDING,
           apply(args) {
             content.style.setProperty(
-              "--tui-dropdownmenu-available-height",
+              "--available-height",
               args.availableHeight + "px",
             );
             content.style.setProperty(
-              "--tui-dropdownmenu-anchor-width",
+              "--anchor-width",
               args.rects.reference.width + "px",
             );
           },
@@ -102,7 +131,7 @@
       const popup = popupFor(content);
       if (popup) {
         popup.style.setProperty(
-          "--tui-dropdownmenu-transform-origin",
+          "--transform-origin",
           anchorOrigin(result, trigger.getBoundingClientRect(), sideOffset),
         );
       }
@@ -186,7 +215,10 @@
       content.style.transitionProperty = "";
       if (content.hidden) return;
       setState(content, "open");
+      startTransition(content);
       trigger.setAttribute("aria-expanded", "true");
+      trigger.setAttribute("data-popup-open", "");
+      trigger.setAttribute("data-pressed", "");
       const popup = popupFor(content);
       if (!popup) return;
       if (focusFirst) {
@@ -200,17 +232,22 @@
 
   function close(content, refocusTrigger) {
     if (content.hidden) return;
+    setTransitionAttribute(content, "data-starting-style", false);
     setState(content, "closed");
+    setTransitionAttribute(content, "data-ending-style", true);
     content.querySelectorAll("[data-tui-dropdownmenu-sub]").forEach(closeSubNow);
     const trigger = triggerFor(content);
     if (trigger) {
       trigger.setAttribute("aria-expanded", "false");
+      trigger.removeAttribute("data-popup-open");
+      trigger.removeAttribute("data-pressed");
       if (refocusTrigger) trigger.focus({ preventScroll: true });
     }
     clearTimeout(content._tuiHide);
     content._tuiHide = setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed" && !content.hidden) {
+      if (content.hasAttribute("data-closed") && !content.hidden) {
         content.hidden = true;
+        setTransitionAttribute(content, "data-ending-style", false);
       }
     }, EXIT_MS);
     unlockScroll();
@@ -221,7 +258,7 @@
   }
 
   function anyOpen() {
-    return [...allContents()].find((c) => c.getAttribute("data-state") === "open") || null;
+    return [...allContents()].find(isOpen) || null;
   }
 
   // ----- submenus -------------------------------------------------------------
@@ -256,7 +293,7 @@
       content.style.top = result.y + "px";
       content.setAttribute("data-side", result.placement.split("-")[0]);
       content.style.setProperty(
-        "--tui-dropdownmenu-transform-origin",
+        "--transform-origin",
         anchorOrigin(result, trigger.getBoundingClientRect(), 0),
       );
       content.offsetHeight; // flush styles before re-enabling transitions
@@ -267,8 +304,10 @@
       content.style.visibility = "";
       void content.offsetWidth;
       content.style.transitionProperty = "";
-      content.setAttribute("data-state", "open");
-      trigger.setAttribute("data-state", "open");
+      content.setAttribute("data-open", "");
+      content.removeAttribute("data-closed");
+      startTransition(content);
+      trigger.setAttribute("data-popup-open", "");
       if (focusFirst) focusItem(itemsIn(content)[0] || content);
     });
   }
@@ -277,11 +316,15 @@
   function closeSub(sub) {
     const { trigger, content } = subParts(sub);
     if (!trigger || !content) return;
-    content.setAttribute("data-state", "closed");
-    trigger.setAttribute("data-state", "closed");
+    content.removeAttribute("data-open");
+    content.setAttribute("data-closed", "");
+    setTransitionAttribute(content, "data-starting-style", false);
+    setTransitionAttribute(content, "data-ending-style", true);
+    trigger.removeAttribute("data-popup-open");
     setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed") {
+      if (content.hasAttribute("data-closed")) {
         content.classList.add("hidden");
+        setTransitionAttribute(content, "data-ending-style", false);
       }
     }, EXIT_MS);
   }
@@ -295,8 +338,11 @@
     const { trigger, content } = subParts(sub);
     if (!trigger || !content) return;
     content.classList.add("hidden");
-    content.setAttribute("data-state", "closed");
-    trigger.setAttribute("data-state", "closed");
+    content.removeAttribute("data-open");
+    content.setAttribute("data-closed", "");
+    setTransitionAttribute(content, "data-starting-style", false);
+    setTransitionAttribute(content, "data-ending-style", false);
+    trigger.removeAttribute("data-popup-open");
   }
 
   // Hover intent: while the pointer is over a sub (trigger or its content),
@@ -310,7 +356,7 @@
     menu.querySelectorAll("[data-tui-dropdownmenu-sub]").forEach((sub) => {
       const { content } = subParts(sub);
       if (!content) return;
-      const isOpen = content.getAttribute("data-state") === "open";
+      const isOpen = content.hasAttribute("data-open");
       const onPath = hovered && (sub === hovered || sub.contains(hovered));
 
       if (onPath) {
@@ -340,7 +386,7 @@
   document.addEventListener("pointermove", (e) => {
     if (!(e.target instanceof Element)) return;
     const content = e.target.closest("[data-tui-dropdownmenu-content]");
-    if (!content || content.getAttribute("data-state") !== "open") return;
+    if (!isOpen(content)) return;
     const item = e.target.closest(ITEM_SELECTOR);
     if (item && containerOf(item)) {
       focusItem(item);
@@ -397,7 +443,7 @@
   function toggle(trigger, focusFirst) {
     const content = contentFor(trigger);
     if (!content) return;
-    if (content.getAttribute("data-state") === "open") {
+    if (isOpen(content)) {
       close(content);
     } else {
       open(content, trigger, focusFirst);
@@ -440,9 +486,8 @@
     const checkbox = e.target.closest("[data-tui-dropdownmenu-checkbox-item]");
     if (checkbox) {
       if (!checkbox.disabled) {
-        const on = checkbox.getAttribute("data-state") === "checked";
-        checkbox.setAttribute("data-state", on ? "unchecked" : "checked");
-        checkbox.setAttribute("aria-checked", on ? "false" : "true");
+        const on = checkbox.hasAttribute("data-checked");
+        setChecked(checkbox, !on);
         checkbox.dispatchEvent(
           new CustomEvent("dropdownmenu-checked-change", {
             bubbles: true,
@@ -460,12 +505,10 @@
         const group = radio.closest("[data-tui-dropdownmenu-radio-group]");
         if (group) {
           group.querySelectorAll("[data-tui-dropdownmenu-radio-item]").forEach((r) => {
-            r.setAttribute("data-state", "unchecked");
-            r.setAttribute("aria-checked", "false");
+            setChecked(r, false);
           });
         }
-        radio.setAttribute("data-state", "checked");
-        radio.setAttribute("aria-checked", "true");
+        setChecked(radio, true);
         radio.dispatchEvent(
           new CustomEvent("dropdownmenu-value-change", {
             bubbles: true,
@@ -556,11 +599,12 @@
   // Keep open menus anchored to their trigger while scrolling or resizing.
   function repositionOpen() {
     allContents().forEach((content) => {
-      if (content.getAttribute("data-state") !== "open") return;
+      if (!isOpen(content)) return;
       const trigger = triggerFor(content);
       if (trigger) positionMenu(content, trigger);
     });
   }
   window.addEventListener("scroll", repositionOpen, true);
   window.addEventListener("resize", repositionOpen);
+
 })();

@@ -55,15 +55,40 @@
   }
 
   function setState(content, state) {
-    content.setAttribute("data-state", state);
+    const open = state === "open";
+    content.toggleAttribute("data-open", open);
+    content.toggleAttribute("data-closed", !open);
     const popup = popupFor(content);
-    if (popup) popup.setAttribute("data-state", state);
+    if (popup) {
+      popup.toggleAttribute("data-open", open);
+      popup.toggleAttribute("data-closed", !open);
+    }
+  }
+
+  function isOpen(content) {
+    return !!content && content.hasAttribute("data-open");
+  }
+
+  function setTransitionAttribute(content, name, present) {
+    content.toggleAttribute(name, present);
+    const popup = popupFor(content);
+    if (popup) popup.toggleAttribute(name, present);
+  }
+
+  function startTransition(content) {
+    setTransitionAttribute(content, "data-ending-style", false);
+    setTransitionAttribute(content, "data-starting-style", true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setTransitionAttribute(content, "data-starting-style", false));
+    });
   }
 
   function setSide(content, side) {
     content.setAttribute("data-side", side);
     const popup = popupFor(content);
     if (popup) popup.setAttribute("data-side", side);
+    const trigger = triggerFor(content);
+    if (trigger) trigger.setAttribute("data-popup-side", side);
   }
 
   // Base UI zooms the popup out of the anchor's center point (e.g.
@@ -119,11 +144,11 @@
           padding: COLLISION_PADDING,
           apply(args) {
             content.style.setProperty(
-              "--tui-select-available-height",
+              "--available-height",
               args.availableHeight + "px",
             );
             content.style.setProperty(
-              "--tui-select-anchor-width",
+              "--anchor-width",
               args.rects.reference.width + "px",
             );
           },
@@ -136,7 +161,7 @@
       const popup = popupFor(content);
       if (popup) {
         popup.style.setProperty(
-          "--tui-select-transform-origin",
+          "--transform-origin",
           anchorOrigin(result, trigger.getBoundingClientRect()),
         );
       }
@@ -152,7 +177,7 @@
     const viewport = viewportFor(content);
     const valueEl = valueSpanFor(trigger);
     const textEl =
-      content.querySelector('[data-tui-select-item][data-state="checked"] [data-tui-select-item-text]') ||
+      content.querySelector('[data-tui-select-item][data-selected] [data-tui-select-item-text]') ||
       content.querySelector("[data-tui-select-item] [data-tui-select-item-text]");
 
     const docEl = document.documentElement;
@@ -233,7 +258,7 @@
         0,
         100,
       );
-      popup.style.setProperty("--tui-select-transform-origin", "50% " + clampedY + "%");
+      popup.style.setProperty("--transform-origin", "50% " + clampedY + "%");
     }
 
     setSide(content, "none");
@@ -437,7 +462,7 @@
     if (scrollbar > 0) document.body.style.paddingRight = scrollbar + "px";
   }
   function unlockScroll() {
-    if ([...allContents()].some((c) => c.getAttribute("data-state") === "open")) return;
+    if ([...allContents()].some(isOpen)) return;
     document.body.removeAttribute("data-tui-scroll-locked");
     document.body.style.overflow = "";
     document.body.style.paddingRight = "";
@@ -471,10 +496,13 @@
       }
       if (content.hidden) return;
       setState(content, "open");
+      startTransition(content);
       trigger.setAttribute("aria-expanded", "true");
+      trigger.setAttribute("data-popup-open", "");
+      trigger.setAttribute("data-pressed", "");
       // Base UI moves focus to the selected item when the listbox opens.
       const selected =
-        content.querySelector('[data-tui-select-item][data-state="checked"]') ||
+        content.querySelector('[data-tui-select-item][data-selected]') ||
         content.querySelector("[data-tui-select-item]");
       if (selected) selected.focus({ preventScroll: true });
     };
@@ -485,21 +513,29 @@
     if (content.hidden) return;
     stopArrowScroll();
     content.style.visibility = "";
+    setTransitionAttribute(content, "data-starting-style", false);
     setState(content, "closed");
+    setTransitionAttribute(content, "data-ending-style", true);
     unlockScroll();
     const trigger = triggerFor(content);
-    if (trigger) trigger.setAttribute("aria-expanded", "false");
+    if (trigger) {
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.removeAttribute("data-popup-open");
+      trigger.removeAttribute("data-pressed");
+    }
     clearTimeout(content._tuiHide);
     // Aligned mode has no exit animation (animate-none, like shadcn) — hide
     // immediately instead of waiting for one.
     const popup = popupFor(content);
     if (popup && popup.getAttribute("data-align-trigger") === "true") {
       content.hidden = true;
+      setTransitionAttribute(content, "data-ending-style", false);
       return;
     }
     content._tuiHide = setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed" && !content.hidden) {
+      if (content.hasAttribute("data-closed") && !content.hidden) {
         content.hidden = true;
+        setTransitionAttribute(content, "data-ending-style", false);
       }
     }, EXIT_MS);
   }
@@ -517,10 +553,10 @@
       (item.querySelector("[data-tui-select-item-text]") || item).textContent.trim();
 
     content.querySelectorAll("[data-tui-select-item]").forEach((i) => {
-      i.setAttribute("data-state", "unchecked");
+      i.removeAttribute("data-selected");
       i.setAttribute("aria-selected", "false");
     });
-    item.setAttribute("data-state", "checked");
+    item.setAttribute("data-selected", "");
     item.setAttribute("aria-selected", "true");
 
     const span = valueSpanFor(trigger);
@@ -564,7 +600,7 @@
       const content = contentFor(trigger);
       if (!content) return;
       portal(content); // portal up front, like React does on mount
-      const checked = content.querySelector('[data-tui-select-item][data-state="checked"]');
+      const checked = content.querySelector('[data-tui-select-item][data-selected]');
       if (!checked) return;
       const label =
         checked.getAttribute("data-tui-select-label") ||
@@ -594,7 +630,7 @@
   function toggle(trigger) {
     const content = contentFor(trigger);
     if (!content) return;
-    if (content.getAttribute("data-state") === "open") {
+    if (isOpen(content)) {
       close(content);
     } else {
       open(content, trigger);
@@ -648,7 +684,7 @@
 
     if (e.key === "Escape") {
       allContents().forEach((content) => {
-        if (content.getAttribute("data-state") !== "open") return;
+        if (!isOpen(content)) return;
         const trigger = triggerFor(content);
         close(content);
         if (trigger) trigger.focus();
@@ -664,7 +700,7 @@
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
         const content = contentFor(trigger);
-        if (content && content.getAttribute("data-state") !== "open") open(content, trigger);
+        if (content && !isOpen(content)) open(content, trigger);
       }
       return;
     }
@@ -727,7 +763,7 @@
       // Page scroll: keep open popper menus attached to their trigger
       // (aligned menus lock page scroll instead).
       allContents().forEach((content) => {
-        if (content.getAttribute("data-state") !== "open" || content._tuiAligned) return;
+        if (!isOpen(content) || content._tuiAligned) return;
         const trigger = triggerFor(content);
         if (trigger) positionPopper(content, trigger).then(() => updateScrollArrows(content));
       });
@@ -737,9 +773,10 @@
 
   window.addEventListener("resize", () => {
     allContents().forEach((content) => {
-      if (content.getAttribute("data-state") !== "open") return;
+      if (!isOpen(content)) return;
       const trigger = triggerFor(content);
       if (trigger) position(content, trigger);
     });
   });
+
 })();

@@ -243,15 +243,14 @@ func Content(props ...ContentProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " data-state=\"closed\" hidden data-tui-portal class=\"pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " data-closed hidden data-tui-portal class=\"pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 = []any{utils.CN(
 			// 1:1 base/ui/popover.tsx PopoverContent, the look comes from
-			// cn-popover-content (animations key on our data-state attribute).
-			// origin-(--transform-origin) becomes our JS variable name.
-			"cn-popover-content cn-popover-content-logical z-50 w-72 origin-(--tui-popover-transform-origin) outline-hidden",
+			// cn-popover-content and Base UI's standard transform-origin variable.
+			"cn-popover-content cn-popover-content-logical z-50 w-72 origin-(--transform-origin) outline-hidden",
 			// JS wiring: the positioner wrapper is pointer-events-none, and the
 			// popup stays mounted after animate-out until hidePopover runs.
 			"pointer-events-auto data-closed:fill-mode-forwards",
@@ -262,7 +261,7 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div data-slot=\"popover-content\" data-tui-popover-popup data-state=\"closed\" role=\"dialog\" tabindex=\"-1\" class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div data-slot=\"popover-content\" data-tui-popover-popup data-closed role=\"dialog\" tabindex=\"-1\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -341,7 +340,7 @@ func Header(props ...HeaderProps) templ.Component {
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popover/popover.templ`, Line: 170, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popover/popover.templ`, Line: 169, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -431,7 +430,7 @@ func Title(props ...TitleProps) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popover/popover.templ`, Line: 187, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popover/popover.templ`, Line: 186, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -521,7 +520,7 @@ func Description(props ...DescriptionProps) templ.Component {
 			var templ_7745c5c3_Var20 string
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popover/popover.templ`, Line: 204, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/popover/popover.templ`, Line: 203, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {

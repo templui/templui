@@ -1,10 +1,10 @@
 (function () {
   function isOn(el) {
-    return el.getAttribute("data-state") === "on";
+    return el.hasAttribute("data-pressed");
   }
 
   function setState(el, on) {
-    el.setAttribute("data-state", on ? "on" : "off");
+    el.toggleAttribute("data-pressed", on);
     el.setAttribute("aria-pressed", on ? "true" : "false");
   }
 
@@ -14,7 +14,7 @@
 
     const group = toggle.closest("[data-tui-toggle-group]");
 
-    if (group && !group.hasAttribute("data-toggle-multiple")) {
+    if (group && !group.hasAttribute("data-multiple")) {
       const wasOn = isOn(toggle);
       group
         .querySelectorAll("[data-tui-toggle]")
@@ -26,7 +26,7 @@
 
     // Expose the group's active value(s) so CSS/HTMX can react without custom JS.
     if (group) {
-      const on = [...group.querySelectorAll('[data-tui-toggle][data-state="on"]')]
+      const on = [...group.querySelectorAll('[data-tui-toggle][data-pressed]')]
         .map((t) => t.getAttribute("data-tui-toggle-value"))
         .filter(Boolean);
       group.setAttribute("data-tui-toggle-group-value", on.join(" "));

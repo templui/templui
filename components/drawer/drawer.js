@@ -552,7 +552,7 @@
   // showModal's Escape lives here now. Capture phase: while a floating
   // popup is visibly open (inside or outside the drawer), its own Escape
   // handler closes it and the drawer stays.
-  const OPEN_POPUP_SELECTOR = '[data-tui-portal][data-state="open"]:not([hidden]):not(dialog)';
+  const OPEN_POPUP_SELECTOR = '[data-tui-portal][data-open]:not([hidden]):not(dialog)';
 
   document.addEventListener(
     "keydown",

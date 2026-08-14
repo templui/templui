@@ -150,7 +150,7 @@ func Trigger(ctx context.Context) templ.Attributes {
 
 // Content is the collapsible panel: hidden while closed, unstyled like
 // Base UI. Its measured height is exposed as
-// --tui-collapsible-panel-height for custom animations.
+// --collapsible-panel-height/width for custom animations.
 func Content(props ...ContentProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

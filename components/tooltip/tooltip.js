@@ -75,7 +75,7 @@
       content.style.left = result.x + "px";
       content.style.top = result.y + "px";
       content.style.setProperty(
-        "--tui-tooltip-transform-origin",
+        "--transform-origin",
         anchorOrigin(result, trigger.getBoundingClientRect(), sideOffset),
       );
       const finalSide = result.placement.split("-")[0];
@@ -109,17 +109,48 @@
       content.style.visibility = "";
       void content.offsetWidth;
       content.style.transitionProperty = "";
-      content.setAttribute("data-state", "open");
+      content.removeAttribute("data-closed");
+      content.removeAttribute("data-ending-style");
+      content.setAttribute("data-open", "");
+      content.setAttribute("data-starting-style", "");
+      const arrowEl = content.querySelector("[data-tui-tooltip-arrow]");
+      if (arrowEl) {
+        arrowEl.removeAttribute("data-closed");
+        arrowEl.removeAttribute("data-ending-style");
+        arrowEl.setAttribute("data-open", "");
+        arrowEl.setAttribute("data-starting-style", "");
+      }
+      trigger.setAttribute("data-popup-open", "");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          content.removeAttribute("data-starting-style");
+          if (arrowEl) arrowEl.removeAttribute("data-starting-style");
+        });
+      });
     });
   }
 
   function close(content) {
     if (content.hidden) return;
-    content.setAttribute("data-state", "closed");
+    content.removeAttribute("data-open");
+    content.removeAttribute("data-starting-style");
+    content.setAttribute("data-closed", "");
+    content.setAttribute("data-ending-style", "");
+    const arrowEl = content.querySelector("[data-tui-tooltip-arrow]");
+    if (arrowEl) {
+      arrowEl.removeAttribute("data-open");
+      arrowEl.removeAttribute("data-starting-style");
+      arrowEl.setAttribute("data-closed", "");
+      arrowEl.setAttribute("data-ending-style", "");
+    }
+    const trigger = triggerFor(content);
+    if (trigger) trigger.removeAttribute("data-popup-open");
     clearTimeout(content._tuiHide);
     content._tuiHide = setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed" && !content.hidden) {
+      if (content.hasAttribute("data-closed") && !content.hidden) {
         content.hidden = true;
+        content.removeAttribute("data-ending-style");
+        if (arrowEl) arrowEl.removeAttribute("data-ending-style");
       }
     }, EXIT_MS);
   }
@@ -193,7 +224,7 @@
   // Keep open tooltips anchored while scrolling or resizing.
   function repositionOpen() {
     allContents().forEach((content) => {
-      if (content.getAttribute("data-state") !== "open") return;
+      if (!content.hasAttribute("data-open")) return;
       const trigger = triggerFor(content);
       if (trigger) positionContent(content, trigger);
     });

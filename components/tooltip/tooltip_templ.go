@@ -137,9 +137,8 @@ func Content(props ...ContentProps) templ.Component {
 		}
 		var templ_7745c5c3_Var3 = []any{utils.CN(
 			// 1:1 base/ui/tooltip.tsx TooltipContent, the look comes from
-			// cn-tooltip-content (animations key on our data-state attribute).
-			// origin-(--transform-origin) becomes our JS variable name.
-			"cn-tooltip-content cn-tooltip-content-logical z-50 w-fit max-w-xs origin-(--tui-tooltip-transform-origin) bg-foreground text-background",
+			// cn-tooltip-content and Base UI's standard transform-origin variable.
+			"cn-tooltip-content cn-tooltip-content-logical z-50 w-fit max-w-xs origin-(--transform-origin) bg-foreground text-background",
 			// Native [popover] resets plus JS wiring: the popup stays mounted
 			// after animate-out until hidePopover runs.
 			"pointer-events-none fixed inset-auto left-0 top-0 m-0 overflow-visible data-closed:fill-mode-forwards",
@@ -189,7 +188,7 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" data-state=\"closed\" hidden data-tui-portal role=\"tooltip\" class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" data-closed hidden data-tui-portal role=\"tooltip\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -218,7 +217,7 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<span data-tui-tooltip-arrow class=\"cn-tooltip-arrow cn-tooltip-arrow-logical absolute z-50 bg-foreground fill-foreground data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1 data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1 data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5\"></span></div></template>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<span data-tui-tooltip-arrow data-closed class=\"cn-tooltip-arrow cn-tooltip-arrow-logical absolute z-50 bg-foreground fill-foreground data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1 data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1 data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5\"></span></div></template>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

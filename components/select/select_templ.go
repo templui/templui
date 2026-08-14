@@ -481,16 +481,14 @@ func Content(props ...ContentProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" data-state=\"closed\" hidden class=\"pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" data-closed hidden class=\"pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var18 = []any{utils.CN(
 			// 1:1 base/ui/select.tsx SelectContent, the look comes from
-			// cn-select-content (animations key on our data-state attribute).
-			// The --available-height/--anchor-width/--transform-origin
-			// variables become our JS variable names.
-			"cn-select-content cn-select-content-logical cn-menu-target cn-menu-translucent relative isolate z-50 max-h-(--tui-select-available-height) w-(--tui-select-anchor-width) origin-(--tui-select-transform-origin) overflow-x-hidden overflow-y-auto data-[align-trigger=true]:animate-none",
+			// cn-select-content and Base UI's standard positioner variables.
+			"cn-select-content cn-select-content-logical cn-menu-target cn-menu-translucent relative isolate z-50 max-h-(--available-height) w-(--anchor-width) origin-(--transform-origin) overflow-x-hidden overflow-y-auto data-[align-trigger=true]:animate-none",
 			// JS wiring: the positioner wrapper is pointer-events-none, the
 			// scroll arrows/viewport need a flex column, and the popup stays
 			// mounted after animate-out until hidePopover runs.
@@ -517,7 +515,7 @@ func Content(props ...ContentProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, " data-state=\"closed\" role=\"listbox\" class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, " data-closed role=\"listbox\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -612,7 +610,7 @@ func Group(props ...GroupProps) templ.Component {
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/select/select.templ`, Line: 251, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/select/select.templ`, Line: 249, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -702,7 +700,7 @@ func Label(props ...LabelProps) templ.Component {
 			var templ_7745c5c3_Var26 string
 			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/select/select.templ`, Line: 269, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/select/select.templ`, Line: 267, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 			if templ_7745c5c3_Err != nil {
@@ -804,7 +802,7 @@ func Item(props ...ItemProps) templ.Component {
 			var templ_7745c5c3_Var30 string
 			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/select/select.templ`, Line: 288, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/select/select.templ`, Line: 286, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 			if templ_7745c5c3_Err != nil {
@@ -822,7 +820,7 @@ func Item(props ...ItemProps) templ.Component {
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(p.Value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/select/select.templ`, Line: 294, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/select/select.templ`, Line: 292, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
@@ -840,7 +838,7 @@ func Item(props ...ItemProps) templ.Component {
 			var templ_7745c5c3_Var32 string
 			templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(p.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/select/select.templ`, Line: 296, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/select/select.templ`, Line: 294, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 			if templ_7745c5c3_Err != nil {
@@ -852,12 +850,12 @@ func Item(props ...ItemProps) templ.Component {
 			}
 		}
 		if selected {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, " data-state=\"checked\" aria-selected=\"true\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, " data-selected aria-selected=\"true\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, " data-state=\"unchecked\" aria-selected=\"false\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, " aria-selected=\"false\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -897,7 +895,7 @@ func Item(props ...ItemProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</span> <span class=\"cn-select-item-indicator opacity-0 group-data-[state=checked]/select-item:opacity-100\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</span> <span class=\"cn-select-item-indicator opacity-0 group-data-selected/select-item:opacity-100\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -955,7 +953,7 @@ func Separator(props ...SeparatorProps) templ.Component {
 			var templ_7745c5c3_Var36 string
 			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/select/select.templ`, Line: 339, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/select/select.templ`, Line: 336, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 			if templ_7745c5c3_Err != nil {
