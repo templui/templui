@@ -1,7 +1,6 @@
 package modules
 
 import (
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -72,22 +71,8 @@ func buildBlockFileTree(files []BlockFile) []*blockFileTree {
 			node = child
 		}
 	}
-	var sortTree func(nodes []*blockFileTree)
-	sortTree = func(nodes []*blockFileTree) {
-		sort.SliceStable(nodes, func(i, j int) bool {
-			// Folders before files, then name order, like the reference tree.
-			iDir := len(nodes[i].Children) > 0
-			jDir := len(nodes[j].Children) > 0
-			if iDir != jDir {
-				return iDir
-			}
-			return nodes[i].Name < nodes[j].Name
-		})
-		for _, n := range nodes {
-			sortTree(n.Children)
-		}
-	}
-	sortTree(root.Children)
+	// No sorting: createFileTreeForRegistryItemFiles keeps insertion order,
+	// so the registry's first file is also the first tree row.
 	return root.Children
 }
 

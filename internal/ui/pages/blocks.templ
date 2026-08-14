@@ -255,7 +255,7 @@ templ blocksPageScript() {
 						b.setAttribute("data-active", b === fileBtn ? "true" : "false");
 					});
 					wrapper.querySelectorAll("[data-tui-block-file-pane]").forEach((p) => {
-						p.classList.toggle("hidden", p.getAttribute("data-tui-block-file-pane") !== path);
+						p.hidden = p.getAttribute("data-tui-block-file-pane") !== path;
 					});
 					return;
 				}
