@@ -186,6 +186,18 @@ templ blocksPageScript() {
 	<script nonce={ templ.GetNonce(ctx) }>
 		(() => {
 			const wrapperOf = (el) => el.closest("[data-tui-block-wrapper]");
+			const setPanelSize = (wrapper, value) => {
+				const pct = Math.min(100, Math.max(30, Number.parseFloat(value) || 100));
+				const panel = wrapper.querySelector("[data-tui-block-panel]");
+				const handle = wrapper.querySelector("[data-tui-block-handle]");
+				if (panel) panel.style.width = pct + "%";
+				if (handle) handle.setAttribute("aria-valuenow", String(Math.round(pct)));
+			};
+			const setPreviewTab = (wrapper) => {
+				const tabs = wrapper.querySelector("[data-tui-block-tabs]");
+				const tabsID = tabs?.getAttribute("data-tui-tabs-id");
+				if (tabsID) window.tui?.tabs?.setActive(tabsID, "preview");
+			};
 
 			// Copy feedback: swap the idle icon for the check for two
 			// seconds, the useCopyToClipboard pendant.
@@ -217,8 +229,8 @@ templ blocksPageScript() {
 					const wrapper = wrapperOf(sizeBtn);
 					if (!wrapper) return;
 					wrapper.setAttribute("data-view", "preview");
-					const panel = wrapper.querySelector("[data-tui-block-panel]");
-					if (panel) panel.style.width = sizeBtn.getAttribute("data-tui-block-size");
+					setPreviewTab(wrapper);
+					setPanelSize(wrapper, sizeBtn.getAttribute("data-tui-block-size"));
 					return;
 				}
 
@@ -241,7 +253,10 @@ templ blocksPageScript() {
 				// File tree folders collapse/expand.
 				const folderBtn = e.target.closest("[data-tui-block-folder-trigger]");
 				if (folderBtn) {
-					folderBtn.closest("[data-tui-block-folder]")?.toggleAttribute("data-closed");
+					const folder = folderBtn.closest("[data-tui-block-folder]");
+					if (!folder) return;
+					const closed = folder.toggleAttribute("data-closed");
+					folderBtn.setAttribute("aria-expanded", String(!closed));
 					return;
 				}
 
@@ -255,7 +270,14 @@ templ blocksPageScript() {
 						b.setAttribute("data-active", b === fileBtn ? "true" : "false");
 					});
 					wrapper.querySelectorAll("[data-tui-block-file-pane]").forEach((p) => {
-						p.hidden = p.getAttribute("data-tui-block-file-pane") !== path;
+						const active = p.getAttribute("data-tui-block-file-pane") === path;
+						p.hidden = !active;
+						if (active) {
+							const scroll = p.querySelector("[data-tui-block-file-scroll]");
+							if (scroll) scroll.scrollTop = 0;
+							const pre = scroll?.querySelector("pre");
+							if (pre) pre.scrollLeft = 0;
+						}
 					});
 					return;
 				}
@@ -279,10 +301,11 @@ templ blocksPageScript() {
 				if (!(e.target instanceof Element)) return;
 				const handle = e.target.closest("[data-tui-block-handle]");
 				if (!handle) return;
+				const wrapper = wrapperOf(handle);
 				const canvas = handle.closest("[data-tui-block-resizable]");
-				const panel = canvas?.querySelector("[data-tui-block-panel]");
-				if (!canvas || !panel) return;
-				drag = { canvas, panel };
+				if (!wrapper || !canvas) return;
+				drag = { wrapper, canvas, handle, pointerId: e.pointerId };
+				handle.setPointerCapture?.(e.pointerId);
 				// Iframes swallow pointermove; fence them during the drag.
 				canvas.querySelectorAll("iframe").forEach((f) => (f.style.pointerEvents = "none"));
 				e.preventDefault();
@@ -291,12 +314,35 @@ templ blocksPageScript() {
 				if (!drag) return;
 				const rect = drag.canvas.getBoundingClientRect();
 				const pct = ((e.clientX - rect.left) / rect.width) * 100;
-				drag.panel.style.width = Math.min(100, Math.max(30, pct)) + "%";
+				setPanelSize(drag.wrapper, pct);
 			});
-			document.addEventListener("pointerup", () => {
+			const endDrag = () => {
 				if (!drag) return;
 				drag.canvas.querySelectorAll("iframe").forEach((f) => (f.style.pointerEvents = ""));
+				if (drag.handle.hasPointerCapture?.(drag.pointerId)) drag.handle.releasePointerCapture(drag.pointerId);
 				drag = null;
+			};
+			document.addEventListener("pointerup", endDrag);
+			document.addEventListener("pointercancel", endDrag);
+			document.addEventListener("keydown", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const handle = e.target.closest("[data-tui-block-handle]");
+				if (!handle) return;
+				const wrapper = wrapperOf(handle);
+				const panel = wrapper?.querySelector("[data-tui-block-panel]");
+				if (!wrapper || !panel) return;
+				const current = Number.parseFloat(panel.style.width) || 100;
+				const step = e.shiftKey ? 1 : 10;
+				let next;
+				switch (e.key) {
+				case "ArrowLeft": next = current - step; break;
+				case "ArrowRight": next = current + step; break;
+				case "Home": next = 30; break;
+				case "End": next = 100; break;
+				default: return;
+				}
+				setPanelSize(wrapper, next);
+				e.preventDefault();
 			});
 		})();
 	</script>

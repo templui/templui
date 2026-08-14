@@ -38,7 +38,11 @@ templ BlockViewer(entry BlockEntry) {
 // pendant and stays out.
 templ blockViewerToolbar(entry BlockEntry) {
 	<div class="hidden w-full items-center gap-2 pl-2 md:pr-6 lg:flex">
-		@tabs.Tabs(tabs.Props{DefaultValue: "preview"}) {
+		@tabs.Tabs(tabs.Props{
+			ID:           entry.Name + "-view-tabs",
+			DefaultValue: "preview",
+			Attributes:   templ.Attributes{"data-tui-block-tabs": ""},
+		}) {
 			@tabs.List(tabs.ListProps{Class: "grid h-8! grid-cols-2 items-center rounded-lg p-1 *:data-[slot=tabs-trigger]:h-6 *:data-[slot=tabs-trigger]:rounded-sm *:data-[slot=tabs-trigger]:px-2 *:data-[slot=tabs-trigger]:text-xs"}) {
 				@tabs.Trigger(tabs.TriggerProps{Value: "preview", Attributes: templ.Attributes{"data-tui-block-set-view": "preview"}}) {
 					Preview
@@ -56,24 +60,24 @@ templ blockViewerToolbar(entry BlockEntry) {
 			{ strings.TrimSuffix(entry.Description, ".") }
 		</a>
 		<div class="ml-auto flex items-center gap-2">
-			<div class="flex h-8 items-center gap-1.5 rounded-md border p-[3px] shadow-none">
+			<div class="h-8 items-center gap-1.5 rounded-md border p-[3px] shadow-none">
 				@togglegroup.ToggleGroup(togglegroup.Props{Spacing: utils.Ptr(1), Class: "*:data-[slot=toggle-group-item]:size-6! *:data-[slot=toggle-group-item]:rounded-sm!"}) {
-					@togglegroup.Item(togglegroup.ItemProps{Attributes: templ.Attributes{"data-tui-block-size": "100%", "title": "Desktop"}}) {
+					@togglegroup.Item(togglegroup.ItemProps{Value: "100%", Pressed: true, Attributes: templ.Attributes{"data-tui-block-size": "100%", "title": "Desktop"}}) {
 						@icon.Monitor()
 					}
-					@togglegroup.Item(togglegroup.ItemProps{Attributes: templ.Attributes{"data-tui-block-size": "60%", "title": "Tablet"}}) {
+					@togglegroup.Item(togglegroup.ItemProps{Value: "60%", Attributes: templ.Attributes{"data-tui-block-size": "60%", "title": "Tablet"}}) {
 						@icon.Tablet()
 					}
-					@togglegroup.Item(togglegroup.ItemProps{Attributes: templ.Attributes{"data-tui-block-size": "30%", "title": "Smartphone"}}) {
+					@togglegroup.Item(togglegroup.ItemProps{Value: "30%", Attributes: templ.Attributes{"data-tui-block-size": "30%", "title": "Mobile"}}) {
 						@icon.Smartphone()
 					}
 					@separator.Separator(separator.Props{Orientation: separator.OrientationVertical, Class: "h-4! self-center!"})
 					@button.Button(button.Props{
-						Size:    button.SizeIcon,
-						Variant: button.VariantGhost,
-						Class:   "size-6 rounded-sm p-0",
-						Href:    "/view/" + entry.Name,
-						Target:  "_blank",
+						Size:       button.SizeIcon,
+						Variant:    button.VariantGhost,
+						Class:      "size-6 rounded-sm p-0",
+						Href:       "/view/" + entry.Name,
+						Target:     "_blank",
 						Attributes: templ.Attributes{"title": "Open in New Tab"},
 					}) {
 						<span class="sr-only">Open in New Tab</span>
@@ -81,9 +85,9 @@ templ blockViewerToolbar(entry BlockEntry) {
 					}
 					@separator.Separator(separator.Props{Orientation: separator.OrientationVertical, Class: "h-4! self-center!"})
 					@button.Button(button.Props{
-						Size:    button.SizeIcon,
-						Variant: button.VariantGhost,
-						Class:   "size-6 rounded-sm p-0",
+						Size:       button.SizeIcon,
+						Variant:    button.VariantGhost,
+						Class:      "size-6 rounded-sm p-0",
 						Attributes: templ.Attributes{"title": "Refresh Preview", "data-tui-block-refresh": entry.Name},
 					}) {
 						@icon.RotateCw()
@@ -93,9 +97,9 @@ templ blockViewerToolbar(entry BlockEntry) {
 			</div>
 			@separator.Separator(separator.Props{Orientation: separator.OrientationVertical, Class: "mx-1 h-4! self-center!"})
 			@button.Button(button.Props{
-				Variant: button.VariantOutline,
-				Size:    button.SizeSm,
-				Class:   "w-fit gap-1 px-2 shadow-none",
+				Variant:    button.VariantOutline,
+				Size:       button.SizeSm,
+				Class:      "w-fit gap-1 px-2 shadow-none",
 				Attributes: templ.Attributes{"data-tui-block-add": "shadcn-templ add " + entry.Name},
 			}) {
 				<span data-tui-block-add-idle>
@@ -135,6 +139,13 @@ templ blockViewerView(entry BlockEntry) {
 				<div
 					class="relative hidden w-3 shrink-0 cursor-col-resize bg-transparent p-0 after:absolute after:top-1/2 after:right-0 after:h-8 after:w-[6px] after:translate-x-[-1px] after:-translate-y-1/2 after:rounded-full after:bg-border after:transition-all after:hover:h-10 md:block"
 					data-tui-block-handle
+					role="separator"
+					tabindex="0"
+					aria-label="Resize preview"
+					aria-orientation="vertical"
+					aria-valuemin="30"
+					aria-valuemax="100"
+					aria-valuenow="100"
 				></div>
 				<div class="min-w-0 flex-1"></div>
 			</div>
@@ -167,9 +178,9 @@ templ blockViewerCode(entry BlockEntry) {
 					{ file.Path }
 					<div class="ml-auto flex items-center gap-2">
 						@button.Button(button.Props{
-							Variant: button.VariantGhost,
-							Size:    button.SizeIcon,
-							Class:   "size-7",
+							Variant:    button.VariantGhost,
+							Size:       button.SizeIcon,
+							Class:      "size-7",
 							Attributes: templ.Attributes{"data-tui-block-copy-file": file.Path, "aria-label": "Copy code"},
 						}) {
 							<span data-tui-block-copy-idle>
@@ -181,7 +192,7 @@ templ blockViewerCode(entry BlockEntry) {
 						}
 					</div>
 				</figcaption>
-				<div class="no-scrollbar min-h-0 flex-1 overflow-y-auto [&_pre]:px-0 [&_pre]:py-3.5" data-tui-code-line-numbers>
+				<div class="no-scrollbar min-h-0 flex-1 overflow-y-auto [&_pre]:px-0 [&_pre]:py-3.5" data-tui-block-file-scroll data-tui-code-line-numbers>
 					@templ.Raw(GetHighlightedHTML(ctx, file.Content, blockFileLanguage(file.Path)))
 				</div>
 				<textarea hidden readonly data-tui-block-file-source={ file.Path }>{ file.Content }</textarea>
@@ -224,7 +235,8 @@ templ blockViewerTreeNode(entry BlockEntry, node *blockFileTree, index int) {
 			<button
 				type="button"
 				data-tui-block-folder-trigger
-				class="flex h-8 w-full items-center gap-2 rounded-none pl-(--index) text-sm whitespace-nowrap hover:bg-muted-foreground/15 focus:bg-muted-foreground/15 [&_svg]:size-4"
+				aria-expanded="true"
+				class="flex h-8 w-full items-center gap-2 rounded-none pl-(--index) text-sm whitespace-nowrap hover:bg-muted-foreground/15 focus:bg-muted-foreground/15 focus-visible:bg-muted-foreground/15 active:bg-muted-foreground/15 data-[active=true]:bg-muted-foreground/15 [&_svg]:size-4"
 				style={ "--index: " + strconv.FormatFloat(float64(index)*utils.IfElse(index == 1, 1.0, 1.2), 'g', -1, 64) + "rem" }
 			>
 				@icon.ChevronRight(icon.Props{Class: "rotate-90 transition-transform group-data-[closed]/block-folder:rotate-0"})
