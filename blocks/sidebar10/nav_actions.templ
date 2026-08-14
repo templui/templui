@@ -48,7 +48,10 @@ templ NavActions() {
 		}) {
 			@icon.Star()
 		}
-		@popover.Popover() {
+		@popover.Popover(popover.Props{
+			ID:          "sidebar10-actions-popover",
+			DefaultOpen: true,
+		}) {
 			@button.Button(button.Props{
 				Variant:    button.VariantGhost,
 				Size:       button.SizeIcon,
@@ -58,7 +61,6 @@ templ NavActions() {
 				@icon.Ellipsis()
 			}
 			@popover.Content(popover.ContentProps{
-				ID:    "sidebar10-actions-popover",
 				Class: "w-56 overflow-hidden rounded-lg p-0",
 				Align: popover.AlignEnd,
 			}) {

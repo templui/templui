@@ -70,15 +70,6 @@ templ Page() {
 				applySides();
 			}
 			mq.addEventListener("change", applySides);
-
-			// The isOpen/useEffect pendant: the actions popover opens once on
-			// mount as the demo flourish.
-			const openActions = () => window.tui?.popover?.open("sidebar10-actions-popover");
-			if (document.readyState === "loading") {
-				document.addEventListener("DOMContentLoaded", openActions);
-			} else {
-				openActions();
-			}
 		})();
 	</script>
 }
