@@ -394,6 +394,10 @@
 
 /* Code line rhythm + line numbers, 1:1 the shadcn globals.css rules (their
    [data-line] maps to shiki's .line spans). */
+[data-rehype-pretty-code-figure] {
+  font-size: var(--text-sm);
+}
+
 .shiki code,
 .shiki code span {
   font-variant-ligatures: none;
