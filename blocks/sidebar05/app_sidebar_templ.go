@@ -301,7 +301,7 @@ func AppSidebar(props ...sidebar.Props) templ.Component {
 										if templ_7745c5c3_Err != nil {
 											return templ_7745c5c3_Err
 										}
-										templ_7745c5c3_Err = icon.Plus(icon.Props{Class: "ml-auto group-data-[state=open]/collapsible:hidden"}).Render(ctx, templ_7745c5c3_Buffer)
+										templ_7745c5c3_Err = icon.Plus(icon.Props{Class: "ml-auto group-aria-expanded/menu-button:hidden"}).Render(ctx, templ_7745c5c3_Buffer)
 										if templ_7745c5c3_Err != nil {
 											return templ_7745c5c3_Err
 										}
@@ -309,7 +309,7 @@ func AppSidebar(props ...sidebar.Props) templ.Component {
 										if templ_7745c5c3_Err != nil {
 											return templ_7745c5c3_Err
 										}
-										templ_7745c5c3_Err = icon.Minus(icon.Props{Class: "ml-auto group-data-[state=closed]/collapsible:hidden"}).Render(ctx, templ_7745c5c3_Buffer)
+										templ_7745c5c3_Err = icon.Minus(icon.Props{Class: "ml-auto hidden group-aria-expanded/menu-button:block"}).Render(ctx, templ_7745c5c3_Buffer)
 										if templ_7745c5c3_Err != nil {
 											return templ_7745c5c3_Err
 										}

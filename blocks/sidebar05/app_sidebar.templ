@@ -111,8 +111,8 @@ templ AppSidebar(props ...sidebar.Props) {
 							@sidebar.MenuItem() {
 								@sidebar.MenuButton(sidebar.MenuButtonProps{Attributes: collapsible.Trigger(ctx)}) {
 									{ item.Title }
-									@icon.Plus(icon.Props{Class: "ml-auto group-data-[state=open]/collapsible:hidden"})
-									@icon.Minus(icon.Props{Class: "ml-auto group-data-[state=closed]/collapsible:hidden"})
+									@icon.Plus(icon.Props{Class: "ml-auto group-aria-expanded/menu-button:hidden"})
+									@icon.Minus(icon.Props{Class: "ml-auto hidden group-aria-expanded/menu-button:block"})
 								}
 								if len(item.Items) > 0 {
 									@collapsible.Content() {
