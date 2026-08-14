@@ -6,6 +6,7 @@ import (
 
 	"github.com/axadrn/shadcn-templ/v2/components/button"
 	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/resizable"
 	"github.com/axadrn/shadcn-templ/v2/components/separator"
 	"github.com/axadrn/shadcn-templ/v2/components/tabs"
 	"github.com/axadrn/shadcn-templ/v2/components/togglegroup"
@@ -114,19 +115,25 @@ templ blockViewerToolbar(entry BlockEntry) {
 	</div>
 }
 
-// blockViewerView is the BlockViewerView pendant: the dotted canvas with
-// the resizable preview panel. react-resizable-panels becomes a width
-// style on the panel plus the drag handle wired in BlocksPageScript.
+// blockViewerView is the BlockViewerView pendant: the dotted canvas and
+// the same PanelGroup -> Panel -> Handle -> Panel composition as shadcn.
 templ blockViewerView(entry BlockEntry) {
 	<div class="hidden group-data-[view=code]/block-view-wrapper:hidden md:h-(--height) lg:flex">
 		<div class="relative grid w-full gap-4">
 			<div class="absolute inset-0 right-4 [background-image:radial-gradient(#d4d4d4_1px,transparent_1px)] [background-size:20px_20px] dark:[background-image:radial-gradient(#404040_1px,transparent_1px)]"></div>
-			<div class="relative z-10 flex h-full w-full after:absolute after:inset-0 after:right-3 after:z-0 after:rounded-xl after:bg-surface/50" data-tui-block-resizable>
-				<div
-					class="relative aspect-[4/2.5] overflow-hidden rounded-lg border bg-background md:aspect-auto md:rounded-xl"
-					style="width: 100%"
-					data-tui-block-panel
-				>
+			@resizable.PanelGroup(resizable.PanelGroupProps{
+				ID:          entry.Name + "-preview-group",
+				Orientation: resizable.OrientationHorizontal,
+				Class:       "relative z-10 after:absolute after:inset-0 after:right-3 after:z-0 after:rounded-xl after:bg-surface/50",
+				Attributes:  templ.Attributes{"data-tui-block-resizable": ""},
+			}) {
+				@resizable.Panel(resizable.PanelProps{
+					ID:          entry.Name + "-preview-panel",
+					DefaultSize: "100%",
+					MinSize:     "30%",
+					Class:       "relative aspect-[4/2.5] overflow-hidden rounded-lg border bg-background md:aspect-auto md:rounded-xl",
+					Attributes:  templ.Attributes{"data-tui-block-panel": ""},
+				}) {
 					<iframe
 						src={ templ.SafeURL("/view/" + entry.Name) }
 						height={ strconv.Itoa(entry.HeightPx()) }
@@ -135,20 +142,17 @@ templ blockViewerView(entry BlockEntry) {
 						title={ entry.Name }
 						data-tui-block-iframe={ entry.Name }
 					></iframe>
-				</div>
-				<div
-					class="relative hidden w-3 shrink-0 cursor-col-resize bg-transparent p-0 after:absolute after:top-1/2 after:right-0 after:h-8 after:w-[6px] after:translate-x-[-1px] after:-translate-y-1/2 after:rounded-full after:bg-border after:transition-all after:hover:h-10 md:block"
-					data-tui-block-handle
-					role="separator"
-					tabindex="0"
-					aria-label="Resize preview"
-					aria-orientation="vertical"
-					aria-valuemin="30"
-					aria-valuemax="100"
-					aria-valuenow="100"
-				></div>
-				<div class="min-w-0 flex-1"></div>
-			</div>
+				}
+				@resizable.Handle(resizable.HandleProps{
+					Class:      "relative hidden w-3 bg-transparent p-0 after:absolute after:top-1/2 after:right-0 after:h-8 after:w-[6px] after:translate-x-[-1px] after:-translate-y-1/2 after:rounded-full after:bg-border after:transition-all after:hover:h-10 md:block",
+					Attributes: templ.Attributes{"data-tui-block-handle": "", "aria-label": "Resize preview"},
+				})
+				@resizable.Panel(resizable.PanelProps{
+					ID:          entry.Name + "-preview-spacer",
+					DefaultSize: "0%",
+					MinSize:     "0%",
+				})
+			}
 		</div>
 	</div>
 }

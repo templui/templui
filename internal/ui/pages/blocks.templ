@@ -180,19 +180,14 @@ templ BlockView(name string) {
 }
 
 // blocksPageScript wires the viewer interactions that React state carries
-// in block-viewer.tsx: view tabs, viewport toggles, the resize handle,
-// refresh, the add command copy, file tree switching and file copy.
+// in block-viewer.tsx. The generic resizable component owns all resize
+// pointer, keyboard and ARIA behavior.
 templ blocksPageScript() {
 	<script nonce={ templ.GetNonce(ctx) }>
 		(() => {
 			const wrapperOf = (el) => el.closest("[data-tui-block-wrapper]");
-			const setPanelSize = (wrapper, value) => {
-				const pct = Math.min(100, Math.max(30, Number.parseFloat(value) || 100));
-				const panel = wrapper.querySelector("[data-tui-block-panel]");
-				const handle = wrapper.querySelector("[data-tui-block-handle]");
-				if (panel) panel.style.width = pct + "%";
-				if (handle) handle.setAttribute("aria-valuenow", String(Math.round(pct)));
-			};
+			const setPanelSize = (wrapper, value) =>
+				window.tui?.resizable?.resize(wrapper.querySelector("[data-tui-block-panel]"), value);
 			const setPreviewTab = (wrapper) => {
 				const tabs = wrapper.querySelector("[data-tui-block-tabs]");
 				const tabsID = tabs?.getAttribute("data-tui-tabs-id");
@@ -292,57 +287,6 @@ templ blocksPageScript() {
 					flash(copyBtn, "[data-tui-block-copy-idle]", "[data-tui-block-copy-done]");
 					return;
 				}
-			});
-
-			// The resize handle, the react-resizable-panels pendant: drag
-			// sets the panel width between 30% and 100% of the canvas.
-			let drag = null;
-			document.addEventListener("pointerdown", (e) => {
-				if (!(e.target instanceof Element)) return;
-				const handle = e.target.closest("[data-tui-block-handle]");
-				if (!handle) return;
-				const wrapper = wrapperOf(handle);
-				const canvas = handle.closest("[data-tui-block-resizable]");
-				if (!wrapper || !canvas) return;
-				drag = { wrapper, canvas, handle, pointerId: e.pointerId };
-				handle.setPointerCapture?.(e.pointerId);
-				// Iframes swallow pointermove; fence them during the drag.
-				canvas.querySelectorAll("iframe").forEach((f) => (f.style.pointerEvents = "none"));
-				e.preventDefault();
-			});
-			document.addEventListener("pointermove", (e) => {
-				if (!drag) return;
-				const rect = drag.canvas.getBoundingClientRect();
-				const pct = ((e.clientX - rect.left) / rect.width) * 100;
-				setPanelSize(drag.wrapper, pct);
-			});
-			const endDrag = () => {
-				if (!drag) return;
-				drag.canvas.querySelectorAll("iframe").forEach((f) => (f.style.pointerEvents = ""));
-				if (drag.handle.hasPointerCapture?.(drag.pointerId)) drag.handle.releasePointerCapture(drag.pointerId);
-				drag = null;
-			};
-			document.addEventListener("pointerup", endDrag);
-			document.addEventListener("pointercancel", endDrag);
-			document.addEventListener("keydown", (e) => {
-				if (!(e.target instanceof Element)) return;
-				const handle = e.target.closest("[data-tui-block-handle]");
-				if (!handle) return;
-				const wrapper = wrapperOf(handle);
-				const panel = wrapper?.querySelector("[data-tui-block-panel]");
-				if (!wrapper || !panel) return;
-				const current = Number.parseFloat(panel.style.width) || 100;
-				const step = e.shiftKey ? 1 : 10;
-				let next;
-				switch (e.key) {
-				case "ArrowLeft": next = current - step; break;
-				case "ArrowRight": next = current + step; break;
-				case "Home": next = 30; break;
-				case "End": next = 100; break;
-				default: return;
-				}
-				setPanelSize(wrapper, next);
-				e.preventDefault();
 			});
 		})();
 	</script>

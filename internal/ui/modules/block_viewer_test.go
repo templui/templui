@@ -52,3 +52,31 @@ func TestBlockViewerCodeKeepsFlexLayoutWhenSwitchingFiles(t *testing.T) {
 		t.Fatal("file pane is missing its vertical scroll container")
 	}
 }
+
+func TestBlockViewerUsesResizablePrimitiveComposition(t *testing.T) {
+	entry := BlockEntry{Name: "dashboard-01", IframeHeight: "930px"}
+
+	var rendered bytes.Buffer
+	if err := blockViewerView(entry).Render(context.Background(), &rendered); err != nil {
+		t.Fatal(err)
+	}
+
+	html := rendered.String()
+	for _, want := range []string{
+		`data-slot="resizable-panel-group"`,
+		`id="dashboard-01-preview-panel"`,
+		`data-default-size="100%"`,
+		`data-min-size="30%"`,
+		`data-slot="resizable-handle"`,
+		`id="dashboard-01-preview-spacer"`,
+		`data-default-size="0%"`,
+		`class="relative z-20 no-scrollbar w-full bg-background"`,
+	} {
+		if !strings.Contains(html, want) {
+			t.Fatalf("block viewer is missing %q", want)
+		}
+	}
+	if strings.Contains(html, `data-tui-block-panel style="width:`) {
+		t.Fatal("block viewer still uses the legacy inline-width resize implementation")
+	}
+}
