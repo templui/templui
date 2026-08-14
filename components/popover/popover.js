@@ -298,7 +298,12 @@
   function init() {
     liftTemplates();
     allContents().forEach((content) => {
-      if (triggerFor(content)) portal(content);
+      if (!triggerFor(content)) return;
+      portal(content);
+      if (content.getAttribute("data-tui-popover-initial-open") === "true") {
+        content.removeAttribute("data-tui-popover-initial-open");
+        open(content);
+      }
     });
   }
 
