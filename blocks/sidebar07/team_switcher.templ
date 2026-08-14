@@ -28,7 +28,7 @@ templ TeamSwitcher(teams []Team) {
 				@dropdownmenu.DropdownMenu(dropdownmenu.Props{ID: "sidebar07-team-menu"}) {
 					@sidebar.MenuButton(sidebar.MenuButtonProps{
 						Size:       sidebar.MenuButtonSizeLg,
-						Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+						Class:      "data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
 						Attributes: dropdownmenu.Trigger(ctx),
 					}) {
 						<div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
@@ -48,7 +48,7 @@ templ TeamSwitcher(teams []Team) {
 						@icon.ChevronsUpDown(icon.Props{Class: "ml-auto"})
 					}
 					@dropdownmenu.Content(dropdownmenu.ContentProps{
-						Class:      "w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg",
+						Class:      "min-w-56 rounded-lg",
 						Align:      dropdownmenu.AlignStart,
 						Side:       dropdownmenu.SideRight,
 						SideOffset: 4,

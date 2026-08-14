@@ -37,7 +37,7 @@ templ NavMain(items []NavMainItem) {
 						}
 						if len(item.Items) > 0 {
 							@sidebar.MenuAction(sidebar.MenuActionProps{
-								Class:      "data-[state=open]:rotate-90",
+								Class:      "aria-expanded:rotate-90",
 								Attributes: collapsible.Trigger(ctx),
 							}) {
 								@icon.ChevronRight()

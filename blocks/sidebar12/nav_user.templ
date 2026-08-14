@@ -19,7 +19,7 @@ templ NavUser(user User) {
 			@dropdownmenu.DropdownMenu() {
 				@sidebar.MenuButton(sidebar.MenuButtonProps{
 					Size:       sidebar.MenuButtonSizeLg,
-					Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+					Class:      "aria-expanded:bg-muted",
 					Attributes: dropdownmenu.Trigger(ctx),
 				}) {
 					// after:rounded-lg + the rounded-lg on Image go beyond the TSX classes:
@@ -39,7 +39,7 @@ templ NavUser(user User) {
 					@icon.ChevronsUpDown(icon.Props{Class: "ml-auto size-4"})
 				}
 				@dropdownmenu.Content(dropdownmenu.ContentProps{
-					Class:      "w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg",
+					Class:      "min-w-56 rounded-lg",
 					Side:       dropdownmenu.SideRight,
 					Align:      dropdownmenu.AlignStart,
 					SideOffset: 4,

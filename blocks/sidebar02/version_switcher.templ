@@ -12,7 +12,7 @@ templ VersionSwitcher(versions []string, defaultVersion string) {
 			@dropdownmenu.DropdownMenu() {
 				@sidebar.MenuButton(sidebar.MenuButtonProps{
 					Size:       sidebar.MenuButtonSizeLg,
-					Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+					Class:      "data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
 					Attributes: dropdownmenu.Trigger(ctx),
 				}) {
 					<div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
@@ -25,7 +25,6 @@ templ VersionSwitcher(versions []string, defaultVersion string) {
 					@icon.ChevronsUpDown(icon.Props{Class: "ml-auto"})
 				}
 				@dropdownmenu.Content(dropdownmenu.ContentProps{
-					Class:      "w-(--radix-dropdown-menu-trigger-width)",
 					Align:      dropdownmenu.AlignStart,
 					Attributes: templ.Attributes{"data-sidebar02-version-switcher": ""},
 				}) {

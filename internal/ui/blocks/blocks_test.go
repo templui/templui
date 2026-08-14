@@ -74,3 +74,42 @@ func TestVerticalBlockSeparatorsUseBaseUIAlignment(t *testing.T) {
 		}
 	}
 }
+
+func TestBlocksUseBaseUIStateContracts(t *testing.T) {
+	forbidden := []string{
+		"--radix-",
+		"data-[state=open]",
+		"data-[state=closed]",
+		"data-[state=checked]",
+		"data-[state=unchecked]",
+		"data-[state=on]",
+		"data-[state=off]",
+		"data-[state=delayed-open]",
+		"group-data-[state=",
+		"[data-state=open]",
+		"[data-state=closed]",
+		"[data-state=checked]",
+		"[data-state=unchecked]",
+		"[data-state=on]",
+		"[data-state=off]",
+	}
+
+	for _, item := range registry.Blocks() {
+		component := Component(item.Name)
+		if component == nil {
+			continue
+		}
+
+		var output bytes.Buffer
+		if err := component.Render(context.Background(), &output); err != nil {
+			t.Fatalf("%s: render: %v", item.Name, err)
+		}
+
+		html := output.String()
+		for _, legacy := range forbidden {
+			if strings.Contains(html, legacy) {
+				t.Errorf("%s: rendered legacy Radix contract %q", item.Name, legacy)
+			}
+		}
+	}
+}

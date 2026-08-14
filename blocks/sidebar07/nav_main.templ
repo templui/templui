@@ -39,7 +39,7 @@ templ NavMain(items []NavMainItem) {
 								@item.Icon()
 							}
 							<span>{ item.Title }</span>
-							@icon.ChevronRight(icon.Props{Class: "ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"})
+							@icon.ChevronRight(icon.Props{Class: "ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90"})
 						}
 						@collapsible.Content() {
 							@sidebar.MenuSub() {

@@ -126,7 +126,7 @@ func NavMain(items []NavMainItem) templ.Component {
 								return nil
 							})
 							templ_7745c5c3_Err = sidebar.MenuButton(sidebar.MenuButtonProps{
-								Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+								Class:      "aria-expanded:bg-muted",
 								Attributes: dropdownmenu.Trigger(ctx),
 							}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var6), templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {

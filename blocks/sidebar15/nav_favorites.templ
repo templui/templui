@@ -30,6 +30,7 @@ templ NavFavorites(favorites []Favorite) {
 					@dropdownmenu.DropdownMenu() {
 						@sidebar.MenuAction(sidebar.MenuActionProps{
 							ShowOnHover: true,
+							Class:       "aria-expanded:bg-muted",
 							Attributes:  dropdownmenu.Trigger(ctx),
 						}) {
 							@icon.Ellipsis()

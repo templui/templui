@@ -21,7 +21,7 @@ templ NavDocuments(items []DocumentItem) {
 					@dropdownmenu.DropdownMenu() {
 						@sidebar.MenuAction(sidebar.MenuActionProps{
 							ShowOnHover: true,
-							Class:       "rounded-sm data-[state=open]:bg-accent",
+							Class:       "aria-expanded:bg-muted",
 							Attributes:  dropdownmenu.Trigger(ctx),
 						}) {
 							@icon.Ellipsis()

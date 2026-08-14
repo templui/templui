@@ -193,7 +193,7 @@ func NavWorkspaces(workspaces []Workspace) templ.Component {
 									return nil
 								})
 								templ_7745c5c3_Err = sidebar.MenuAction(sidebar.MenuActionProps{
-									Class:       "left-2 bg-sidebar-accent text-sidebar-accent-foreground data-[state=open]:rotate-90",
+									Class:       "left-2 bg-sidebar-accent text-sidebar-accent-foreground data-popup-open:rotate-90",
 									ShowOnHover: true,
 									Attributes:  collapsible.Trigger(ctx),
 								}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var11), templ_7745c5c3_Buffer)

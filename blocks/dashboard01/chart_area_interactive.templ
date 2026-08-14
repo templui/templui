@@ -264,7 +264,7 @@ templ ChartAreaInteractive() {
 				// time range must stay active, so re-press it.
 				const toggle = e.target.closest("[data-tui-toggle]");
 				if (toggle && e.detail.pressed === false) {
-					toggle.setAttribute("data-state", "on");
+					toggle.setAttribute("data-pressed", "");
 					toggle.setAttribute("aria-pressed", "true");
 				}
 				const card = group.closest("[data-slot=card]");
@@ -285,7 +285,7 @@ templ ChartAreaInteractive() {
 				if (!group) return;
 				group.querySelectorAll("[data-tui-toggle]").forEach((t) => {
 					const on = t.getAttribute("data-tui-toggle-value") === e.detail.value;
-					t.setAttribute("data-state", on ? "on" : "off");
+					t.toggleAttribute("data-pressed", on);
 					t.setAttribute("aria-pressed", String(on));
 				});
 				group.setAttribute("data-tui-toggle-group-value", e.detail.value);

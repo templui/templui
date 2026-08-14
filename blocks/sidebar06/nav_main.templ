@@ -27,7 +27,7 @@ templ NavMain(items []NavMainItem) {
 				@dropdownmenu.DropdownMenu() {
 					@sidebar.MenuItem() {
 						@sidebar.MenuButton(sidebar.MenuButtonProps{
-							Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+							Class:      "aria-expanded:bg-muted",
 							Attributes: dropdownmenu.Trigger(ctx),
 						}) {
 							{ item.Title }

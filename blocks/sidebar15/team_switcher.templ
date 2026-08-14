@@ -27,7 +27,7 @@ templ TeamSwitcher(teams []Team) {
 			@sidebar.MenuItem() {
 				@dropdownmenu.DropdownMenu(dropdownmenu.Props{ID: "sidebar15-team-menu"}) {
 					@sidebar.MenuButton(sidebar.MenuButtonProps{
-						Class:      "w-fit px-1.5",
+						Class:      "w-fit px-1.5 aria-expanded:bg-muted aria-expanded:text-foreground",
 						Attributes: dropdownmenu.Trigger(ctx),
 					}) {
 						<div class="flex aspect-square size-5 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">

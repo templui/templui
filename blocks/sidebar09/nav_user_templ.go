@@ -180,7 +180,7 @@ func NavUser(user User) templ.Component {
 					})
 					templ_7745c5c3_Err = sidebar.MenuButton(sidebar.MenuButtonProps{
 						Size:       sidebar.MenuButtonSizeLg,
-						Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground md:h-8 md:p-0",
+						Class:      "md:h-8 md:p-0 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
 						Attributes: dropdownmenu.Trigger(ctx),
 					}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
@@ -515,7 +515,7 @@ func NavUser(user User) templ.Component {
 						return nil
 					})
 					templ_7745c5c3_Err = dropdownmenu.Content(dropdownmenu.ContentProps{
-						Class:      "w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg",
+						Class:      "min-w-56 rounded-lg",
 						Side:       dropdownmenu.SideRight,
 						Align:      dropdownmenu.AlignEnd,
 						SideOffset: 4,

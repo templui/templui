@@ -128,7 +128,7 @@ func NavActions() templ.Component {
 			templ_7745c5c3_Err = button.Button(button.Props{
 				Variant:    button.VariantGhost,
 				Size:       button.SizeIcon,
-				Class:      "h-7 w-7 data-[state=open]:bg-accent",
+				Class:      "h-7 w-7 data-popup-open:bg-accent",
 				Attributes: popover.Trigger(ctx),
 			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {

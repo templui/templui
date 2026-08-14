@@ -116,7 +116,7 @@ func VersionSwitcher(versions []string, defaultVersion string) templ.Component {
 					})
 					templ_7745c5c3_Err = sidebar.MenuButton(sidebar.MenuButtonProps{
 						Size:       sidebar.MenuButtonSizeLg,
-						Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+						Class:      "data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
 						Attributes: dropdownmenu.Trigger(ctx),
 					}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
@@ -158,7 +158,7 @@ func VersionSwitcher(versions []string, defaultVersion string) templ.Component {
 								var templ_7745c5c3_Var9 string
 								templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(version)
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar01/version_switcher.templ`, Line: 36, Col: 17}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar01/version_switcher.templ`, Line: 35, Col: 17}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 								if templ_7745c5c3_Err != nil {
@@ -180,7 +180,6 @@ func VersionSwitcher(versions []string, defaultVersion string) templ.Component {
 						return nil
 					})
 					templ_7745c5c3_Err = dropdownmenu.Content(dropdownmenu.ContentProps{
-						Class:      "w-(--radix-dropdown-menu-trigger-width)",
 						Align:      dropdownmenu.AlignStart,
 						Attributes: templ.Attributes{"data-sidebar01-version-switcher": ""},
 					}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var7), templ_7745c5c3_Buffer)
@@ -212,7 +211,7 @@ func VersionSwitcher(versions []string, defaultVersion string) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar01/version_switcher.templ`, Line: 44, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar01/version_switcher.templ`, Line: 43, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {

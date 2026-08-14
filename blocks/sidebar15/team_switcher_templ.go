@@ -136,7 +136,7 @@ func TeamSwitcher(teams []Team) templ.Component {
 							return nil
 						})
 						templ_7745c5c3_Err = sidebar.MenuButton(sidebar.MenuButtonProps{
-							Class:      "w-fit px-1.5",
+							Class:      "w-fit px-1.5 aria-expanded:bg-muted aria-expanded:text-foreground",
 							Attributes: dropdownmenu.Trigger(ctx),
 						}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {

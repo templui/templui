@@ -193,7 +193,7 @@ func NavMain(items []NavMainItem) templ.Component {
 									return nil
 								})
 								templ_7745c5c3_Err = sidebar.MenuAction(sidebar.MenuActionProps{
-									Class:      "data-[state=open]:rotate-90",
+									Class:      "aria-expanded:rotate-90",
 									Attributes: collapsible.Trigger(ctx),
 								}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var9), templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {

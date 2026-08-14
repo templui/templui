@@ -52,7 +52,7 @@ templ NavActions() {
 			@button.Button(button.Props{
 				Variant:    button.VariantGhost,
 				Size:       button.SizeIcon,
-				Class:      "h-7 w-7 data-[state=open]:bg-accent",
+				Class:      "h-7 w-7 data-popup-open:bg-accent",
 				Attributes: popover.Trigger(ctx),
 			}) {
 				@icon.Ellipsis()

@@ -333,7 +333,7 @@ templ dataTableScript() {
 				const root = document.querySelector("[data-dashboard01-table]");
 				if (!root) return;
 				const index = parseInt(item.getAttribute("data-dashboard01-column"), 10);
-				const show = item.getAttribute("data-state") === "checked";
+				const show = item.hasAttribute("data-checked");
 				root.querySelectorAll("thead tr, tbody tr").forEach((row) => {
 					const cell = row.children[index];
 					if (cell) cell.hidden = !show;
@@ -485,7 +485,7 @@ templ dataTableRow(item Item, page, size int) {
 			@dropdownmenu.DropdownMenu() {
 				@button.Button(button.Props{
 					Variant:    button.VariantGhost,
-					Class:      "flex size-8 text-muted-foreground data-[state=open]:bg-muted",
+					Class:      "flex size-8 text-muted-foreground data-popup-open:bg-muted",
 					Size:       button.SizeIcon,
 					Attributes: dropdownmenu.Trigger(ctx),
 				}) {

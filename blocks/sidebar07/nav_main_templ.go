@@ -158,7 +158,7 @@ func NavMain(items []NavMainItem) templ.Component {
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
-								templ_7745c5c3_Err = icon.ChevronRight(icon.Props{Class: "ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"}).Render(ctx, templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = icon.ChevronRight(icon.Props{Class: "ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90"}).Render(ctx, templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}

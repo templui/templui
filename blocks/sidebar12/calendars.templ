@@ -25,7 +25,7 @@ templ Calendars(calendars []Calendar) {
 					Attributes: collapsible.Trigger(ctx),
 				}) {
 					{ calendar.Name }
-					@icon.ChevronRight(icon.Props{Class: "ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90"})
+					@icon.ChevronRight(icon.Props{Class: "ml-auto transition-transform group-data-open/collapsible:rotate-90"})
 				}
 				@collapsible.Content() {
 					@sidebar.GroupContent() {

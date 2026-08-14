@@ -183,6 +183,7 @@ func NavProjects(projects []Project) templ.Component {
 							})
 							templ_7745c5c3_Err = sidebar.MenuAction(sidebar.MenuActionProps{
 								ShowOnHover: true,
+								Class:       "aria-expanded:bg-muted",
 								Attributes:  dropdownmenu.Trigger(ctx),
 							}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var9), templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {

@@ -21,7 +21,7 @@ templ NavWorkspaces(workspaces []Workspace) {
 								<span>{ workspace.Name }</span>
 							}
 							@sidebar.MenuAction(sidebar.MenuActionProps{
-								Class:       "left-2 bg-sidebar-accent text-sidebar-accent-foreground data-[state=open]:rotate-90",
+								Class:       "left-2 bg-sidebar-accent text-sidebar-accent-foreground data-popup-open:rotate-90",
 								ShowOnHover: true,
 								Attributes:  collapsible.Trigger(ctx),
 							}) {
