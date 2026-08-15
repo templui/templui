@@ -9,6 +9,7 @@
   const TRIGGER_COLLISION = 20; // trigger this close to an edge -> popper
   const TOL = 1; // scroll edge tolerance
   const ARROW_TICK_MS = 40; // hovering a scroll arrow scrolls one item per tick
+  const SELECTED_DELAY = 400; // mouseup selection stays disabled this long after open
 
   function allContents() {
     return document.querySelectorAll("[data-tui-select-content]");
@@ -496,6 +497,21 @@
       if (c !== content) close(c);
     });
     clearTimeout(content._tuiHide);
+    // A press on the trigger can open the popup under the pointer (aligned
+    // mode). Mouseup selection stays disabled briefly so releasing over the
+    // selected item or a neighboring item doesn't commit an accidental
+    // selection (Base UI's selectionRef + SELECTED_DELAY). Dragging can
+    // re-arm unselected mouseup sooner, see the pointermove handler.
+    content._tuiSelection = {
+      allowSelectedMouseUp: false,
+      allowUnselectedMouseUp: false,
+      dragY: 0,
+    };
+    clearTimeout(content._tuiSelectedDelay);
+    content._tuiSelectedDelay = setTimeout(() => {
+      content._tuiSelection.allowSelectedMouseUp = true;
+      content._tuiSelection.allowUnselectedMouseUp = true;
+    }, SELECTED_DELAY);
     portal(content);
     lockScroll(); // Base UI's select is modal by default: no page scroll while open
     // z-index portal like shadcn (no native top layer); re-append
@@ -536,6 +552,12 @@
     if (content.hidden) return;
     stopAutoPositioning(content);
     stopArrowScroll();
+    clearTimeout(content._tuiSelectedDelay);
+    content._tuiSelection = {
+      allowSelectedMouseUp: false,
+      allowUnselectedMouseUp: false,
+      dragY: 0,
+    };
     content.style.visibility = "";
     setTransitionAttribute(content, "data-starting-style", false);
     setState(content, "closed");
@@ -699,18 +721,82 @@
   // programmatic .click()) toggles instead.
   const pressedTriggers = new WeakSet();
 
+  function isMouseWithinBounds(e, el) {
+    const rect = el.getBoundingClientRect();
+    return (
+      e.clientX >= rect.left &&
+      e.clientX <= rect.right &&
+      e.clientY >= rect.top &&
+      e.clientY <= rect.bottom
+    );
+  }
+
+  // Pendant of SelectTrigger's mousedown handler: the press that opened the
+  // popup cancels the open again when released outside the trigger and the
+  // popup positioner.
+  function armCancelOpen(trigger, content) {
+    // Firefox can fire the mouseup upon mousedown, hence the deferred attach.
+    setTimeout(() => {
+      document.addEventListener(
+        "mouseup",
+        (e) => {
+          const target = e.target instanceof Element ? e.target : null;
+          // Don't treat the release as an outside press when it lands on the
+          // trigger or inside the popup (or their children).
+          if (target && (trigger.contains(target) || content.contains(target))) return;
+          if (isMouseWithinBounds(e, trigger)) return;
+          close(content);
+        },
+        { once: true },
+      );
+    }, 0);
+  }
+
   document.addEventListener("pointerdown", (e) => {
     if (e.button !== 0 || !(e.target instanceof Element)) return;
     const trigger = e.target.closest("[data-tui-select-trigger]");
     if (trigger) {
+      // Touch opens on the click that fires at release (Base UI opens on
+      // the compat mousedown, which for touch also fires post-touchend).
+      // Opening at press would put the aligned popup under the still-down
+      // finger, and the tap's click, hit-tested at the release point,
+      // would land on the item above the trigger and instantly commit it.
+      if (e.pointerType === "touch") return;
       pressedTriggers.add(trigger);
       // Keep the browser from focusing the trigger button, focus lives on
       // the selected item while the listbox is open (Base UI focus scope).
       e.preventDefault();
-      if (!trigger.disabled) toggle(trigger);
+      if (!trigger.disabled) {
+        const content = contentFor(trigger);
+        if (content) {
+          if (isOpen(content)) {
+            requestOpenChange(content, false);
+          } else {
+            requestOpenChange(content, true);
+            armCancelOpen(trigger, content);
+          }
+        }
+      }
       return;
     }
+    // Pendant of SelectItem's allowMouseSelectionRef: a real pointer click
+    // only commits when its press started on the item. The stray click the
+    // browser hit-tests onto the popup that just opened over the trigger
+    // (touch fires its compatibility click at the tap position) never did.
+    const item = e.target.closest("[data-tui-select-item]");
+    if (item) {
+      item._tuiPointerType = e.pointerType;
+      item._tuiAllowMouseSelection = true;
+      const content = item.closest("[data-tui-select-content]");
+      if (content && content._tuiSelection) content._tuiSelection.dragY = 0;
+    }
     if (!e.target.closest("[data-tui-select-content]")) requestCloseAll();
+  });
+
+  document.addEventListener("pointerover", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const item = e.target.closest("[data-tui-select-item]");
+    if (item) item._tuiPointerType = e.pointerType;
   });
 
   document.addEventListener("click", (e) => {
@@ -726,10 +812,47 @@
     }
 
     const item = e.target.closest("[data-tui-select-item]");
-    if (item && !item.hasAttribute("data-disabled")) {
+    if (item) {
       const content = item.closest("[data-tui-select-content]");
-      if (content) selectItem(content, item);
+      if (!content) return;
+      // Virtual clicks (detail 0: keyboard, assistive technology, .click())
+      // represent explicit activation and always commit; so do touch clicks,
+      // whose press necessarily started on the item.
+      const isMouseClick = (item._tuiPointerType || "mouse") !== "touch";
+      const isVirtualClick = e.detail === 0;
+      const isInvalidMouseClick =
+        isMouseClick && !isVirtualClick && !item._tuiAllowMouseSelection;
+      item._tuiAllowMouseSelection = false;
+      if (item.hasAttribute("data-disabled") || isInvalidMouseClick) return;
+      selectItem(content, item);
     }
+  });
+
+  // Pendant of SelectItem's mouseup: releasing a press that started on the
+  // trigger commits the item under the pointer (press trigger, drag, release
+  // to select), once the SELECTED_DELAY / drag guards allow it. Touch never
+  // selects on mouseup, only on click.
+  document.addEventListener("mouseup", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const item = e.target.closest("[data-tui-select-item]");
+    if (!item) return;
+    const content = item.closest("[data-tui-select-content]");
+    const selection = content && content._tuiSelection;
+    if (!selection) return;
+    selection.dragY = 0;
+    if (item.hasAttribute("data-disabled") || item._tuiPointerType === "touch") return;
+    // Regular clicks are committed by the click event.
+    if (item._tuiAllowMouseSelection) return;
+    const selected = item.hasAttribute("data-selected");
+    if (
+      (!selection.allowSelectedMouseUp && selected) ||
+      (!selection.allowUnselectedMouseUp && !selected)
+    ) {
+      return;
+    }
+    item._tuiAllowMouseSelection = true;
+    item.click();
+    item._tuiAllowMouseSelection = false;
   });
 
   let typeBuffer = "";
@@ -799,7 +922,19 @@
   document.addEventListener("pointermove", (e) => {
     if (!(e.target instanceof Element)) return;
     const item = e.target.closest("[data-tui-select-item]");
-    if (item && !item.hasAttribute("data-disabled") && document.activeElement !== item) {
+    if (!item) return;
+    // Dragging with the button held re-arms unselected mouseup selection
+    // before SELECTED_DELAY has elapsed, once the drag covers >= 8px.
+    if (e.pointerType === "mouse" && e.buttons === 1) {
+      const content = item.closest("[data-tui-select-content]");
+      if (content && content._tuiSelection) {
+        content._tuiSelection.dragY += e.movementY;
+        if (content._tuiSelection.dragY ** 2 >= 64) {
+          content._tuiSelection.allowUnselectedMouseUp = true;
+        }
+      }
+    }
+    if (!item.hasAttribute("data-disabled") && document.activeElement !== item) {
       item.focus({ preventScroll: true });
     }
   });

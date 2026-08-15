@@ -6,7 +6,7 @@ name: deploy
 
 on:
   push:
-    branches: [v2, main]
+    branches: [main]
 
 permissions:
   contents: read

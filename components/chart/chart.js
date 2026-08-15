@@ -554,8 +554,9 @@ function renderCartesian(panel, m, state, alpha = 1) {
 
   // Explicit pixel size like Recharts' Surface: the svg never stretches
   // between resize frames, every frame lays out fresh. The accessibility
-  // layer puts Recharts' role and tabIndex on the surface.
-  const a11y = m.accessibilityLayer ? ` role="application" tabindex="0"` : "";
+  // layer puts Recharts' role and tabIndex on the surface; it is on unless
+  // the chart opted out, Recharts' accessibilityLayer !== false.
+  const a11y = m.accessibilityLayer !== false ? ` role="application" tabindex="0"` : "";
   let svg = `<svg class="recharts-surface"${a11y} width="${fmtF(W)}" height="${fmtF(H)}" viewBox="0 0 ${fmtF(W)} ${fmtF(H)}">`;
 
   if (m.defs && m.defs.length) {
@@ -1802,6 +1803,13 @@ function initPanel(script) {
     // The points this panel drew are what the next visible panel morphs
     // from, Recharts' previousPointsRef.
     if (state.points) container._tuiActivePoints = state.points;
+    // Recharts renders the cursor and the active dots from the tooltip
+    // state on every pass, so a hover keeps its overlays through the
+    // entrance animation even though each frame rebuilds the surface.
+    if (state.activeIndex != null) {
+      showCursor(panel, m, state, state.activeIndex);
+      showActiveDots(panel, m, state, state.activeIndex);
+    }
     // The default tooltip waits for the first real layout of a panel that
     // mounted hidden.
     if (state.onFirstRender && state.geom) {
@@ -1858,6 +1866,18 @@ function initPanel(script) {
 
   const wrapper = tooltipWrapper(container);
 
+  // TooltipBoundingBox: Escape dismisses the tooltip box at its current
+  // coordinate; the cursor and the active dots stay up, and the box comes
+  // back as soon as the coordinate changes.
+  state.dismissed = false;
+  state.dismissedAt = { x: 0, y: 0 };
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    state.dismissed = true;
+    state.dismissedAt = state.tooltipCoord || { x: 0, y: 0 };
+    wrapper.style.visibility = "hidden";
+  });
+
   // Like Recharts' inRange: the tooltip only activates while the pointer
   // is inside the plot rectangle, not over the axis labels below.
   const activeIndexAt = (chartX, chartY) => {
@@ -1892,7 +1912,14 @@ function initPanel(script) {
     return Math.max(0, Math.min(g.n - 1, Math.round((chartX - g.plotX) / step)));
   };
 
-  panel.addEventListener("pointermove", (e) => {
+  // parseEventsOfWrapper: the tooltip listens to mouse events, and an axis
+  // tooltip additionally to touchmove, whose handleTouchMove feeds the
+  // changed touch into the mouse handler. A touch tap shows the tooltip
+  // through the browser's compatibility mousemove and it stays until a tap
+  // elsewhere fires mouseleave; a finger dragged across the plot keeps
+  // scrubbing through touchmove even while the page scrolls. An item
+  // tooltip (pie) attaches no wrapper touch events.
+  const handleMouseMove = (e) => {
     if (m.kind === "pie") {
       const sector = e.target.closest(".recharts-sector");
       const idx = sector ? parseInt(sector.getAttribute("data-tui-chart-sector") || "-1", 10) : -1;
@@ -1907,11 +1934,12 @@ function initPanel(script) {
     const chartX = e.clientX - rect.left;
     const chartY = e.clientY - rect.top;
     const i = activeIndexAt(chartX, chartY);
+    state.hoverActive = i >= 0;
     if (i < 0) {
-      wrapper.style.visibility = "hidden";
-      hideCursor(panel);
+      resolveTooltip();
       return;
     }
+    state.activeIndex = i;
     showCursor(panel, m, state, i);
     showActiveDots(panel, m, state, i);
     // getActiveCoordinate: the category axis snaps to its tick and the
@@ -1923,7 +1951,15 @@ function initPanel(script) {
     }
     const snap = g ? g.cats[i] : null;
     positionTooltip(e, g && g.vertical ? null : snap, g && g.vertical ? snap : null, i);
-  });
+  };
+  panel.addEventListener("mousemove", handleMouseMove);
+  if (m.kind !== "pie") {
+    panel.addEventListener("touchmove", (e) => {
+      if (e.changedTouches != null && e.changedTouches.length > 0) {
+        handleMouseMove(e.changedTouches[0]);
+      }
+    });
+  }
 
   function positionTooltip(e, snapX, snapY, i, pieIndex = 0) {
     const wasHidden = wrapper.style.visibility !== "visible";
@@ -1935,6 +1971,15 @@ function initPanel(script) {
     const prect = panel.getBoundingClientRect();
     const px = snapX != null ? snapX + (prect.left - crect.left) : e.clientX - crect.left;
     const py = snapY != null ? snapY + (prect.top - crect.top) : e.clientY - crect.top;
+    // A dismissed tooltip stays hidden until its coordinate changes.
+    if (state.dismissed) {
+      if (px === state.dismissedAt.x && py === state.dismissedAt.y) {
+        wrapper.style.visibility = "hidden";
+      } else {
+        state.dismissed = false;
+      }
+    }
+    state.tooltipCoord = { x: px, y: py };
     const tx = tooltipTranslate(px, tw, 0, crect.width);
     const ty = tooltipTranslate(py, th, 0, crect.height);
     if (wasHidden) {
@@ -1949,9 +1994,9 @@ function initPanel(script) {
     wrapper.style.transform = `translate(${tx}px, ${ty}px)`;
   }
 
-  panel.addEventListener("pointerleave", () => {
-    wrapper.style.visibility = "hidden";
-    hideCursor(panel);
+  panel.addEventListener("mouseleave", () => {
+    state.hoverActive = false;
+    resolveTooltip();
   });
 
   // displayDefaultTooltip: a Tooltip with a defaultIndex shows once on
@@ -1963,6 +2008,7 @@ function initPanel(script) {
       const g = state.geom;
       if (!g || !g.cats || di < 0 || di > g.cats.length - 1) return;
       const dep = (g.plotY + g.H) / 2;
+      state.activeIndex = di;
       showCursor(panel, m, state, di);
       showActiveDots(panel, m, state, di);
       positionTooltip(null, g.vertical ? dep : g.cats[di], g.vertical ? g.cats[di] : dep, di);
@@ -1971,34 +2017,75 @@ function initPanel(script) {
     else state.onFirstRender = show;
   }
 
-  // The AccessibilityManager pendant: with the accessibility layer the
-  // surface is focusable, focus shows the tooltip at the active index and
-  // the arrow keys walk it through the categories. Recharts spoofs a mouse
-  // move at the tick coordinate and offset.top plus half the height, and
+  // The keyboard interaction of Recharts' keyboardEventsMiddleware: the
+  // first focus activates index 0, the arrow keys walk the categories and
+  // stop at the ends, Enter toggles the interaction at the current index
+  // and blur deactivates it but keeps the index.
+  state.keyboard = { active: false, index: null };
+
+  // spoofKeyboard shows the keyboard tooltip like Recharts spoofs a mouse
+  // move: at the tick coordinate and offset.top plus half the height, and
   // only in the horizontal layout.
-  if (m.accessibilityLayer) {
-    state.a11yIndex = typeof di === "number" ? di : 0;
-    const spoof = () => {
-      const g = state.geom;
-      if (!g || !g.cats || g.vertical) return;
-      const i = Math.min(Math.max(state.a11yIndex, 0), g.cats.length - 1);
-      state.a11yIndex = i;
-      const rect = panel.getBoundingClientRect();
-      const e = { clientX: rect.left + g.cats[i], clientY: rect.top + g.plotY + g.H / 2 };
-      showCursor(panel, m, state, i);
-      showActiveDots(panel, m, state, i);
-      positionTooltip(e, g.cats[i], null, i);
-    };
-    panel.addEventListener("focusin", spoof);
+  const spoofKeyboard = () => {
+    const g = state.geom;
+    if (!g || !g.cats || g.vertical) return;
+    const i = Math.min(Math.max(state.keyboard.index, 0), g.cats.length - 1);
+    const rect = panel.getBoundingClientRect();
+    const e = { clientX: rect.left + g.cats[i], clientY: rect.top + g.plotY + g.H / 2 };
+    state.activeIndex = i;
+    showCursor(panel, m, state, i);
+    showActiveDots(panel, m, state, i);
+    positionTooltip(e, g.cats[i], null, i);
+  };
+
+  // combineTooltipInteractionState: an active hover always wins, then the
+  // active keyboard interaction, otherwise the tooltip hides. This is why
+  // a touch tap stays where the finger is even though the tap also
+  // focuses the surface.
+  function resolveTooltip() {
+    if (state.hoverActive) return;
+    if (state.keyboard.active) {
+      spoofKeyboard();
+      return;
+    }
+    state.activeIndex = null;
+    wrapper.style.visibility = "hidden";
+    hideCursor(panel);
+  }
+
+  if (m.accessibilityLayer !== false) {
+    // focusAction: only the first focus activates the keyboard
+    // interaction, at index 0; a refocus after blur keeps the tooltip
+    // hidden until the arrow keys move it again.
+    panel.addEventListener("focusin", () => {
+      if (state.keyboard.active) return;
+      if (state.keyboard.index == null) {
+        state.keyboard = { active: true, index: 0 };
+        resolveTooltip();
+      }
+    });
+    // blurAction deactivates the interaction but keeps the index.
+    panel.addEventListener("focusout", () => {
+      if (state.keyboard.active) {
+        state.keyboard.active = false;
+        resolveTooltip();
+      }
+    });
     panel.addEventListener("keydown", (e) => {
-      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
       const g = state.geom;
       if (!g || !g.cats || g.vertical) return;
-      state.a11yIndex =
-        e.key === "ArrowRight"
-          ? Math.min(state.a11yIndex + 1, g.cats.length - 1)
-          : Math.max(state.a11yIndex - 1, 0);
-      spoof();
+      if (e.key === "Enter") {
+        if (state.keyboard.index == null) return;
+        state.keyboard.active = !state.keyboard.active;
+        resolveTooltip();
+        return;
+      }
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      const movement = e.key === "ArrowRight" ? 1 : -1;
+      const next = state.keyboard.index == null ? (movement > 0 ? 0 : g.cats.length - 1) : state.keyboard.index + movement;
+      if (next < 0 || next > g.cats.length - 1) return;
+      state.keyboard = { active: true, index: next };
+      resolveTooltip();
     });
   }
 }

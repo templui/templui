@@ -48,6 +48,13 @@ func TestClientRequestsCancelableValueAndOpenChanges(t *testing.T) {
 		`data-tui-select-open-controlled`,
 		`FloatingUIDOM.autoUpdate(trigger, content, update`,
 		`layoutShift: typeof IntersectionObserver !== "undefined"`,
+		`const SELECTED_DELAY = 400`,
+		`item._tuiAllowMouseSelection = true`,
+		`item._tuiPointerType === "touch"`,
+		`document.addEventListener("mouseup"`,
+		`item.hasAttribute("data-selected")`,
+		`requestOpenChange(content, false)`,
+		`requestOpenChange(content, true)`,
 	} {
 		if !strings.Contains(js, want) {
 			t.Fatalf("client behavior is missing %q", want)
