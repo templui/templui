@@ -4,6 +4,7 @@
 package inliner
 
 import (
+	"regexp"
 	"os"
 	"strings"
 	"testing"
@@ -24,7 +25,8 @@ func TestTransformStyleButtonTempl(t *testing.T) {
 	if !strings.Contains(out, `return "`+novaButtonVariantDefault+`"`) {
 		t.Errorf("default variant did not expand to the exact nova utilities")
 	}
-	if strings.Contains(out, "cn-") {
+	// \bcn- keeps the module path (shadcn-templ) out of the match.
+	if regexp.MustCompile(`\bcn-`).MatchString(out) {
 		t.Errorf("inlined output still contains cn-")
 	}
 	if !strings.Contains(out, "bg-primary") {

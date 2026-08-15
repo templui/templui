@@ -11,8 +11,8 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
 )
 
-// The full-page example from sidebar-icon-example.tsx: an icon-collapsible
-// sidebar with team switcher, collapsible nav and a user footer menu.
+// Full-page icon-collapsible sidebar with team switcher, collapsible nav,
+// and a user footer menu.
 
 var sidebarIconExampleUser = struct {
 	Name   string
@@ -98,7 +98,7 @@ templ sidebarIconExampleTeamSwitcher() {
 			@dropdownmenu.DropdownMenu(dropdownmenu.Props{ID: "sidebar-icon-example-team-menu"}) {
 				@sidebar.MenuButton(sidebar.MenuButtonProps{
 					Size:       sidebar.MenuButtonSizeLg,
-					Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+					Class:      "data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
 					Attributes: dropdownmenu.Trigger(ctx),
 				}) {
 					<span class="inline-flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground [&_svg]:size-4">
@@ -143,8 +143,8 @@ templ sidebarIconExampleNavMainGroup() {
 		@sidebar.Menu() {
 			for _, navItem := range sidebarIconExampleNavMain {
 				@collapsible.Collapsible(collapsible.Props{
-					Open:  navItem.IsActive,
-					Class: "group/collapsible",
+					DefaultOpen: navItem.IsActive,
+					Class:       "group/collapsible",
 				}) {
 					@sidebar.MenuItem() {
 						@sidebar.MenuButton(sidebar.MenuButtonProps{
@@ -153,7 +153,7 @@ templ sidebarIconExampleNavMainGroup() {
 						}) {
 							@navItem.Icon()
 							<span>{ navItem.Title }</span>
-							@icon.ChevronRight(icon.Props{Class: "ml-auto transition-transform duration-100 group-data-[state=open]/collapsible:rotate-90"})
+							@icon.ChevronRight(icon.Props{Class: "ml-auto transition-transform duration-100 group-data-open/collapsible:rotate-90"})
 						}
 						@collapsible.Content() {
 							@sidebar.MenuSub() {
@@ -197,7 +197,7 @@ templ sidebarIconExampleNavUser() {
 			@dropdownmenu.DropdownMenu() {
 				@sidebar.MenuButton(sidebar.MenuButtonProps{
 					Size:       sidebar.MenuButtonSizeLg,
-					Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+					Class:      "data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
 					Attributes: dropdownmenu.Trigger(ctx),
 				}) {
 					@avatar.Avatar() {
@@ -292,7 +292,7 @@ templ SidebarIconExample() {
 	}
 	<script nonce={ templ.GetNonce(ctx) }>
 		(() => {
-			// Team switching, the pendant of the demo's activeTeam React state.
+			// Keep the selected team details in sync.
 			const plans = ["Enterprise", "Startup", "Free"];
 			document.addEventListener("click", (e) => {
 				if (!(e.target instanceof Element)) return;

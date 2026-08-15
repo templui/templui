@@ -13,7 +13,6 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/tooltip"
 )
 
-// The kitchen-sink page from button-group-example.tsx.
 templ buttonGroupExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {
@@ -195,13 +194,13 @@ templ buttonGroupExampleWithSelect() {
 				Amount
 			}
 			@buttongroup.ButtonGroup() {
-				@selectcomp.Select() {
+				@selectcomp.Select(selectcomp.Props{DefaultValue: "$"}) {
 					@selectcomp.Trigger() {
 						@selectcomp.Value()
 					}
 					@selectcomp.Content() {
 						@selectcomp.Group() {
-							@selectcomp.Item(selectcomp.ItemProps{Value: "$", Label: "$", Selected: true}) {
+							@selectcomp.Item(selectcomp.ItemProps{Value: "$", Label: "$"}) {
 								$
 							}
 							@selectcomp.Item(selectcomp.ItemProps{Value: "€", Label: "€"}) {
@@ -305,13 +304,13 @@ templ buttonGroupExampleWithLike() {
 templ buttonGroupExampleWithSelectAndInput() {
 	@buttonGroupExampleSection("With Select and Input") {
 		@buttongroup.ButtonGroup() {
-			@selectcomp.Select() {
+			@selectcomp.Select(selectcomp.Props{DefaultValue: "hours"}) {
 				@selectcomp.Trigger(selectcomp.TriggerProps{ID: "button-group-example-duration"}) {
 					@selectcomp.Value()
 				}
 				@selectcomp.Content(selectcomp.ContentProps{Align: selectcomp.AlignStart}) {
 					@selectcomp.Group() {
-						@selectcomp.Item(selectcomp.ItemProps{Value: "hours", Label: "Hours", Selected: true}) {
+						@selectcomp.Item(selectcomp.ItemProps{Value: "hours", Label: "Hours"}) {
 							Hours
 						}
 						@selectcomp.Item(selectcomp.ItemProps{Value: "days", Label: "Days"}) {

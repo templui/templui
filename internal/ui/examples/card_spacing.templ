@@ -24,14 +24,14 @@ var spacingOptions = []spacingOption{
 templ CardSpacing() {
 	<div class="mx-auto grid w-full max-w-sm gap-4" data-card-spacing-demo>
 		@togglegroup.ToggleGroup(togglegroup.Props{
-			Variant: togglegroup.VariantOutline,
-			Size:    togglegroup.SizeSm,
-			Class:   "justify-center",
+			Variant:      togglegroup.VariantOutline,
+			Size:         togglegroup.SizeSm,
+			Class:        "justify-center",
+			DefaultValue: []string{spacingOptions[0].Value},
 		}) {
-			for i, option := range spacingOptions {
+			for _, option := range spacingOptions {
 				@togglegroup.Item(togglegroup.ItemProps{
 					Value:      option.Value,
-					Pressed:    i == 0,
 					Attributes: templ.Attributes{"data-spacing-class": option.Class},
 				}) {
 					{ option.Label }
@@ -95,8 +95,7 @@ templ CardSpacing() {
 		}
 	</div>
 	<script nonce={ templ.GetNonce(ctx) }>
-		// The vanilla pendant of the demo's React state, the pressed toggle
-		// swaps the spacing class on the card.
+		// The pressed toggle swaps the spacing class on the card.
 		document.addEventListener('toggle-change', (e) => {
 			const demo = e.target.closest('[data-card-spacing-demo]');
 			if (!demo || !e.detail.pressed) return;

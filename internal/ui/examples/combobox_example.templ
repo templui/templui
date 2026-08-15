@@ -16,7 +16,6 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
-// The kitchen-sink page from combobox-example.tsx.
 templ comboboxExampleSection(title string, containerClass string) {
 	<div data-slot="example" class={ utils.CN("mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none", containerClass) }>
 		if title != "" {
@@ -219,7 +218,7 @@ templ comboboxExampleInvalid() {
 
 templ comboboxExampleWithClear() {
 	@comboboxExampleSection("With Clear Button", "") {
-		@combobox.Combobox(combobox.Props{Value: "templ"}) {
+		@combobox.Combobox(combobox.Props{DefaultValue: "templ"}) {
 			@combobox.Input(combobox.InputProps{Placeholder: "Select a framework", ShowClear: true})
 			@combobox.Content() {
 				@combobox.Empty() {
@@ -441,7 +440,7 @@ templ comboboxExampleMultiple() {
 		@combobox.Combobox(combobox.Props{
 			Multiple:      true,
 			AutoHighlight: true,
-			Values:        []string{"templ"},
+			DefaultValues: []string{"templ"},
 		}) {
 			@combobox.Chips() {
 				@combobox.Value()
@@ -464,7 +463,7 @@ templ comboboxExampleMultipleDisabled() {
 		@combobox.Combobox(combobox.Props{
 			Multiple:      true,
 			AutoHighlight: true,
-			Values:        []string{"templ", "htmx"},
+			DefaultValues: []string{"templ", "htmx"},
 			Disabled:      true,
 		}) {
 			@combobox.Chips() {
@@ -489,7 +488,7 @@ templ comboboxExampleMultipleInvalid() {
 			@combobox.Combobox(combobox.Props{
 				Multiple:      true,
 				AutoHighlight: true,
-				Values:        []string{"templ", "htmx"},
+				DefaultValues: []string{"templ", "htmx"},
 			}) {
 				@combobox.Chips() {
 					@combobox.Value()
@@ -511,7 +510,7 @@ templ comboboxExampleMultipleInvalid() {
 				@combobox.Combobox(combobox.Props{
 					Multiple:      true,
 					AutoHighlight: true,
-					Values:        []string{"templ", "htmx", "gin"},
+					DefaultValues: []string{"templ", "htmx", "gin"},
 				}) {
 					@combobox.Chips() {
 						@combobox.Value()
@@ -545,7 +544,7 @@ templ comboboxExampleMultipleNoRemove() {
 		@combobox.Combobox(combobox.Props{
 			Multiple:      true,
 			AutoHighlight: true,
-			Values:        []string{"templ", "htmx"},
+			DefaultValues: []string{"templ", "htmx"},
 		}) {
 			@combobox.Chips(combobox.ChipsProps{Class: "[&_[data-tui-combobox-chip-remove]]:hidden"}) {
 				@combobox.Value()

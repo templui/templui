@@ -1,0 +1,45 @@
+package dashboard01
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/button"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+templ NavMain(items []NavItem) {
+	@sidebar.Group() {
+		@sidebar.GroupContent(sidebar.GroupContentProps{Class: "flex flex-col gap-2"}) {
+			@sidebar.Menu() {
+				@sidebar.MenuItem(sidebar.MenuItemProps{Class: "flex items-center gap-2"}) {
+					@sidebar.MenuButton(sidebar.MenuButtonProps{
+						Tooltip: "Quick Create",
+						Class:   "min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground",
+					}) {
+						@icon.CirclePlus()
+						<span>Quick Create</span>
+					}
+					@button.Button(button.Props{
+						Size:    button.SizeIcon,
+						Class:   "size-8 group-data-[collapsible=icon]:opacity-0",
+						Variant: button.VariantOutline,
+					}) {
+						@icon.Mail()
+						<span class="sr-only">Inbox</span>
+					}
+				}
+			}
+			@sidebar.Menu() {
+				for _, item := range items {
+					@sidebar.MenuItem() {
+						@sidebar.MenuButton(sidebar.MenuButtonProps{Tooltip: item.Title}) {
+							if item.Icon != nil {
+								@item.Icon()
+							}
+							<span>{ item.Title }</span>
+						}
+					}
+				}
+			}
+		}
+	}
+}

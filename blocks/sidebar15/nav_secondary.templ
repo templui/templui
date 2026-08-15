@@ -1,0 +1,39 @@
+package sidebar15
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+type NavSecondaryItem struct {
+	Title string
+	URL   string
+	Icon  func(...icon.Props) templ.Component
+	Badge string
+}
+
+templ NavSecondary(items []NavSecondaryItem, props ...sidebar.GroupProps) {
+	{{ var p sidebar.GroupProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@sidebar.Group(p) {
+		@sidebar.GroupContent() {
+			@sidebar.Menu() {
+				for _, item := range items {
+					@sidebar.MenuItem() {
+						@sidebar.MenuButton(sidebar.MenuButtonProps{Href: item.URL}) {
+							@item.Icon()
+							<span>{ item.Title }</span>
+						}
+						if item.Badge != "" {
+							@sidebar.MenuBadge() {
+								{ item.Badge }
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

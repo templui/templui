@@ -1,0 +1,57 @@
+package sidebar10
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/breadcrumb"
+	"github.com/axadrn/shadcn-templ/v2/components/separator"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+templ Page() {
+	@sidebar.Provider() {
+		@AppSidebar()
+		@sidebar.Inset() {
+			<header class="flex h-14 shrink-0 items-center gap-2">
+				<div class="flex flex-1 items-center gap-2 px-3">
+					@sidebar.Trigger()
+					@separator.Separator(separator.Props{
+						Orientation: separator.OrientationVertical,
+						Class:       "mr-2 data-vertical:h-4 data-vertical:self-auto",
+					})
+					@breadcrumb.Breadcrumb() {
+						@breadcrumb.List() {
+							@breadcrumb.Item() {
+								@breadcrumb.Page(breadcrumb.ItemProps{Class: "line-clamp-1"}) {
+									Project Management & Task Tracking
+								}
+							}
+						}
+					}
+				</div>
+				<div class="ml-auto px-3">
+					@NavActions()
+				</div>
+			</header>
+			<div class="flex flex-1 flex-col gap-4 px-4 py-10">
+				<div class="mx-auto h-24 w-full max-w-3xl rounded-xl bg-muted/50"></div>
+				<div class="mx-auto h-full w-full max-w-3xl rounded-xl bg-muted/50"></div>
+			</div>
+		}
+	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		(() => {
+			// Keep the selected team details in sync.
+			document.addEventListener("click", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const item = e.target.closest("#sidebar10-team-menu [data-sidebar10-team-index]");
+				if (!item) return;
+				const i = item.getAttribute("data-sidebar10-team-index");
+				const name = item.textContent.trim().replace(/⌘\d$/, "").trim();
+				document.querySelectorAll("[data-sidebar10-team-logo]").forEach((logo) => {
+					logo.classList.toggle("hidden", logo.getAttribute("data-sidebar10-team-logo") !== i);
+				});
+				const nameEl = document.querySelector("[data-sidebar10-team-name]");
+				if (nameEl) nameEl.textContent = name;
+			});
+		})();
+	</script>
+}

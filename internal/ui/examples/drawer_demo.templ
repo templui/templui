@@ -39,7 +39,7 @@ templ DrawerDemo() {
 				}
 			}
 			<div class="flex-1 scroll-fade overflow-y-auto p-4">
-				@radiogroup.RadioGroup(radiogroup.Props{Value: "asap", Class: "gap-2"}) {
+				@radiogroup.RadioGroup(radiogroup.Props{DefaultValue: "asap", Class: "gap-2"}) {
 					for _, time := range drawerDemoTimes {
 						@field.Label(field.LabelProps{For: time.ID}) {
 							@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {

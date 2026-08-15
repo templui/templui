@@ -27,6 +27,7 @@ type ctxState struct {
 	id               string
 	parentID         string
 	open             bool
+	controlled       bool
 	disableClickAway bool
 	disableModal     bool
 	direction        SwipeDirection
@@ -44,8 +45,10 @@ func state(ctx context.Context) ctxState {
 
 type Props struct {
 	ID string
-	// Open renders the drawer already open on page load.
-	Open bool
+	// Open is the controlled open state. Use DefaultOpen when the browser
+	// should own the state after the initial render.
+	Open        *bool
+	DefaultOpen bool
 	// DisableDismissible keeps the drawer open when clicking the backdrop
 	// (Base UI's disablePointerDismissal).
 	DisableDismissible bool
@@ -65,6 +68,13 @@ type Props struct {
 	// distance determines the next snap point (Base UI's
 	// snapToSequentialPoints).
 	SnapToSequentialPoints bool
+}
+
+func initialOpen(p Props) bool {
+	if p.Open != nil {
+		return *p.Open
+	}
+	return p.DefaultOpen
 }
 
 type ContentProps struct {
@@ -122,12 +132,12 @@ templ Drawer(props ...Props) {
 	{{ snapJSON := "" }}
 	if len(p.SnapPoints) > 0 {
 		{{
-	if b, err := json.Marshal(p.SnapPoints); err == nil {
-		snapJSON = string(b)
-	}
+			if b, err := json.Marshal(p.SnapPoints); err == nil {
+				snapJSON = string(b)
+			}
 		}}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, parentID: parentID, open: p.Open, disableClickAway: p.DisableDismissible, disableModal: p.DisableModal, direction: p.SwipeDirection, showSwipeHandle: p.ShowSwipeHandle, snapJSON: snapJSON, snapSequential: p.SnapToSequentialPoints}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, parentID: parentID, open: initialOpen(p), controlled: p.Open != nil, disableClickAway: p.DisableDismissible, disableModal: p.DisableModal, direction: p.SwipeDirection, showSwipeHandle: p.ShowSwipeHandle, snapJSON: snapJSON, snapSequential: p.SnapToSequentialPoints}) }}
 	{ children... }
 }
 
@@ -202,9 +212,11 @@ templ Content(props ...ContentProps) {
 		<dialog
 			id={ s.id }
 			data-tui-drawer-content
+			data-tui-portal
 			data-modal={ utils.IfElse(!s.disableModal, "true", "false") }
 			data-tui-dialog-show-modal={ utils.IfElse(!s.disableModal, "true", "false") }
 			data-tui-drawer-initial-open={ utils.IfElse(s.open, "true", "false") }
+			data-tui-drawer-controlled?={ s.controlled }
 			if s.parentID != "" {
 				data-tui-drawer-parent={ s.parentID }
 			}

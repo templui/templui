@@ -45,24 +45,28 @@ type Item struct {
 	Schema               string      `json:"$schema,omitempty"`
 	Extends              string      `json:"extends,omitempty"`
 	Name                 string      `json:"name"`
+	Description          string      `json:"description,omitempty"`
 	Dependencies         []string    `json:"dependencies,omitempty"`
 	DevDependencies      []string    `json:"devDependencies,omitempty"`
 	RegistryDependencies []string    `json:"registryDependencies,omitempty"`
 	Files                []ItemFile  `json:"files,omitzero"`
 	CSSVars              *ItemVars   `json:"cssVars,omitempty"`
 	CSS                  *CSS        `json:"css,omitempty"`
+	Categories           []string    `json:"categories,omitempty"`
 	Meta                 *ItemMeta   `json:"meta,omitempty"`
 	Type                 string      `json:"type"`
 	Config               *ItemConfig `json:"config,omitempty"`
 }
 
 // ItemFile field order follows the live files[] entries (path, content,
-// type). target is omitted like in the golden output; the shadcn-templ CLI
-// derives the install path from path and its own components dir config.
+// type, target). target stays omitted for ui items like in the golden
+// output; block files may carry it and the shadcn-templ CLI prefers it over
+// the components dir mapping.
 type ItemFile struct {
 	Path    string `json:"path"`
 	Content string `json:"content"`
 	Type    string `json:"type"`
+	Target  string `json:"target,omitempty"`
 }
 
 type ItemVars struct {
@@ -72,7 +76,10 @@ type ItemVars struct {
 }
 
 type ItemMeta struct {
-	Links ItemLinks `json:"links"`
+	Links ItemLinks `json:"links,omitzero"`
+	// IframeHeight is the /blocks preview height of block items
+	// (shadcn's meta.iframeHeight).
+	IframeHeight string `json:"iframeHeight,omitempty"`
 }
 
 // ItemLinks keeps only docs; shadcn's examples/api links point at tsx

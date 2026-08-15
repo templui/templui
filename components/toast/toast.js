@@ -365,7 +365,7 @@
 
   // ----- SSR/htmx adoption --------------------------------------------------
 
-  function adopt() {
+  function init() {
     document.querySelectorAll("[data-tui-toast-ssr]").forEach(function (stub) {
       var opts = {
         id: stub.id || undefined,
@@ -380,16 +380,12 @@
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", adopt);
+    document.addEventListener("DOMContentLoaded", init);
   } else {
-    adopt();
+    init();
   }
-  new MutationObserver(function (mutations) {
-    for (var i = 0; i < mutations.length; i++) {
-      if (mutations[i].addedNodes.length) {
-        adopt();
-        return;
-      }
-    }
-  }).observe(document.documentElement, { childList: true, subtree: true });
+  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
+  // does not fire in hidden tabs or throttled iframes): swapped-in markup
+  // wires itself.
+  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
 })();

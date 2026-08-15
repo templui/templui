@@ -506,8 +506,23 @@
     return stateOf(target)?.open || false;
   }
 
+  function requestOpenChange(target, nextOpen, trigger) {
+    const state = stateOf(target);
+    if (!state || state.open === nextOpen) return;
+    const accepted = state.popup.dispatchEvent(
+      new CustomEvent("dialog-open-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { open: nextOpen },
+      }),
+    );
+    if (!accepted || state.popup.hasAttribute("data-tui-dialog-controlled")) return;
+    if (nextOpen) openDialog(state.popup, trigger);
+    else closeDialog(state.popup);
+  }
+
   function toggleDialog(target, trigger) {
-    isDialogOpen(target) ? closeDialog(target) : openDialog(target, trigger);
+    requestOpenChange(target, !isDialogOpen(target), trigger);
   }
 
   // ----- dismissal (useDismiss + DialogInteractions) -------------------------
@@ -536,7 +551,7 @@
     if (!isTopmost(state)) return;
     if (event.button !== 0) return;
     if (pressStartedInPopup === state.popup) return;
-    closeDialog(state.popup);
+    requestOpenChange(state.popup, false);
   }
 
   // useDismiss escape key: closes the topmost dialog, ignoring presses that
@@ -565,7 +580,7 @@
       const state = openStack[openStack.length - 1];
       if (!state) return;
       event.preventDefault();
-      closeDialog(state.popup);
+      requestOpenChange(state.popup, false);
       return;
     }
     // FloatingFocusManager: prevent Tab from escaping the modal when the
@@ -611,7 +626,6 @@
       closeType: "",
       undoMarkOthers: null,
       finishToken: null,
-      hadTriggers: triggersFor(popup).length > 0,
     };
     dialogs.set(popup, state);
 
@@ -706,6 +720,7 @@
         if (parentPopup?.id) root.setAttribute("data-tui-dialog-parent", parentPopup.id);
         const stale = document.getElementById(popup.id);
         if (stale) destroyDialog(stale);
+        root._tuiPortalOwner = tpl.parentElement;
         document.body.appendChild(root);
         lifted = true;
       }
@@ -716,7 +731,7 @@
     if (lifted) liftTemplates();
   }
 
-  function initDialogs() {
+  function init() {
     liftTemplates();
     document.querySelectorAll("body > [data-tui-dialog-root]").forEach((root) => {
       const popup = root.querySelector("[data-tui-dialog-content]");
@@ -725,15 +740,14 @@
         return;
       }
 
-      // Remove portaled leftovers whose page content got swapped out: a
-      // dialog that had triggers when it was lifted (or gained some later)
-      // but lost all of them to a swap. A dialog that never had triggers is
-      // driven programmatically (window.tui.dialog.open) and stays alive.
+      // The unmount half of the React portal pendant: the dialog lives as
+      // long as its SSR declaration site (_tuiPortalOwner) stays in the
+      // document. Ownership keeps trigger-less programmatic dialogs
+      // (dialog.TriggerFor, the command menu) alive and judges swaps
+      // without mid-swap trigger heuristics.
       const state = dialogs.get(popup);
-      const hasTriggers = triggersFor(popup).length > 0;
       if (state) {
-        if (hasTriggers) state.hadTriggers = true;
-        else if (state.hadTriggers) destroyDialog(popup);
+        if (root._tuiPortalOwner && !root._tuiPortalOwner.isConnected) destroyDialog(popup);
         return;
       }
 
@@ -758,7 +772,7 @@
     }
     const closeButton = event.target.closest("[data-tui-dialog-close]");
     if (closeButton) {
-      closeDialog(dialogFor(closeButton));
+      requestOpenChange(dialogFor(closeButton), false);
       return;
     }
     const backdrop = event.target.closest("[data-tui-dialog-backdrop]");
@@ -768,9 +782,9 @@
   });
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => initDialogs());
+    document.addEventListener("DOMContentLoaded", () => init());
   } else {
-    initDialogs();
+    init();
   }
 
   // Initialize dialogs added later (e.g. swapped in via htmx), so a
@@ -778,7 +792,7 @@
   // whose source got swapped out of the DOM (releasing the scroll lock and
   // the aria-hidden marking).
   new MutationObserver(() => {
-    initDialogs();
+    init();
     unlockScroll();
   }).observe(document.body, {
     childList: true,

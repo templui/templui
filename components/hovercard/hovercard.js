@@ -17,6 +17,11 @@
     );
   }
 
+  function setOpenState(content, open) {
+    content.toggleAttribute("data-open", open);
+    content.toggleAttribute("data-closed", !open);
+  }
+
   // Base UI zooms the popup out of the anchor's center point (e.g.
   // "96px -4px"), not out of a placement corner.
   function anchorOrigin(result, anchorRect, sideOffset) {
@@ -29,13 +34,20 @@
     return "calc(100% + " + sideOffset + "px) " + centerY;
   }
 
-  // Moves the content to <body> (shadcn portals it the same way). Also removes
-  // contents whose trigger is gone (leftovers from swapped-out pages).
+  // Moves the content to <body> (shadcn portals it the same way).
+  // The unmount half of the React portal pendant: a portaled content lives
+  // as long as its SSR declaration site (_tuiPortalOwner) stays in the
+  // document. Trigger-presence heuristics judged mid-swap moments wrongly -
+  // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
     document.querySelectorAll("body > [data-tui-hovercard-content]").forEach((c) => {
-      if (c !== content && !triggerFor(c)) c.remove();
+      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) {
+        stopAutoPositioning(c);
+        c.remove();
+      }
     });
     if (content.parentElement !== document.body) {
+      if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
       document.body.appendChild(content);
     }
   }
@@ -52,11 +64,11 @@
 
     return computePosition(trigger, content, {
       placement: placement,
-      strategy: "fixed",
+      strategy: "absolute",
       middleware: [
         offset({ mainAxis: sideOffset, alignmentAxis: alignOffset }),
         flip(),
-        shift({ padding: 8 }),
+        shift({ padding: 5 }),
       ],
     }).then((result) => {
       content.style.transition = "none";
@@ -72,31 +84,72 @@
     });
   }
 
+  function startAutoPositioning(content, trigger) {
+    if (content._tuiPositionCleanup) content._tuiPositionCleanup();
+    let resolveFirst;
+    const firstPosition = new Promise((resolve) => {
+      resolveFirst = resolve;
+    });
+    const update = () => positionContent(content, trigger).then(resolveFirst, resolveFirst);
+    content._tuiPositionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
+      elementResize: typeof ResizeObserver !== "undefined",
+      layoutShift: typeof IntersectionObserver !== "undefined",
+    });
+    return firstPosition;
+  }
+
+  function stopAutoPositioning(content) {
+    if (!content._tuiPositionCleanup) return;
+    content._tuiPositionCleanup();
+    content._tuiPositionCleanup = null;
+  }
+
   function open(content, trigger) {
     clearTimeout(content._tuiHide);
     portal(content);
-    if (!content.matches(":popover-open")) {
-      content.showPopover(); // native top layer
-    }
+    // z-index portal like shadcn (no native top layer); re-append
+    // keeps paint order = open order.
+    document.body.appendChild(content);
+    content.hidden = false;
 
     // Position it invisibly first, then play the enter animation in place.
     content.style.visibility = "hidden";
-    positionContent(content, trigger).then(() => {
-      if (!content.matches(":popover-open")) return; // closed meanwhile
+    startAutoPositioning(content, trigger).then(() => {
+      if (content.hidden) return; // closed meanwhile
+      // duration-100 transitions `all`; a visibility transition would
+      // freeze at hidden in background tabs - flip suppressed.
+      content.style.transitionProperty = "none";
       content.style.visibility = "";
-      content.setAttribute("data-state", "open");
+      void content.offsetWidth;
+      content.style.transitionProperty = "";
+      setOpenState(content, true);
     });
   }
 
   function close(content) {
-    if (!content.matches(":popover-open")) return;
-    content.setAttribute("data-state", "closed");
+    if (content.hidden) return;
+    stopAutoPositioning(content);
+    setOpenState(content, false);
     clearTimeout(content._tuiHide);
     content._tuiHide = setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
-        content.hidePopover();
+      if (content.hasAttribute("data-closed") && !content.hidden) {
+        content.hidden = true;
       }
     }, EXIT_MS);
+  }
+
+  function requestOpenChange(content, nextOpen) {
+  const trigger = triggerFor(content);
+  const change = new CustomEvent("hovercard-open-change", {
+    bubbles: true,
+    cancelable: true,
+    detail: { open: nextOpen },
+  });
+  const accepted = (trigger || content).dispatchEvent(change);
+  if (!accepted || content.hasAttribute("data-tui-hovercard-controlled")) return false;
+  if (nextOpen && trigger) open(content, trigger);
+  else if (!nextOpen) close(content);
+  return true;
   }
 
   // Hover intent: entering trigger or card keeps it open; leaving both
@@ -104,22 +157,22 @@
   function scheduleOpen(content, trigger) {
     clearTimeout(content._tuiClose);
     content._tuiClose = null;
-    if (content.getAttribute("data-state") === "open" || content._tuiOpen) return;
+    if (content.hasAttribute("data-open") || content._tuiOpen) return;
     const delay = parseInt(content.getAttribute("data-tui-hovercard-delay"), 10) || 600;
     content._tuiOpen = setTimeout(() => {
       content._tuiOpen = null;
-      open(content, trigger);
+    requestOpenChange(content, true);
     }, delay);
   }
 
   function scheduleClose(content) {
     clearTimeout(content._tuiOpen);
     content._tuiOpen = null;
-    if (content.getAttribute("data-state") !== "open" || content._tuiClose) return;
+    if (!content.hasAttribute("data-open") || content._tuiClose) return;
     const delay = parseInt(content.getAttribute("data-tui-hovercard-close-delay"), 10) || 300;
     content._tuiClose = setTimeout(() => {
       content._tuiClose = null;
-      close(content);
+    requestOpenChange(content, false);
     }, delay);
   }
 
@@ -159,7 +212,9 @@
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") allContents().forEach(close);
+  if (e.key === "Escape") {
+    allContents().forEach((content) => requestOpenChange(content, false));
+  }
   });
 
   // Lift SSR'd contents out of their inert <template> wrappers into <body>,
@@ -169,7 +224,11 @@
       const content = tpl.content.querySelector("[data-tui-hovercard-content]");
       if (content) {
         const stale = document.getElementById(content.id);
-        if (stale) stale.remove();
+        if (stale) {
+          stopAutoPositioning(stale);
+          stale.remove();
+        }
+        content._tuiPortalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
       tpl.remove();
@@ -178,45 +237,27 @@
 
   // Portal all contents up front (React portals on mount too). Runs on load
   // and whenever new cards appear in the DOM.
-  function initCards() {
+  function init() {
     liftTemplates();
     allContents().forEach((content) => {
       if (triggerFor(content)) portal(content);
-    });
-  }
-
-  let initQueued = false;
-  function queueInit() {
-    if (initQueued) return;
-    initQueued = true;
-    requestAnimationFrame(() => {
-      initQueued = false;
-      initCards();
+    if (content.getAttribute("data-tui-hovercard-initial-open") === "true") {
+    content.removeAttribute("data-tui-hovercard-initial-open");
+    const trigger = triggerFor(content);
+    if (trigger) open(content, trigger);
+    }
     });
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initCards);
+    document.addEventListener("DOMContentLoaded", init);
   } else {
-    initCards();
+    init();
   }
-  new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      if (m.addedNodes.length) {
-        queueInit();
-        break;
-      }
-    }
-  }).observe(document.documentElement, { childList: true, subtree: true });
+  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
+  // does not fire in hidden tabs or throttled iframes): swapped-in markup
+  // lifts and wires itself, removals release portaled content through the
+  // ownership sweep.
+  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
 
-  // Keep open cards anchored while scrolling or resizing.
-  function repositionOpen() {
-    allContents().forEach((content) => {
-      if (content.getAttribute("data-state") !== "open") return;
-      const trigger = triggerFor(content);
-      if (trigger) positionContent(content, trigger);
-    });
-  }
-  window.addEventListener("scroll", repositionOpen, true);
-  window.addEventListener("resize", repositionOpen);
 })();

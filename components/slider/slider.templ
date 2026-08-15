@@ -18,10 +18,11 @@ type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	// Value are the initial thumb values, one thumb per value. Nil renders
-	// a thumb at Min and one at Max (Base UI's default).
-	Value []float64
-	Min    float64
+	// Value is the controlled thumb value. Use DefaultValue when the browser
+	// should own the value after the initial render.
+	Value        []float64
+	DefaultValue []float64
+	Min          float64
 	// Max defaults to 100.
 	Max float64
 	// Step defaults to 1.
@@ -113,13 +114,17 @@ templ Slider(props ...Props) {
 	if p.Orientation == "" {
 		{{ p.Orientation = OrientationHorizontal }}
 	}
-	if p.Value == nil {
-		{{ p.Value = []float64{p.Min, p.Max} }}
+	{{ values := p.DefaultValue }}
+	if p.Value != nil {
+		{{ values = p.Value }}
+	}
+	if values == nil {
+		{{ values = []float64{p.Min, p.Max} }}
 	}
 	{{
 		vertical := p.Orientation == OrientationVertical
-		fs := make([]float64, len(p.Value))
-		for i, v := range p.Value {
+		fs := make([]float64, len(values))
+		for i, v := range values {
 			fs[i] = fraction(v, p.Min, p.Max)
 		}
 	}}
@@ -129,6 +134,7 @@ templ Slider(props ...Props) {
 		id={ p.ID }
 		data-slot="slider"
 		data-tui-slider
+		data-tui-slider-controlled?={ p.Value != nil }
 		data-orientation={ string(p.Orientation) }
 		if vertical {
 			data-vertical
@@ -145,7 +151,7 @@ templ Slider(props ...Props) {
 		{ p.Attributes... }
 	>
 		if p.Name != "" {
-			for _, v := range p.Value {
+			for _, v := range values {
 				<input type="hidden" name={ p.Name } value={ fmtF(v) } data-tui-slider-input aria-hidden="true" tabindex="-1"/>
 			}
 		}
@@ -171,7 +177,7 @@ templ Slider(props ...Props) {
 					style={ indicatorStyle(fs, vertical) }
 				></div>
 			</div>
-			for i, v := range p.Value {
+			for i, v := range values {
 				// The thumb's disabled:* classes are dead CSS on a div, exactly
 				// like in shadcn's thumb: only the control dims to 50%.
 				<div

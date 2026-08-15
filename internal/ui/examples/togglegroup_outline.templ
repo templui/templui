@@ -1,16 +1,14 @@
 package examples
 
-import (
-	"github.com/axadrn/shadcn-templ/v2/components/togglegroup"
-)
+import "github.com/axadrn/shadcn-templ/v2/components/togglegroup"
 
 templ ToggleGroupOutline() {
 	@togglegroup.ToggleGroup(togglegroup.Props{
-		Variant: togglegroup.VariantOutline,
-			}) {
+		Variant:      togglegroup.VariantOutline,
+		DefaultValue: []string{"all"},
+	}) {
 		@togglegroup.Item(togglegroup.ItemProps{
 			Value:      "all",
-			Pressed:    true,
 			Attributes: templ.Attributes{"aria-label": "Toggle all"},
 		}) {
 			All

@@ -13,8 +13,9 @@ import (
 // CommandMenu is the pendant of shadcn's components/command-menu.tsx: the
 // header search button opening a ⌘K command dialog. The honest reduction of
 // their groups: "Pages" lists the nav items and the sidebar sections follow
-// as groups (their pageGroupsSection over the docs tree). No Styles, Colors,
-// Blocks or full-text search groups, shadcn-templ has no pendants for those, and
+// as groups (their pageGroupsSection over the docs tree). No Styles, Colors
+// or full-text search groups, shadcn-templ has no pendants for those (Blocks
+// rides in the Pages group via NavItems), and
 // the footer shows the one action every item shares: Go to Page.
 templ CommandMenu() {
 	@button.Button(button.Props{

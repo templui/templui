@@ -12,10 +12,11 @@ templ ToggleGroupCustom() {
 			Font Weight
 		}
 		@togglegroup.ToggleGroup(togglegroup.Props{
-			ID:      "font-weight-group",
-						Variant: togglegroup.VariantOutline,
-			Size:    togglegroup.SizeLg,
-			Spacing: utils.Ptr(2),
+			ID:           "font-weight-group",
+			Variant:      togglegroup.VariantOutline,
+			Size:         togglegroup.SizeLg,
+			Spacing:      utils.Ptr(2),
+			DefaultValue: []string{"normal"},
 		}) {
 			@togglegroup.Item(togglegroup.ItemProps{
 				Value:      "light",
@@ -27,7 +28,6 @@ templ ToggleGroupCustom() {
 			}
 			@togglegroup.Item(togglegroup.ItemProps{
 				Value:      "normal",
-				Pressed:    true,
 				Class:      "flex size-16 flex-col items-center justify-center rounded-xl",
 				Attributes: templ.Attributes{"aria-label": "Normal"},
 			}) {

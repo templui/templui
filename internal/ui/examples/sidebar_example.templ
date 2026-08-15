@@ -8,8 +8,7 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
 )
 
-// The full-page example from sidebar-example.tsx: the docs sidebar with a
-// version switcher and a search field.
+// Full-page docs sidebar with a version switcher and search field.
 
 type sidebarExampleNavGroup struct {
 	Title string
@@ -66,7 +65,7 @@ var sidebarExampleNavMain = []sidebarExampleNavGroup{
 		Items: []sidebarExampleNavItem{
 			{Title: "Accessibility", URL: "#"},
 			{Title: "Fast Refresh", URL: "#"},
-			{Title: "Next.js Compiler", URL: "#"},
+			{Title: "templ Compiler", URL: "#"},
 			{Title: "Supported Browsers", URL: "#"},
 			{Title: "Turbopack", URL: "#"},
 		},
@@ -79,7 +78,7 @@ templ sidebarExampleVersionSwitcher() {
 			@dropdownmenu.DropdownMenu(dropdownmenu.Props{ID: "sidebar-example-version-menu"}) {
 				@sidebar.MenuButton(sidebar.MenuButtonProps{
 					Size:       sidebar.MenuButtonSizeLg,
-					Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+					Class:      "data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
 					Attributes: dropdownmenu.Trigger(ctx),
 				}) {
 					@item.Item(item.Props{Size: item.SizeXs, Class: "p-0"}) {

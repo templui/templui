@@ -19,8 +19,9 @@ const (
 )
 
 type ctxState struct {
-	id   string
-	open bool
+	id         string
+	open       bool
+	controlled bool
 }
 
 func state(ctx context.Context) ctxState {
@@ -32,8 +33,17 @@ func state(ctx context.Context) ctxState {
 
 type Props struct {
 	ID string
-	// Open renders the alert dialog already open on page load.
-	Open bool
+	// Open is the controlled open state. Use DefaultOpen when the browser
+	// should own the state after the initial render.
+	Open        *bool
+	DefaultOpen bool
+}
+
+func initialOpen(p Props) bool {
+	if p.Open != nil {
+		return *p.Open
+	}
+	return p.DefaultOpen
 }
 
 type ContentProps struct {
@@ -101,7 +111,7 @@ templ AlertDialog(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: p.Open}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: initialOpen(p), controlled: p.Open != nil}) }}
 	{ children... }
 }
 
@@ -196,28 +206,29 @@ templ Content(props ...ContentProps) {
 	// the popup), only Esc and the buttons do.
 	@Portal() {
 		@Overlay()
-			// 1:1 base/ui/alert-dialog.tsx AlertDialogContent
-			// (AlertDialog.Popup): the look comes from cn-alert-dialog-content.
-			<div
-				id={ s.id }
-				role="alertdialog"
-				tabindex="-1"
-				data-slot="alert-dialog-content"
-				data-tui-dialog-content
-				data-size={ string(p.Size) }
-				data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
-				data-tui-dialog-show-modal="true"
-				data-tui-dialog-disable-dismissible="true"
-				class={
-					utils.CN(
-						"cn-alert-dialog-content group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 outline-none",
-						p.Class,
-					),
-				}
-				{ p.Attributes... }
-			>
-				{ children... }
-			</div>
+		// 1:1 base/ui/alert-dialog.tsx AlertDialogContent
+		// (AlertDialog.Popup): the look comes from cn-alert-dialog-content.
+		<div
+			id={ s.id }
+			role="alertdialog"
+			tabindex="-1"
+			data-slot="alert-dialog-content"
+			data-tui-dialog-content
+			data-size={ string(p.Size) }
+			data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
+			data-tui-dialog-controlled?={ s.controlled }
+			data-tui-dialog-show-modal="true"
+			data-tui-dialog-disable-dismissible="true"
+			class={
+				utils.CN(
+					"cn-alert-dialog-content group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 outline-none",
+					p.Class,
+				),
+			}
+			{ p.Attributes... }
+		>
+			{ children... }
+		</div>
 	}
 }
 

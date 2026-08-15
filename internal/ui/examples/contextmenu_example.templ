@@ -7,7 +7,6 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/icon"
 )
 
-// The kitchen-sink page from context-menu-example.tsx.
 templ contextMenuExampleSection(title, containerClass string) {
 	<div data-slot="example" class={ "mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none", containerClass }>
 		if title != "" {
@@ -326,13 +325,13 @@ templ contextMenuExampleWithCheckboxes() {
 			@contextMenuExampleTrigger()
 			@contextmenu.Content() {
 				@contextmenu.Group() {
-					@contextmenu.CheckboxItem(contextmenu.CheckboxItemProps{Checked: true}) {
+					@contextmenu.CheckboxItem(contextmenu.CheckboxItemProps{DefaultChecked: true}) {
 						Show Bookmarks Bar
 					}
 					@contextmenu.CheckboxItem() {
 						Show Full URLs
 					}
-					@contextmenu.CheckboxItem(contextmenu.CheckboxItemProps{Checked: true}) {
+					@contextmenu.CheckboxItem(contextmenu.CheckboxItemProps{DefaultChecked: true}) {
 						Show Developer Tools
 					}
 				}
@@ -350,8 +349,8 @@ templ contextMenuExampleWithRadio() {
 					@contextmenu.Label() {
 						People
 					}
-					@contextmenu.RadioGroup() {
-						@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "pedro", Checked: true}) {
+					@contextmenu.RadioGroup(contextmenu.RadioGroupProps{DefaultValue: "pedro"}) {
+						@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "pedro"}) {
 							Pedro Duarte
 						}
 						@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "colm"}) {
@@ -364,8 +363,8 @@ templ contextMenuExampleWithRadio() {
 					@contextmenu.Label() {
 						Theme
 					}
-					@contextmenu.RadioGroup() {
-						@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "light", Checked: true}) {
+					@contextmenu.RadioGroup(contextmenu.RadioGroupProps{DefaultValue: "light"}) {
+						@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "light"}) {
 							Light
 						}
 						@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "dark"}) {
@@ -513,8 +512,8 @@ templ contextMenuExampleWithInset() {
 						Appearance
 					}
 					@contextmenu.CheckboxItem(contextmenu.CheckboxItemProps{
-						Checked:    true,
-						Attributes: templ.Attributes{"data-inset": "true"},
+						DefaultChecked: true,
+						Attributes:     templ.Attributes{"data-inset": "true"},
 					}) {
 						Bookmarks
 					}
@@ -529,7 +528,7 @@ templ contextMenuExampleWithInset() {
 					@contextmenu.Label(contextmenu.LabelProps{Inset: true}) {
 						Theme
 					}
-					@contextmenu.RadioGroup() {
+					@contextmenu.RadioGroup(contextmenu.RadioGroupProps{DefaultValue: "system"}) {
 						@contextmenu.RadioItem(contextmenu.RadioItemProps{
 							Value:      "light",
 							Attributes: templ.Attributes{"data-inset": "true"},
@@ -544,7 +543,6 @@ templ contextMenuExampleWithInset() {
 						}
 						@contextmenu.RadioItem(contextmenu.RadioItemProps{
 							Value:      "system",
-							Checked:    true,
 							Attributes: templ.Attributes{"data-inset": "true"},
 						}) {
 							System

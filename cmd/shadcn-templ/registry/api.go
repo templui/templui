@@ -81,17 +81,23 @@ func (e *NotFoundError) Error() string {
 }
 
 // ItemURL returns the per-style item URL, the pendant of
-// r/styles/<style>/<name>.json.
-func ItemURL(registryURL, style, name string) string {
-	return fmt.Sprintf("%s/r/styles/%s/%s.json", registryURL, style, name)
+// r/styles/<style>/<name>.json. query carries the install-time config the
+// reference CLI applies locally (menuColor, rtl) - shadcn-templ's registry
+// resolves those markers at serve time instead.
+func ItemURL(registryURL, style, name string, query url.Values) string {
+	itemURL := fmt.Sprintf("%s/r/styles/%s/%s.json", registryURL, style, name)
+	if enc := query.Encode(); enc != "" {
+		itemURL += "?" + enc
+	}
+	return itemURL
 }
 
 // GetItem fetches one registry item by name (from the configured style) or
 // by direct URL.
-func GetItem(registryURL, style, nameOrURL string) (*Item, error) {
+func GetItem(registryURL, style, nameOrURL string, query url.Values) (*Item, error) {
 	itemURL := nameOrURL
 	if !IsURL(nameOrURL) {
-		itemURL = ItemURL(registryURL, style, nameOrURL)
+		itemURL = ItemURL(registryURL, style, nameOrURL, query)
 	}
 
 	var item Item

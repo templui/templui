@@ -563,7 +563,7 @@ func upcomingPayment(title, date, amount string) templ.Component {
 					var templ_7745c5c3_Var24 string
 					templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 120, Col: 11}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 119, Col: 11}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 					if templ_7745c5c3_Err != nil {
@@ -594,7 +594,7 @@ func upcomingPayment(title, date, amount string) templ.Component {
 					var templ_7745c5c3_Var26 string
 					templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(date)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 123, Col: 10}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 122, Col: 10}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 					if templ_7745c5c3_Err != nil {
@@ -631,7 +631,7 @@ func upcomingPayment(title, date, amount string) templ.Component {
 				var templ_7745c5c3_Var28 string
 				templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(amount)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 127, Col: 11}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 126, Col: 11}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 				if templ_7745c5c3_Err != nil {
@@ -966,7 +966,7 @@ func cardPreferences() templ.Component {
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = switchcomp.Switch(switchcomp.Props{ID: "public-statistics", Checked: true}).Render(ctx, templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = switchcomp.Switch(switchcomp.Props{ID: "public-statistics", DefaultChecked: true}).Render(ctx, templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -1070,7 +1070,7 @@ func cardPreferences() templ.Component {
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = switchcomp.Switch(switchcomp.Props{ID: "email-notifications", Checked: true}).Render(ctx, templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = switchcomp.Switch(switchcomp.Props{ID: "email-notifications", DefaultChecked: true}).Render(ctx, templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -1273,7 +1273,7 @@ func currencySelect(id string) templ.Component {
 						}
 						return nil
 					})
-					templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "usd", Selected: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var56), templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "usd"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var56), templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -1369,7 +1369,7 @@ func currencySelect(id string) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = selectcomp.Select().Render(templ.WithChildren(ctx, templ_7745c5c3_Var52), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = selectcomp.Select(selectcomp.Props{DefaultValue: "usd"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var52), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1642,7 +1642,7 @@ func cardPayoutThreshold() templ.Component {
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = slider.Slider(slider.Props{ID: "min-payout", Min: 50, Max: 10000, Step: 50, Value: []float64{2500}}).Render(ctx, templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = slider.Slider(slider.Props{ID: "min-payout", Min: 50, Max: 10000, Step: 50, DefaultValue: []float64{2500}}).Render(ctx, templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -1825,7 +1825,7 @@ func cardPayoutThreshold() templ.Component {
 		var templ_7745c5c3_Var79 string
 		templ_7745c5c3_Var79, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 270, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 269, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var79))
 		if templ_7745c5c3_Err != nil {
@@ -2236,7 +2236,7 @@ func faqList(entries []faqEntry) templ.Component {
 						var templ_7745c5c3_Var98 string
 						templ_7745c5c3_Var98, templ_7745c5c3_Err = templ.JoinStringErrs(entry.q)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 344, Col: 14}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 343, Col: 14}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var98))
 						if templ_7745c5c3_Err != nil {
@@ -2267,7 +2267,7 @@ func faqList(entries []faqEntry) templ.Component {
 						var templ_7745c5c3_Var100 string
 						templ_7745c5c3_Var100, templ_7745c5c3_Err = templ.JoinStringErrs(entry.a)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 347, Col: 14}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 346, Col: 14}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var100))
 						if templ_7745c5c3_Err != nil {
@@ -2281,14 +2281,14 @@ func faqList(entries []faqEntry) templ.Component {
 					}
 					return nil
 				})
-				templ_7745c5c3_Err = accordion.Item(accordion.ItemProps{Attributes: templ.Attributes{"open": i == 0}}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var96), templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = accordion.Item(accordion.ItemProps{Value: fmt.Sprintf("item-%d", i)}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var96), templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = accordion.Accordion().Render(templ.WithChildren(ctx, templ_7745c5c3_Var95), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = accordion.Accordion(accordion.Props{DefaultValue: []string{"item-0"}}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var95), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -2973,7 +2973,7 @@ func cardQrConnect() templ.Component {
 				var templ_7745c5c3_Var131 string
 				templ_7745c5c3_Var131, templ_7745c5c3_Err = templ.JoinStringErrs(qrConnectPath)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 458, Col: 43}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 457, Col: 43}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var131))
 				if templ_7745c5c3_Err != nil {
@@ -3382,7 +3382,7 @@ func cardDividendIncome() templ.Component {
 									var templ_7745c5c3_Var149 string
 									templ_7745c5c3_Var149, templ_7745c5c3_Err = templ.JoinStringErrs(holding.name)
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 557, Col: 22}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 556, Col: 22}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var149))
 									if templ_7745c5c3_Err != nil {
@@ -3413,7 +3413,7 @@ func cardDividendIncome() templ.Component {
 									var templ_7745c5c3_Var151 string
 									templ_7745c5c3_Var151, templ_7745c5c3_Err = templ.JoinStringErrs(holding.shares)
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 560, Col: 24}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 559, Col: 24}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var151))
 									if templ_7745c5c3_Err != nil {
@@ -3496,7 +3496,7 @@ func cardDividendIncome() templ.Component {
 							var templ_7745c5c3_Var154 string
 							templ_7745c5c3_Var154, templ_7745c5c3_Err = templ.JoinStringErrs(holding.amount)
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 575, Col: 87}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 574, Col: 87}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var154))
 							if templ_7745c5c3_Err != nil {
@@ -4207,7 +4207,7 @@ func cardKitchenIsland() templ.Component {
 						}()
 					}
 					ctx = templ.InitializeContext(ctx)
-					templ_7745c5c3_Err = switchcomp.Switch(switchcomp.Props{Checked: true}).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = switchcomp.Switch(switchcomp.Props{DefaultChecked: true}).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -4273,7 +4273,7 @@ func cardKitchenIsland() templ.Component {
 						}
 						return nil
 					})
-					templ_7745c5c3_Err = togglegroup.Item(togglegroup.ItemProps{Value: "cooking", Pressed: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var187), templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = togglegroup.Item(togglegroup.ItemProps{Value: "cooking"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var187), templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -4358,9 +4358,10 @@ func cardKitchenIsland() templ.Component {
 					return nil
 				})
 				templ_7745c5c3_Err = togglegroup.ToggleGroup(togglegroup.Props{
-					Variant: togglegroup.VariantOutline,
-					Spacing: utils.Ptr(1),
-					Class:   "flex-wrap",
+					Variant:      togglegroup.VariantOutline,
+					Spacing:      utils.Ptr(1),
+					Class:        "flex-wrap",
+					DefaultValue: []string{"cooking"},
 				}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var186), templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -4475,7 +4476,7 @@ func cardKitchenIsland() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Err = slider.Slider(slider.Props{Value: []float64{90}, Max: 100, Class: "w-full"}).Render(ctx, templ_7745c5c3_Buffer)
+							templ_7745c5c3_Err = slider.Slider(slider.Props{DefaultValue: []float64{90}, Max: 100, Class: "w-full"}).Render(ctx, templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -4589,7 +4590,7 @@ func cardKitchenIsland() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Err = slider.Slider(slider.Props{Value: []float64{70}, Max: 100}).Render(ctx, templ_7745c5c3_Buffer)
+							templ_7745c5c3_Err = slider.Slider(slider.Props{DefaultValue: []float64{70}, Max: 100}).Render(ctx, templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -4703,7 +4704,7 @@ func cardKitchenIsland() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Err = slider.Slider(slider.Props{Value: []float64{30}, Max: 100}).Render(ctx, templ_7745c5c3_Buffer)
+							templ_7745c5c3_Err = slider.Slider(slider.Props{DefaultValue: []float64{30}, Max: 100}).Render(ctx, templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -4817,7 +4818,7 @@ func cardKitchenIsland() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Err = slider.Slider(slider.Props{Value: []float64{0}, Max: 100}).Render(ctx, templ_7745c5c3_Buffer)
+							templ_7745c5c3_Err = slider.Slider(slider.Props{DefaultValue: []float64{0}, Max: 100}).Render(ctx, templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -5609,7 +5610,7 @@ func cardSavingsTargets() templ.Component {
 										}
 										return nil
 									})
-									templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "market", Selected: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var248), templ_7745c5c3_Buffer)
+									templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "market"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var248), templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
@@ -5679,7 +5680,7 @@ func cardSavingsTargets() templ.Component {
 							}
 							return nil
 						})
-						templ_7745c5c3_Err = selectcomp.Select().Render(templ.WithChildren(ctx, templ_7745c5c3_Var244), templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = selectcomp.Select(selectcomp.Props{DefaultValue: "market"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var244), templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -7734,7 +7735,7 @@ func cardReleaseCatalog() templ.Component {
 						}
 						return nil
 					})
-					templ_7745c5c3_Err = togglegroup.Item(togglegroup.ItemProps{Value: "etfs", Pressed: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var339), templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = togglegroup.Item(togglegroup.ItemProps{Value: "etfs"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var339), templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -7767,8 +7768,9 @@ func cardReleaseCatalog() templ.Component {
 					return nil
 				})
 				templ_7745c5c3_Err = togglegroup.ToggleGroup(togglegroup.Props{
-					Variant: togglegroup.VariantOutline,
-					Spacing: utils.Ptr(1),
+					Variant:      togglegroup.VariantOutline,
+					Spacing:      utils.Ptr(1),
+					DefaultValue: []string{"etfs"},
 				}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var337), templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -7843,7 +7845,7 @@ func cardReleaseCatalog() templ.Component {
 								var templ_7745c5c3_Var345 string
 								templ_7745c5c3_Var345, templ_7745c5c3_Err = templ.JoinStringErrs(holding.ticker)
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1303, Col: 24}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1304, Col: 24}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var345))
 								if templ_7745c5c3_Err != nil {
@@ -7890,7 +7892,7 @@ func cardReleaseCatalog() templ.Component {
 									var templ_7745c5c3_Var348 string
 									templ_7745c5c3_Var348, templ_7745c5c3_Err = templ.JoinStringErrs(holding.name)
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1308, Col: 22}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1309, Col: 22}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var348))
 									if templ_7745c5c3_Err != nil {
@@ -7921,7 +7923,7 @@ func cardReleaseCatalog() templ.Component {
 									var templ_7745c5c3_Var350 string
 									templ_7745c5c3_Var350, templ_7745c5c3_Err = templ.JoinStringErrs(holding.shares)
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1311, Col: 24}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1312, Col: 24}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var350))
 									if templ_7745c5c3_Err != nil {
@@ -7934,7 +7936,7 @@ func cardReleaseCatalog() templ.Component {
 									var templ_7745c5c3_Var351 string
 									templ_7745c5c3_Var351, templ_7745c5c3_Err = templ.JoinStringErrs(holding.added)
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1311, Col: 52}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1312, Col: 52}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var351))
 									if templ_7745c5c3_Err != nil {
@@ -7971,7 +7973,7 @@ func cardReleaseCatalog() templ.Component {
 								var templ_7745c5c3_Var353 string
 								templ_7745c5c3_Var353, templ_7745c5c3_Err = templ.JoinStringErrs(holding.typ)
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1316, Col: 21}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1317, Col: 21}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var353))
 								if templ_7745c5c3_Err != nil {
@@ -7990,7 +7992,7 @@ func cardReleaseCatalog() templ.Component {
 							var templ_7745c5c3_Var354 string
 							templ_7745c5c3_Var354, templ_7745c5c3_Err = templ.JoinStringErrs(holding.value)
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1320, Col: 62}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1321, Col: 62}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var354))
 							if templ_7745c5c3_Err != nil {
@@ -9503,7 +9505,7 @@ func transferAccountSelect(id string, accounts []transferAccount, selected strin
 							var templ_7745c5c3_Var418 string
 							templ_7745c5c3_Var418, templ_7745c5c3_Err = templ.JoinStringErrs(account.label)
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1559, Col: 21}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1560, Col: 21}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var418))
 							if templ_7745c5c3_Err != nil {
@@ -9511,7 +9513,7 @@ func transferAccountSelect(id string, accounts []transferAccount, selected strin
 							}
 							return nil
 						})
-						templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: account.value, Selected: account.value == selected}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var417), templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: account.value}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var417), templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -9530,7 +9532,7 @@ func transferAccountSelect(id string, accounts []transferAccount, selected strin
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = selectcomp.Select().Render(templ.WithChildren(ctx, templ_7745c5c3_Var413), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = selectcomp.Select(selectcomp.Props{DefaultValue: selected}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var413), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -10145,7 +10147,7 @@ func cardReceivingMethod() templ.Component {
 									}()
 								}
 								ctx = templ.InitializeContext(ctx)
-								templ_7745c5c3_Err = radiogroup.Item(radiogroup.ItemProps{Name: "receiving-method", Value: "bank", ID: "method-bank", Checked: true}).Render(ctx, templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = radiogroup.Item(radiogroup.ItemProps{Name: "receiving-method", Value: "bank", ID: "method-bank", DefaultChecked: true}).Render(ctx, templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -11057,7 +11059,7 @@ func cardRollerShades() templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = slider.Slider(slider.Props{Value: []float64{50}, Max: 100, Class: "flex-1"}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = slider.Slider(slider.Props{DefaultValue: []float64{50}, Max: 100, Class: "flex-1"}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -11143,7 +11145,7 @@ func cardRollerShades() templ.Component {
 						}
 						return nil
 					})
-					templ_7745c5c3_Err = togglegroup.Item(togglegroup.ItemProps{Value: "half", Pressed: true, Class: "flex-1"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var486), templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = togglegroup.Item(togglegroup.ItemProps{Value: "half", Class: "flex-1"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var486), templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -11176,9 +11178,10 @@ func cardRollerShades() templ.Component {
 					return nil
 				})
 				templ_7745c5c3_Err = togglegroup.ToggleGroup(togglegroup.Props{
-					Variant: togglegroup.VariantOutline,
-					Spacing: utils.Ptr(1),
-					Class:   "w-full",
+					Variant:      togglegroup.VariantOutline,
+					Spacing:      utils.Ptr(1),
+					Class:        "w-full",
+					DefaultValue: []string{"half"},
 				}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var484), templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -11202,7 +11205,7 @@ func cardRollerShades() templ.Component {
 		var templ_7745c5c3_Var488 string
 		templ_7745c5c3_Var488, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1810, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1812, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var488))
 		if templ_7745c5c3_Err != nil {
@@ -11506,7 +11509,7 @@ func cardStockPerformance() templ.Component {
 											var templ_7745c5c3_Var503 string
 											templ_7745c5c3_Var503, templ_7745c5c3_Err = templ.JoinStringErrs(ticker)
 											if templ_7745c5c3_Err != nil {
-												return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1932, Col: 18}
+												return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1934, Col: 18}
 											}
 											_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var503))
 											if templ_7745c5c3_Err != nil {
@@ -11533,7 +11536,7 @@ func cardStockPerformance() templ.Component {
 							}
 							return nil
 						})
-						templ_7745c5c3_Err = combobox.Combobox(combobox.Props{Value: "VOO"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var498), templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = combobox.Combobox(combobox.Props{DefaultValue: "VOO"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var498), templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -11581,7 +11584,7 @@ func cardStockPerformance() templ.Component {
 						var templ_7745c5c3_Var505 string
 						templ_7745c5c3_Var505, templ_7745c5c3_Err = templ.JoinStringErrs(panel.Key)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1943, Col: 38}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1945, Col: 38}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var505))
 						if templ_7745c5c3_Err != nil {
@@ -11725,7 +11728,7 @@ func cardStockPerformance() templ.Component {
 		var templ_7745c5c3_Var509 string
 		templ_7745c5c3_Var509, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1974, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 1976, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var509))
 		if templ_7745c5c3_Err != nil {
@@ -13118,7 +13121,7 @@ func cardNotificationSettings() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Err = checkbox.Checkbox(checkbox.Props{ID: "notify-" + setting.id, Checked: setting.checked}).Render(ctx, templ_7745c5c3_Buffer)
+							templ_7745c5c3_Err = checkbox.Checkbox(checkbox.Props{ID: "notify-" + setting.id, DefaultChecked: setting.checked}).Render(ctx, templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -13153,7 +13156,7 @@ func cardNotificationSettings() templ.Component {
 									var templ_7745c5c3_Var574 string
 									templ_7745c5c3_Var574, templ_7745c5c3_Err = templ.JoinStringErrs(setting.label)
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2172, Col: 23}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2174, Col: 23}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var574))
 									if templ_7745c5c3_Err != nil {
@@ -13184,7 +13187,7 @@ func cardNotificationSettings() templ.Component {
 									var templ_7745c5c3_Var576 string
 									templ_7745c5c3_Var576, templ_7745c5c3_Err = templ.JoinStringErrs(setting.description)
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2175, Col: 29}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2177, Col: 29}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var576))
 									if templ_7745c5c3_Err != nil {
@@ -13278,7 +13281,7 @@ func cardNotificationSettings() templ.Component {
 		var templ_7745c5c3_Var579 string
 		templ_7745c5c3_Var579, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2188, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2190, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var579))
 		if templ_7745c5c3_Err != nil {
@@ -13369,7 +13372,7 @@ func cardStyleOverview() templ.Component {
 					var templ_7745c5c3_Var583 string
 					templ_7745c5c3_Var583, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(templ.SafeCSS("--color: var(" + variable + ")"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2296, Col: 62}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2298, Col: 62}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var583))
 					if templ_7745c5c3_Err != nil {
@@ -13382,7 +13385,7 @@ func cardStyleOverview() templ.Component {
 					var templ_7745c5c3_Var584 string
 					templ_7745c5c3_Var584, templ_7745c5c3_Err = templ.JoinStringErrs(variable)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2299, Col: 17}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2301, Col: 17}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var584))
 					if templ_7745c5c3_Err != nil {
@@ -13416,7 +13419,7 @@ func cardStyleOverview() templ.Component {
 		var templ_7745c5c3_Var585 string
 		templ_7745c5c3_Var585, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2306, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2308, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var585))
 		if templ_7745c5c3_Err != nil {
@@ -13855,7 +13858,7 @@ func cardTypographySpecimen() templ.Component {
 												}
 												return nil
 											})
-											templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "general", Selected: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var607), templ_7745c5c3_Buffer)
+											templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "general"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var607), templ_7745c5c3_Buffer)
 											if templ_7745c5c3_Err != nil {
 												return templ_7745c5c3_Err
 											}
@@ -13951,7 +13954,7 @@ func cardTypographySpecimen() templ.Component {
 									}
 									return nil
 								})
-								templ_7745c5c3_Err = selectcomp.Select().Render(templ.WithChildren(ctx, templ_7745c5c3_Var603), templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = selectcomp.Select(selectcomp.Props{DefaultValue: "general"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var603), templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -14120,7 +14123,7 @@ func cardTypographySpecimen() templ.Component {
 		var templ_7745c5c3_Var616 string
 		templ_7745c5c3_Var616, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2449, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2451, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var616))
 		if templ_7745c5c3_Err != nil {
@@ -14407,7 +14410,7 @@ func cardUIElements(suffix string) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = slider.Slider(slider.Props{Value: []float64{500}, Max: 1000, Min: 0, Step: 10, Class: "flex-1", Attributes: templ.Attributes{"aria-label": "Slider"}}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = slider.Slider(slider.Props{DefaultValue: []float64{500}, Max: 1000, Min: 0, Step: 10, Class: "flex-1", Attributes: templ.Attributes{"aria-label": "Slider"}}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -14617,7 +14620,7 @@ func cardUIElements(suffix string) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = radiogroup.Item(radiogroup.ItemProps{Name: "ui-elements-fruit-" + suffix, Value: "apple", Checked: true}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = radiogroup.Item(radiogroup.ItemProps{Name: "ui-elements-fruit-" + suffix, Value: "apple", DefaultChecked: true}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -14629,7 +14632,7 @@ func cardUIElements(suffix string) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = checkbox.Checkbox(checkbox.Props{Checked: true}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = checkbox.Checkbox(checkbox.Props{DefaultChecked: true}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -15245,7 +15248,7 @@ func cardUIElements(suffix string) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = switchcomp.Switch(switchcomp.Props{Checked: true, Class: "ml-auto"}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = switchcomp.Switch(switchcomp.Props{DefaultChecked: true, Class: "ml-auto"}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -16725,7 +16728,7 @@ func cardCodespaces() templ.Component {
 		var templ_7745c5c3_Var726 string
 		templ_7745c5c3_Var726, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2829, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2831, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var726))
 		if templ_7745c5c3_Err != nil {
@@ -17215,7 +17218,7 @@ func cardInvoice() templ.Component {
 									var templ_7745c5c3_Var749 string
 									templ_7745c5c3_Var749, templ_7745c5c3_Err = templ.JoinStringErrs(row.item)
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2933, Col: 18}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2935, Col: 18}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var749))
 									if templ_7745c5c3_Err != nil {
@@ -17246,7 +17249,7 @@ func cardInvoice() templ.Component {
 									var templ_7745c5c3_Var751 string
 									templ_7745c5c3_Var751, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", row.qty))
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2936, Col: 36}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2938, Col: 36}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var751))
 									if templ_7745c5c3_Err != nil {
@@ -17277,7 +17280,7 @@ func cardInvoice() templ.Component {
 									var templ_7745c5c3_Var753 string
 									templ_7745c5c3_Var753, templ_7745c5c3_Err = templ.JoinStringErrs(invoiceUSD(row.unitPrice))
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2939, Col: 35}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2941, Col: 35}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var753))
 									if templ_7745c5c3_Err != nil {
@@ -17308,7 +17311,7 @@ func cardInvoice() templ.Component {
 									var templ_7745c5c3_Var755 string
 									templ_7745c5c3_Var755, templ_7745c5c3_Err = templ.JoinStringErrs(invoiceUSD(row.qty * row.unitPrice))
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2942, Col: 45}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2944, Col: 45}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var755))
 									if templ_7745c5c3_Err != nil {
@@ -17384,7 +17387,7 @@ func cardInvoice() templ.Component {
 								var templ_7745c5c3_Var759 string
 								templ_7745c5c3_Var759, templ_7745c5c3_Err = templ.JoinStringErrs(invoiceUSD(invoiceSubtotal()))
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2951, Col: 38}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2953, Col: 38}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var759))
 								if templ_7745c5c3_Err != nil {
@@ -17529,7 +17532,7 @@ func cardInvoice() templ.Component {
 								var templ_7745c5c3_Var766 string
 								templ_7745c5c3_Var766, templ_7745c5c3_Err = templ.JoinStringErrs(invoiceUSD(invoiceSubtotal()))
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2967, Col: 38}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 2969, Col: 38}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var766))
 								if templ_7745c5c3_Err != nil {
@@ -18347,7 +18350,7 @@ func cardShippingAddress() templ.Component {
 											}
 											return nil
 										})
-										templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "CA", Selected: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var801), templ_7745c5c3_Buffer)
+										templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "CA"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var801), templ_7745c5c3_Buffer)
 										if templ_7745c5c3_Err != nil {
 											return templ_7745c5c3_Err
 										}
@@ -18417,7 +18420,7 @@ func cardShippingAddress() templ.Component {
 								}
 								return nil
 							})
-							templ_7745c5c3_Err = selectcomp.Select().Render(templ.WithChildren(ctx, templ_7745c5c3_Var797), templ_7745c5c3_Buffer)
+							templ_7745c5c3_Err = selectcomp.Select(selectcomp.Props{DefaultValue: "CA"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var797), templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -18619,7 +18622,7 @@ func cardShippingAddress() templ.Component {
 											}
 											return nil
 										})
-										templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "US", Selected: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var813), templ_7745c5c3_Buffer)
+										templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "US"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var813), templ_7745c5c3_Buffer)
 										if templ_7745c5c3_Err != nil {
 											return templ_7745c5c3_Err
 										}
@@ -18689,7 +18692,7 @@ func cardShippingAddress() templ.Component {
 								}
 								return nil
 							})
-							templ_7745c5c3_Err = selectcomp.Select().Render(templ.WithChildren(ctx, templ_7745c5c3_Var809), templ_7745c5c3_Buffer)
+							templ_7745c5c3_Err = selectcomp.Select(selectcomp.Props{DefaultValue: "US"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var809), templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -18721,7 +18724,7 @@ func cardShippingAddress() templ.Component {
 							}()
 						}
 						ctx = templ.InitializeContext(ctx)
-						templ_7745c5c3_Err = checkbox.Checkbox(checkbox.Props{ID: "shipping-save", Checked: true}).Render(ctx, templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = checkbox.Checkbox(checkbox.Props{ID: "shipping-save", DefaultChecked: true}).Render(ctx, templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -18983,7 +18986,7 @@ func cardEnvironmentVariables() templ.Component {
 					var templ_7745c5c3_Var827 string
 					templ_7745c5c3_Var827, templ_7745c5c3_Err = templ.JoinStringErrs(env.key)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3177, Col: 40}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3179, Col: 40}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var827))
 					if templ_7745c5c3_Err != nil {
@@ -19354,7 +19357,7 @@ func cardBarChart() templ.Component {
 				var templ_7745c5c3_Var839 string
 				templ_7745c5c3_Var839, templ_7745c5c3_Err = templ.JoinStringErrs(barChartCardTotalString("desktop"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3281, Col: 87}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3283, Col: 87}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var839))
 				if templ_7745c5c3_Err != nil {
@@ -19367,7 +19370,7 @@ func cardBarChart() templ.Component {
 				var templ_7745c5c3_Var840 string
 				templ_7745c5c3_Var840, templ_7745c5c3_Err = templ.JoinStringErrs(barChartCardTotalString("mobile"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3285, Col: 86}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3287, Col: 86}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var840))
 				if templ_7745c5c3_Err != nil {
@@ -19380,7 +19383,7 @@ func cardBarChart() templ.Component {
 				var templ_7745c5c3_Var841 string
 				templ_7745c5c3_Var841, templ_7745c5c3_Err = templ.JoinStringErrs(barChartCardDelta())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3289, Col: 72}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3291, Col: 72}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var841))
 				if templ_7745c5c3_Err != nil {
@@ -19668,7 +19671,7 @@ func cardInviteTeam() templ.Component {
 									}
 									return nil
 								})
-								templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "admin", Selected: invite.role == "admin"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var854), templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "admin"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var854), templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -19694,7 +19697,7 @@ func cardInviteTeam() templ.Component {
 									}
 									return nil
 								})
-								templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "editor", Selected: invite.role == "editor"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var855), templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "editor"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var855), templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -19720,7 +19723,7 @@ func cardInviteTeam() templ.Component {
 									}
 									return nil
 								})
-								templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "viewer", Selected: invite.role == "viewer"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var856), templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "viewer"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var856), templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -19738,7 +19741,7 @@ func cardInviteTeam() templ.Component {
 						}
 						return nil
 					})
-					templ_7745c5c3_Err = selectcomp.Select().Render(templ.WithChildren(ctx, templ_7745c5c3_Var850), templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = selectcomp.Select(selectcomp.Props{DefaultValue: invite.role}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var850), templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -20157,7 +20160,7 @@ func cardActivateAgentDialog() templ.Component {
 						var templ_7745c5c3_Var875 string
 						templ_7745c5c3_Var875, templ_7745c5c3_Err = templ.JoinStringErrs("for production issues with deployment context.")
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3393, Col: 92}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3395, Col: 92}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var875))
 						if templ_7745c5c3_Err != nil {
@@ -20710,7 +20713,7 @@ func cardPieChart() templ.Component {
 						var templ_7745c5c3_Var897 string
 						templ_7745c5c3_Var897, templ_7745c5c3_Err = templ.JoinStringErrs(topBrowser)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3500, Col: 17}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3502, Col: 17}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var897))
 						if templ_7745c5c3_Err != nil {
@@ -20868,7 +20871,7 @@ func cardPieChart() templ.Component {
 				var templ_7745c5c3_Var903 string
 				templ_7745c5c3_Var903, templ_7745c5c3_Err = templ.JoinStringErrs(topBrowser)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3532, Col: 42}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3534, Col: 42}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var903))
 				if templ_7745c5c3_Err != nil {
@@ -20881,7 +20884,7 @@ func cardPieChart() templ.Component {
 				var templ_7745c5c3_Var904 string
 				templ_7745c5c3_Var904, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d%%", topShare))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3533, Col: 92}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3535, Col: 92}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var904))
 				if templ_7745c5c3_Err != nil {
@@ -21641,7 +21644,7 @@ func cardReportBug() templ.Component {
 										}
 										return nil
 									})
-									templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "medium", Selected: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var939), templ_7745c5c3_Buffer)
+									templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "medium"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var939), templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
@@ -21685,7 +21688,7 @@ func cardReportBug() templ.Component {
 							}
 							return nil
 						})
-						templ_7745c5c3_Err = selectcomp.Select().Render(templ.WithChildren(ctx, templ_7745c5c3_Var933), templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = selectcomp.Select(selectcomp.Props{DefaultValue: "medium"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var933), templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -21813,7 +21816,7 @@ func cardReportBug() templ.Component {
 										}
 										return nil
 									})
-									templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "dashboard", Selected: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var947), templ_7745c5c3_Buffer)
+									templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "dashboard"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var947), templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
@@ -21909,7 +21912,7 @@ func cardReportBug() templ.Component {
 							}
 							return nil
 						})
-						templ_7745c5c3_Err = selectcomp.Select().Render(templ.WithChildren(ctx, templ_7745c5c3_Var943), templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = selectcomp.Select(selectcomp.Props{DefaultValue: "dashboard"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var943), templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -22253,7 +22256,7 @@ func cardContributors() templ.Component {
 							var templ_7745c5c3_Var965 string
 							templ_7745c5c3_Var965, templ_7745c5c3_Err = templ.JoinStringErrs(username[:1])
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3714, Col: 21}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3716, Col: 21}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var965))
 							if templ_7745c5c3_Err != nil {
@@ -22514,7 +22517,7 @@ func cardFeedbackForm() templ.Component {
 											var templ_7745c5c3_Var978 string
 											templ_7745c5c3_Var978, templ_7745c5c3_Err = templ.JoinStringErrs(topic.label)
 											if templ_7745c5c3_Err != nil {
-												return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3762, Col: 24}
+												return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3764, Col: 24}
 											}
 											_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var978))
 											if templ_7745c5c3_Err != nil {
@@ -22868,7 +22871,7 @@ func cardBookAppointment() templ.Component {
 									var templ_7745c5c3_Var994 string
 									templ_7745c5c3_Var994, templ_7745c5c3_Err = templ.JoinStringErrs(slot)
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3807, Col: 14}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3809, Col: 14}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var994))
 									if templ_7745c5c3_Err != nil {
@@ -22876,14 +22879,14 @@ func cardBookAppointment() templ.Component {
 									}
 									return nil
 								})
-								templ_7745c5c3_Err = togglegroup.Item(togglegroup.ItemProps{Value: fmt.Sprintf("slot-%d", i), Pressed: i == 0}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var993), templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = togglegroup.Item(togglegroup.ItemProps{Value: fmt.Sprintf("slot-%d", i)}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var993), templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
 							}
 							return nil
 						})
-						templ_7745c5c3_Err = togglegroup.ToggleGroup(togglegroup.Props{Spacing: utils.Ptr(2)}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var992), templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = togglegroup.ToggleGroup(togglegroup.Props{Spacing: utils.Ptr(2), DefaultValue: []string{"slot-0"}}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var992), templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -23246,7 +23249,7 @@ func cardSleepReport() templ.Component {
 					var templ_7745c5c3_Var1008 string
 					templ_7745c5c3_Var1008, templ_7745c5c3_Err = templ.JoinStringErrs(stat.value)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3885, Col: 64}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3887, Col: 64}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var1008))
 					if templ_7745c5c3_Err != nil {
@@ -23259,7 +23262,7 @@ func cardSleepReport() templ.Component {
 					var templ_7745c5c3_Var1009 string
 					templ_7745c5c3_Var1009, templ_7745c5c3_Err = templ.JoinStringErrs(stat.label)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3886, Col: 61}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3888, Col: 61}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var1009))
 					if templ_7745c5c3_Err != nil {
@@ -23687,7 +23690,7 @@ func cardGithubProfile() templ.Component {
 										}
 										return nil
 									})
-									templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "m@example.com", Selected: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var1029), templ_7745c5c3_Buffer)
+									templ_7745c5c3_Err = selectcomp.Item(selectcomp.ItemProps{Value: "m@example.com"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var1029), templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
@@ -23731,7 +23734,7 @@ func cardGithubProfile() templ.Component {
 							}
 							return nil
 						})
-						templ_7745c5c3_Err = selectcomp.Select().Render(templ.WithChildren(ctx, templ_7745c5c3_Var1025), templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = selectcomp.Select(selectcomp.Props{DefaultValue: "m@example.com"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var1025), templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -23836,7 +23839,7 @@ func cardGithubProfile() templ.Component {
 							var templ_7745c5c3_Var1035 string
 							templ_7745c5c3_Var1035, templ_7745c5c3_Err = templ.JoinStringErrs("@mention")
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3954, Col: 33}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3956, Col: 33}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var1035))
 							if templ_7745c5c3_Err != nil {
@@ -24070,7 +24073,7 @@ func cardWeeklyFitnessSummary() templ.Component {
 					var templ_7745c5c3_Var1044 string
 					templ_7745c5c3_Var1044, templ_7745c5c3_Err = templ.JoinStringErrs(day.day)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3997, Col: 58}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 3999, Col: 58}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var1044))
 					if templ_7745c5c3_Err != nil {
@@ -24083,7 +24086,7 @@ func cardWeeklyFitnessSummary() templ.Component {
 					var templ_7745c5c3_Var1045 string
 					templ_7745c5c3_Var1045, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(templ.SafeCSS(fmt.Sprintf("height: %d%%", day.load)))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4001, Col: 68}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4003, Col: 68}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var1045))
 					if templ_7745c5c3_Err != nil {
@@ -24749,7 +24752,7 @@ func usageGauge(percentage float64) templ.Component {
 		var templ_7745c5c3_Var1072 string
 		templ_7745c5c3_Var1072, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(templ.SafeCSS(fmt.Sprintf("stroke-dasharray: %f %f", circumference, circumference)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4149, Col: 94}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4151, Col: 94}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var1072))
 		if templ_7745c5c3_Err != nil {
@@ -24762,7 +24765,7 @@ func usageGauge(percentage float64) templ.Component {
 		var templ_7745c5c3_Var1073 string
 		templ_7745c5c3_Var1073, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(templ.SafeCSS(fmt.Sprintf("stroke-dasharray: %f %f", strokePercent, circumference)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4161, Col: 94}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4163, Col: 94}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var1073))
 		if templ_7745c5c3_Err != nil {
@@ -24943,7 +24946,7 @@ func cardUsage() templ.Component {
 									var templ_7745c5c3_Var1084 string
 									templ_7745c5c3_Var1084, templ_7745c5c3_Err = templ.JoinStringErrs(entry.name)
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4182, Col: 20}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4184, Col: 20}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var1084))
 									if templ_7745c5c3_Err != nil {
@@ -24984,7 +24987,7 @@ func cardUsage() templ.Component {
 								var templ_7745c5c3_Var1086 string
 								templ_7745c5c3_Var1086, templ_7745c5c3_Err = templ.JoinStringErrs(entry.value)
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4186, Col: 99}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4188, Col: 99}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var1086))
 								if templ_7745c5c3_Err != nil {
@@ -25153,7 +25156,7 @@ func cardShortcuts() templ.Component {
 									var templ_7745c5c3_Var1094 string
 									templ_7745c5c3_Var1094, templ_7745c5c3_Err = templ.JoinStringErrs(shortcut.label)
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4221, Col: 25}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4223, Col: 25}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var1094))
 									if templ_7745c5c3_Err != nil {
@@ -25201,7 +25204,7 @@ func cardShortcuts() templ.Component {
 											var templ_7745c5c3_Var1097 string
 											templ_7745c5c3_Var1097, templ_7745c5c3_Err = templ.JoinStringErrs(key)
 											if templ_7745c5c3_Err != nil {
-												return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4227, Col: 17}
+												return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4229, Col: 17}
 											}
 											_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var1097))
 											if templ_7745c5c3_Err != nil {
@@ -25689,7 +25692,7 @@ func cardLiveWaveform() templ.Component {
 		var templ_7745c5c3_Var1117 string
 		templ_7745c5c3_Var1117, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4296, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4298, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var1117))
 		if templ_7745c5c3_Err != nil {
@@ -25852,7 +25855,7 @@ func cardVisitors() templ.Component {
 						var templ_7745c5c3_Var1125 string
 						templ_7745c5c3_Var1125, templ_7745c5c3_Err = templ.JoinStringErrs(visitorsTrend())
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4636, Col: 22}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/pages/create_preview_cards.templ`, Line: 4638, Col: 22}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var1125))
 						if templ_7745c5c3_Err != nil {

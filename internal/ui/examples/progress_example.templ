@@ -7,7 +7,6 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/slider"
 )
 
-// The kitchen-sink page from progress-example.tsx.
 templ progressExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {
@@ -53,7 +52,7 @@ templ progressExampleWithLabel() {
 	}
 }
 
-// The vanilla pendant of the demo's React state: the slider drives the bar.
+// The slider drives the progress bar.
 templ progressExampleControlled() {
 	@progressExampleSection("Controlled") {
 		<div class="flex w-full flex-col gap-4" data-progress-example-controlled>
@@ -63,10 +62,10 @@ templ progressExampleControlled() {
 				Class: "w-full",
 			})
 			@slider.Slider(slider.Props{
-				Value: []float64{50},
-				Min:    0,
-				Max:    100,
-				Step:   1,
+				DefaultValue: []float64{50},
+				Min:          0,
+				Max:          100,
+				Step:         1,
 			})
 		</div>
 		<script nonce={ templ.GetNonce(ctx) }>

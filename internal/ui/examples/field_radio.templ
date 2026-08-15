@@ -16,10 +16,10 @@ templ FieldRadio() {
 		<div data-slot="radio-group" class="grid gap-3">
 			@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 				@radiogroup.Item(radiogroup.ItemProps{
-					Name:    "plan",
-					Value:   "monthly",
-					ID:      "plan-monthly",
-					Checked: true,
+					Name:           "plan",
+					Value:          "monthly",
+					ID:             "plan-monthly",
+					DefaultChecked: true,
 				})
 				@field.Label(field.LabelProps{
 					For:   "plan-monthly",

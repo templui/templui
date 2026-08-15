@@ -12,7 +12,6 @@ import (
 	selectcomp "github.com/axadrn/shadcn-templ/v2/components/select"
 )
 
-// The kitchen-sink page from select-example.tsx.
 templ selectExampleSection(title, containerClass string) {
 	<div data-slot="example" class={ "mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none", containerClass }>
 		if title != "" {
@@ -257,7 +256,7 @@ var selectExamplePlans = []selectExamplePlanItem{
 // markup only lives in the list (the SelectValue render prop has no pendant).
 templ selectExamplePlan() {
 	@selectExampleSection("Subscription Plan", "") {
-		@selectcomp.Select(selectcomp.Props{Value: "Starter"}) {
+		@selectcomp.Select(selectcomp.Props{DefaultValue: "Starter"}) {
 			@selectcomp.Trigger(selectcomp.TriggerProps{Class: "h-auto! w-72"}) {
 				@selectcomp.Value()
 			}

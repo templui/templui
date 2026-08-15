@@ -1,0 +1,56 @@
+package sidebar06
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/dropdownmenu"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+type NavMainItem struct {
+	Title    string
+	URL      string
+	Icon     func(...icon.Props) templ.Component
+	IsActive bool
+	Items    []NavMainSubItem
+}
+
+type NavMainSubItem struct {
+	Title    string
+	URL      string
+	IsActive bool
+}
+
+templ NavMain(items []NavMainItem) {
+	@sidebar.Group() {
+		@sidebar.Menu() {
+			for _, item := range items {
+				@dropdownmenu.DropdownMenu() {
+					@sidebar.MenuItem() {
+						@sidebar.MenuButton(sidebar.MenuButtonProps{
+							Class:      "aria-expanded:bg-muted",
+							Attributes: dropdownmenu.Trigger(ctx),
+						}) {
+							{ item.Title }
+							@icon.Ellipsis(icon.Props{Class: "ml-auto"})
+						}
+						if len(item.Items) > 0 {
+							@dropdownmenu.Content(dropdownmenu.ContentProps{
+								Side:        dropdownmenu.SideRight,
+								Align:       dropdownmenu.AlignStart,
+								MobileSide:  dropdownmenu.SideBottom,
+								MobileAlign: dropdownmenu.AlignEnd,
+								Class:       "min-w-56 rounded-lg",
+							}) {
+								for _, subItem := range item.Items {
+									@dropdownmenu.Item(dropdownmenu.ItemProps{Href: subItem.URL}) {
+										{ subItem.Title }
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -26,13 +26,19 @@ const (
 
 type ctxKey string
 
-const idKey ctxKey = "popoverID"
+const stateKey ctxKey = "popoverState"
 
-func popoverID(ctx context.Context) string {
-	if id, ok := ctx.Value(idKey).(string); ok {
-		return id
+type ctxState struct {
+	id          string
+	initialOpen bool
+	controlled  bool
+}
+
+func state(ctx context.Context) ctxState {
+	if s, ok := ctx.Value(stateKey).(ctxState); ok {
+		return s
 	}
-	return ""
+	return ctxState{}
 }
 
 // Trigger returns the attributes that turn any element (usually a button)
@@ -40,7 +46,7 @@ func popoverID(ctx context.Context) string {
 func Trigger(ctx context.Context) templ.Attributes {
 	return templ.Attributes{
 		"data-tui-popover-trigger": true,
-		"aria-controls":            popoverID(ctx),
+		"aria-controls":            state(ctx).id,
 		"aria-haspopup":            "dialog",
 		"aria-expanded":            "false",
 	}
@@ -48,10 +54,22 @@ func Trigger(ctx context.Context) templ.Attributes {
 
 type Props struct {
 	ID string
+	// Open is the server-rendered controlled state. In a static templ render,
+	// a non-nil value overrides DefaultOpen, matching Base UI's optional open.
+	Open *bool
+	// DefaultOpen renders an uncontrolled popover initially open, matching
+	// Base UI Popover.Root's defaultOpen prop.
+	DefaultOpen bool
+}
+
+func initialOpen(p Props) bool {
+	if p.Open != nil {
+		return *p.Open
+	}
+	return p.DefaultOpen
 }
 
 type ContentProps struct {
-	ID         string
 	Class      string
 	Attributes templ.Attributes
 	// Side of the trigger to open against. Defaults to bottom.
@@ -92,7 +110,7 @@ templ Popover(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, idKey, p.ID) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, initialOpen: initialOpen(p), controlled: p.Open != nil}) }}
 	{ children... }
 }
 
@@ -112,50 +130,49 @@ templ Content(props ...ContentProps) {
 		if sideOffset == 0 {
 			sideOffset = 4
 		}
-		id := popoverID(ctx)
-		if p.ID != "" {
-			id = p.ID
-		}
+		s := state(ctx)
 	}}
 	// Inert until the script portals it to <body> at init, so the SSRd
 	// content never participates in layout or sibling CSS.
 	<template data-tui-popover-portal>
-	<div
-		id={ id }
-		data-tui-popover-content
-		data-tui-popover-side={ string(p.Side) }
-		data-tui-popover-align={ string(p.Align) }
-		data-tui-popover-side-offset={ strconv.Itoa(sideOffset) }
-		if p.AlignOffset != 0 {
-			data-tui-popover-align-offset={ strconv.Itoa(p.AlignOffset) }
-		}
-		data-state="closed"
-		popover="manual"
-		class="pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
-	>
 		<div
-			data-slot="popover-content"
-			data-tui-popover-popup
-			data-state="closed"
-			role="dialog"
-			tabindex="-1"
-			class={
-				utils.CN(
-					// 1:1 base/ui/popover.tsx PopoverContent, the look comes from
-					// cn-popover-content (animations key on our data-state attribute).
-					// origin-(--transform-origin) becomes our JS variable name.
-					"cn-popover-content cn-popover-content-logical z-50 w-72 origin-(--tui-popover-transform-origin) outline-hidden",
-					// JS wiring: the positioner wrapper is pointer-events-none, and the
-					// popup stays mounted after animate-out until hidePopover runs.
-					"pointer-events-auto data-closed:fill-mode-forwards",
-					p.Class,
-				),
+			id={ s.id }
+			data-tui-popover-content
+			data-tui-popover-side={ string(p.Side) }
+			data-tui-popover-align={ string(p.Align) }
+			data-tui-popover-side-offset={ strconv.Itoa(sideOffset) }
+			data-tui-popover-initial-open={ strconv.FormatBool(s.initialOpen) }
+			data-tui-popover-controlled?={ s.controlled }
+			if p.AlignOffset != 0 {
+				data-tui-popover-align-offset={ strconv.Itoa(p.AlignOffset) }
 			}
-			{ p.Attributes... }
+			data-closed
+			hidden
+			data-tui-portal
+			class="pointer-events-none isolate absolute inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
 		>
-			{ children... }
+			<div
+				data-slot="popover-content"
+				data-tui-popover-popup
+				data-closed
+				role="dialog"
+				tabindex="-1"
+				class={
+					utils.CN(
+						// 1:1 base/ui/popover.tsx PopoverContent, the look comes from
+						// cn-popover-content and Base UI's standard transform-origin variable.
+						"cn-popover-content cn-popover-content-logical z-50 w-72 origin-(--transform-origin) outline-hidden",
+						// JS wiring: the positioner wrapper is pointer-events-none, and the
+						// popup stays mounted after animate-out until hidePopover runs.
+						"pointer-events-auto data-closed:fill-mode-forwards",
+						p.Class,
+					),
+				}
+				{ p.Attributes... }
+			>
+				{ children... }
+			</div>
 		</div>
-	</div>
 	</template>
 }
 

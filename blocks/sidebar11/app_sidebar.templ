@@ -1,0 +1,141 @@
+package sidebar11
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/collapsible"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+// This is sample data.
+type change struct {
+	File  string
+	State string
+}
+
+var changes = []change{
+	{File: "README.md", State: "M"},
+	{File: "api/hello/route.ts", State: "U"},
+	{File: "app/layout.templ", State: "M"},
+}
+
+// treeData mirrors the tsx's TreeItem = string | TreeItem[] shape: a string is
+// a file, a slice is a folder whose first element is its name.
+var treeData = []any{
+	[]any{
+		"app",
+		[]any{
+			"api",
+			[]any{"hello", []any{"route.ts"}},
+			"page.templ",
+			"layout.templ",
+			[]any{"blog", []any{"page.templ"}},
+		},
+	},
+	[]any{
+		"components",
+		[]any{"ui", "button.templ", "card.templ"},
+		"header.templ",
+		"footer.templ",
+	},
+	[]any{"lib", []any{"util.ts"}},
+	[]any{"public", "favicon.ico", "vercel.svg"},
+	".eslintrc.json",
+	".gitignore",
+	"next.config.js",
+	"tailwind.config.js",
+	"package.json",
+	"README.md",
+}
+
+templ AppSidebar(props ...sidebar.Props) {
+	{{ var p sidebar.Props }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	@sidebar.Sidebar(p) {
+		@sidebar.Content() {
+			@sidebar.Group() {
+				@sidebar.GroupLabel() {
+					Changes
+				}
+				@sidebar.GroupContent() {
+					@sidebar.Menu() {
+						for _, item := range changes {
+							@sidebar.MenuItem() {
+								@sidebar.MenuButton() {
+									@icon.File()
+									{ item.File }
+								}
+								@sidebar.MenuBadge() {
+									{ item.State }
+								}
+							}
+						}
+					}
+				}
+			}
+			@sidebar.Group() {
+				@sidebar.GroupLabel() {
+					Files
+				}
+				@sidebar.GroupContent() {
+					@sidebar.Menu() {
+						for _, item := range treeData {
+							@tree(item)
+						}
+					}
+				}
+			}
+		}
+		@sidebar.Rail()
+	}
+}
+
+// treeParts is the pendant of the tsx's
+// const [name, ...items] = Array.isArray(item) ? item : [item]
+func treeParts(item any) (string, []any) {
+	if arr, ok := item.([]any); ok {
+		if len(arr) == 0 {
+			return "", nil
+		}
+		name, _ := arr[0].(string)
+		return name, arr[1:]
+	}
+	name, _ := item.(string)
+	return name, nil
+}
+
+templ tree(item any) {
+	{{ name, items := treeParts(item) }}
+	if len(items) == 0 {
+		@sidebar.MenuButton(sidebar.MenuButtonProps{
+			IsActive: name == "button.templ",
+			Class:    "data-[active=true]:bg-transparent",
+		}) {
+			@icon.File()
+			{ name }
+		}
+	} else {
+		@sidebar.MenuItem() {
+			@collapsible.Collapsible(collapsible.Props{
+				Class:       "group/collapsible [&[data-open]>button>svg:first-child]:rotate-90",
+				DefaultOpen: name == "components" || name == "ui",
+			}) {
+				@sidebar.MenuButton(sidebar.MenuButtonProps{
+					Attributes: collapsible.Trigger(ctx),
+				}) {
+					@icon.ChevronRight(icon.Props{Class: "transition-transform"})
+					@icon.Folder()
+					{ name }
+				}
+				@collapsible.Content() {
+					@sidebar.MenuSub() {
+						for _, subItem := range items {
+							@tree(subItem)
+						}
+					}
+				}
+			}
+		}
+	}
+}

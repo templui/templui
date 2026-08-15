@@ -1,0 +1,76 @@
+package sidebar10
+
+import (
+	"strconv"
+
+	"github.com/axadrn/shadcn-templ/v2/components/dropdownmenu"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+templ TeamSwitcher(teams []Team) {
+	if len(teams) > 0 {
+		@sidebar.Menu() {
+			@sidebar.MenuItem() {
+				@dropdownmenu.DropdownMenu(dropdownmenu.Props{ID: "sidebar10-team-menu"}) {
+					@sidebar.MenuButton(sidebar.MenuButtonProps{
+						Class:      "w-fit px-1.5",
+						Attributes: dropdownmenu.Trigger(ctx),
+					}) {
+						<div class="flex aspect-square size-5 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
+							// Render every logo up front; the page script shows the active one.
+							for i, team := range teams {
+								@team.Logo(icon.Props{
+									Class:      teamLogoHidden(i),
+									Attributes: templ.Attributes{"data-sidebar10-team-logo": strconv.Itoa(i)},
+								})
+							}
+						</div>
+						<span class="truncate font-medium" data-sidebar10-team-name>{ teams[0].Name }</span>
+						@icon.ChevronDown(icon.Props{Class: "opacity-50"})
+					}
+					@dropdownmenu.Content(dropdownmenu.ContentProps{
+						Class:      "w-64 rounded-lg",
+						Align:      dropdownmenu.AlignStart,
+						Side:       dropdownmenu.SideBottom,
+						SideOffset: 4,
+					}) {
+						@dropdownmenu.Label(dropdownmenu.LabelProps{Class: "text-xs text-muted-foreground"}) {
+							Teams
+						}
+						for i, team := range teams {
+							@dropdownmenu.Item(dropdownmenu.ItemProps{
+								Class:      "gap-2 p-2",
+								Attributes: templ.Attributes{"data-sidebar10-team-index": strconv.Itoa(i)},
+							}) {
+								<div class="flex size-6 items-center justify-center rounded-xs border">
+									@team.Logo()
+								</div>
+								{ team.Name }
+								@dropdownmenu.Shortcut() {
+									⌘{ strconv.Itoa(i + 1) }
+								}
+							}
+						}
+						@dropdownmenu.Separator()
+						@dropdownmenu.Item(dropdownmenu.ItemProps{Class: "gap-2 p-2"}) {
+							<div class="flex size-6 items-center justify-center rounded-md border bg-background">
+								@icon.Plus(icon.Props{Class: "size-4"})
+							</div>
+							<div class="font-medium text-muted-foreground">Add team</div>
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// teamLogoHidden hides every logo except the active one, the SSR half of the
+// page script's team switch.
+func teamLogoHidden(i int) string {
+	if i == 0 {
+		return ""
+	}
+	return " hidden"
+}

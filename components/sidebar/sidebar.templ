@@ -208,6 +208,10 @@ type MenuButtonProps struct {
 	Variant    MenuButtonVariant // default: "default"
 	Size       MenuButtonSize    // default: "default"
 	Tooltip    string            // Tooltip text to show when sidebar is collapsed to icons
+	// TooltipHidden overrides the automatic tooltip visibility (shadcn's
+	// tooltip.hidden): nil follows the collapsed-to-icons rule, false forces
+	// the tooltip, true disables it.
+	TooltipHidden *bool
 }
 
 type MenuActionProps struct {
@@ -745,8 +749,15 @@ templ MenuButton(props ...MenuButtonProps) {
 			{{ tp := p }}
 			{{ trigger := tooltip.Trigger(ctx) }}
 			// The tooltip only shows while the sidebar is collapsed to icons;
-			// the script keeps the attribute in sync on toggle.
-			if !(s.collapsed && s.collapsible == CollapsibleIcon) {
+			// the script keeps the attribute in sync on toggle. An explicit
+			// TooltipHidden pins the state (the fixed marker keeps the
+			// script's toggle sync away).
+			if p.TooltipHidden != nil {
+				{{ trigger["data-tui-sidebar-tooltip-fixed"] = true }}
+				if *p.TooltipHidden {
+					{{ trigger["data-tui-tooltip-disabled"] = true }}
+				}
+			} else if !(s.collapsed && s.collapsible == CollapsibleIcon) {
 				{{ trigger["data-tui-tooltip-disabled"] = true }}
 			}
 			{{ tp.Attributes = utils.MergeAttributes(trigger, p.Attributes) }}

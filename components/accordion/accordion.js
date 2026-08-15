@@ -12,9 +12,29 @@
     return item.querySelector('[data-slot="accordion-content"]');
   }
 
+  function valueOf(item) {
+    return item.getAttribute("data-tui-accordion-value") || "";
+  }
+
+  function valuesOf(accordion) {
+    return [...accordion.querySelectorAll('[data-slot="accordion-item"]')]
+      .filter(
+        (item) =>
+          item.closest('[data-slot="accordion"]') === accordion &&
+          triggerOf(item)?.getAttribute("aria-expanded") === "true",
+      )
+      .map(valueOf);
+  }
+
+  function syncItemState(item, open) {
+    item.toggleAttribute("data-open", open);
+    item.toggleAttribute("data-closed", !open);
+  }
+
   function openItem(item) {
     const panel = panelOf(item);
     triggerOf(item).setAttribute("aria-expanded", "true");
+  syncItemState(item, true);
     if (!panel) return;
     panel.removeAttribute("data-closed");
     panel.hidden = false;
@@ -25,6 +45,7 @@
   function closeItem(item) {
     const panel = panelOf(item);
     triggerOf(item).setAttribute("aria-expanded", "false");
+  syncItemState(item, false);
     if (!panel) return;
     panel.removeAttribute("data-open");
     panel.style.setProperty("--tui-accordion-panel-height", panel.scrollHeight + "px");
@@ -41,19 +62,44 @@
     );
   }
 
+  function requestValueChange(accordion, item) {
+    const open = triggerOf(item).getAttribute("aria-expanded") === "true";
+    let values = valuesOf(accordion);
+    if (open) {
+      values = values.filter((value) => value !== valueOf(item));
+    } else if (accordion.hasAttribute("data-multiple")) {
+      values = [...values, valueOf(item)];
+    } else {
+      values = [valueOf(item)];
+    }
+    const change = new CustomEvent("accordion-value-change", {
+      bubbles: true,
+      cancelable: true,
+      detail: { values },
+    });
+    const accepted = accordion.dispatchEvent(change);
+    return accepted && !accordion.hasAttribute("data-tui-accordion-controlled");
+  }
+
   document.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
     const trigger = e.target.closest('[data-slot="accordion-trigger"]');
     if (!trigger) return;
     const item = trigger.closest('[data-slot="accordion-item"]');
     const accordion = trigger.closest('[data-slot="accordion"]');
-    if (!item || !accordion || item.hasAttribute("data-disabled")) return;
+  if (
+    !item ||
+    !accordion ||
+    item.hasAttribute("data-disabled") ||
+    accordion.hasAttribute("data-disabled") ||
+    !requestValueChange(accordion, item)
+  ) return;
 
     if (trigger.getAttribute("aria-expanded") === "true") {
       closeItem(item);
       return;
     }
-    if (accordion.hasAttribute("data-disable-open-multiple")) {
+  if (!accordion.hasAttribute("data-multiple")) {
       accordion.querySelectorAll('[data-slot="accordion-item"]').forEach((other) => {
         if (other === item) return;
         if (other.closest('[data-slot="accordion"]') !== accordion) return;

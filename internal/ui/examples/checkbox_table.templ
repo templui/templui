@@ -49,9 +49,9 @@ templ CheckboxTable() {
 					}) {
 						@table.Cell() {
 							@checkbox.Checkbox(checkbox.Props{
-								ID:      "row-" + row.ID + "-checkbox",
-								Name:    "row-" + row.ID + "-checkbox",
-								Checked: row.ID == "1",
+								ID:             "row-" + row.ID + "-checkbox",
+								Name:           "row-" + row.ID + "-checkbox",
+								DefaultChecked: row.ID == "1",
 							})
 						}
 						@table.Cell(table.CellProps{Class: "font-medium"}) {
@@ -69,8 +69,7 @@ templ CheckboxTable() {
 		}
 	</div>
 	<script nonce={ templ.GetNonce(ctx) }>
-		// The vanilla pendant of the demo's React selection state. The
-		// checkbox renders a span root with a hidden native input beside it;
+		// The checkbox renders a span root with a hidden native input beside it;
 		// dispatching change after a programmatic check lets checkbox.js sync
 		// the root's state attributes.
 		let updatingCheckboxTable = false;

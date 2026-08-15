@@ -27,10 +27,16 @@ type ctxKey string
 const stateKey ctxKey = "selectState"
 
 type ctxState struct {
-	id       string
-	name     string
-	value    string
-	disabled bool
+	id              string
+	name            string
+	value           string
+	valueControlled bool
+	initialOpen     bool
+	openControlled  bool
+	disabled        bool
+	readOnly        bool
+	required        bool
+	form            string
 }
 
 func state(ctx context.Context) ctxState {
@@ -44,9 +50,30 @@ type Props struct {
 	ID string
 	// Name makes the select submit its value in forms (hidden input).
 	Name string
-	// Value preselects the item with this value.
-	Value    string
-	Disabled bool
+	// Value is the controlled selected value. Use DefaultValue when the
+	// browser should own selection after the initial render.
+	Value        *string
+	DefaultValue string
+	Open         *bool
+	DefaultOpen  bool
+	Disabled     bool
+	ReadOnly     bool
+	Required     bool
+	Form         string
+}
+
+func initialValue(p Props) string {
+	if p.Value != nil {
+		return *p.Value
+	}
+	return p.DefaultValue
+}
+
+func initialOpen(p Props) bool {
+	if p.Open != nil {
+		return *p.Open
+	}
+	return p.DefaultOpen
 }
 
 type TriggerProps struct {
@@ -68,7 +95,7 @@ type ValueProps struct {
 type ContentProps struct {
 	Class      string
 	Attributes templ.Attributes
-		// DisableAlignItemWithTrigger opens the popup below the trigger like a
+	// DisableAlignItemWithTrigger opens the popup below the trigger like a
 	// dropdown instead of overlaying the selected item (Base UI
 	// alignItemWithTrigger, default true).
 	DisableAlignItemWithTrigger bool
@@ -93,7 +120,6 @@ type ItemProps struct {
 	Class      string
 	Attributes templ.Attributes
 	Value      string
-	Selected   bool
 	Disabled   bool
 	// Label overrides the text shown on the trigger when this item is
 	// selected (Base UI Select.Item label).
@@ -116,7 +142,7 @@ templ Select(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, name: p.Name, value: p.Value, disabled: p.Disabled}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, name: p.Name, value: initialValue(p), valueControlled: p.Value != nil, initialOpen: initialOpen(p), openControlled: p.Open != nil, disabled: p.Disabled, readOnly: p.ReadOnly, required: p.Required, form: p.Form}) }}
 	{ children... }
 }
 
@@ -130,7 +156,17 @@ templ Trigger(props ...TriggerProps) {
 	}
 	{{ s := state(ctx) }}
 	if s.name != "" {
-		<input type="hidden" name={ s.name } value={ s.value } data-tui-select-input aria-hidden="true" tabindex="-1"/>
+		<input
+			type="hidden"
+			name={ s.name }
+			value={ s.value }
+			if s.form != "" {
+				form={ s.form }
+			}
+			data-tui-select-input
+			aria-hidden="true"
+			tabindex="-1"
+		/>
 	}
 	<button
 		type="button"
@@ -144,6 +180,9 @@ templ Trigger(props ...TriggerProps) {
 		aria-controls={ s.id }
 		aria-haspopup="listbox"
 		aria-expanded="false"
+		aria-readonly?={ s.readOnly }
+		aria-required?={ s.required }
+		data-tui-select-value-controlled?={ s.valueControlled }
 		if s.value == "" {
 			data-placeholder
 		}
@@ -191,52 +230,53 @@ templ Content(props ...ContentProps) {
 	// Inert until the script portals it to <body> at init, so the SSRd
 	// content never participates in layout or sibling CSS.
 	<template data-tui-select-portal>
-	<div
-		id={ s.id }
-		data-tui-select-content
-		data-tui-select-disable-align-item-with-trigger?={ p.DisableAlignItemWithTrigger }
-		data-tui-select-align={ string(p.Align) }
-		data-state="closed"
-		popover="manual"
-		class="pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
-	>
 		<div
-			data-slot="select-content"
-			data-tui-select-popup
-			if p.DisableAlignItemWithTrigger {
-				data-align-trigger="false"
-			} else {
-				data-align-trigger="true"
-			}
-			data-state="closed"
-			role="listbox"
-			class={
-				utils.CN(
-					// 1:1 base/ui/select.tsx SelectContent, the look comes from
-					// cn-select-content (animations key on our data-state attribute).
-					// The --available-height/--anchor-width/--transform-origin
-					// variables become our JS variable names.
-					"cn-select-content cn-select-content-logical cn-menu-target cn-menu-translucent relative isolate z-50 max-h-(--tui-select-available-height) w-(--tui-select-anchor-width) origin-(--tui-select-transform-origin) overflow-x-hidden overflow-y-auto data-[align-trigger=true]:animate-none",
-					// JS wiring: the positioner wrapper is pointer-events-none, the
-					// scroll arrows/viewport need a flex column, and the popup stays
-					// mounted after animate-out until hidePopover runs.
-					"pointer-events-auto flex flex-col data-closed:fill-mode-forwards",
-					p.Class,
-				),
-			}
-			{ p.Attributes... }
+			id={ s.id }
+			data-tui-select-content
+			data-tui-portal
+			data-tui-select-disable-align-item-with-trigger?={ p.DisableAlignItemWithTrigger }
+			data-tui-select-align={ string(p.Align) }
+			data-tui-select-initial-open={ utils.IfElse(s.initialOpen, "true", "false") }
+			data-tui-select-open-controlled?={ s.openControlled }
+			data-closed
+			hidden
+			class="pointer-events-none isolate absolute inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
 		>
-			<div data-slot="select-scroll-up-button" data-tui-select-scroll-up class="cn-select-scroll-up-button top-0 w-full absolute hidden">
-				@icon.ChevronUp()
-			</div>
-			<div data-tui-select-viewport class="relative flex-1 overflow-x-hidden overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-				{ children... }
-			</div>
-			<div data-slot="select-scroll-down-button" data-tui-select-scroll-down class="cn-select-scroll-down-button bottom-0 w-full absolute hidden">
-				@icon.ChevronDown()
+			<div
+				data-slot="select-content"
+				data-tui-select-popup
+				if p.DisableAlignItemWithTrigger {
+					data-align-trigger="false"
+				} else {
+					data-align-trigger="true"
+				}
+				data-closed
+				role="listbox"
+				class={
+					utils.CN(
+						// 1:1 base/ui/select.tsx SelectContent, the look comes from
+						// cn-select-content and Base UI's standard positioner variables.
+						"cn-select-content cn-select-content-logical cn-menu-target cn-menu-translucent relative isolate z-50 max-h-(--available-height) w-(--anchor-width) origin-(--transform-origin) overflow-x-hidden overflow-y-auto data-[align-trigger=true]:animate-none",
+						// JS wiring: the positioner wrapper is pointer-events-none, the
+						// scroll arrows/viewport need a flex column, and the popup stays
+						// mounted after animate-out until hidePopover runs.
+						"pointer-events-auto flex flex-col data-closed:fill-mode-forwards",
+						p.Class,
+					),
+				}
+				{ p.Attributes... }
+			>
+				<div data-slot="select-scroll-up-button" data-tui-select-scroll-up class="cn-select-scroll-up-button top-0 w-full absolute hidden">
+					@icon.ChevronUp()
+				</div>
+				<div data-tui-select-viewport class="relative flex-1 overflow-x-hidden overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+					{ children... }
+				</div>
+				<div data-slot="select-scroll-down-button" data-tui-select-scroll-down class="cn-select-scroll-down-button bottom-0 w-full absolute hidden">
+					@icon.ChevronDown()
+				</div>
 			</div>
 		</div>
-	</div>
 	</template>
 }
 
@@ -281,7 +321,7 @@ templ Item(props ...ItemProps) {
 		{{ p = props[0] }}
 	}
 	{{ s := state(ctx) }}
-	{{ selected := p.Selected || (s.value != "" && s.value == p.Value) }}
+	{{ selected := s.value != "" && s.value == p.Value }}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
@@ -295,10 +335,9 @@ templ Item(props ...ItemProps) {
 			data-tui-select-label={ p.Label }
 		}
 		if selected {
-			data-state="checked"
+			data-selected
 			aria-selected="true"
 		} else {
-			data-state="unchecked"
 			aria-selected="false"
 		}
 		if p.Disabled {
@@ -322,7 +361,7 @@ templ Item(props ...ItemProps) {
 		<span data-tui-select-item-text class="cn-select-item-text shrink-0 whitespace-nowrap">
 			{ children... }
 		</span>
-		<span class="cn-select-item-indicator opacity-0 group-data-[state=checked]/select-item:opacity-100">
+		<span class="cn-select-item-indicator opacity-0 group-data-selected/select-item:opacity-100">
 			@icon.Check(icon.Props{Class: "cn-select-item-indicator-icon pointer-events-none"})
 		</span>
 	</div>

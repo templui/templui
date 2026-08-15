@@ -1,6 +1,8 @@
 package registryapi
 
 import (
+	"regexp"
+	"github.com/axadrn/shadcn-templ/v2/internal/inliner"
 	"encoding/json"
 	"net/url"
 	"strings"
@@ -330,7 +332,7 @@ func TestBuildStyleItem(t *testing.T) {
 	// repo root).
 	t.Setenv("GO_ENV", "production")
 
-	item, err := BuildStyleItem("base-nova", "button")
+	item, err := BuildStyleItem("base-nova", "button", inliner.Options{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -344,7 +346,8 @@ func TestBuildStyleItem(t *testing.T) {
 		t.Fatalf("files = %+v", item.Files)
 	}
 	content := item.Files[0].Content
-	if strings.Contains(content, "cn-") {
+	// \bcn- keeps the module path (shadcn-templ) out of the match.
+	if regexp.MustCompile(`\bcn-`).MatchString(content) {
 		t.Error("compiled content still contains cn-* markers")
 	}
 	if !strings.Contains(content, "bg-primary") {
@@ -354,7 +357,7 @@ func TestBuildStyleItem(t *testing.T) {
 		t.Errorf("meta = %+v", item.Meta)
 	}
 
-	vega, err := BuildStyleItem("base-vega", "button")
+	vega, err := BuildStyleItem("base-vega", "button", inliner.Options{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -363,13 +366,13 @@ func TestBuildStyleItem(t *testing.T) {
 	}
 
 	// Unknown style and unknown component are the 404 case.
-	if item, _ := BuildStyleItem("base-bogus", "button"); item != nil {
+	if item, _ := BuildStyleItem("base-bogus", "button", inliner.Options{}); item != nil {
 		t.Error("unknown style returned an item")
 	}
-	if item, _ := BuildStyleItem("radix-nova", "button"); item != nil {
+	if item, _ := BuildStyleItem("radix-nova", "button", inliner.Options{}); item != nil {
 		t.Error("radix base must 404, shadcn-templ has only base-*")
 	}
-	if item, _ := BuildStyleItem("base-nova", "bogus"); item != nil {
+	if item, _ := BuildStyleItem("base-nova", "bogus", inliner.Options{}); item != nil {
 		t.Error("unknown component returned an item")
 	}
 }

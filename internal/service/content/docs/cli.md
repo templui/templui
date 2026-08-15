@@ -52,6 +52,8 @@ shadcn-templ add [component]
 
 The CLI resolves registry dependencies recursively (for example `alert-dialog` pulls in `button` and `dialog`) and rewrites all imports to your module. After adding, run `templ generate` and `go mod tidy` to complete the install.
 
+Blocks install the same way: `shadcn-templ add sidebar-07` writes the block's package with every file and pulls in the components it builds on. Browse them at [/blocks](/blocks).
+
 Existing files are never overwritten silently; re-run with `--overwrite` to update.
 
 **Options**

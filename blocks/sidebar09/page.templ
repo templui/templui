@@ -1,0 +1,73 @@
+package sidebar09
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/breadcrumb"
+	"github.com/axadrn/shadcn-templ/v2/components/separator"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+templ Page() {
+	@sidebar.Provider(sidebar.ProviderProps{
+		// Set both custom widths because this style replaces the provider default.
+		Attributes: templ.Attributes{"style": "--sidebar-width: 350px; --sidebar-width-icon: 3rem;"},
+	}) {
+		@AppSidebar()
+		@sidebar.Inset() {
+			<header class="sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4">
+				@sidebar.Trigger(sidebar.TriggerProps{Class: "-ml-1"})
+				@separator.Separator(separator.Props{
+					Orientation: separator.OrientationVertical,
+					Class:       "mr-2 data-vertical:h-4 data-vertical:self-auto",
+				})
+				@breadcrumb.Breadcrumb() {
+					@breadcrumb.List() {
+						@breadcrumb.Item(breadcrumb.ItemProps{Class: "hidden md:block"}) {
+							@breadcrumb.Link(breadcrumb.LinkProps{Href: "#"}) {
+								All Inboxes
+							}
+						}
+						@breadcrumb.Separator(breadcrumb.SeparatorProps{Class: "hidden md:block"})
+						@breadcrumb.Item() {
+							@breadcrumb.Page() {
+								Inbox
+							}
+						}
+					}
+				}
+			</header>
+			<div class="flex flex-1 flex-col gap-4 p-4">
+				for i := 0; i < 24; i++ {
+					<div class="aspect-video h-12 w-full rounded-lg bg-muted/50"></div>
+				}
+			</div>
+		}
+	}
+	<script nonce={ templ.GetNonce(ctx) }>
+		(() => {
+			// The activeItem/setMails/setOpen pendant: a picked inbox item
+			// activates itself, retitles the mail sidebar, reshuffles the
+			// mail list to a random 5-10 slice and expands the sidebar.
+			document.addEventListener("click", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const btn = e.target.closest("[data-sidebar09-nav]");
+				if (!btn) return;
+				document.querySelectorAll("[data-sidebar09-nav]").forEach((el) => {
+					el.toggleAttribute("data-active", el === btn);
+				});
+				const title = document.querySelector("[data-sidebar09-active-title]");
+				if (title) title.textContent = btn.getAttribute("data-sidebar09-nav");
+				const list = document.querySelector("[data-sidebar09-mails]");
+				if (list) {
+					const items = [...list.children];
+					items.sort(() => Math.random() - 0.5);
+					const count = Math.max(5, Math.floor(Math.random() * 10) + 1);
+					items.forEach((item, i) => {
+						list.appendChild(item);
+						item.hidden = i >= count;
+					});
+				}
+				window.tui.sidebar.setOpen(true, "sidebar09-icon-sidebar");
+			});
+		})();
+	</script>
+}

@@ -120,18 +120,33 @@ func printFileSummary(verb string, files []string, suffix string) {
 	}
 }
 
-// resolveFilePath is the resolveFilePath pendant: registry paths map onto the
-// configured directories by type ("components/button/button.templ" ->
-// <components dir>/button/button.templ, "utils/shadcn-templ.go" -> <utils dir>/
-// shadcn-templ.go).
+// resolveFilePath is the resolveFilePath pendant: an explicit target wins
+// (shadcn resolves block pages onto their target path), then registry paths
+// map onto the configured directories by type
+// ("components/button/button.templ" -> <components dir>/button/button.templ,
+// "utils/shadcn-templ.go" -> <utils dir>/shadcn-templ.go).
 func resolveFilePath(file registry.ItemFile, config *utils.Config, pathOverride string) (string, error) {
 	switch {
+	case file.Target != "":
+		base := config.ResolvedPaths.Cwd
+		if pathOverride != "" {
+			base = filepath.Join(config.ResolvedPaths.Cwd, filepath.FromSlash(pathOverride))
+		}
+		return filepath.Join(base, filepath.FromSlash(file.Target)), nil
 	case strings.HasPrefix(file.Path, "components/"):
 		base := config.ResolvedPaths.Components
 		if pathOverride != "" {
 			base = filepath.Join(config.ResolvedPaths.Cwd, filepath.FromSlash(pathOverride))
 		}
 		return filepath.Join(base, filepath.FromSlash(strings.TrimPrefix(file.Path, "components/"))), nil
+	case strings.HasPrefix(file.Path, "blocks/"):
+		// Blocks install under <components dir>/blocks/, mirroring the
+		// repo's ui/blocks sibling split.
+		base := config.ResolvedPaths.Components
+		if pathOverride != "" {
+			base = filepath.Join(config.ResolvedPaths.Cwd, filepath.FromSlash(pathOverride))
+		}
+		return filepath.Join(base, "blocks", filepath.FromSlash(strings.TrimPrefix(file.Path, "blocks/"))), nil
 	case strings.HasPrefix(file.Path, "utils/"):
 		return filepath.Join(config.ResolvedPaths.Utils, filepath.FromSlash(strings.TrimPrefix(file.Path, "utils/"))), nil
 	case file.Type == "registry:lib":
@@ -159,6 +174,8 @@ func transformContent(file registry.ItemFile, config *utils.Config) string {
 		switch {
 		case strings.HasPrefix(repoPath, "components/"):
 			return `"` + config.Aliases.Components + `/` + strings.TrimPrefix(repoPath, "components/") + `"`
+		case strings.HasPrefix(repoPath, "blocks/"):
+			return `"` + config.Aliases.Components + `/blocks/` + strings.TrimPrefix(repoPath, "blocks/") + `"`
 		case repoPath == "utils":
 			return `"` + config.Aliases.Utils + `"`
 		case strings.HasPrefix(repoPath, "utils/"):

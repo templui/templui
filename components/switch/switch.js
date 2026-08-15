@@ -56,6 +56,18 @@
     }
   }
 
+  function requestCheckedChange(root, input, sourceEvent) {
+    const nextChecked = !input.checked;
+    const change = new CustomEvent("switch-change", {
+      bubbles: true,
+      cancelable: true,
+      detail: { checked: nextChecked },
+    });
+    root.dispatchEvent(change);
+    if (change.defaultPrevented || root.hasAttribute("data-tui-switch-controlled")) return;
+    forwardClick(input, sourceEvent);
+  }
+
   // SwitchRoot onClick: cancel the click's default (a wrapping label would
   // otherwise forward it to the input a second time) and toggle through the
   // hidden input so the native change event fires.
@@ -71,7 +83,7 @@
     }
     if (isReadOnly(root)) return;
     e.preventDefault();
-    forwardClick(input, e);
+    requestCheckedChange(root, input, e);
   });
 
   document.addEventListener("change", (e) => {
@@ -148,9 +160,13 @@
     document.querySelectorAll("[data-tui-switch]").forEach(setup);
   }
 
-  document.addEventListener("DOMContentLoaded", init);
-  new MutationObserver(init).observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
+  // does not fire in hidden tabs or throttled iframes): swapped-in markup
+  // wires itself.
+  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
 })();

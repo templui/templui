@@ -10,7 +10,6 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/togglegroup"
 )
 
-// The kitchen-sink page from card-example.tsx.
 templ cardExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {
@@ -91,14 +90,14 @@ templ cardExampleCustomSpacing() {
 	@cardExampleSection("Custom Spacing") {
 		<div class="mx-auto grid w-full max-w-sm gap-4" data-card-example-spacing>
 			@togglegroup.ToggleGroup(togglegroup.Props{
-				Variant: togglegroup.VariantOutline,
-				Size:    togglegroup.SizeSm,
-				Class:   "justify-center",
+				Variant:      togglegroup.VariantOutline,
+				Size:         togglegroup.SizeSm,
+				Class:        "justify-center",
+				DefaultValue: []string{cardExampleSpacingOptions[0].Value},
 			}) {
-				for i, option := range cardExampleSpacingOptions {
+				for _, option := range cardExampleSpacingOptions {
 					@togglegroup.Item(togglegroup.ItemProps{
 						Value:      option.Value,
-						Pressed:    i == 0,
 						Attributes: templ.Attributes{"data-spacing-class": option.Class},
 					}) {
 						{ option.Label }
@@ -129,8 +128,7 @@ templ cardExampleCustomSpacing() {
 			}
 		</div>
 		<script nonce={ templ.GetNonce(ctx) }>
-			// The vanilla pendant of the demo's React state, the pressed toggle
-			// swaps the spacing class on the card.
+			// The pressed toggle swaps the spacing class on the card.
 			document.addEventListener('toggle-change', (e) => {
 				const demo = e.target.closest('[data-card-example-spacing]');
 				if (!demo || !e.detail.pressed) return;

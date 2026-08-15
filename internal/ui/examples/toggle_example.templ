@@ -6,7 +6,6 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/toggle"
 )
 
-// The kitchen-sink page from toggle-example.tsx.
 templ toggleExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {
@@ -37,8 +36,8 @@ templ toggleExampleBasic() {
 	@toggleExampleSection("Basic") {
 		<div class="flex flex-wrap items-center gap-2">
 			@toggle.Toggle(toggle.Props{
-				Pressed:    true,
-				Attributes: templ.Attributes{"aria-label": "Toggle bold"},
+				DefaultPressed: true,
+				Attributes:     templ.Attributes{"aria-label": "Toggle bold"},
 			}) {
 				@icon.Bold()
 			}
@@ -264,8 +263,8 @@ templ toggleExampleWithIcon() {
 	@toggleExampleSection("With Icon") {
 		<div class="flex flex-wrap items-center gap-2">
 			@toggle.Toggle(toggle.Props{
-				Pressed:    true,
-				Attributes: templ.Attributes{"aria-label": "Toggle bookmark"},
+				DefaultPressed: true,
+				Attributes:     templ.Attributes{"aria-label": "Toggle bookmark"},
 			}) {
 				@icon.Bookmark(icon.Props{Class: "group-aria-pressed/toggle:fill-accent-foreground"})
 			}

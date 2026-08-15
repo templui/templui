@@ -1,0 +1,137 @@
+package sidebar10
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+	"github.com/axadrn/shadcn-templ/v2/utils"
+)
+
+// This is sample data.
+type Team struct {
+	Name string
+	Logo func(...icon.Props) templ.Component
+	Plan string
+}
+
+type NavItem struct {
+	Title    string
+	URL      string
+	Icon     func(...icon.Props) templ.Component
+	IsActive bool
+	Badge    string
+}
+
+type Favorite struct {
+	Name  string
+	URL   string
+	Emoji string
+}
+
+type WorkspacePage struct {
+	Name  string
+	URL   string
+	Emoji string
+}
+
+type Workspace struct {
+	Name  string
+	Emoji string
+	Pages []WorkspacePage
+}
+
+var teams = []Team{
+	{Name: "Acme Inc", Logo: icon.Terminal, Plan: "Enterprise"},
+	{Name: "Acme Corp.", Logo: icon.AudioLines, Plan: "Startup"},
+	{Name: "Evil Corp.", Logo: icon.Terminal, Plan: "Free"},
+}
+
+var navMain = []NavItem{
+	{Title: "Search", URL: "#", Icon: icon.Search},
+	{Title: "Ask AI", URL: "#", Icon: icon.Sparkles},
+	{Title: "Home", URL: "#", Icon: icon.House, IsActive: true},
+	{Title: "Inbox", URL: "#", Icon: icon.Inbox, Badge: "10"},
+}
+
+var navSecondary = []NavItem{
+	{Title: "Calendar", URL: "#", Icon: icon.Calendar},
+	{Title: "Settings", URL: "#", Icon: icon.Settings2},
+	{Title: "Templates", URL: "#", Icon: icon.Blocks},
+	{Title: "Trash", URL: "#", Icon: icon.Trash2},
+	{Title: "Help", URL: "#", Icon: icon.MessageCircleQuestionMark},
+}
+
+var favorites = []Favorite{
+	{Name: "Project Management & Task Tracking", URL: "#", Emoji: "📊"},
+	{Name: "Family Recipe Collection & Meal Planning", URL: "#", Emoji: "🍳"},
+	{Name: "Fitness Tracker & Workout Routines", URL: "#", Emoji: "💪"},
+	{Name: "Book Notes & Reading List", URL: "#", Emoji: "📚"},
+	{Name: "Sustainable Gardening Tips & Plant Care", URL: "#", Emoji: "🌱"},
+	{Name: "Language Learning Progress & Resources", URL: "#", Emoji: "🗣️"},
+	{Name: "Home Renovation Ideas & Budget Tracker", URL: "#", Emoji: "🏠"},
+	{Name: "Personal Finance & Investment Portfolio", URL: "#", Emoji: "💰"},
+	{Name: "Movie & TV Show Watchlist with Reviews", URL: "#", Emoji: "🎬"},
+	{Name: "Daily Habit Tracker & Goal Setting", URL: "#", Emoji: "✅"},
+}
+
+var workspaces = []Workspace{
+	{
+		Name: "Personal Life Management", Emoji: "🏠",
+		Pages: []WorkspacePage{
+			{Name: "Daily Journal & Reflection", URL: "#", Emoji: "📔"},
+			{Name: "Health & Wellness Tracker", URL: "#", Emoji: "🍏"},
+			{Name: "Personal Growth & Learning Goals", URL: "#", Emoji: "🌟"},
+		},
+	},
+	{
+		Name: "Professional Development", Emoji: "💼",
+		Pages: []WorkspacePage{
+			{Name: "Career Objectives & Milestones", URL: "#", Emoji: "🎯"},
+			{Name: "Skill Acquisition & Training Log", URL: "#", Emoji: "🧠"},
+			{Name: "Networking Contacts & Events", URL: "#", Emoji: "🤝"},
+		},
+	},
+	{
+		Name: "Creative Projects", Emoji: "🎨",
+		Pages: []WorkspacePage{
+			{Name: "Writing Ideas & Story Outlines", URL: "#", Emoji: "✍️"},
+			{Name: "Art & Design Portfolio", URL: "#", Emoji: "🖼️"},
+			{Name: "Music Composition & Practice Log", URL: "#", Emoji: "🎵"},
+		},
+	},
+	{
+		Name: "Home Management", Emoji: "🏡",
+		Pages: []WorkspacePage{
+			{Name: "Household Budget & Expense Tracking", URL: "#", Emoji: "💰"},
+			{Name: "Home Maintenance Schedule & Tasks", URL: "#", Emoji: "🔧"},
+			{Name: "Family Calendar & Event Planning", URL: "#", Emoji: "📅"},
+		},
+	},
+	{
+		Name: "Travel & Adventure", Emoji: "🧳",
+		Pages: []WorkspacePage{
+			{Name: "Trip Planning & Itineraries", URL: "#", Emoji: "🗺️"},
+			{Name: "Travel Bucket List & Inspiration", URL: "#", Emoji: "🌎"},
+			{Name: "Travel Journal & Photo Gallery", URL: "#", Emoji: "📸"},
+		},
+	},
+}
+
+templ AppSidebar(props ...sidebar.Props) {
+	{{ p := sidebar.Props{} }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ p.Class = utils.CN("border-r-0", p.Class) }}
+	@sidebar.Sidebar(p) {
+		@sidebar.Header() {
+			@TeamSwitcher(teams)
+			@NavMain(navMain)
+		}
+		@sidebar.Content() {
+			@NavFavorites(favorites)
+			@NavWorkspaces(workspaces)
+			@NavSecondary(navSecondary, "mt-auto")
+		}
+		@sidebar.Rail()
+	}
+}

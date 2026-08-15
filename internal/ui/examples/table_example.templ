@@ -9,7 +9,6 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/table"
 )
 
-// The kitchen-sink page from table-example.tsx.
 templ tableExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {
@@ -370,7 +369,7 @@ templ tableExampleWithSelect() {
 							{ task.Task }
 						}
 						@table.Cell() {
-							@selectcomp.Select(selectcomp.Props{Value: task.Assignee}) {
+							@selectcomp.Select(selectcomp.Props{DefaultValue: task.Assignee}) {
 								@selectcomp.Trigger(selectcomp.TriggerProps{Class: "w-40", Size: selectcomp.SizeSm}) {
 									@selectcomp.Value()
 								}

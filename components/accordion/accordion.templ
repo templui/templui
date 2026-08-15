@@ -2,23 +2,27 @@ package accordion
 
 import (
 	"context"
+	"strings"
 
 	"github.com/axadrn/shadcn-templ/v2/components/icon"
 	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
 type Props struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-	DisableOpenMultiple   bool
+	ID           string
+	Class        string
+	Attributes   templ.Attributes
+	Value        []string
+	DefaultValue []string
+	Multiple     bool
+	Disabled     bool
 }
 
 type ItemProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
-	Open       bool
+	Value      string
 	Disabled   bool
 }
 
@@ -37,18 +41,37 @@ type ContentProps struct {
 type ctxKey string
 
 const (
-	openKey     ctxKey = "accordionItemOpen"
-	disabledKey ctxKey = "accordionItemDisabled"
+	rootKey ctxKey = "accordionRoot"
+	itemKey ctxKey = "accordionItem"
 )
 
+type rootState struct {
+	values     map[string]bool
+	controlled bool
+	disabled   bool
+}
+
+type itemState struct {
+	open     bool
+	disabled bool
+}
+
+func root(ctx context.Context) rootState {
+	state, _ := ctx.Value(rootKey).(rootState)
+	return state
+}
+
+func item(ctx context.Context) itemState {
+	state, _ := ctx.Value(itemKey).(itemState)
+	return state
+}
+
 func itemOpen(ctx context.Context) bool {
-	open, _ := ctx.Value(openKey).(bool)
-	return open
+	return item(ctx).open
 }
 
 func itemDisabled(ctx context.Context) bool {
-	disabled, _ := ctx.Value(disabledKey).(bool)
-	return disabled
+	return item(ctx).disabled
 }
 
 templ Accordion(props ...Props) {
@@ -56,12 +79,25 @@ templ Accordion(props ...Props) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	{{ values := p.DefaultValue }}
+	if p.Value != nil {
+		{{ values = p.Value }}
+	}
+	{{ expanded := make(map[string]bool, len(values)) }}
+	for _, value := range values {
+		{{ expanded[value] = true }}
+	}
+	{{ ctx = context.WithValue(ctx, rootKey, rootState{values: expanded, controlled: p.Value != nil, disabled: p.Disabled}) }}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
 		data-slot="accordion"
-		data-disable-open-multiple?={ p.DisableOpenMultiple }
+		data-tui-accordion
+		data-multiple?={ p.Multiple }
+		data-disabled?={ p.Disabled }
+		data-tui-accordion-controlled?={ p.Value != nil }
+		data-tui-accordion-value={ strings.Join(values, " ") }
 		class={
 			utils.CN(
 				"cn-accordion flex w-full flex-col",
@@ -79,14 +115,22 @@ templ Item(props ...ItemProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	{{ ctx = context.WithValue(ctx, openKey, p.Open) }}
-	{{ ctx = context.WithValue(ctx, disabledKey, p.Disabled) }}
+	if p.Value == "" {
+		{{ p.Value = utils.RandomID() }}
+	}
+	{{ r := root(ctx) }}
+	{{ open := r.values[p.Value] }}
+	{{ disabled := p.Disabled || r.disabled }}
+	{{ ctx = context.WithValue(ctx, itemKey, itemState{open: open, disabled: disabled}) }}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
 		data-slot="accordion-item"
-		data-disabled?={ p.Disabled }
+		data-tui-accordion-value={ p.Value }
+		data-open?={ open }
+		data-closed?={ !open }
+		data-disabled?={ disabled }
 		class={
 			utils.CN(
 				"cn-accordion-item",

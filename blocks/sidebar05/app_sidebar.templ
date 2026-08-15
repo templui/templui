@@ -1,0 +1,141 @@
+package sidebar05
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/collapsible"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+// This is sample data.
+type navItem struct {
+	Title string
+	URL   string
+	Items []navSubItem
+}
+
+type navSubItem struct {
+	Title    string
+	URL      string
+	IsActive bool
+}
+
+var data = struct {
+	NavMain []navItem
+}{
+	NavMain: []navItem{
+		{
+			Title: "Getting Started",
+			URL:   "#",
+			Items: []navSubItem{
+				{Title: "Installation", URL: "#"},
+				{Title: "Project Structure", URL: "#"},
+			},
+		},
+		{
+			Title: "Build Your Application",
+			URL:   "#",
+			Items: []navSubItem{
+				{Title: "Routing", URL: "#"},
+				{Title: "Data Fetching", URL: "#", IsActive: true},
+				{Title: "Rendering", URL: "#"},
+				{Title: "Caching", URL: "#"},
+				{Title: "Styling", URL: "#"},
+				{Title: "Optimizing", URL: "#"},
+				{Title: "Configuring", URL: "#"},
+				{Title: "Testing", URL: "#"},
+				{Title: "Authentication", URL: "#"},
+				{Title: "Deploying", URL: "#"},
+				{Title: "Upgrading", URL: "#"},
+				{Title: "Examples", URL: "#"},
+			},
+		},
+		{
+			Title: "API Reference",
+			URL:   "#",
+			Items: []navSubItem{
+				{Title: "Components", URL: "#"},
+				{Title: "File Conventions", URL: "#"},
+				{Title: "Functions", URL: "#"},
+				{Title: "next.config.js Options", URL: "#"},
+				{Title: "CLI", URL: "#"},
+				{Title: "Edge Runtime", URL: "#"},
+			},
+		},
+		{
+			Title: "Architecture",
+			URL:   "#",
+			Items: []navSubItem{
+				{Title: "Accessibility", URL: "#"},
+				{Title: "Fast Refresh", URL: "#"},
+				{Title: "templ Compiler", URL: "#"},
+				{Title: "Supported Browsers", URL: "#"},
+				{Title: "Turbopack", URL: "#"},
+			},
+		},
+		{
+			Title: "Community",
+			URL:   "#",
+			Items: []navSubItem{
+				{Title: "Contribution Guide", URL: "#"},
+			},
+		},
+	},
+}
+
+templ AppSidebar(props ...sidebar.Props) {
+	@sidebar.Sidebar(props...) {
+		@sidebar.Header() {
+			@sidebar.Menu() {
+				@sidebar.MenuItem() {
+					@sidebar.MenuButton(sidebar.MenuButtonProps{Size: sidebar.MenuButtonSizeLg, Href: "#"}) {
+						<div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+							@icon.GalleryVerticalEnd(icon.Props{Class: "size-4"})
+						</div>
+						<div class="flex flex-col gap-0.5 leading-none">
+							<span class="font-medium">Documentation</span>
+							<span class="">v1.0.0</span>
+						</div>
+					}
+				}
+			}
+			@SearchForm()
+		}
+		@sidebar.Content() {
+			@sidebar.Group() {
+				@sidebar.Menu() {
+					for index, item := range data.NavMain {
+						@collapsible.Collapsible(collapsible.Props{
+							DefaultOpen: index == 1,
+							Class:       "group/collapsible",
+						}) {
+							@sidebar.MenuItem() {
+								@sidebar.MenuButton(sidebar.MenuButtonProps{Attributes: collapsible.Trigger(ctx)}) {
+									{ item.Title }
+									@icon.Plus(icon.Props{Class: "ml-auto group-aria-expanded/menu-button:hidden"})
+									@icon.Minus(icon.Props{Class: "ml-auto hidden group-aria-expanded/menu-button:block"})
+								}
+								if len(item.Items) > 0 {
+									@collapsible.Content() {
+										@sidebar.MenuSub() {
+											for _, subItem := range item.Items {
+												@sidebar.MenuSubItem() {
+													@sidebar.MenuSubButton(sidebar.MenuSubButtonProps{
+														Href:     subItem.URL,
+														IsActive: subItem.IsActive,
+													}) {
+														{ subItem.Title }
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		@sidebar.Rail()
+	}
+}

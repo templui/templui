@@ -6,7 +6,6 @@ import (
 	switchcomp "github.com/axadrn/shadcn-templ/v2/components/switch"
 )
 
-// The kitchen-sink page from switch-example.tsx.
 templ switchExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {
@@ -62,7 +61,7 @@ templ switchExampleWithDescription() {
 templ switchExampleWithLabel() {
 	@switchExampleSection("With Label") {
 		<div class="flex items-center gap-2">
-			@switchcomp.Switch(switchcomp.Props{ID: "switch-bluetooth", Checked: true})
+			@switchcomp.Switch(switchcomp.Props{ID: "switch-bluetooth", DefaultChecked: true})
 			@label.Label(label.Props{For: "switch-bluetooth"}) {
 				Bluetooth
 			}
@@ -80,7 +79,7 @@ templ switchExampleDisabled() {
 				}
 			</div>
 			<div class="flex items-center gap-2">
-				@switchcomp.Switch(switchcomp.Props{ID: "switch-disabled-checked", Checked: true, Disabled: true})
+				@switchcomp.Switch(switchcomp.Props{ID: "switch-disabled-checked", DefaultChecked: true, Disabled: true})
 				@label.Label(label.Props{For: "switch-disabled-checked"}) {
 					Disabled (Checked)
 				}

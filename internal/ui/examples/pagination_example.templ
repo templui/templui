@@ -6,7 +6,6 @@ import (
 	selectcomp "github.com/axadrn/shadcn-templ/v2/components/select"
 )
 
-// The kitchen-sink page from pagination-example.tsx.
 templ paginationExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {
@@ -102,7 +101,7 @@ templ paginationExampleWithSelect() {
 				@field.Label(field.LabelProps{For: "select-rows-per-page"}) {
 					Rows per page
 				}
-				@selectcomp.Select(selectcomp.Props{Value: "25"}) {
+				@selectcomp.Select(selectcomp.Props{DefaultValue: "25"}) {
 					@selectcomp.Trigger(selectcomp.TriggerProps{ID: "select-rows-per-page", Class: "w-20"}) {
 						@selectcomp.Value()
 					}

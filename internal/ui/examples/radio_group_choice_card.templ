@@ -6,7 +6,7 @@ import (
 )
 
 templ RadioGroupChoiceCard() {
-	@radiogroup.RadioGroup(radiogroup.Props{Value: "plus", Class: "max-w-sm"}) {
+	@radiogroup.RadioGroup(radiogroup.Props{DefaultValue: "plus", Class: "max-w-sm"}) {
 		@field.Label(field.LabelProps{For: "plus-plan"}) {
 			@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 				@field.Content() {

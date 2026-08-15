@@ -16,10 +16,22 @@ type Props struct {
 	Name       string
 	Value      string
 	Disabled   bool
-	Checked    bool
-	Form       string
+	// Checked is the controlled checked state. Use DefaultChecked when the
+	// browser should own the state after the initial render.
+	Checked        *bool
+	DefaultChecked bool
+	ReadOnly       bool
+	Required       bool
+	Form           string
 	// Size of the switch. Options: 'default', 'sm'.
 	Size Size
+}
+
+func initialChecked(p Props) bool {
+	if p.Checked != nil {
+		return *p.Checked
+	}
+	return p.DefaultChecked
 }
 
 // Switch is the vanilla port of Base UI's Switch.Root
@@ -40,12 +52,13 @@ templ Switch(props ...Props) {
 	if p.Size == "" {
 		{{ p.Size = SizeDefault }}
 	}
+	{{ checked := initialChecked(p) }}
 	<span
 		data-slot="switch"
 		data-tui-switch
 		data-size={ string(p.Size) }
 		role="switch"
-		if p.Checked {
+		if checked {
 			aria-checked="true"
 			data-checked
 		} else {
@@ -59,6 +72,9 @@ templ Switch(props ...Props) {
 		} else {
 			tabindex="0"
 		}
+		aria-readonly?={ p.ReadOnly }
+		aria-required?={ p.Required }
+		data-tui-switch-controlled?={ p.Checked != nil }
 		class={
 			utils.CN(
 				// 1:1 base/ui/switch.tsx: structure lives here, the look comes from
@@ -73,7 +89,7 @@ templ Switch(props ...Props) {
 		// stateAttributesMapping; switch.js keeps them in sync.
 		<span
 			data-slot="switch-thumb"
-			if p.Checked {
+			if checked {
 				data-checked
 			} else {
 				data-unchecked
@@ -92,8 +108,10 @@ templ Switch(props ...Props) {
 		aria-hidden="true"
 		tabindex="-1"
 		id={ p.ID }
-		checked?={ p.Checked }
+		checked?={ checked }
 		disabled?={ p.Disabled }
+		readonly?={ p.ReadOnly }
+		required?={ p.Required }
 		if p.Name != "" {
 			name={ p.Name }
 		}

@@ -17,9 +17,9 @@ templ FieldGroupExample() {
 			@field.Group(field.GroupProps{Attributes: templ.Attributes{"data-slot": "checkbox-group"}}) {
 				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 					@checkbox.Checkbox(checkbox.Props{
-						ID:       "push",
-						Checked:  true,
-						Disabled: true,
+						ID:             "push",
+						DefaultChecked: true,
+						Disabled:       true,
 					})
 					@field.Label(field.LabelProps{
 						For:   "push",

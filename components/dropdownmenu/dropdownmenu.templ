@@ -34,14 +34,20 @@ const (
 
 type ctxKey string
 
-const idKey ctxKey = "dropdownmenuID"
+const stateKey ctxKey = "dropdownmenuState"
+const radioStateKey ctxKey = "dropdownmenuRadioState"
 
-// menuID returns the id shared by Root, Trigger and Content via ctx.
-func menuID(ctx context.Context) string {
-	if id, ok := ctx.Value(idKey).(string); ok {
-		return id
+type ctxState struct {
+	id          string
+	initialOpen bool
+	controlled  bool
+}
+
+func state(ctx context.Context) ctxState {
+	if s, ok := ctx.Value(stateKey).(ctxState); ok {
+		return s
 	}
-	return ""
+	return ctxState{}
 }
 
 // Trigger returns the attributes that turn any element (usually a button)
@@ -50,14 +56,23 @@ func menuID(ctx context.Context) string {
 func Trigger(ctx context.Context) templ.Attributes {
 	return templ.Attributes{
 		"data-tui-dropdownmenu-trigger": true,
-		"aria-controls":                 menuID(ctx),
+		"aria-controls":                 state(ctx).id,
 		"aria-haspopup":                 "menu",
 		"aria-expanded":                 "false",
 	}
 }
 
 type Props struct {
-	ID string
+	ID          string
+	Open        *bool
+	DefaultOpen bool
+}
+
+func initialOpen(p Props) bool {
+	if p.Open != nil {
+		return *p.Open
+	}
+	return p.DefaultOpen
 }
 
 type ContentProps struct {
@@ -68,6 +83,12 @@ type ContentProps struct {
 	Side Side
 	// Align along the trigger edge. Defaults to start.
 	Align Align
+	// MobileSide/MobileAlign are the vanilla pendant of passing responsive
+	// side/align values from useSidebar. They apply below md while the normal
+	// Side/Align remain the desktop preference; collision avoidance still
+	// runs for both placements.
+	MobileSide  Side
+	MobileAlign Align
 	// SideOffset is the gap to the trigger in px. Defaults to 4.
 	SideOffset int
 	// AlignOffset shifts the menu along the aligned edge in px. Defaults to 0.
@@ -88,29 +109,33 @@ type LabelProps struct {
 }
 
 type ItemProps struct {
-	ID           string
-	Class        string
-	Attributes   templ.Attributes
-	Variant      ItemVariant
-	Disabled     bool
-	Inset        bool
-	Href         string
-	Target       string
+	ID                  string
+	Class               string
+	Attributes          templ.Attributes
+	Variant             ItemVariant
+	Disabled            bool
+	Inset               bool
+	Href                string
+	Target              string
 	DisableCloseOnClick bool
 }
 
 type CheckboxItemProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
-	Checked    bool
-	Disabled   bool
+	ID             string
+	Class          string
+	Attributes     templ.Attributes
+	Checked        *bool
+	DefaultChecked bool
+	Disabled       bool
 }
 
 type RadioGroupProps struct {
-	ID         string
-	Class      string
-	Attributes templ.Attributes
+	ID           string
+	Class        string
+	Attributes   templ.Attributes
+	Value        *string
+	DefaultValue string
+	Disabled     bool
 }
 
 type RadioItemProps struct {
@@ -118,8 +143,27 @@ type RadioItemProps struct {
 	Class      string
 	Attributes templ.Attributes
 	Value      string
-	Checked    bool
 	Disabled   bool
+}
+
+type radioState struct {
+	value      string
+	controlled bool
+	disabled   bool
+}
+
+func initialChecked(p CheckboxItemProps) bool {
+	if p.Checked != nil {
+		return *p.Checked
+	}
+	return p.DefaultChecked
+}
+
+func initialRadioValue(p RadioGroupProps) string {
+	if p.Value != nil {
+		return *p.Value
+	}
+	return p.DefaultValue
 }
 
 type SeparatorProps struct {
@@ -138,6 +182,15 @@ type SubProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
+	Open        *bool
+	DefaultOpen bool
+}
+
+func initialSubOpen(p SubProps) bool {
+	if p.Open != nil {
+		return *p.Open
+	}
+	return p.DefaultOpen
 }
 
 type SubTriggerProps struct {
@@ -160,7 +213,8 @@ type SubContentProps struct {
 func itemClasses(disabled bool) string {
 	return utils.CN(
 		"cn-dropdown-menu-item group/dropdown-menu-item relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-		// Native <a>/<button> wiring instead of Base UI's div items.
+		// Base UI's item primitive fills the menu row. Native buttons and links
+		// need that layout semantics explicitly.
 		"w-full text-left",
 		map[string]bool{"pointer-events-none opacity-50": disabled},
 	)
@@ -171,8 +225,8 @@ func itemClasses(disabled bool) string {
 func checkItemClasses(cnClass string, disabled bool) string {
 	return utils.CN(
 		cnClass+" relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-		// Native <button> wiring: Base UI unmounts the indicator when unchecked,
-		// our indicator toggles on the checked state via the group instead.
+		// Base UI unmounts the indicator when unchecked; our indicator toggles
+		// on the checked state via the group instead.
 		"group/dmitem w-full text-left",
 		map[string]bool{"pointer-events-none opacity-50": disabled},
 	)
@@ -188,7 +242,7 @@ templ DropdownMenu(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, idKey, p.ID) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, initialOpen: initialOpen(p), controlled: p.Open != nil}) }}
 	{ children... }
 }
 
@@ -224,44 +278,53 @@ templ Content(props ...ContentProps) {
 	if p.SideOffset == 0 {
 		{{ p.SideOffset = 4 }}
 	}
+	{{ s := state(ctx) }}
 	// Inert until the script portals it to <body> at init, so the SSRd
 	// content never participates in layout or sibling CSS.
 	@Portal() {
-	<div
-		id={ menuID(ctx) }
-		data-tui-dropdownmenu-content
-		data-tui-dropdownmenu-side={ string(p.Side) }
-		data-tui-dropdownmenu-align={ string(p.Align) }
-		data-tui-dropdownmenu-side-offset={ strconv.Itoa(p.SideOffset) }
-		data-tui-dropdownmenu-align-offset={ strconv.Itoa(p.AlignOffset) }
-		data-state="closed"
-		popover="manual"
-		class="pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
-	>
 		<div
-			data-slot="dropdown-menu-content"
-			data-tui-dropdownmenu-popup
-			data-state="closed"
-			role="menu"
-			tabindex="-1"
-			class={
-				utils.CN(
-					// 1:1 base/ui/dropdown-menu.tsx DropdownMenuContent, the look comes
-					// from cn-dropdown-menu-content (animations key on our data-state
-					// attribute). The --available-height/--anchor-width/--transform-origin
-					// variables become our JS variable names.
-					"cn-dropdown-menu-content cn-dropdown-menu-content-logical cn-menu-target cn-menu-translucent z-50 max-h-(--tui-dropdownmenu-available-height) w-(--tui-dropdownmenu-anchor-width) origin-(--tui-dropdownmenu-transform-origin) overflow-x-hidden overflow-y-auto outline-none data-closed:overflow-hidden",
-					// JS wiring: the positioner wrapper is pointer-events-none, and the
-					// popup stays mounted after animate-out until hidePopover runs.
-					"pointer-events-auto relative isolate data-closed:fill-mode-forwards",
-					p.Class,
-				),
+			id={ s.id }
+			data-tui-dropdownmenu-content
+			data-tui-dropdownmenu-side={ string(p.Side) }
+			data-tui-dropdownmenu-align={ string(p.Align) }
+			if p.MobileSide != "" {
+				data-tui-dropdownmenu-mobile-side={ string(p.MobileSide) }
 			}
-			{ p.Attributes... }
+			if p.MobileAlign != "" {
+				data-tui-dropdownmenu-mobile-align={ string(p.MobileAlign) }
+			}
+			data-tui-dropdownmenu-side-offset={ strconv.Itoa(p.SideOffset) }
+			data-tui-dropdownmenu-align-offset={ strconv.Itoa(p.AlignOffset) }
+			data-tui-dropdownmenu-initial-open={ strconv.FormatBool(s.initialOpen) }
+			data-tui-dropdownmenu-controlled?={ s.controlled }
+			data-closed
+			hidden
+			data-tui-portal
+			class="pointer-events-none isolate absolute inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
 		>
-			{ children... }
+			<div
+				data-slot="dropdown-menu-content"
+				data-tui-dropdownmenu-popup
+				data-closed
+				role="menu"
+				tabindex="-1"
+				class={
+					utils.CN(
+						// 1:1 base/ui/dropdown-menu.tsx DropdownMenuContent, the look comes
+						// from cn-dropdown-menu-content. Positioner variables and state
+						// attributes use Base UI's public contract verbatim.
+						"cn-dropdown-menu-content cn-dropdown-menu-content-logical cn-menu-target cn-menu-translucent z-50 max-h-(--available-height) w-(--anchor-width) origin-(--transform-origin) overflow-x-hidden overflow-y-auto outline-none data-closed:overflow-hidden",
+						// JS wiring: the positioner wrapper is pointer-events-none, and the
+						// popup stays mounted after animate-out until hidePopover runs.
+						"pointer-events-auto relative isolate data-closed:fill-mode-forwards",
+						p.Class,
+					),
+				}
+				{ p.Attributes... }
+			>
+				{ children... }
+			</div>
 		</div>
-	</div>
 	}
 }
 
@@ -362,6 +425,7 @@ templ CheckboxItem(props ...CheckboxItemProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	{{ checked := initialChecked(p) }}
 	<button
 		if p.ID != "" {
 			id={ p.ID }
@@ -369,12 +433,13 @@ templ CheckboxItem(props ...CheckboxItemProps) {
 		type="button"
 		data-slot="dropdown-menu-checkbox-item"
 		data-tui-dropdownmenu-checkbox-item
+		data-tui-dropdownmenu-checkbox-controlled?={ p.Checked != nil }
 		role="menuitemcheckbox"
-		if p.Checked {
-			data-state="checked"
+		if checked {
+			data-checked
 			aria-checked="true"
 		} else {
-			data-state="unchecked"
+			data-unchecked
 			aria-checked="false"
 		}
 		disabled?={ p.Disabled }
@@ -383,7 +448,7 @@ templ CheckboxItem(props ...CheckboxItemProps) {
 	>
 		<span
 			data-slot="dropdown-menu-checkbox-item-indicator"
-			class="cn-dropdown-menu-item-indicator pointer-events-none opacity-0 group-data-[state=checked]/dmitem:opacity-100"
+			class="cn-dropdown-menu-item-indicator pointer-events-none opacity-0 group-data-checked/dmitem:opacity-100"
 		>
 			@icon.Check()
 		</span>
@@ -396,6 +461,8 @@ templ RadioGroup(props ...RadioGroupProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	{{ value := initialRadioValue(p) }}
+	{{ ctx = context.WithValue(ctx, radioStateKey, radioState{value: value, controlled: p.Value != nil, disabled: p.Disabled}) }}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
@@ -403,6 +470,9 @@ templ RadioGroup(props ...RadioGroupProps) {
 		role="group"
 		data-slot="dropdown-menu-radio-group"
 		data-tui-dropdownmenu-radio-group
+		data-tui-dropdownmenu-radio-controlled?={ p.Value != nil }
+		data-tui-dropdownmenu-radio-value={ value }
+		data-disabled?={ p.Disabled }
 		class={ utils.CN("", p.Class) }
 		{ p.Attributes... }
 	>
@@ -415,6 +485,9 @@ templ RadioItem(props ...RadioItemProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	{{ group, _ := ctx.Value(radioStateKey).(radioState) }}
+	{{ checked := group.value != "" && group.value == p.Value }}
+	{{ disabled := p.Disabled || group.disabled }}
 	<button
 		if p.ID != "" {
 			id={ p.ID }
@@ -426,20 +499,20 @@ templ RadioItem(props ...RadioItemProps) {
 			data-tui-dropdownmenu-radio-value={ p.Value }
 		}
 		role="menuitemradio"
-		if p.Checked {
-			data-state="checked"
+		if checked {
+			data-checked
 			aria-checked="true"
 		} else {
-			data-state="unchecked"
+			data-unchecked
 			aria-checked="false"
 		}
-		disabled?={ p.Disabled }
-		class={ utils.CN(checkItemClasses("cn-dropdown-menu-radio-item", p.Disabled), p.Class) }
+		disabled?={ disabled }
+		class={ utils.CN(checkItemClasses("cn-dropdown-menu-radio-item", disabled), p.Class) }
 		{ p.Attributes... }
 	>
 		<span
 			data-slot="dropdown-menu-radio-item-indicator"
-			class="cn-dropdown-menu-item-indicator pointer-events-none opacity-0 group-data-[state=checked]/dmitem:opacity-100"
+			class="cn-dropdown-menu-item-indicator pointer-events-none opacity-0 group-data-checked/dmitem:opacity-100"
 		>
 			@icon.Check()
 		</span>
@@ -491,6 +564,8 @@ templ Sub(props ...SubProps) {
 		}
 		data-slot="dropdown-menu-sub"
 		data-tui-dropdownmenu-sub
+		data-tui-dropdownmenu-sub-open={ strconv.FormatBool(initialSubOpen(p)) }
+		data-tui-dropdownmenu-sub-controlled?={ p.Open != nil }
 		class={ utils.CN("", p.Class) }
 		{ p.Attributes... }
 	>
@@ -511,17 +586,15 @@ templ SubTrigger(props ...SubTriggerProps) {
 		data-slot="dropdown-menu-sub-trigger"
 		data-inset?={ p.Inset }
 		data-tui-dropdownmenu-sub-trigger
-		data-state="closed"
 		role="menuitem"
 		aria-haspopup="menu"
+		aria-expanded="false"
 		class={
 			utils.CN(
 				// 1:1 base/ui/dropdown-menu.tsx DropdownMenuSubTrigger, the look comes
 				// from cn-dropdown-menu-sub-trigger. Base UI keys the open highlight on
-				// data-popup-open, our JS sets data-state=open, which the data-open
-				// variants inside the cn class match as well.
+				// data-popup-open.
 				"cn-dropdown-menu-sub-trigger flex cursor-default items-center outline-hidden select-none data-popup-open:bg-accent data-popup-open:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0",
-				// Native <button> wiring instead of Base UI's div items.
 				"w-full text-left",
 				p.Class,
 			),
@@ -544,18 +617,18 @@ templ SubContent(props ...SubContentProps) {
 		}
 		data-slot="dropdown-menu-sub-content"
 		data-tui-dropdownmenu-sub-content
-		data-state="closed"
+		data-closed
 		role="menu"
 		tabindex="-1"
 		class={
 			utils.CN(
 				// 1:1 base/ui/dropdown-menu.tsx DropdownMenuSubContent: the sub content
 				// is the content plus cn-dropdown-menu-sub-content and w-auto, the look
-				// comes from the cn classes (animations key on our data-state attribute).
-				"cn-dropdown-menu-content cn-dropdown-menu-content-logical cn-menu-target cn-menu-translucent cn-dropdown-menu-sub-content z-50 w-auto origin-(--tui-dropdownmenu-transform-origin) overflow-x-hidden overflow-y-auto outline-none data-closed:overflow-hidden",
+				// comes from the cn classes and Base UI's standard positioner variables.
+				"cn-dropdown-menu-content cn-dropdown-menu-content-logical cn-menu-target cn-menu-translucent cn-dropdown-menu-sub-content z-50 w-auto origin-(--transform-origin) overflow-x-hidden overflow-y-auto outline-none data-closed:overflow-hidden",
 				// JS wiring: floatingui positions the sub content as a fixed layer and
 				// toggles the hidden class around the exit animation.
-				"hidden fixed inset-auto left-0 top-0 data-closed:fill-mode-forwards",
+				"hidden absolute inset-auto left-0 top-0 data-closed:fill-mode-forwards",
 				p.Class,
 			),
 		}

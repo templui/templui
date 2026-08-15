@@ -13,7 +13,7 @@
 
   // The sidebar content renders once and moves between the desktop container
   // and the mobile sheet, depending on the viewport.
-  function setupMobilePortals() {
+  function init() {
     document.querySelectorAll("[data-tui-sidebar-content]").forEach((content) => {
       const sidebarId = content.getAttribute("data-tui-sidebar-content");
       const portal = document.querySelector(
@@ -32,12 +32,16 @@
     });
   }
 
-  setupMobilePortals();
-  window.addEventListener("resize", setupMobilePortals);
-  new MutationObserver(setupMobilePortals).observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+  window.addEventListener("resize", init);
+  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
+  // does not fire in hidden tabs or throttled iframes): swapped-in markup
+  // wires itself.
+  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
 
   function toggleSidebar(sidebarId) {
     // Below md the trigger opens the mobile sheet instead of collapsing.
@@ -60,6 +64,8 @@
     // Menu button tooltips only show while collapsed to icons.
     const tooltipsDisabled = !(collapsed && mode === "icon");
     wrapper.querySelectorAll("[data-tui-tooltip-trigger]").forEach((trigger) => {
+      // An explicit tooltip.hidden pendant pins the state.
+      if (trigger.hasAttribute("data-tui-sidebar-tooltip-fixed")) return;
       trigger.toggleAttribute("data-tui-tooltip-disabled", tooltipsDisabled);
     });
 

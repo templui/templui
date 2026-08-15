@@ -1,7 +1,6 @@
 package pages
 
 import (
-
 	"github.com/axadrn/shadcn-templ/v2/components/alertdialog"
 	"github.com/axadrn/shadcn-templ/v2/components/button"
 	"github.com/axadrn/shadcn-templ/v2/components/card"
@@ -25,8 +24,8 @@ import (
 
 // Class blocks verbatim from app/(app)/(create)/components/picker.tsx.
 const (
-	createTriggerClass = "relative w-36 shrink-0 touch-manipulation rounded-xl p-3 ring-1 ring-foreground/10 select-none hover:bg-muted focus-visible:ring-foreground/50 focus-visible:outline-none disabled:opacity-50 data-popup-open:bg-muted md:w-full md:rounded-lg md:px-2.5 md:py-2"
-	createContentClass = "cn-menu-target fixed z-50 no-scrollbar max-h-(--available-height) w-[calc(var(--available-width)-(--spacing(6)))] min-w-32 origin-(--transform-origin) translate-y-2 overflow-x-hidden overflow-y-auto rounded-xl border-0 bg-neutral-950/80 p-1.5 text-neutral-100 ring-1 ring-neutral-950/80 backdrop-blur-xl outline-none md:w-52 dark:bg-neutral-800/90 dark:ring-neutral-700/50 data-closed:overflow-hidden"
+	createTriggerClass   = "relative w-36 shrink-0 touch-manipulation rounded-xl p-3 ring-1 ring-foreground/10 select-none hover:bg-muted focus-visible:ring-foreground/50 focus-visible:outline-none disabled:opacity-50 data-popup-open:bg-muted md:w-full md:rounded-lg md:px-2.5 md:py-2"
+	createContentClass   = "cn-menu-target fixed z-50 no-scrollbar max-h-(--available-height) w-[calc(var(--available-width)-(--spacing(6)))] min-w-32 origin-(--transform-origin) translate-y-2 overflow-x-hidden overflow-y-auto rounded-xl border-0 bg-neutral-950/80 p-1.5 text-neutral-100 ring-1 ring-neutral-950/80 backdrop-blur-xl outline-none md:w-52 dark:bg-neutral-800/90 dark:ring-neutral-700/50 data-closed:overflow-hidden"
 	createRadioItemClass = "relative flex cursor-default items-center gap-2 rounded-lg py-1.5 pr-8 pl-2 text-sm font-medium outline-hidden select-none **:text-neutral-100 focus:bg-neutral-600 focus:text-neutral-100 focus:**:text-neutral-100 data-inset:pl-8 dark:focus:bg-neutral-700/80 pointer-coarse:gap-3 pointer-coarse:py-2.5 pointer-coarse:pl-3 pointer-coarse:text-base data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
 	createMenuItemClass  = "group/dropdown-menu-item relative flex cursor-default items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium outline-hidden select-none **:text-neutral-100 focus:bg-neutral-600 focus:text-neutral-100 focus:**:text-neutral-100 data-inset:pl-8 dark:focus:bg-neutral-700/80 pointer-coarse:gap-3 pointer-coarse:py-2.5 pointer-coarse:pl-3 pointer-coarse:text-base data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
 	createLabelClass     = "px-2 py-1.5 text-xs font-medium text-neutral-400 data-inset:pl-8"
@@ -793,13 +792,14 @@ templ createCodeDialog() {
 					// The tab switcher is a ToggleGroup like the tsx; our items
 					// carry data-state instead of Base UI's data-pressed.
 					@togglegroup.ToggleGroup(togglegroup.Props{
-						Class: "**:data-[slot=toggle-group-item]:data-[state=on]:bg-neutral-700/70",
+						Class:        "**:data-[slot=toggle-group-item]:data-[state=on]:bg-neutral-700/70",
+						DefaultValue: []string{"new-project"},
 						Attributes: templ.Attributes{
 							"aria-label":           "Project type",
 							"data-tui-create-tabs": true,
 						},
 					}) {
-						@togglegroup.Item(togglegroup.ItemProps{Value: "new-project", Pressed: true}) {
+						@togglegroup.Item(togglegroup.ItemProps{Value: "new-project"}) {
 							New Project
 						}
 						@togglegroup.Item(togglegroup.ItemProps{Value: "existing-project"}) {
@@ -883,9 +883,9 @@ templ createCodeDialog() {
 // create.js.
 templ createApplyModeGrid() {
 	@radiogroup.RadioGroup(radiogroup.Props{
-		Name:       "create-apply-mode",
-		Value:      "full",
-		Attributes: templ.Attributes{"aria-label": "Apply"},
+		Name:         "create-apply-mode",
+		DefaultValue: "full",
+		Attributes:   templ.Attributes{"aria-label": "Apply"},
 	}) {
 		for _, mode := range createApplyModes {
 			@field.Label(field.LabelProps{For: "create-apply-" + mode.Value}) {

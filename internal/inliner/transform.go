@@ -27,6 +27,10 @@ type Options struct {
 	// the target project's Tailwind CSS defines --font-heading; default is
 	// the strip.
 	FontHeading bool
+	// MenuColor is config.menuColor for transformMenu: "default", "inverted",
+	// "default-translucent" or "inverted-translucent". Empty means "default"
+	// (both markers stripped).
+	MenuColor string
 }
 
 // transformerStyle is the TransformerStyle pendant.

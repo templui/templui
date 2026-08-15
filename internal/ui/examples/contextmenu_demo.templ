@@ -61,7 +61,7 @@ templ ContextMenuDemo() {
 			}
 			@contextmenu.Separator()
 			@contextmenu.Group() {
-				@contextmenu.CheckboxItem(contextmenu.CheckboxItemProps{Checked: true}) {
+				@contextmenu.CheckboxItem(contextmenu.CheckboxItemProps{DefaultChecked: true}) {
 					Show Bookmarks
 				}
 				@contextmenu.CheckboxItem() {
@@ -70,11 +70,11 @@ templ ContextMenuDemo() {
 			}
 			@contextmenu.Separator()
 			@contextmenu.Group() {
-				@contextmenu.RadioGroup() {
+				@contextmenu.RadioGroup(contextmenu.RadioGroupProps{DefaultValue: "pedro"}) {
 					@contextmenu.Label() {
 						People
 					}
-					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "pedro", Checked: true}) {
+					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "pedro"}) {
 						Pedro Duarte
 					}
 					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "colm"}) {

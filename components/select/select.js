@@ -56,15 +56,40 @@
   }
 
   function setState(content, state) {
-    content.setAttribute("data-state", state);
+    const open = state === "open";
+    content.toggleAttribute("data-open", open);
+    content.toggleAttribute("data-closed", !open);
     const popup = popupFor(content);
-    if (popup) popup.setAttribute("data-state", state);
+    if (popup) {
+      popup.toggleAttribute("data-open", open);
+      popup.toggleAttribute("data-closed", !open);
+    }
+  }
+
+  function isOpen(content) {
+    return !!content && content.hasAttribute("data-open");
+  }
+
+  function setTransitionAttribute(content, name, present) {
+    content.toggleAttribute(name, present);
+    const popup = popupFor(content);
+    if (popup) popup.toggleAttribute(name, present);
+  }
+
+  function startTransition(content) {
+    setTransitionAttribute(content, "data-ending-style", false);
+    setTransitionAttribute(content, "data-starting-style", true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setTransitionAttribute(content, "data-starting-style", false));
+    });
   }
 
   function setSide(content, side) {
     content.setAttribute("data-side", side);
     const popup = popupFor(content);
     if (popup) popup.setAttribute("data-side", side);
+    const trigger = triggerFor(content);
+    if (trigger) trigger.setAttribute("data-popup-side", side);
   }
 
   // Base UI zooms the popup out of the anchor's center point (e.g.
@@ -79,13 +104,20 @@
     return "calc(100% + " + SIDE_OFFSET + "px) " + centerY;
   }
 
-  // Moves the content to <body> (shadcn portals it the same way). Also removes
-  // contents whose trigger is gone (leftovers from swapped-out pages).
+  // Moves the content to <body> (shadcn portals it the same way).
+  // The unmount half of the React portal pendant: a portaled content lives
+  // as long as its SSR declaration site (_tuiPortalOwner) stays in the
+  // document. Trigger-presence heuristics judged mid-swap moments wrongly -
+  // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
     document.querySelectorAll("body > [data-tui-select-content]").forEach((c) => {
-      if (c !== content && !triggerFor(c)) c.remove();
+      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) {
+        stopAutoPositioning(c);
+        c.remove();
+      }
     });
     if (content.parentElement !== document.body) {
+      if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
       document.body.appendChild(content);
     }
   }
@@ -107,7 +139,7 @@
 
     return computePosition(trigger, content, {
       placement: placement,
-      strategy: "fixed",
+      strategy: "absolute",
       middleware: [
         offset(SIDE_OFFSET),
         flip({ padding: COLLISION_PADDING }),
@@ -116,11 +148,11 @@
           padding: COLLISION_PADDING,
           apply(args) {
             content.style.setProperty(
-              "--tui-select-available-height",
+              "--available-height",
               args.availableHeight + "px",
             );
             content.style.setProperty(
-              "--tui-select-anchor-width",
+              "--anchor-width",
               args.rects.reference.width + "px",
             );
           },
@@ -133,7 +165,7 @@
       const popup = popupFor(content);
       if (popup) {
         popup.style.setProperty(
-          "--tui-select-transform-origin",
+          "--transform-origin",
           anchorOrigin(result, trigger.getBoundingClientRect()),
         );
       }
@@ -149,7 +181,7 @@
     const viewport = viewportFor(content);
     const valueEl = valueSpanFor(trigger);
     const textEl =
-      content.querySelector('[data-tui-select-item][data-state="checked"] [data-tui-select-item-text]') ||
+      content.querySelector('[data-tui-select-item][data-selected] [data-tui-select-item-text]') ||
       content.querySelector("[data-tui-select-item] [data-tui-select-item-text]");
 
     const docEl = document.documentElement;
@@ -230,7 +262,7 @@
         0,
         100,
       );
-      popup.style.setProperty("--tui-select-transform-origin", "50% " + clampedY + "%");
+      popup.style.setProperty("--transform-origin", "50% " + clampedY + "%");
     }
 
     setSide(content, "none");
@@ -262,6 +294,26 @@
         return positionPopper(content, trigger);
       })
       .then(() => updateScrollArrows(content));
+  }
+
+  function startAutoPositioning(content, trigger) {
+    if (content._tuiPositionCleanup) content._tuiPositionCleanup();
+    let resolveFirst;
+    const firstPosition = new Promise((resolve) => {
+      resolveFirst = resolve;
+    });
+    const update = () => position(content, trigger).then(resolveFirst, resolveFirst);
+    content._tuiPositionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
+      elementResize: typeof ResizeObserver !== "undefined",
+      layoutShift: typeof IntersectionObserver !== "undefined",
+    });
+    return firstPosition;
+  }
+
+  function stopAutoPositioning(content) {
+    if (!content._tuiPositionCleanup) return;
+    content._tuiPositionCleanup();
+    content._tuiPositionCleanup = null;
   }
 
   // ----- scroll arrows + capped grow-on-scroll (Base UI behavior) -----------
@@ -434,7 +486,7 @@
     if (scrollbar > 0) document.body.style.paddingRight = scrollbar + "px";
   }
   function unlockScroll() {
-    if ([...allContents()].some((c) => c.getAttribute("data-state") === "open")) return;
+    if ([...allContents()].some(isOpen)) return;
     document.body.removeAttribute("data-tui-scroll-locked");
     document.body.style.overflow = "";
     document.body.style.paddingRight = "";
@@ -462,28 +514,43 @@
     }, SELECTED_DELAY);
     portal(content);
     lockScroll(); // Base UI's select is modal by default: no page scroll while open
-    if (!content.matches(":popover-open")) {
-      content.showPopover(); // native top layer
-    }
+    // z-index portal like shadcn (no native top layer); re-append
+    // keeps paint order = open order.
+    document.body.appendChild(content);
+    content.hidden = false;
 
     // Position it invisibly first, then play the enter animation in place.
     content.style.visibility = "hidden";
     const finish = () => {
+      // The popup transitions `all` (duration-100), so clearing the
+      // measuring visibility would animate visibility itself - and in
+      // background tabs and throttled iframes that transition freezes at
+      // its hidden start value. Flip with transitions suppressed.
+      const popup = popupFor(content);
+      if (popup) popup.style.transitionProperty = "none";
       content.style.visibility = "";
-      if (!content.matches(":popover-open")) return;
+      if (popup) {
+        void popup.offsetWidth;
+        popup.style.transitionProperty = "";
+      }
+      if (content.hidden) return;
       setState(content, "open");
+      startTransition(content);
       trigger.setAttribute("aria-expanded", "true");
+      trigger.setAttribute("data-popup-open", "");
+      trigger.setAttribute("data-pressed", "");
       // Base UI moves focus to the selected item when the listbox opens.
       const selected =
-        content.querySelector('[data-tui-select-item][data-state="checked"]') ||
+        content.querySelector('[data-tui-select-item][data-selected]') ||
         content.querySelector("[data-tui-select-item]");
       if (selected) selected.focus({ preventScroll: true });
     };
-    position(content, trigger).then(finish, finish);
+    startAutoPositioning(content, trigger).then(finish, finish);
   }
 
   function close(content) {
-    if (!content.matches(":popover-open")) return;
+    if (content.hidden) return;
+    stopAutoPositioning(content);
     stopArrowScroll();
     clearTimeout(content._tuiSelectedDelay);
     content._tuiSelection = {
@@ -492,21 +559,29 @@
       dragY: 0,
     };
     content.style.visibility = "";
+    setTransitionAttribute(content, "data-starting-style", false);
     setState(content, "closed");
+    setTransitionAttribute(content, "data-ending-style", true);
     unlockScroll();
     const trigger = triggerFor(content);
-    if (trigger) trigger.setAttribute("aria-expanded", "false");
+    if (trigger) {
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.removeAttribute("data-popup-open");
+      trigger.removeAttribute("data-pressed");
+    }
     clearTimeout(content._tuiHide);
     // Aligned mode has no exit animation (animate-none, like shadcn) — hide
     // immediately instead of waiting for one.
     const popup = popupFor(content);
     if (popup && popup.getAttribute("data-align-trigger") === "true") {
-      content.hidePopover();
+      content.hidden = true;
+      setTransitionAttribute(content, "data-ending-style", false);
       return;
     }
     content._tuiHide = setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
-        content.hidePopover();
+      if (content.hasAttribute("data-closed") && !content.hidden) {
+        content.hidden = true;
+        setTransitionAttribute(content, "data-ending-style", false);
       }
     }, EXIT_MS);
   }
@@ -515,34 +590,62 @@
     allContents().forEach(close);
   }
 
+  function requestOpenChange(content, nextOpen) {
+    if (!content || isOpen(content) === nextOpen) return;
+    const accepted = content.dispatchEvent(
+      new CustomEvent("select-open-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { open: nextOpen },
+      }),
+    );
+    if (!accepted || content.hasAttribute("data-tui-select-open-controlled")) return;
+    const trigger = triggerFor(content);
+    if (nextOpen && trigger) open(content, trigger);
+    else if (!nextOpen) close(content);
+  }
+
+  function requestCloseAll() {
+    allContents().forEach((content) => requestOpenChange(content, false));
+  }
+
   function selectItem(content, item) {
     const trigger = triggerFor(content);
     if (!trigger) return;
+  if (trigger.getAttribute("aria-readonly") === "true") return;
     const value = item.getAttribute("data-tui-select-value") || "";
     const label =
       item.getAttribute("data-tui-select-label") ||
       (item.querySelector("[data-tui-select-item-text]") || item).textContent.trim();
 
-    content.querySelectorAll("[data-tui-select-item]").forEach((i) => {
-      i.setAttribute("data-state", "unchecked");
-      i.setAttribute("aria-selected", "false");
-    });
-    item.setAttribute("data-state", "checked");
-    item.setAttribute("aria-selected", "true");
-
-    const span = valueSpanFor(trigger);
-    if (span) span.textContent = label;
-    trigger.removeAttribute("data-placeholder");
-
-    const input = inputFor(trigger);
-    if (input && input.value !== value) {
-      input.value = value;
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-    trigger.dispatchEvent(
-      new CustomEvent("select-change", { bubbles: true, detail: { value: value, label: label } }),
+    const accepted = trigger.dispatchEvent(
+      new CustomEvent("select-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { value: value, label: label },
+      }),
     );
-    close(content);
+    if (!accepted) return;
+
+    if (!trigger.hasAttribute("data-tui-select-value-controlled")) {
+      content.querySelectorAll("[data-tui-select-item]").forEach((i) => {
+      i.removeAttribute("data-selected");
+      i.setAttribute("aria-selected", "false");
+      });
+      item.setAttribute("data-selected", "");
+      item.setAttribute("aria-selected", "true");
+
+      const span = valueSpanFor(trigger);
+      if (span) span.textContent = label;
+      trigger.removeAttribute("data-placeholder");
+
+      const input = inputFor(trigger);
+      if (input && input.value !== value) {
+        input.value = value;
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    }
+    requestOpenChange(content, false);
     trigger.focus();
   }
 
@@ -557,53 +660,49 @@
       const content = tpl.content.querySelector("[data-tui-select-content]");
       if (content) {
         const stale = document.getElementById(content.id);
-        if (stale) stale.remove();
+        if (stale) {
+          stopAutoPositioning(stale);
+          stale.remove();
+        }
+        content._tuiPortalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
       tpl.remove();
     });
   }
 
-  function syncTriggers() {
+  function init() {
     liftTemplates();
     document.querySelectorAll("[data-tui-select-trigger]").forEach((trigger) => {
       const content = contentFor(trigger);
       if (!content) return;
       portal(content); // portal up front, like React does on mount
-      const checked = content.querySelector('[data-tui-select-item][data-state="checked"]');
-      if (!checked) return;
-      const label =
-        checked.getAttribute("data-tui-select-label") ||
-        (checked.querySelector("[data-tui-select-item-text]") || checked).textContent.trim();
-      const span = valueSpanFor(trigger);
-      if (span && span.textContent.trim() !== label) span.textContent = label;
-      if (trigger.hasAttribute("data-placeholder")) trigger.removeAttribute("data-placeholder");
-    });
-  }
-
-  let syncQueued = false;
-  function queueSync() {
-    if (syncQueued) return;
-    syncQueued = true;
-    requestAnimationFrame(() => {
-      syncQueued = false;
-      syncTriggers();
+      const checked = content.querySelector('[data-tui-select-item][data-selected]');
+      if (checked) {
+        const label =
+          checked.getAttribute("data-tui-select-label") ||
+          (checked.querySelector("[data-tui-select-item-text]") || checked).textContent.trim();
+        const span = valueSpanFor(trigger);
+        if (span && span.textContent.trim() !== label) span.textContent = label;
+        if (trigger.hasAttribute("data-placeholder")) trigger.removeAttribute("data-placeholder");
+      }
+      if (content.getAttribute("data-tui-select-initial-open") === "true") {
+        content.removeAttribute("data-tui-select-initial-open");
+        open(content, trigger);
+      }
     });
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", syncTriggers);
+    document.addEventListener("DOMContentLoaded", init);
   } else {
-    syncTriggers();
+    init();
   }
-  new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      if (m.addedNodes.length) {
-        queueSync();
-        break;
-      }
-    }
-  }).observe(document.documentElement, { childList: true, subtree: true });
+  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
+  // does not fire in hidden tabs or throttled iframes): swapped-in markup
+  // lifts and wires itself, removals release portaled content through the
+  // ownership sweep.
+  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
 
   // ----- events -------------------------------------------------------------
 
@@ -613,11 +712,7 @@
   function toggle(trigger) {
     const content = contentFor(trigger);
     if (!content) return;
-    if (content.getAttribute("data-state") === "open") {
-      close(content);
-    } else {
-      open(content, trigger);
-    }
+    requestOpenChange(content, !isOpen(content));
   }
 
   // Pendant of floating-ui useClick's pointerTypeRef: pointerdown marks the
@@ -674,17 +769,16 @@
       if (!trigger.disabled) {
         const content = contentFor(trigger);
         if (content) {
-          if (content.getAttribute("data-state") === "open") {
-            close(content);
+          if (isOpen(content)) {
+            requestOpenChange(content, false);
           } else {
-            open(content, trigger);
+            requestOpenChange(content, true);
             armCancelOpen(trigger, content);
           }
         }
       }
       return;
     }
-
     // Pendant of SelectItem's allowMouseSelectionRef: a real pointer click
     // only commits when its press started on the item. The stray click the
     // browser hit-tests onto the popup that just opened over the trigger
@@ -696,7 +790,7 @@
       const content = item.closest("[data-tui-select-content]");
       if (content && content._tuiSelection) content._tuiSelection.dragY = 0;
     }
-    if (!e.target.closest("[data-tui-select-content]")) closeAll();
+    if (!e.target.closest("[data-tui-select-content]")) requestCloseAll();
   });
 
   document.addEventListener("pointerover", (e) => {
@@ -749,7 +843,7 @@
     if (item.hasAttribute("data-disabled") || item._tuiPointerType === "touch") return;
     // Regular clicks are committed by the click event.
     if (item._tuiAllowMouseSelection) return;
-    const selected = item.getAttribute("data-state") === "checked";
+    const selected = item.hasAttribute("data-selected");
     if (
       (!selection.allowSelectedMouseUp && selected) ||
       (!selection.allowUnselectedMouseUp && !selected)
@@ -769,9 +863,9 @@
 
     if (e.key === "Escape") {
       allContents().forEach((content) => {
-        if (content.getAttribute("data-state") !== "open") return;
+        if (!isOpen(content)) return;
         const trigger = triggerFor(content);
-        close(content);
+        requestOpenChange(content, false);
         if (trigger) trigger.focus();
       });
       return;
@@ -785,7 +879,7 @@
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
         const content = contentFor(trigger);
-        if (content && content.getAttribute("data-state") !== "open") open(content, trigger);
+        if (content && !isOpen(content)) open(content, trigger);
       }
       return;
     }
@@ -812,7 +906,7 @@
       e.preventDefault();
       selectItem(content, item);
     } else if (e.key === "Tab") {
-      close(content);
+      requestOpenChange(content, false);
     } else if (e.key.length === 1) {
       clearTimeout(typeTimer);
       typeBuffer += e.key.toLowerCase();
@@ -857,22 +951,8 @@
         }
         return;
       }
-      // Page scroll: keep open popper menus attached to their trigger
-      // (aligned menus lock page scroll instead).
-      allContents().forEach((content) => {
-        if (content.getAttribute("data-state") !== "open" || content._tuiAligned) return;
-        const trigger = triggerFor(content);
-        if (trigger) positionPopper(content, trigger).then(() => updateScrollArrows(content));
-      });
     },
     true,
   );
 
-  window.addEventListener("resize", () => {
-    allContents().forEach((content) => {
-      if (content.getAttribute("data-state") !== "open") return;
-      const trigger = triggerFor(content);
-      if (trigger) position(content, trigger);
-    });
-  });
 })();

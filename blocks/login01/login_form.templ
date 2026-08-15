@@ -1,0 +1,65 @@
+package login01
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/button"
+	"github.com/axadrn/shadcn-templ/v2/components/card"
+	"github.com/axadrn/shadcn-templ/v2/components/field"
+	"github.com/axadrn/shadcn-templ/v2/components/input"
+)
+
+templ LoginForm() {
+	<div class="flex flex-col gap-6">
+		@card.Card() {
+			@card.Header() {
+				@card.Title() {
+					Login to your account
+				}
+				@card.Description() {
+					Enter your email below to login to your account
+				}
+			}
+			@card.Content() {
+				<form>
+					@field.Group() {
+						@field.Field() {
+							@field.Label(field.LabelProps{For: "email"}) {
+								Email
+							}
+							@input.Input(input.Props{
+								ID:          "email",
+								Type:        "email",
+								Placeholder: "m@example.com",
+								Required:    true,
+							})
+						}
+						@field.Field() {
+							<div class="flex items-center">
+								@field.Label(field.LabelProps{For: "password"}) {
+									Password
+								}
+								<a
+									href="#"
+									class="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+								>
+									Forgot your password?
+								</a>
+							</div>
+							@input.Input(input.Props{ID: "password", Type: "password", Required: true})
+						}
+						@field.Field() {
+							@button.Button(button.Props{Type: button.TypeSubmit}) {
+								Login
+							}
+							@button.Button(button.Props{Variant: button.VariantOutline, Type: button.TypeButton}) {
+								Login with Google
+							}
+							@field.Description(field.DescriptionProps{Class: "text-center"}) {
+								Don't have an account? <a href="#">Sign up</a>
+							}
+						}
+					}
+				</form>
+			}
+		}
+	</div>
+}

@@ -1,0 +1,62 @@
+package dashboard01
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/dropdownmenu"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+templ NavDocuments(items []DocumentItem) {
+	@sidebar.Group(sidebar.GroupProps{Class: "group-data-[collapsible=icon]:hidden"}) {
+		@sidebar.GroupLabel() {
+			Documents
+		}
+		@sidebar.Menu() {
+			for _, item := range items {
+				@sidebar.MenuItem() {
+					@sidebar.MenuButton(sidebar.MenuButtonProps{Href: item.URL}) {
+						@item.Icon()
+						<span>{ item.Name }</span>
+					}
+					@dropdownmenu.DropdownMenu() {
+						@sidebar.MenuAction(sidebar.MenuActionProps{
+							ShowOnHover: true,
+							Class:       "aria-expanded:bg-muted",
+							Attributes:  dropdownmenu.Trigger(ctx),
+						}) {
+							@icon.Ellipsis()
+							<span class="sr-only">More</span>
+						}
+						@dropdownmenu.Content(dropdownmenu.ContentProps{
+							Class:       "w-24",
+							Side:        dropdownmenu.SideRight,
+							Align:       dropdownmenu.AlignStart,
+							MobileSide:  dropdownmenu.SideBottom,
+							MobileAlign: dropdownmenu.AlignEnd,
+						}) {
+							@dropdownmenu.Item() {
+								@icon.Folder()
+								<span>Open</span>
+							}
+							@dropdownmenu.Item() {
+								@icon.Share()
+								<span>Share</span>
+							}
+							@dropdownmenu.Separator()
+							@dropdownmenu.Item(dropdownmenu.ItemProps{Variant: dropdownmenu.ItemVariantDestructive}) {
+								@icon.Trash2()
+								<span>Delete</span>
+							}
+						}
+					}
+				}
+			}
+			@sidebar.MenuItem() {
+				@sidebar.MenuButton(sidebar.MenuButtonProps{Class: "text-sidebar-foreground/70"}) {
+					@icon.Ellipsis(icon.Props{Class: "text-sidebar-foreground/70"})
+					<span>More</span>
+				}
+			}
+		}
+	}
+}

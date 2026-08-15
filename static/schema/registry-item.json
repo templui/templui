@@ -14,7 +14,7 @@
     },
     "type": {
       "type": "string",
-      "enum": ["registry:ui", "registry:lib", "registry:example"]
+      "enum": ["registry:ui", "registry:lib", "registry:example", "registry:block"]
     },
     "title": {
       "type": "string"
@@ -56,7 +56,15 @@
           },
           "type": {
             "type": "string",
-            "enum": ["registry:ui", "registry:lib", "registry:example"]
+            "enum": [
+              "registry:ui",
+              "registry:lib",
+              "registry:example",
+              "registry:block",
+              "registry:page",
+              "registry:component",
+              "registry:file"
+            ]
           },
           "content": {
             "type": "string",

@@ -5,7 +5,7 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/slider"
 )
 
-// The vanilla pendant of the demo's React state: the slider drives the bar.
+// The slider drives the progress bar.
 templ ProgressControlled() {
 	<div class="flex w-full max-w-sm flex-col gap-4" data-progress-controlled-demo>
 		@progress.Progress(progress.Props{
@@ -14,10 +14,10 @@ templ ProgressControlled() {
 			Class: "w-full",
 		})
 		@slider.Slider(slider.Props{
-			Value: []float64{50},
-			Min:    0,
-			Max:    100,
-			Step:   1,
+			DefaultValue: []float64{50},
+			Min:          0,
+			Max:          100,
+			Step:         1,
 		})
 	</div>
 	<script nonce={ templ.GetNonce(ctx) }>

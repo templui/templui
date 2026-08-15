@@ -1,0 +1,70 @@
+package sidebar10
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/dropdownmenu"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+templ NavFavorites(favorites []Favorite) {
+	@sidebar.Group(sidebar.GroupProps{Class: "group-data-[collapsible=icon]:hidden"}) {
+		@sidebar.GroupLabel() {
+			Favorites
+		}
+		@sidebar.Menu() {
+			for _, item := range favorites {
+				@sidebar.MenuItem() {
+					@sidebar.MenuButton(sidebar.MenuButtonProps{
+						Href:       item.URL,
+						Attributes: templ.Attributes{"title": item.Name},
+					}) {
+						<span>{ item.Emoji }</span>
+						<span>{ item.Name }</span>
+					}
+					@dropdownmenu.DropdownMenu() {
+						@sidebar.MenuAction(sidebar.MenuActionProps{
+							ShowOnHover: true,
+							Class:       "aria-expanded:bg-muted",
+							Attributes:  dropdownmenu.Trigger(ctx),
+						}) {
+							@icon.Ellipsis()
+							<span class="sr-only">More</span>
+						}
+						@dropdownmenu.Content(dropdownmenu.ContentProps{
+							Class:       "w-56 rounded-lg",
+							Side:        dropdownmenu.SideRight,
+							Align:       dropdownmenu.AlignStart,
+							MobileSide:  dropdownmenu.SideBottom,
+							MobileAlign: dropdownmenu.AlignEnd,
+						}) {
+							@dropdownmenu.Item() {
+								@icon.StarOff(icon.Props{Class: "text-muted-foreground"})
+								<span>Remove from Favorites</span>
+							}
+							@dropdownmenu.Separator()
+							@dropdownmenu.Item() {
+								@icon.Link(icon.Props{Class: "text-muted-foreground"})
+								<span>Copy Link</span>
+							}
+							@dropdownmenu.Item() {
+								@icon.ArrowUpRight(icon.Props{Class: "text-muted-foreground"})
+								<span>Open in New Tab</span>
+							}
+							@dropdownmenu.Separator()
+							@dropdownmenu.Item() {
+								@icon.Trash2(icon.Props{Class: "text-muted-foreground"})
+								<span>Delete</span>
+							}
+						}
+					}
+				}
+			}
+			@sidebar.MenuItem() {
+				@sidebar.MenuButton(sidebar.MenuButtonProps{Class: "text-sidebar-foreground/70"}) {
+					@icon.Ellipsis()
+					<span>More</span>
+				}
+			}
+		}
+	}
+}

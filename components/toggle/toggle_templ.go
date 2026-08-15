@@ -32,18 +32,30 @@ const (
 type ctxKey string
 
 const (
-	variantKey ctxKey = "toggleVariant"
-	sizeKey    ctxKey = "toggleSize"
-	spacingKey ctxKey = "toggleSpacing"
+	variantKey    ctxKey = "toggleVariant"
+	sizeKey       ctxKey = "toggleSize"
+	spacingKey    ctxKey = "toggleSpacing"
+	groupStateKey ctxKey = "toggleGroupState"
 )
+
+type groupState struct {
+	initialized bool
+	controlled  bool
+	pressed     map[string]bool
+}
 
 // WithGroupDefaults stores a group's variant/size/spacing in the context so
 // child Toggles inherit them and style themselves as group items. Used by the
 // togglegroup component.
-func WithGroupDefaults(ctx context.Context, variant Variant, size Size, spacing int) context.Context {
+func WithGroupDefaults(ctx context.Context, variant Variant, size Size, spacing int, values []string, initialized bool, controlled bool) context.Context {
 	ctx = context.WithValue(ctx, variantKey, variant)
 	ctx = context.WithValue(ctx, sizeKey, size)
 	ctx = context.WithValue(ctx, spacingKey, spacing)
+	pressed := make(map[string]bool, len(values))
+	for _, value := range values {
+		pressed[value] = true
+	}
+	ctx = context.WithValue(ctx, groupStateKey, groupState{initialized: initialized, controlled: controlled, pressed: pressed})
 	return ctx
 }
 
@@ -68,16 +80,34 @@ func spacingFromCtx(ctx context.Context) (int, bool) {
 	return s, ok
 }
 
+func pressedFromGroup(ctx context.Context, value string) (pressed bool, initialized bool, controlled bool) {
+	state, ok := ctx.Value(groupStateKey).(groupState)
+	if !ok {
+		return false, false, false
+	}
+	return state.pressed[value], state.initialized, state.controlled
+}
+
 type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
 	Variant    Variant
 	Size       Size
-	Pressed    bool
-	Disabled   bool
+	// Pressed is the controlled pressed state. Use DefaultPressed when the
+	// browser should own the state after the initial render.
+	Pressed        *bool
+	DefaultPressed bool
+	Disabled       bool
 	// Value identifies the toggle within a group (exposed in the toggle-change event).
 	Value string
+}
+
+func initialPressed(p Props) bool {
+	if p.Pressed != nil {
+		return *p.Pressed
+	}
+	return p.DefaultPressed
 }
 
 // 1:1 base/ui/toggle.tsx: structure lives here, the look comes from the
@@ -142,6 +172,11 @@ func Toggle(props ...Props) templ.Component {
 			p.Size = sizeFromCtx(ctx)
 		}
 		spacing, inGroup := spacingFromCtx(ctx)
+		pressed := initialPressed(p)
+		groupPressed, groupInitialized, groupControlled := pressedFromGroup(ctx, p.Value)
+		if groupInitialized {
+			pressed = groupPressed
+		}
 		var templ_7745c5c3_Var2 = []any{utils.CN(map[string]bool{groupItemClasses(): inGroup}, baseClasses, variantClasses(p.Variant), sizeClasses(p.Size), p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
@@ -159,7 +194,7 @@ func Toggle(props ...Props) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Variant))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 121, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 156, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -172,7 +207,7 @@ func Toggle(props ...Props) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(string(p.Size))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 122, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 157, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -185,7 +220,7 @@ func Toggle(props ...Props) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(spacing))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 123, Col: 39}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 158, Col: 39}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -209,7 +244,7 @@ func Toggle(props ...Props) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 128, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 163, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -232,7 +267,7 @@ func Toggle(props ...Props) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.Value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 132, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 167, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -248,9 +283,9 @@ func Toggle(props ...Props) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatBool(p.Pressed))
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatBool(pressed))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 134, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/toggle/toggle.templ`, Line: 169, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -260,13 +295,14 @@ func Toggle(props ...Props) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if p.Pressed {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, " data-state=\"on\"")
+		if pressed {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, " data-pressed")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, " data-state=\"off\"")
+		}
+		if p.Pressed != nil || groupControlled {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, " data-tui-toggle-controlled")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

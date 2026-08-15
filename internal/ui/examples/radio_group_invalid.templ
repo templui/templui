@@ -13,7 +13,7 @@ templ RadioGroupInvalid() {
 		@field.Description() {
 			Choose how you want to receive notifications.
 		}
-		@radiogroup.RadioGroup(radiogroup.Props{Value: "email"}) {
+		@radiogroup.RadioGroup(radiogroup.Props{DefaultValue: "email"}) {
 			@field.Field(field.Props{Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"aria-invalid": "true"}}) {
 				@radiogroup.Item(radiogroup.ItemProps{ID: "invalid-email", Value: "email", Attributes: templ.Attributes{"aria-invalid": "true"}})
 				@field.Label(field.LabelProps{For: "invalid-email", Class: "font-normal"}) {

@@ -6,8 +6,7 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
-// The kitchen-sink page from button-example.tsx. The tsx unrolls every
-// variant by hand, the loops here render the identical markup.
+// The loops render every variant in the same DOM order.
 templ buttonExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {

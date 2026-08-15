@@ -58,6 +58,7 @@ templ Toaster(props ...ToasterProps) {
 		}
 		data-slot="toast-viewport"
 		data-tui-toaster
+		data-tui-portal
 		data-tui-toaster-timeout={ strconv.Itoa(p.Timeout) }
 		data-tui-toaster-limit={ strconv.Itoa(p.Limit) }
 		class={ utils.CN(

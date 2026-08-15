@@ -1,0 +1,874 @@
+package dashboard01
+
+import (
+	"fmt"
+
+	"github.com/axadrn/shadcn-templ/v2/components/badge"
+	"github.com/axadrn/shadcn-templ/v2/components/button"
+	"github.com/axadrn/shadcn-templ/v2/components/chart"
+	"github.com/axadrn/shadcn-templ/v2/components/checkbox"
+	"github.com/axadrn/shadcn-templ/v2/components/drawer"
+	"github.com/axadrn/shadcn-templ/v2/components/dropdownmenu"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/input"
+	"github.com/axadrn/shadcn-templ/v2/components/label"
+	selectcomp "github.com/axadrn/shadcn-templ/v2/components/select"
+	"github.com/axadrn/shadcn-templ/v2/components/separator"
+	"github.com/axadrn/shadcn-templ/v2/components/skeleton"
+	"github.com/axadrn/shadcn-templ/v2/components/table"
+	"github.com/axadrn/shadcn-templ/v2/components/tabs"
+	"github.com/axadrn/shadcn-templ/v2/utils"
+)
+
+// dataTablePageSize is the pendant of the pagination state's pageSize.
+const dataTablePageSize = 10
+
+// dataTableHideableColumns are the columns the Columns menu
+// lists in the tsx: every accessor column that can hide.
+var dataTableHideableColumns = []string{"type", "status", "target", "limit", "reviewer"}
+
+var dataTableViews = []struct {
+	Value string
+	Label string
+}{
+	{"outline", "Outline"},
+	{"past-performance", "Past Performance"},
+	{"key-personnel", "Key Personnel"},
+	{"focus-documents", "Focus Documents"},
+}
+
+templ DataTable(data []Item) {
+	// Pagination state lives in the URL (see data_table.go); the window,
+	// page count and button states are computed server-side.
+	{{ page, size := dataTablePageParams(ctx, len(data)) }}
+	{{ pageCount := dataTablePageCount(len(data), size) }}
+	// The swappable fragment: a fragment-aware handler (?fragment=data-table
+	// + templ.WithFragments) renders just this container for the script's
+	// partial updates; everywhere else the wrapper is transparent.
+	@templ.Fragment("data-table") {
+		@tabs.Tabs(tabs.Props{
+			DefaultValue: "outline",
+			Class:        "w-full flex-col justify-start gap-6",
+			Attributes:   templ.Attributes{"data-dashboard01-table": ""},
+		}) {
+			<div class="flex items-center justify-between px-4 lg:px-6">
+				@label.Label(label.Props{For: "view-selector", Class: "sr-only"}) {
+					View
+				}
+				// The view select is static: it mirrors the tabs but does not
+				// switch them (the tsx does not wire it to the tabs either).
+				@selectcomp.Select(selectcomp.Props{DefaultValue: "outline"}) {
+					@selectcomp.Trigger(selectcomp.TriggerProps{
+						Class: "flex w-fit @4xl/main:hidden",
+						Size:  selectcomp.SizeSm,
+						ID:    "view-selector",
+					}) {
+						@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a view"})
+					}
+					@selectcomp.Content() {
+						@selectcomp.Group() {
+							for _, view := range dataTableViews {
+								@selectcomp.Item(selectcomp.ItemProps{Value: view.Value}) {
+									{ view.Label }
+								}
+							}
+						}
+					}
+				}
+				@tabs.List(tabs.ListProps{Class: "hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:bg-muted-foreground/30 **:data-[slot=badge]:px-1 @4xl/main:flex"}) {
+					@tabs.Trigger(tabs.TriggerProps{Value: "outline"}) {
+						Outline
+					}
+					@tabs.Trigger(tabs.TriggerProps{Value: "past-performance"}) {
+						Past Performance
+						@badge.Badge(badge.Props{Variant: badge.VariantSecondary}) {
+							3
+						}
+					}
+					@tabs.Trigger(tabs.TriggerProps{Value: "key-personnel"}) {
+						Key Personnel
+						@badge.Badge(badge.Props{Variant: badge.VariantSecondary}) {
+							2
+						}
+					}
+					@tabs.Trigger(tabs.TriggerProps{Value: "focus-documents"}) {
+						Focus Documents
+					}
+				}
+				<div class="flex items-center gap-2">
+					@dropdownmenu.DropdownMenu() {
+						@button.Button(button.Props{
+							Variant:    button.VariantOutline,
+							Size:       button.SizeSm,
+							Attributes: dropdownmenu.Trigger(ctx),
+						}) {
+							@icon.Columns3(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-start"}})
+							Columns
+							@icon.ChevronDown(icon.Props{Attributes: templ.Attributes{"data-icon": "inline-end"}})
+						}
+						@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignEnd, Class: "w-32"}) {
+							// The columnVisibility pendant: dataTableScript toggles
+							// the column's cells; the attribute carries the cell
+							// index (after the drag, select and header columns).
+							for i, column := range dataTableHideableColumns {
+								@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{
+									Class:          "capitalize",
+									DefaultChecked: true,
+									Attributes:     templ.Attributes{"data-dashboard01-column": fmt.Sprint(i + 3)},
+								}) {
+									{ column }
+								}
+							}
+						}
+					}
+					@button.Button(button.Props{Variant: button.VariantOutline, Size: button.SizeSm}) {
+						@icon.Plus()
+						<span class="hidden lg:inline">Add Section</span>
+					}
+				</div>
+			</div>
+			@tabs.Content(tabs.ContentProps{
+				Value: "outline",
+				Class: "relative flex flex-col gap-4 overflow-auto px-4 lg:px-6",
+			}) {
+				<div class="overflow-hidden rounded-lg border">
+					@table.Table() {
+						@table.Header(table.HeaderProps{Class: "sticky top-0 z-10 bg-muted"}) {
+							@table.Row() {
+								@table.Head()
+								@table.Head() {
+									<div class="flex items-center justify-center">
+										@checkbox.Checkbox(checkbox.Props{
+											Attributes: templ.Attributes{"aria-label": "Select all"},
+										})
+									</div>
+								}
+								@table.Head() {
+									Header
+								}
+								@table.Head() {
+									Section Type
+								}
+								@table.Head() {
+									Status
+								}
+								@table.Head() {
+									<div class="w-full text-right">Target</div>
+								}
+								@table.Head() {
+									<div class="w-full text-right">Limit</div>
+								}
+								@table.Head() {
+									Reviewer
+								}
+								@table.Head()
+							}
+						}
+						@table.Body(table.BodyProps{
+							Class:      "**:data-[slot=table-cell]:first:w-8",
+							Attributes: templ.Attributes{"data-dashboard01-sortable": ""},
+						}) {
+							if len(data) > 0 {
+								for _, item := range dataTablePageWindow(data, page, size) {
+									@dataTableRow(item, page, size)
+								}
+							} else {
+								@table.Row() {
+									@table.Cell(table.CellProps{
+										Class:      "h-24 text-center",
+										Attributes: templ.Attributes{"colspan": "9"},
+									}) {
+										No results.
+									}
+								}
+							}
+						}
+					}
+				</div>
+				<div class="flex items-center justify-between px-4">
+					<div class="hidden flex-1 text-sm text-muted-foreground lg:flex">
+						// Selection is view-local UI state. dataTableScript keeps the
+						// count live and resets it on page navigation.
+						<span data-dashboard01-selected-count>0</span>
+						&nbsp;of { fmt.Sprint(len(data)) } row(s) selected.
+					</div>
+					<div class="flex w-full items-center gap-8 lg:w-fit">
+						// The rows-per-page pick is declarative htmx: the select
+						// syncs its hidden input[name=size], whose change event
+						// bubbles to this wrapper and fetches page one with the
+						// new size (the setPageSize pendant, reset like tanstack).
+						<div
+							class="hidden items-center gap-2 lg:flex"
+							hx-get="?page=1&fragment=data-table"
+							hx-trigger="change"
+							hx-include="input[name='size']"
+							hx-target="[data-dashboard01-table]"
+							hx-swap="outerHTML"
+						>
+							@label.Label(label.Props{For: "rows-per-page", Class: "text-sm font-medium"}) {
+								Rows per page
+							}
+							// The tsx passes side="top" to the SelectContent; the
+							// templ select has no side prop, the content aligns to
+							// the trigger.
+							@selectcomp.Select(selectcomp.Props{DefaultValue: fmt.Sprint(size), Name: "size"}) {
+								@selectcomp.Trigger(selectcomp.TriggerProps{
+									Size:  selectcomp.SizeSm,
+									Class: "w-20",
+									ID:    "rows-per-page",
+								}) {
+									@selectcomp.Value(selectcomp.ValueProps{Placeholder: fmt.Sprint(size)})
+								}
+								@selectcomp.Content() {
+									@selectcomp.Group() {
+										for _, pageSize := range dataTablePageSizes {
+											@selectcomp.Item(selectcomp.ItemProps{Value: fmt.Sprint(pageSize)}) {
+												{ fmt.Sprint(pageSize) }
+											}
+										}
+									}
+								}
+							}
+						</div>
+						<div class="flex w-fit items-center justify-center text-sm font-medium">
+							Page { fmt.Sprint(page) } of { fmt.Sprint(pageCount) }
+						</div>
+						<div class="ml-auto flex items-center gap-2 lg:ml-0">
+							// The nav buttons are links onto the page's own URL
+							// (?page=&size=), disabled states computed server-side -
+							// the setPageIndex/getCanPreviousPage pendant. htmx
+							// swaps just the data-table fragment; without JS the
+							// links navigate normally.
+							@button.Button(button.Props{
+								Variant:    button.VariantOutline,
+								Class:      "hidden h-8 w-8 p-0 lg:flex",
+								Href:       dataTablePageHref(1, size),
+								Disabled:   page == 1,
+								Attributes: dataTableHxAttrs(dataTablePageHref(1, size)),
+							}) {
+								<span class="sr-only">Go to first page</span>
+								@icon.ChevronsLeft()
+							}
+							@button.Button(button.Props{
+								Variant:    button.VariantOutline,
+								Class:      "size-8",
+								Size:       button.SizeIcon,
+								Href:       dataTablePageHref(page-1, size),
+								Disabled:   page == 1,
+								Attributes: dataTableHxAttrs(dataTablePageHref(page-1, size)),
+							}) {
+								<span class="sr-only">Go to previous page</span>
+								@icon.ChevronLeft()
+							}
+							@button.Button(button.Props{
+								Variant:    button.VariantOutline,
+								Class:      "size-8",
+								Size:       button.SizeIcon,
+								Href:       dataTablePageHref(page+1, size),
+								Disabled:   page == pageCount,
+								Attributes: dataTableHxAttrs(dataTablePageHref(page+1, size)),
+							}) {
+								<span class="sr-only">Go to next page</span>
+								@icon.ChevronRight()
+							}
+							@button.Button(button.Props{
+								Variant:    button.VariantOutline,
+								Class:      "hidden size-8 lg:flex",
+								Size:       button.SizeIcon,
+								Href:       dataTablePageHref(pageCount, size),
+								Disabled:   page == pageCount,
+								Attributes: dataTableHxAttrs(dataTablePageHref(pageCount, size)),
+							}) {
+								<span class="sr-only">Go to last page</span>
+								@icon.ChevronsRight()
+							}
+						</div>
+					</div>
+				</div>
+			}
+			@tabs.Content(tabs.ContentProps{
+				Value: "past-performance",
+				Class: "flex flex-col px-4 lg:px-6",
+			}) {
+				<div class="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
+			}
+			@tabs.Content(tabs.ContentProps{Value: "key-personnel", Class: "flex flex-col px-4 lg:px-6"}) {
+				<div class="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
+			}
+			@tabs.Content(tabs.ContentProps{
+				Value: "focus-documents",
+				Class: "flex flex-col px-4 lg:px-6",
+			}) {
+				<div class="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
+			}
+		}
+	}
+	@dataTableScript()
+}
+
+// dataTableScript owns the view-local interactions from the TSX: column
+// visibility, row selection and sortable rows. Pagination stays in the URL.
+templ dataTableScript() {
+	<script nonce={ templ.GetNonce(ctx) }>
+		(() => {
+			if (window.__tuiDashboard01DataTable) return;
+			window.__tuiDashboard01DataTable = true;
+			let draggedRow = null;
+			let keyboardOrigin = null;
+
+			// Pagination and rows-per-page are htmx-driven (see the hx-*
+			// attributes on the nav links and the rows-per-page wrapper);
+			// this script only covers the view-local UI state below.
+
+			// Column visibility (the tsx's columnVisibility state): the
+			// Columns checkbox items hide/show their column's
+			// cells. The dropdown content is portaled to <body>, so the
+			// table is resolved directly (one instance per page).
+			document.addEventListener("dropdownmenu-checked-change", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const item = e.target.closest("[data-dashboard01-column]");
+				if (!item) return;
+				const root = document.querySelector("[data-dashboard01-table]");
+				if (!root) return;
+				const index = parseInt(item.getAttribute("data-dashboard01-column"), 10);
+				const show = item.hasAttribute("data-checked");
+				root.querySelectorAll("thead tr, tbody tr").forEach((row) => {
+					const cell = row.children[index];
+					if (cell) cell.hidden = !show;
+				});
+			});
+
+			// Row selection: the header checkbox toggles the page's rows and
+			// mirrors them as checked/indeterminate (the checkbox component
+			// renders the mixed state natively); selected rows tint via
+			// data-state and the footer count stays live.
+			let syncing = false;
+			document.addEventListener("change", (e) => {
+				if (syncing || !(e.target instanceof Element)) return;
+				if (!e.target.matches("[data-tui-checkbox-input]")) return;
+				const root = e.target.closest("[data-dashboard01-table]");
+				if (!root) return;
+				const all = root.querySelector("thead [data-tui-checkbox-input]");
+				const rows = [...root.querySelectorAll("tbody [data-tui-checkbox-input]")];
+				if (!all || rows.length === 0) return;
+
+				syncing = true;
+				if (e.target === all) {
+					// toggleAllPageRowsSelected pendant.
+					rows.forEach((input) => {
+						if (input.checked !== all.checked) {
+							input.checked = all.checked;
+							input.dispatchEvent(new Event("change", { bubbles: true }));
+						}
+					});
+				}
+				const checked = rows.filter((input) => input.checked).length;
+				rows.forEach((input) => {
+					const row = input.closest("tr");
+					if (!row) return;
+					if (input.checked) row.setAttribute("data-state", "selected");
+					else row.removeAttribute("data-state");
+				});
+				// getIsAllPageRowsSelected / getIsSomePageRowsSelected pendant;
+				// checkbox.js paints the mixed state off input.indeterminate.
+				all.checked = checked === rows.length;
+				all.indeterminate = checked > 0 && checked < rows.length;
+				all.dispatchEvent(new Event("change", { bubbles: true }));
+				syncing = false;
+
+				const count = root.querySelector("[data-dashboard01-selected-count]");
+				if (count) count.textContent = String(checked);
+			});
+
+			// Vanilla pendant of dnd-kit's vertical SortableContext. Pointer,
+			// touch, native drag and keyboard input all reorder the rendered rows.
+			const finishDrag = () => {
+				if (draggedRow) draggedRow.removeAttribute("data-dragging");
+				draggedRow = null;
+				keyboardOrigin = null;
+			};
+			const moveAt = (tbody, row, clientY) => {
+				const rect = row.getBoundingClientRect();
+				const target = document.elementsFromPoint(rect.left + rect.width / 2, clientY)
+					.map((element) => element.closest && element.closest("[data-dashboard01-row]"))
+					.find((element) => element && element.parentElement === tbody && element !== row);
+				if (!target) return;
+				const before = clientY < target.getBoundingClientRect().top + target.offsetHeight / 2;
+				tbody.insertBefore(row, before ? target : target.nextSibling);
+			};
+
+			document.addEventListener("dragstart", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const handle = e.target.closest("[data-dashboard01-drag-handle]");
+				if (!handle) return;
+				draggedRow = handle.closest("[data-dashboard01-row]");
+				if (!draggedRow) return;
+				draggedRow.setAttribute("data-dragging", "true");
+				if (e.dataTransfer) {
+					e.dataTransfer.effectAllowed = "move";
+					e.dataTransfer.setData("text/plain", draggedRow.getAttribute("data-dashboard01-row") || "");
+				}
+			});
+			document.addEventListener("dragover", (e) => {
+				if (!draggedRow) return;
+				const tbody = draggedRow.closest("[data-dashboard01-sortable]");
+				if (!tbody) return;
+				e.preventDefault();
+				moveAt(tbody, draggedRow, e.clientY);
+			});
+			document.addEventListener("dragend", finishDrag);
+
+			let pointer = null;
+			document.addEventListener("pointerdown", (e) => {
+				if (!(e.target instanceof Element) || e.pointerType === "mouse") return;
+				const handle = e.target.closest("[data-dashboard01-drag-handle]");
+				const row = handle && handle.closest("[data-dashboard01-row]");
+				if (!handle || !row) return;
+				pointer = { id: e.pointerId, handle, row };
+				draggedRow = row;
+				row.setAttribute("data-dragging", "true");
+				handle.setPointerCapture(e.pointerId);
+				e.preventDefault();
+			});
+			document.addEventListener("pointermove", (e) => {
+				if (!pointer || pointer.id !== e.pointerId) return;
+				const tbody = pointer.row.closest("[data-dashboard01-sortable]");
+				if (tbody) moveAt(tbody, pointer.row, e.clientY);
+				e.preventDefault();
+			});
+			const finishPointer = (e) => {
+				if (!pointer || pointer.id !== e.pointerId) return;
+				if (pointer.handle.hasPointerCapture(e.pointerId)) pointer.handle.releasePointerCapture(e.pointerId);
+				pointer = null;
+				finishDrag();
+			};
+			document.addEventListener("pointerup", finishPointer);
+			document.addEventListener("pointercancel", finishPointer);
+
+			document.addEventListener("keydown", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const handle = e.target.closest("[data-dashboard01-drag-handle]");
+				if (!handle) return;
+				const row = handle.closest("[data-dashboard01-row]");
+				const tbody = row && row.closest("[data-dashboard01-sortable]");
+				if (!row || !tbody) return;
+				if (e.key === " " || e.key === "Enter") {
+					e.preventDefault();
+					if (draggedRow === row) finishDrag();
+					else {
+						finishDrag();
+						draggedRow = row;
+						keyboardOrigin = row.nextSibling;
+						row.setAttribute("data-dragging", "true");
+					}
+				} else if (draggedRow === row && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+					e.preventDefault();
+					const sibling = e.key === "ArrowUp" ? row.previousElementSibling : row.nextElementSibling;
+					if (sibling) tbody.insertBefore(row, e.key === "ArrowUp" ? sibling : sibling.nextSibling);
+					handle.focus();
+				} else if (draggedRow === row && e.key === "Escape") {
+					e.preventDefault();
+					tbody.insertBefore(row, keyboardOrigin && keyboardOrigin.isConnected ? keyboardOrigin : null);
+					finishDrag();
+				}
+			});
+
+			// The current Base block uses toast.promise on the two inline forms.
+			document.addEventListener("submit", (e) => {
+				if (!(e.target instanceof HTMLFormElement) || !e.target.matches("[data-dashboard01-save]")) return;
+				e.preventDefault();
+				const title = e.target.getAttribute("data-dashboard01-save") || "section";
+				window.tui?.toast?.promise(
+					new Promise((resolve) => window.setTimeout(resolve, 1000)),
+					{ loading: `Saving ${title}`, success: "Done", error: "Error" },
+				);
+			});
+
+			// useIsMobile pendant for TableCellViewer: mutate the inert portal
+			// template before drawer.js opens it, so the first open is correct.
+			const drawerDialog = (trigger) => {
+				const id = trigger.getAttribute("aria-controls");
+				if (!id) return null;
+				const live = document.getElementById(id);
+				if (live) return live;
+				for (const template of document.querySelectorAll("template[data-tui-drawer-portal]")) {
+					const dialog = [...template.content.querySelectorAll("dialog[data-tui-drawer-content]")].find((item) => item.id === id);
+					if (dialog) return dialog;
+				}
+				return null;
+			};
+			const syncDrawerDirection = (trigger) => {
+				const popup = drawerDialog(trigger)?.querySelector("[data-tui-drawer-popup]");
+				if (!popup) return;
+				const mobile = window.matchMedia("(max-width: 767px)").matches;
+				popup.setAttribute("data-swipe-direction", mobile ? "down" : "right");
+				popup.setAttribute("data-swipe-axis", mobile ? "y" : "x");
+			};
+			document.addEventListener("pointerdown", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const trigger = e.target.closest("[data-dashboard01-drawer-trigger]");
+				if (trigger) syncDrawerDirection(trigger);
+			}, true);
+			document.addEventListener("keydown", (e) => {
+				if (!(e.target instanceof Element) || (e.key !== "Enter" && e.key !== " ")) return;
+				const trigger = e.target.closest("[data-dashboard01-drawer-trigger]");
+				if (trigger) syncDrawerDirection(trigger);
+			}, true);
+			document.addEventListener("click", (e) => {
+				if (!(e.target instanceof Element)) return;
+				const trigger = e.target.closest("[data-dashboard01-drawer-trigger]");
+				if (trigger) syncDrawerDirection(trigger);
+			}, true);
+		})();
+	</script>
+}
+
+templ dataTableRow(item Item, page, size int) {
+	@table.Row(table.RowProps{
+		Class:      "relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80",
+		Attributes: templ.Attributes{"data-dashboard01-row": fmt.Sprint(item.ID)},
+	}) {
+		@table.Cell() {
+			@button.Button(button.Props{
+				Variant: button.VariantGhost,
+				Size:    button.SizeIcon,
+				Class:   "size-7 text-muted-foreground hover:bg-transparent",
+				Attributes: templ.Attributes{
+					"data-dashboard01-drag-handle": "",
+					"draggable":                      "true",
+					"style":                          "touch-action:none",
+				},
+			}) {
+				@icon.GripVertical(icon.Props{Class: "size-3 text-muted-foreground"})
+				<span class="sr-only">Drag to reorder</span>
+			}
+		}
+		@table.Cell() {
+			<div class="flex items-center justify-center">
+				@checkbox.Checkbox(checkbox.Props{
+					Attributes: templ.Attributes{"aria-label": "Select row"},
+				})
+			</div>
+		}
+		@table.Cell() {
+			@dataTableCellViewer(item, page, size)
+		}
+		@table.Cell() {
+			<div class="w-32">
+				@badge.Badge(badge.Props{Variant: badge.VariantOutline, Class: "px-1.5 text-muted-foreground"}) {
+					{ item.SectionType }
+				}
+			</div>
+		}
+		@table.Cell() {
+			@badge.Badge(badge.Props{Variant: badge.VariantOutline, Class: "px-1.5 text-muted-foreground"}) {
+				if item.Status == "Done" {
+					@icon.CircleCheck(icon.Props{Class: "fill-green-500 dark:fill-green-400"})
+				} else {
+					@icon.Loader()
+				}
+				{ item.Status }
+			}
+		}
+		@table.Cell() {
+			<form data-dashboard01-save={ item.Header }>
+				@label.Label(label.Props{For: fmt.Sprintf("%d-target", item.ID), Class: "sr-only"}) {
+					Target
+				}
+				@input.Input(input.Props{
+					Class: "h-8 w-16 border-transparent bg-transparent text-right shadow-none hover:bg-input/30 focus-visible:border focus-visible:bg-background dark:bg-transparent dark:hover:bg-input/30 dark:focus-visible:bg-input/30",
+					Value: item.Target,
+					ID:    fmt.Sprintf("%d-target", item.ID),
+				})
+			</form>
+		}
+		@table.Cell() {
+			<form data-dashboard01-save={ item.Header }>
+				@label.Label(label.Props{For: fmt.Sprintf("%d-limit", item.ID), Class: "sr-only"}) {
+					Limit
+				}
+				@input.Input(input.Props{
+					Class: "h-8 w-16 border-transparent bg-transparent text-right shadow-none hover:bg-input/30 focus-visible:border focus-visible:bg-background dark:bg-transparent dark:hover:bg-input/30 dark:focus-visible:bg-input/30",
+					Value: item.Limit,
+					ID:    fmt.Sprintf("%d-limit", item.ID),
+				})
+			</form>
+		}
+		@table.Cell() {
+			if item.Reviewer != "Assign reviewer" {
+				{ item.Reviewer }
+			} else {
+				@label.Label(label.Props{For: fmt.Sprintf("%d-reviewer", item.ID), Class: "sr-only"}) {
+					Reviewer
+				}
+				@selectcomp.Select() {
+					@selectcomp.Trigger(selectcomp.TriggerProps{
+						Class: "w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate",
+						Size:  selectcomp.SizeSm,
+						ID:    fmt.Sprintf("%d-reviewer", item.ID),
+					}) {
+						@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Assign reviewer"})
+					}
+					@selectcomp.Content(selectcomp.ContentProps{Align: selectcomp.AlignEnd}) {
+						@selectcomp.Group() {
+							@selectcomp.Item(selectcomp.ItemProps{Value: "Eddie Lake"}) {
+								Eddie Lake
+							}
+							@selectcomp.Item(selectcomp.ItemProps{Value: "Jamik Tashpulatov"}) {
+								Jamik Tashpulatov
+							}
+						}
+					}
+				}
+			}
+		}
+		@table.Cell() {
+			@dropdownmenu.DropdownMenu() {
+				@button.Button(button.Props{
+					Variant:    button.VariantGhost,
+					Class:      "flex size-8 text-muted-foreground data-popup-open:bg-muted",
+					Size:       button.SizeIcon,
+					Attributes: dropdownmenu.Trigger(ctx),
+				}) {
+					@icon.EllipsisVertical()
+					<span class="sr-only">Open menu</span>
+				}
+				@dropdownmenu.Content(dropdownmenu.ContentProps{Align: dropdownmenu.AlignEnd, Class: "w-32"}) {
+					@dropdownmenu.Item() {
+						Edit
+					}
+					@dropdownmenu.Item() {
+						Make a copy
+					}
+					@dropdownmenu.Item() {
+						Favorite
+					}
+					@dropdownmenu.Separator()
+					@dropdownmenu.Item(dropdownmenu.ItemProps{Variant: dropdownmenu.ItemVariantDestructive}) {
+						Delete
+					}
+				}
+			}
+		}
+	}
+}
+
+var dataTableCellViewerChartData = []chart.Datum{
+	{"month": "January", "desktop": 186, "mobile": 80},
+	{"month": "February", "desktop": 305, "mobile": 200},
+	{"month": "March", "desktop": 237, "mobile": 120},
+	{"month": "April", "desktop": 73, "mobile": 190},
+	{"month": "May", "desktop": 209, "mobile": 130},
+	{"month": "June", "desktop": 214, "mobile": 140},
+}
+
+var dataTableCellViewerChartConfig = chart.Config{
+	{Key: "desktop", Label: "Desktop", Color: "var(--primary)"},
+	{Key: "mobile", Label: "Mobile", Color: "var(--primary)"},
+}
+
+// dataTableCellViewerMonthShort returns the three-letter month label.
+func dataTableCellViewerMonthShort(v any) string {
+	s, _ := v.(string)
+	if len(s) > 3 {
+		return s[:3]
+	}
+	return s
+}
+
+templ dataTableCellViewer(item Item, page, size int) {
+	@drawer.Drawer(drawer.Props{SwipeDirection: drawer.SwipeDirectionRight}) {
+		// Lazy-load this row's templ fragment once, so the page never ships
+		// 68 hidden charts.
+		@button.Button(button.Props{
+			Variant: button.VariantLink,
+			Class:   "w-fit px-0 text-left text-foreground",
+			Attributes: utils.MergeAttributes(drawer.Trigger(ctx), templ.Attributes{
+				"data-dashboard01-drawer-trigger": "",
+				"hx-get":                          dataTablePageHref(page, size) + "&fragment=" + dataTableDrawerFragment(item.ID),
+				"hx-trigger":                      "click once",
+				"hx-target":                       "#" + dataTableDrawerBodyID(item.ID),
+				"hx-swap":                         "innerHTML",
+			}),
+		}) {
+			{ item.Header }
+		}
+		@drawer.Content() {
+			@drawer.Header(drawer.HeaderProps{Class: "gap-1"}) {
+				@drawer.Title() {
+					{ item.Header }
+				}
+				@drawer.Description() {
+					Showing total visitors for the last 6 months
+				}
+			}
+			<div class="flex flex-col gap-4 overflow-y-auto px-4 text-sm" id={ dataTableDrawerBodyID(item.ID) }>
+				if dataTableDrawerRequested(ctx, item.ID) {
+					@templ.Fragment(dataTableDrawerFragment(item.ID)) {
+						@dataTableDrawerBody(item)
+					}
+				} else {
+					// The skeleton the fragment swap replaces on first open.
+					@skeleton.Skeleton(skeleton.Props{Class: "aspect-video w-full"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-4 w-2/3"})
+					@skeleton.Skeleton(skeleton.Props{Class: "h-40 w-full"})
+				}
+			</div>
+			@drawer.Footer() {
+				@button.Button() {
+					Submit
+				}
+				@button.Button(button.Props{
+					Variant:    button.VariantOutline,
+					Attributes: drawer.Close(ctx),
+				}) {
+					Done
+				}
+			}
+		}
+	}
+}
+
+// dataTableDrawerBody is the drawer's heavy content (chart, trend, form),
+// rendered only for its own fragment request.
+templ dataTableDrawerBody(item Item) {
+	<div class="hidden md:contents">
+		@chart.Container(chart.ContainerProps{Config: dataTableCellViewerChartConfig}) {
+		@chart.AreaChart(chart.AreaChartProps{
+			AccessibilityLayer: true,
+			Data:               dataTableCellViewerChartData,
+			Margin:             &chart.Margin{Left: 0, Right: 10},
+		}) {
+			@chart.CartesianGrid(chart.CartesianGridProps{Vertical: chart.Bool(false)})
+			@chart.XAxis(chart.XAxisProps{
+				DataKey:       "month",
+				TickMargin:    8,
+				TickFormatter: dataTableCellViewerMonthShort,
+				Hide:          true,
+			})
+			@chart.Tooltip(chart.TooltipProps{
+				Cursor:  chart.Bool(false),
+				Content: chart.TooltipContentProps{Indicator: "dot"},
+			})
+			@chart.Area(chart.AreaProps{
+				DataKey:     "mobile",
+				Type:        chart.CurveNatural,
+				Fill:        "var(--color-mobile)",
+				FillOpacity: 0.6,
+				Stroke:      "var(--color-mobile)",
+				StackID:     "a",
+			})
+			@chart.Area(chart.AreaProps{
+				DataKey:     "desktop",
+				Type:        chart.CurveNatural,
+				Fill:        "var(--color-desktop)",
+				FillOpacity: 0.4,
+				Stroke:      "var(--color-desktop)",
+				StackID:     "a",
+			})
+		}
+		}
+		@separator.Separator()
+		<div class="grid gap-2">
+		<div class="flex gap-2 leading-none font-medium">
+			Trending up by 5.2% this month
+			@icon.TrendingUp(icon.Props{Class: "size-4"})
+		</div>
+		<div class="text-muted-foreground">
+			Showing total visitors for the last 6 months. This is just
+			some random text to test the layout. It spans multiple lines
+			and should wrap around.
+		</div>
+		</div>
+		@separator.Separator()
+	</div>
+	<form class="flex flex-col gap-4">
+		<div class="flex flex-col gap-3">
+			@label.Label(label.Props{For: "header"}) {
+				Header
+			}
+			@input.Input(input.Props{ID: "header", Value: item.Header})
+		</div>
+		<div class="grid grid-cols-2 gap-4">
+			<div class="flex flex-col gap-3">
+				@label.Label(label.Props{For: "type"}) {
+					Type
+				}
+				@selectcomp.Select(selectcomp.Props{DefaultValue: item.SectionType}) {
+					@selectcomp.Trigger(selectcomp.TriggerProps{ID: "type", Class: "w-full"}) {
+						@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a type"})
+					}
+					@selectcomp.Content() {
+						@selectcomp.Group() {
+							for _, sectionType := range []string{"Table of Contents", "Executive Summary", "Technical Approach", "Design", "Capabilities", "Focus Documents", "Narrative", "Cover Page"} {
+								@selectcomp.Item(selectcomp.ItemProps{Value: sectionType}) {
+									{ sectionType }
+								}
+							}
+						}
+					}
+				}
+			</div>
+			<div class="flex flex-col gap-3">
+				@label.Label(label.Props{For: "status"}) {
+					Status
+				}
+				@selectcomp.Select(selectcomp.Props{DefaultValue: item.Status}) {
+					@selectcomp.Trigger(selectcomp.TriggerProps{ID: "status", Class: "w-full"}) {
+						@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a status"})
+					}
+					@selectcomp.Content() {
+						@selectcomp.Group() {
+							@selectcomp.Item(selectcomp.ItemProps{Value: "Done"}) {
+								Done
+							}
+							@selectcomp.Item(selectcomp.ItemProps{Value: "In Progress"}) {
+								In Progress
+							}
+							@selectcomp.Item(selectcomp.ItemProps{Value: "Not Started"}) {
+								Not Started
+							}
+						}
+					}
+				}
+			</div>
+		</div>
+		<div class="grid grid-cols-2 gap-4">
+			<div class="flex flex-col gap-3">
+				@label.Label(label.Props{For: "target"}) {
+					Target
+				}
+				@input.Input(input.Props{ID: "target", Value: item.Target})
+			</div>
+			<div class="flex flex-col gap-3">
+				@label.Label(label.Props{For: "limit"}) {
+					Limit
+				}
+				@input.Input(input.Props{ID: "limit", Value: item.Limit})
+			</div>
+		</div>
+		<div class="flex flex-col gap-3">
+			@label.Label(label.Props{For: "reviewer"}) {
+				Reviewer
+			}
+			@selectcomp.Select(selectcomp.Props{DefaultValue: item.Reviewer}) {
+				@selectcomp.Trigger(selectcomp.TriggerProps{ID: "reviewer", Class: "w-full"}) {
+					@selectcomp.Value(selectcomp.ValueProps{Placeholder: "Select a reviewer"})
+				}
+				@selectcomp.Content() {
+					@selectcomp.Group() {
+						@selectcomp.Item(selectcomp.ItemProps{Value: "Eddie Lake"}) {
+							Eddie Lake
+						}
+						@selectcomp.Item(selectcomp.ItemProps{Value: "Jamik Tashpulatov"}) {
+							Jamik Tashpulatov
+						}
+						@selectcomp.Item(selectcomp.ItemProps{Value: "Emily Whalen"}) {
+							Emily Whalen
+						}
+					}
+				}
+			}
+		</div>
+	</form>
+}

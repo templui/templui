@@ -34,6 +34,12 @@ type Props struct {
 
 type DialogProps struct {
 	ID string
+	// Open is the controlled dialog state. Use DefaultOpen for browser-owned
+	// state after the initial render, matching Dialog.Root's public surface.
+	Open        *bool
+	DefaultOpen bool
+	// DisableDismissible keeps the dialog open on backdrop presses.
+	DisableDismissible bool
 	// Title is the dialog's screen-reader title. Defaults to "Command Palette".
 	Title string
 	// Description is the dialog's screen-reader description. Defaults to
@@ -135,7 +141,12 @@ templ Dialog(props ...DialogProps) {
 	if p.Description == "" {
 		{{ p.Description = "Search for a command to run..." }}
 	}
-	@dialog.Dialog(dialog.Props{ID: p.ID}) {
+	@dialog.Dialog(dialog.Props{
+		ID:                 p.ID,
+		Open:               p.Open,
+		DefaultOpen:        p.DefaultOpen,
+		DisableDismissible: p.DisableDismissible,
+	}) {
 		@dialog.Header(dialog.HeaderProps{Class: "sr-only"}) {
 			@dialog.Title() {
 				{ p.Title }

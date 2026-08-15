@@ -1,0 +1,25 @@
+package sidebar01
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/label"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+templ SearchForm() {
+	<form>
+		@sidebar.Group(sidebar.GroupProps{Class: "py-0"}) {
+			@sidebar.GroupContent(sidebar.GroupContentProps{Class: "relative"}) {
+				@label.Label(label.Props{For: "search", Class: "sr-only"}) {
+					Search
+				}
+				@sidebar.Input(sidebar.InputProps{
+					ID:          "search",
+					Placeholder: "Search the docs...",
+					Class:       "pl-8",
+				})
+				@icon.Search(icon.Props{Class: "pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 opacity-50 select-none"})
+			}
+		}
+	</form>
+}

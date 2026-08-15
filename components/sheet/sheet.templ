@@ -24,6 +24,7 @@ const (
 type ctxState struct {
 	id               string
 	open             bool
+	controlled       bool
 	disableClickAway bool
 }
 
@@ -36,10 +37,19 @@ func state(ctx context.Context) ctxState {
 
 type Props struct {
 	ID string
-	// Open renders the sheet already open on page load.
-	Open bool
+	// Open is the controlled open state. Use DefaultOpen when the browser
+	// should own the state after the initial render.
+	Open        *bool
+	DefaultOpen bool
 	// DisableDismissible keeps the sheet open when clicking the backdrop.
 	DisableDismissible bool
+}
+
+func initialOpen(p Props) bool {
+	if p.Open != nil {
+		return *p.Open
+	}
+	return p.DefaultOpen
 }
 
 type ContentProps struct {
@@ -85,7 +95,7 @@ templ Sheet(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: p.Open, disableClickAway: p.DisableDismissible}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: initialOpen(p), controlled: p.Open != nil, disableClickAway: p.DisableDismissible}) }}
 	{ children... }
 }
 
@@ -153,6 +163,7 @@ templ Content(props ...ContentProps) {
 				data-tui-dialog-content
 				data-side={ string(p.Side) }
 				data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
+				data-tui-dialog-controlled?={ s.controlled }
 				data-tui-dialog-show-modal="true"
 				if s.disableClickAway {
 					data-tui-dialog-disable-dismissible="true"

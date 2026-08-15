@@ -1,0 +1,108 @@
+package dashboard01
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/badge"
+	"github.com/axadrn/shadcn-templ/v2/components/card"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+)
+
+templ SectionCards() {
+	<div class="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card">
+		@card.Card(card.Props{Class: "@container/card"}) {
+			@card.Header() {
+				@card.Description() {
+					Total Revenue
+				}
+				@card.Title(card.TitleProps{Class: "text-2xl font-semibold tabular-nums @[250px]/card:text-3xl"}) {
+					$1,250.00
+				}
+				@card.Action() {
+					@badge.Badge(badge.Props{Variant: badge.VariantOutline}) {
+						@icon.TrendingUp()
+						+12.5%
+					}
+				}
+			}
+			@card.Footer(card.FooterProps{Class: "flex-col items-start gap-1.5 text-sm"}) {
+				<div class="line-clamp-1 flex gap-2 font-medium">
+					Trending up this month
+					@icon.TrendingUp(icon.Props{Class: "size-4"})
+				</div>
+				<div class="text-muted-foreground">
+					Visitors for the last 6 months
+				</div>
+			}
+		}
+		@card.Card(card.Props{Class: "@container/card"}) {
+			@card.Header() {
+				@card.Description() {
+					New Customers
+				}
+				@card.Title(card.TitleProps{Class: "text-2xl font-semibold tabular-nums @[250px]/card:text-3xl"}) {
+					1,234
+				}
+				@card.Action() {
+					@badge.Badge(badge.Props{Variant: badge.VariantOutline}) {
+						@icon.TrendingDown()
+						-20%
+					}
+				}
+			}
+			@card.Footer(card.FooterProps{Class: "flex-col items-start gap-1.5 text-sm"}) {
+				<div class="line-clamp-1 flex gap-2 font-medium">
+					Down 20% this period
+					@icon.TrendingDown(icon.Props{Class: "size-4"})
+				</div>
+				<div class="text-muted-foreground">
+					Acquisition needs attention
+				</div>
+			}
+		}
+		@card.Card(card.Props{Class: "@container/card"}) {
+			@card.Header() {
+				@card.Description() {
+					Active Accounts
+				}
+				@card.Title(card.TitleProps{Class: "text-2xl font-semibold tabular-nums @[250px]/card:text-3xl"}) {
+					45,678
+				}
+				@card.Action() {
+					@badge.Badge(badge.Props{Variant: badge.VariantOutline}) {
+						@icon.TrendingUp()
+						+12.5%
+					}
+				}
+			}
+			@card.Footer(card.FooterProps{Class: "flex-col items-start gap-1.5 text-sm"}) {
+				<div class="line-clamp-1 flex gap-2 font-medium">
+					Strong user retention
+					@icon.TrendingUp(icon.Props{Class: "size-4"})
+				</div>
+				<div class="text-muted-foreground">Engagement exceed targets</div>
+			}
+		}
+		@card.Card(card.Props{Class: "@container/card"}) {
+			@card.Header() {
+				@card.Description() {
+					Growth Rate
+				}
+				@card.Title(card.TitleProps{Class: "text-2xl font-semibold tabular-nums @[250px]/card:text-3xl"}) {
+					4.5%
+				}
+				@card.Action() {
+					@badge.Badge(badge.Props{Variant: badge.VariantOutline}) {
+						@icon.TrendingUp()
+						+4.5%
+					}
+				}
+			}
+			@card.Footer(card.FooterProps{Class: "flex-col items-start gap-1.5 text-sm"}) {
+				<div class="line-clamp-1 flex gap-2 font-medium">
+					Steady performance increase
+					@icon.TrendingUp(icon.Props{Class: "size-4"})
+				</div>
+				<div class="text-muted-foreground">Meets growth projections</div>
+			}
+		}
+	</div>
+}

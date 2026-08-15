@@ -1,0 +1,94 @@
+package sidebar10
+
+import (
+	"github.com/axadrn/shadcn-templ/v2/components/button"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
+	"github.com/axadrn/shadcn-templ/v2/components/popover"
+	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
+)
+
+type action struct {
+	Label string
+	Icon  func(...icon.Props) templ.Component
+}
+
+var actions = [][]action{
+	{
+		{Label: "Customize Page", Icon: icon.Settings2},
+		{Label: "Turn into wiki", Icon: icon.FileText},
+	},
+	{
+		{Label: "Copy Link", Icon: icon.Link},
+		{Label: "Duplicate", Icon: icon.Copy},
+		{Label: "Move to", Icon: icon.CornerUpRight},
+		{Label: "Move to Trash", Icon: icon.Trash2},
+	},
+	{
+		{Label: "Undo", Icon: icon.CornerUpLeft},
+		{Label: "View analytics", Icon: icon.ChartLine},
+		{Label: "Version History", Icon: icon.GalleryVerticalEnd},
+		{Label: "Show delete pages", Icon: icon.Trash},
+		{Label: "Notifications", Icon: icon.Bell},
+	},
+	{
+		{Label: "Import", Icon: icon.ArrowUp},
+		{Label: "Export", Icon: icon.ArrowDown},
+	},
+}
+
+templ NavActions() {
+	<div class="flex items-center gap-2 text-sm">
+		<div class="hidden font-medium text-muted-foreground md:inline-block">
+			Edit Oct 08
+		</div>
+		@button.Button(button.Props{
+			Variant: button.VariantGhost,
+			Size:    button.SizeIcon,
+			Class:   "h-7 w-7",
+		}) {
+			@icon.Star()
+		}
+		@popover.Popover(popover.Props{
+			ID:          "sidebar10-actions-popover",
+			DefaultOpen: true,
+		}) {
+			@button.Button(button.Props{
+				Variant:    button.VariantGhost,
+				Size:       button.SizeIcon,
+				Class:      "h-7 w-7 data-popup-open:bg-accent",
+				Attributes: popover.Trigger(ctx),
+			}) {
+				@icon.Ellipsis()
+			}
+			@popover.Content(popover.ContentProps{
+				Class: "w-56 overflow-hidden rounded-lg p-0",
+				Align: popover.AlignEnd,
+			}) {
+				@sidebar.Sidebar(sidebar.Props{
+					ID:          "sidebar10-nav-actions",
+					Collapsible: sidebar.CollapsibleNone,
+					Class:       "bg-transparent",
+				}) {
+					@sidebar.Content() {
+						for _, group := range actions {
+							@sidebar.Group(sidebar.GroupProps{Class: "border-b last:border-none"}) {
+								@sidebar.GroupContent(sidebar.GroupContentProps{Class: "gap-0"}) {
+									@sidebar.Menu() {
+										for _, item := range group {
+											@sidebar.MenuItem() {
+												@sidebar.MenuButton() {
+													@item.Icon()
+													<span>{ item.Label }</span>
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	</div>
+}

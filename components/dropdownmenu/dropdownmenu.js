@@ -1,7 +1,7 @@
 // Uses window.FloatingUIDOM from components/floatingui (loaded in the same bundle).
 (function () {
   const EXIT_MS = 120; // exit animation (duration-100) + slack
-  const COLLISION_PADDING = 8;
+  const COLLISION_PADDING = 5;
   // Submenu hover intent, like Base UI: open fast, close with a grace delay so
   // moving the mouse diagonally into the submenu does not flicker.
   const SUB_OPEN_DELAY = 100;
@@ -26,9 +26,38 @@
   }
 
   function setState(content, state) {
-    content.setAttribute("data-state", state);
+    const open = state === "open";
+    content.toggleAttribute("data-open", open);
+    content.toggleAttribute("data-closed", !open);
     const popup = popupFor(content);
-    if (popup) popup.setAttribute("data-state", state);
+    if (popup) {
+      popup.toggleAttribute("data-open", open);
+      popup.toggleAttribute("data-closed", !open);
+    }
+  }
+
+  function isOpen(el) {
+    return !!el && el.hasAttribute("data-open");
+  }
+
+  function setTransitionAttribute(content, name, present) {
+    content.toggleAttribute(name, present);
+    const popup = popupFor(content);
+    if (popup) popup.toggleAttribute(name, present);
+  }
+
+  function startTransition(content) {
+    setTransitionAttribute(content, "data-ending-style", false);
+    setTransitionAttribute(content, "data-starting-style", true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setTransitionAttribute(content, "data-starting-style", false));
+    });
+  }
+
+  function setChecked(item, checked) {
+    item.toggleAttribute("data-checked", checked);
+    item.toggleAttribute("data-unchecked", !checked);
+    item.setAttribute("aria-checked", checked ? "true" : "false");
   }
 
   function setSide(content, side) {
@@ -49,21 +78,35 @@
     return "calc(100% + " + sideOffset + "px) " + centerY;
   }
 
-  // Moves the content to <body> (shadcn portals it the same way). Also removes
-  // contents whose trigger is gone (leftovers from swapped-out pages).
+  // Moves the content to <body> (shadcn portals it the same way).
+  // The unmount half of the React portal pendant: a portaled content lives
+  // as long as its SSR declaration site (_tuiPortalOwner) stays in the
+  // document. Trigger-presence heuristics judged mid-swap moments wrongly -
+  // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
     document.querySelectorAll("body > [data-tui-dropdownmenu-content]").forEach((c) => {
-      if (c !== content && !triggerFor(c)) c.remove();
+      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) {
+        stopAutoPositioning(c);
+        c.remove();
+      }
     });
     if (content.parentElement !== document.body) {
+      if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
       document.body.appendChild(content);
     }
   }
 
   function positionMenu(content, trigger) {
     const { computePosition, offset, flip, shift, size } = window.FloatingUIDOM;
-    const side = content.getAttribute("data-tui-dropdownmenu-side") || "bottom";
-    const align = content.getAttribute("data-tui-dropdownmenu-align") || "start";
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
+    const side =
+      (mobile && content.getAttribute("data-tui-dropdownmenu-mobile-side")) ||
+      content.getAttribute("data-tui-dropdownmenu-side") ||
+      "bottom";
+    const align =
+      (mobile && content.getAttribute("data-tui-dropdownmenu-mobile-align")) ||
+      content.getAttribute("data-tui-dropdownmenu-align") ||
+      "start";
     const sideOffset =
       parseInt(content.getAttribute("data-tui-dropdownmenu-side-offset"), 10) || 4;
     const alignOffset =
@@ -72,7 +115,7 @@
 
     return computePosition(trigger, content, {
       placement: placement,
-      strategy: "fixed",
+      strategy: "absolute",
       middleware: [
         offset({ mainAxis: sideOffset, alignmentAxis: alignOffset }),
         flip({ padding: COLLISION_PADDING }),
@@ -81,11 +124,11 @@
           padding: COLLISION_PADDING,
           apply(args) {
             content.style.setProperty(
-              "--tui-dropdownmenu-available-height",
+              "--available-height",
               args.availableHeight + "px",
             );
             content.style.setProperty(
-              "--tui-dropdownmenu-anchor-width",
+              "--anchor-width",
               args.rects.reference.width + "px",
             );
           },
@@ -98,11 +141,34 @@
       const popup = popupFor(content);
       if (popup) {
         popup.style.setProperty(
-          "--tui-dropdownmenu-transform-origin",
+          "--transform-origin",
           anchorOrigin(result, trigger.getBoundingClientRect(), sideOffset),
         );
       }
     });
+  }
+
+  // Base UI keeps mounted popups attached to their anchors while ancestors
+  // move, resize, scroll, or shift layout. This also tracks a mobile sidebar
+  // while its opening transform is still settling.
+  function startAutoPositioning(content, trigger) {
+    if (content._tuiPositionCleanup) content._tuiPositionCleanup();
+    let resolveFirst;
+    const firstPosition = new Promise((resolve) => {
+      resolveFirst = resolve;
+    });
+    const update = () => positionMenu(content, trigger).then(resolveFirst, resolveFirst);
+    content._tuiPositionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
+      elementResize: typeof ResizeObserver !== "undefined",
+      layoutShift: typeof IntersectionObserver !== "undefined",
+    });
+    return firstPosition;
+  }
+
+  function stopAutoPositioning(content) {
+    if (!content._tuiPositionCleanup) return;
+    content._tuiPositionCleanup();
+    content._tuiPositionCleanup = null;
   }
 
   // ----- focus highlighting (Base UI moves real focus to menu items) --------
@@ -166,41 +232,57 @@
     clearTimeout(content._tuiHide);
     portal(content);
     lockScroll();
-    if (!content.matches(":popover-open")) {
-      content.showPopover(); // native top layer
-    }
+    // z-index portal like shadcn (no native top layer); re-append
+    // keeps paint order = open order.
+    document.body.appendChild(content);
+    content.hidden = false;
 
     // Position it invisibly first, then play the enter animation in place.
     content.style.visibility = "hidden";
     const finish = () => {
+      // duration-100 transitions `all`; a visibility transition would
+      // freeze at hidden in background tabs - flip suppressed.
+      content.style.transitionProperty = "none";
       content.style.visibility = "";
-      if (!content.matches(":popover-open")) return;
+      void content.offsetWidth;
+      content.style.transitionProperty = "";
+      if (content.hidden) return;
       setState(content, "open");
+      startTransition(content);
       trigger.setAttribute("aria-expanded", "true");
+      trigger.setAttribute("data-popup-open", "");
+      trigger.setAttribute("data-pressed", "");
       const popup = popupFor(content);
       if (!popup) return;
+	  syncSubState(popup);
       if (focusFirst) {
         focusItem(itemsIn(popup)[0] || popup);
       } else {
         popup.focus({ preventScroll: true });
       }
     };
-    positionMenu(content, trigger).then(finish, finish);
+    startAutoPositioning(content, trigger).then(finish, finish);
   }
 
   function close(content, refocusTrigger) {
-    if (!content.matches(":popover-open")) return;
+    if (content.hidden) return;
+    stopAutoPositioning(content);
+    setTransitionAttribute(content, "data-starting-style", false);
     setState(content, "closed");
+    setTransitionAttribute(content, "data-ending-style", true);
     content.querySelectorAll("[data-tui-dropdownmenu-sub]").forEach(closeSubNow);
     const trigger = triggerFor(content);
     if (trigger) {
       trigger.setAttribute("aria-expanded", "false");
+      trigger.removeAttribute("data-popup-open");
+      trigger.removeAttribute("data-pressed");
       if (refocusTrigger) trigger.focus({ preventScroll: true });
     }
     clearTimeout(content._tuiHide);
     content._tuiHide = setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
-        content.hidePopover();
+      if (content.hasAttribute("data-closed") && !content.hidden) {
+        content.hidden = true;
+        setTransitionAttribute(content, "data-ending-style", false);
       }
     }, EXIT_MS);
     unlockScroll();
@@ -210,8 +292,29 @@
     allContents().forEach((content) => close(content, refocusTrigger));
   }
 
+  function requestOpenChange(content, nextOpen, focusFirst, refocusTrigger) {
+    if (!content || isOpen(content) === nextOpen) return;
+    const accepted = content.dispatchEvent(
+      new CustomEvent("dropdownmenu-open-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { open: nextOpen },
+      }),
+    );
+    if (!accepted || content.hasAttribute("data-tui-dropdownmenu-controlled")) return;
+    const trigger = triggerFor(content);
+    if (nextOpen && trigger) open(content, trigger, focusFirst);
+    else if (!nextOpen) close(content, refocusTrigger);
+  }
+
+  function requestCloseAll(refocusTrigger) {
+    allContents().forEach((content) =>
+      requestOpenChange(content, false, false, refocusTrigger),
+    );
+  }
+
   function anyOpen() {
-    return [...allContents()].find((c) => c.getAttribute("data-state") === "open") || null;
+    return [...allContents()].find(isOpen) || null;
   }
 
   // ----- submenus -------------------------------------------------------------
@@ -233,7 +336,7 @@
     // Base UI submenu placement: right-start, sideOffset 0, alignOffset -3.
     computePosition(trigger, content, {
       placement: "right-start",
-      strategy: "fixed",
+      strategy: "absolute",
       middleware: [
         offset({ mainAxis: 0, alignmentAxis: -3 }),
         flip({ padding: COLLISION_PADDING }),
@@ -246,14 +349,22 @@
       content.style.top = result.y + "px";
       content.setAttribute("data-side", result.placement.split("-")[0]);
       content.style.setProperty(
-        "--tui-dropdownmenu-transform-origin",
+        "--transform-origin",
         anchorOrigin(result, trigger.getBoundingClientRect(), 0),
       );
       content.offsetHeight; // flush styles before re-enabling transitions
       content.style.transition = "";
+      // duration-100 transitions `all`; a visibility transition would
+      // freeze at hidden in background tabs - flip suppressed.
+      content.style.transitionProperty = "none";
       content.style.visibility = "";
-      content.setAttribute("data-state", "open");
-      trigger.setAttribute("data-state", "open");
+      void content.offsetWidth;
+      content.style.transitionProperty = "";
+      content.setAttribute("data-open", "");
+      content.removeAttribute("data-closed");
+      startTransition(content);
+      trigger.setAttribute("data-popup-open", "");
+	  trigger.setAttribute("aria-expanded", "true");
       if (focusFirst) focusItem(itemsIn(content)[0] || content);
     });
   }
@@ -262,11 +373,16 @@
   function closeSub(sub) {
     const { trigger, content } = subParts(sub);
     if (!trigger || !content) return;
-    content.setAttribute("data-state", "closed");
-    trigger.setAttribute("data-state", "closed");
+    content.removeAttribute("data-open");
+    content.setAttribute("data-closed", "");
+    setTransitionAttribute(content, "data-starting-style", false);
+    setTransitionAttribute(content, "data-ending-style", true);
+    trigger.removeAttribute("data-popup-open");
+	trigger.setAttribute("aria-expanded", "false");
     setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed") {
+      if (content.hasAttribute("data-closed")) {
         content.classList.add("hidden");
+        setTransitionAttribute(content, "data-ending-style", false);
       }
     }, EXIT_MS);
   }
@@ -280,8 +396,38 @@
     const { trigger, content } = subParts(sub);
     if (!trigger || !content) return;
     content.classList.add("hidden");
-    content.setAttribute("data-state", "closed");
-    trigger.setAttribute("data-state", "closed");
+    content.removeAttribute("data-open");
+    content.setAttribute("data-closed", "");
+    setTransitionAttribute(content, "data-starting-style", false);
+    setTransitionAttribute(content, "data-ending-style", false);
+    trigger.removeAttribute("data-popup-open");
+	trigger.setAttribute("aria-expanded", "false");
+  }
+
+  function requestSubOpenChange(sub, nextOpen, focusFirst) {
+	const { trigger, content } = subParts(sub);
+	if (!trigger || !content || content.hasAttribute("data-open") === nextOpen) return;
+	const accepted = trigger.dispatchEvent(
+	  new CustomEvent("dropdownmenu-sub-open-change", {
+		bubbles: true,
+		cancelable: true,
+		detail: { open: nextOpen },
+	  }),
+	);
+	if (!accepted || sub.hasAttribute("data-tui-dropdownmenu-sub-controlled")) return;
+	sub.setAttribute("data-tui-dropdownmenu-sub-open", String(nextOpen));
+	if (nextOpen) openSub(sub, focusFirst);
+	else closeSub(sub);
+  }
+
+  function syncSubState(menu) {
+	menu.querySelectorAll("[data-tui-dropdownmenu-sub]").forEach((sub) => {
+	  const { content } = subParts(sub);
+	  if (!content) return;
+	  const shouldOpen = sub.getAttribute("data-tui-dropdownmenu-sub-open") === "true";
+	  if (shouldOpen && !content.hasAttribute("data-open")) openSub(sub, false);
+	  else if (!shouldOpen && content.hasAttribute("data-open")) closeSubNow(sub);
+	});
   }
 
   // Hover intent: while the pointer is over a sub (trigger or its content),
@@ -295,7 +441,7 @@
     menu.querySelectorAll("[data-tui-dropdownmenu-sub]").forEach((sub) => {
       const { content } = subParts(sub);
       if (!content) return;
-      const isOpen = content.getAttribute("data-state") === "open";
+      const isOpen = content.hasAttribute("data-open");
       const onPath = hovered && (sub === hovered || sub.contains(hovered));
 
       if (onPath) {
@@ -304,7 +450,7 @@
         if (!isOpen && !sub._tuiOpen) {
           sub._tuiOpen = setTimeout(() => {
             sub._tuiOpen = null;
-            openSub(sub);
+			requestSubOpenChange(sub, true);
           }, SUB_OPEN_DELAY);
         }
       } else {
@@ -313,7 +459,7 @@
         if (isOpen && !sub._tuiClose) {
           sub._tuiClose = setTimeout(() => {
             sub._tuiClose = null;
-            closeSub(sub);
+			requestSubOpenChange(sub, false);
           }, SUB_CLOSE_DELAY);
         }
       }
@@ -325,7 +471,7 @@
   document.addEventListener("pointermove", (e) => {
     if (!(e.target instanceof Element)) return;
     const content = e.target.closest("[data-tui-dropdownmenu-content]");
-    if (!content || content.getAttribute("data-state") !== "open") return;
+    if (!isOpen(content)) return;
     const item = e.target.closest(ITEM_SELECTOR);
     if (item && containerOf(item)) {
       focusItem(item);
@@ -347,44 +493,40 @@
       const content = tpl.content.querySelector("[data-tui-dropdownmenu-content]");
       if (content) {
         const stale = document.getElementById(content.id);
-        if (stale) stale.remove();
+        if (stale) {
+          stopAutoPositioning(stale);
+          stale.remove();
+        }
+        content._tuiPortalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
       tpl.remove();
     });
   }
 
-  function initMenus() {
+  function init() {
     liftTemplates();
     document.querySelectorAll("[data-tui-dropdownmenu-trigger]").forEach((trigger) => {
       const content = contentFor(trigger);
-      if (content) portal(content);
-    });
-  }
-
-  let initQueued = false;
-  function queueInit() {
-    if (initQueued) return;
-    initQueued = true;
-    requestAnimationFrame(() => {
-      initQueued = false;
-      initMenus();
+      if (!content) return;
+      portal(content);
+      if (content.getAttribute("data-tui-dropdownmenu-initial-open") === "true") {
+        content.removeAttribute("data-tui-dropdownmenu-initial-open");
+        open(content, trigger, false);
+      }
     });
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initMenus);
+    document.addEventListener("DOMContentLoaded", init);
   } else {
-    initMenus();
+    init();
   }
-  new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      if (m.addedNodes.length) {
-        queueInit();
-        break;
-      }
-    }
-  }).observe(document.documentElement, { childList: true, subtree: true });
+  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
+  // does not fire in hidden tabs or throttled iframes): swapped-in markup
+  // lifts and wires itself, removals release portaled content through the
+  // ownership sweep.
+  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
 
   // ----- events ---------------------------------------------------------------
 
@@ -394,11 +536,7 @@
   function toggle(trigger, focusFirst) {
     const content = contentFor(trigger);
     if (!content) return;
-    if (content.getAttribute("data-state") === "open") {
-      close(content);
-    } else {
-      open(content, trigger, focusFirst);
-    }
+    requestOpenChange(content, !isOpen(content), focusFirst);
   }
 
   document.addEventListener("pointerdown", (e) => {
@@ -408,7 +546,7 @@
       if (!trigger.disabled) toggle(trigger, false);
       return;
     }
-    if (!e.target.closest("[data-tui-dropdownmenu-content]")) closeAll(false);
+    if (!e.target.closest("[data-tui-dropdownmenu-content]")) requestCloseAll(false);
   });
 
   document.addEventListener("click", (e) => {
@@ -428,7 +566,7 @@
       if (sub) {
         clearTimeout(sub._tuiOpen);
         sub._tuiOpen = null;
-        openSub(sub, e.detail === 0);
+		requestSubOpenChange(sub, true, e.detail === 0);
       }
       return;
     }
@@ -437,15 +575,16 @@
     const checkbox = e.target.closest("[data-tui-dropdownmenu-checkbox-item]");
     if (checkbox) {
       if (!checkbox.disabled) {
-        const on = checkbox.getAttribute("data-state") === "checked";
-        checkbox.setAttribute("data-state", on ? "unchecked" : "checked");
-        checkbox.setAttribute("aria-checked", on ? "false" : "true");
-        checkbox.dispatchEvent(
-          new CustomEvent("dropdownmenu-checked-change", {
-            bubbles: true,
-            detail: { checked: !on },
-          }),
-        );
+        const on = checkbox.hasAttribute("data-checked");
+    const change = new CustomEvent("dropdownmenu-checked-change", {
+      bubbles: true,
+      cancelable: true,
+      detail: { checked: !on },
+    });
+    const accepted = checkbox.dispatchEvent(change);
+    if (accepted && !checkbox.hasAttribute("data-tui-dropdownmenu-checkbox-controlled")) {
+      setChecked(checkbox, !on);
+    }
       }
       return;
     }
@@ -455,20 +594,18 @@
     if (radio) {
       if (!radio.disabled) {
         const group = radio.closest("[data-tui-dropdownmenu-radio-group]");
-        if (group) {
+    const change = new CustomEvent("dropdownmenu-value-change", {
+      bubbles: true,
+      cancelable: true,
+      detail: { value: radio.getAttribute("data-tui-dropdownmenu-radio-value") },
+    });
+    const accepted = (group || radio).dispatchEvent(change);
+    if (accepted && group && !group.hasAttribute("data-tui-dropdownmenu-radio-controlled")) {
           group.querySelectorAll("[data-tui-dropdownmenu-radio-item]").forEach((r) => {
-            r.setAttribute("data-state", "unchecked");
-            r.setAttribute("aria-checked", "false");
+            setChecked(r, false);
           });
+      setChecked(radio, true);
         }
-        radio.setAttribute("data-state", "checked");
-        radio.setAttribute("aria-checked", "true");
-        radio.dispatchEvent(
-          new CustomEvent("dropdownmenu-value-change", {
-            bubbles: true,
-            detail: { value: radio.getAttribute("data-tui-dropdownmenu-radio-value") },
-          }),
-        );
       }
       return;
     }
@@ -480,7 +617,7 @@
         item.getAttribute("data-tui-dropdownmenu-disable-close-on-click") !== "true"
       ) {
         const content = item.closest("[data-tui-dropdownmenu-content]");
-        if (content) close(content, true);
+        if (content) requestOpenChange(content, false, false, true);
       }
       return;
     }
@@ -491,11 +628,11 @@
     if (!content) return;
 
     if (e.key === "Escape") {
-      closeAll(true);
+      requestCloseAll(true);
       return;
     }
     if (e.key === "Tab") {
-      closeAll(false);
+      requestCloseAll(false);
       return;
     }
 
@@ -530,7 +667,7 @@
         if (subTrigger) {
           e.preventDefault();
           const sub = subTrigger.closest("[data-tui-dropdownmenu-sub]");
-          if (sub) openSub(sub, true);
+		  if (sub) requestSubOpenChange(sub, true, true);
         }
         break;
       }
@@ -541,7 +678,7 @@
           const sub = subContent.closest("[data-tui-dropdownmenu-sub]");
           if (sub) {
             const { trigger } = subParts(sub);
-            closeSub(sub);
+			requestSubOpenChange(sub, false);
             if (trigger) trigger.focus({ preventScroll: true });
           }
         }
@@ -550,14 +687,4 @@
     }
   });
 
-  // Keep open menus anchored to their trigger while scrolling or resizing.
-  function repositionOpen() {
-    allContents().forEach((content) => {
-      if (content.getAttribute("data-state") !== "open") return;
-      const trigger = triggerFor(content);
-      if (trigger) positionMenu(content, trigger);
-    });
-  }
-  window.addEventListener("scroll", repositionOpen, true);
-  window.addEventListener("resize", repositionOpen);
 })();

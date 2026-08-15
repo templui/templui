@@ -70,6 +70,19 @@ func routes() []string {
 		out = append(out, "/charts/"+t)
 	}
 
+	// Blocks: the featured page plus one page per routable category. The
+	// highlight generator crawls these, so the baked cache covers the code
+	// tabs of every block.
+	out = append(out, "/blocks")
+	var blockCategories []string
+	for c := range pages.BlockCategories {
+		blockCategories = append(blockCategories, c)
+	}
+	sort.Strings(blockCategories)
+	for _, c := range blockCategories {
+		out = append(out, "/blocks/"+c)
+	}
+
 	return out
 }
 

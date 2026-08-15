@@ -3,8 +3,8 @@ package examples
 import "github.com/axadrn/shadcn-templ/v2/components/accordion"
 
 templ AccordionMultiple() {
-	@accordion.Accordion(accordion.Props{DisableOpenMultiple: true, Class: "max-w-lg"}) {
-		@accordion.Item(accordion.ItemProps{Open: true}) {
+	@accordion.Accordion(accordion.Props{Multiple: true, DefaultValue: []string{"item-3"}, Class: "max-w-lg"}) {
+		@accordion.Item(accordion.ItemProps{Value: "item-3"}) {
 			@accordion.Trigger() {
 				Notification Settings
 			}
@@ -12,7 +12,7 @@ templ AccordionMultiple() {
 				Manage how you receive notifications. You can enable email alerts for updates or push notifications for mobile devices.
 			}
 		}
-		@accordion.Item() {
+		@accordion.Item(accordion.ItemProps{Value: "item-1"}) {
 			@accordion.Trigger() {
 				Privacy & Security
 			}
@@ -20,7 +20,7 @@ templ AccordionMultiple() {
 				Control your privacy settings and security preferences. Enable two-factor authentication, manage connected devices, review active sessions, and configure data sharing preferences. You can also download your data or delete your account.
 			}
 		}
-		@accordion.Item() {
+		@accordion.Item(accordion.ItemProps{Value: "item-2"}) {
 			@accordion.Trigger() {
 				Billing & Subscription
 			}

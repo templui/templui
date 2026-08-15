@@ -513,8 +513,62 @@
     unwatchSnapResize(dialog);
     updateState(dialog, false);
     unlockScroll();
+    syncInert();
+    // Return focus to where the drawer was opened from, if focus is still
+    // ours to give back.
+    if (
+      dialog._tuiPreviousFocus?.isConnected &&
+      (dialog.contains(document.activeElement) || document.activeElement === document.body)
+    ) {
+      dialog._tuiPreviousFocus.focus({ preventScroll: true });
+    }
+    delete dialog._tuiPreviousFocus;
     syncStack();
   }
+
+  // The hand-built half of showModal's modality: while a modal drawer is
+  // open, every body-level sibling is inert - except the surfaces carrying
+  // the shared data-tui-portal marker (floating popups, dialogs, the
+  // toaster). inert removes the rest from tab order and the accessibility
+  // tree: floating-ui's markOthers-with-inert pendant, without knowing any
+  // component by name.
+  function syncInert() {
+    const anyModalOpen = Array.from(
+      document.querySelectorAll("body > dialog[data-tui-drawer-content]"),
+    ).some(
+      (d) =>
+        d.open &&
+        d.getAttribute("data-modal") === "true" &&
+        // A closing drawer no longer counts (Base UI removes markOthers at
+        // dismiss start, not after the exit transition).
+        !popupOf(d)?.hasAttribute("data-ending-style"),
+    );
+    for (const node of document.body.children) {
+      if (node.localName === "script" || node.matches("[data-tui-portal]")) continue;
+      node.toggleAttribute("inert", anyModalOpen);
+    }
+  }
+
+  // showModal's Escape lives here now. Capture phase: while a floating
+  // popup is visibly open (inside or outside the drawer), its own Escape
+  // handler closes it and the drawer stays.
+  const OPEN_POPUP_SELECTOR = '[data-tui-portal][data-open]:not([hidden]):not(dialog)';
+
+  document.addEventListener(
+    "keydown",
+    (e) => {
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      if (document.querySelector(OPEN_POPUP_SELECTOR)) return;
+      const open = Array.from(
+        document.querySelectorAll("body > dialog[data-tui-drawer-content]"),
+      ).filter((d) => d.open && !d.hasAttribute("data-tui-drawer-disable-dismissible"));
+      // The deepest open drawer dismisses first (a parent with an open
+      // nested drawer stays).
+      const top = open.find((d) => !hasOpenNested(d));
+      if (top) requestOpenChange(top, false);
+    },
+    true,
+  );
 
   function openDrawer(target) {
     const dialog = getDrawer(target);
@@ -533,11 +587,16 @@
       // below transition the panel in (450ms cubic-bezier(0.22,1,0.36,1)).
       setPartsAttr(dialog, "data-starting-style", true);
       try {
+        // Modal drawers open non-modally too: shadcn/Base UI never use the
+        // native top layer (it would stack above the z-index portaled
+        // popups). Modality - scroll lock, inert siblings, focus - is
+        // built by hand, like Base UI does.
+        dialog.show();
         if (dialog.getAttribute("data-tui-dialog-show-modal") === "true") {
-          dialog.showModal();
           lockScroll();
-        } else {
-          dialog.show();
+          dialog._tuiPreviousFocus = document.activeElement;
+          syncInert();
+          (popupOf(dialog) || dialog).focus({ preventScroll: true });
         }
       } catch {
         setPartsAttr(dialog, "data-starting-style", false);
@@ -584,6 +643,14 @@
     if (overlay) overlay.style.setProperty("--drawer-swipe-strength", String(value));
     setPartsAttr(dialog, "data-ending-style", true);
     updateState(dialog, false);
+    syncInert();
+    if (
+      dialog._tuiPreviousFocus?.isConnected &&
+      (dialog.contains(document.activeElement) || document.activeElement === document.body)
+    ) {
+      dialog._tuiPreviousFocus.focus({ preventScroll: true });
+    }
+    delete dialog._tuiPreviousFocus;
     // The stack treats a closing drawer as closed (Base UI flips `open`
     // before the exit transition), so the parent starts scaling forward now.
     syncStack();
@@ -606,8 +673,24 @@
     return getDrawer(target)?.open || false;
   }
 
+  function requestOpenChange(target, nextOpen, strength) {
+    const dialog = getDrawer(target);
+    if (!dialog || dialog.open === nextOpen) return false;
+    const accepted = dialog.dispatchEvent(
+      new CustomEvent("drawer-open-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { open: nextOpen },
+      }),
+    );
+    if (!accepted || dialog.hasAttribute("data-tui-drawer-controlled")) return false;
+    if (nextOpen) openDrawer(dialog);
+    else closeDrawer(dialog, strength);
+    return true;
+  }
+
   function toggleDrawer(target) {
-    isDrawerOpen(target) ? closeDrawer(target) : openDrawer(target);
+    requestOpenChange(target, !isDrawerOpen(target));
   }
 
   // Sets the active snap point (the pendant of the controlled snapPoint
@@ -931,9 +1014,15 @@
             releaseVelocity,
             overallVelocity,
           );
+          const previousActive = snap.active;
           snap.active = null;
           finishNestedSwipe(0);
-          closeDrawer(dialog, strength);
+          if (!requestOpenChange(dialog, false, strength)) {
+            snap.active = previousActive;
+            applySnapState(dialog);
+            popup.style.setProperty("--drawer-swipe-movement-x", "0px");
+            popup.style.setProperty("--drawer-swipe-movement-y", "0px");
+          }
         };
         const settle = (point) => {
           snap.active = point.value;
@@ -1012,11 +1101,12 @@
 
       if (shouldClose) {
         finishNestedSwipe(0);
-        closeDrawer(
+        const closed = requestOpenChange(
           dialog,
+          false,
           resolveSwipeStrength(dialog, state.size, disp, releaseVelocity, overallVelocity),
         );
-        return;
+        if (closed) return;
       }
 
       // Spring back: hand the transform to the movement vars at the released
@@ -1201,7 +1291,7 @@
 
     dialog.addEventListener("cancel", (event) => {
       event.preventDefault();
-      closeDrawer(dialog);
+      requestOpenChange(dialog, false);
     });
 
     dialog.addEventListener("close", () => {
@@ -1219,7 +1309,7 @@
       if (dialog.hasAttribute("data-tui-drawer-disable-dismissible")) return;
       const popup = popupOf(dialog);
       const target = event.target instanceof Element ? event.target : null;
-      if (popup && target && !popup.contains(target)) closeDrawer(dialog);
+      if (popup && target && !popup.contains(target)) requestOpenChange(dialog, false);
     });
 
     attachSwipe(dialog);
@@ -1230,6 +1320,7 @@
   // Moves the drawer to <body>, the pendant of the reference's DrawerPortal.
   function portal(dialog) {
     if (dialog.parentElement !== document.body) {
+      if (!dialog._tuiPortalOwner) dialog._tuiPortalOwner = dialog.parentElement;
       document.body.appendChild(dialog);
     }
   }
@@ -1245,21 +1336,24 @@
       if (content) {
         const stale = content.id && document.getElementById(content.id);
         if (stale) stale.remove();
+        content._tuiPortalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
       tpl.remove();
     }
   }
 
-  function initDrawers(root = document) {
+  function init(root = document) {
     liftTemplates();
-    // Remove portaled leftovers whose trigger got swapped out of the page.
-    // A drawer that never had triggers is driven programmatically
-    // (window.tui.drawer.open) and stays alive.
+    // Self-healing modality: recompute the inert siblings on every DOM
+    // change, so a swap or a missed close event never leaves stale inert.
+    syncInert();
+    // The unmount half of the React portal pendant: a drawer lives as long
+    // as its SSR declaration site (_tuiPortalOwner) stays in the document.
+    // Ownership keeps programmatic drawers (window.tui.drawer.open) alive
+    // and judges swaps without mid-swap trigger heuristics.
     document.querySelectorAll("body > dialog[data-tui-drawer-content]").forEach((dialog) => {
-      if (triggersFor(dialog).length) {
-        dialog.dataset.tuiDrawerHadTriggers = "true";
-      } else if (!dialog.open && dialog.dataset.tuiDrawerHadTriggers === "true") {
+      if (dialog._tuiPortalOwner && !dialog._tuiPortalOwner.isConnected) {
         unwatchSnapResize(dialog);
         dialog.remove();
       }
@@ -1290,21 +1384,21 @@
     }
     const closeButton = event.target.closest("[data-tui-drawer-close]");
     if (closeButton) {
-      closeDrawer(drawerFor(closeButton));
+      requestOpenChange(drawerFor(closeButton), false);
     }
   });
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => initDrawers());
+    document.addEventListener("DOMContentLoaded", () => init());
   } else {
-    initDrawers();
+    init();
   }
 
   // Initialize drawers added later (e.g. swapped in via htmx), so a
   // server-rendered drawer with Open true still gets showModal(). Also
   // release the scroll lock if an open drawer got swapped out of the DOM.
   new MutationObserver(() => {
-    initDrawers();
+    init();
     unlockScroll();
   }).observe(document.body, {
     childList: true,

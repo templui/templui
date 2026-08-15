@@ -4,9 +4,9 @@ import "github.com/axadrn/shadcn-templ/v2/components/slider"
 
 templ SliderDemo() {
 	@slider.Slider(slider.Props{
-		Value: []float64{75},
-		Max:    100,
-		Step:   1,
-		Class:  "mx-auto w-full max-w-xs",
+		DefaultValue: []float64{75},
+		Max:          100,
+		Step:         1,
+		Class:        "mx-auto w-full max-w-xs",
 	})
 }

@@ -14,10 +14,11 @@ import (
 
 	shadcntempl "github.com/axadrn/shadcn-templ/v2"
 	"github.com/axadrn/shadcn-templ/v2/assets"
-	"github.com/axadrn/shadcn-templ/v2/internal/shared"
+	"github.com/axadrn/shadcn-templ/v2/blocks"
 	"github.com/axadrn/shadcn-templ/v2/components"
 	"github.com/axadrn/shadcn-templ/v2/internal/inliner"
 	"github.com/axadrn/shadcn-templ/v2/internal/registry"
+	"github.com/axadrn/shadcn-templ/v2/internal/shared"
 )
 
 // isDevelopment mirrors components/scripts.go: outside production every
@@ -89,14 +90,17 @@ func styleMapFor(bare string) (inliner.StyleMap, error) {
 }
 
 // componentSource reads a registry file path ("components/button/button.templ",
-// "utils/shadcntempl.go") from disk in development, from the embeds in
-// production.
+// "blocks/sidebar07/page.templ", "utils/shadcntempl.go") from disk in
+// development, from the embeds in production.
 func componentSource(filePath string) ([]byte, error) {
 	if isDevelopment() {
 		return os.ReadFile("./" + filePath)
 	}
 	if strings.HasPrefix(filePath, "utils/") {
 		return shadcntempl.UtilsFiles.ReadFile(filePath)
+	}
+	if strings.HasPrefix(filePath, "blocks/") {
+		return blocks.TemplFiles.ReadFile(strings.TrimPrefix(filePath, "blocks/"))
 	}
 	return components.TemplFiles.ReadFile(strings.TrimPrefix(filePath, "components/"))
 }
@@ -110,7 +114,7 @@ var (
 // one style. Returns (nil, nil) when style or component are unknown (the 404
 // case). Results are cached per style+name in production and rebuilt on
 // every call in development.
-func BuildStyleItem(styleName, name string) (*Item, error) {
+func BuildStyleItem(styleName, name string, opts inliner.Options) (*Item, error) {
 	bare, ok := splitStyleName(styleName)
 	if !ok {
 		return nil, nil
@@ -120,7 +124,7 @@ func BuildStyleItem(styleName, name string) (*Item, error) {
 		return nil, nil
 	}
 
-	cacheKey := styleName + "/" + name
+	cacheKey := fmt.Sprintf("%s/%s/%s/%t", styleName, name, opts.MenuColor, opts.RTL)
 	if !isDevelopment() {
 		itemMu.Lock()
 		cached, ok := itemCache[cacheKey]
@@ -143,7 +147,7 @@ func BuildStyleItem(styleName, name string) (*Item, error) {
 		}
 		content := string(src)
 		if strings.HasSuffix(file.Path, ".templ") {
-			content, err = inliner.TransformStyle(content, styleMap, inliner.Options{})
+			content, err = inliner.TransformStyle(content, styleMap, opts)
 			if err != nil {
 				return nil, fmt.Errorf("registryapi: inline %s for %s: %w", file.Path, styleName, err)
 			}
@@ -152,6 +156,7 @@ func BuildStyleItem(styleName, name string) (*Item, error) {
 			Path:    file.Path,
 			Content: content,
 			Type:    file.Type,
+			Target:  file.Target,
 		})
 	}
 
@@ -165,6 +170,15 @@ func BuildStyleItem(styleName, name string) (*Item, error) {
 	if def.Type == "registry:ui" {
 		item.Meta = &ItemMeta{
 			Links: ItemLinks{Docs: shared.BaseURL() + "/docs/components/" + def.Name},
+		}
+	}
+	// Block items ship their description, categories and preview height, the
+	// shape of shadcn's served registry:block items.
+	if def.Type == "registry:block" {
+		item.Description = def.Description
+		item.Categories = def.Categories
+		if def.Meta != nil && def.Meta.IframeHeight != "" {
+			item.Meta = &ItemMeta{IframeHeight: def.Meta.IframeHeight}
 		}
 	}
 

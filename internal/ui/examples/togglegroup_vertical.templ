@@ -8,20 +8,19 @@ import (
 
 templ ToggleGroupVertical() {
 	@togglegroup.ToggleGroup(togglegroup.Props{
-		ToggleMultiple: true,
-		Orientation: togglegroup.OrientationVertical,
-		Spacing:     utils.Ptr(1),
+		Multiple:     true,
+		DefaultValue: []string{"bold", "italic"},
+		Orientation:  togglegroup.OrientationVertical,
+		Spacing:      utils.Ptr(1),
 	}) {
 		@togglegroup.Item(togglegroup.ItemProps{
 			Value:      "bold",
-			Pressed:    true,
 			Attributes: templ.Attributes{"aria-label": "Toggle bold"},
 		}) {
 			@icon.Bold()
 		}
 		@togglegroup.Item(togglegroup.ItemProps{
 			Value:      "italic",
-			Pressed:    true,
 			Attributes: templ.Attributes{"aria-label": "Toggle italic"},
 		}) {
 			@icon.Italic()

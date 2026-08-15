@@ -24,10 +24,10 @@ templ CheckboxDefault() {
 		<!-- Checkbox with description -->
 		<div class="flex items-start gap-3">
 			@checkbox.Checkbox(checkbox.Props{
-				ID:      "newsletter",
-				Name:    "agreements",
-				Value:   "newsletter",
-				Checked: true,
+				ID:             "newsletter",
+				Name:           "agreements",
+				Value:          "newsletter",
+				DefaultChecked: true,
 			})
 			<div class="grid gap-2">
 				@label.Label(label.Props{

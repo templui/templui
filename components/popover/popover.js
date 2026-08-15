@@ -23,9 +23,28 @@
   }
 
   function setState(content, state) {
-    content.setAttribute("data-state", state);
+    const open = state === "open";
+    content.toggleAttribute("data-open", open);
+    content.toggleAttribute("data-closed", !open);
     const popup = popupFor(content);
-    if (popup) popup.setAttribute("data-state", state);
+    if (popup) {
+      popup.toggleAttribute("data-open", open);
+      popup.toggleAttribute("data-closed", !open);
+    }
+  }
+
+  function setTransitionAttribute(content, name, present) {
+    content.toggleAttribute(name, present);
+    const popup = popupFor(content);
+    if (popup) popup.toggleAttribute(name, present);
+  }
+
+  function startTransition(content) {
+    setTransitionAttribute(content, "data-ending-style", false);
+    setTransitionAttribute(content, "data-starting-style", true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setTransitionAttribute(content, "data-starting-style", false));
+    });
   }
 
   function setSide(content, side) {
@@ -46,13 +65,20 @@
     return "calc(100% + " + sideOffset + "px) " + centerY;
   }
 
-  // Moves the content to <body> (shadcn portals it the same way). Also removes
-  // contents whose trigger is gone (leftovers from swapped-out pages).
+  // Moves the content to <body> (shadcn portals it the same way).
+  // The unmount half of the React portal pendant: a portaled content lives
+  // as long as its SSR declaration site (_tuiPortalOwner) stays in the
+  // document. Trigger-presence heuristics judged mid-swap moments wrongly -
+  // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
     document.querySelectorAll("body > [data-tui-popover-content]").forEach((c) => {
-      if (c !== content && !triggerFor(c)) c.remove();
+      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) {
+        stopAutoPositioning(c);
+        c.remove();
+      }
     });
     if (content.parentElement !== document.body) {
+      if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
       document.body.appendChild(content);
     }
     wireAria(content);
@@ -87,7 +113,7 @@
 
     return computePosition(trigger, content, {
       placement: placement,
-      strategy: "fixed",
+      strategy: "absolute",
       middleware: [
         offset({ mainAxis: sideOffset, crossAxis: alignOffset }),
         flip({ padding: COLLISION_PADDING }),
@@ -100,15 +126,51 @@
       const popup = popupFor(content);
       if (popup) {
         popup.style.setProperty(
-          "--tui-popover-transform-origin",
+          "--transform-origin",
           anchorOrigin(result, trigger.getBoundingClientRect(), sideOffset),
         );
       }
     });
   }
 
+  function startAutoPositioning(content) {
+    const trigger = triggerFor(content);
+    if (!trigger) return Promise.resolve();
+    if (content._tuiPositionCleanup) content._tuiPositionCleanup();
+    let resolveFirst;
+    const firstPosition = new Promise((resolve) => {
+      resolveFirst = resolve;
+    });
+    const update = () => position(content).then(resolveFirst, resolveFirst);
+    content._tuiPositionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
+      elementResize: typeof ResizeObserver !== "undefined",
+      layoutShift: typeof IntersectionObserver !== "undefined",
+    });
+    return firstPosition;
+  }
+
+  function stopAutoPositioning(content) {
+    if (!content._tuiPositionCleanup) return;
+    content._tuiPositionCleanup();
+    content._tuiPositionCleanup = null;
+  }
+
   function isOpen(content) {
-    return content.getAttribute("data-state") === "open";
+    return content.hasAttribute("data-open");
+  }
+
+  function requestOpenChange(content, nextOpen, returnFocus) {
+    if (!content || isOpen(content) === nextOpen) return;
+    const accepted = content.dispatchEvent(
+      new CustomEvent("popover-open-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { open: nextOpen },
+      }),
+    );
+    if (!accepted || content.hasAttribute("data-tui-popover-controlled")) return;
+    if (nextOpen) open(content);
+    else close(content, returnFocus);
   }
 
   function open(content) {
@@ -119,50 +181,73 @@
     });
     clearTimeout(content._tuiHide);
     portal(content);
-    if (!content.matches(":popover-open")) {
-      content.showPopover(); // native top layer
-    }
+    // z-index portal like shadcn (no native top layer); re-append
+    // keeps paint order = open order.
+    document.body.appendChild(content);
+    content.hidden = false;
 
     // Position it invisibly first, then play the enter animation in place.
     content.style.visibility = "hidden";
     const finish = () => {
+      // duration-100 transitions `all`; a visibility transition would
+      // freeze at hidden in background tabs - flip suppressed.
+      content.style.transitionProperty = "none";
       content.style.visibility = "";
-      if (!content.matches(":popover-open")) return;
+      void content.offsetWidth;
+      content.style.transitionProperty = "";
+      if (content.hidden) return;
       setState(content, "open");
+      startTransition(content);
       const trigger = triggerFor(content);
-      if (trigger) trigger.setAttribute("aria-expanded", "true");
+      if (trigger) {
+        trigger.setAttribute("aria-expanded", "true");
+        trigger.setAttribute("data-popup-open", "");
+        trigger.setAttribute("data-pressed", "");
+      }
       // Base UI moves focus into the popup when it opens.
       const popup = popupFor(content);
       if (popup && !content.contains(document.activeElement)) {
         popup.focus({ preventScroll: true });
       }
     };
-    position(content).then(finish, finish);
+    startAutoPositioning(content).then(finish, finish);
   }
 
   // returnFocus false skips the focus restore, like Base UI on pointer
   // dismiss: focus follows the outside press instead of the trigger.
   function close(content, returnFocus) {
     if (typeof content === "string") content = document.getElementById(content);
-    if (!content || !content.matches(":popover-open")) return;
+    if (!content || content.hidden) return;
+    stopAutoPositioning(content);
     if (returnFocus !== false && content.contains(document.activeElement)) {
       const focusTrigger = triggerFor(content);
       if (focusTrigger) focusTrigger.focus({ preventScroll: true });
     }
     content.style.visibility = "";
+    setTransitionAttribute(content, "data-starting-style", false);
     setState(content, "closed");
+    setTransitionAttribute(content, "data-ending-style", true);
     const trigger = triggerFor(content);
-    if (trigger) trigger.setAttribute("aria-expanded", "false");
+    if (trigger) {
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.removeAttribute("data-popup-open");
+      trigger.removeAttribute("data-pressed");
+    }
     clearTimeout(content._tuiHide);
     content._tuiHide = setTimeout(() => {
-      if (content.getAttribute("data-state") === "closed" && content.matches(":popover-open")) {
-        content.hidePopover();
+      if (content.hasAttribute("data-closed") && !content.hidden) {
+        content.hidden = true;
+        setTransitionAttribute(content, "data-ending-style", false);
       }
     }, EXIT_MS);
   }
 
   function closeAll(returnFocus) {
     allContents().forEach((content) => close(content, returnFocus));
+  }
+
+  function requestCloseAll(returnFocus) {
+    allContents().forEach((content) => requestOpenChange(content, false, returnFocus));
   }
 
   function closeNearest(element) {
@@ -172,17 +257,13 @@
       (element.closest?.("[data-tui-popover-trigger]") &&
         contentFor(element.closest("[data-tui-popover-trigger]"))) ||
       element.querySelector?.("[data-tui-popover-content]");
-    if (content) close(content);
+    if (content) requestOpenChange(content, false);
   }
 
   function toggle(content) {
     if (typeof content === "string") content = document.getElementById(content);
     if (!content) return;
-    if (isOpen(content)) {
-      close(content);
-    } else {
-      open(content);
-    }
+    requestOpenChange(content, !isOpen(content));
   }
 
   // Pointer interactions toggle and dismiss on PRESS, exactly like Base UI.
@@ -197,7 +278,7 @@
       if (content) toggle(content);
       return;
     }
-    if (!e.target.closest("[data-tui-popover-content]")) closeAll(false);
+    if (!e.target.closest("[data-tui-popover-content]")) requestCloseAll(false);
   });
 
   document.addEventListener("click", (e) => {
@@ -214,26 +295,9 @@
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeAll();
+    if (e.key === "Escape") requestCloseAll();
   });
 
-  // Page scroll or resize: keep open popovers attached to their trigger.
-  window.addEventListener(
-    "scroll",
-    (e) => {
-      if (e.target instanceof Element && e.target.closest("[data-tui-popover-content]")) return;
-      allContents().forEach((content) => {
-        if (isOpen(content)) position(content);
-      });
-    },
-    true,
-  );
-
-  window.addEventListener("resize", () => {
-    allContents().forEach((content) => {
-      if (isOpen(content)) position(content);
-    });
-  });
 
   // Portal all contents up front (React portals on mount too): popovers must
   // not sit inside layout groups where hidden siblings break :last-child
@@ -245,43 +309,39 @@
       const content = tpl.content.querySelector("[data-tui-popover-content]");
       if (content) {
         const stale = document.getElementById(content.id);
-        if (stale) stale.remove();
+        if (stale) {
+          stopAutoPositioning(stale);
+          stale.remove();
+        }
+        content._tuiPortalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
       tpl.remove();
     });
   }
 
-  function portalAll() {
+  function init() {
     liftTemplates();
     allContents().forEach((content) => {
-      if (triggerFor(content)) portal(content);
-    });
-  }
-
-  let portalQueued = false;
-  function queuePortal() {
-    if (portalQueued) return;
-    portalQueued = true;
-    requestAnimationFrame(() => {
-      portalQueued = false;
-      portalAll();
+      if (!triggerFor(content)) return;
+      portal(content);
+      if (content.getAttribute("data-tui-popover-initial-open") === "true") {
+        content.removeAttribute("data-tui-popover-initial-open");
+        open(content);
+      }
     });
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", portalAll);
+    document.addEventListener("DOMContentLoaded", init);
   } else {
-    portalAll();
+    init();
   }
-  new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      if (m.addedNodes.length) {
-        queuePortal();
-        break;
-      }
-    }
-  }).observe(document.documentElement, { childList: true, subtree: true });
+  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
+  // does not fire in hidden tabs or throttled iframes): swapped-in markup
+  // lifts and wires itself, removals release portaled content through the
+  // ownership sweep.
+  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
 
   window.tui = window.tui || {};
   window.tui.popover = {

@@ -187,19 +187,19 @@ templ UIElements() {
 					}
 				</div>
 				@radiogroup.RadioGroup(radiogroup.Props{
-					Name:       "cards-ui-elements-fruit",
-					Value:      "apple",
-					Class:      "ml-auto flex w-fit gap-3",
-					Attributes: templ.Attributes{"aria-label": "Fruit preference"},
+					Name:         "cards-ui-elements-fruit",
+					DefaultValue: "apple",
+					Class:        "ml-auto flex w-fit gap-3",
+					Attributes:   templ.Attributes{"aria-label": "Fruit preference"},
 				}) {
 					@radiogroup.Item(radiogroup.ItemProps{Value: "apple", Attributes: templ.Attributes{"aria-label": "Apple"}})
 					@radiogroup.Item(radiogroup.ItemProps{Value: "banana", Attributes: templ.Attributes{"aria-label": "Banana"}})
 				}
 				<div class="flex gap-3">
-					@checkbox.Checkbox(checkbox.Props{Checked: true, Attributes: templ.Attributes{"aria-label": "Enable email alerts"}})
+					@checkbox.Checkbox(checkbox.Props{DefaultChecked: true, Attributes: templ.Attributes{"aria-label": "Enable email alerts"}})
 					@checkbox.Checkbox(checkbox.Props{Class: "hidden 4xl:flex", Attributes: templ.Attributes{"aria-label": "Enable push alerts"}})
 				</div>
-				@switchcomp.Switch(switchcomp.Props{Checked: true, Class: "flex 4xl:hidden", Attributes: templ.Attributes{"aria-label": "Enable compact notifications"}})
+				@switchcomp.Switch(switchcomp.Props{DefaultChecked: true, Class: "flex 4xl:hidden", Attributes: templ.Attributes{"aria-label": "Enable compact notifications"}})
 			</div>
 			<div class="flex items-center gap-4">
 				@alertdialog.AlertDialog() {
@@ -263,7 +263,7 @@ templ UIElements() {
 						}
 					}
 				}
-				@switchcomp.Switch(switchcomp.Props{Checked: true, Class: "hidden 4xl:flex", Attributes: templ.Attributes{"aria-label": "Enable advanced setting"}})
+				@switchcomp.Switch(switchcomp.Props{DefaultChecked: true, Class: "hidden 4xl:flex", Attributes: templ.Attributes{"aria-label": "Enable advanced setting"}})
 			</div>
 		}
 	}
@@ -639,14 +639,14 @@ templ PayoutThreshold() {
 					@field.Label(field.LabelProps{For: "preferred-currency"}) {
 						Preferred Currency
 					}
-					@selectcomp.Select() {
+					@selectcomp.Select(selectcomp.Props{DefaultValue: "usd"}) {
 						@selectcomp.Trigger(selectcomp.TriggerProps{ID: "preferred-currency", Class: "w-full"}) {
 							@selectcomp.Value()
 						}
 						@selectcomp.Content() {
 							@selectcomp.Group() {
 								for _, currency := range cardsCurrencies {
-									@selectcomp.Item(selectcomp.ItemProps{Value: currency.Value, Selected: currency.Value == "usd"}) {
+									@selectcomp.Item(selectcomp.ItemProps{Value: currency.Value}) {
 										{ currency.Label }
 									}
 								}
@@ -948,7 +948,7 @@ templ NotificationSettings() {
 			@field.Group() {
 				for _, notification := range cardsNotifications {
 					@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
-						@checkbox.Checkbox(checkbox.Props{ID: "notify-" + notification.id, Checked: notification.checked})
+						@checkbox.Checkbox(checkbox.Props{ID: "notify-" + notification.id, DefaultChecked: notification.checked})
 						@field.Content() {
 							@field.Label(field.LabelProps{For: "notify-" + notification.id}) {
 								{ notification.label }

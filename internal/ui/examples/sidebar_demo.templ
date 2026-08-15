@@ -101,15 +101,14 @@ templ sidebarDemoTeamSwitcher() {
 			@dropdownmenu.DropdownMenu(dropdownmenu.Props{ID: "sidebar-demo-team-menu"}) {
 				@sidebar.MenuButton(sidebar.MenuButtonProps{
 					Size:       sidebar.MenuButtonSizeLg,
-					Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+					Class:      "data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
 					Attributes: dropdownmenu.Trigger(ctx),
 				}) {
 					<div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-						// All logos render up front, the demo script toggles them on
-						// team switch (the pendant of React swapping activeTeam.logo).
+						// Render every logo up front; the demo script shows the active one.
 						for i, team := range sidebarDemoTeams {
 							@team.Logo(icon.Props{
-								Class: "size-4" + logoHidden(i),
+								Class:      "size-4" + logoHidden(i),
 								Attributes: templ.Attributes{"data-team-logo": strconv.Itoa(i)},
 							})
 						}
@@ -121,11 +120,11 @@ templ sidebarDemoTeamSwitcher() {
 					@icon.ChevronsUpDown(icon.Props{Class: "ml-auto"})
 				}
 				@dropdownmenu.Content(dropdownmenu.ContentProps{
-					Class:      "w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg",
+					Class:      "min-w-56 rounded-lg",
 					Align:      dropdownmenu.AlignStart,
 					Side:       dropdownmenu.SideRight,
+					MobileSide: dropdownmenu.SideBottom,
 					SideOffset: 4,
-					Attributes: templ.Attributes{"data-sidebar-demo-menu": "team"},
 				}) {
 					@dropdownmenu.Group() {
 						@dropdownmenu.Label(dropdownmenu.LabelProps{Class: "text-xs text-muted-foreground"}) {
@@ -176,8 +175,8 @@ templ sidebarDemoNavMainGroup() {
 		@sidebar.Menu() {
 			for _, item := range sidebarDemoNavMain {
 				@collapsible.Collapsible(collapsible.Props{
-					Open:  item.IsActive,
-					Class: "group/collapsible",
+					DefaultOpen: item.IsActive,
+					Class:       "group/collapsible",
 				}) {
 					@sidebar.MenuItem() {
 						@sidebar.MenuButton(sidebar.MenuButtonProps{
@@ -186,7 +185,7 @@ templ sidebarDemoNavMainGroup() {
 						}) {
 							@item.Icon()
 							<span>{ item.Title }</span>
-							@icon.ChevronRight(icon.Props{Class: "ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"})
+							@icon.ChevronRight(icon.Props{Class: "ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90"})
 						}
 						@collapsible.Content() {
 							@sidebar.MenuSub() {
@@ -227,10 +226,11 @@ templ sidebarDemoNavProjects() {
 							<span class="sr-only">More</span>
 						}
 						@dropdownmenu.Content(dropdownmenu.ContentProps{
-							Class:      "w-48 rounded-lg",
-							Side:       dropdownmenu.SideRight,
-							Align:      dropdownmenu.AlignStart,
-							Attributes: templ.Attributes{"data-sidebar-demo-menu": "project"},
+							Class:       "w-48 rounded-lg",
+							Side:        dropdownmenu.SideRight,
+							Align:       dropdownmenu.AlignStart,
+							MobileSide:  dropdownmenu.SideBottom,
+							MobileAlign: dropdownmenu.AlignEnd,
 						}) {
 							@dropdownmenu.Item() {
 								@icon.Folder(icon.Props{Class: "text-muted-foreground"})
@@ -265,7 +265,7 @@ templ sidebarDemoNavUser() {
 			@dropdownmenu.DropdownMenu() {
 				@sidebar.MenuButton(sidebar.MenuButtonProps{
 					Size:       sidebar.MenuButtonSizeLg,
-					Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+					Class:      "data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
 					Attributes: dropdownmenu.Trigger(ctx),
 				}) {
 					@avatar.Avatar(avatar.Props{Class: "h-8 w-8 rounded-lg"}) {
@@ -281,11 +281,11 @@ templ sidebarDemoNavUser() {
 					@icon.ChevronsUpDown(icon.Props{Class: "ml-auto size-4"})
 				}
 				@dropdownmenu.Content(dropdownmenu.ContentProps{
-					Class:      "w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg",
+					Class:      "min-w-56 rounded-lg",
 					Side:       dropdownmenu.SideRight,
 					Align:      dropdownmenu.AlignEnd,
+					MobileSide: dropdownmenu.SideBottom,
 					SideOffset: 4,
-					Attributes: templ.Attributes{"data-sidebar-demo-menu": "user"},
 				}) {
 					@dropdownmenu.Group() {
 						@dropdownmenu.Label(dropdownmenu.LabelProps{Class: "p-0 font-normal"}) {
@@ -363,7 +363,7 @@ templ SidebarDemo() {
 	}
 	<script nonce={ templ.GetNonce(ctx) }>
 		(() => {
-			// Team switching, the pendant of the demo's activeTeam React state.
+			// Keep the selected team details in sync.
 			document.addEventListener("click", (e) => {
 				if (!(e.target instanceof Element)) return;
 				const item = e.target.closest("#sidebar-demo-team-menu [data-team-index]");
@@ -379,20 +379,6 @@ templ SidebarDemo() {
 				if (nameEl) nameEl.textContent = name;
 				if (planEl) planEl.textContent = plan;
 			});
-
-			// side={isMobile ? "bottom" : "right"} pendant: the menus flip to
-			// bottom below md, like useSidebar's isMobile.
-			const mq = window.matchMedia("(max-width: 767px)");
-			const applySides = () => {
-				document.querySelectorAll("[data-sidebar-demo-menu]").forEach((menu) => {
-					menu.setAttribute("data-tui-dropdownmenu-side", mq.matches ? "bottom" : "right");
-					if (menu.getAttribute("data-sidebar-demo-menu") === "project") {
-						menu.setAttribute("data-tui-dropdownmenu-align", mq.matches ? "end" : "start");
-					}
-				});
-			};
-			applySides();
-			mq.addEventListener("change", applySides);
 		})();
 	</script>
 }

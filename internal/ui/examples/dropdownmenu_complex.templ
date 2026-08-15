@@ -98,7 +98,7 @@ templ DropdownMenuComplex() {
 				@dropdownmenu.Label() {
 					View
 				}
-				@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+				@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{DefaultChecked: true}) {
 					@icon.Eye()
 					Show Sidebar
 				}
@@ -116,10 +116,9 @@ templ DropdownMenuComplex() {
 							@dropdownmenu.Label() {
 								Appearance
 							}
-							@dropdownmenu.RadioGroup() {
+							@dropdownmenu.RadioGroup(dropdownmenu.RadioGroupProps{DefaultValue: "light"}) {
 								@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{
-									Value:   "light",
-									Checked: true,
+									Value: "light",
 								}) {
 									@icon.Sun()
 									Light
@@ -181,11 +180,11 @@ templ DropdownMenuComplex() {
 										@dropdownmenu.Label() {
 											Notification Types
 										}
-										@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+										@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{DefaultChecked: true}) {
 											@icon.Bell()
 											Push Notifications
 										}
-										@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+										@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{DefaultChecked: true}) {
 											@icon.Mail()
 											Email Notifications
 										}

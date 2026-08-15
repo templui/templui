@@ -19,7 +19,7 @@ templ DropdownMenuCheckboxesIcons() {
 				@dropdownmenu.Label() {
 					Notification Preferences
 				}
-				@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+				@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{DefaultChecked: true}) {
 					@icon.Mail()
 					Email notifications
 				}
@@ -27,7 +27,7 @@ templ DropdownMenuCheckboxesIcons() {
 					@icon.MessageSquare()
 					SMS notifications
 				}
-				@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+				@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{DefaultChecked: true}) {
 					@icon.Bell()
 					Push notifications
 				}

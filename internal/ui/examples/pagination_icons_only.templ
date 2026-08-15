@@ -12,7 +12,7 @@ templ PaginationIconsOnly() {
 			@field.Label(field.LabelProps{For: "select-rows-per-page"}) {
 				Rows per page
 			}
-			@selectcomp.Select(selectcomp.Props{Value: "25"}) {
+			@selectcomp.Select(selectcomp.Props{DefaultValue: "25"}) {
 				@selectcomp.Trigger(selectcomp.TriggerProps{ID: "select-rows-per-page", Class: "w-20"}) {
 					@selectcomp.Value()
 				}

@@ -1,0 +1,20 @@
+package dashboard01
+
+import "github.com/axadrn/shadcn-templ/v2/components/sidebar"
+
+templ NavSecondary(items []NavItem, class string) {
+	@sidebar.Group(sidebar.GroupProps{Class: class}) {
+		@sidebar.GroupContent() {
+			@sidebar.Menu() {
+				for _, item := range items {
+					@sidebar.MenuItem() {
+						@sidebar.MenuButton(sidebar.MenuButtonProps{Href: item.URL}) {
+							@item.Icon()
+							<span>{ item.Title }</span>
+						}
+					}
+				}
+			}
+		}
+	}
+}

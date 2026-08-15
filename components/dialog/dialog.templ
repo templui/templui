@@ -15,6 +15,7 @@ const stateKey ctxKey = "dialogState"
 type ctxState struct {
 	id               string
 	open             bool
+	controlled       bool
 	disableClickAway bool
 }
 
@@ -27,10 +28,19 @@ func state(ctx context.Context) ctxState {
 
 type Props struct {
 	ID string
-	// Open renders the dialog already open on page load.
-	Open bool
+	// Open is the controlled open state. Use DefaultOpen when the browser
+	// should own the state after the initial render.
+	Open        *bool
+	DefaultOpen bool
 	// DisableDismissible keeps the dialog open when clicking the backdrop.
 	DisableDismissible bool
+}
+
+func initialOpen(p Props) bool {
+	if p.Open != nil {
+		return *p.Open
+	}
+	return p.DefaultOpen
 }
 
 type ContentProps struct {
@@ -74,7 +84,7 @@ templ Dialog(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: p.Open, disableClickAway: p.DisableDismissible}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: initialOpen(p), controlled: p.Open != nil, disableClickAway: p.DisableDismissible}) }}
 	{ children... }
 }
 
@@ -126,7 +136,7 @@ templ Portal(props ...PortalProps) {
 		{{ p = props[0] }}
 	}
 	<template data-tui-dialog-portal>
-		<div data-tui-dialog-root hidden { p.Attributes... }>
+		<div data-tui-dialog-root data-tui-portal hidden { p.Attributes... }>
 			{ children... }
 		</div>
 	</template>
@@ -168,45 +178,46 @@ templ Content(props ...ContentProps) {
 	// 1:1 base/ui/dialog.tsx DialogContent: Portal > Overlay > Popup.
 	@Portal() {
 		@Overlay()
-			// 1:1 base/ui/dialog.tsx DialogContent (Dialog.Popup): the look
-			// comes from cn-dialog-content. tabindex is managed at runtime
-			// like Base UI's handleTabIndex.
-			<div
-				id={ s.id }
-				role="dialog"
-				tabindex="-1"
-				data-slot="dialog-content"
-				data-tui-dialog-content
-				data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
-				data-tui-dialog-show-modal={ utils.IfElse(!p.DisableModal, "true", "false") }
-				if s.disableClickAway {
-					data-tui-dialog-disable-dismissible="true"
+		// 1:1 base/ui/dialog.tsx DialogContent (Dialog.Popup): the look
+		// comes from cn-dialog-content. tabindex is managed at runtime
+		// like Base UI's handleTabIndex.
+		<div
+			id={ s.id }
+			role="dialog"
+			tabindex="-1"
+			data-slot="dialog-content"
+			data-tui-dialog-content
+			data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
+			data-tui-dialog-controlled?={ s.controlled }
+			data-tui-dialog-show-modal={ utils.IfElse(!p.DisableModal, "true", "false") }
+			if s.disableClickAway {
+				data-tui-dialog-disable-dismissible="true"
+			}
+			class={
+				utils.CN(
+					"cn-dialog-content fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 outline-none",
+					p.Class,
+				),
+			}
+			{ p.Attributes... }
+		>
+			{ children... }
+			if !p.HideCloseButton {
+				@button.Button(button.Props{
+					Variant: button.VariantGhost,
+					Size:    button.SizeIconSm,
+					Class:   "cn-dialog-close",
+					Attributes: templ.Attributes{
+						"data-slot":             "dialog-close",
+						"data-tui-dialog-close": true,
+						"aria-label":            "Close",
+					},
+				}) {
+					@icon.X()
+					<span class="sr-only">Close</span>
 				}
-				class={
-					utils.CN(
-						"cn-dialog-content fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 outline-none",
-						p.Class,
-					),
-				}
-				{ p.Attributes... }
-			>
-				{ children... }
-				if !p.HideCloseButton {
-					@button.Button(button.Props{
-						Variant: button.VariantGhost,
-						Size:    button.SizeIconSm,
-						Class:   "cn-dialog-close",
-						Attributes: templ.Attributes{
-							"data-slot":             "dialog-close",
-							"data-tui-dialog-close": true,
-							"aria-label":            "Close",
-						},
-					}) {
-						@icon.X()
-						<span class="sr-only">Close</span>
-					}
-				}
-			</div>
+			}
+		</div>
 	}
 }
 
