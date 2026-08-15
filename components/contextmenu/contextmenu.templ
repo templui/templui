@@ -192,6 +192,9 @@ type SubContentProps struct {
 func itemClasses(disabled bool) string {
 	return utils.CN(
 		"cn-context-menu-item group/context-menu-item relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+		// Base UI's item primitive fills the menu row. Native buttons and links
+		// need that layout semantics explicitly.
+		"w-full text-left",
 		map[string]bool{"pointer-events-none opacity-50": disabled},
 	)
 }
@@ -203,7 +206,7 @@ func checkItemClasses(cnClass string, disabled bool) string {
 		cnClass+" relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 		// Base UI unmounts the indicator when unchecked; our indicator toggles
 		// on the checked state via the group instead.
-		"group/cmitem",
+		"group/cmitem w-full text-left",
 		map[string]bool{"pointer-events-none opacity-50": disabled},
 	)
 }
@@ -579,6 +582,7 @@ templ SubTrigger(props ...SubTriggerProps) {
 				// from cn-context-menu-sub-trigger (the open highlight keys on our
 				// Base UI data-open/data-closed attributes).
 				"cn-context-menu-sub-trigger flex cursor-default items-center outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0",
+				"w-full text-left",
 				p.Class,
 			),
 		}

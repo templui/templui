@@ -8,6 +8,25 @@ import (
 	"testing"
 )
 
+func TestNativeMenuItemsFillTheirRows(t *testing.T) {
+	for name, classes := range map[string]string{
+		"item":       itemClasses(false),
+		"check item": checkItemClasses("cn-dropdown-menu-checkbox-item", false),
+	} {
+		if !strings.Contains(classes, "w-full") || !strings.Contains(classes, "text-left") {
+			t.Fatalf("%s classes must preserve Base UI row layout: %q", name, classes)
+		}
+	}
+
+	var output bytes.Buffer
+	if err := SubTrigger().Render(context.Background(), &output); err != nil {
+		t.Fatal(err)
+	}
+	if html := output.String(); !strings.Contains(html, "w-full") || !strings.Contains(html, "text-left") {
+		t.Fatalf("submenu trigger must preserve Base UI row layout: %s", html)
+	}
+}
+
 func TestContentCarriesStateAndResponsivePlacement(t *testing.T) {
 	ctx := context.WithValue(context.Background(), stateKey, ctxState{id: "menu", initialOpen: true, controlled: true})
 	var output bytes.Buffer
