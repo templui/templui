@@ -183,7 +183,7 @@ func NavDocuments(items []DocumentItem) templ.Component {
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
-							templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "    ")
+							templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, " ")
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -241,7 +241,7 @@ func NavDocuments(items []DocumentItem) templ.Component {
 										}()
 									}
 									ctx = templ.InitializeContext(ctx)
-									templ_7745c5c3_Err = icon.Forward().Render(ctx, templ_7745c5c3_Buffer)
+									templ_7745c5c3_Err = icon.Share().Render(ctx, templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
@@ -296,9 +296,11 @@ func NavDocuments(items []DocumentItem) templ.Component {
 								return nil
 							})
 							templ_7745c5c3_Err = dropdownmenu.Content(dropdownmenu.ContentProps{
-								Class: "w-24 rounded-lg",
-								Side:  dropdownmenu.SideRight,
-								Align: dropdownmenu.AlignStart,
+								Class:       "w-24",
+								Side:        dropdownmenu.SideRight,
+								Align:       dropdownmenu.AlignStart,
+								MobileSide:  dropdownmenu.SideBottom,
+								MobileAlign: dropdownmenu.AlignEnd,
 							}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var10), templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err

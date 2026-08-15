@@ -118,8 +118,8 @@ templ tree(item any) {
 	} else {
 		@sidebar.MenuItem() {
 			@collapsible.Collapsible(collapsible.Props{
-				Class: "group/collapsible [&[data-open]>button>svg:first-child]:rotate-90",
-				Open:  name == "components" || name == "ui",
+				Class:       "group/collapsible [&[data-open]>button>svg:first-child]:rotate-90",
+				DefaultOpen: name == "components" || name == "ui",
 			}) {
 				@sidebar.MenuButton(sidebar.MenuButtonProps{
 					Attributes: collapsible.Trigger(ctx),

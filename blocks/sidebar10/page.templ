@@ -52,24 +52,6 @@ templ Page() {
 				const nameEl = document.querySelector("[data-sidebar10-team-name]");
 				if (nameEl) nameEl.textContent = name;
 			});
-
-			// side={isMobile ? "bottom" : "right"} / align pendant: the
-			// favorites menu flips below md, like useSidebar's isMobile.
-			const mq = window.matchMedia("(max-width: 767px)");
-			const applySides = () => {
-				document.querySelectorAll("[data-sidebar10-menu]").forEach((menu) => {
-					menu.setAttribute("data-tui-dropdownmenu-side", mq.matches ? "bottom" : "right");
-					menu.setAttribute("data-tui-dropdownmenu-align", mq.matches ? "end" : "start");
-				});
-			};
-			// The portals lift with the deferred bundle, so the initial pass
-			// waits for DOM ready (matchMedia changes keep it live after).
-			if (document.readyState === "loading") {
-				document.addEventListener("DOMContentLoaded", applySides);
-			} else {
-				applySides();
-			}
-			mq.addEventListener("change", applySides);
 		})();
 	</script>
 }

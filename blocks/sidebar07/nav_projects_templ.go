@@ -217,7 +217,7 @@ func NavProjects(projects []Project) templ.Component {
 										}()
 									}
 									ctx = templ.InitializeContext(ctx)
-									templ_7745c5c3_Err = icon.Folder(icon.Props{Class: "text-muted-foreground"}).Render(ctx, templ_7745c5c3_Buffer)
+									templ_7745c5c3_Err = icon.Folder().Render(ctx, templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
@@ -247,7 +247,7 @@ func NavProjects(projects []Project) templ.Component {
 										}()
 									}
 									ctx = templ.InitializeContext(ctx)
-									templ_7745c5c3_Err = icon.Forward(icon.Props{Class: "text-muted-foreground"}).Render(ctx, templ_7745c5c3_Buffer)
+									templ_7745c5c3_Err = icon.ArrowRight().Render(ctx, templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
@@ -285,7 +285,7 @@ func NavProjects(projects []Project) templ.Component {
 										}()
 									}
 									ctx = templ.InitializeContext(ctx)
-									templ_7745c5c3_Err = icon.Trash2(icon.Props{Class: "text-muted-foreground"}).Render(ctx, templ_7745c5c3_Buffer)
+									templ_7745c5c3_Err = icon.Trash2().Render(ctx, templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
@@ -295,17 +295,18 @@ func NavProjects(projects []Project) templ.Component {
 									}
 									return nil
 								})
-								templ_7745c5c3_Err = dropdownmenu.Item().Render(templ.WithChildren(ctx, templ_7745c5c3_Var13), templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = dropdownmenu.Item(dropdownmenu.ItemProps{Variant: dropdownmenu.ItemVariantDestructive}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var13), templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
 								return nil
 							})
 							templ_7745c5c3_Err = dropdownmenu.Content(dropdownmenu.ContentProps{
-								Class:      "w-48 rounded-lg",
-								Side:       dropdownmenu.SideRight,
-								Align:      dropdownmenu.AlignStart,
-								Attributes: templ.Attributes{"data-sidebar07-menu": "project"},
+								Class:       "w-fit",
+								Side:        dropdownmenu.SideRight,
+								Align:       dropdownmenu.AlignStart,
+								MobileSide:  dropdownmenu.SideBottom,
+								MobileAlign: dropdownmenu.AlignEnd,
 							}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var10), templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err

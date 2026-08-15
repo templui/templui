@@ -453,28 +453,28 @@ func SetupAssetsRoutes(mux *http.ServeMux) {
 	// Per-page open-graph image, the pendant of app/og/route.tsx
 	mux.Handle("GET /og", og.Handler())
 
-	// Safari Favicon Compatibility
-	// Safari often ignores HTML favicon tags and looks for files in the root directory.
-	// We serve specific favicon files from /assets/img/favicon/ at root URLs for better Safari compatibility.
-	faviconRoutes := map[string]string{
-		"/favicon.ico":          "img/favicon/favicon.ico",
-		"/apple-touch-icon.png": "img/favicon/apple-touch-icon.png",
-		"/favicon-32x32.png":    "img/favicon/favicon-32x32.png",
-		"/favicon-16x16.png":    "img/favicon/favicon-16x16.png",
+	// Root assets preserve the public URLs used by browsers and the upstream
+	// block fixtures. The files themselves remain in the single embedded asset
+	// tree used by development and production.
+	rootAssetRoutes := map[string]struct {
+		Path        string
+		ContentType string
+	}{
+		"/favicon.ico":          {"img/favicon/favicon.ico", "image/x-icon"},
+		"/apple-touch-icon.png": {"img/favicon/apple-touch-icon.png", "image/png"},
+		"/favicon-32x32.png":    {"img/favicon/favicon-32x32.png", "image/png"},
+		"/favicon-16x16.png":    {"img/favicon/favicon-16x16.png", "image/png"},
+		"/avatars/shadcn.jpg":   {"img/shadcn.jpg", "image/jpeg"},
 	}
 
-	for route, assetPath := range faviconRoutes {
+	for route, asset := range rootAssetRoutes {
 		// Capture variables for closure
 		r := route
-		path := assetPath
+		path := asset.Path
+		contentType := asset.ContentType
 
 		mux.HandleFunc("GET "+r, func(w http.ResponseWriter, r *http.Request) {
-			// Set content type based on file extension
-			if strings.HasSuffix(path, ".ico") {
-				w.Header().Set("Content-Type", "image/x-icon")
-			} else if strings.HasSuffix(path, ".png") {
-				w.Header().Set("Content-Type", "image/png")
-			}
+			w.Header().Set("Content-Type", contentType)
 
 			if isDevelopment {
 				w.Header().Set("Cache-Control", "no-store")
@@ -482,7 +482,7 @@ func SetupAssetsRoutes(mux *http.ServeMux) {
 			} else {
 				content, err := assets.Assets.ReadFile(path)
 				if err != nil {
-					http.Error(w, "Favicon not found", http.StatusNotFound)
+					http.Error(w, "Asset not found", http.StatusNotFound)
 					return
 				}
 				w.Write(content)

@@ -1,7 +1,6 @@
 package dashboard01
 
 import (
-	"github.com/axadrn/shadcn-templ/v2/components/button"
 	"github.com/axadrn/shadcn-templ/v2/components/separator"
 	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
 )
@@ -15,18 +14,6 @@ templ SiteHeader() {
 				Class:       "mx-2 h-4 data-vertical:self-auto",
 			})
 			<h1 class="text-base font-medium">Documents</h1>
-			<div class="ml-auto flex items-center gap-2">
-				@button.Button(button.Props{
-					Variant:    button.VariantGhost,
-					Size:       button.SizeSm,
-					Class:      "hidden sm:flex dark:text-foreground",
-					Href:       "https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard",
-					Target:     "_blank",
-					Attributes: templ.Attributes{"rel": "noopener noreferrer"},
-				}) {
-					GitHub
-				}
-			</div>
 		</div>
 	</header>
 }

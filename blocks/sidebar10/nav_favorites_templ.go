@@ -346,10 +346,11 @@ func NavFavorites(favorites []Favorite) templ.Component {
 								return nil
 							})
 							templ_7745c5c3_Err = dropdownmenu.Content(dropdownmenu.ContentProps{
-								Class:      "w-56 rounded-lg",
-								Side:       dropdownmenu.SideRight,
-								Align:      dropdownmenu.AlignStart,
-								Attributes: templ.Attributes{"data-sidebar10-menu": "favorites"},
+								Class:       "w-56 rounded-lg",
+								Side:        dropdownmenu.SideRight,
+								Align:       dropdownmenu.AlignStart,
+								MobileSide:  dropdownmenu.SideBottom,
+								MobileAlign: dropdownmenu.AlignEnd,
 							}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var11), templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err

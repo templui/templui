@@ -19,9 +19,9 @@ var sidebarRightData = struct {
 	Calendars []Calendar
 }{
 	User: User{
-		Name:   "Axel Adrian",
+		Name:   "shadcn",
 		Email:  "m@example.com",
-		Avatar: "https://github.com/axadrn.png",
+		Avatar: "/avatars/shadcn.jpg",
 	},
 	Calendars: []Calendar{
 		{Name: "My Calendars", Items: []string{"Personal", "Work", "Family"}},

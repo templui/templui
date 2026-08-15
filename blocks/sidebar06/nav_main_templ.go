@@ -165,7 +165,7 @@ func NavMain(items []NavMainItem) templ.Component {
 											var templ_7745c5c3_Var10 string
 											templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(subItem.Title)
 											if templ_7745c5c3_Err != nil {
-												return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar06/nav_main.templ`, Line: 45, Col: 25}
+												return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar06/nav_main.templ`, Line: 46, Col: 25}
 											}
 											_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 											if templ_7745c5c3_Err != nil {
@@ -181,10 +181,11 @@ func NavMain(items []NavMainItem) templ.Component {
 									return nil
 								})
 								templ_7745c5c3_Err = dropdownmenu.Content(dropdownmenu.ContentProps{
-									Side:       dropdownmenu.SideRight,
-									Align:      dropdownmenu.AlignStart,
-									Class:      "min-w-56 rounded-lg",
-									Attributes: templ.Attributes{"data-sidebar06-menu": "nav"},
+									Side:        dropdownmenu.SideRight,
+									Align:       dropdownmenu.AlignStart,
+									MobileSide:  dropdownmenu.SideBottom,
+									MobileAlign: dropdownmenu.AlignEnd,
+									Class:       "min-w-56 rounded-lg",
 								}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var8), templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err

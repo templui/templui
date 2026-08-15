@@ -22,7 +22,7 @@ templ TeamSwitcher(teams []Team) {
 							// team switch (the pendant of React swapping activeTeam.logo).
 							for i, team := range teams {
 								@team.Logo(icon.Props{
-									Class:      "size-3" + teamLogoHidden(i),
+									Class:      teamLogoHidden(i),
 									Attributes: templ.Attributes{"data-sidebar10-team-logo": strconv.Itoa(i)},
 								})
 							}
@@ -45,7 +45,7 @@ templ TeamSwitcher(teams []Team) {
 								Attributes: templ.Attributes{"data-sidebar10-team-index": strconv.Itoa(i)},
 							}) {
 								<div class="flex size-6 items-center justify-center rounded-xs border">
-									@team.Logo(icon.Props{Class: "size-4 shrink-0"})
+									@team.Logo()
 								</div>
 								{ team.Name }
 								@dropdownmenu.Shortcut() {

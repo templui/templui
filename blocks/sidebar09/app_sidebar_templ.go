@@ -33,9 +33,9 @@ type mail struct {
 }
 
 var user = User{
-	Name:   "Axel Adrian",
+	Name:   "shadcn",
 	Email:  "m@example.com",
-	Avatar: "https://github.com/axadrn.png",
+	Avatar: "/avatars/shadcn.jpg",
 }
 
 var navMain = []navItem{
@@ -220,7 +220,7 @@ func AppSidebar() templ.Component {
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
-								templ_7745c5c3_Err = icon.Command(icon.Props{Class: "size-4"}).Render(ctx, templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = icon.Terminal(icon.Props{Class: "size-4"}).Render(ctx, templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}

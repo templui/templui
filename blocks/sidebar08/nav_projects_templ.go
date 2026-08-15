@@ -302,10 +302,11 @@ func NavProjects(projects []Project) templ.Component {
 								return nil
 							})
 							templ_7745c5c3_Err = dropdownmenu.Content(dropdownmenu.ContentProps{
-								Class:      "w-48",
-								Side:       dropdownmenu.SideRight,
-								Align:      dropdownmenu.AlignStart,
-								Attributes: templ.Attributes{"data-sidebar08-menu": "project"},
+								Class:       "w-48",
+								Side:        dropdownmenu.SideRight,
+								Align:       dropdownmenu.AlignStart,
+								MobileSide:  dropdownmenu.SideBottom,
+								MobileAlign: dropdownmenu.AlignEnd,
 							}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var10), templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err

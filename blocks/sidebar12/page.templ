@@ -35,24 +35,4 @@ templ Page() {
 			</div>
 		}
 	}
-	<script nonce={ templ.GetNonce(ctx) }>
-		(() => {
-			// side={isMobile ? "bottom" : "right"} pendant: the user menu
-			// flips to bottom below md, like useSidebar's isMobile.
-			const mq = window.matchMedia("(max-width: 767px)");
-			const applySides = () => {
-				document.querySelectorAll("[data-sidebar12-menu]").forEach((menu) => {
-					menu.setAttribute("data-tui-dropdownmenu-side", mq.matches ? "bottom" : "right");
-				});
-			};
-			// The portals lift with the deferred bundle, so the initial pass
-			// waits for DOM ready (matchMedia changes keep it live after).
-			if (document.readyState === "loading") {
-				document.addEventListener("DOMContentLoaded", applySides);
-			} else {
-				applySides();
-			}
-			mq.addEventListener("change", applySides);
-		})();
-	</script>
 }

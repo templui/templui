@@ -37,15 +37,15 @@ type DocumentItem struct {
 }
 
 var appSidebarUser = User{
-	Name:   "Axel Adrian",
+	Name:   "shadcn",
 	Email:  "m@example.com",
-	Avatar: "https://github.com/axadrn.png",
+	Avatar: "/avatars/shadcn.jpg",
 }
 
 var appSidebarNavMain = []NavItem{
 	{Title: "Dashboard", URL: "#", Icon: icon.LayoutDashboard},
-	{Title: "Lifecycle", URL: "#", Icon: icon.TableOfContents},
-	{Title: "Analytics", URL: "#", Icon: icon.ChartColumn},
+	{Title: "Lifecycle", URL: "#", Icon: icon.List},
+	{Title: "Analytics", URL: "#", Icon: icon.ChartBar},
 	{Title: "Projects", URL: "#", Icon: icon.Folder},
 	{Title: "Team", URL: "#", Icon: icon.Users},
 }
@@ -68,7 +68,7 @@ var _ = []NavCloudItem{
 		},
 	},
 	{
-		Title: "Prompts", Icon: icon.FileCode, URL: "#",
+		Title: "Prompts", Icon: icon.FileText, URL: "#",
 		Items: []NavCloudSubItem{
 			{Title: "Active Proposals", URL: "#"},
 			{Title: "Archived", URL: "#"},
@@ -77,15 +77,15 @@ var _ = []NavCloudItem{
 }
 
 var appSidebarNavSecondary = []NavItem{
-	{Title: "Settings", URL: "#", Icon: icon.Settings},
+	{Title: "Settings", URL: "#", Icon: icon.Settings2},
 	{Title: "Get Help", URL: "#", Icon: icon.CircleQuestionMark},
 	{Title: "Search", URL: "#", Icon: icon.Search},
 }
 
 var appSidebarDocuments = []DocumentItem{
 	{Name: "Data Library", URL: "#", Icon: icon.Database},
-	{Name: "Reports", URL: "#", Icon: icon.ClipboardList},
-	{Name: "Word Assistant", URL: "#", Icon: icon.FileType},
+	{Name: "Reports", URL: "#", Icon: icon.FileChartColumn},
+	{Name: "Word Assistant", URL: "#", Icon: icon.File},
 }
 
 templ AppSidebar() {
@@ -97,9 +97,7 @@ templ AppSidebar() {
 						Class: "data-[slot=sidebar-menu-button]:p-1.5!",
 						Href:  "#",
 					}) {
-						// IconInnerShadowTop has no lucide pendant, LoaderCircle is
-						// the closest circle-with-arc shape.
-						@icon.LoaderCircle(icon.Props{Class: "size-5!"})
+						@icon.Command(icon.Props{Class: "size-5!"})
 						<span class="text-base font-semibold">Acme Inc.</span>
 					}
 				}

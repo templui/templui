@@ -45,15 +45,15 @@ type DocumentItem struct {
 }
 
 var appSidebarUser = User{
-	Name:   "Axel Adrian",
+	Name:   "shadcn",
 	Email:  "m@example.com",
-	Avatar: "https://github.com/axadrn.png",
+	Avatar: "/avatars/shadcn.jpg",
 }
 
 var appSidebarNavMain = []NavItem{
 	{Title: "Dashboard", URL: "#", Icon: icon.LayoutDashboard},
-	{Title: "Lifecycle", URL: "#", Icon: icon.TableOfContents},
-	{Title: "Analytics", URL: "#", Icon: icon.ChartColumn},
+	{Title: "Lifecycle", URL: "#", Icon: icon.List},
+	{Title: "Analytics", URL: "#", Icon: icon.ChartBar},
 	{Title: "Projects", URL: "#", Icon: icon.Folder},
 	{Title: "Team", URL: "#", Icon: icon.Users},
 }
@@ -76,7 +76,7 @@ var _ = []NavCloudItem{
 		},
 	},
 	{
-		Title: "Prompts", Icon: icon.FileCode, URL: "#",
+		Title: "Prompts", Icon: icon.FileText, URL: "#",
 		Items: []NavCloudSubItem{
 			{Title: "Active Proposals", URL: "#"},
 			{Title: "Archived", URL: "#"},
@@ -85,15 +85,15 @@ var _ = []NavCloudItem{
 }
 
 var appSidebarNavSecondary = []NavItem{
-	{Title: "Settings", URL: "#", Icon: icon.Settings},
+	{Title: "Settings", URL: "#", Icon: icon.Settings2},
 	{Title: "Get Help", URL: "#", Icon: icon.CircleQuestionMark},
 	{Title: "Search", URL: "#", Icon: icon.Search},
 }
 
 var appSidebarDocuments = []DocumentItem{
 	{Name: "Data Library", URL: "#", Icon: icon.Database},
-	{Name: "Reports", URL: "#", Icon: icon.ClipboardList},
-	{Name: "Word Assistant", URL: "#", Icon: icon.FileType},
+	{Name: "Reports", URL: "#", Icon: icon.FileChartColumn},
+	{Name: "Word Assistant", URL: "#", Icon: icon.File},
 }
 
 func AppSidebar() templ.Component {
@@ -177,15 +177,11 @@ func AppSidebar() templ.Component {
 								}()
 							}
 							ctx = templ.InitializeContext(ctx)
-							templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "  ")
+							templ_7745c5c3_Err = icon.Command(icon.Props{Class: "size-5!"}).Render(ctx, templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
-							templ_7745c5c3_Err = icon.LoaderCircle(icon.Props{Class: "size-5!"}).Render(ctx, templ_7745c5c3_Buffer)
-							if templ_7745c5c3_Err != nil {
-								return templ_7745c5c3_Err
-							}
-							templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " <span class=\"text-base font-semibold\">Acme Inc.</span>")
+							templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <span class=\"text-base font-semibold\">Acme Inc.</span>")
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -216,7 +212,7 @@ func AppSidebar() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -236,7 +232,7 @@ func AppSidebar() templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -244,7 +240,7 @@ func AppSidebar() templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, " ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -258,7 +254,7 @@ func AppSidebar() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, " ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

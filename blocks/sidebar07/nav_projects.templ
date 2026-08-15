@@ -34,22 +34,23 @@ templ NavProjects(projects []Project) {
 							<span class="sr-only">More</span>
 						}
 						@dropdownmenu.Content(dropdownmenu.ContentProps{
-							Class:      "w-48 rounded-lg",
-							Side:       dropdownmenu.SideRight,
-							Align:      dropdownmenu.AlignStart,
-							Attributes: templ.Attributes{"data-sidebar07-menu": "project"},
+							Class:       "w-fit",
+							Side:        dropdownmenu.SideRight,
+							Align:       dropdownmenu.AlignStart,
+							MobileSide:  dropdownmenu.SideBottom,
+							MobileAlign: dropdownmenu.AlignEnd,
 						}) {
 							@dropdownmenu.Item() {
-								@icon.Folder(icon.Props{Class: "text-muted-foreground"})
+								@icon.Folder()
 								<span>View Project</span>
 							}
 							@dropdownmenu.Item() {
-								@icon.Forward(icon.Props{Class: "text-muted-foreground"})
+								@icon.ArrowRight()
 								<span>Share Project</span>
 							}
 							@dropdownmenu.Separator()
-							@dropdownmenu.Item() {
-								@icon.Trash2(icon.Props{Class: "text-muted-foreground"})
+							@dropdownmenu.Item(dropdownmenu.ItemProps{Variant: dropdownmenu.ItemVariantDestructive}) {
+								@icon.Trash2()
 								<span>Delete Project</span>
 							}
 						}

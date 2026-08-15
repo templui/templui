@@ -1,15 +1,22 @@
 package sidebar12
 
 import (
+	"time"
+
 	"github.com/axadrn/shadcn-templ/v2/components/calendar"
 	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
 )
 
 templ DatePicker() {
+	{{ now := time.Now() }}
+	{{ selected := time.Date(now.Year(), now.Month(), 12, 0, 0, 0, 0, now.Location()) }}
 	@sidebar.Group(sidebar.GroupProps{Class: "px-0"}) {
 		@sidebar.GroupContent() {
 			@calendar.Calendar(calendar.Props{
-				Class: "[&_[role=gridcell]]:w-[33px] [&_[role=gridcell].bg-accent]:bg-sidebar-primary [&_[role=gridcell].bg-accent]:text-sidebar-primary-foreground",
+				Mode:          calendar.ModeSingle,
+				Selected:      selected,
+				CaptionLayout: calendar.CaptionLayoutDropdown,
+				Class:         "bg-transparent [--cell-size:2.1rem]",
 			})
 		}
 	}

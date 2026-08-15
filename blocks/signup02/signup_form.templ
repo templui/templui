@@ -19,13 +19,13 @@ templ SignupForm() {
 				@field.Label(field.LabelProps{For: "name"}) {
 					Full Name
 				}
-				@input.Input(input.Props{ID: "name", Type: "text", Placeholder: "John Doe", Required: true})
+				@input.Input(input.Props{ID: "name", Type: "text", Placeholder: "John Doe", Required: true, Class: "bg-background"})
 			}
 			@field.Field() {
 				@field.Label(field.LabelProps{For: "email"}) {
 					Email
 				}
-				@input.Input(input.Props{ID: "email", Type: "email", Placeholder: "m@example.com", Required: true})
+				@input.Input(input.Props{ID: "email", Type: "email", Placeholder: "m@example.com", Required: true, Class: "bg-background"})
 				@field.Description() {
 					We'll use this to contact you. We will not share your email
 					with anyone else.
@@ -35,7 +35,7 @@ templ SignupForm() {
 				@field.Label(field.LabelProps{For: "password"}) {
 					Password
 				}
-				@input.Input(input.Props{ID: "password", Type: "password", Required: true})
+				@input.Input(input.Props{ID: "password", Type: "password", Required: true, Class: "bg-background"})
 				@field.Description() {
 					Must be at least 8 characters long.
 				}
@@ -44,7 +44,7 @@ templ SignupForm() {
 				@field.Label(field.LabelProps{For: "confirm-password"}) {
 					Confirm Password
 				}
-				@input.Input(input.Props{ID: "confirm-password", Type: "password", Required: true})
+				@input.Input(input.Props{ID: "confirm-password", Type: "password", Required: true, Class: "bg-background"})
 				@field.Description() {
 					Please confirm your password.
 				}

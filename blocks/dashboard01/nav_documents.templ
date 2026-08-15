@@ -27,20 +27,19 @@ templ NavDocuments(items []DocumentItem) {
 							@icon.Ellipsis()
 							<span class="sr-only">More</span>
 						}
-						// side={isMobile ? "bottom" : "right"} / align flip: the
-						// useSidebar isMobile switch is omitted, the menu always
-						// opens to the right.
 						@dropdownmenu.Content(dropdownmenu.ContentProps{
-							Class: "w-24 rounded-lg",
-							Side:  dropdownmenu.SideRight,
-							Align: dropdownmenu.AlignStart,
+							Class:       "w-24",
+							Side:        dropdownmenu.SideRight,
+							Align:       dropdownmenu.AlignStart,
+							MobileSide:  dropdownmenu.SideBottom,
+							MobileAlign: dropdownmenu.AlignEnd,
 						}) {
 							@dropdownmenu.Item() {
 								@icon.Folder()
 								<span>Open</span>
 							}
 							@dropdownmenu.Item() {
-								@icon.Forward()
+								@icon.Share()
 								<span>Share</span>
 							}
 							@dropdownmenu.Separator()

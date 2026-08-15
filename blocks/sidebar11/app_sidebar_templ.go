@@ -578,8 +578,8 @@ func tree(item any) templ.Component {
 					return nil
 				})
 				templ_7745c5c3_Err = collapsible.Collapsible(collapsible.Props{
-					Class: "group/collapsible [&[data-open]>button>svg:first-child]:rotate-90",
-					Open:  name == "components" || name == "ui",
+					Class:       "group/collapsible [&[data-open]>button>svg:first-child]:rotate-90",
+					DefaultOpen: name == "components" || name == "ui",
 				}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var21), templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

@@ -62,8 +62,8 @@ templ blockViewerToolbar(entry BlockEntry) {
 		</a>
 		<div class="ml-auto flex items-center gap-2">
 			<div class="h-8 items-center gap-1.5 rounded-md border p-[3px] shadow-none">
-				@togglegroup.ToggleGroup(togglegroup.Props{Spacing: utils.Ptr(1), Class: "*:data-[slot=toggle-group-item]:size-6! *:data-[slot=toggle-group-item]:rounded-sm!"}) {
-					@togglegroup.Item(togglegroup.ItemProps{Value: "100%", Pressed: true, Attributes: templ.Attributes{"data-tui-block-size": "100%", "title": "Desktop"}}) {
+				@togglegroup.ToggleGroup(togglegroup.Props{Spacing: utils.Ptr(1), DefaultValue: []string{"100%"}, Class: "*:data-[slot=toggle-group-item]:size-6! *:data-[slot=toggle-group-item]:rounded-sm!"}) {
+					@togglegroup.Item(togglegroup.ItemProps{Value: "100%", Attributes: templ.Attributes{"data-tui-block-size": "100%", "title": "Desktop"}}) {
 						@icon.Monitor()
 					}
 					@togglegroup.Item(togglegroup.ItemProps{Value: "60%", Attributes: templ.Attributes{"data-tui-block-size": "60%", "title": "Tablet"}}) {

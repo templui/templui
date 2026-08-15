@@ -144,9 +144,10 @@ var chartAreaInteractiveRanges = []struct {
 }
 
 templ ChartAreaInteractive() {
-	// The React.useEffect that switches the range to "7d" on mobile
-	// (useIsMobile) is omitted; the default stays "90d".
-	@card.Card(card.Props{Class: "@container/card"}) {
+	@card.Card(card.Props{
+		Class:      "@container/card",
+		Attributes: templ.Attributes{"data-dashboard01-chart-range-card": ""},
+	}) {
 		@card.Header() {
 			@card.Title() {
 				Total Visitors
@@ -159,7 +160,8 @@ templ ChartAreaInteractive() {
 			}
 			@card.Action() {
 				@togglegroup.ToggleGroup(togglegroup.Props{
-					Variant: togglegroup.VariantOutline,
+					Variant:      togglegroup.VariantOutline,
+					DefaultValue: []string{"90d"},
 					// Spacing 0 is the joined bar of the TSX ToggleGroup default;
 					// px-4! beats the joined mode's px-2 like upstream.
 					Spacing:    utils.Ptr(0),
@@ -167,12 +169,12 @@ templ ChartAreaInteractive() {
 					Attributes: templ.Attributes{"data-tui-chart-range-toggle": "dashboard01-area-interactive"},
 				}) {
 					for _, rng := range chartAreaInteractiveRanges {
-						@togglegroup.Item(togglegroup.ItemProps{Value: rng.Key, Pressed: rng.Key == "90d"}) {
+						@togglegroup.Item(togglegroup.ItemProps{Value: rng.Key}) {
 							{ rng.Label }
 						}
 					}
 				}
-				@selectcomp.Select(selectcomp.Props{Value: "90d"}) {
+				@selectcomp.Select(selectcomp.Props{DefaultValue: "90d"}) {
 					@selectcomp.Trigger(selectcomp.TriggerProps{
 						Class:      "flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden",
 						Size:       selectcomp.SizeSm,
@@ -253,6 +255,48 @@ templ ChartAreaInteractive() {
 			// select-change event chart.js flips the panels on.
 			if (window.__tuiDashboard01ChartRange) return;
 			window.__tuiDashboard01ChartRange = true;
+			const mobile = window.matchMedia("(max-width: 767px)");
+
+			const selectContent = (trigger) => {
+				const id = trigger && trigger.getAttribute("aria-controls");
+				if (!id) return null;
+				const live = document.getElementById(id);
+				if (live) return live;
+				for (const template of document.querySelectorAll("template[data-tui-select-portal]")) {
+					const content = [...template.content.querySelectorAll("[data-tui-select-content]")].find((item) => item.id === id);
+					if (content) return content;
+				}
+				return null;
+			};
+
+			// useIsMobile sets 7d whenever the viewport enters mobile. Update the
+			// same uncontrolled select state without opening or focusing it.
+			const setRange = (card, value) => {
+				const trigger = card && card.querySelector("[data-tui-chart-range-select]");
+				const content = selectContent(trigger);
+				const item = content && content.querySelector('[data-tui-select-item][data-tui-select-value="' + value + '"]');
+				if (!trigger || !item) return;
+				content.querySelectorAll("[data-tui-select-item]").forEach((candidate) => {
+					const selected = candidate === item;
+					candidate.toggleAttribute("data-selected", selected);
+					candidate.setAttribute("aria-selected", String(selected));
+				});
+				const label = item.getAttribute("data-tui-select-label") || item.textContent.trim();
+				const valueNode = trigger.querySelector("[data-tui-select-value]");
+				if (valueNode) valueNode.textContent = label;
+				trigger.removeAttribute("data-placeholder");
+				trigger.dispatchEvent(new CustomEvent("select-change", {
+					bubbles: true,
+					detail: { value, label },
+				}));
+			};
+			const syncMobileRange = () => {
+				if (!mobile.matches) return;
+				document.querySelectorAll("[data-dashboard01-chart-range-card]").forEach((card) => setRange(card, "7d"));
+			};
+			if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", syncMobileRange, { once: true });
+			else syncMobileRange();
+			mobile.addEventListener("change", syncMobileRange);
 
 			document.addEventListener("toggle-change", (e) => {
 				if (!(e.target instanceof Element)) return;

@@ -27,8 +27,8 @@ templ NavMain(items []NavMainItem) {
 		@sidebar.Menu() {
 			for _, item := range items {
 				@collapsible.Collapsible(collapsible.Props{
-					Open:  item.IsActive,
-					Class: "group/collapsible",
+					DefaultOpen: item.IsActive,
+					Class:       "group/collapsible",
 				}) {
 					@sidebar.MenuItem() {
 						@sidebar.MenuButton(sidebar.MenuButtonProps{

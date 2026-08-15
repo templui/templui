@@ -113,3 +113,25 @@ func TestBlocksUseBaseUIStateContracts(t *testing.T) {
 		}
 	}
 }
+
+func TestBlockSourcesDoNotRegressToLocalOrLegacyFixtures(t *testing.T) {
+	t.Setenv("GO_ENV", "production")
+
+	forbidden := []string{
+		"Axel Adrian",
+		"github.com/axadrn.png",
+		"bg-gradient-to-t",
+		"Customize Columns",
+		"[&_[role=gridcell]]:w-[33px]",
+	}
+
+	for _, item := range registry.Blocks() {
+		for _, file := range Files(item) {
+			for _, stale := range forbidden {
+				if strings.Contains(file.Content, stale) {
+					t.Errorf("%s (%s): stale non-Base fixture %q", item.Name, file.Path, stale)
+				}
+			}
+		}
+	}
+}

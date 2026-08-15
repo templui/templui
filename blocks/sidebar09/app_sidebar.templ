@@ -25,9 +25,9 @@ type mail struct {
 }
 
 var user = User{
-	Name:   "Axel Adrian",
+	Name:   "shadcn",
 	Email:  "m@example.com",
-	Avatar: "https://github.com/axadrn.png",
+	Avatar: "/avatars/shadcn.jpg",
 }
 
 var navMain = []navItem{
@@ -138,7 +138,7 @@ templ AppSidebar() {
 							Href:  "#",
 						}) {
 							<div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-								@icon.Command(icon.Props{Class: "size-4"})
+								@icon.Terminal(icon.Props{Class: "size-4"})
 							</div>
 							<div class="grid flex-1 text-left text-sm leading-tight">
 								<span class="truncate font-medium">Acme Inc</span>

@@ -9,6 +9,8 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
+	"time"
+
 	"github.com/axadrn/shadcn-templ/v2/components/calendar"
 	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
 )
@@ -34,6 +36,8 @@ func DatePicker() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		now := time.Now()
+		selected := time.Date(now.Year(), now.Month(), 12, 0, 0, 0, 0, now.Location())
 		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -59,7 +63,10 @@ func DatePicker() templ.Component {
 				}
 				ctx = templ.InitializeContext(ctx)
 				templ_7745c5c3_Err = calendar.Calendar(calendar.Props{
-					Class: "[&_[role=gridcell]]:w-[33px] [&_[role=gridcell].bg-accent]:bg-sidebar-primary [&_[role=gridcell].bg-accent]:text-sidebar-primary-foreground",
+					Mode:          calendar.ModeSingle,
+					Selected:      selected,
+					CaptionLayout: calendar.CaptionLayoutDropdown,
+					Class:         "bg-transparent [--cell-size:2.1rem]",
 				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

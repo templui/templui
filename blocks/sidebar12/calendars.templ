@@ -15,10 +15,10 @@ type Calendar struct {
 
 templ Calendars(calendars []Calendar) {
 	for index, calendar := range calendars {
-		@sidebar.Group(sidebar.GroupProps{Class: "py-0"}) {
+		@sidebar.Group() {
 			@collapsible.Collapsible(collapsible.Props{
-				Open:  index == 0,
-				Class: "group/collapsible",
+				DefaultOpen: index == 0,
+				Class:       "group/collapsible",
 			}) {
 				@sidebar.GroupLabel(sidebar.GroupLabelProps{
 					Class:      "group/label w-full text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",

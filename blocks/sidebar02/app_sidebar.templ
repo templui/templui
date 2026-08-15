@@ -85,9 +85,9 @@ templ AppSidebar() {
 			// We create a collapsible SidebarGroup for each parent.
 			for _, item := range navMain {
 				@collapsible.Collapsible(collapsible.Props{
-					Open:       true,
-					Class:      "group/collapsible",
-					Attributes: templ.Attributes{"title": item.Title},
+					DefaultOpen: true,
+					Class:       "group/collapsible",
+					Attributes:  templ.Attributes{"title": item.Title},
 				}) {
 					@sidebar.Group() {
 						@sidebar.GroupLabel(sidebar.GroupLabelProps{

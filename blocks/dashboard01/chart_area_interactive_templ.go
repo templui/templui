@@ -288,7 +288,7 @@ func ChartAreaInteractive() templ.Component {
 								var templ_7745c5c3_Var9 string
 								templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(rng.Label)
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 171, Col: 18}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 173, Col: 18}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 								if templ_7745c5c3_Err != nil {
@@ -296,7 +296,7 @@ func ChartAreaInteractive() templ.Component {
 								}
 								return nil
 							})
-							templ_7745c5c3_Err = togglegroup.Item(togglegroup.ItemProps{Value: rng.Key, Pressed: rng.Key == "90d"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var8), templ_7745c5c3_Buffer)
+							templ_7745c5c3_Err = togglegroup.Item(togglegroup.ItemProps{Value: rng.Key}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var8), templ_7745c5c3_Buffer)
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -304,7 +304,8 @@ func ChartAreaInteractive() templ.Component {
 						return nil
 					})
 					templ_7745c5c3_Err = togglegroup.ToggleGroup(togglegroup.Props{
-						Variant: togglegroup.VariantOutline,
+						Variant:      togglegroup.VariantOutline,
+						DefaultValue: []string{"90d"},
 						// Spacing 0 is the joined bar of the TSX ToggleGroup default;
 						// px-4! beats the joined mode's px-2 like upstream.
 						Spacing:    utils.Ptr(0),
@@ -400,7 +401,7 @@ func ChartAreaInteractive() templ.Component {
 										var templ_7745c5c3_Var15 string
 										templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(rng.Label)
 										if templ_7745c5c3_Err != nil {
-											return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 187, Col: 20}
+											return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 189, Col: 20}
 										}
 										_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 										if templ_7745c5c3_Err != nil {
@@ -427,7 +428,7 @@ func ChartAreaInteractive() templ.Component {
 						}
 						return nil
 					})
-					templ_7745c5c3_Err = selectcomp.Select(selectcomp.Props{Value: "90d"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var10), templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = selectcomp.Select(selectcomp.Props{DefaultValue: "90d"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var10), templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -483,7 +484,7 @@ func ChartAreaInteractive() templ.Component {
 						var templ_7745c5c3_Var18 string
 						templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(rng.Key)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 200, Col: 40}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 202, Col: 40}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 						if templ_7745c5c3_Err != nil {
@@ -671,7 +672,10 @@ func ChartAreaInteractive() templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = card.Card(card.Props{Class: "@container/card"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = card.Card(card.Props{
+			Class:      "@container/card",
+			Attributes: templ.Attributes{"data-dashboard01-chart-range-card": ""},
+		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -682,13 +686,13 @@ func ChartAreaInteractive() templ.Component {
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 248, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/chart_area_interactive.templ`, Line: 250, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\">\n\t\t(() => {\n\t\t\t// The two range controls share one state like the TSX's timeRange:\n\t\t\t// a toggle pick forwards to the matching select item, so select.js\n\t\t\t// stays the single owner of value, trigger label and the\n\t\t\t// select-change event chart.js flips the panels on.\n\t\t\tif (window.__tuiDashboard01ChartRange) return;\n\t\t\twindow.__tuiDashboard01ChartRange = true;\n\n\t\t\tdocument.addEventListener(\"toggle-change\", (e) => {\n\t\t\t\tif (!(e.target instanceof Element)) return;\n\t\t\t\tconst group = e.target.closest(\"[data-tui-chart-range-toggle]\");\n\t\t\t\tif (!group) return;\n\t\t\t\tconst value = e.detail && e.detail.value;\n\t\t\t\tif (!value) return;\n\t\t\t\t// Single-select groups allow unpressing the active item; a\n\t\t\t\t// time range must stay active, so re-press it.\n\t\t\t\tconst toggle = e.target.closest(\"[data-tui-toggle]\");\n\t\t\t\tif (toggle && e.detail.pressed === false) {\n\t\t\t\t\ttoggle.setAttribute(\"data-pressed\", \"\");\n\t\t\t\t\ttoggle.setAttribute(\"aria-pressed\", \"true\");\n\t\t\t\t}\n\t\t\t\tconst card = group.closest(\"[data-slot=card]\");\n\t\t\t\tconst trigger = card && card.querySelector(\"[data-tui-chart-range-select]\");\n\t\t\t\tconst content = trigger && document.getElementById(trigger.getAttribute(\"aria-controls\"));\n\t\t\t\tconst item = content && content.querySelector('[data-tui-select-item][data-tui-select-value=\"' + value + '\"]');\n\t\t\t\tif (item) item.click();\n\t\t\t});\n\n\t\t\t// A pick in the mobile select presses the matching toggle;\n\t\t\t// chart.js flips the panels on the same select-change.\n\t\t\tdocument.addEventListener(\"select-change\", (e) => {\n\t\t\t\tif (!(e.target instanceof Element)) return;\n\t\t\t\tconst trigger = e.target.closest(\"[data-tui-chart-range-select]\");\n\t\t\t\tif (!trigger) return;\n\t\t\t\tconst card = trigger.closest(\"[data-slot=card]\");\n\t\t\t\tconst group = card && card.querySelector(\"[data-tui-chart-range-toggle]\");\n\t\t\t\tif (!group) return;\n\t\t\t\tgroup.querySelectorAll(\"[data-tui-toggle]\").forEach((t) => {\n\t\t\t\t\tconst on = t.getAttribute(\"data-tui-toggle-value\") === e.detail.value;\n\t\t\t\t\tt.toggleAttribute(\"data-pressed\", on);\n\t\t\t\t\tt.setAttribute(\"aria-pressed\", String(on));\n\t\t\t\t});\n\t\t\t\tgroup.setAttribute(\"data-tui-toggle-group-value\", e.detail.value);\n\t\t\t});\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\">\n\t\t(() => {\n\t\t\t// The two range controls share one state like the TSX's timeRange:\n\t\t\t// a toggle pick forwards to the matching select item, so select.js\n\t\t\t// stays the single owner of value, trigger label and the\n\t\t\t// select-change event chart.js flips the panels on.\n\t\t\tif (window.__tuiDashboard01ChartRange) return;\n\t\t\twindow.__tuiDashboard01ChartRange = true;\n\t\t\tconst mobile = window.matchMedia(\"(max-width: 767px)\");\n\n\t\t\tconst selectContent = (trigger) => {\n\t\t\t\tconst id = trigger && trigger.getAttribute(\"aria-controls\");\n\t\t\t\tif (!id) return null;\n\t\t\t\tconst live = document.getElementById(id);\n\t\t\t\tif (live) return live;\n\t\t\t\tfor (const template of document.querySelectorAll(\"template[data-tui-select-portal]\")) {\n\t\t\t\t\tconst content = [...template.content.querySelectorAll(\"[data-tui-select-content]\")].find((item) => item.id === id);\n\t\t\t\t\tif (content) return content;\n\t\t\t\t}\n\t\t\t\treturn null;\n\t\t\t};\n\n\t\t\t// useIsMobile sets 7d whenever the viewport enters mobile. Update the\n\t\t\t// same uncontrolled select state without opening or focusing it.\n\t\t\tconst setRange = (card, value) => {\n\t\t\t\tconst trigger = card && card.querySelector(\"[data-tui-chart-range-select]\");\n\t\t\t\tconst content = selectContent(trigger);\n\t\t\t\tconst item = content && content.querySelector('[data-tui-select-item][data-tui-select-value=\"' + value + '\"]');\n\t\t\t\tif (!trigger || !item) return;\n\t\t\t\tcontent.querySelectorAll(\"[data-tui-select-item]\").forEach((candidate) => {\n\t\t\t\t\tconst selected = candidate === item;\n\t\t\t\t\tcandidate.toggleAttribute(\"data-selected\", selected);\n\t\t\t\t\tcandidate.setAttribute(\"aria-selected\", String(selected));\n\t\t\t\t});\n\t\t\t\tconst label = item.getAttribute(\"data-tui-select-label\") || item.textContent.trim();\n\t\t\t\tconst valueNode = trigger.querySelector(\"[data-tui-select-value]\");\n\t\t\t\tif (valueNode) valueNode.textContent = label;\n\t\t\t\ttrigger.removeAttribute(\"data-placeholder\");\n\t\t\t\ttrigger.dispatchEvent(new CustomEvent(\"select-change\", {\n\t\t\t\t\tbubbles: true,\n\t\t\t\t\tdetail: { value, label },\n\t\t\t\t}));\n\t\t\t};\n\t\t\tconst syncMobileRange = () => {\n\t\t\t\tif (!mobile.matches) return;\n\t\t\t\tdocument.querySelectorAll(\"[data-dashboard01-chart-range-card]\").forEach((card) => setRange(card, \"7d\"));\n\t\t\t};\n\t\t\tif (document.readyState === \"loading\") document.addEventListener(\"DOMContentLoaded\", syncMobileRange, { once: true });\n\t\t\telse syncMobileRange();\n\t\t\tmobile.addEventListener(\"change\", syncMobileRange);\n\n\t\t\tdocument.addEventListener(\"toggle-change\", (e) => {\n\t\t\t\tif (!(e.target instanceof Element)) return;\n\t\t\t\tconst group = e.target.closest(\"[data-tui-chart-range-toggle]\");\n\t\t\t\tif (!group) return;\n\t\t\t\tconst value = e.detail && e.detail.value;\n\t\t\t\tif (!value) return;\n\t\t\t\t// Single-select groups allow unpressing the active item; a\n\t\t\t\t// time range must stay active, so re-press it.\n\t\t\t\tconst toggle = e.target.closest(\"[data-tui-toggle]\");\n\t\t\t\tif (toggle && e.detail.pressed === false) {\n\t\t\t\t\ttoggle.setAttribute(\"data-pressed\", \"\");\n\t\t\t\t\ttoggle.setAttribute(\"aria-pressed\", \"true\");\n\t\t\t\t}\n\t\t\t\tconst card = group.closest(\"[data-slot=card]\");\n\t\t\t\tconst trigger = card && card.querySelector(\"[data-tui-chart-range-select]\");\n\t\t\t\tconst content = trigger && document.getElementById(trigger.getAttribute(\"aria-controls\"));\n\t\t\t\tconst item = content && content.querySelector('[data-tui-select-item][data-tui-select-value=\"' + value + '\"]');\n\t\t\t\tif (item) item.click();\n\t\t\t});\n\n\t\t\t// A pick in the mobile select presses the matching toggle;\n\t\t\t// chart.js flips the panels on the same select-change.\n\t\t\tdocument.addEventListener(\"select-change\", (e) => {\n\t\t\t\tif (!(e.target instanceof Element)) return;\n\t\t\t\tconst trigger = e.target.closest(\"[data-tui-chart-range-select]\");\n\t\t\t\tif (!trigger) return;\n\t\t\t\tconst card = trigger.closest(\"[data-slot=card]\");\n\t\t\t\tconst group = card && card.querySelector(\"[data-tui-chart-range-toggle]\");\n\t\t\t\tif (!group) return;\n\t\t\t\tgroup.querySelectorAll(\"[data-tui-toggle]\").forEach((t) => {\n\t\t\t\t\tconst on = t.getAttribute(\"data-tui-toggle-value\") === e.detail.value;\n\t\t\t\t\tt.toggleAttribute(\"data-pressed\", on);\n\t\t\t\t\tt.setAttribute(\"aria-pressed\", String(on));\n\t\t\t\t});\n\t\t\t\tgroup.setAttribute(\"data-tui-toggle-group-value\", e.detail.value);\n\t\t\t});\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

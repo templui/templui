@@ -92,7 +92,7 @@ func TeamSwitcher(teams []Team) templ.Component {
 							}
 							for i, team := range teams {
 								templ_7745c5c3_Err = team.Logo(icon.Props{
-									Class:      "size-3" + teamLogoHidden(i),
+									Class:      teamLogoHidden(i),
 									Attributes: templ.Attributes{"data-sidebar10-team-logo": strconv.Itoa(i)},
 								}).Render(ctx, templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
@@ -184,7 +184,7 @@ func TeamSwitcher(teams []Team) templ.Component {
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}
-									templ_7745c5c3_Err = team.Logo(icon.Props{Class: "size-4 shrink-0"}).Render(ctx, templ_7745c5c3_Buffer)
+									templ_7745c5c3_Err = team.Logo().Render(ctx, templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
 									}

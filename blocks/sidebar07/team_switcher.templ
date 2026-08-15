@@ -36,7 +36,7 @@ templ TeamSwitcher(teams []Team) {
 							// team switch (the pendant of React swapping activeTeam.logo).
 							for i, team := range teams {
 								@team.Logo(icon.Props{
-									Class:      "size-4" + teamLogoHidden(i),
+									Class:      teamLogoHidden(i),
 									Attributes: templ.Attributes{"data-sidebar07-team-logo": strconv.Itoa(i)},
 								})
 							}
@@ -48,35 +48,39 @@ templ TeamSwitcher(teams []Team) {
 						@icon.ChevronsUpDown(icon.Props{Class: "ml-auto"})
 					}
 					@dropdownmenu.Content(dropdownmenu.ContentProps{
-						Class:      "min-w-56 rounded-lg",
+						Class:      "w-fit",
 						Align:      dropdownmenu.AlignStart,
 						Side:       dropdownmenu.SideRight,
+						MobileSide: dropdownmenu.SideBottom,
 						SideOffset: 4,
-						Attributes: templ.Attributes{"data-sidebar07-menu": "team"},
 					}) {
-						@dropdownmenu.Label(dropdownmenu.LabelProps{Class: "text-xs text-muted-foreground"}) {
-							Teams
-						}
-						for i, team := range teams {
-							@dropdownmenu.Item(dropdownmenu.ItemProps{
-								Class:      "gap-2 p-2",
-								Attributes: templ.Attributes{"data-sidebar07-team-index": strconv.Itoa(i)},
-							}) {
-								<div class="flex size-6 items-center justify-center rounded-md border">
-									@team.Logo(icon.Props{Class: "size-3.5 shrink-0"})
-								</div>
-								{ team.Name }
-								@dropdownmenu.Shortcut() {
-									⌘{ strconv.Itoa(i + 1) }
+						@dropdownmenu.Group() {
+							@dropdownmenu.Label(dropdownmenu.LabelProps{Class: "text-xs text-muted-foreground"}) {
+								Teams
+							}
+							for i, team := range teams {
+								@dropdownmenu.Item(dropdownmenu.ItemProps{
+									Class:      "gap-2 p-2",
+									Attributes: templ.Attributes{"data-sidebar07-team-index": strconv.Itoa(i)},
+								}) {
+									<div class="flex size-6 items-center justify-center rounded-md border">
+										@team.Logo()
+									</div>
+									{ team.Name }
+									@dropdownmenu.Shortcut() {
+										⌘{ strconv.Itoa(i + 1) }
+									}
 								}
 							}
 						}
 						@dropdownmenu.Separator()
-						@dropdownmenu.Item(dropdownmenu.ItemProps{Class: "gap-2 p-2"}) {
-							<div class="flex size-6 items-center justify-center rounded-md border bg-transparent">
-								@icon.Plus(icon.Props{Class: "size-4"})
-							</div>
-							<div class="font-medium text-muted-foreground">Add team</div>
+						@dropdownmenu.Group() {
+							@dropdownmenu.Item(dropdownmenu.ItemProps{Class: "gap-2 p-2"}) {
+								<div class="flex size-6 items-center justify-center rounded-md border bg-transparent">
+									@icon.Plus(icon.Props{Class: "size-4"})
+								</div>
+								<div class="font-medium text-muted-foreground">Add team</div>
+							}
 						}
 					}
 				}
