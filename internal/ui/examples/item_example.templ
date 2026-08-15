@@ -6,9 +6,8 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/item"
 )
 
-// The kitchen-sink page from item-example.tsx. The nine variant/size
-// sections and the image sections repeat the same item combinations, so
-// they render through the shared matrix helpers below.
+// The variant, size, and image sections reuse the same item combinations
+// through the shared matrix helpers below.
 templ itemExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {
@@ -519,7 +518,7 @@ templ itemExampleHeaderAndFooterSection() {
 					Mobile App Development
 				}
 				@item.Description() {
-					Building a cross-platform mobile application for iOS and Android with React Native.
+					Building a fast server-rendered web application with Go and templ.
 				}
 			}
 			@item.Footer() {

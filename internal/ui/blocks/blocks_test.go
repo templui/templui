@@ -114,12 +114,16 @@ func TestBlocksUseBaseUIStateContracts(t *testing.T) {
 	}
 }
 
-func TestBlockSourcesDoNotRegressToLocalOrLegacyFixtures(t *testing.T) {
+func TestBlockSourcesDoNotRegressToReactOrLegacyFixtures(t *testing.T) {
 	t.Setenv("GO_ENV", "production")
 
 	forbidden := []string{
-		"Axel Adrian",
-		"github.com/axadrn.png",
+		`Name:   "shadcn"`,
+		`Avatar: "/avatars/shadcn.jpg"`,
+		"Next.js",
+		"React",
+		".tsx",
+		".jsx",
 		"bg-gradient-to-t",
 		"Customize Columns",
 		"[&_[role=gridcell]]:w-[33px]",

@@ -16,7 +16,6 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/tooltip"
 )
 
-// The kitchen-sink page from input-group-example.tsx.
 templ inputGroupExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {
@@ -757,13 +756,13 @@ templ inputGroupExampleTextarea() {
 				@inputgroup.InputGroup() {
 					@inputgroup.Textarea(inputgroup.TextareaProps{
 						ID:          "textarea-code-32",
-						Placeholder: "console.log('Hello, world!');",
+						Placeholder: `fmt.Println("Hello, world!")`,
 						Class:       "min-h-[300px] py-3",
 					})
 					@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignBlockStart, Class: "border-b"}) {
 						@inputgroup.Text(inputgroup.TextProps{Class: "font-mono font-medium"}) {
 							@icon.Code()
-							script.js
+							main.go
 						}
 						@inputgroup.Button(inputgroup.ButtonProps{
 							Size:  inputgroup.ButtonSizeIconXs,
@@ -783,7 +782,7 @@ templ inputGroupExampleTextarea() {
 							Line 1, Column 1
 						}
 						@inputgroup.Text(inputgroup.TextProps{Class: "ml-auto"}) {
-							JavaScript
+							Go
 						}
 					}
 				}

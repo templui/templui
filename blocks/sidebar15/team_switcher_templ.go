@@ -119,7 +119,7 @@ func TeamSwitcher(teams []Team) templ.Component {
 							var templ_7745c5c3_Var6 string
 							templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(teams[0].Name)
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar15/team_switcher.templ`, Line: 43, Col: 71}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar15/team_switcher.templ`, Line: 42, Col: 71}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 							if templ_7745c5c3_Err != nil {
@@ -208,7 +208,7 @@ func TeamSwitcher(teams []Team) templ.Component {
 									var templ_7745c5c3_Var10 string
 									templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(team.Name)
 									if templ_7745c5c3_Err != nil {
-										return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar15/team_switcher.templ`, Line: 63, Col: 19}
+										return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar15/team_switcher.templ`, Line: 62, Col: 19}
 									}
 									_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 									if templ_7745c5c3_Err != nil {
@@ -233,7 +233,7 @@ func TeamSwitcher(teams []Team) templ.Component {
 										var templ_7745c5c3_Var12 string
 										templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(i + 1))
 										if templ_7745c5c3_Err != nil {
-											return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar15/team_switcher.templ`, Line: 65, Col: 33}
+											return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar15/team_switcher.templ`, Line: 64, Col: 33}
 										}
 										_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 										if templ_7745c5c3_Err != nil {

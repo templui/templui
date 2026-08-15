@@ -108,9 +108,8 @@ func dataTableDrawerBodyID(id int) string {
 
 // dataTableDrawerRequested reports whether this row's drawer content is the
 // requested fragment: only then does the heavy drawer body (chart + form)
-// render - every other render ships the skeleton and the drawer trigger
-// lazy-loads the body on first open, the pendant of React mounting drawer
-// children on open.
+// render. Every other render ships the skeleton, and the drawer trigger
+// lazy-loads the body on first open.
 func dataTableDrawerRequested(ctx context.Context, id int) bool {
 	r, ok := ctx.Value(requestKey{}).(*http.Request)
 	return ok && r.URL.Query().Get("fragment") == dataTableDrawerFragment(id)

@@ -9,7 +9,6 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
-// The kitchen-sink page from toggle-group-example.tsx.
 templ toggleGroupExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {
@@ -543,7 +542,7 @@ templ toggleGroupExampleVerticalWithSpacing() {
 	}
 }
 
-// The vanilla pendant of the demo's fontWeight React state.
+// Keep the selected font weight in sync with the preview.
 templ toggleGroupExampleFontWeightSelector() {
 	@toggleGroupExampleSection("Font Weight Selector") {
 		@field.Field() {

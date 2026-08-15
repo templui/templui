@@ -5,7 +5,6 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/slider"
 )
 
-// The kitchen-sink page from slider-example.tsx.
 templ sliderExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {
@@ -69,7 +68,7 @@ templ sliderExampleVertical() {
 	}
 }
 
-// The vanilla pendant of the demo's React state.
+// Keep the displayed value in sync with the slider.
 templ sliderExampleControlled() {
 	@sliderExampleSection("Controlled") {
 		<div class="grid w-full gap-3" data-slider-example-controlled>

@@ -29,11 +29,11 @@ templ InputGroupBlockStart() {
 				Textarea
 			}
 			@inputgroup.InputGroup() {
-				@inputgroup.Textarea(inputgroup.TextareaProps{ID: "block-start-textarea", Placeholder: "console.log('Hello, world!');", Class: "font-mono text-sm"})
+				@inputgroup.Textarea(inputgroup.TextareaProps{ID: "block-start-textarea", Placeholder: `fmt.Println("Hello, world!")`, Class: "font-mono text-sm"})
 				@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignBlockStart}) {
 					@icon.FileCode(icon.Props{Class: "text-muted-foreground"})
 					@inputgroup.Text(inputgroup.TextProps{Class: "font-mono"}) {
-						script.js
+						main.go
 					}
 					@inputgroup.Button(inputgroup.ButtonProps{Size: inputgroup.ButtonSizeIconXs, Class: "ml-auto"}) {
 						@icon.Copy()

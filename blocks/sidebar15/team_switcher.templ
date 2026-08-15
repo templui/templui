@@ -31,8 +31,7 @@ templ TeamSwitcher(teams []Team) {
 						Attributes: dropdownmenu.Trigger(ctx),
 					}) {
 						<div class="flex aspect-square size-5 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-							// All logos render up front, the page script toggles them on
-							// team switch (the pendant of React swapping activeTeam.logo).
+							// Render every logo up front; the page script shows the active one.
 							for i, team := range teams {
 								@team.Logo(icon.Props{
 									Class:      teamLogoHidden(i),

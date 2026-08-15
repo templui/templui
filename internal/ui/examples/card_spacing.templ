@@ -95,8 +95,7 @@ templ CardSpacing() {
 		}
 	</div>
 	<script nonce={ templ.GetNonce(ctx) }>
-		// The vanilla pendant of the demo's React state, the pressed toggle
-		// swaps the spacing class on the card.
+		// The pressed toggle swaps the spacing class on the card.
 		document.addEventListener('toggle-change', (e) => {
 			const demo = e.target.closest('[data-card-spacing-demo]');
 			if (!demo || !e.detail.pressed) return;

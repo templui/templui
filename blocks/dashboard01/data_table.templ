@@ -187,9 +187,8 @@ templ DataTable(data []Item) {
 				</div>
 				<div class="flex items-center justify-between px-4">
 					<div class="hidden flex-1 text-sm text-muted-foreground lg:flex">
-						// Selection is view-local UI state (the tsx keeps it in
-						// React memory); dataTableScript keeps the count live. It
-						// resets on a page navigation.
+						// Selection is view-local UI state. dataTableScript keeps the
+						// count live and resets it on page navigation.
 						<span data-dashboard01-selected-count>0</span>
 						&nbsp;of { fmt.Sprint(len(data)) } row(s) selected.
 					</div>
@@ -668,7 +667,7 @@ var dataTableCellViewerChartConfig = chart.Config{
 	{Key: "mobile", Label: "Mobile", Color: "var(--primary)"},
 }
 
-// dataTableCellViewerMonthShort is the tsx tickFormatter: value.slice(0, 3).
+// dataTableCellViewerMonthShort returns the three-letter month label.
 func dataTableCellViewerMonthShort(v any) string {
 	s, _ := v.(string)
 	if len(s) > 3 {
@@ -679,9 +678,8 @@ func dataTableCellViewerMonthShort(v any) string {
 
 templ dataTableCellViewer(item Item, page, size int) {
 	@drawer.Drawer(drawer.Props{SwipeDirection: drawer.SwipeDirectionRight}) {
-		// The drawer body lazy-loads on first open: React mounts drawer
-		// children on open, the htmx pendant fetches this row's templ
-		// fragment once - so the page never ships 68 hidden charts.
+		// Lazy-load this row's templ fragment once, so the page never ships
+		// 68 hidden charts.
 		@button.Button(button.Props{
 			Variant: button.VariantLink,
 			Class:   "w-fit px-0 text-left text-foreground",

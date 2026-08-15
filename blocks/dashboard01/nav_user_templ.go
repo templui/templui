@@ -116,7 +116,7 @@ func NavUser(user User) templ.Component {
 									}()
 								}
 								ctx = templ.InitializeContext(ctx)
-								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "CN")
+								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "AA")
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -252,7 +252,7 @@ func NavUser(user User) templ.Component {
 											}()
 										}
 										ctx = templ.InitializeContext(ctx)
-										templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "CN")
+										templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "AA")
 										if templ_7745c5c3_Err != nil {
 											return templ_7745c5c3_Err
 										}

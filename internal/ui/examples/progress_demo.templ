@@ -2,7 +2,7 @@ package examples
 
 import "github.com/axadrn/shadcn-templ/v2/components/progress"
 
-// The vanilla pendant of the demo's React state: 13 on load, 66 after 500ms.
+// Start at 13 and advance to 66 after 500ms.
 templ ProgressDemo() {
 	@progress.Progress(progress.Props{
 		ID:    "progress-demo",

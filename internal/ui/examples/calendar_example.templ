@@ -13,8 +13,7 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
-// The kitchen-sink page from calendar-example.tsx. The Multiple section is
-// skipped, the calendar component has no multiple mode.
+// The multiple-date section is omitted because the calendar has no multiple mode.
 templ calendarExampleSection(title string, containerClass string, class string) {
 	<div data-slot="example" class={ utils.CN("mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none", containerClass) }>
 		if title != "" {

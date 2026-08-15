@@ -19,7 +19,7 @@ templ NavUser(user User) {
 					@avatar.Avatar(avatar.Props{Class: "size-8 rounded-lg grayscale"}) {
 						@avatar.Image(avatar.ImageProps{Src: user.Avatar, Alt: user.Name})
 						@avatar.Fallback(avatar.FallbackProps{Class: "rounded-lg"}) {
-							CN
+							AA
 						}
 					}
 					<div class="grid flex-1 text-left text-sm leading-tight">
@@ -43,7 +43,7 @@ templ NavUser(user User) {
 								@avatar.Avatar(avatar.Props{Class: "size-8"}) {
 									@avatar.Image(avatar.ImageProps{Src: user.Avatar, Alt: user.Name})
 									@avatar.Fallback(avatar.FallbackProps{Class: "rounded-lg"}) {
-										CN
+										AA
 									}
 								}
 								<div class="grid flex-1 text-left text-sm leading-tight">

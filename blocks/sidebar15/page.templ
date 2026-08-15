@@ -37,8 +37,7 @@ templ Page() {
 	}
 	<script nonce={ templ.GetNonce(ctx) }>
 		(() => {
-			// Team switching, the pendant of the team switcher's activeTeam
-			// React state.
+			// Keep the selected team details in sync.
 			document.addEventListener("click", (e) => {
 				if (!(e.target instanceof Element)) return;
 				const item = e.target.closest("#sidebar15-team-menu [data-team-index]");

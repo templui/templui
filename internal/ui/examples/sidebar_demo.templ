@@ -105,8 +105,7 @@ templ sidebarDemoTeamSwitcher() {
 					Attributes: dropdownmenu.Trigger(ctx),
 				}) {
 					<div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-						// All logos render up front, the demo script toggles them on
-						// team switch (the pendant of React swapping activeTeam.logo).
+						// Render every logo up front; the demo script shows the active one.
 						for i, team := range sidebarDemoTeams {
 							@team.Logo(icon.Props{
 								Class:      "size-4" + logoHidden(i),
@@ -364,7 +363,7 @@ templ SidebarDemo() {
 	}
 	<script nonce={ templ.GetNonce(ctx) }>
 		(() => {
-			// Team switching, the pendant of the demo's activeTeam React state.
+			// Keep the selected team details in sync.
 			document.addEventListener("click", (e) => {
 				if (!(e.target instanceof Element)) return;
 				const item = e.target.closest("#sidebar-demo-team-menu [data-team-index]");

@@ -6,7 +6,6 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/table"
 )
 
-// The kitchen-sink page from checkbox-example.tsx.
 templ checkboxExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {
@@ -180,8 +179,7 @@ templ checkboxExampleInTable() {
 			}
 		</div>
 		<script nonce={ templ.GetNonce(ctx) }>
-			// The vanilla pendant of the demo's React selection state. The
-			// checkbox renders a span root with a hidden native input beside it;
+			// The checkbox renders a span root with a hidden native input beside it;
 			// dispatching change after a programmatic check lets checkbox.js sync
 			// the root's state attributes.
 			let updatingCheckboxExampleTable = false;

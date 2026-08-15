@@ -18,7 +18,7 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/utils"
 )
 
-// The pendant of chart-area-interactive.tsx.
+// Interactive area-chart data.
 
 var chartAreaInteractiveData = []chart.Datum{
 	{"date": "2024-04-01", "desktop": 222, "mobile": 150},

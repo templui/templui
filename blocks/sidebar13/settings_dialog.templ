@@ -33,8 +33,7 @@ var data = struct {
 }
 
 templ SettingsDialog() {
-	// Open renders the dialog already open, the pendant of the
-	// React.useState(true) initial open state.
+	// Start this demo with the dialog open.
 	@dialog.Dialog(dialog.Props{DefaultOpen: true}) {
 		@button.Button(button.Props{
 			Size:       button.SizeSm,

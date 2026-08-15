@@ -11,7 +11,7 @@ templ InputGroupTextareaExample() {
 		@inputgroup.InputGroup() {
 			@inputgroup.Textarea(inputgroup.TextareaProps{
 				ID:          "textarea-code",
-				Placeholder: "console.log('Hello, world!');",
+				Placeholder: `fmt.Println("Hello, world!")`,
 				Class:       "min-h-[200px]",
 			})
 			@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignBlockEnd, Class: "border-t"}) {
@@ -26,7 +26,7 @@ templ InputGroupTextareaExample() {
 			@inputgroup.Addon(inputgroup.AddonProps{Align: inputgroup.AlignBlockStart, Class: "border-b"}) {
 				@inputgroup.Text(inputgroup.TextProps{Class: "font-mono font-medium"}) {
 					@icon.FileCode()
-					script.js
+					main.go
 				}
 				@inputgroup.Button(inputgroup.ButtonProps{Size: inputgroup.ButtonSizeIconXs, Class: "ml-auto"}) {
 					@icon.RefreshCw()

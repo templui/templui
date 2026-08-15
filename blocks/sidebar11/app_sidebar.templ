@@ -15,7 +15,7 @@ type change struct {
 var changes = []change{
 	{File: "README.md", State: "M"},
 	{File: "api/hello/route.ts", State: "U"},
-	{File: "app/layout.tsx", State: "M"},
+	{File: "app/layout.templ", State: "M"},
 }
 
 // treeData mirrors the tsx's TreeItem = string | TreeItem[] shape: a string is
@@ -26,16 +26,16 @@ var treeData = []any{
 		[]any{
 			"api",
 			[]any{"hello", []any{"route.ts"}},
-			"page.tsx",
-			"layout.tsx",
-			[]any{"blog", []any{"page.tsx"}},
+			"page.templ",
+			"layout.templ",
+			[]any{"blog", []any{"page.templ"}},
 		},
 	},
 	[]any{
 		"components",
-		[]any{"ui", "button.tsx", "card.tsx"},
-		"header.tsx",
-		"footer.tsx",
+		[]any{"ui", "button.templ", "card.templ"},
+		"header.templ",
+		"footer.templ",
 	},
 	[]any{"lib", []any{"util.ts"}},
 	[]any{"public", "favicon.ico", "vercel.svg"},
@@ -109,7 +109,7 @@ templ tree(item any) {
 	{{ name, items := treeParts(item) }}
 	if len(items) == 0 {
 		@sidebar.MenuButton(sidebar.MenuButtonProps{
-			IsActive: name == "button.tsx",
+			IsActive: name == "button.templ",
 			Class:    "data-[active=true]:bg-transparent",
 		}) {
 			@icon.File()

@@ -11,8 +11,8 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/sidebar"
 )
 
-// The full-page example from sidebar-icon-example.tsx: an icon-collapsible
-// sidebar with team switcher, collapsible nav and a user footer menu.
+// Full-page icon-collapsible sidebar with team switcher, collapsible nav,
+// and a user footer menu.
 
 var sidebarIconExampleUser = struct {
 	Name   string
@@ -292,7 +292,7 @@ templ SidebarIconExample() {
 	}
 	<script nonce={ templ.GetNonce(ctx) }>
 		(() => {
-			// Team switching, the pendant of the demo's activeTeam React state.
+			// Keep the selected team details in sync.
 			const plans = ["Enterprise", "Startup", "Free"];
 			document.addEventListener("click", (e) => {
 				if (!(e.target instanceof Element)) return;

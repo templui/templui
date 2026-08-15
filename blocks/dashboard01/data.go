@@ -1,7 +1,6 @@
 package dashboard01
 
-// Item mirrors one row of data.json (the pendant of the zod schema in
-// data-table.tsx: id, header, type, status, target, limit, reviewer).
+// Item represents one row of data.json.
 type Item struct {
 	ID          int
 	Header      string

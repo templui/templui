@@ -12,8 +12,9 @@ attributes.
 
 When syncing a block:
 
-- Preserve the Base UI block's content, assets, responsive behavior, and
-  block-level utility overrides.
+- Preserve the Base UI block's layout, responsive behavior, and block-level
+  utility overrides; translate visible ecosystem-specific fixtures to their
+  Go/templ pendant while keeping neutral demo content unchanged.
 - Translate React and Base UI primitive behavior to the templ/vanilla Base UI
   pendant without copying Radix-specific variables or selectors.
 - Keep necessary stack translations local and explicit. Do not change a shared

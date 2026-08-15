@@ -896,7 +896,7 @@ func DataTable(data []Item) templ.Component {
 					var templ_7745c5c3_Var38 string
 					templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(len(data)))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 194, Col: 38}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 193, Col: 38}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 					if templ_7745c5c3_Err != nil {
@@ -1010,7 +1010,7 @@ func DataTable(data []Item) templ.Component {
 										var templ_7745c5c3_Var45 string
 										templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(pageSize))
 										if templ_7745c5c3_Err != nil {
-											return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 227, Col: 34}
+											return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 226, Col: 34}
 										}
 										_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 										if templ_7745c5c3_Err != nil {
@@ -1048,7 +1048,7 @@ func DataTable(data []Item) templ.Component {
 					var templ_7745c5c3_Var46 string
 					templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(page))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 235, Col: 30}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 234, Col: 30}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
 					if templ_7745c5c3_Err != nil {
@@ -1061,7 +1061,7 @@ func DataTable(data []Item) templ.Component {
 					var templ_7745c5c3_Var47 string
 					templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(pageCount))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 235, Col: 59}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 234, Col: 59}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 					if templ_7745c5c3_Err != nil {
@@ -1353,7 +1353,7 @@ func dataTableScript() templ.Component {
 		var templ_7745c5c3_Var56 string
 		templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 313, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 312, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var56))
 		if templ_7745c5c3_Err != nil {
@@ -1550,7 +1550,7 @@ func dataTableRow(item Item, page, size int) templ.Component {
 					var templ_7745c5c3_Var65 string
 					templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.JoinStringErrs(item.SectionType)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 560, Col: 23}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 559, Col: 23}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var65))
 					if templ_7745c5c3_Err != nil {
@@ -1618,7 +1618,7 @@ func dataTableRow(item Item, page, size int) templ.Component {
 					var templ_7745c5c3_Var68 string
 					templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.JoinStringErrs(item.Status)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 571, Col: 17}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 570, Col: 17}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var68))
 					if templ_7745c5c3_Err != nil {
@@ -1659,7 +1659,7 @@ func dataTableRow(item Item, page, size int) templ.Component {
 				var templ_7745c5c3_Var70 string
 				templ_7745c5c3_Var70, templ_7745c5c3_Err = templ.JoinStringErrs(item.Header)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 575, Col: 44}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 574, Col: 44}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var70))
 				if templ_7745c5c3_Err != nil {
@@ -1732,7 +1732,7 @@ func dataTableRow(item Item, page, size int) templ.Component {
 				var templ_7745c5c3_Var73 string
 				templ_7745c5c3_Var73, templ_7745c5c3_Err = templ.JoinStringErrs(item.Header)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 587, Col: 44}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 586, Col: 44}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var73))
 				if templ_7745c5c3_Err != nil {
@@ -1802,7 +1802,7 @@ func dataTableRow(item Item, page, size int) templ.Component {
 					var templ_7745c5c3_Var76 string
 					templ_7745c5c3_Var76, templ_7745c5c3_Err = templ.JoinStringErrs(item.Reviewer)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 600, Col: 19}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 599, Col: 19}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var76))
 					if templ_7745c5c3_Err != nil {
@@ -2202,7 +2202,7 @@ var dataTableCellViewerChartConfig = chart.Config{
 	{Key: "mobile", Label: "Mobile", Color: "var(--primary)"},
 }
 
-// dataTableCellViewerMonthShort is the tsx tickFormatter: value.slice(0, 3).
+// dataTableCellViewerMonthShort returns the three-letter month label.
 func dataTableCellViewerMonthShort(v any) string {
 	s, _ := v.(string)
 	if len(s) > 3 {
@@ -2244,7 +2244,7 @@ func dataTableCellViewer(item Item, page, size int) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "   ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "  ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2263,7 +2263,7 @@ func dataTableCellViewer(item Item, page, size int) templ.Component {
 				var templ_7745c5c3_Var95 string
 				templ_7745c5c3_Var95, templ_7745c5c3_Err = templ.JoinStringErrs(item.Header)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 696, Col: 16}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 694, Col: 16}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var95))
 				if templ_7745c5c3_Err != nil {
@@ -2328,7 +2328,7 @@ func dataTableCellViewer(item Item, page, size int) templ.Component {
 						var templ_7745c5c3_Var99 string
 						templ_7745c5c3_Var99, templ_7745c5c3_Err = templ.JoinStringErrs(item.Header)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 701, Col: 18}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 699, Col: 18}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var99))
 						if templ_7745c5c3_Err != nil {
@@ -2379,7 +2379,7 @@ func dataTableCellViewer(item Item, page, size int) templ.Component {
 				var templ_7745c5c3_Var101 string
 				templ_7745c5c3_Var101, templ_7745c5c3_Err = templ.JoinStringErrs(dataTableDrawerBodyID(item.ID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 707, Col: 100}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 705, Col: 100}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var101))
 				if templ_7745c5c3_Err != nil {
@@ -2806,7 +2806,7 @@ func dataTableDrawerBody(item Item) templ.Component {
 							var templ_7745c5c3_Var116 string
 							templ_7745c5c3_Var116, templ_7745c5c3_Err = templ.JoinStringErrs(sectionType)
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 807, Col: 22}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/dashboard01/data_table.templ`, Line: 805, Col: 22}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var116))
 							if templ_7745c5c3_Err != nil {

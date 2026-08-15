@@ -15,9 +15,9 @@ import (
 
 // This is sample data.
 var user = User{
-	Name:   "shadcn",
+	Name:   "Axel Adrian",
 	Email:  "m@example.com",
-	Avatar: "/avatars/shadcn.jpg",
+	Avatar: "https://github.com/axadrn.png",
 }
 
 var calendars = []Calendar{

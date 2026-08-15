@@ -67,7 +67,7 @@ var navMain = []navItem{
 		Items: []navSubItem{
 			{Title: "Accessibility", URL: "#"},
 			{Title: "Fast Refresh", URL: "#"},
-			{Title: "Next.js Compiler", URL: "#"},
+			{Title: "templ Compiler", URL: "#"},
 			{Title: "Supported Browsers", URL: "#"},
 			{Title: "Turbopack", URL: "#"},
 		},

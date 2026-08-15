@@ -8,9 +8,7 @@ import (
 
 templ Page() {
 	@sidebar.Provider(sidebar.ProviderProps{
-		// The tsx's style={{"--sidebar-width": "350px"}}; --sidebar-width-icon
-		// rides along because the style attribute replaces the provider default
-		// wholesale instead of merging like React does.
+		// Set both custom widths because this style replaces the provider default.
 		Attributes: templ.Attributes{"style": "--sidebar-width: 350px; --sidebar-width-icon: 3rem;"},
 	}) {
 		@AppSidebar()

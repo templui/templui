@@ -14,8 +14,7 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/components/textarea"
 )
 
-// The kitchen-sink page from field-example.tsx. The native select markup is
-// inlined from base/ui/native-select.tsx, we have no native select component.
+// The native select markup is inlined in this showcase.
 templ fieldExampleSection(title string) {
 	<div data-slot="example" class="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
 		if title != "" {
@@ -296,7 +295,7 @@ templ fieldExampleSelectFields() {
 	}
 }
 
-// The native select markup from base/ui/native-select.tsx, inlined.
+// Native select markup used directly by this showcase.
 templ fieldExampleNativeSelect(id string, invalid, disabled bool) {
 	<div class="cn-native-select-wrapper group/native-select relative w-fit has-[select:disabled]:opacity-50" data-slot="native-select-wrapper" data-size="default">
 		<select
@@ -831,8 +830,7 @@ templ fieldExampleSliderFields() {
 				}
 			}
 		}
-		// The vanilla pendant of the demo's React state for the live
-		// slider descriptions.
+		// Keep the live slider descriptions in sync.
 		<script nonce={ templ.GetNonce(ctx) }>
 			(() => {
 				const bind = (id, target, format) => {

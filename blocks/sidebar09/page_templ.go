@@ -233,9 +233,7 @@ func Page() templ.Component {
 			return nil
 		})
 		templ_7745c5c3_Err = sidebar.Provider(sidebar.ProviderProps{
-			// The tsx's style={{"--sidebar-width": "350px"}}; --sidebar-width-icon
-			// rides along because the style attribute replaces the provider default
-			// wholesale instead of merging like React does.
+			// Set both custom widths because this style replaces the provider default.
 			Attributes: templ.Attributes{"style": "--sidebar-width: 350px; --sidebar-width-icon: 3rem;"},
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -248,7 +246,7 @@ func Page() templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(templ.GetNonce(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/page.templ`, Line: 47, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `blocks/sidebar09/page.templ`, Line: 45, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
