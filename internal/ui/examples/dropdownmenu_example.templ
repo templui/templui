@@ -123,7 +123,7 @@ templ dropdownMenuExampleComplex() {
 					@dropdownmenu.Label() {
 						View
 					}
-					@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+					@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{DefaultChecked: true}) {
 						@icon.PanelLeft()
 						Sidebar
 					}
@@ -372,7 +372,7 @@ templ dropdownMenuExampleWithCheckboxes() {
 					@dropdownmenu.Label() {
 						Appearance
 					}
-					@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+					@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{DefaultChecked: true}) {
 						@icon.PanelsTopLeft()
 						Status Bar
 					}
@@ -405,7 +405,7 @@ templ dropdownMenuExampleWithCheckboxesIcons() {
 					@dropdownmenu.Label() {
 						Notification Preferences
 					}
-					@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+					@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{DefaultChecked: true}) {
 						@icon.Mail()
 						Email notifications
 					}
@@ -413,7 +413,7 @@ templ dropdownMenuExampleWithCheckboxesIcons() {
 						@icon.MessageSquare()
 						SMS notifications
 					}
-					@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}) {
+					@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{DefaultChecked: true}) {
 						@icon.Bell()
 						Push notifications
 					}
@@ -438,12 +438,12 @@ templ dropdownMenuExampleWithRadio() {
 					@dropdownmenu.Label() {
 						Panel Position
 					}
-					@dropdownmenu.RadioGroup() {
+					@dropdownmenu.RadioGroup(dropdownmenu.RadioGroupProps{DefaultValue: "bottom"}) {
 						@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{Value: "top"}) {
 							@icon.ArrowUp()
 							Top
 						}
-						@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{Value: "bottom", Checked: true}) {
+						@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{Value: "bottom"}) {
 							@icon.ArrowDown()
 							Bottom
 						}
@@ -473,8 +473,8 @@ templ dropdownMenuExampleWithRadioIcons() {
 					@dropdownmenu.Label() {
 						Select Payment Method
 					}
-					@dropdownmenu.RadioGroup() {
-						@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{Value: "card", Checked: true}) {
+					@dropdownmenu.RadioGroup(dropdownmenu.RadioGroupProps{DefaultValue: "card"}) {
+						@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{Value: "card"}) {
 							@icon.CreditCard()
 							Credit Card
 						}
@@ -706,8 +706,8 @@ templ dropdownMenuExampleWithInset() {
 						Appearance
 					}
 					@dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{
-						Checked:    true,
-						Attributes: templ.Attributes{"data-inset": "true"},
+						DefaultChecked: true,
+						Attributes:     templ.Attributes{"data-inset": "true"},
 					}) {
 						Bookmarks
 					}
@@ -722,7 +722,7 @@ templ dropdownMenuExampleWithInset() {
 					@dropdownmenu.Label(dropdownmenu.LabelProps{Inset: true}) {
 						Theme
 					}
-					@dropdownmenu.RadioGroup() {
+					@dropdownmenu.RadioGroup(dropdownmenu.RadioGroupProps{DefaultValue: "system"}) {
 						@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{
 							Value:      "light",
 							Attributes: templ.Attributes{"data-inset": "true"},
@@ -737,7 +737,6 @@ templ dropdownMenuExampleWithInset() {
 						}
 						@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{
 							Value:      "system",
-							Checked:    true,
 							Attributes: templ.Attributes{"data-inset": "true"},
 						}) {
 							System

@@ -18,36 +18,36 @@ templ SelectAlignItem() {
 				}
 			}
 			@switchcomp.Switch(switchcomp.Props{
-				ID:      "align-item-switch",
-				Checked: true,
+				ID:             "align-item-switch",
+				DefaultChecked: true,
 			})
 		}
 		@field.Field() {
 			@selectcomp.Select(selectcomp.Props{
-				ID:    "align-item-select",
-				Value: "banana",
+				ID:           "align-item-select",
+				DefaultValue: "banana",
 			}) {
 				@selectcomp.Trigger() {
 					@selectcomp.Value()
 				}
 				@selectcomp.Content() {
 					@selectcomp.Group() {
-					@selectcomp.Item(selectcomp.ItemProps{Value: "apple"}) {
-						Apple
+						@selectcomp.Item(selectcomp.ItemProps{Value: "apple"}) {
+							Apple
+						}
+						@selectcomp.Item(selectcomp.ItemProps{Value: "banana"}) {
+							Banana
+						}
+						@selectcomp.Item(selectcomp.ItemProps{Value: "blueberry"}) {
+							Blueberry
+						}
+						@selectcomp.Item(selectcomp.ItemProps{Value: "grapes"}) {
+							Grapes
+						}
+						@selectcomp.Item(selectcomp.ItemProps{Value: "pineapple"}) {
+							Pineapple
+						}
 					}
-					@selectcomp.Item(selectcomp.ItemProps{Value: "banana"}) {
-						Banana
-					}
-					@selectcomp.Item(selectcomp.ItemProps{Value: "blueberry"}) {
-						Blueberry
-					}
-					@selectcomp.Item(selectcomp.ItemProps{Value: "grapes"}) {
-						Grapes
-					}
-					@selectcomp.Item(selectcomp.ItemProps{Value: "pineapple"}) {
-						Pineapple
-					}
-				}
 				}
 			}
 		}

@@ -3,6 +3,10 @@
 
   // Update tab state
   function setActiveTab(tabsId, value) {
+  const root = document.querySelector(
+    `[data-tui-tabs][data-tui-tabs-id="${tabsId}"]`,
+  );
+  if (root) root.setAttribute("data-tui-tabs-value", value || "");
     // Update all triggers with this tabs-id
     document
       .querySelectorAll(`[data-tui-tabs-trigger][data-tui-tabs-id="${tabsId}"]`)
@@ -30,6 +34,19 @@
       });
   }
 
+  function requestValueChange(root, value) {
+    if (!root || root.getAttribute("data-tui-tabs-value") === value) return;
+    const accepted = root.dispatchEvent(
+      new CustomEvent("tabs-value-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { value },
+      }),
+    );
+    if (!accepted || root.hasAttribute("data-tui-tabs-controlled")) return;
+    setActiveTab(root.getAttribute("data-tui-tabs-id"), value);
+  }
+
   // Click handler
   document.addEventListener("click", (e) => {
     const trigger = e.target.closest("[data-tui-tabs-trigger]");
@@ -38,7 +55,8 @@
     const tabsId = trigger.getAttribute("data-tui-tabs-id");
     const value = trigger.getAttribute("data-tui-tabs-value");
     if (tabsId && value) {
-      setActiveTab(tabsId, value);
+    const root = trigger.closest("[data-tui-tabs]");
+    requestValueChange(root, value);
     }
   });
 
@@ -49,10 +67,14 @@
       if (!tabsId) return;
 
       // Find active trigger or use first
-      const activeTrigger =
-        container.querySelector(
-          `[data-tui-tabs-trigger][data-tui-tabs-state="active"]`,
-        ) || container.querySelector(`[data-tui-tabs-trigger]`);
+    const authored = container.querySelector(
+    `[data-tui-tabs-trigger][data-tui-tabs-state="active"]`,
+    );
+    const activeTrigger =
+    authored ||
+    (container.hasAttribute("data-tui-tabs-controlled")
+      ? null
+      : container.querySelector(`[data-tui-tabs-trigger]:not(:disabled)`));
 
       if (activeTrigger) {
         setActiveTab(tabsId, activeTrigger.getAttribute("data-tui-tabs-value"));

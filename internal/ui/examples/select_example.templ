@@ -257,7 +257,7 @@ var selectExamplePlans = []selectExamplePlanItem{
 // markup only lives in the list (the SelectValue render prop has no pendant).
 templ selectExamplePlan() {
 	@selectExampleSection("Subscription Plan", "") {
-		@selectcomp.Select(selectcomp.Props{Value: "Starter"}) {
+		@selectcomp.Select(selectcomp.Props{DefaultValue: "Starter"}) {
 			@selectcomp.Trigger(selectcomp.TriggerProps{Class: "h-auto! w-72"}) {
 				@selectcomp.Value()
 			}

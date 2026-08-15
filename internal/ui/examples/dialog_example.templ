@@ -226,7 +226,7 @@ func dialogExampleAccents() []dialogExampleOption {
 }
 
 templ dialogExampleSettingsSelect(id, value string, options []dialogExampleOption) {
-	@selectcomp.Select(selectcomp.Props{Value: value}) {
+	@selectcomp.Select(selectcomp.Props{DefaultValue: value}) {
 		@selectcomp.Trigger(selectcomp.TriggerProps{ID: id}) {
 			@selectcomp.Value()
 		}
@@ -341,7 +341,7 @@ templ dialogExampleChatSettings() {
 										}
 										@field.Group(field.GroupProps{Attributes: templ.Attributes{"data-slot": "checkbox-group"}}) {
 											@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
-												@checkbox.Checkbox(checkbox.Props{ID: "push", Checked: true, Disabled: true})
+												@checkbox.Checkbox(checkbox.Props{ID: "push", DefaultChecked: true, Disabled: true})
 												@field.Label(field.LabelProps{For: "push", Class: "font-normal"}) {
 													Push notifications
 												}
@@ -433,7 +433,7 @@ templ dialogExampleChatSettings() {
 													Enable customizations to make ChatGPT more personalized.
 												}
 											}
-											@switchcomp.Switch(switchcomp.Props{ID: "customization", Checked: true})
+											@switchcomp.Switch(switchcomp.Props{ID: "customization", DefaultChecked: true})
 										}
 									}
 								}

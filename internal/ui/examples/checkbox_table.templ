@@ -49,9 +49,9 @@ templ CheckboxTable() {
 					}) {
 						@table.Cell() {
 							@checkbox.Checkbox(checkbox.Props{
-								ID:      "row-" + row.ID + "-checkbox",
-								Name:    "row-" + row.ID + "-checkbox",
-								Checked: row.ID == "1",
+								ID:             "row-" + row.ID + "-checkbox",
+								Name:           "row-" + row.ID + "-checkbox",
+								DefaultChecked: row.ID == "1",
 							})
 						}
 						@table.Cell(table.CellProps{Class: "font-medium"}) {

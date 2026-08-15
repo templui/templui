@@ -110,7 +110,10 @@
   // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
     document.querySelectorAll("body > [data-tui-select-content]").forEach((c) => {
-      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) c.remove();
+      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) {
+        stopAutoPositioning(c);
+        c.remove();
+      }
     });
     if (content.parentElement !== document.body) {
       if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
@@ -135,7 +138,7 @@
 
     return computePosition(trigger, content, {
       placement: placement,
-      strategy: "fixed",
+      strategy: "absolute",
       middleware: [
         offset(SIDE_OFFSET),
         flip({ padding: COLLISION_PADDING }),
@@ -290,6 +293,26 @@
         return positionPopper(content, trigger);
       })
       .then(() => updateScrollArrows(content));
+  }
+
+  function startAutoPositioning(content, trigger) {
+    if (content._tuiPositionCleanup) content._tuiPositionCleanup();
+    let resolveFirst;
+    const firstPosition = new Promise((resolve) => {
+      resolveFirst = resolve;
+    });
+    const update = () => position(content, trigger).then(resolveFirst, resolveFirst);
+    content._tuiPositionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
+      elementResize: typeof ResizeObserver !== "undefined",
+      layoutShift: typeof IntersectionObserver !== "undefined",
+    });
+    return firstPosition;
+  }
+
+  function stopAutoPositioning(content) {
+    if (!content._tuiPositionCleanup) return;
+    content._tuiPositionCleanup();
+    content._tuiPositionCleanup = null;
   }
 
   // ----- scroll arrows + capped grow-on-scroll (Base UI behavior) -----------
@@ -506,11 +529,12 @@
         content.querySelector("[data-tui-select-item]");
       if (selected) selected.focus({ preventScroll: true });
     };
-    position(content, trigger).then(finish, finish);
+    startAutoPositioning(content, trigger).then(finish, finish);
   }
 
   function close(content) {
     if (content.hidden) return;
+    stopAutoPositioning(content);
     stopArrowScroll();
     content.style.visibility = "";
     setTransitionAttribute(content, "data-starting-style", false);
@@ -544,34 +568,62 @@
     allContents().forEach(close);
   }
 
+  function requestOpenChange(content, nextOpen) {
+    if (!content || isOpen(content) === nextOpen) return;
+    const accepted = content.dispatchEvent(
+      new CustomEvent("select-open-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { open: nextOpen },
+      }),
+    );
+    if (!accepted || content.hasAttribute("data-tui-select-open-controlled")) return;
+    const trigger = triggerFor(content);
+    if (nextOpen && trigger) open(content, trigger);
+    else if (!nextOpen) close(content);
+  }
+
+  function requestCloseAll() {
+    allContents().forEach((content) => requestOpenChange(content, false));
+  }
+
   function selectItem(content, item) {
     const trigger = triggerFor(content);
     if (!trigger) return;
+  if (trigger.getAttribute("aria-readonly") === "true") return;
     const value = item.getAttribute("data-tui-select-value") || "";
     const label =
       item.getAttribute("data-tui-select-label") ||
       (item.querySelector("[data-tui-select-item-text]") || item).textContent.trim();
 
-    content.querySelectorAll("[data-tui-select-item]").forEach((i) => {
+    const accepted = trigger.dispatchEvent(
+      new CustomEvent("select-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { value: value, label: label },
+      }),
+    );
+    if (!accepted) return;
+
+    if (!trigger.hasAttribute("data-tui-select-value-controlled")) {
+      content.querySelectorAll("[data-tui-select-item]").forEach((i) => {
       i.removeAttribute("data-selected");
       i.setAttribute("aria-selected", "false");
-    });
-    item.setAttribute("data-selected", "");
-    item.setAttribute("aria-selected", "true");
+      });
+      item.setAttribute("data-selected", "");
+      item.setAttribute("aria-selected", "true");
 
-    const span = valueSpanFor(trigger);
-    if (span) span.textContent = label;
-    trigger.removeAttribute("data-placeholder");
+      const span = valueSpanFor(trigger);
+      if (span) span.textContent = label;
+      trigger.removeAttribute("data-placeholder");
 
-    const input = inputFor(trigger);
-    if (input && input.value !== value) {
-      input.value = value;
-      input.dispatchEvent(new Event("change", { bubbles: true }));
+      const input = inputFor(trigger);
+      if (input && input.value !== value) {
+        input.value = value;
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      }
     }
-    trigger.dispatchEvent(
-      new CustomEvent("select-change", { bubbles: true, detail: { value: value, label: label } }),
-    );
-    close(content);
+    requestOpenChange(content, false);
     trigger.focus();
   }
 
@@ -586,7 +638,10 @@
       const content = tpl.content.querySelector("[data-tui-select-content]");
       if (content) {
         const stale = document.getElementById(content.id);
-        if (stale) stale.remove();
+        if (stale) {
+          stopAutoPositioning(stale);
+          stale.remove();
+        }
         content._tuiPortalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
@@ -601,13 +656,18 @@
       if (!content) return;
       portal(content); // portal up front, like React does on mount
       const checked = content.querySelector('[data-tui-select-item][data-selected]');
-      if (!checked) return;
-      const label =
-        checked.getAttribute("data-tui-select-label") ||
-        (checked.querySelector("[data-tui-select-item-text]") || checked).textContent.trim();
-      const span = valueSpanFor(trigger);
-      if (span && span.textContent.trim() !== label) span.textContent = label;
-      if (trigger.hasAttribute("data-placeholder")) trigger.removeAttribute("data-placeholder");
+      if (checked) {
+        const label =
+          checked.getAttribute("data-tui-select-label") ||
+          (checked.querySelector("[data-tui-select-item-text]") || checked).textContent.trim();
+        const span = valueSpanFor(trigger);
+        if (span && span.textContent.trim() !== label) span.textContent = label;
+        if (trigger.hasAttribute("data-placeholder")) trigger.removeAttribute("data-placeholder");
+      }
+      if (content.getAttribute("data-tui-select-initial-open") === "true") {
+        content.removeAttribute("data-tui-select-initial-open");
+        open(content, trigger);
+      }
     });
   }
 
@@ -630,11 +690,7 @@
   function toggle(trigger) {
     const content = contentFor(trigger);
     if (!content) return;
-    if (isOpen(content)) {
-      close(content);
-    } else {
-      open(content, trigger);
-    }
+    requestOpenChange(content, !isOpen(content));
   }
 
   // Pendant of floating-ui useClick's pointerTypeRef: pointerdown marks the
@@ -654,7 +710,7 @@
       if (!trigger.disabled) toggle(trigger);
       return;
     }
-    if (!e.target.closest("[data-tui-select-content]")) closeAll();
+    if (!e.target.closest("[data-tui-select-content]")) requestCloseAll();
   });
 
   document.addEventListener("click", (e) => {
@@ -686,7 +742,7 @@
       allContents().forEach((content) => {
         if (!isOpen(content)) return;
         const trigger = triggerFor(content);
-        close(content);
+        requestOpenChange(content, false);
         if (trigger) trigger.focus();
       });
       return;
@@ -727,7 +783,7 @@
       e.preventDefault();
       selectItem(content, item);
     } else if (e.key === "Tab") {
-      close(content);
+      requestOpenChange(content, false);
     } else if (e.key.length === 1) {
       clearTimeout(typeTimer);
       typeBuffer += e.key.toLowerCase();
@@ -760,23 +816,8 @@
         }
         return;
       }
-      // Page scroll: keep open popper menus attached to their trigger
-      // (aligned menus lock page scroll instead).
-      allContents().forEach((content) => {
-        if (!isOpen(content) || content._tuiAligned) return;
-        const trigger = triggerFor(content);
-        if (trigger) positionPopper(content, trigger).then(() => updateScrollArrows(content));
-      });
     },
     true,
   );
-
-  window.addEventListener("resize", () => {
-    allContents().forEach((content) => {
-      if (!isOpen(content)) return;
-      const trigger = triggerFor(content);
-      if (trigger) position(content, trigger);
-    });
-  });
 
 })();

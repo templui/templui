@@ -87,9 +87,17 @@
     if (index > 0) v = Math.max(v, values[index - 1]);
     if (index < values.length - 1) v = Math.min(v, values[index + 1]);
     if (values[index] === v) return;
+  const nextValues = values.slice();
+  nextValues[index] = v;
+  const change = new CustomEvent("slider-change", {
+    bubbles: true,
+    cancelable: true,
+    detail: { values: nextValues },
+  });
+  const accepted = root.dispatchEvent(change);
+  if (!accepted || root.hasAttribute("data-tui-slider-controlled")) return;
     thumbsOf(root)[index].setAttribute("aria-valuenow", String(v));
     render(root);
-    root.dispatchEvent(new CustomEvent("slider-change", { bubbles: true, detail: { values: valuesOf(root) } }));
   }
 
   // Inverts the edge alignment: the usable span is the track minus one thumb.

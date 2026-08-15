@@ -37,8 +37,8 @@ templ toggleExampleBasic() {
 	@toggleExampleSection("Basic") {
 		<div class="flex flex-wrap items-center gap-2">
 			@toggle.Toggle(toggle.Props{
-				Pressed:    true,
-				Attributes: templ.Attributes{"aria-label": "Toggle bold"},
+				DefaultPressed: true,
+				Attributes:     templ.Attributes{"aria-label": "Toggle bold"},
 			}) {
 				@icon.Bold()
 			}
@@ -264,8 +264,8 @@ templ toggleExampleWithIcon() {
 	@toggleExampleSection("With Icon") {
 		<div class="flex flex-wrap items-center gap-2">
 			@toggle.Toggle(toggle.Props{
-				Pressed:    true,
-				Attributes: templ.Attributes{"aria-label": "Toggle bookmark"},
+				DefaultPressed: true,
+				Attributes:     templ.Attributes{"aria-label": "Toggle bookmark"},
 			}) {
 				@icon.Bookmark(icon.Props{Class: "group-aria-pressed/toggle:fill-accent-foreground"})
 			}

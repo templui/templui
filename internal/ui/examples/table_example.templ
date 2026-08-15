@@ -370,7 +370,7 @@ templ tableExampleWithSelect() {
 							{ task.Task }
 						}
 						@table.Cell() {
-							@selectcomp.Select(selectcomp.Props{Value: task.Assignee}) {
+							@selectcomp.Select(selectcomp.Props{DefaultValue: task.Assignee}) {
 								@selectcomp.Trigger(selectcomp.TriggerProps{Class: "w-40", Size: selectcomp.SizeSm}) {
 									@selectcomp.Value()
 								}

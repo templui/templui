@@ -7,13 +7,13 @@ import (
 
 templ ToggleGroupSpacing() {
 	@togglegroup.ToggleGroup(togglegroup.Props{
-				Size:    togglegroup.SizeSm,
-		Variant: togglegroup.VariantOutline,
-		Spacing: utils.Ptr(2),
+		Size:         togglegroup.SizeSm,
+		Variant:      togglegroup.VariantOutline,
+		Spacing:      utils.Ptr(2),
+		DefaultValue: []string{"top"},
 	}) {
 		@togglegroup.Item(togglegroup.ItemProps{
 			Value:      "top",
-			Pressed:    true,
 			Attributes: templ.Attributes{"aria-label": "Toggle top"},
 		}) {
 			Top

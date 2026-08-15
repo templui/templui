@@ -12,12 +12,24 @@ type Props struct {
 	Name       string
 	Value      string
 	Disabled   bool
-	Checked    bool
+	// Checked is the controlled checked state. Use DefaultChecked when the
+	// browser should own the state after the initial render.
+	Checked        *bool
+	DefaultChecked bool
+	ReadOnly       bool
+	Required       bool
 	// Indeterminate renders the mixed state (Base UI's indeterminate prop):
 	// aria-checked="mixed", data-indeterminate and a visible indicator. A
 	// user click leaves the mixed state like the native input does.
 	Indeterminate bool
 	Form          string
+}
+
+func initialChecked(p Props) bool {
+	if p.Checked != nil {
+		return *p.Checked
+	}
+	return p.DefaultChecked
 }
 
 // Checkbox is the vanilla port of Base UI's Checkbox.Root
@@ -31,6 +43,7 @@ templ Checkbox(props ...Props) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
+	{{ checked := initialChecked(p) }}
 	<span
 		data-slot="checkbox"
 		data-tui-checkbox
@@ -38,12 +51,14 @@ templ Checkbox(props ...Props) {
 		if p.Indeterminate {
 			aria-checked="mixed"
 			data-indeterminate
-			if p.Checked {
+			if checked {
 				data-checked
 			} else {
 				data-unchecked
 			}
-		} else if p.Checked {
+		}
+		else
+		if checked {
 			aria-checked="true"
 			data-checked
 		} else {
@@ -57,6 +72,9 @@ templ Checkbox(props ...Props) {
 		} else {
 			tabindex="0"
 		}
+		aria-readonly?={ p.ReadOnly }
+		aria-required?={ p.Required }
+		data-tui-checkbox-controlled?={ p.Checked != nil }
 		class={
 			utils.CN(
 				// 1:1 base/ui/checkbox.tsx: structure lives here, the look comes
@@ -75,12 +93,12 @@ templ Checkbox(props ...Props) {
 			if p.Indeterminate {
 				data-indeterminate
 			}
-			if p.Checked {
+			if checked {
 				data-checked
 			} else {
 				data-unchecked
 			}
-			if !p.Checked && !p.Indeterminate {
+			if !checked && !p.Indeterminate {
 				hidden
 			}
 			class="cn-checkbox-indicator grid place-content-center text-current transition-none"
@@ -98,8 +116,10 @@ templ Checkbox(props ...Props) {
 		data-tui-checkbox-input
 		aria-hidden="true"
 		tabindex="-1"
-		checked?={ p.Checked }
+		checked?={ checked }
 		disabled?={ p.Disabled }
+		readonly?={ p.ReadOnly }
+		required?={ p.Required }
 		if p.ID != "" {
 			id={ p.ID }
 		}

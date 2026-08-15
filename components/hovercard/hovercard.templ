@@ -26,7 +26,13 @@ const (
 
 type ctxKey string
 
-const idKey ctxKey = "hovercardID"
+const stateKey ctxKey = "hovercardState"
+
+type ctxState struct {
+	id          string
+	initialOpen bool
+	controlled  bool
+}
 
 type delaysKey struct{}
 
@@ -36,8 +42,8 @@ type delays struct {
 }
 
 func cardID(ctx context.Context) string {
-	if id, ok := ctx.Value(idKey).(string); ok {
-		return id
+	if state, ok := ctx.Value(stateKey).(ctxState); ok {
+		return state.id
 	}
 	return ""
 }
@@ -52,11 +58,20 @@ func Trigger(ctx context.Context) templ.Attributes {
 }
 
 type Props struct {
-	ID string
+	ID          string
+	Open        *bool
+	DefaultOpen bool
 	// Delay is the hover intent before showing, in ms. Defaults to 600 like Base UI.
 	Delay int
 	// CloseDelay is the grace period before hiding, in ms. Defaults to 300.
 	CloseDelay int
+}
+
+func initialOpen(p Props) bool {
+	if p.Open != nil {
+		return *p.Open
+	}
+	return p.DefaultOpen
 }
 
 type ContentProps struct {
@@ -90,7 +105,7 @@ templ HoverCard(props ...Props) {
 	if p.CloseDelay == 0 {
 		{{ p.CloseDelay = 300 }}
 	}
-	{{ ctx = context.WithValue(ctx, idKey, p.ID) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, initialOpen: initialOpen(p), controlled: p.Open != nil}) }}
 	{{ ctx = context.WithValue(ctx, delaysKey{}, delays{open: p.Delay, close: p.CloseDelay}) }}
 	{ children... }
 }
@@ -113,37 +128,40 @@ templ Content(props ...ContentProps) {
 		{{ p.AlignOffset = 4 }}
 	}
 	{{ d, _ := ctx.Value(delaysKey{}).(delays) }}
+	{{ s, _ := ctx.Value(stateKey).(ctxState) }}
 	// Inert until the script portals it to <body> at init, so the SSRd
 	// content never participates in layout or sibling CSS.
 	<template data-tui-hovercard-portal>
-	<div
-		id={ cardID(ctx) }
-		data-slot="hover-card-content"
-		data-tui-hovercard-content
-		data-tui-hovercard-side={ string(p.Side) }
-		data-tui-hovercard-align={ string(p.Align) }
-		data-tui-hovercard-side-offset={ strconv.Itoa(p.SideOffset) }
-		data-tui-hovercard-align-offset={ strconv.Itoa(p.AlignOffset) }
-		data-tui-hovercard-delay={ strconv.Itoa(d.open) }
-		data-tui-hovercard-close-delay={ strconv.Itoa(d.close) }
-		data-state="closed"
-		hidden
-		data-tui-portal
-		class={
-			utils.CN(
-				// 1:1 base/ui/hover-card.tsx HoverCardContent, the look comes from
-				// cn-hover-card-content (animations key on our data-state attribute).
-				// origin-(--transform-origin) becomes our JS variable name.
-				"cn-hover-card-content cn-hover-card-content-logical z-50 origin-(--tui-hovercard-transform-origin) outline-hidden",
-				// Native [popover] resets plus JS wiring: the popup stays mounted
-				// after animate-out until hidePopover runs.
-				"fixed inset-auto left-0 top-0 m-0 overflow-visible data-closed:fill-mode-forwards",
-				p.Class,
-			),
-		}
-		{ p.Attributes... }
-	>
-		{ children... }
-	</div>
+		<div
+			id={ cardID(ctx) }
+			data-slot="hover-card-content"
+			data-tui-hovercard-content
+			data-tui-hovercard-initial-open={ strconv.FormatBool(s.initialOpen) }
+			data-tui-hovercard-controlled?={ s.controlled }
+			data-tui-hovercard-side={ string(p.Side) }
+			data-tui-hovercard-align={ string(p.Align) }
+			data-tui-hovercard-side-offset={ strconv.Itoa(p.SideOffset) }
+			data-tui-hovercard-align-offset={ strconv.Itoa(p.AlignOffset) }
+			data-tui-hovercard-delay={ strconv.Itoa(d.open) }
+			data-tui-hovercard-close-delay={ strconv.Itoa(d.close) }
+			data-closed
+			hidden
+			data-tui-portal
+			class={
+				utils.CN(
+					// 1:1 base/ui/hover-card.tsx HoverCardContent, the look comes from
+					// cn-hover-card-content (animations key on Base UI's data-open/data-closed attributes).
+					// origin-(--transform-origin) becomes our JS variable name.
+					"cn-hover-card-content cn-hover-card-content-logical z-50 origin-(--tui-hovercard-transform-origin) outline-hidden",
+					// Native [popover] resets plus JS wiring: the popup stays mounted
+					// after animate-out until hidePopover runs.
+					"absolute inset-auto left-0 top-0 m-0 overflow-visible data-closed:fill-mode-forwards",
+					p.Class,
+				),
+			}
+			{ p.Attributes... }
+		>
+			{ children... }
+		</div>
 	</template>
 }

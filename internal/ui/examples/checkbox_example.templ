@@ -46,7 +46,7 @@ templ checkboxExampleBasic() {
 templ checkboxExampleWithDescription() {
 	@checkboxExampleSection("With Description") {
 		@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
-			@checkbox.Checkbox(checkbox.Props{ID: "checkbox-example-terms-2", Checked: true})
+			@checkbox.Checkbox(checkbox.Props{ID: "checkbox-example-terms-2", DefaultChecked: true})
 			@field.Content() {
 				@field.Label(field.LabelProps{For: "checkbox-example-terms-2"}) {
 					Accept terms and conditions
@@ -89,7 +89,7 @@ templ checkboxExampleWithTitle() {
 		@field.Group() {
 			@field.Label(field.LabelProps{For: "checkbox-example-toggle-2"}) {
 				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
-					@checkbox.Checkbox(checkbox.Props{ID: "checkbox-example-toggle-2", Checked: true})
+					@checkbox.Checkbox(checkbox.Props{ID: "checkbox-example-toggle-2", DefaultChecked: true})
 					@field.Content() {
 						@field.Title() {
 							Enable notifications
@@ -161,8 +161,8 @@ templ checkboxExampleInTable() {
 						}) {
 							@table.Cell() {
 								@checkbox.Checkbox(checkbox.Props{
-									ID:      "checkbox-example-row-" + row.ID,
-									Checked: row.ID == "1",
+									ID:             "checkbox-example-row-" + row.ID,
+									DefaultChecked: row.ID == "1",
 								})
 							}
 							@table.Cell(table.CellProps{Class: "font-medium"}) {

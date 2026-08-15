@@ -93,7 +93,7 @@ templ SidebarFloatingExample() {
 							@dropdownmenu.DropdownMenu() {
 								@sidebar.MenuItem() {
 									@sidebar.MenuButton(sidebar.MenuButtonProps{
-										Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+										Class:      "data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
 										Attributes: dropdownmenu.Trigger(ctx),
 									}) {
 										{ group.Title }

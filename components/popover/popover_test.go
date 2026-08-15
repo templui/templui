@@ -56,6 +56,8 @@ func TestClientConsumesInitialOpenAfterPortalMount(t *testing.T) {
 		`content.getAttribute("data-tui-popover-initial-open") === "true"`,
 		`content.removeAttribute("data-tui-popover-initial-open")`,
 		`open(content);`,
+		`FloatingUIDOM.autoUpdate(trigger, content, update`,
+		`layoutShift: typeof IntersectionObserver !== "undefined"`,
 	} {
 		if !strings.Contains(js, want) {
 			t.Fatalf("client behavior is missing %q", want)

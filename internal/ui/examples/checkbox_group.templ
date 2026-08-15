@@ -15,13 +15,13 @@ templ CheckboxGroup() {
 		}
 		@field.Group(field.GroupProps{Class: "gap-3"}) {
 			@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
-				@checkbox.Checkbox(checkbox.Props{ID: "finder-pref-hard-disks-checkbox", Name: "finder-pref-hard-disks-checkbox", Checked: true})
+				@checkbox.Checkbox(checkbox.Props{ID: "finder-pref-hard-disks-checkbox", Name: "finder-pref-hard-disks-checkbox", DefaultChecked: true})
 				@field.Label(field.LabelProps{For: "finder-pref-hard-disks-checkbox", Class: "font-normal"}) {
 					Hard disks
 				}
 			}
 			@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
-				@checkbox.Checkbox(checkbox.Props{ID: "finder-pref-external-disks-checkbox", Name: "finder-pref-external-disks-checkbox", Checked: true})
+				@checkbox.Checkbox(checkbox.Props{ID: "finder-pref-external-disks-checkbox", Name: "finder-pref-external-disks-checkbox", DefaultChecked: true})
 				@field.Label(field.LabelProps{For: "finder-pref-external-disks-checkbox", Class: "font-normal"}) {
 					External disks
 				}

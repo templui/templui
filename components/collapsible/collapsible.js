@@ -48,9 +48,18 @@
     const panel = panelFor(trigger);
     if (!panel) return;
     const root = panel.closest("[data-tui-collapsible]");
+    if (!root || root.hasAttribute("data-disabled")) return;
     const isOpen = !panel.hasAttribute("data-open");
+  const accepted = root.dispatchEvent(
+    new CustomEvent("collapsible-open-change", {
+      bubbles: true,
+      cancelable: true,
+      detail: { open: isOpen },
+    }),
+  );
+  if (!accepted || root.hasAttribute("data-tui-collapsible-controlled")) return;
 
-    if (root) setOpen(root, isOpen);
+    setOpen(root, isOpen);
     trigger.setAttribute("aria-expanded", isOpen ? "true" : "false");
     trigger.toggleAttribute("data-panel-open", isOpen);
     if (isOpen) {

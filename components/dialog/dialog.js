@@ -506,8 +506,23 @@
     return stateOf(target)?.open || false;
   }
 
+  function requestOpenChange(target, nextOpen, trigger) {
+    const state = stateOf(target);
+    if (!state || state.open === nextOpen) return;
+    const accepted = state.popup.dispatchEvent(
+      new CustomEvent("dialog-open-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { open: nextOpen },
+      }),
+    );
+    if (!accepted || state.popup.hasAttribute("data-tui-dialog-controlled")) return;
+    if (nextOpen) openDialog(state.popup, trigger);
+    else closeDialog(state.popup);
+  }
+
   function toggleDialog(target, trigger) {
-    isDialogOpen(target) ? closeDialog(target) : openDialog(target, trigger);
+    requestOpenChange(target, !isDialogOpen(target), trigger);
   }
 
   // ----- dismissal (useDismiss + DialogInteractions) -------------------------
@@ -536,7 +551,7 @@
     if (!isTopmost(state)) return;
     if (event.button !== 0) return;
     if (pressStartedInPopup === state.popup) return;
-    closeDialog(state.popup);
+    requestOpenChange(state.popup, false);
   }
 
   // useDismiss escape key: closes the topmost dialog, ignoring presses that
@@ -565,7 +580,7 @@
       const state = openStack[openStack.length - 1];
       if (!state) return;
       event.preventDefault();
-      closeDialog(state.popup);
+      requestOpenChange(state.popup, false);
       return;
     }
     // FloatingFocusManager: prevent Tab from escaping the modal when the
@@ -757,7 +772,7 @@
     }
     const closeButton = event.target.closest("[data-tui-dialog-close]");
     if (closeButton) {
-      closeDialog(dialogFor(closeButton));
+      requestOpenChange(dialogFor(closeButton), false);
       return;
     }
     const backdrop = event.target.closest("[data-tui-dialog-backdrop]");

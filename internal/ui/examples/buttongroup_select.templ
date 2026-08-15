@@ -11,19 +11,15 @@ import (
 templ ButtonGroupSelect() {
 	@buttongroup.ButtonGroup() {
 		@buttongroup.ButtonGroup() {
-			@selectcomp.Select() {
+			@selectcomp.Select(selectcomp.Props{DefaultValue: "$"}) {
 				@selectcomp.Trigger(selectcomp.TriggerProps{Class: "font-mono"}) {
 					@selectcomp.Value(selectcomp.ValueProps{Placeholder: "$"})
 				}
 				@selectcomp.Content(selectcomp.ContentProps{DisableAlignItemWithTrigger: true, Align: selectcomp.AlignStart}) {
 					@selectcomp.Group() {
-						@selectcomp.Item(selectcomp.ItemProps{
-						Value:    "$",
-						Label:    "$",
-						Selected: true,
-					}) {
-						$ <span class="text-muted-foreground">US Dollar</span>
-					}
+						@selectcomp.Item(selectcomp.ItemProps{Value: "$", Label: "$"}) {
+							$ <span class="text-muted-foreground">US Dollar</span>
+						}
 						@selectcomp.Item(selectcomp.ItemProps{Value: "€", Label: "€"}) {
 							€ <span class="text-muted-foreground">Euro</span>
 						}

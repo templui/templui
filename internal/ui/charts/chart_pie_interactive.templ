@@ -57,7 +57,7 @@ templ ChartPieInteractive() {
 					January - June 2024
 				}
 			</div>
-			@selectcomp.Select(selectcomp.Props{Value: "january"}) {
+			@selectcomp.Select(selectcomp.Props{DefaultValue: "january"}) {
 				@selectcomp.Trigger(selectcomp.TriggerProps{
 					Class:      "ml-auto h-7 w-[130px] rounded-lg pl-2.5",
 					Attributes: templ.Attributes{"aria-label": "Select a value", "data-tui-chart-month-select": "pie-interactive"},

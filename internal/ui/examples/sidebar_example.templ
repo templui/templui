@@ -79,7 +79,7 @@ templ sidebarExampleVersionSwitcher() {
 			@dropdownmenu.DropdownMenu(dropdownmenu.Props{ID: "sidebar-example-version-menu"}) {
 				@sidebar.MenuButton(sidebar.MenuButtonProps{
 					Size:       sidebar.MenuButtonSizeLg,
-					Class:      "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+					Class:      "data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
 					Attributes: dropdownmenu.Trigger(ctx),
 				}) {
 					@item.Item(item.Props{Size: item.SizeXs, Class: "p-0"}) {

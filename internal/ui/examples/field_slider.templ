@@ -14,12 +14,12 @@ templ FieldSlider() {
 			Set your budget range ($<span id="field-slider-min" class="font-medium tabular-nums">200</span> - <span id="field-slider-max" class="font-medium tabular-nums">800</span>).
 		}
 		@slider.Slider(slider.Props{
-			ID:     "field-slider",
-			Value: []float64{200, 800},
-			Min:    0,
-			Max:    1000,
-			Step:   10,
-			Class:  "mt-2 w-full",
+			ID:           "field-slider",
+			DefaultValue: []float64{200, 800},
+			Min:          0,
+			Max:          1000,
+			Step:         10,
+			Class:        "mt-2 w-full",
 			Attributes: templ.Attributes{
 				"aria-label": "Price Range",
 			},

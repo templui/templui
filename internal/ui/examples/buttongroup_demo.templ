@@ -73,10 +73,9 @@ templ ButtonGroupDemo() {
 								Label As...
 							}
 							@dropdownmenu.SubContent() {
-								@dropdownmenu.RadioGroup() {
+								@dropdownmenu.RadioGroup(dropdownmenu.RadioGroupProps{DefaultValue: "personal"}) {
 									@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{
-										Value:   "personal",
-										Checked: true,
+										Value: "personal",
 									}) {
 										Personal
 									}

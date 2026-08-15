@@ -4,7 +4,7 @@ import "github.com/axadrn/shadcn-templ/v2/components/accordion"
 
 templ AccordionDisabled() {
 	@accordion.Accordion(accordion.Props{Class: "w-full"}) {
-		@accordion.Item() {
+		@accordion.Item(accordion.ItemProps{Value: "item-1"}) {
 			@accordion.Trigger() {
 				Can I access my account history?
 			}
@@ -12,7 +12,7 @@ templ AccordionDisabled() {
 				Yes, you can view your complete account history including all transactions, plan changes, and support tickets in the Account History section of your dashboard.
 			}
 		}
-		@accordion.Item(accordion.ItemProps{Disabled: true}) {
+		@accordion.Item(accordion.ItemProps{Value: "item-3", Disabled: true}) {
 			@accordion.Trigger() {
 				Premium feature information
 			}
@@ -20,7 +20,7 @@ templ AccordionDisabled() {
 				This section contains information about premium features. Upgrade your plan to access this content.
 			}
 		}
-		@accordion.Item() {
+		@accordion.Item(accordion.ItemProps{Value: "item-2"}) {
 			@accordion.Trigger() {
 				How do I update my email address?
 			}

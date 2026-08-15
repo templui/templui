@@ -6,7 +6,7 @@ templ ComboboxMultiple() {
 	@combobox.Combobox(combobox.Props{
 		Multiple:      true,
 		AutoHighlight: true,
-		Values:        []string{"templ"},
+		DefaultValues: []string{"templ"},
 	}) {
 		@combobox.Chips(combobox.ChipsProps{Class: "w-full max-w-xs"}) {
 			@combobox.Value()

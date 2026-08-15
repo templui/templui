@@ -10,13 +10,13 @@ templ ContextMenuCheckboxes() {
 		}
 		@contextmenu.Content() {
 			@contextmenu.Group() {
-				@contextmenu.CheckboxItem(contextmenu.CheckboxItemProps{Checked: true}) {
+				@contextmenu.CheckboxItem(contextmenu.CheckboxItemProps{DefaultChecked: true}) {
 					Show Bookmarks Bar
 				}
 				@contextmenu.CheckboxItem() {
 					Show Full URLs
 				}
-				@contextmenu.CheckboxItem(contextmenu.CheckboxItemProps{Checked: true}) {
+				@contextmenu.CheckboxItem(contextmenu.CheckboxItemProps{DefaultChecked: true}) {
 					Show Developer Tools
 				}
 			}

@@ -6,7 +6,7 @@ import (
 )
 
 templ RadioGroupDemo() {
-	@radiogroup.RadioGroup(radiogroup.Props{Value: "comfortable", Class: "w-fit"}) {
+	@radiogroup.RadioGroup(radiogroup.Props{DefaultValue: "comfortable", Class: "w-fit"}) {
 		<div class="flex items-center gap-3">
 			@radiogroup.Item(radiogroup.ItemProps{ID: "r1", Value: "default"})
 			@label.Label(label.Props{For: "r1"}) {

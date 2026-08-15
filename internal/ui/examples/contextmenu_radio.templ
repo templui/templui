@@ -13,8 +13,8 @@ templ ContextMenuRadio() {
 				@contextmenu.Label() {
 					People
 				}
-				@contextmenu.RadioGroup() {
-					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "pedro", Checked: true}) {
+				@contextmenu.RadioGroup(contextmenu.RadioGroupProps{DefaultValue: "pedro"}) {
+					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "pedro"}) {
 						Pedro Duarte
 					}
 					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "colm"}) {
@@ -27,8 +27,8 @@ templ ContextMenuRadio() {
 				@contextmenu.Label() {
 					Theme
 				}
-				@contextmenu.RadioGroup() {
-					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "light", Checked: true}) {
+				@contextmenu.RadioGroup(contextmenu.RadioGroupProps{DefaultValue: "light"}) {
+					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "light"}) {
 						Light
 					}
 					@contextmenu.RadioItem(contextmenu.RadioItemProps{Value: "dark"}) {

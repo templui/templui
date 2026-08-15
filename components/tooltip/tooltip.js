@@ -46,7 +46,10 @@
   // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
     document.querySelectorAll("body > [data-tui-tooltip-content]").forEach((c) => {
-      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) c.remove();
+      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) {
+        stopAutoPositioning(c);
+        c.remove();
+      }
     });
     if (content.parentElement !== document.body) {
       if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
@@ -63,12 +66,12 @@
 
     return computePosition(trigger, content, {
       placement: side,
-      strategy: "fixed",
+      strategy: "absolute",
       middleware: [
         offset(sideOffset),
         flip(),
-        shift({ padding: 8 }),
-        arrowEl ? arrow({ element: arrowEl, padding: 6 }) : undefined,
+        shift({ padding: 5 }),
+        arrowEl ? arrow({ element: arrowEl, padding: 5 }) : undefined,
       ].filter(Boolean),
     }).then((result) => {
       content.style.transition = "none";
@@ -86,6 +89,26 @@
     });
   }
 
+  function startAutoPositioning(content, trigger) {
+    if (content._tuiPositionCleanup) content._tuiPositionCleanup();
+    let resolveFirst;
+    const firstPosition = new Promise((resolve) => {
+      resolveFirst = resolve;
+    });
+    const update = () => positionContent(content, trigger).then(resolveFirst, resolveFirst);
+    content._tuiPositionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
+      elementResize: typeof ResizeObserver !== "undefined",
+      layoutShift: typeof IntersectionObserver !== "undefined",
+    });
+    return firstPosition;
+  }
+
+  function stopAutoPositioning(content) {
+    if (!content._tuiPositionCleanup) return;
+    content._tuiPositionCleanup();
+    content._tuiPositionCleanup = null;
+  }
+
   function open(trigger) {
     // Consumers can suppress a tooltip situationally (e.g. the sidebar only
     // shows menu tooltips while collapsed to icons).
@@ -101,7 +124,7 @@
 
     // Position it invisibly first, then play the enter animation in place.
     content.style.visibility = "hidden";
-    positionContent(content, trigger).then(() => {
+    startAutoPositioning(content, trigger).then(() => {
       if (content.hidden) return; // closed meanwhile
       // duration-100 transitions `all`; a visibility transition would
       // freeze at hidden in background tabs - flip suppressed.
@@ -132,6 +155,7 @@
 
   function close(content) {
     if (content.hidden) return;
+    stopAutoPositioning(content);
     content.removeAttribute("data-open");
     content.removeAttribute("data-starting-style");
     content.setAttribute("data-closed", "");
@@ -159,11 +183,31 @@
     allContents().forEach(close);
   }
 
+  function requestOpenChange(trigger, nextOpen) {
+    if (!trigger) return;
+    const content = contentFor(trigger);
+    if (!content || content.hasAttribute("data-open") === nextOpen) return;
+    const accepted = content.dispatchEvent(
+      new CustomEvent("tooltip-open-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { open: nextOpen },
+      }),
+    );
+    if (!accepted || content.hasAttribute("data-tui-tooltip-controlled")) return;
+    if (nextOpen) open(trigger);
+    else close(content);
+  }
+
+  function requestCloseAll() {
+    allContents().forEach((content) => requestOpenChange(triggerFor(content), false));
+  }
+
   // ----- events -------------------------------------------------------------
 
   document.addEventListener("mouseover", (e) => {
     const trigger = e.target.closest("[data-tui-tooltip-trigger]");
-    if (trigger) open(trigger);
+    if (trigger) requestOpenChange(trigger, true);
   });
 
   document.addEventListener("mouseout", (e) => {
@@ -171,7 +215,7 @@
     if (!trigger) return;
     if (e.relatedTarget && trigger.contains(e.relatedTarget)) return; // still inside
     const content = contentFor(trigger);
-    if (content) close(content);
+    if (content) requestOpenChange(trigger, false);
   });
 
   // Keyboard: show on focus, hide on blur. Like Base UI, only visible
@@ -179,18 +223,18 @@
   // autofocus) does not pop it.
   document.addEventListener("focusin", (e) => {
     const trigger = e.target.closest("[data-tui-tooltip-trigger]");
-    if (trigger && trigger.matches(":focus-visible")) open(trigger);
+    if (trigger && trigger.matches(":focus-visible")) requestOpenChange(trigger, true);
   });
 
   document.addEventListener("focusout", (e) => {
     const trigger = e.target.closest("[data-tui-tooltip-trigger]");
     if (!trigger) return;
     const content = contentFor(trigger);
-    if (content) close(content);
+    if (content) requestOpenChange(trigger, false);
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeAll();
+    if (e.key === "Escape") requestCloseAll();
   });
 
   // Lift every content out of its inert <template> into <body>, shadcn's
@@ -202,13 +246,23 @@
         const content = tpl.content.querySelector("[data-tui-tooltip-content]");
         if (content) {
           const stale = document.getElementById(content.id);
-          if (stale) stale.remove(); // htmx re-swap of the same id
+          if (stale) {
+            stopAutoPositioning(stale);
+            stale.remove(); // htmx re-swap of the same id
+          }
           content._tuiPortalOwner = tpl.parentElement;
           portal(content);
         }
         tpl.remove();
       });
-    allContents().forEach(portal);
+    allContents().forEach((content) => {
+      portal(content);
+      if (content.getAttribute("data-tui-tooltip-initial-open") === "true") {
+        content.removeAttribute("data-tui-tooltip-initial-open");
+        const trigger = triggerFor(content);
+        if (trigger) open(trigger);
+      }
+    });
   }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
@@ -221,14 +275,4 @@
   // ownership sweep.
   new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
 
-  // Keep open tooltips anchored while scrolling or resizing.
-  function repositionOpen() {
-    allContents().forEach((content) => {
-      if (!content.hasAttribute("data-open")) return;
-      const trigger = triggerFor(content);
-      if (trigger) positionContent(content, trigger);
-    });
-  }
-  window.addEventListener("scroll", repositionOpen, true);
-  window.addEventListener("resize", repositionOpen);
 })();

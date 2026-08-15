@@ -19,10 +19,9 @@ templ DropdownMenuRadioIcons() {
 				@dropdownmenu.Label() {
 					Select Payment Method
 				}
-				@dropdownmenu.RadioGroup() {
+				@dropdownmenu.RadioGroup(dropdownmenu.RadioGroupProps{DefaultValue: "card"}) {
 					@dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{
-						Value:   "card",
-						Checked: true,
+						Value: "card",
 					}) {
 						@icon.CreditCard()
 						Credit Card

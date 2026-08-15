@@ -68,8 +68,8 @@ templ SidebarInsetExample() {
 					@sidebar.Menu() {
 						for _, navItem := range sidebarInsetExampleNavMain {
 							@collapsible.Collapsible(collapsible.Props{
-								Open:  navItem.IsActive,
-								Class: "group/collapsible",
+								DefaultOpen: navItem.IsActive,
+								Class:       "group/collapsible",
 							}) {
 								@sidebar.MenuItem() {
 									@sidebar.MenuButton(sidebar.MenuButtonProps{
@@ -81,7 +81,7 @@ templ SidebarInsetExample() {
 									}
 									if len(navItem.Items) > 0 {
 										@sidebar.MenuAction(sidebar.MenuActionProps{
-											Class:      "group-data-[state=open]/collapsible:rotate-90",
+											Class:      "group-data-open/collapsible:rotate-90",
 											Attributes: collapsible.Trigger(ctx),
 										}) {
 											@icon.ChevronRight()

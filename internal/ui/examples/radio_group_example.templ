@@ -32,7 +32,7 @@ templ RadioGroupExample() {
 
 templ radioGroupExampleBasic() {
 	@radioGroupExampleSection("Basic") {
-		@radiogroup.RadioGroup(radiogroup.Props{Value: "comfortable"}) {
+		@radiogroup.RadioGroup(radiogroup.Props{DefaultValue: "comfortable"}) {
 			@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 				@radiogroup.Item(radiogroup.ItemProps{ID: "r1", Value: "default"})
 				@field.Label(field.LabelProps{For: "r1", Class: "font-normal"}) {
@@ -57,7 +57,7 @@ templ radioGroupExampleBasic() {
 
 templ radioGroupExampleWithDescriptions() {
 	@radioGroupExampleSection("With Descriptions") {
-		@radiogroup.RadioGroup(radiogroup.Props{Value: "plus"}) {
+		@radiogroup.RadioGroup(radiogroup.Props{DefaultValue: "plus"}) {
 			@field.Label(field.LabelProps{For: "plus-plan"}) {
 				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 					@field.Content() {
@@ -104,7 +104,7 @@ templ radioGroupExampleWithFieldSet() {
 			@field.Description() {
 				Choose your preferred battery level.
 			}
-			@radiogroup.RadioGroup(radiogroup.Props{Value: "medium"}) {
+			@radiogroup.RadioGroup(radiogroup.Props{DefaultValue: "medium"}) {
 				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 					@radiogroup.Item(radiogroup.ItemProps{ID: "battery-high", Value: "high"})
 					@field.Label(field.LabelProps{For: "battery-high", Class: "font-normal"}) {
@@ -130,7 +130,7 @@ templ radioGroupExampleWithFieldSet() {
 
 templ radioGroupExampleGrid() {
 	@radioGroupExampleSection("Grid Layout") {
-		@radiogroup.RadioGroup(radiogroup.Props{Value: "medium", Class: "grid grid-cols-2 gap-2"}) {
+		@radiogroup.RadioGroup(radiogroup.Props{DefaultValue: "medium", Class: "grid grid-cols-2 gap-2"}) {
 			@field.Label(field.LabelProps{For: "size-small"}) {
 				@field.Field(field.Props{Orientation: field.OrientationHorizontal}) {
 					@radiogroup.Item(radiogroup.ItemProps{ID: "size-small", Value: "small"})
@@ -161,7 +161,7 @@ templ radioGroupExampleGrid() {
 
 templ radioGroupExampleDisabled() {
 	@radioGroupExampleSection("Disabled") {
-		@radiogroup.RadioGroup(radiogroup.Props{Value: "option2"}) {
+		@radiogroup.RadioGroup(radiogroup.Props{DefaultValue: "option2"}) {
 			@field.Field(field.Props{Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-disabled": "true"}}) {
 				@radiogroup.Item(radiogroup.ItemProps{ID: "disabled-1", Value: "option1", Disabled: true})
 				@field.Label(field.LabelProps{For: "disabled-1", Class: "font-normal"}) {
@@ -193,7 +193,7 @@ templ radioGroupExampleInvalid() {
 			@field.Description() {
 				Choose how you want to receive notifications.
 			}
-			@radiogroup.RadioGroup(radiogroup.Props{Value: "email"}) {
+			@radiogroup.RadioGroup(radiogroup.Props{DefaultValue: "email"}) {
 				@field.Field(field.Props{Orientation: field.OrientationHorizontal, Attributes: templ.Attributes{"data-invalid": "true"}}) {
 					@radiogroup.Item(radiogroup.ItemProps{ID: "invalid-email", Value: "email", Attributes: templ.Attributes{"aria-invalid": "true"}})
 					@field.Label(field.LabelProps{For: "invalid-email", Class: "font-normal"}) {

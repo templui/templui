@@ -186,7 +186,7 @@ templ inputExampleWithSelect() {
 				Placeholder: "Enter amount",
 				Class:       "flex-1",
 			})
-			@selectcomp.Select(selectcomp.Props{Value: "usd"}) {
+			@selectcomp.Select(selectcomp.Props{DefaultValue: "usd"}) {
 				@selectcomp.Trigger(selectcomp.TriggerProps{Class: "w-32"}) {
 					@selectcomp.Value()
 				}
@@ -291,7 +291,7 @@ templ inputExampleForm() {
 						@field.Label(field.LabelProps{For: "form-country"}) {
 							Country
 						}
-						@selectcomp.Select(selectcomp.Props{Value: "us"}) {
+						@selectcomp.Select(selectcomp.Props{DefaultValue: "us"}) {
 							@selectcomp.Trigger(selectcomp.TriggerProps{ID: "form-country"}) {
 								@selectcomp.Value()
 							}

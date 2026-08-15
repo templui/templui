@@ -195,13 +195,13 @@ templ buttonGroupExampleWithSelect() {
 				Amount
 			}
 			@buttongroup.ButtonGroup() {
-				@selectcomp.Select() {
+				@selectcomp.Select(selectcomp.Props{DefaultValue: "$"}) {
 					@selectcomp.Trigger() {
 						@selectcomp.Value()
 					}
 					@selectcomp.Content() {
 						@selectcomp.Group() {
-							@selectcomp.Item(selectcomp.ItemProps{Value: "$", Label: "$", Selected: true}) {
+							@selectcomp.Item(selectcomp.ItemProps{Value: "$", Label: "$"}) {
 								$
 							}
 							@selectcomp.Item(selectcomp.ItemProps{Value: "€", Label: "€"}) {
@@ -305,13 +305,13 @@ templ buttonGroupExampleWithLike() {
 templ buttonGroupExampleWithSelectAndInput() {
 	@buttonGroupExampleSection("With Select and Input") {
 		@buttongroup.ButtonGroup() {
-			@selectcomp.Select() {
+			@selectcomp.Select(selectcomp.Props{DefaultValue: "hours"}) {
 				@selectcomp.Trigger(selectcomp.TriggerProps{ID: "button-group-example-duration"}) {
 					@selectcomp.Value()
 				}
 				@selectcomp.Content(selectcomp.ContentProps{Align: selectcomp.AlignStart}) {
 					@selectcomp.Group() {
-						@selectcomp.Item(selectcomp.ItemProps{Value: "hours", Label: "Hours", Selected: true}) {
+						@selectcomp.Item(selectcomp.ItemProps{Value: "hours", Label: "Hours"}) {
 							Hours
 						}
 						@selectcomp.Item(selectcomp.ItemProps{Value: "days", Label: "Days"}) {

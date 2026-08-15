@@ -565,7 +565,7 @@
       // The deepest open drawer dismisses first (a parent with an open
       // nested drawer stays).
       const top = open.find((d) => !hasOpenNested(d));
-      if (top) closeDrawer(top);
+      if (top) requestOpenChange(top, false);
     },
     true,
   );
@@ -673,8 +673,24 @@
     return getDrawer(target)?.open || false;
   }
 
+  function requestOpenChange(target, nextOpen, strength) {
+    const dialog = getDrawer(target);
+    if (!dialog || dialog.open === nextOpen) return false;
+    const accepted = dialog.dispatchEvent(
+      new CustomEvent("drawer-open-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { open: nextOpen },
+      }),
+    );
+    if (!accepted || dialog.hasAttribute("data-tui-drawer-controlled")) return false;
+    if (nextOpen) openDrawer(dialog);
+    else closeDrawer(dialog, strength);
+    return true;
+  }
+
   function toggleDrawer(target) {
-    isDrawerOpen(target) ? closeDrawer(target) : openDrawer(target);
+    requestOpenChange(target, !isDrawerOpen(target));
   }
 
   // Sets the active snap point (the pendant of the controlled snapPoint
@@ -998,9 +1014,15 @@
             releaseVelocity,
             overallVelocity,
           );
+          const previousActive = snap.active;
           snap.active = null;
           finishNestedSwipe(0);
-          closeDrawer(dialog, strength);
+          if (!requestOpenChange(dialog, false, strength)) {
+            snap.active = previousActive;
+            applySnapState(dialog);
+            popup.style.setProperty("--drawer-swipe-movement-x", "0px");
+            popup.style.setProperty("--drawer-swipe-movement-y", "0px");
+          }
         };
         const settle = (point) => {
           snap.active = point.value;
@@ -1079,11 +1101,12 @@
 
       if (shouldClose) {
         finishNestedSwipe(0);
-        closeDrawer(
+        const closed = requestOpenChange(
           dialog,
+          false,
           resolveSwipeStrength(dialog, state.size, disp, releaseVelocity, overallVelocity),
         );
-        return;
+        if (closed) return;
       }
 
       // Spring back: hand the transform to the movement vars at the released
@@ -1268,7 +1291,7 @@
 
     dialog.addEventListener("cancel", (event) => {
       event.preventDefault();
-      closeDrawer(dialog);
+      requestOpenChange(dialog, false);
     });
 
     dialog.addEventListener("close", () => {
@@ -1286,7 +1309,7 @@
       if (dialog.hasAttribute("data-tui-drawer-disable-dismissible")) return;
       const popup = popupOf(dialog);
       const target = event.target instanceof Element ? event.target : null;
-      if (popup && target && !popup.contains(target)) closeDrawer(dialog);
+      if (popup && target && !popup.contains(target)) requestOpenChange(dialog, false);
     });
 
     attachSwipe(dialog);
@@ -1361,7 +1384,7 @@
     }
     const closeButton = event.target.closest("[data-tui-drawer-close]");
     if (closeButton) {
-      closeDrawer(drawerFor(closeButton));
+      requestOpenChange(drawerFor(closeButton), false);
     }
   });
 

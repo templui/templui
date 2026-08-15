@@ -219,7 +219,7 @@ templ comboboxExampleInvalid() {
 
 templ comboboxExampleWithClear() {
 	@comboboxExampleSection("With Clear Button", "") {
-		@combobox.Combobox(combobox.Props{Value: "templ"}) {
+		@combobox.Combobox(combobox.Props{DefaultValue: "templ"}) {
 			@combobox.Input(combobox.InputProps{Placeholder: "Select a framework", ShowClear: true})
 			@combobox.Content() {
 				@combobox.Empty() {
@@ -441,7 +441,7 @@ templ comboboxExampleMultiple() {
 		@combobox.Combobox(combobox.Props{
 			Multiple:      true,
 			AutoHighlight: true,
-			Values:        []string{"templ"},
+			DefaultValues: []string{"templ"},
 		}) {
 			@combobox.Chips() {
 				@combobox.Value()
@@ -464,7 +464,7 @@ templ comboboxExampleMultipleDisabled() {
 		@combobox.Combobox(combobox.Props{
 			Multiple:      true,
 			AutoHighlight: true,
-			Values:        []string{"templ", "htmx"},
+			DefaultValues: []string{"templ", "htmx"},
 			Disabled:      true,
 		}) {
 			@combobox.Chips() {
@@ -489,7 +489,7 @@ templ comboboxExampleMultipleInvalid() {
 			@combobox.Combobox(combobox.Props{
 				Multiple:      true,
 				AutoHighlight: true,
-				Values:        []string{"templ", "htmx"},
+				DefaultValues: []string{"templ", "htmx"},
 			}) {
 				@combobox.Chips() {
 					@combobox.Value()
@@ -511,7 +511,7 @@ templ comboboxExampleMultipleInvalid() {
 				@combobox.Combobox(combobox.Props{
 					Multiple:      true,
 					AutoHighlight: true,
-					Values:        []string{"templ", "htmx", "gin"},
+					DefaultValues: []string{"templ", "htmx", "gin"},
 				}) {
 					@combobox.Chips() {
 						@combobox.Value()
@@ -545,7 +545,7 @@ templ comboboxExampleMultipleNoRemove() {
 		@combobox.Combobox(combobox.Props{
 			Multiple:      true,
 			AutoHighlight: true,
-			Values:        []string{"templ", "htmx"},
+			DefaultValues: []string{"templ", "htmx"},
 		}) {
 			@combobox.Chips(combobox.ChipsProps{Class: "[&_[data-tui-combobox-chip-remove]]:hidden"}) {
 				@combobox.Value()

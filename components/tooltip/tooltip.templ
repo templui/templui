@@ -18,13 +18,19 @@ const (
 
 type ctxKey string
 
-const idKey ctxKey = "tooltipID"
+const stateKey ctxKey = "tooltipState"
 
-func tooltipID(ctx context.Context) string {
-	if id, ok := ctx.Value(idKey).(string); ok {
-		return id
+type ctxState struct {
+	id          string
+	initialOpen bool
+	controlled  bool
+}
+
+func state(ctx context.Context) ctxState {
+	if s, ok := ctx.Value(stateKey).(ctxState); ok {
+		return s
 	}
-	return ""
+	return ctxState{}
 }
 
 // Trigger returns the attributes that turn any element into the tooltip
@@ -35,12 +41,21 @@ func tooltipID(ctx context.Context) string {
 func Trigger(ctx context.Context) templ.Attributes {
 	return templ.Attributes{
 		"data-tui-tooltip-trigger": true,
-		"aria-describedby":         tooltipID(ctx),
+		"aria-describedby":         state(ctx).id,
 	}
 }
 
 type Props struct {
-	ID string
+	ID          string
+	Open        *bool
+	DefaultOpen bool
+}
+
+func initialOpen(p Props) bool {
+	if p.Open != nil {
+		return *p.Open
+	}
+	return p.DefaultOpen
 }
 
 type ContentProps struct {
@@ -63,7 +78,7 @@ templ Tooltip(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, idKey, p.ID) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, initialOpen: initialOpen(p), controlled: p.Open != nil}) }}
 	{ children... }
 }
 
@@ -78,38 +93,41 @@ templ Content(props ...ContentProps) {
 	if p.SideOffset == 0 {
 		{{ p.SideOffset = 4 }}
 	}
+	{{ s := state(ctx) }}
 	// Inert until the script portals it to <body>: inline it would count as a
 	// layout sibling (e.g. button group's last-child rounding).
 	<template data-tui-tooltip-portal>
 		<div
-			id={ tooltipID(ctx) }
+			id={ s.id }
 			data-slot="tooltip-content"
-		data-tui-tooltip-content
-		data-tui-tooltip-side={ string(p.Side) }
-		data-tui-tooltip-side-offset={ strconv.Itoa(p.SideOffset) }
-		data-closed
-		hidden
-		data-tui-portal
-		role="tooltip"
-		class={
-			utils.CN(
-				// 1:1 base/ui/tooltip.tsx TooltipContent, the look comes from
-				// cn-tooltip-content and Base UI's standard transform-origin variable.
-				"cn-tooltip-content cn-tooltip-content-logical z-50 w-fit max-w-xs origin-(--transform-origin) bg-foreground text-background",
-				// Native [popover] resets plus JS wiring: the popup stays mounted
-				// after animate-out until hidePopover runs.
-				"pointer-events-none fixed inset-auto left-0 top-0 m-0 overflow-visible data-closed:fill-mode-forwards",
-				p.Class,
-			),
-		}
-		{ p.Attributes... }
-	>
-		{ children... }
-		<span
-			data-tui-tooltip-arrow
+			data-tui-tooltip-content
+			data-tui-tooltip-side={ string(p.Side) }
+			data-tui-tooltip-side-offset={ strconv.Itoa(p.SideOffset) }
+			data-tui-tooltip-initial-open={ strconv.FormatBool(s.initialOpen) }
+			data-tui-tooltip-controlled?={ s.controlled }
 			data-closed
-			class="cn-tooltip-arrow cn-tooltip-arrow-logical absolute z-50 bg-foreground fill-foreground data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1 data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1 data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5"
-		></span>
+			hidden
+			data-tui-portal
+			role="tooltip"
+			class={
+				utils.CN(
+					// 1:1 base/ui/tooltip.tsx TooltipContent, the look comes from
+					// cn-tooltip-content and Base UI's standard transform-origin variable.
+					"cn-tooltip-content cn-tooltip-content-logical z-50 w-fit max-w-xs origin-(--transform-origin) bg-foreground text-background",
+					// Native [popover] resets plus JS wiring: the popup stays mounted
+					// after animate-out until hidePopover runs.
+					"pointer-events-none absolute inset-auto left-0 top-0 m-0 overflow-visible data-closed:fill-mode-forwards",
+					p.Class,
+				),
+			}
+			{ p.Attributes... }
+		>
+			{ children... }
+			<span
+				data-tui-tooltip-arrow
+				data-closed
+				class="cn-tooltip-arrow cn-tooltip-arrow-logical absolute z-50 bg-foreground fill-foreground data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1 data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1 data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5"
+			></span>
 		</div>
 	</template>
 }

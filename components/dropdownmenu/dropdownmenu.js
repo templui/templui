@@ -1,7 +1,7 @@
 // Uses window.FloatingUIDOM from components/floatingui (loaded in the same bundle).
 (function () {
   const EXIT_MS = 120; // exit animation (duration-100) + slack
-  const COLLISION_PADDING = 8;
+  const COLLISION_PADDING = 5;
   // Submenu hover intent, like Base UI: open fast, close with a grace delay so
   // moving the mouse diagonally into the submenu does not flicker.
   const SUB_OPEN_DELAY = 100;
@@ -85,7 +85,10 @@
   // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
     document.querySelectorAll("body > [data-tui-dropdownmenu-content]").forEach((c) => {
-      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) c.remove();
+      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) {
+        stopAutoPositioning(c);
+        c.remove();
+      }
     });
     if (content.parentElement !== document.body) {
       if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
@@ -95,8 +98,15 @@
 
   function positionMenu(content, trigger) {
     const { computePosition, offset, flip, shift, size } = window.FloatingUIDOM;
-    const side = content.getAttribute("data-tui-dropdownmenu-side") || "bottom";
-    const align = content.getAttribute("data-tui-dropdownmenu-align") || "start";
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
+    const side =
+      (mobile && content.getAttribute("data-tui-dropdownmenu-mobile-side")) ||
+      content.getAttribute("data-tui-dropdownmenu-side") ||
+      "bottom";
+    const align =
+      (mobile && content.getAttribute("data-tui-dropdownmenu-mobile-align")) ||
+      content.getAttribute("data-tui-dropdownmenu-align") ||
+      "start";
     const sideOffset =
       parseInt(content.getAttribute("data-tui-dropdownmenu-side-offset"), 10) || 4;
     const alignOffset =
@@ -105,7 +115,7 @@
 
     return computePosition(trigger, content, {
       placement: placement,
-      strategy: "fixed",
+      strategy: "absolute",
       middleware: [
         offset({ mainAxis: sideOffset, alignmentAxis: alignOffset }),
         flip({ padding: COLLISION_PADDING }),
@@ -136,6 +146,29 @@
         );
       }
     });
+  }
+
+  // Base UI keeps mounted popups attached to their anchors while ancestors
+  // move, resize, scroll, or shift layout. This also tracks a mobile sidebar
+  // while its opening transform is still settling.
+  function startAutoPositioning(content, trigger) {
+    if (content._tuiPositionCleanup) content._tuiPositionCleanup();
+    let resolveFirst;
+    const firstPosition = new Promise((resolve) => {
+      resolveFirst = resolve;
+    });
+    const update = () => positionMenu(content, trigger).then(resolveFirst, resolveFirst);
+    content._tuiPositionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
+      elementResize: typeof ResizeObserver !== "undefined",
+      layoutShift: typeof IntersectionObserver !== "undefined",
+    });
+    return firstPosition;
+  }
+
+  function stopAutoPositioning(content) {
+    if (!content._tuiPositionCleanup) return;
+    content._tuiPositionCleanup();
+    content._tuiPositionCleanup = null;
   }
 
   // ----- focus highlighting (Base UI moves real focus to menu items) --------
@@ -221,17 +254,19 @@
       trigger.setAttribute("data-pressed", "");
       const popup = popupFor(content);
       if (!popup) return;
+	  syncSubState(popup);
       if (focusFirst) {
         focusItem(itemsIn(popup)[0] || popup);
       } else {
         popup.focus({ preventScroll: true });
       }
     };
-    positionMenu(content, trigger).then(finish, finish);
+    startAutoPositioning(content, trigger).then(finish, finish);
   }
 
   function close(content, refocusTrigger) {
     if (content.hidden) return;
+    stopAutoPositioning(content);
     setTransitionAttribute(content, "data-starting-style", false);
     setState(content, "closed");
     setTransitionAttribute(content, "data-ending-style", true);
@@ -257,6 +292,27 @@
     allContents().forEach((content) => close(content, refocusTrigger));
   }
 
+  function requestOpenChange(content, nextOpen, focusFirst, refocusTrigger) {
+    if (!content || isOpen(content) === nextOpen) return;
+    const accepted = content.dispatchEvent(
+      new CustomEvent("dropdownmenu-open-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { open: nextOpen },
+      }),
+    );
+    if (!accepted || content.hasAttribute("data-tui-dropdownmenu-controlled")) return;
+    const trigger = triggerFor(content);
+    if (nextOpen && trigger) open(content, trigger, focusFirst);
+    else if (!nextOpen) close(content, refocusTrigger);
+  }
+
+  function requestCloseAll(refocusTrigger) {
+    allContents().forEach((content) =>
+      requestOpenChange(content, false, false, refocusTrigger),
+    );
+  }
+
   function anyOpen() {
     return [...allContents()].find(isOpen) || null;
   }
@@ -280,7 +336,7 @@
     // Base UI submenu placement: right-start, sideOffset 0, alignOffset -3.
     computePosition(trigger, content, {
       placement: "right-start",
-      strategy: "fixed",
+      strategy: "absolute",
       middleware: [
         offset({ mainAxis: 0, alignmentAxis: -3 }),
         flip({ padding: COLLISION_PADDING }),
@@ -308,6 +364,7 @@
       content.removeAttribute("data-closed");
       startTransition(content);
       trigger.setAttribute("data-popup-open", "");
+	  trigger.setAttribute("aria-expanded", "true");
       if (focusFirst) focusItem(itemsIn(content)[0] || content);
     });
   }
@@ -321,6 +378,7 @@
     setTransitionAttribute(content, "data-starting-style", false);
     setTransitionAttribute(content, "data-ending-style", true);
     trigger.removeAttribute("data-popup-open");
+	trigger.setAttribute("aria-expanded", "false");
     setTimeout(() => {
       if (content.hasAttribute("data-closed")) {
         content.classList.add("hidden");
@@ -343,6 +401,33 @@
     setTransitionAttribute(content, "data-starting-style", false);
     setTransitionAttribute(content, "data-ending-style", false);
     trigger.removeAttribute("data-popup-open");
+	trigger.setAttribute("aria-expanded", "false");
+  }
+
+  function requestSubOpenChange(sub, nextOpen, focusFirst) {
+	const { trigger, content } = subParts(sub);
+	if (!trigger || !content || content.hasAttribute("data-open") === nextOpen) return;
+	const accepted = trigger.dispatchEvent(
+	  new CustomEvent("dropdownmenu-sub-open-change", {
+		bubbles: true,
+		cancelable: true,
+		detail: { open: nextOpen },
+	  }),
+	);
+	if (!accepted || sub.hasAttribute("data-tui-dropdownmenu-sub-controlled")) return;
+	sub.setAttribute("data-tui-dropdownmenu-sub-open", String(nextOpen));
+	if (nextOpen) openSub(sub, focusFirst);
+	else closeSub(sub);
+  }
+
+  function syncSubState(menu) {
+	menu.querySelectorAll("[data-tui-dropdownmenu-sub]").forEach((sub) => {
+	  const { content } = subParts(sub);
+	  if (!content) return;
+	  const shouldOpen = sub.getAttribute("data-tui-dropdownmenu-sub-open") === "true";
+	  if (shouldOpen && !content.hasAttribute("data-open")) openSub(sub, false);
+	  else if (!shouldOpen && content.hasAttribute("data-open")) closeSubNow(sub);
+	});
   }
 
   // Hover intent: while the pointer is over a sub (trigger or its content),
@@ -365,7 +450,7 @@
         if (!isOpen && !sub._tuiOpen) {
           sub._tuiOpen = setTimeout(() => {
             sub._tuiOpen = null;
-            openSub(sub);
+			requestSubOpenChange(sub, true);
           }, SUB_OPEN_DELAY);
         }
       } else {
@@ -374,7 +459,7 @@
         if (isOpen && !sub._tuiClose) {
           sub._tuiClose = setTimeout(() => {
             sub._tuiClose = null;
-            closeSub(sub);
+			requestSubOpenChange(sub, false);
           }, SUB_CLOSE_DELAY);
         }
       }
@@ -408,7 +493,10 @@
       const content = tpl.content.querySelector("[data-tui-dropdownmenu-content]");
       if (content) {
         const stale = document.getElementById(content.id);
-        if (stale) stale.remove();
+        if (stale) {
+          stopAutoPositioning(stale);
+          stale.remove();
+        }
         content._tuiPortalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
@@ -420,7 +508,12 @@
     liftTemplates();
     document.querySelectorAll("[data-tui-dropdownmenu-trigger]").forEach((trigger) => {
       const content = contentFor(trigger);
-      if (content) portal(content);
+      if (!content) return;
+      portal(content);
+      if (content.getAttribute("data-tui-dropdownmenu-initial-open") === "true") {
+        content.removeAttribute("data-tui-dropdownmenu-initial-open");
+        open(content, trigger, false);
+      }
     });
   }
 
@@ -443,11 +536,7 @@
   function toggle(trigger, focusFirst) {
     const content = contentFor(trigger);
     if (!content) return;
-    if (isOpen(content)) {
-      close(content);
-    } else {
-      open(content, trigger, focusFirst);
-    }
+    requestOpenChange(content, !isOpen(content), focusFirst);
   }
 
   document.addEventListener("pointerdown", (e) => {
@@ -457,7 +546,7 @@
       if (!trigger.disabled) toggle(trigger, false);
       return;
     }
-    if (!e.target.closest("[data-tui-dropdownmenu-content]")) closeAll(false);
+    if (!e.target.closest("[data-tui-dropdownmenu-content]")) requestCloseAll(false);
   });
 
   document.addEventListener("click", (e) => {
@@ -477,7 +566,7 @@
       if (sub) {
         clearTimeout(sub._tuiOpen);
         sub._tuiOpen = null;
-        openSub(sub, e.detail === 0);
+		requestSubOpenChange(sub, true, e.detail === 0);
       }
       return;
     }
@@ -487,13 +576,15 @@
     if (checkbox) {
       if (!checkbox.disabled) {
         const on = checkbox.hasAttribute("data-checked");
-        setChecked(checkbox, !on);
-        checkbox.dispatchEvent(
-          new CustomEvent("dropdownmenu-checked-change", {
-            bubbles: true,
-            detail: { checked: !on },
-          }),
-        );
+    const change = new CustomEvent("dropdownmenu-checked-change", {
+      bubbles: true,
+      cancelable: true,
+      detail: { checked: !on },
+    });
+    const accepted = checkbox.dispatchEvent(change);
+    if (accepted && !checkbox.hasAttribute("data-tui-dropdownmenu-checkbox-controlled")) {
+      setChecked(checkbox, !on);
+    }
       }
       return;
     }
@@ -503,18 +594,18 @@
     if (radio) {
       if (!radio.disabled) {
         const group = radio.closest("[data-tui-dropdownmenu-radio-group]");
-        if (group) {
+    const change = new CustomEvent("dropdownmenu-value-change", {
+      bubbles: true,
+      cancelable: true,
+      detail: { value: radio.getAttribute("data-tui-dropdownmenu-radio-value") },
+    });
+    const accepted = (group || radio).dispatchEvent(change);
+    if (accepted && group && !group.hasAttribute("data-tui-dropdownmenu-radio-controlled")) {
           group.querySelectorAll("[data-tui-dropdownmenu-radio-item]").forEach((r) => {
             setChecked(r, false);
           });
+      setChecked(radio, true);
         }
-        setChecked(radio, true);
-        radio.dispatchEvent(
-          new CustomEvent("dropdownmenu-value-change", {
-            bubbles: true,
-            detail: { value: radio.getAttribute("data-tui-dropdownmenu-radio-value") },
-          }),
-        );
       }
       return;
     }
@@ -526,7 +617,7 @@
         item.getAttribute("data-tui-dropdownmenu-disable-close-on-click") !== "true"
       ) {
         const content = item.closest("[data-tui-dropdownmenu-content]");
-        if (content) close(content, true);
+        if (content) requestOpenChange(content, false, false, true);
       }
       return;
     }
@@ -537,11 +628,11 @@
     if (!content) return;
 
     if (e.key === "Escape") {
-      closeAll(true);
+      requestCloseAll(true);
       return;
     }
     if (e.key === "Tab") {
-      closeAll(false);
+      requestCloseAll(false);
       return;
     }
 
@@ -576,7 +667,7 @@
         if (subTrigger) {
           e.preventDefault();
           const sub = subTrigger.closest("[data-tui-dropdownmenu-sub]");
-          if (sub) openSub(sub, true);
+		  if (sub) requestSubOpenChange(sub, true, true);
         }
         break;
       }
@@ -587,7 +678,7 @@
           const sub = subContent.closest("[data-tui-dropdownmenu-sub]");
           if (sub) {
             const { trigger } = subParts(sub);
-            closeSub(sub);
+			requestSubOpenChange(sub, false);
             if (trigger) trigger.focus({ preventScroll: true });
           }
         }
@@ -595,16 +686,5 @@
       }
     }
   });
-
-  // Keep open menus anchored to their trigger while scrolling or resizing.
-  function repositionOpen() {
-    allContents().forEach((content) => {
-      if (!isOpen(content)) return;
-      const trigger = triggerFor(content);
-      if (trigger) positionMenu(content, trigger);
-    });
-  }
-  window.addEventListener("scroll", repositionOpen, true);
-  window.addEventListener("resize", repositionOpen);
 
 })();

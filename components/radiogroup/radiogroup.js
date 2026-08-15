@@ -33,6 +33,26 @@
     return item.getAttribute("aria-readonly") === "true";
   }
 
+  function groupOf(input) {
+    return input.closest("[data-tui-radio-group]");
+  }
+
+  function requestValueChange(input) {
+    const group = groupOf(input);
+    if (input.checked) return true;
+    const change = new CustomEvent(group ? "radio-group-value-change" : "radio-checked-change", {
+      bubbles: true,
+      cancelable: true,
+      detail: group ? { value: input.value } : { checked: true },
+    });
+    const target = group || itemOf(input);
+    const accepted = target.dispatchEvent(change);
+    const controlled = group
+      ? group.hasAttribute("data-tui-radio-group-controlled")
+      : target.hasAttribute("data-tui-radio-controlled");
+    return accepted && !controlled;
+  }
+
   // Port of utils/dispatchClickWithModifiers.ts: the constructed click keeps
   // the source event's modifier state and still runs native activation
   // behavior (selecting the radio).
@@ -83,7 +103,7 @@
   function syncByInput(input) {
     // The browser already unchecked the same-name siblings without firing
     // change events on them, so the whole group resyncs.
-    const group = input.closest("[data-tui-radio-group]");
+    const group = groupOf(input);
     if (group) {
       syncGroup(group);
     } else {
@@ -179,7 +199,10 @@
     // The clicks dispatched on the hidden input are an implementation detail
     // and must not reach ancestors, which already receive the original click
     // (RadioRoot's input onClick).
-    input.addEventListener("click", (e) => e.stopPropagation());
+    input.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!requestValueChange(input)) e.preventDefault();
+    });
     // useAriaLabelledBy fallback: the span control is labelled by the native
     // label associated with the hidden input.
     if (!item.hasAttribute("aria-labelledby") && !item.hasAttribute("aria-label")) {

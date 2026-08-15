@@ -151,7 +151,7 @@ templ ChartAreaInteractive() {
 					Showing total visitors for the last 3 months
 				}
 			</div>
-			@selectcomp.Select(selectcomp.Props{Value: "90d"}) {
+			@selectcomp.Select(selectcomp.Props{DefaultValue: "90d"}) {
 				@selectcomp.Trigger(selectcomp.TriggerProps{
 					Class:      "hidden w-[160px] rounded-lg sm:ml-auto sm:flex",
 					Attributes: templ.Attributes{"aria-label": "Select a value", "data-tui-chart-range-select": "area-interactive"},

@@ -63,10 +63,10 @@ templ progressExampleControlled() {
 				Class: "w-full",
 			})
 			@slider.Slider(slider.Props{
-				Value: []float64{50},
-				Min:    0,
-				Max:    100,
-				Step:   1,
+				DefaultValue: []float64{50},
+				Min:          0,
+				Max:          100,
+				Step:         1,
 			})
 		</div>
 		<script nonce={ templ.GetNonce(ctx) }>

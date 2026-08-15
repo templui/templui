@@ -4,9 +4,9 @@ import "github.com/axadrn/shadcn-templ/v2/components/slider"
 
 templ SliderMultiple() {
 	@slider.Slider(slider.Props{
-		Value: []float64{10, 20, 70},
-		Max:    100,
-		Step:   10,
-		Class:  "mx-auto w-full max-w-xs",
+		DefaultValue: []float64{10, 20, 70},
+		Max:          100,
+		Step:         10,
+		Class:        "mx-auto w-full max-w-xs",
 	})
 }

@@ -2127,7 +2127,7 @@ func formExampleMenu() templ.Component {
 						}
 						return nil
 					})
-					templ_7745c5c3_Err = dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var88), templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{DefaultChecked: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var88), templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -2292,8 +2292,7 @@ func formExampleMenu() templ.Component {
 										return nil
 									})
 									templ_7745c5c3_Err = dropdownmenu.RadioItem(dropdownmenu.RadioItemProps{
-										Value:   "light",
-										Checked: true,
+										Value: "light",
 									}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var96), templ_7745c5c3_Buffer)
 									if templ_7745c5c3_Err != nil {
 										return templ_7745c5c3_Err
@@ -2360,7 +2359,7 @@ func formExampleMenu() templ.Component {
 									}
 									return nil
 								})
-								templ_7745c5c3_Err = dropdownmenu.RadioGroup().Render(templ.WithChildren(ctx, templ_7745c5c3_Var95), templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = dropdownmenu.RadioGroup(dropdownmenu.RadioGroupProps{DefaultValue: "light"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var95), templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -2786,7 +2785,7 @@ func formExampleMenu() templ.Component {
 												}
 												return nil
 											})
-											templ_7745c5c3_Err = dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var116), templ_7745c5c3_Buffer)
+											templ_7745c5c3_Err = dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{DefaultChecked: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var116), templ_7745c5c3_Buffer)
 											if templ_7745c5c3_Err != nil {
 												return templ_7745c5c3_Err
 											}
@@ -2816,7 +2815,7 @@ func formExampleMenu() templ.Component {
 												}
 												return nil
 											})
-											templ_7745c5c3_Err = dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{Checked: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var117), templ_7745c5c3_Buffer)
+											templ_7745c5c3_Err = dropdownmenu.CheckboxItem(dropdownmenu.CheckboxItemProps{DefaultChecked: true}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var117), templ_7745c5c3_Buffer)
 											if templ_7745c5c3_Err != nil {
 												return templ_7745c5c3_Err
 											}

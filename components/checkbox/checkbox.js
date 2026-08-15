@@ -63,6 +63,18 @@
     }
   }
 
+  function requestCheckedChange(root, input, sourceEvent) {
+    const nextChecked = !input.checked;
+    const change = new CustomEvent("checkbox-change", {
+      bubbles: true,
+      cancelable: true,
+      detail: { checked: nextChecked },
+    });
+    root.dispatchEvent(change);
+    if (change.defaultPrevented || root.hasAttribute("data-tui-checkbox-controlled")) return;
+    forwardClick(input, sourceEvent);
+  }
+
   // CheckboxRoot onClick: cancel the click's default (a wrapping label would
   // otherwise forward it to the input a second time) and toggle through the
   // hidden input so the native change event fires.
@@ -78,7 +90,7 @@
     }
     if (isReadOnly(root)) return;
     e.preventDefault();
-    forwardClick(input, e);
+    requestCheckedChange(root, input, e);
   });
 
   document.addEventListener("change", (e) => {
