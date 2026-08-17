@@ -140,6 +140,7 @@ func BuildStyleItem(styleName, name string, opts inliner.Options) (*Item, error)
 	}
 
 	files := make([]ItemFile, 0, len(def.Files))
+	registryDependencies := append([]string(nil), def.RegistryDependencies...)
 	for _, file := range def.Files {
 		src, err := componentSource(file.Path)
 		if err != nil {
@@ -158,12 +159,17 @@ func BuildStyleItem(styleName, name string, opts inliner.Options) (*Item, error)
 			Type:    file.Type,
 			Target:  file.Target,
 		})
+		// Component JavaScript needs the shared local bundle. Derive this
+		// registry dependency from the files so new JS components cannot omit it.
+		if strings.HasSuffix(file.Path, ".js") && !contains(registryDependencies, "scripts") {
+			registryDependencies = append(registryDependencies, "scripts")
+		}
 	}
 
 	item := &Item{
 		Schema:               shared.BaseURL() + "/schema/registry-item.json",
 		Name:                 def.Name,
-		RegistryDependencies: def.RegistryDependencies,
+		RegistryDependencies: registryDependencies,
 		Files:                files,
 		Type:                 def.Type,
 	}

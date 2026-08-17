@@ -7,9 +7,10 @@
 package commands
 
 import (
-	"net/url"
 	"flag"
 	"fmt"
+	"net/url"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -157,7 +158,8 @@ func addComponents(components []string, config *utils.Config, registryURL string
 	printFontNote(tree.FontDependencies, options.Silent)
 
 	if result.HasJS() {
-		logf(options.Silent, "Component scripts installed. Render @components.Scripts() once in your layout <head> and mount components.ScriptsHandler().\n")
+		pkg := path.Base(config.Aliases.Components)
+		logf(options.Silent, "Component scripts installed. Render @%s.Scripts() once in your layout <head> and mount %s.ScriptsHandler().\n", pkg, pkg)
 	}
 
 	if tree.Docs != "" {

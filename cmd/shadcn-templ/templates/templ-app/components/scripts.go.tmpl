@@ -19,6 +19,10 @@ import (
 // embedded files; in development it is rebuilt from disk on every request so
 // edits hot-reload.
 
+// developmentComponentsDir is rewritten by the CLI when aliases.components
+// points somewhere other than the default components directory.
+const developmentComponentsDir = "components"
+
 func isDevelopment() bool {
 	return os.Getenv("GO_ENV") != "production"
 }
@@ -62,7 +66,7 @@ func gzipBundle(js []byte) []byte {
 
 func bundle() ([]byte, []byte, string) {
 	if isDevelopment() {
-		js, hash := buildBundle(os.DirFS("components"))
+		js, hash := buildBundle(os.DirFS(developmentComponentsDir))
 		return js, nil, hash
 	}
 	prodOnce.Do(func() {

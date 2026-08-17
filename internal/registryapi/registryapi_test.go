@@ -1,13 +1,13 @@
 package registryapi
 
 import (
-	"regexp"
-	"github.com/axadrn/shadcn-templ/v2/internal/inliner"
 	"encoding/json"
 	"net/url"
+	"regexp"
 	"strings"
 	"testing"
 
+	"github.com/axadrn/shadcn-templ/v2/internal/inliner"
 	"github.com/axadrn/shadcn-templ/v2/internal/shared"
 )
 
@@ -355,6 +355,31 @@ func TestBuildStyleItem(t *testing.T) {
 	}
 	if item.Meta == nil || item.Meta.Links.Docs != shared.BaseURL()+"/docs/components/button" {
 		t.Errorf("meta = %+v", item.Meta)
+	}
+	if contains(item.RegistryDependencies, "scripts") {
+		t.Errorf("button has no JavaScript but depends on scripts: %v", item.RegistryDependencies)
+	}
+
+	accordion, err := BuildStyleItem("base-nova", "accordion", inliner.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !contains(accordion.RegistryDependencies, "scripts") {
+		t.Errorf("JavaScript component dependencies = %v, want scripts", accordion.RegistryDependencies)
+	}
+
+	scripts, err := BuildStyleItem("base-nova", "scripts", inliner.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if scripts == nil || scripts.Type != "registry:lib" || len(scripts.Files) != 3 {
+		t.Fatalf("scripts item = %+v", scripts)
+	}
+	wantScriptFiles := []string{"components/scripts.templ", "components/scripts.go", "components/embed.go"}
+	for i, want := range wantScriptFiles {
+		if scripts.Files[i].Path != want {
+			t.Errorf("scripts file %d = %q, want %q", i, scripts.Files[i].Path, want)
+		}
 	}
 
 	vega, err := BuildStyleItem("base-vega", "button", inliner.Options{})

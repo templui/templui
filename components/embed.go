@@ -2,5 +2,5 @@ package components
 
 import "embed"
 
-//go:embed **/*.templ **/*.go **/*.js
+//go:embed all:*
 var TemplFiles embed.FS

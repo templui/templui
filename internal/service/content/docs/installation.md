@@ -287,10 +287,10 @@ import "your-app/components"
 Mount the route the script tag points at:
 
 ```go
-mux.Handle("GET /components/shadcn-templ.js", components.ScriptsHandler())
+mux.Handle("GET /components/{bundle}", components.ScriptsHandler())
 ```
 
-The bundle is the concatenation of every `components/*/*.js` file. In production (`GO_ENV=production`) it is built once from the embedded files and served with immutable caching; in development it is rebuilt from the local `components` directory on every request, so edits to copied component scripts hot-reload.
+The bundle is the concatenation of every `.js` file under your configured components directory. In production (`GO_ENV=production`) it is built once from the embedded files and served with immutable caching; in development it is rebuilt from that local directory on every request, so edits to copied component scripts hot-reload.
 
 ## Serve Assets
 
@@ -321,11 +321,11 @@ func setupAssetsRoutes(mux *http.ServeMux) {
   mux.Handle("GET /assets/", http.StripPrefix("/assets/", assetHandler))
 
   // shadcn-templ component script bundle
-  mux.Handle("GET /components/shadcn-templ.js", components.ScriptsHandler())
+  mux.Handle("GET /components/{bundle}", components.ScriptsHandler())
 }
 ```
 
-Your Go app must serve `/assets/...` so the browser can load `assets/css/output.css`, fonts, images, and local files. The `/components/shadcn-templ.js` route serves the script bundle that `@components.Scripts()` loads.
+Your Go app must serve `/assets/...` so the browser can load `assets/css/output.css`, fonts, images, and local files. The `/components/{bundle}` route serves the hashed script bundle that `@components.Scripts()` loads.
 
 > **📝 Note:** shadcn-templ also works as a plain Go module dependency without copying any source. That is a shadcn-templ extra outside this page, see [Import Workflow](/docs/import-workflow).
 

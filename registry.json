@@ -1034,9 +1034,28 @@
       ]
     },
     {
+      "name": "scripts",
+      "type": "registry:lib",
+      "description": "Shared component JavaScript bundle and HTTP handler",
+      "files": [
+        {
+          "path": "components/scripts.templ",
+          "type": "registry:lib"
+        },
+        {
+          "path": "components/scripts.go",
+          "type": "registry:lib"
+        },
+        {
+          "path": "components/embed.go",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
       "name": "utils",
       "type": "registry:lib",
-      "description": "Core utility functions, asset URLs, and component script helpers",
+      "description": "Core utility functions and asset URLs",
       "files": [
         {
           "path": "utils/shadcn-templ.go",
