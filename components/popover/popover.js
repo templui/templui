@@ -8,12 +8,11 @@ import "./floating_ui_dom.js";
   function matchesPopoverOpen(el) {
     if (!el) return false;
     try {
-      return matchesPopoverOpen(el);
-    } catch (e) {
+      return el.matches(":popover-open");
+    } catch {
       return false;
     }
   }
-
 
   const floatingCleanups = new WeakMap();
   const hoverTimeouts = new WeakMap();
@@ -73,9 +72,7 @@ import "./floating_ui_dom.js";
   }
 
   function isOpenRoot(root) {
-    // Use the native popover state as source of truth: the data-attribute is
-    // only a CSS hook for fade animations and can drift when something else
-    // (e.g. DatePicker) closes via content.hidePopover() directly.
+    // Native state is the source of truth; the data attribute only drives CSS.
     return matchesPopoverOpen(getContent(root)) === true;
   }
 

@@ -1,16 +1,5 @@
 (function () {
   'use strict';
-  // Safari/iOS < 17 does not know the :popover-open selector and throws a
-  // SyntaxError DOMException on matches() instead of returning false (#583).
-  function matchesPopoverOpen(el) {
-    if (!el) return false;
-    try {
-      return matchesPopoverOpen(el);
-    } catch (e) {
-      return false;
-    }
-  }
-
 
   /**
    * Reactive Binding for hidden inputs
@@ -88,14 +77,7 @@
   }
 
   function closePopover(trigger) {
-    const content = getContentFromTrigger(trigger);
-    if (!content?.matches(':popover-open')) return;
-
-    try {
-      content.hidePopover();
-    } catch {
-      // ignore
-    }
+    window.tui?.popover?.closeNearest?.(trigger);
   }
 
   // Helper to sync selections from hidden input value
@@ -372,7 +354,7 @@
       const searchInput = content?.querySelector('[data-tui-selectbox-search]');
       if (searchInput) {
         requestAnimationFrame(() => {
-          if (content?.matches(':popover-open')) searchInput.focus();
+          searchInput.focus();
         });
       } else {
         requestAnimationFrame(() => {
