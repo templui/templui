@@ -309,7 +309,7 @@ func Addon(props ...AddonProps) templ.Component {
 		case AlignBlockEnd:
 			align = "cn-input-group-addon-align-block-end order-last w-full justify-start"
 		}
-		var templ_7745c5c3_Var8 = []any{utils.CN("cn-input-group-addon flex cursor-text items-center justify-center select-none "+align, p.Class)}
+		var templ_7745c5c3_Var8 = []any{utils.CN("cn-input-group-addon flex cursor-text items-center justify-center select-none", align, p.Class)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var8...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -389,16 +389,15 @@ func Addon(props ...AddonProps) templ.Component {
 
 // 1:1 the inputGroupButtonVariants cva from base/ui/input-group.tsx.
 func inputGroupButtonClasses(size ButtonSize) string {
-	base := "cn-input-group-button flex items-center shadow-none"
 	switch size {
 	case ButtonSizeSm:
-		return base + " cn-input-group-button-size-sm"
+		return "cn-input-group-button-size-sm"
 	case ButtonSizeIconXs:
-		return base + " cn-input-group-button-size-icon-xs"
+		return "cn-input-group-button-size-icon-xs"
 	case ButtonSizeIconSm:
-		return base + " cn-input-group-button-size-icon-sm"
+		return "cn-input-group-button-size-icon-sm"
 	default:
-		return base + " cn-input-group-button-size-xs"
+		return "cn-input-group-button-size-xs"
 	}
 }
 
@@ -462,7 +461,7 @@ func Button(props ...ButtonProps) templ.Component {
 			Type:       p.Type,
 			Variant:    p.Variant,
 			Disabled:   p.Disabled,
-			Class:      utils.CN(inputGroupButtonClasses(p.Size), p.Class),
+			Class:      utils.CN("cn-input-group-button flex items-center shadow-none", inputGroupButtonClasses(p.Size), p.Class),
 			Attributes: attrs,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var13), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -514,7 +513,7 @@ func Text(props ...TextProps) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputgroup/inputgroup.templ`, Line: 235, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/inputgroup/inputgroup.templ`, Line: 234, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {

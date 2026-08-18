@@ -84,14 +84,13 @@ type ErrorProps struct {
 // [data-slot=radio] selectors are our pendants of the tsx [role=checkbox],
 // [role=radio] ones, our items carry data-slot instead of a role.
 func fieldClasses(o Orientation) string {
-	base := "cn-field group/field flex w-full"
 	switch o {
 	case OrientationHorizontal:
-		return base + " cn-field-orientation-horizontal flex-row items-center has-[>[data-slot=field-content]]:items-start *:data-[slot=field-label]:flex-auto has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px"
+		return "cn-field-orientation-horizontal flex-row items-center has-[>[data-slot=field-content]]:items-start *:data-[slot=field-label]:flex-auto has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px"
 	case OrientationResponsive:
-		return base + " cn-field-orientation-responsive flex-col *:w-full @md/field-group:flex-row @md/field-group:items-center @md/field-group:*:w-auto @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:*:data-[slot=field-label]:flex-auto [&>.sr-only]:w-auto @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px @md/field-group:has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px"
+		return "cn-field-orientation-responsive flex-col *:w-full @md/field-group:flex-row @md/field-group:items-center @md/field-group:*:w-auto @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:*:data-[slot=field-label]:flex-auto [&>.sr-only]:w-auto @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px @md/field-group:has-[>[data-slot=field-content]]:[&>[data-slot=checkbox],[data-slot=radio]]:mt-px"
 	default:
-		return base + " cn-field-orientation-vertical flex-col *:w-full [&>.sr-only]:w-auto"
+		return "cn-field-orientation-vertical flex-col *:w-full [&>.sr-only]:w-auto"
 	}
 }
 
@@ -180,7 +179,7 @@ templ Field(props ...Props) {
 		role="group"
 		data-slot="field"
 		data-orientation={ string(p.Orientation) }
-		class={ utils.CN(fieldClasses(p.Orientation), p.Class) }
+		class={ utils.CN("cn-field group/field flex w-full", fieldClasses(p.Orientation), p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }

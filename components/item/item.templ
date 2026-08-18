@@ -120,14 +120,13 @@ func sizeClasses(size Size) string {
 }
 
 func mediaClasses(variant MediaVariant) string {
-	base := "cn-item-media flex shrink-0 items-center justify-center [&_svg]:pointer-events-none"
 	switch variant {
 	case MediaVariantIcon:
-		return base + " cn-item-media-variant-icon"
+		return "cn-item-media-variant-icon"
 	case MediaVariantImage:
-		return base + " cn-item-media-variant-image"
+		return "cn-item-media-variant-image"
 	default:
-		return base + " cn-item-media-variant-default"
+		return "cn-item-media-variant-default"
 	}
 }
 
@@ -203,8 +202,8 @@ templ Media(props ...MediaProps) {
 	if p.Variant == "" {
 		{{ p.Variant = MediaVariantDefault }}
 	}
-	{{ class := mediaClasses(p.Variant) }}
-	{{ class = utils.CN(class, p.Class) }}
+	{{ class := "cn-item-media flex shrink-0 items-center justify-center [&_svg]:pointer-events-none" }}
+	{{ class = utils.CN(class, mediaClasses(p.Variant), p.Class) }}
 	<div
 		if p.ID != "" {
 			id={ p.ID }

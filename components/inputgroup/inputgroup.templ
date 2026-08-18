@@ -172,7 +172,7 @@ templ Addon(props ...AddonProps) {
 		role="group"
 		data-slot="input-group-addon"
 		data-align={ string(p.Align) }
-		class={ utils.CN("cn-input-group-addon flex cursor-text items-center justify-center select-none "+align, p.Class) }
+		class={ utils.CN("cn-input-group-addon flex cursor-text items-center justify-center select-none", align, p.Class) }
 		{ p.Attributes... }
 	>
 		{ children... }
@@ -181,16 +181,15 @@ templ Addon(props ...AddonProps) {
 
 // 1:1 the inputGroupButtonVariants cva from base/ui/input-group.tsx.
 func inputGroupButtonClasses(size ButtonSize) string {
-	base := "cn-input-group-button flex items-center shadow-none"
 	switch size {
 	case ButtonSizeSm:
-		return base + " cn-input-group-button-size-sm"
+		return "cn-input-group-button-size-sm"
 	case ButtonSizeIconXs:
-		return base + " cn-input-group-button-size-icon-xs"
+		return "cn-input-group-button-size-icon-xs"
 	case ButtonSizeIconSm:
-		return base + " cn-input-group-button-size-icon-sm"
+		return "cn-input-group-button-size-icon-sm"
 	default:
-		return base + " cn-input-group-button-size-xs"
+		return "cn-input-group-button-size-xs"
 	}
 }
 
@@ -218,7 +217,7 @@ templ Button(props ...ButtonProps) {
 		Type:       p.Type,
 		Variant:    p.Variant,
 		Disabled:   p.Disabled,
-		Class:      utils.CN(inputGroupButtonClasses(p.Size), p.Class),
+		Class:      utils.CN("cn-input-group-button flex items-center shadow-none", inputGroupButtonClasses(p.Size), p.Class),
 		Attributes: attrs,
 	}) {
 		{ children... }
