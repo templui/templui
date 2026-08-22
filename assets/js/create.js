@@ -771,15 +771,17 @@
   }
 
   function renderProjectForm() {
-    // ToggleGroup value={[activeTab]}: the group is controlled, so pressed
-    // states re-sync here (toggle.js already flipped them on click).
-    document
-      .querySelectorAll("[data-tui-create-tabs] [data-tui-toggle]")
-      .forEach(function (toggle) {
+    // ToggleGroup value={[activeTab]}: the group is controlled, so this is
+    // the single source of truth for its pressed state.
+    var group = document.querySelector("[data-tui-create-tabs]");
+    if (group) {
+      group.setAttribute("data-tui-toggle-group-value", activeTab);
+      group.querySelectorAll("[data-tui-toggle]").forEach(function (toggle) {
         var on = toggle.getAttribute("data-tui-toggle-value") === activeTab;
-        toggle.setAttribute("data-state", on ? "on" : "off");
+        toggle.toggleAttribute("data-pressed", on);
         toggle.setAttribute("aria-pressed", String(on));
       });
+    }
     document.querySelectorAll("[data-tui-create-tab]").forEach(function (panel) {
       panel.hidden = panel.getAttribute("data-tui-create-tab") !== activeTab;
     });
@@ -1582,13 +1584,12 @@
       }
     });
 
-    // Get Code tabs (project-form.tsx onValueChange: an empty selection —
-    // pressing the active tab again — falls back to "new-project").
-    document.addEventListener("toggle-change", function (e) {
+    // Get Code tabs (project-form.tsx onValueChange: consume the proposed
+    // group value directly; an empty selection falls back to "new-project").
+    document.addEventListener("toggle-group-value-change", function (e) {
       var group = e.target instanceof Element && e.target.closest("[data-tui-create-tabs]");
       if (!group) return;
-      var on = group.querySelector('[data-tui-toggle][data-state="on"]');
-      activeTab = (on && on.getAttribute("data-tui-toggle-value")) || "new-project";
+      activeTab = e.detail.value[0] || "new-project";
       renderProjectForm();
     });
 

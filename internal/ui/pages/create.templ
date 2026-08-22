@@ -789,11 +789,11 @@ templ createCodeDialog() {
 		@dialog.Content(dialog.ContentProps{Class: "dark top-[64px] no-scrollbar flex max-h-[calc(100svh-2rem)] translate-y-0 flex-col rounded-2xl p-0 shadow-xl **:data-[slot=dialog-close]:top-4.5 **:data-[slot=dialog-close]:right-4 **:data-[slot=field-separator]:h-2 sm:max-w-md"}) {
 			<div class="flex min-w-0 flex-1 flex-col gap-0 overflow-hidden rounded-2xl">
 				@dialog.Header(dialog.HeaderProps{Class: "border-b px-6 py-5"}) {
-					// The tab switcher is a ToggleGroup like the tsx; our items
-					// carry data-state instead of Base UI's data-pressed.
+					// The tab switcher is controlled like project-form.tsx: create.js
+					// owns activeTab and applies the next group value from the change event.
 					@togglegroup.ToggleGroup(togglegroup.Props{
-						Class:        "**:data-[slot=toggle-group-item]:data-[state=on]:bg-neutral-700/70",
-						DefaultValue: []string{"new-project"},
+						Class: "**:data-[slot=toggle-group-item]:data-pressed:bg-neutral-700/70",
+						Value: []string{"new-project"},
 						Attributes: templ.Attributes{
 							"aria-label":           "Project type",
 							"data-tui-create-tabs": true,

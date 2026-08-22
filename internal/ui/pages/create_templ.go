@@ -4026,8 +4026,8 @@ func createCodeDialog() templ.Component {
 						return nil
 					})
 					templ_7745c5c3_Err = togglegroup.ToggleGroup(togglegroup.Props{
-						Class:        "**:data-[slot=toggle-group-item]:data-[state=on]:bg-neutral-700/70",
-						DefaultValue: []string{"new-project"},
+						Class: "**:data-[slot=toggle-group-item]:data-pressed:bg-neutral-700/70",
+						Value: []string{"new-project"},
 						Attributes: templ.Attributes{
 							"aria-label":           "Project type",
 							"data-tui-create-tabs": true,

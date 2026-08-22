@@ -700,10 +700,10 @@ templ cardKitchenIsland() {
 			<div class="flex flex-col gap-2">
 				<span class="sr-only">Scenes</span>
 				@togglegroup.ToggleGroup(togglegroup.Props{
-					Variant:      togglegroup.VariantOutline,
-					Spacing:      utils.Ptr(1),
-					Class:        "flex-wrap",
-					DefaultValue: []string{"cooking"},
+					Variant: togglegroup.VariantOutline,
+					Spacing: utils.Ptr(1),
+					Class:   "flex-wrap",
+					Value:   []string{"cooking"},
 				}) {
 					@togglegroup.Item(togglegroup.ItemProps{Value: "cooking"}) {
 						Cooking
@@ -804,12 +804,12 @@ templ cardKitchenIsland() {
 				range.style.left = "0";
 				range.style.width = "calc(" + (f * 100).toFixed(4) + "% + " + (6 - f * 12).toFixed(2) + "px)";
 			};
-			document.addEventListener("toggle-change", (e) => {
+			document.addEventListener("toggle-group-value-change", (e) => {
 				const card = e.target.closest("[data-kitchen-island]");
 				if (!card) return;
 				// handleSceneChange(value[0] ?? "cooking"): unpressing falls
 				// back to the cooking scene.
-				const scene = e.detail.pressed ? e.detail.value : "cooking";
+				const scene = e.detail.value[0] || "cooking";
 				const preset = SCENES[scene];
 				if (!preset) return;
 				card.querySelectorAll("[data-tui-slider]").forEach((root, i) => {
@@ -818,7 +818,7 @@ templ cardKitchenIsland() {
 				const group = card.querySelector("[data-tui-toggle-group]");
 				group.querySelectorAll("[data-tui-toggle]").forEach((t) => {
 					const on = t.getAttribute("data-tui-toggle-value") === scene;
-					t.setAttribute("data-state", on ? "on" : "off");
+					t.toggleAttribute("data-pressed", on);
 					t.setAttribute("aria-pressed", on ? "true" : "false");
 				});
 				group.setAttribute("data-tui-toggle-group-value", scene);
@@ -1792,10 +1792,10 @@ templ cardRollerShades() {
 		}
 		@card.Footer() {
 			@togglegroup.ToggleGroup(togglegroup.Props{
-				Variant:      togglegroup.VariantOutline,
-				Spacing:      utils.Ptr(1),
-				Class:        "w-full",
-				DefaultValue: []string{"half"},
+				Variant: togglegroup.VariantOutline,
+				Spacing: utils.Ptr(1),
+				Class:   "w-full",
+				Value:   []string{"half"},
 			}) {
 				@togglegroup.Item(togglegroup.ItemProps{Value: "open", Class: "flex-1"}) {
 					Open
@@ -1838,7 +1838,7 @@ templ cardRollerShades() {
 				const group = card.querySelector("[data-tui-toggle-group]");
 				group.querySelectorAll("[data-tui-toggle]").forEach((t) => {
 					const on = t.getAttribute("data-tui-toggle-value") === preset;
-					t.setAttribute("data-state", on ? "on" : "off");
+					t.toggleAttribute("data-pressed", on);
 					t.setAttribute("aria-pressed", on ? "true" : "false");
 				});
 				group.setAttribute("data-tui-toggle-group-value", preset);
@@ -1848,13 +1848,14 @@ templ cardRollerShades() {
 				if (!card) return;
 				render(card, e.detail.values[0]);
 			});
-			document.addEventListener("toggle-change", (e) => {
+			document.addEventListener("toggle-group-value-change", (e) => {
 				const card = e.target.closest("[data-roller-shades]");
 				if (!card) return;
 				const sliderRoot = card.querySelector("[data-tui-slider]");
 				let v;
-				if (e.detail.pressed && e.detail.value in POSITIONS) {
-					v = POSITIONS[e.detail.value];
+				const nextPreset = e.detail.value[0];
+				if (nextPreset in POSITIONS) {
+					v = POSITIONS[nextPreset];
 					setSlider(sliderRoot, v);
 				} else {
 					// Unpressing keeps the position; render re-asserts the

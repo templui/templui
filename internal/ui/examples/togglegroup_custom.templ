@@ -59,8 +59,8 @@ templ ToggleGroupCustom() {
 		(() => {
 			const group = document.getElementById("font-weight-group");
 			const code = document.getElementById("font-weight-code");
-			group.addEventListener("toggle-change", () => {
-				const value = group.getAttribute("data-tui-toggle-group-value");
+			group.addEventListener("toggle-group-value-change", (e) => {
+				const value = e.detail.value[0];
 				if (value) code.textContent = "font-" + value;
 			});
 		})();
