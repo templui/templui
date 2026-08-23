@@ -20,6 +20,15 @@ func TestControlledStateOverridesDefaults(t *testing.T) {
 	}
 }
 
+func TestControlledOpenMethodDefaultsToProgrammatic(t *testing.T) {
+	if got := initialOpenMethod(Props{}); got != OpenMethodProgrammatic {
+		t.Fatalf("empty open method must default to programmatic, got %q", got)
+	}
+	if got := initialOpenMethod(Props{OpenMethod: OpenMethodTouch}); got != OpenMethodTouch {
+		t.Fatalf("controlled touch method must survive rendering, got %q", got)
+	}
+}
+
 func TestItemSelectionComesOnlyFromRootValue(t *testing.T) {
 	ctx := context.WithValue(context.Background(), stateKey, ctxState{value: "banana"})
 	var output bytes.Buffer
@@ -48,16 +57,34 @@ func TestClientRequestsCancelableValueAndOpenChanges(t *testing.T) {
 		`data-tui-select-open-controlled`,
 		`FloatingUIDOM.autoUpdate(trigger, content, update`,
 		`layoutShift: typeof IntersectionObserver !== "undefined"`,
+		`positionPopper(content, trigger, alignMode ? "fixed" : "absolute")`,
+		`positionPopper(content, trigger, "absolute")`,
+		`content._tuiOpenMethod !== "touch"`,
+		`openMethod: nextOpen ? openMethod || "programmatic" : null`,
+		`data-tui-select-initial-open-method`,
+		`document.addEventListener("pointercancel"`,
+		`popup.setAttribute("data-align-trigger", "false")`,
+		`requestOpenChange(content, true, "keyboard")`,
 		`const SELECTED_DELAY = 400`,
 		`item._tuiAllowMouseSelection = true`,
 		`item._tuiPointerType === "touch"`,
 		`document.addEventListener("mouseup"`,
 		`item.hasAttribute("data-selected")`,
 		`requestOpenChange(content, false)`,
-		`requestOpenChange(content, true)`,
+		`requestOpenChange(content, true,`,
 	} {
 		if !strings.Contains(js, want) {
 			t.Fatalf("client behavior is missing %q", want)
 		}
+	}
+}
+
+func TestPositionerStartsFixedForAlignedMode(t *testing.T) {
+	source, err := os.ReadFile("select.templ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(source), `class="pointer-events-none isolate fixed`) {
+		t.Fatal("select positioner must start fixed like Base UI's aligned mode")
 	}
 }

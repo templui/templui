@@ -137,10 +137,19 @@ Set the `Invalid` prop on the `field.Field` component and `aria-invalid` on the 
 
 The `selectcomp.Select` component is the root that carries the selection and the form value.
 
+The `select-open-change` event detail contains `open` and `openMethod`. When
+controlling `Open`, pass `openMethod` back through `OpenMethod` so touch opens
+use the normal popper instead of item alignment. `openMethod` is `null` when
+the event requests that the Select close.
+
 | Prop       | Type     | Default |
 | ---------- | -------- | ------- |
 | `Name`     | `string` | -       |
 | `Value`    | `string` | -       |
+| `DefaultValue` | `string` | - |
+| `Open` | `*bool` | - |
+| `DefaultOpen` | `bool` | `false` |
+| `OpenMethod` | `OpenMethodProgrammatic \| OpenMethodKeyboard \| OpenMethodMouse \| OpenMethodTouch` | `OpenMethodProgrammatic` |
 | `Disabled` | `bool`   | `false` |
 
 ### SelectTrigger

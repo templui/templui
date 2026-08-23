@@ -94,10 +94,10 @@
 
   // Base UI zooms the popup out of the anchor's center point (e.g.
   // "96px -4px"), not out of a placement corner.
-  function anchorOrigin(result, anchorRect) {
+  function anchorOrigin(result, anchorRect, positionerRect) {
     const side = result.placement.split("-")[0];
-    const centerX = anchorRect.left + anchorRect.width / 2 - result.x + "px";
-    const centerY = anchorRect.top + anchorRect.height / 2 - result.y + "px";
+    const centerX = anchorRect.left + anchorRect.width / 2 - positionerRect.left + "px";
+    const centerY = anchorRect.top + anchorRect.height / 2 - positionerRect.top + "px";
     if (side === "bottom") return centerX + " " + -SIDE_OFFSET + "px";
     if (side === "top") return centerX + " calc(100% + " + SIDE_OFFSET + "px)";
     if (side === "right") return -SIDE_OFFSET + "px " + centerY;
@@ -132,14 +132,16 @@
   }
 
   // Regular anchored placement below/above the trigger (Base UI's positioner).
-  function positionPopper(content, trigger) {
+  function positionPopper(content, trigger, strategy) {
     const { computePosition, offset, flip, shift, size } = window.FloatingUIDOM;
     const align = content.getAttribute("data-tui-select-align") || "center";
     const placement = align === "center" ? "bottom" : "bottom-" + align;
 
+    content.style.position = strategy;
+
     return computePosition(trigger, content, {
       placement: placement,
-      strategy: "absolute",
+      strategy: strategy,
       middleware: [
         offset(SIDE_OFFSET),
         flip({ padding: COLLISION_PADDING }),
@@ -166,7 +168,7 @@
       if (popup) {
         popup.style.setProperty(
           "--transform-origin",
-          anchorOrigin(result, trigger.getBoundingClientRect()),
+          anchorOrigin(result, trigger.getBoundingClientRect(), content.getBoundingClientRect()),
         );
       }
     });
@@ -276,12 +278,15 @@
     const popup = popupFor(content);
     const viewport = viewportFor(content);
     if (!popup || !viewport) return Promise.resolve();
-    const alignMode = isAlignMode(content);
+    // Base UI uses viewport positioning while the selected item is aligned
+    // with the trigger. Touch and regular popper positioning use Floating
+    // UI's standard absolute positioning instead.
+    const alignMode = isAlignMode(content) && content._tuiOpenMethod !== "touch";
     popup.setAttribute("data-align-trigger", alignMode ? "true" : "false");
     resetInlineStyles(content);
     content._tuiAligned = false;
 
-    return positionPopper(content, trigger)
+    return positionPopper(content, trigger, alignMode ? "fixed" : "absolute")
       .then(() => {
         if (!alignMode) return undefined;
         if (positionAligned(content, trigger)) {
@@ -290,8 +295,9 @@
         }
         // Not enough room: redo the plain popper pass (the aligned attempt
         // dirtied the inline styles).
+        popup.setAttribute("data-align-trigger", "false");
         resetInlineStyles(content);
-        return positionPopper(content, trigger);
+        return positionPopper(content, trigger, "absolute");
       })
       .then(() => updateScrollArrows(content));
   }
@@ -492,11 +498,12 @@
     document.body.style.paddingRight = "";
   }
 
-  function open(content, trigger) {
+  function open(content, trigger, openMethod) {
     allContents().forEach((c) => {
       if (c !== content) close(c);
     });
     clearTimeout(content._tuiHide);
+    content._tuiOpenMethod = openMethod || "programmatic";
     // A press on the trigger can open the popup under the pointer (aligned
     // mode). Mouseup selection stays disabled briefly so releasing over the
     // selected item or a neighboring item doesn't commit an accidental
@@ -590,18 +597,21 @@
     allContents().forEach(close);
   }
 
-  function requestOpenChange(content, nextOpen) {
+  function requestOpenChange(content, nextOpen, openMethod) {
     if (!content || isOpen(content) === nextOpen) return;
     const accepted = content.dispatchEvent(
       new CustomEvent("select-open-change", {
         bubbles: true,
         cancelable: true,
-        detail: { open: nextOpen },
+        detail: {
+          open: nextOpen,
+          openMethod: nextOpen ? openMethod || "programmatic" : null,
+        },
       }),
     );
     if (!accepted || content.hasAttribute("data-tui-select-open-controlled")) return;
     const trigger = triggerFor(content);
-    if (nextOpen && trigger) open(content, trigger);
+    if (nextOpen && trigger) open(content, trigger, openMethod);
     else if (!nextOpen) close(content);
   }
 
@@ -688,7 +698,9 @@
       }
       if (content.getAttribute("data-tui-select-initial-open") === "true") {
         content.removeAttribute("data-tui-select-initial-open");
-        open(content, trigger);
+        const openMethod =
+          content.getAttribute("data-tui-select-initial-open-method") || "programmatic";
+        open(content, trigger, openMethod);
       }
     });
   }
@@ -709,10 +721,10 @@
   // Pointer interactions toggle and dismiss on PRESS, exactly like Base UI.
   // Click is never used for open/close, so the stray click the browser fires
   // on <body> after the menu opened over the trigger is naturally harmless.
-  function toggle(trigger) {
+  function toggle(trigger, openMethod) {
     const content = contentFor(trigger);
     if (!content) return;
-    requestOpenChange(content, !isOpen(content));
+    requestOpenChange(content, !isOpen(content), openMethod);
   }
 
   // Pendant of floating-ui useClick's pointerTypeRef: pointerdown marks the
@@ -761,6 +773,7 @@
       // Opening at press would put the aligned popup under the still-down
       // finger, and the tap's click, hit-tested at the release point,
       // would land on the item above the trigger and instantly commit it.
+      trigger._tuiOpenMethod = e.pointerType;
       if (e.pointerType === "touch") return;
       pressedTriggers.add(trigger);
       // Keep the browser from focusing the trigger button, focus lives on
@@ -772,7 +785,7 @@
           if (isOpen(content)) {
             requestOpenChange(content, false);
           } else {
-            requestOpenChange(content, true);
+            requestOpenChange(content, true, e.pointerType);
             armCancelOpen(trigger, content);
           }
         }
@@ -799,6 +812,14 @@
     if (item) item._tuiPointerType = e.pointerType;
   });
 
+  document.addEventListener("pointercancel", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const trigger = e.target.closest("[data-tui-select-trigger]");
+    if (!trigger) return;
+    trigger._tuiOpenMethod = null;
+    pressedTriggers.delete(trigger);
+  });
+
   document.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
     const trigger = e.target.closest("[data-tui-select-trigger]");
@@ -807,7 +828,11 @@
         pressedTriggers.delete(trigger);
         return;
       }
-      if (!trigger.disabled) toggle(trigger);
+      const openMethod = trigger._tuiOpenMethod || (e.detail === 0 ? "keyboard" : "mouse");
+      trigger._tuiOpenMethod = null;
+      if (!trigger.disabled) {
+        toggle(trigger, openMethod);
+      }
       return;
     }
 
@@ -876,10 +901,11 @@
     const trigger = e.target.closest("[data-tui-select-trigger]");
     if (trigger && !trigger.disabled) {
       pressedTriggers.delete(trigger); // like useClick's onKeyDown reset
+      trigger._tuiOpenMethod = null;
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
         const content = contentFor(trigger);
-        if (content && !isOpen(content)) open(content, trigger);
+        if (content && !isOpen(content)) requestOpenChange(content, true, "keyboard");
       }
       return;
     }

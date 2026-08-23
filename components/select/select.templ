@@ -22,6 +22,15 @@ const (
 	AlignEnd    Align = "end"
 )
 
+type OpenMethod string
+
+const (
+	OpenMethodProgrammatic OpenMethod = "programmatic"
+	OpenMethodKeyboard     OpenMethod = "keyboard"
+	OpenMethodMouse        OpenMethod = "mouse"
+	OpenMethodTouch        OpenMethod = "touch"
+)
+
 type ctxKey string
 
 const stateKey ctxKey = "selectState"
@@ -32,6 +41,7 @@ type ctxState struct {
 	value           string
 	valueControlled bool
 	initialOpen     bool
+	openMethod      OpenMethod
 	openControlled  bool
 	disabled        bool
 	readOnly        bool
@@ -56,6 +66,9 @@ type Props struct {
 	DefaultValue string
 	Open         *bool
 	DefaultOpen  bool
+	// OpenMethod preserves how a controlled Open state was requested. Read it
+	// from the select-open-change event detail. Defaults to programmatic.
+	OpenMethod OpenMethod
 	Disabled     bool
 	ReadOnly     bool
 	Required     bool
@@ -74,6 +87,15 @@ func initialOpen(p Props) bool {
 		return *p.Open
 	}
 	return p.DefaultOpen
+}
+
+func initialOpenMethod(p Props) OpenMethod {
+	switch p.OpenMethod {
+	case OpenMethodKeyboard, OpenMethodMouse, OpenMethodTouch:
+		return p.OpenMethod
+	default:
+		return OpenMethodProgrammatic
+	}
 }
 
 type TriggerProps struct {
@@ -142,7 +164,7 @@ templ Select(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, name: p.Name, value: initialValue(p), valueControlled: p.Value != nil, initialOpen: initialOpen(p), openControlled: p.Open != nil, disabled: p.Disabled, readOnly: p.ReadOnly, required: p.Required, form: p.Form}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, name: p.Name, value: initialValue(p), valueControlled: p.Value != nil, initialOpen: initialOpen(p), openMethod: initialOpenMethod(p), openControlled: p.Open != nil, disabled: p.Disabled, readOnly: p.ReadOnly, required: p.Required, form: p.Form}) }}
 	{ children... }
 }
 
@@ -237,10 +259,11 @@ templ Content(props ...ContentProps) {
 			data-tui-select-disable-align-item-with-trigger?={ p.DisableAlignItemWithTrigger }
 			data-tui-select-align={ string(p.Align) }
 			data-tui-select-initial-open={ utils.IfElse(s.initialOpen, "true", "false") }
+			data-tui-select-initial-open-method={ string(s.openMethod) }
 			data-tui-select-open-controlled?={ s.openControlled }
 			data-closed
 			hidden
-			class="pointer-events-none isolate absolute inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
+			class="pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
 		>
 			<div
 				data-slot="select-content"
