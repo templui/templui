@@ -115,10 +115,10 @@
 
   // Base UI zooms the popup out of the anchor's center point (e.g.
   // "128px -4px"), not out of a placement corner.
-  function anchorOrigin(result, anchorRect, sideOffset) {
+  function anchorOrigin(result, anchorRect, positionerRect, sideOffset) {
     const side = result.placement.split("-")[0];
-    const centerX = anchorRect.left + anchorRect.width / 2 - result.x + "px";
-    const centerY = anchorRect.top + anchorRect.height / 2 - result.y + "px";
+    const centerX = anchorRect.left + anchorRect.width / 2 - positionerRect.left + "px";
+    const centerY = anchorRect.top + anchorRect.height / 2 - positionerRect.top + "px";
     if (side === "bottom") return centerX + " " + -sideOffset + "px";
     if (side === "top") return centerX + " calc(100% + " + sideOffset + "px)";
     if (side === "right") return -sideOffset + "px " + centerY;
@@ -177,7 +177,12 @@
       if (popup) {
         popup.style.setProperty(
           "--tui-combobox-transform-origin",
-          anchorOrigin(result, anchor.getBoundingClientRect(), sideOffset),
+          anchorOrigin(
+            result,
+            anchor.getBoundingClientRect(),
+            content.getBoundingClientRect(),
+            sideOffset,
+          ),
         );
       }
     });

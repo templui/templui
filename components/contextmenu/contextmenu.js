@@ -51,10 +51,10 @@
 
   // Base UI zooms the popup out of the anchor's center point, not out of a
   // placement corner. The anchor here is the cursor (a zero-size rect).
-  function anchorOrigin(result, anchorRect, sideOffset) {
+  function anchorOrigin(result, anchorRect, positionerRect, sideOffset) {
     const side = result.placement.split("-")[0];
-    const centerX = anchorRect.left + anchorRect.width / 2 - result.x + "px";
-    const centerY = anchorRect.top + anchorRect.height / 2 - result.y + "px";
+    const centerX = anchorRect.left + anchorRect.width / 2 - positionerRect.left + "px";
+    const centerY = anchorRect.top + anchorRect.height / 2 - positionerRect.top + "px";
     if (side === "bottom") return centerX + " " + -sideOffset + "px";
     if (side === "top") return centerX + " calc(100% + " + sideOffset + "px)";
     if (side === "right") return -sideOffset + "px " + centerY;
@@ -121,7 +121,12 @@
       if (popup) {
         popup.style.setProperty(
           "--tui-contextmenu-transform-origin",
-          anchorOrigin(result, anchor.getBoundingClientRect(), sideOffset),
+          anchorOrigin(
+            result,
+            anchor.getBoundingClientRect(),
+            content.getBoundingClientRect(),
+            sideOffset,
+          ),
         );
       }
     });
@@ -287,7 +292,7 @@
       content.setAttribute("data-side", result.placement.split("-")[0]);
       content.style.setProperty(
         "--tui-contextmenu-transform-origin",
-        anchorOrigin(result, trigger.getBoundingClientRect(), 0),
+        anchorOrigin(result, trigger.getBoundingClientRect(), content.getBoundingClientRect(), 0),
       );
       content.offsetHeight; // flush styles before re-enabling transitions
       content.style.transition = "";
