@@ -301,6 +301,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://templui.io/docs/components/hover-card</loc>
+    <lastmod>2026-08-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://templui.io/docs/test-form-items</loc>
     <lastmod>2025-12-24</lastmod>
     <changefreq>daily</changefreq>
