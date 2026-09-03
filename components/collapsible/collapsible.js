@@ -1,6 +1,8 @@
 (function () {
   "use strict";
 
+  const closeTimers = new WeakMap();
+
   function panelFor(trigger) {
     return document.getElementById(trigger.getAttribute("aria-controls") || "");
   }
@@ -44,26 +46,15 @@
     );
   }
 
-  function toggle(trigger) {
-    const panel = panelFor(trigger);
-    if (!panel) return;
-    const root = panel.closest("[data-tui-collapsible]");
-    if (!root || root.hasAttribute("data-disabled")) return;
-    const isOpen = !panel.hasAttribute("data-open");
-  const accepted = root.dispatchEvent(
-    new CustomEvent("collapsible-open-change", {
-      bubbles: true,
-      cancelable: true,
-      detail: { open: isOpen },
-    }),
-  );
-  if (!accepted || root.hasAttribute("data-tui-collapsible-controlled")) return;
-
+  function applyOpen(root, isOpen) {
+    const trigger = root.querySelector('[data-slot="collapsible-trigger"]');
+    const panel = trigger && panelFor(trigger);
+    if (!trigger || !panel) return;
     setOpen(root, isOpen);
     trigger.setAttribute("aria-expanded", isOpen ? "true" : "false");
     trigger.toggleAttribute("data-panel-open", isOpen);
     if (isOpen) {
-      clearTimeout(panel._tuiCloseTimer);
+      clearTimeout(closeTimers.get(panel));
       panel.hidden = false;
       panel.removeAttribute("data-ending-style");
       setOpen(panel, true);
@@ -76,30 +67,59 @@
       panel.removeAttribute("data-starting-style");
       setOpen(panel, false);
       panel.setAttribute("data-ending-style", "");
-      clearTimeout(panel._tuiCloseTimer);
+      clearTimeout(closeTimers.get(panel));
       const duration = motionMs(panel);
       if (duration === 0) {
         finishClose(panel);
       } else {
-        panel._tuiCloseTimer = setTimeout(() => finishClose(panel), duration + 50);
+        closeTimers.set(panel, setTimeout(() => finishClose(panel), duration + 50));
       }
     }
   }
 
+  function toggle(trigger) {
+    const panel = panelFor(trigger);
+    if (!panel) return;
+    const root = panel.closest('[data-slot="collapsible"]');
+    if (!root || root.hasAttribute("data-disabled")) return;
+    const isOpen = !panel.hasAttribute("data-open");
+    const accepted = root.dispatchEvent(
+      new CustomEvent("collapsible-open-change", {
+        bubbles: true,
+        cancelable: true,
+        detail: { open: isOpen },
+      }),
+    );
+    if (accepted) applyOpen(root, isOpen);
+  }
+
   document.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
-    const trigger = e.target.closest("[data-tui-collapsible-trigger]");
+    const trigger = e.target.closest('[data-slot="collapsible-trigger"]');
     if (trigger) toggle(trigger);
   });
 
   function finishMotion(e) {
     if (!(e.target instanceof Element)) return;
-    const panel = e.target.closest("[data-tui-collapsible-content][data-ending-style]");
+    const panel = e.target.closest('[data-slot="collapsible-content"][data-ending-style]');
     if (panel) finishClose(panel);
   }
 
   document.addEventListener("transitionend", finishMotion);
   document.addEventListener("animationend", finishMotion);
 
-  document.querySelectorAll("[data-tui-collapsible-content][data-open]").forEach(measure);
+  window.shadcnTempl.lifecycle.register("collapsible", {
+    selector: '[data-slot="collapsible"]',
+    setup() {},
+    attributes: ["data-open"],
+    attributeChanged(root) {
+      const open = root.hasAttribute("data-open");
+      const trigger = root.querySelector('[data-slot="collapsible-trigger"]');
+      if (trigger?.getAttribute("aria-expanded") !== String(open)) applyOpen(root, open);
+    },
+  });
+  window.shadcnTempl.lifecycle.register("collapsible-content", {
+    selector: '[data-slot="collapsible-content"][data-open]',
+    setup: measure,
+  });
 })();

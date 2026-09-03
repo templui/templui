@@ -2,7 +2,6 @@ package accordion
 
 import (
 	"context"
-	"strings"
 
 	"github.com/axadrn/shadcn-templ/v2/components/icon"
 	"github.com/axadrn/shadcn-templ/v2/utils"
@@ -46,9 +45,8 @@ const (
 )
 
 type rootState struct {
-	values     map[string]bool
-	controlled bool
-	disabled   bool
+	values   map[string]bool
+	disabled bool
 }
 
 type itemState struct {
@@ -87,17 +85,14 @@ templ Accordion(props ...Props) {
 	for _, value := range values {
 		{{ expanded[value] = true }}
 	}
-	{{ ctx = context.WithValue(ctx, rootKey, rootState{values: expanded, controlled: p.Value != nil, disabled: p.Disabled}) }}
+	{{ ctx = context.WithValue(ctx, rootKey, rootState{values: expanded, disabled: p.Disabled}) }}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
 		data-slot="accordion"
-		data-tui-accordion
 		data-multiple?={ p.Multiple }
 		data-disabled?={ p.Disabled }
-		data-tui-accordion-controlled?={ p.Value != nil }
-		data-tui-accordion-value={ strings.Join(values, " ") }
 		class={
 			utils.CN(
 				"cn-accordion flex w-full flex-col",
@@ -127,7 +122,7 @@ templ Item(props ...ItemProps) {
 			id={ p.ID }
 		}
 		data-slot="accordion-item"
-		data-tui-accordion-value={ p.Value }
+		data-value={ p.Value }
 		data-open?={ open }
 		data-closed?={ !open }
 		data-disabled?={ disabled }

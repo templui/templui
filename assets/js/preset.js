@@ -302,7 +302,7 @@
   };
 
   if (typeof window !== "undefined") {
-    window.tuiPreset = api;
+    window.shadcnTempl = window.shadcnTempl || {}; window.shadcnTempl.preset = api;
   }
   if (typeof module !== "undefined" && module.exports) {
     module.exports = api;

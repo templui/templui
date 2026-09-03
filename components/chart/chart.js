@@ -383,6 +383,12 @@ const TICK_SIZE = 6;
 /* ---------------------------------------------------------------- */
 
 let uid = 0;
+const chartContainerStates = new WeakMap();
+
+function chartContainerState(container) {
+  if (!chartContainerStates.has(container)) chartContainerStates.set(container, {});
+  return chartContainerStates.get(container);
+}
 
 /* swapSVG applies a newly built SVG to the panel. While the structure is
  * unchanged (animation frames) it only syncs attributes and text in
@@ -1385,7 +1391,7 @@ function renderPie(panel, m, state, alpha = 1) {
         : [{ inner: innerR, outer: outerR }];
       svg += `<g class="recharts-layer recharts-pie-sector">`;
       for (const sh of shapes) {
-        svg += `<path class="recharts-sector"${stroke}${strokeWidth} fill="${fill}" data-tui-chart-pie="${pi}" data-tui-chart-sector="${i}" d="${sectorPath(cx, cy, sh.inner, sh.outer, sc.start, sc.end)}"/>`;
+        svg += `<path class="recharts-sector"${stroke}${strokeWidth} fill="${fill}" data-ring-index="${pi}" data-index="${i}" d="${sectorPath(cx, cy, sh.inner, sh.outer, sc.start, sc.end)}"/>`;
       }
       svg += `</g>`;
     }
@@ -1787,13 +1793,10 @@ function tooltipTranslate(coordinate, tooltipDimension, viewBoxKey, viewBoxDimen
 }
 
 function initPanel(script) {
-  if (script.dataset.tuiChartInit) return;
-  script.dataset.tuiChartInit = "true";
-
   const panel = script.parentElement;
-  const container = panel.closest("[data-tui-chart]");
+  const container = panel.closest('[data-slot="chart"]');
   const m = JSON.parse(script.textContent);
-  const state = { uid: "tui-chart-" + uid++ };
+  const state = { uid: "shadcn-templ-chart-" + uid++ };
 
   const render = (alpha = 1) => {
     if (m.kind === "pie") renderPie(panel, m, state, alpha);
@@ -1802,7 +1805,7 @@ function initPanel(script) {
     else renderCartesian(panel, m, state, alpha);
     // The points this panel drew are what the next visible panel morphs
     // from, Recharts' previousPointsRef.
-    if (state.points) container._tuiActivePoints = state.points;
+    if (state.points) chartContainerState(container).activePoints = state.points;
     // Recharts renders the cursor and the active dots from the tooltip
     // state on every pass, so a hover keeps its overlays through the
     // entrance animation even though each frame rebuilds the surface.
@@ -1825,9 +1828,9 @@ function initPanel(script) {
   // visible panel's model when the shapes line up. Plain resizes
   // re-render without animating.
   const enter = () => {
-    const prev = container._tuiActive;
-    const prevPoints = container._tuiActivePoints;
-    container._tuiActive = m;
+    const prev = chartContainerState(container).active;
+    const prevPoints = chartContainerState(container).activePoints;
+    chartContainerState(container).active = m;
     const sameShape =
       m.kind === "pie"
         ? prev && prev.pies && m.pies && prev.pies.length === m.pies.length
@@ -1922,12 +1925,12 @@ function initPanel(script) {
   const handleMouseMove = (e) => {
     if (m.kind === "pie") {
       const sector = e.target.closest(".recharts-sector");
-      const idx = sector ? parseInt(sector.getAttribute("data-tui-chart-sector") || "-1", 10) : -1;
+      const idx = sector ? parseInt(sector.getAttribute("data-index") || "-1", 10) : -1;
       if (idx < 0) {
         wrapper.style.visibility = "hidden";
         return;
       }
-      positionTooltip(e, null, null, idx, parseInt(sector.getAttribute("data-tui-chart-pie") || "0", 10));
+      positionTooltip(e, null, null, idx, parseInt(sector.getAttribute("data-ring-index") || "0", 10));
       return;
     }
     const rect = panel.getBoundingClientRect();
@@ -2090,20 +2093,16 @@ function initPanel(script) {
   }
 }
 
-function init() {
-  document.querySelectorAll("script[data-tui-chart-model]").forEach(initPanel);
-}
-
 /* Interactive demo wiring: selects and header buttons toggle the SSR
  * rendered variants of a chart. */
 document.addEventListener("select-change", (e) => {
-  const trigger = e.target instanceof Element && e.target.closest("[data-tui-chart-range-select], [data-tui-chart-month-select]");
+  const trigger = e.target instanceof Element && e.target.closest("[data-chart-range-select], [data-chart-month-select]");
   if (!trigger) return;
   const value = e.detail && e.detail.value;
   if (!value) return;
   const chart = trigger.closest("[data-slot=card]");
   if (!chart) return;
-  const attr = trigger.hasAttribute("data-tui-chart-range-select") ? "data-tui-chart-range" : "data-tui-chart-month";
+  const attr = trigger.hasAttribute("data-chart-range-select") ? "data-chart-range" : "data-chart-month";
   chart.querySelectorAll(`[${attr}]`).forEach((el) => {
     el.hidden = el.getAttribute(attr) !== value;
   });
@@ -2111,28 +2110,20 @@ document.addEventListener("select-change", (e) => {
 
 document.addEventListener("click", (e) => {
   if (!(e.target instanceof Element)) return;
-  const btn = e.target.closest("[data-tui-chart-series]");
+  const btn = e.target.closest("[data-chart-series]");
   if (!btn) return;
   const chart = btn.closest("[data-slot=card]");
   if (!chart) return;
-  const series = btn.getAttribute("data-tui-chart-series");
-  chart.querySelectorAll("[data-tui-chart-series]").forEach((b) => {
+  const series = btn.getAttribute("data-chart-series");
+  chart.querySelectorAll("[data-chart-series]").forEach((b) => {
     b.setAttribute("data-active", b === btn ? "true" : "false");
   });
-  chart.querySelectorAll("[data-tui-chart-series-panel]").forEach((el) => {
-    el.hidden = el.getAttribute("data-tui-chart-series-panel") !== series;
+  chart.querySelectorAll("[data-chart-series-panel]").forEach((el) => {
+    el.hidden = el.getAttribute("data-chart-series-panel") !== series;
   });
 });
 
-// Setup on load and on mutations, the shadcn-templ convention: init is
-// idempotent (every panel carries its own init flag), so any inserted
-// node just re-runs the full scan, no matter what put it into the DOM.
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
-} else {
-  init();
-}
-// Re-init on any childList mutation, directly (never rAF-deferred: rAF
-// does not fire in hidden tabs or throttled iframes): swapped-in markup
-// wires itself.
-new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+window.shadcnTempl.lifecycle.register("chart", {
+  selector: 'script[type="application/vnd.shadcn-templ.chart+json"]',
+  setup: initPanel,
+});

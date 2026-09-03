@@ -27,7 +27,6 @@ type ctxState struct {
 	id               string
 	parentID         string
 	open             bool
-	controlled       bool
 	disableClickAway bool
 	disableModal     bool
 	direction        SwipeDirection
@@ -137,7 +136,7 @@ templ Drawer(props ...Props) {
 			}
 		}}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, parentID: parentID, open: initialOpen(p), controlled: p.Open != nil, disableClickAway: p.DisableDismissible, disableModal: p.DisableModal, direction: p.SwipeDirection, showSwipeHandle: p.ShowSwipeHandle, snapJSON: snapJSON, snapSequential: p.SnapToSequentialPoints}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, parentID: parentID, open: initialOpen(p), disableClickAway: p.DisableDismissible, disableModal: p.DisableModal, direction: p.SwipeDirection, showSwipeHandle: p.ShowSwipeHandle, snapJSON: snapJSON, snapSequential: p.SnapToSequentialPoints}) }}
 	{ children... }
 }
 
@@ -150,10 +149,10 @@ func Trigger(ctx context.Context) templ.Attributes {
 // TriggerFor targets a drawer outside the current Drawer root by id.
 func TriggerFor(id string) templ.Attributes {
 	return templ.Attributes{
-		"data-tui-drawer-trigger": true,
-		"aria-controls":           id,
-		"aria-haspopup":           "dialog",
-		"aria-expanded":           "false",
+		"data-slot":     "drawer-trigger",
+		"aria-controls": id,
+		"aria-haspopup": "dialog",
+		"aria-expanded": "false",
 	}
 }
 
@@ -165,8 +164,8 @@ func Close(ctx context.Context) templ.Attributes {
 // CloseFor targets a drawer outside the current Drawer root by id.
 func CloseFor(id string) templ.Attributes {
 	return templ.Attributes{
-		"data-tui-drawer-close":  true,
-		"data-tui-drawer-target": id,
+		"data-slot":     "drawer-close",
+		"aria-controls": id,
 	}
 }
 
@@ -188,10 +187,8 @@ func CloseFor(id string) templ.Attributes {
 //     overlay, so the blocks apply 1:1.
 //
 // The <template> keeps the SSRd content inert until drawer.js portals it
-// (DrawerPortal pendant). data-tui-dialog-show-modal is shared with
-// dialog.js: both scripts key the body scroll lock release on
-// dialog[open][data-tui-dialog-show-modal="true"], so a closing dialog never
-// unlocks scroll under an open drawer.
+// (DrawerPortal pendant). The shared runtime coordinates scroll locking with
+// every other modal component.
 //
 // The inline styles seed the vars the reference registers with initial
 // values via CSS.registerProperty (DrawerPopup removeCSSVariableInheritance)
@@ -208,27 +205,20 @@ templ Content(props ...ContentProps) {
 		{{ axis = "x" }}
 	}
 	{{ hasSnapPoints := s.snapJSON != "" }}
-	<template data-tui-drawer-portal>
+	<template data-slot="drawer-portal">
 		<dialog
 			id={ s.id }
-			data-tui-drawer-content
-			data-tui-portal
+			data-slot="drawer-content"
 			data-modal={ utils.IfElse(!s.disableModal, "true", "false") }
-			data-tui-dialog-show-modal={ utils.IfElse(!s.disableModal, "true", "false") }
-			data-tui-drawer-initial-open={ utils.IfElse(s.open, "true", "false") }
-			data-tui-drawer-controlled?={ s.controlled }
+			data-dismissible={ utils.IfElse(s.disableClickAway, "false", "true") }
+			data-open?={ s.open }
 			if s.parentID != "" {
-				data-tui-drawer-parent={ s.parentID }
+				data-parent-id={ s.parentID }
 			}
-			if s.disableClickAway {
-				data-tui-drawer-disable-dismissible="true"
+			if s.snapJSON != "" {
+				data-snap-points={ s.snapJSON }
 			}
-			if hasSnapPoints {
-				data-tui-drawer-snap-points={ s.snapJSON }
-			}
-			if s.snapSequential {
-				data-tui-drawer-snap-sequential="true"
-			}
+			data-snap-sequential?={ s.snapSequential }
 			class={
 				utils.CN(
 					// 1:1 DrawerContent's Drawer.Viewport class. data-[modal=true]
@@ -253,7 +243,6 @@ templ Content(props ...ContentProps) {
 			if !s.disableModal && s.parentID == "" {
 				<div
 					data-slot="drawer-overlay"
-					data-tui-drawer-overlay
 					role="presentation"
 					if hasSnapPoints {
 						data-snap-points=""
@@ -264,7 +253,6 @@ templ Content(props ...ContentProps) {
 			}
 			<div
 				data-slot="drawer-popup"
-				data-tui-drawer-popup
 				data-swipe-direction={ string(s.direction) }
 				data-swipe-axis={ axis }
 				if hasSnapPoints {

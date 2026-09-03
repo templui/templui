@@ -346,7 +346,7 @@ templ Sidebar(props ...Props) {
 						Displays the mobile sidebar.
 					}
 				}
-				<div class="flex h-full w-full flex-col" data-tui-sidebar-mobile-portal={ p.ID }></div>
+				<div class="flex h-full w-full flex-col" data-slot="sidebar-mobile-content" data-sidebar-id={ p.ID }></div>
 			}
 		}
 		<!-- Desktop -->
@@ -357,10 +357,9 @@ templ Sidebar(props ...Props) {
 			data-variant={ string(p.Variant) }
 			data-side={ string(p.Side) }
 			data-slot="sidebar"
-			data-tui-sidebar-wrapper
-			data-tui-sidebar-id={ p.ID }
-			data-tui-sidebar-collapsible-mode={ string(p.Collapsible) }
-			data-tui-sidebar-keyboard-shortcut={ sidebarKeyboardShortcut }
+			data-sidebar-id={ p.ID }
+			data-collapsible-mode={ string(p.Collapsible) }
+			data-keyboard-shortcut={ sidebarKeyboardShortcut }
 		>
 			<!-- Gap element that keeps the sidebar width in the document flow -->
 			<div
@@ -396,7 +395,7 @@ templ Sidebar(props ...Props) {
 					data-slot="sidebar-inner"
 					class="cn-sidebar-inner flex size-full flex-col"
 				>
-					<div data-tui-sidebar-content={ p.ID } class="flex h-full w-full flex-col">
+					<div data-slot="sidebar-content-root" data-sidebar-id={ p.ID } class="flex h-full w-full flex-col">
 						{ children... }
 					</div>
 				</div>
@@ -425,8 +424,7 @@ templ Trigger(props ...TriggerProps) {
 			templ.Attributes{
 				"data-sidebar":             "trigger",
 				"data-slot":                "sidebar-trigger",
-				"data-tui-sidebar-trigger": true,
-				"data-tui-sidebar-target":  targetID,
+				"aria-controls":             targetID,
 			},
 			p.Attributes,
 		),
@@ -446,9 +444,7 @@ templ Rail(props ...RailProps) {
 		type="button"
 		data-sidebar="rail"
 		data-slot="sidebar-rail"
-		data-tui-sidebar-trigger
-		data-tui-sidebar-target={ sidebarID(ctx) }
-		data-tui-sidebar-rail
+		aria-controls={ sidebarID(ctx) }
 		aria-label="Toggle Sidebar"
 		tabindex="-1"
 		title="Toggle Sidebar"
@@ -753,12 +749,12 @@ templ MenuButton(props ...MenuButtonProps) {
 			// TooltipHidden pins the state (the fixed marker keeps the
 			// script's toggle sync away).
 			if p.TooltipHidden != nil {
-				{{ trigger["data-tui-sidebar-tooltip-fixed"] = true }}
+				{{ trigger["data-tooltip-fixed"] = true }}
 				if *p.TooltipHidden {
-					{{ trigger["data-tui-tooltip-disabled"] = true }}
+					{{ trigger["data-tooltip-disabled"] = true }}
 				}
 			} else if !(s.collapsed && s.collapsible == CollapsibleIcon) {
-				{{ trigger["data-tui-tooltip-disabled"] = true }}
+				{{ trigger["data-tooltip-disabled"] = true }}
 			}
 			{{ tp.Attributes = utils.MergeAttributes(trigger, p.Attributes) }}
 			@menuButtonEl(tp) {

@@ -76,10 +76,10 @@ templ DrawerDemo() {
 		(() => {
 			// The dialog waits inside its portal <template> until drawer.js
 			// lifts it to <body>. The template copy wins over a stale portaled
-			// copy from a previous htmx swap; attributes and listeners set on
+			// copy from a previous DOM replacement; attributes and listeners set on
 			// it survive the lift (same node).
 			const drawerDemo = () => {
-				for (const tpl of document.querySelectorAll("template[data-tui-drawer-portal]")) {
+				for (const tpl of document.querySelectorAll('template[data-slot="drawer-portal"]')) {
 					const content = tpl.content.getElementById("drawer-demo");
 					if (content) return content;
 				}
@@ -94,7 +94,7 @@ templ DrawerDemo() {
 			const mq = window.matchMedia("(max-width: 767px)");
 			const apply = () => {
 				const dialog = drawerDemo();
-				const popup = dialog?.querySelector('[data-tui-drawer-popup]');
+				const popup = dialog?.querySelector('[data-slot="drawer-popup"]');
 				if (!popup) return;
 				popup.setAttribute("data-swipe-direction", mq.matches ? "down" : "right");
 				popup.setAttribute("data-swipe-axis", mq.matches ? "y" : "x");
@@ -118,10 +118,10 @@ templ DrawerDemo() {
 			const confirm = drawerDemo()?.querySelector("#drawer-demo-confirm");
 			confirm?.addEventListener("click", () => {
 				const dialog = drawerDemo();
-				const selected = dialog?.querySelector("input[data-tui-radio-input]:checked");
+				const selected = dialog?.querySelector('[data-slot="radio-group-item"] + input[type="radio"]:checked');
 				if (!selected || !(selected.value in labels)) return;
-				window.tui.drawer.close(dialog);
-				window.tui.toast.add({
+				window.shadcnTempl.drawer.close(dialog);
+				window.shadcnTempl.toast.add({
 					title: "Delivery time confirmed",
 					description: labels[selected.value],
 				});

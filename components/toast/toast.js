@@ -7,6 +7,14 @@
   var ENTER_EXIT_MS = 500;
   var SWIPE_THRESHOLD = 45;
   var GAP = 12; // --gap: 0.75rem
+  var viewportConfigs = new WeakMap();
+  var toastTimeouts = new WeakMap();
+  var toastStates = new WeakMap();
+
+  function state(toast) {
+    if (!toastStates.has(toast)) toastStates.set(toast, {});
+    return toastStates.get(toast);
+  }
 
   var TOAST_CLASS = [
     "cn-toast group/toast pointer-events-auto absolute right-0 bottom-0 z-[calc(1000-var(--toast-index))] w-full origin-bottom border bg-popover text-popover-foreground shadow-lg will-change-transform outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
@@ -59,7 +67,7 @@
   };
 
   function viewportOf(el) {
-    return el ? el.closest("[data-tui-toaster]") : document.querySelector("[data-tui-toaster]");
+    return el ? el.closest('[data-slot="toast-viewport"]') : document.querySelector('[data-slot="toast-viewport"]');
   }
 
   function toastsOf(vp) {
@@ -72,7 +80,7 @@
 
   function layout(vp) {
     var list = toastsOf(vp);
-    var limit = parseInt(vp.getAttribute("data-tui-toaster-limit"), 10) || 3;
+    var limit = parseInt(viewportConfigs.get(vp)?.limit, 10) || 3;
     var expanded = vp.hasAttribute("data-expanded");
 
     // Natural heights first: with the per-toast vars cleared, h-(--height)
@@ -111,22 +119,22 @@
   function startTimer(t) {
     if (t.getAttribute("data-type") === "loading") return;
     var vp = viewportOf(t);
-    var timeout = parseInt(t.getAttribute("data-tui-toast-timeout"), 10);
+    var timeout = toastTimeouts.get(t);
     if (!timeout) {
-      timeout = parseInt(vp.getAttribute("data-tui-toaster-timeout"), 10) || 5000;
+      timeout = parseInt(viewportConfigs.get(vp)?.timeout, 10) || 5000;
     }
-    var remaining = t._tuiRemaining != null ? t._tuiRemaining : timeout;
-    t._tuiDeadline = Date.now() + remaining;
-    t._tuiTimer = window.setTimeout(function () {
+    var remaining = state(t).remaining != null ? state(t).remaining : timeout;
+    state(t).deadline = Date.now() + remaining;
+    state(t).timer = window.setTimeout(function () {
       dismiss(t);
     }, remaining);
   }
 
   function stopTimer(t) {
-    if (t._tuiTimer) {
-      window.clearTimeout(t._tuiTimer);
-      t._tuiTimer = null;
-      t._tuiRemaining = Math.max(0, (t._tuiDeadline || 0) - Date.now());
+    if (state(t).timer) {
+      window.clearTimeout(state(t).timer);
+      state(t).timer = null;
+      state(t).remaining = Math.max(0, (state(t).deadline || 0) - Date.now());
     }
   }
 
@@ -136,13 +144,13 @@
 
   function build(opts) {
     var t = document.createElement("div");
-    t.className = TOAST_CLASS;
+    t.className = opts.className ? TOAST_CLASS + " " + opts.className : TOAST_CLASS;
     t.setAttribute("data-slot", "toast");
     t.setAttribute("role", "status");
     t.setAttribute("aria-atomic", "true");
-    t.id = opts.id || "tui-toast-" + ++seq;
+    t.id = opts.id || "shadcn-templ-toast-" + ++seq;
     if (opts.type) t.setAttribute("data-type", opts.type);
-    if (opts.timeout) t.setAttribute("data-tui-toast-timeout", String(opts.timeout));
+    if (opts.timeout) toastTimeouts.set(t, Number(opts.timeout));
     t.style.setProperty("--toast-swipe-movement-x", "0px");
     t.style.setProperty("--toast-swipe-movement-y", "0px");
 
@@ -241,15 +249,15 @@
 
   document.addEventListener("pointerover", function (e) {
     if (!(e.target instanceof Element)) return;
-    var vp = e.target.closest("[data-tui-toaster]");
+    var vp = e.target.closest('[data-slot="toast-viewport"]');
     if (vp) setExpanded(vp, true);
   });
 
   document.addEventListener("pointerout", function (e) {
     if (!(e.target instanceof Element)) return;
-    var vp = e.target.closest("[data-tui-toaster]");
+    var vp = e.target.closest('[data-slot="toast-viewport"]');
     if (!vp) return;
-    if (e.relatedTarget instanceof Element && e.relatedTarget.closest("[data-tui-toaster]") === vp) return;
+    if (e.relatedTarget instanceof Element && e.relatedTarget.closest('[data-slot="toast-viewport"]') === vp) return;
     setExpanded(vp, false);
   });
 
@@ -267,15 +275,15 @@
     if (!(e.target instanceof Element)) return;
     var t = e.target.closest('[data-slot="toast"]');
     if (!t || e.target.closest("button")) return;
-    t._tuiSwipe = { x: e.clientX, y: e.clientY };
+    state(t).swipe = { x: e.clientX, y: e.clientY };
   });
 
   document.addEventListener("pointermove", function (e) {
     if (!(e.target instanceof Element)) return;
     var t = e.target.closest('[data-slot="toast"]');
-    if (!t || !t._tuiSwipe) return;
-    var dx = Math.max(0, e.clientX - t._tuiSwipe.x);
-    var dy = Math.max(0, e.clientY - t._tuiSwipe.y);
+    if (!t || !state(t).swipe) return;
+    var dx = Math.max(0, e.clientX - state(t).swipe.x);
+    var dy = Math.max(0, e.clientY - state(t).swipe.y);
     t.style.setProperty("--toast-swipe-movement-x", dx + "px");
     t.style.setProperty("--toast-swipe-movement-y", dy + "px");
   });
@@ -283,10 +291,10 @@
   document.addEventListener("pointerup", function (e) {
     if (!(e.target instanceof Element)) return;
     var t = e.target.closest('[data-slot="toast"]');
-    if (!t || !t._tuiSwipe) return;
-    var dx = Math.max(0, e.clientX - t._tuiSwipe.x);
-    var dy = Math.max(0, e.clientY - t._tuiSwipe.y);
-    t._tuiSwipe = null;
+    if (!t || !state(t).swipe) return;
+    var dx = Math.max(0, e.clientX - state(t).swipe.x);
+    var dy = Math.max(0, e.clientY - state(t).swipe.y);
+    state(t).swipe = null;
     if (dy >= SWIPE_THRESHOLD && dy >= dx) {
       dismiss(t, "down");
     } else if (dx >= SWIPE_THRESHOLD) {
@@ -346,7 +354,7 @@
         }
         var vp = viewportOf(t);
         if (vp) layout(vp);
-        t._tuiRemaining = null;
+        state(t).remaining = null;
         startTimer(t);
       }
       Promise.resolve(p)
@@ -360,32 +368,37 @@
     },
   };
 
-  window.tui = window.tui || {};
-  window.tui.toast = api;
+  window.shadcnTempl.toast = api;
 
-  // ----- SSR/htmx adoption --------------------------------------------------
+  // ----- server-rendered DOM adoption --------------------------------------
 
-  function init() {
-    document.querySelectorAll("[data-tui-toast-ssr]").forEach(function (stub) {
-      var opts = {
-        id: stub.id || undefined,
-        title: stub.getAttribute("data-tui-toast-title") || "",
-        description: stub.getAttribute("data-tui-toast-description") || "",
-        type: stub.getAttribute("data-type") || "",
-        timeout: parseInt(stub.getAttribute("data-tui-toast-timeout"), 10) || 0,
-      };
-      stub.remove();
-      createToast(opts);
-    });
+  function adoptDeclaration(stub) {
+    var content = stub.content;
+    var title = content.querySelector('[data-slot="toast-title"]');
+    var description = content.querySelector('[data-slot="toast-description"]');
+    var opts = {
+      id: stub.id || undefined,
+      type: stub.getAttribute("data-type") || undefined,
+      timeout: Number(stub.getAttribute("data-timeout")) || undefined,
+      title: title?.textContent || "",
+      description: description?.textContent || "",
+      className: stub.getAttribute("data-class") || "",
+    };
+    stub.remove();
+    createToast(opts);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
-  // does not fire in hidden tabs or throttled iframes): swapped-in markup
-  // wires itself.
-  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+  window.shadcnTempl.lifecycle.register("toast-viewport", {
+    selector: '[data-slot="toast-viewport"]',
+    setup(viewport) {
+      viewportConfigs.set(viewport, {
+        timeout: viewport.getAttribute("data-timeout"),
+        limit: viewport.getAttribute("data-limit"),
+      });
+    },
+  });
+  window.shadcnTempl.lifecycle.register("toast-declaration", {
+    selector: '[data-slot="toast-declaration"]',
+    setup: adoptDeclaration,
+  });
 })();

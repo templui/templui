@@ -190,7 +190,7 @@ func Content(props ...ContentProps) templ.Component {
 			// 1:1 base/ui/hover-card.tsx HoverCardContent, the look comes from
 			// cn-hover-card-content (animations key on Base UI's data-open/data-closed attributes).
 			// origin-(--transform-origin) becomes our JS variable name.
-			"cn-hover-card-content cn-hover-card-content-logical z-50 origin-(--tui-hovercard-transform-origin) outline-hidden",
+			"cn-hover-card-content cn-hover-card-content-logical z-50 origin-(--hovercard-transform-origin) outline-hidden",
 			// Native [popover] resets plus JS wiring: the popup stays mounted
 			// after animate-out until hidePopover runs.
 			"absolute inset-auto left-0 top-0 m-0 overflow-visible data-closed:fill-mode-forwards",

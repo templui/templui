@@ -27,8 +27,10 @@
     booked: "[&>button]:line-through opacity-100",
   };
 
+  const states = new WeakMap();
+
   function containers() {
-    return document.querySelectorAll("[data-tui-calendar]");
+    return document.querySelectorAll('[data-slot="calendar"]');
   }
 
   function parseISO(s) {
@@ -56,29 +58,29 @@
   }
 
   function state(root) {
-    if (!root._tui) {
-      const selected = parseISO(root.getAttribute("data-tui-calendar-selected"));
-      const end = parseISO(root.getAttribute("data-tui-calendar-end"));
-      const view = parseISO(root.getAttribute("data-tui-calendar-month")) || selected || new Date();
-      root._tui = {
-        mode: root.getAttribute("data-tui-calendar-mode") || "single",
-        locale: root.getAttribute("data-tui-calendar-locale") || "en-US",
-        startOfWeek: parseInt(root.getAttribute("data-tui-calendar-week-starts-on"), 10) || 0,
-        outsideDays: root.getAttribute("data-tui-calendar-outside-days") !== "false",
-        fixedWeeks: root.hasAttribute("data-tui-calendar-fixed-weeks"),
-        weekNumbers: root.hasAttribute("data-tui-calendar-week-number"),
-        min: parseISO(root.getAttribute("data-tui-calendar-min")),
-        max: parseISO(root.getAttribute("data-tui-calendar-max")),
-        disabledDates: (root.getAttribute("data-tui-calendar-disabled") || "")
+    if (!states.has(root)) {
+      const selected = parseISO(root.getAttribute("data-selected"));
+      const end = parseISO(root.getAttribute("data-range-end"));
+      const view = parseISO(root.getAttribute("data-month")) || selected || new Date();
+      states.set(root, {
+        mode: root.getAttribute("data-mode") || "single",
+        locale: root.getAttribute("data-locale") || "en-US",
+        startOfWeek: parseInt(root.getAttribute("data-week-starts-on"), 10) || 0,
+        outsideDays: root.getAttribute("data-outside-days") !== "false",
+        fixedWeeks: root.hasAttribute("data-fixed-weeks"),
+        weekNumbers: root.hasAttribute("data-week-number"),
+        min: parseISO(root.getAttribute("data-min")),
+        max: parseISO(root.getAttribute("data-max")),
+        disabledDates: (root.getAttribute("data-disabled-dates") || "")
           .split(",").map(parseISO).filter(Boolean),
-        bookedDates: (root.getAttribute("data-tui-calendar-booked-dates") || "")
+        bookedDates: (root.getAttribute("data-booked-dates") || "")
           .split(",").map(parseISO).filter(Boolean),
         month: new Date(view.getFullYear(), view.getMonth(), 1),
         selected: selected,
         end: end,
-      };
+      });
     }
-    return root._tui;
+    return states.get(root);
   }
 
   function isDisabled(s, date) {
@@ -89,8 +91,8 @@
 
   function render(root) {
     const s = state(root);
-    root.querySelectorAll("[data-tui-calendar-month-block]").forEach((block) => {
-      const offset = parseInt(block.getAttribute("data-tui-calendar-month-block"), 10) || 0;
+    root.querySelectorAll('[data-slot="calendar-month"]').forEach((block) => {
+      const offset = parseInt(block.getAttribute("data-index"), 10) || 0;
       const month = new Date(s.month.getFullYear(), s.month.getMonth() + offset, 1);
       renderCaption(block, s, month);
       renderWeekdays(block, s);
@@ -101,28 +103,28 @@
   }
 
   function renderCaption(block, s, month) {
-    const label = block.querySelector("[data-tui-calendar-caption]");
+    const label = block.querySelector('[data-slot="calendar-caption"]');
     if (label) {
       label.textContent = month.toLocaleDateString(s.locale, { month: "long", year: "numeric" });
     }
-    const monthSelect = block.querySelector("[data-tui-calendar-month-select]");
+    const monthSelect = block.querySelector('[data-slot="calendar-month-select"]');
     if (monthSelect) {
       monthSelect.value = String(month.getMonth());
-      const monthLabel = block.querySelector("[data-tui-calendar-month-label]");
+      const monthLabel = block.querySelector('[data-slot="calendar-month-label"]');
       if (monthLabel) {
         monthLabel.textContent = new Date(2000, month.getMonth(), 1).toLocaleDateString(s.locale, { month: "short" });
       }
     }
-    const yearSelect = block.querySelector("[data-tui-calendar-year-select]");
+    const yearSelect = block.querySelector('[data-slot="calendar-year-select"]');
     if (yearSelect) {
       yearSelect.value = String(month.getFullYear());
-      const yearLabel = block.querySelector("[data-tui-calendar-year-label]");
+      const yearLabel = block.querySelector('[data-slot="calendar-year-label"]');
       if (yearLabel) yearLabel.textContent = String(month.getFullYear());
     }
   }
 
   function renderWeekdays(block, s) {
-    const row = block.querySelector("[data-tui-calendar-weekdays]");
+    const row = block.querySelector('[data-slot="calendar-weekdays"]');
     if (!row) return;
     row.innerHTML = "";
     if (s.weekNumbers) {
@@ -156,8 +158,8 @@
   }
 
   function renderWeeks(root, block, s, month) {
-    const tbody = block.querySelector("[data-tui-calendar-weeks]");
-    const template = root.querySelector("[data-tui-calendar-day-template]");
+    const tbody = block.querySelector('[data-slot="calendar-weeks"]');
+    const template = root.querySelector('[data-slot="calendar-day-template"]');
     if (!tbody || !template) return;
     tbody.innerHTML = "";
 
@@ -215,8 +217,7 @@
 
         const btn = template.content.firstElementChild.cloneNode(true);
         btn.textContent = String(date.getDate());
-        btn.setAttribute("data-tui-calendar-day", toISO(date));
-        btn.setAttribute("data-day", date.toLocaleDateString(s.locale));
+        btn.setAttribute("data-day", toISO(date));
         btn.setAttribute("data-outside", outside ? "true" : "false");
         btn.setAttribute("data-selected-single", mods.selectedSingle ? "true" : "false");
         btn.setAttribute("data-range-start", mods.rangeStart ? "true" : "false");
@@ -232,8 +233,8 @@
   }
 
   function updateNav(root, s) {
-    const prev = root.querySelector("[data-tui-calendar-prev]");
-    const next = root.querySelector("[data-tui-calendar-next]");
+    const prev = root.querySelector('[data-slot="calendar-previous"]');
+    const next = root.querySelector('[data-slot="calendar-next"]');
     if (prev && s.min) {
       prev.disabled = s.month <= new Date(s.min.getFullYear(), s.min.getMonth(), 1);
     }
@@ -243,19 +244,40 @@
   }
 
   function sync(root, s) {
-    const hidden = root.querySelector("[data-tui-calendar-hidden-input]");
-    const hiddenEnd = root.querySelector("[data-tui-calendar-hidden-end-input]");
-    if (hiddenEnd) hiddenEnd.value = toISO(s.end);
+    const hidden = root.querySelector('[data-slot="calendar-input"]');
+    const hiddenEnd = root.querySelector('[data-slot="calendar-end-input"]');
+    if (hiddenEnd && hiddenEnd.value !== toISO(s.end)) {
+      hiddenEnd.value = toISO(s.end);
+      hiddenEnd.dispatchEvent(new Event("input", { bubbles: true }));
+      hiddenEnd.dispatchEvent(new Event("change", { bubbles: true }));
+    }
     if (hidden && hidden.value !== toISO(s.selected)) {
       hidden.value = toISO(s.selected);
+      hidden.dispatchEvent(new Event("input", { bubbles: true }));
       hidden.dispatchEvent(new Event("change", { bubbles: true }));
     }
-    root.dispatchEvent(
+  }
+
+  function requestValueChange(root, selected, end) {
+    return root.dispatchEvent(
       new CustomEvent("calendar-change", {
         bubbles: true,
-        detail: { value: s.selected, endValue: s.end, valueISO: toISO(s.selected), endValueISO: toISO(s.end) },
+        cancelable: true,
+        detail: { value: selected, endValue: end, valueISO: toISO(selected), endValueISO: toISO(end) },
       }),
     );
+  }
+
+  function commit(root, selected, end) {
+    const s = state(root);
+    s.selected = selected;
+    s.end = end;
+    root.toggleAttribute("data-selected", !!selected);
+    if (selected) root.setAttribute("data-selected", toISO(selected));
+    root.toggleAttribute("data-range-end", !!end);
+    if (end) root.setAttribute("data-range-end", toISO(end));
+    render(root);
+    sync(root, s);
   }
 
   // Range selection is react-day-picker's addToRange (min 0, not required):
@@ -265,77 +287,84 @@
   // clicks inside move the end.
   function selectDate(root, date) {
     const s = state(root);
+    let selected = s.selected;
+    let end = s.end;
     if (s.mode === "range") {
-      const from = s.selected;
-      const to = s.end || s.selected;
+      const from = selected;
+      const to = end || selected;
       if (!from) {
-        s.selected = date;
-        s.end = date;
+        selected = date;
+        end = date;
       } else if (sameDay(from, date) && sameDay(to, date)) {
-        s.selected = null;
-        s.end = null;
+        selected = null;
+        end = null;
       } else if (sameDay(from, date)) {
-        s.end = date;
+        end = date;
       } else if (sameDay(to, date)) {
-        s.selected = date;
-        s.end = date;
+        selected = date;
+        end = date;
       } else if (date < from) {
-        s.selected = date;
+        selected = date;
       } else {
-        s.end = date;
+        end = date;
       }
     } else {
-      s.selected = sameDay(s.selected, date) ? null : date;
+      selected = sameDay(selected, date) ? null : date;
+      end = null;
     }
-    render(root);
-    sync(root, s);
+    if (!requestValueChange(root, selected, end)) return;
+    commit(root, selected, end);
     // Re-rendering destroyed the clicked button; refocus its replacement so
     // the focus ring stays on the day, exactly like react-day-picker.
-    const btn = root.querySelector('[data-tui-calendar-day="' + toISO(date) + '"]');
+    const btn = root.querySelector('[data-day="' + toISO(date) + '"]');
     if (btn) btn.focus();
   }
 
   function setDate(root, date) {
     const s = state(root);
-    s.selected = date;
-    s.end = s.mode === "range" ? date : null;
+    const end = s.mode === "range" ? date : null;
+    if (!requestValueChange(root, date, end)) return;
     s.month = new Date(date.getFullYear(), date.getMonth(), 1);
-    render(root);
-    sync(root, s);
+    root.setAttribute("data-month", toISO(s.month));
+    commit(root, date, end);
   }
 
   document.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
-    const root = e.target.closest("[data-tui-calendar]");
+    const root = e.target.closest('[data-slot="calendar"]');
     if (!root) return;
     const s = state(root);
 
-    const day = e.target.closest("[data-tui-calendar-day]");
+    const day = e.target.closest("[data-day]");
     if (day && !day.disabled) {
-      selectDate(root, parseISO(day.getAttribute("data-tui-calendar-day")));
+      selectDate(root, parseISO(day.getAttribute("data-day")));
       return;
     }
-    if (e.target.closest("[data-tui-calendar-prev]")) {
+    if (e.target.closest('[data-slot="calendar-previous"]')) {
       s.month = new Date(s.month.getFullYear(), s.month.getMonth() - 1, 1);
+      root.setAttribute("data-month", toISO(s.month));
       render(root);
       return;
     }
-    if (e.target.closest("[data-tui-calendar-next]")) {
+    if (e.target.closest('[data-slot="calendar-next"]')) {
       s.month = new Date(s.month.getFullYear(), s.month.getMonth() + 1, 1);
+      root.setAttribute("data-month", toISO(s.month));
       render(root);
     }
   });
 
   document.addEventListener("change", (e) => {
     if (!(e.target instanceof Element)) return;
-    const root = e.target.closest("[data-tui-calendar]");
+    const root = e.target.closest('[data-slot="calendar"]');
     if (!root) return;
     const s = state(root);
-    if (e.target.hasAttribute("data-tui-calendar-month-select")) {
+    if (e.target.matches('[data-slot="calendar-month-select"]')) {
       s.month = new Date(s.month.getFullYear(), parseInt(e.target.value, 10), 1);
+      root.setAttribute("data-month", toISO(s.month));
       render(root);
-    } else if (e.target.hasAttribute("data-tui-calendar-year-select")) {
+    } else if (e.target.matches('[data-slot="calendar-year-select"]')) {
       s.month = new Date(parseInt(e.target.value, 10), s.month.getMonth(), 1);
+      root.setAttribute("data-month", toISO(s.month));
       render(root);
     }
   });
@@ -343,7 +372,7 @@
   // Programmatic selection, e.g. from preset buttons: dispatch a
   // "calendar-set" CustomEvent with detail.date (ISO) on/inside the calendar.
   document.addEventListener("calendar-set", (e) => {
-    const root = e.target instanceof Element && e.target.closest("[data-tui-calendar]");
+    const root = e.target instanceof Element && e.target.closest('[data-slot="calendar"]');
     if (!root) return;
     const date = parseISO(e.detail && e.detail.date);
     if (date) setDate(root, date);
@@ -351,53 +380,88 @@
 
   // Keyboard: arrows move day focus, Enter/Space activate natively.
   document.addEventListener("keydown", (e) => {
-    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-calendar-day")) return;
+    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-day")) return;
     const deltas = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
     const delta = deltas[e.key];
     if (!delta) return;
     e.preventDefault();
-    const root = e.target.closest("[data-tui-calendar]");
+    const root = e.target.closest('[data-slot="calendar"]');
     const s = state(root);
-    const current = parseISO(e.target.getAttribute("data-tui-calendar-day"));
+    const current = parseISO(e.target.getAttribute("data-day"));
     const nextDate = new Date(current.getFullYear(), current.getMonth(), current.getDate() + delta);
     if (nextDate.getMonth() !== s.month.getMonth() || nextDate.getFullYear() !== s.month.getFullYear()) {
       s.month = new Date(nextDate.getFullYear(), nextDate.getMonth(), 1);
+      root.setAttribute("data-month", toISO(s.month));
       render(root);
     }
-    const btn = root.querySelector('[data-tui-calendar-day="' + toISO(nextDate) + '"]');
+    const btn = root.querySelector('[data-day="' + toISO(nextDate) + '"]');
     if (btn) btn.focus();
   });
 
   // The focus ring lives on the cell (group/day) like react-day-picker.
   document.addEventListener("focusin", (e) => {
-    if (e.target instanceof Element && e.target.hasAttribute("data-tui-calendar-day")) {
+    if (e.target instanceof Element && e.target.hasAttribute("data-day")) {
       const td = e.target.closest("td");
       if (td) td.setAttribute("data-focused", "true");
     }
   });
   document.addEventListener("focusout", (e) => {
-    if (e.target instanceof Element && e.target.hasAttribute("data-tui-calendar-day")) {
+    if (e.target instanceof Element && e.target.hasAttribute("data-day")) {
       const td = e.target.closest("td");
       if (td) td.removeAttribute("data-focused");
     }
   });
 
-  function init() {
-    containers().forEach((root) => {
-      if (!root._tuiRendered) {
-        root._tuiRendered = true;
-        render(root);
-      }
-    });
-  }
+  document.addEventListener("change", (event) => {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement)) return;
+    if (!input.matches('[data-slot="calendar-input"], [data-slot="calendar-end-input"]')) return;
+    const root = input.closest('[data-slot="calendar"]');
+    if (!root) return;
+    if (input.matches('[data-slot="calendar-input"]')) {
+      root.toggleAttribute("data-selected", input.value !== "");
+      if (input.value) root.setAttribute("data-selected", input.value);
+    } else {
+      root.toggleAttribute("data-range-end", input.value !== "");
+      if (input.value) root.setAttribute("data-range-end", input.value);
+    }
+  });
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
-  // does not fire in hidden tabs or throttled iframes): swapped-in markup
-  // wires itself.
-  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+  window.shadcnTempl.lifecycle.register("calendar", {
+    selector: '[data-slot="calendar"]',
+    setup(root) {
+      render(root);
+      const inputs = root.querySelectorAll(
+        '[data-slot="calendar-input"], [data-slot="calendar-end-input"]',
+      );
+      const cleanups = [...inputs].map((input) =>
+        window.shadcnTempl.lifecycle.watchProperty(input, "value", () => {
+          if (input.matches('[data-slot="calendar-input"]')) {
+            root.toggleAttribute("data-selected", input.value !== "");
+            if (input.value) root.setAttribute("data-selected", input.value);
+          } else {
+            root.toggleAttribute("data-range-end", input.value !== "");
+            if (input.value) root.setAttribute("data-range-end", input.value);
+          }
+        }),
+      );
+      return () => cleanups.forEach((cleanup) => cleanup?.());
+    },
+    attributes: ["data-selected", "data-range-end", "data-month"],
+    attributeChanged(root) {
+      const s = state(root);
+      const selected = parseISO(root.getAttribute("data-selected"));
+      const end = parseISO(root.getAttribute("data-range-end"));
+      const month = parseISO(root.getAttribute("data-month"));
+      const sameSelection = (!selected && !s.selected) || sameDay(selected, s.selected);
+      const sameEnd = (!end && !s.end) || sameDay(end, s.end);
+      const sameMonth = !month || (month.getFullYear() === s.month.getFullYear() && month.getMonth() === s.month.getMonth());
+      if (sameSelection && sameEnd && sameMonth) return;
+      s.selected = selected;
+      s.end = end;
+      if (month) s.month = new Date(month.getFullYear(), month.getMonth(), 1);
+      render(root);
+      sync(root, s);
+    },
+  });
 })();

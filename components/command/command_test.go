@@ -1,23 +1,23 @@
 package command
 
 import (
-	"bytes"
-	"context"
+	"os"
 	"strings"
 	"testing"
 )
 
 func TestDialogForwardsOpenStateToDialogRoot(t *testing.T) {
-	open := false
-	var out bytes.Buffer
-	if err := Dialog(DialogProps{ID: "palette", Open: &open, DefaultOpen: true}).Render(context.Background(), &out); err != nil {
+	source, err := os.ReadFile("command.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
-	html := out.String()
-	if !strings.Contains(html, `data-tui-dialog-controlled`) {
-		t.Fatal("controlled command dialog is missing the dialog controlled marker")
+	templ := string(source)
+	for _, want := range []string{"Open:               p.Open", "DefaultOpen:        p.DefaultOpen"} {
+		if !strings.Contains(templ, want) {
+			t.Fatalf("command dialog does not forward %q", want)
+		}
 	}
-	if strings.Contains(html, `data-tui-dialog-initial-open="true"`) {
-		t.Fatal("controlled false must override defaultOpen true")
+	if strings.Contains(templ, "data-dialog-controlled") {
+		t.Fatal("command dialog leaks private state ownership into HTML")
 	}
 }

@@ -758,12 +758,12 @@ func Content(props ...ContentProps) templ.Component {
 			// cn-combobox-content (animations key on Base UI's data-open/data-closed attributes).
 			// The --available-height/--available-width/--anchor-width/
 			// --transform-origin variables become our JS variable names.
-			"cn-combobox-content cn-combobox-content-logical cn-menu-target cn-menu-translucent group/combobox-content relative max-h-(--tui-combobox-available-height) w-(--tui-combobox-anchor-width) max-w-(--tui-combobox-available-width) min-w-[calc(var(--tui-combobox-anchor-width)+--spacing(7))] origin-(--tui-combobox-transform-origin) data-[chips=true]:min-w-(--tui-combobox-anchor-width)",
+			"cn-combobox-content cn-combobox-content-logical cn-menu-target cn-menu-translucent group/combobox-content relative max-h-(--combobox-available-height) w-(--combobox-anchor-width) max-w-(--combobox-available-width) min-w-[calc(var(--combobox-anchor-width)+--spacing(7))] origin-(--combobox-transform-origin) data-[chips=true]:min-w-(--combobox-anchor-width)",
 			// JS wiring: the positioner wrapper is pointer-events-none, the popup
 			// stays mounted after animate-out until hidePopover runs, and the
 			// vendored cn-combobox-list reads --available-height, which we bridge
 			// to our JS variable here.
-			"pointer-events-auto data-closed:fill-mode-forwards [--available-height:var(--tui-combobox-available-height)]",
+			"pointer-events-auto data-closed:fill-mode-forwards [--available-height:var(--combobox-available-height)]",
 			p.Class,
 		),
 		}

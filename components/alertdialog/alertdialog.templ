@@ -21,7 +21,6 @@ const (
 type ctxState struct {
 	id         string
 	open       bool
-	controlled bool
 }
 
 func state(ctx context.Context) ctxState {
@@ -111,7 +110,7 @@ templ AlertDialog(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: initialOpen(p), controlled: p.Open != nil}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: initialOpen(p)}) }}
 	{ children... }
 }
 
@@ -124,10 +123,10 @@ func Trigger(ctx context.Context) templ.Attributes {
 // TriggerFor targets an alert dialog outside the current AlertDialog root by id.
 func TriggerFor(id string) templ.Attributes {
 	return templ.Attributes{
-		"data-tui-dialog-trigger": true,
-		"aria-controls":           id,
-		"aria-haspopup":           "dialog",
-		"aria-expanded":           "false",
+		"data-slot":     "alert-dialog-trigger",
+		"aria-controls": id,
+		"aria-haspopup": "dialog",
+		"aria-expanded": "false",
 	}
 }
 
@@ -139,8 +138,8 @@ func Close(ctx context.Context) templ.Attributes {
 // CloseFor targets an alert dialog outside the current AlertDialog root by id.
 func CloseFor(id string) templ.Attributes {
 	return templ.Attributes{
-		"data-tui-dialog-close":  true,
-		"data-tui-dialog-target": id,
+		"data-slot":     "alert-dialog-close",
+		"aria-controls": id,
 	}
 }
 
@@ -158,8 +157,8 @@ templ Portal(props ...PortalProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<template data-tui-dialog-portal>
-		<div data-tui-dialog-root hidden { p.Attributes... }>
+	<template>
+		<div data-slot="dialog-root" hidden { p.Attributes... }>
 			{ children... }
 		</div>
 	</template>
@@ -184,7 +183,6 @@ templ Overlay(props ...OverlayProps) {
 			id={ p.ID }
 		}
 		data-slot="alert-dialog-overlay"
-		data-tui-dialog-backdrop
 		role="presentation"
 		style="user-select: none; -webkit-user-select: none;"
 		class={ utils.CN("cn-alert-dialog-overlay fixed inset-0 isolate z-50", p.Class) }
@@ -213,12 +211,10 @@ templ Content(props ...ContentProps) {
 			role="alertdialog"
 			tabindex="-1"
 			data-slot="alert-dialog-content"
-			data-tui-dialog-content
 			data-size={ string(p.Size) }
-			data-tui-dialog-initial-open={ utils.IfElse(s.open, "true", "false") }
-			data-tui-dialog-controlled?={ s.controlled }
-			data-tui-dialog-show-modal="true"
-			data-tui-dialog-disable-dismissible="true"
+			aria-modal="true"
+			data-dismissible="false"
+			data-open?={ s.open }
 			class={
 				utils.CN(
 					"cn-alert-dialog-content group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 outline-none",
@@ -293,7 +289,6 @@ templ Title(props ...TitleProps) {
 			id={ p.ID }
 		}
 		data-slot="alert-dialog-title"
-		data-tui-dialog-title
 		class={ utils.CN("cn-alert-dialog-title cn-font-heading", p.Class) }
 		{ p.Attributes... }
 	>
@@ -311,7 +306,6 @@ templ Description(props ...DescriptionProps) {
 			id={ p.ID }
 		}
 		data-slot="alert-dialog-description"
-		data-tui-dialog-description
 		class={ utils.CN("cn-alert-dialog-description", p.Class) }
 		{ p.Attributes... }
 	>
@@ -355,9 +349,8 @@ templ Cancel(props ...CancelProps) {
 	}
 	{{
 		attrs := templ.Attributes{
-			"data-slot":              "alert-dialog-cancel",
-			"data-tui-dialog-close":  true,
-			"data-tui-dialog-target": state(ctx).id,
+			"data-slot":     "alert-dialog-cancel",
+			"aria-controls": state(ctx).id,
 		}
 		for k, v := range p.Attributes {
 			attrs[k] = v

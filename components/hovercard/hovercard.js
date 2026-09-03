@@ -1,19 +1,26 @@
 // Uses window.FloatingUIDOM from components/floatingui (loaded in the same bundle).
 (function () {
+  const configs = new WeakMap();
+  const elementStates = new WeakMap();
   // Exit animations run for 100ms (duration-100); hide shortly after.
   const EXIT_MS = 120;
 
+  function state(element) {
+    if (!elementStates.has(element)) elementStates.set(element, {});
+    return elementStates.get(element);
+  }
+
   function allContents() {
-    return document.querySelectorAll("[data-tui-hovercard-content]");
+    return document.querySelectorAll(`[data-slot="hover-card-content"]`);
   }
 
   function contentFor(trigger) {
-    return document.getElementById(trigger.getAttribute("data-tui-hovercard-for"));
+    return document.getElementById(trigger.getAttribute("aria-controls"));
   }
 
   function triggerFor(content) {
     return document.querySelector(
-      '[data-tui-hovercard-trigger][data-tui-hovercard-for="' + content.id + '"]',
+      '[data-slot="hover-card-trigger"][aria-controls="' + content.id + '"]',
     );
   }
 
@@ -36,30 +43,29 @@
 
   // Moves the content to <body> (shadcn portals it the same way).
   // The unmount half of the React portal pendant: a portaled content lives
-  // as long as its SSR declaration site (_tuiPortalOwner) stays in the
+  // as long as its SSR declaration site stays in the
   // document. Trigger-presence heuristics judged mid-swap moments wrongly -
   // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
-    document.querySelectorAll("body > [data-tui-hovercard-content]").forEach((c) => {
-      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) {
+    document.querySelectorAll('body > [data-slot="hover-card-content"]').forEach((c) => {
+      if (c !== content && state(c).portalOwner && !state(c).portalOwner.isConnected) {
         stopAutoPositioning(c);
         c.remove();
       }
     });
     if (content.parentElement !== document.body) {
-      if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
+      if (!state(content).portalOwner) state(content).portalOwner = content.parentElement;
       document.body.appendChild(content);
     }
   }
 
   function positionContent(content, trigger) {
     const { computePosition, offset, flip, shift } = window.FloatingUIDOM;
-    const side = content.getAttribute("data-tui-hovercard-side") || "bottom";
-    const align = content.getAttribute("data-tui-hovercard-align") || "center";
-    const sideOffset =
-      parseInt(content.getAttribute("data-tui-hovercard-side-offset"), 10) || 4;
-    const alignOffset =
-      parseInt(content.getAttribute("data-tui-hovercard-align-offset"), 10) || 0;
+    const componentConfig = configs.get(content) || {};
+    const side = componentConfig.side || "bottom";
+    const align = componentConfig.align || "center";
+    const sideOffset = parseInt(componentConfig.sideOffset, 10) || 4;
+    const alignOffset = parseInt(componentConfig.alignOffset, 10) || 0;
     const placement = align === "center" ? side : side + "-" + align;
 
     return computePosition(trigger, content, {
@@ -75,7 +81,7 @@
       content.style.left = result.x + "px";
       content.style.top = result.y + "px";
       content.style.setProperty(
-        "--tui-hovercard-transform-origin",
+        "--transform-origin",
         anchorOrigin(
           result,
           trigger.getBoundingClientRect(),
@@ -90,13 +96,13 @@
   }
 
   function startAutoPositioning(content, trigger) {
-    if (content._tuiPositionCleanup) content._tuiPositionCleanup();
+    if (state(content).positionCleanup) state(content).positionCleanup();
     let resolveFirst;
     const firstPosition = new Promise((resolve) => {
       resolveFirst = resolve;
     });
     const update = () => positionContent(content, trigger).then(resolveFirst, resolveFirst);
-    content._tuiPositionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
+    state(content).positionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
       elementResize: typeof ResizeObserver !== "undefined",
       layoutShift: typeof IntersectionObserver !== "undefined",
     });
@@ -104,13 +110,13 @@
   }
 
   function stopAutoPositioning(content) {
-    if (!content._tuiPositionCleanup) return;
-    content._tuiPositionCleanup();
-    content._tuiPositionCleanup = null;
+    if (!state(content).positionCleanup) return;
+    state(content).positionCleanup();
+    state(content).positionCleanup = null;
   }
 
   function open(content, trigger) {
-    clearTimeout(content._tuiHide);
+    clearTimeout(state(content).hideTimer);
     portal(content);
     // z-index portal like shadcn (no native top layer); re-append
     // keeps paint order = open order.
@@ -135,8 +141,8 @@
     if (content.hidden) return;
     stopAutoPositioning(content);
     setOpenState(content, false);
-    clearTimeout(content._tuiHide);
-    content._tuiHide = setTimeout(() => {
+    clearTimeout(state(content).hideTimer);
+    state(content).hideTimer = setTimeout(() => {
       if (content.hasAttribute("data-closed") && !content.hidden) {
         content.hidden = true;
       }
@@ -151,7 +157,7 @@
     detail: { open: nextOpen },
   });
   const accepted = (trigger || content).dispatchEvent(change);
-  if (!accepted || content.hasAttribute("data-tui-hovercard-controlled")) return false;
+  if (!accepted) return false;
   if (nextOpen && trigger) open(content, trigger);
   else if (!nextOpen) close(content);
   return true;
@@ -160,54 +166,54 @@
   // Hover intent: entering trigger or card keeps it open; leaving both
   // schedules the close after the card's close delay.
   function scheduleOpen(content, trigger) {
-    clearTimeout(content._tuiClose);
-    content._tuiClose = null;
-    if (content.hasAttribute("data-open") || content._tuiOpen) return;
-    const delay = parseInt(content.getAttribute("data-tui-hovercard-delay"), 10) || 600;
-    content._tuiOpen = setTimeout(() => {
-      content._tuiOpen = null;
+    clearTimeout(state(content).closeTimer);
+    state(content).closeTimer = null;
+    if (content.hasAttribute("data-open") || state(content).openTimer) return;
+    const delay = parseInt(configs.get(content)?.delay, 10) || 600;
+    state(content).openTimer = setTimeout(() => {
+      state(content).openTimer = null;
     requestOpenChange(content, true);
     }, delay);
   }
 
   function scheduleClose(content) {
-    clearTimeout(content._tuiOpen);
-    content._tuiOpen = null;
-    if (!content.hasAttribute("data-open") || content._tuiClose) return;
-    const delay = parseInt(content.getAttribute("data-tui-hovercard-close-delay"), 10) || 300;
-    content._tuiClose = setTimeout(() => {
-      content._tuiClose = null;
+    clearTimeout(state(content).openTimer);
+    state(content).openTimer = null;
+    if (!content.hasAttribute("data-open") || state(content).closeTimer) return;
+    const delay = parseInt(configs.get(content)?.closeDelay, 10) || 300;
+    state(content).closeTimer = setTimeout(() => {
+      state(content).closeTimer = null;
     requestOpenChange(content, false);
     }, delay);
   }
 
   document.addEventListener("mouseover", (e) => {
-    const trigger = e.target.closest("[data-tui-hovercard-trigger]");
+    const trigger = e.target.closest(`[data-slot="hover-card-trigger"]`);
     if (trigger) {
       const content = contentFor(trigger);
       if (content) scheduleOpen(content, trigger);
       return;
     }
-    const content = e.target.closest("[data-tui-hovercard-content]");
+    const content = e.target.closest(`[data-slot="hover-card-content"]`);
     if (content) {
-      clearTimeout(content._tuiClose);
-      content._tuiClose = null;
+      clearTimeout(state(content).closeTimer);
+      state(content).closeTimer = null;
     }
   });
 
   document.addEventListener("mouseout", (e) => {
-    const from = e.target.closest("[data-tui-hovercard-trigger], [data-tui-hovercard-content]");
+    const from = e.target.closest('[data-slot="hover-card-trigger"], [data-slot="hover-card-content"]');
     if (!from) return;
-    const content = from.hasAttribute("data-tui-hovercard-content")
+    const content = from.matches('[data-slot="hover-card-content"]')
       ? from
       : contentFor(from);
     if (!content) return;
     if (e.relatedTarget) {
-      const to = e.relatedTarget.closest("[data-tui-hovercard-trigger], [data-tui-hovercard-content]");
+      const to = e.relatedTarget.closest('[data-slot="hover-card-trigger"], [data-slot="hover-card-content"]');
       // Only moving between THIS card's trigger and popup keeps it open;
       // landing on another instance must still close this one.
       if (to) {
-        const toContent = to.hasAttribute("data-tui-hovercard-content")
+        const toContent = to.matches('[data-slot="hover-card-content"]')
           ? to
           : contentFor(to);
         if (toContent === content) return;
@@ -223,17 +229,18 @@
   });
 
   // Lift SSR'd contents out of their inert <template> wrappers into <body>,
-  // replacing a stale portaled copy on re-swaps (e.g. htmx).
+  // replacing a stale portaled copy after ordinary DOM replacement.
   function liftTemplates() {
-    document.querySelectorAll("template[data-tui-hovercard-portal]").forEach((tpl) => {
-      const content = tpl.content.querySelector("[data-tui-hovercard-content]");
+    document.querySelectorAll("template").forEach((tpl) => {
+      const content = tpl.content.querySelector(`[data-slot="hover-card-content"]`);
+      if (!content) return;
       if (content) {
         const stale = document.getElementById(content.id);
         if (stale) {
           stopAutoPositioning(stale);
           stale.remove();
         }
-        content._tuiPortalOwner = tpl.parentElement;
+        state(content).portalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
       tpl.remove();
@@ -246,23 +253,35 @@
     liftTemplates();
     allContents().forEach((content) => {
       if (triggerFor(content)) portal(content);
-    if (content.getAttribute("data-tui-hovercard-initial-open") === "true") {
-    content.removeAttribute("data-tui-hovercard-initial-open");
+    if (content.hasAttribute("data-open")) {
     const trigger = triggerFor(content);
     if (trigger) open(content, trigger);
     }
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
-  // does not fire in hidden tabs or throttled iframes): swapped-in markup
-  // lifts and wires itself, removals release portaled content through the
-  // ownership sweep.
-  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+  window.shadcnTempl.lifecycle.register("hover-card-content", {
+    selector: '[data-slot="hover-card-content"]',
+    setup(content) {
+      configs.set(content, {
+        side: content.getAttribute("data-side"),
+        align: content.getAttribute("data-align"),
+        sideOffset: content.getAttribute("data-side-offset"),
+        alignOffset: content.getAttribute("data-align-offset"),
+        delay: content.getAttribute("data-open-delay"),
+        closeDelay: content.getAttribute("data-close-delay"),
+      });
+    },
+    attributes: ["data-open"],
+    attributeChanged(content) {
+      const trigger = triggerFor(content);
+      if (content.hasAttribute("data-open") && content.hidden && trigger) open(content, trigger);
+      else if (!content.hasAttribute("data-open") && !content.hidden && !content.hasAttribute("data-closed")) close(content);
+    },
+  });
+  window.shadcnTempl.lifecycle.register("hover-card", {
+    mount: init,
+    unmount: init,
+  });
 
 })();

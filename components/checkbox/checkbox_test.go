@@ -1,8 +1,6 @@
 package checkbox
 
 import (
-	"bytes"
-	"context"
 	"os"
 	"strings"
 	"testing"
@@ -10,19 +8,8 @@ import (
 
 func TestControlledCheckedOverridesDefaultChecked(t *testing.T) {
 	checked := false
-	var output bytes.Buffer
-	if err := Checkbox(Props{Checked: &checked, DefaultChecked: true}).Render(context.Background(), &output); err != nil {
-		t.Fatal(err)
-	}
-
-	html := output.String()
-	for _, want := range []string{`aria-checked="false"`, `data-unchecked`, `data-tui-checkbox-controlled`} {
-		if !strings.Contains(html, want) {
-			t.Fatalf("rendered checkbox is missing %q: %s", want, html)
-		}
-	}
-	if strings.Contains(html, ` checked`) {
-		t.Fatalf("controlled false checkbox rendered checked: %s", html)
+	if initialChecked(Props{Checked: &checked, DefaultChecked: true}) {
+		t.Fatal("explicit false must override DefaultChecked")
 	}
 }
 
@@ -32,7 +19,7 @@ func TestClientRequestsCancelableCheckedChanges(t *testing.T) {
 		t.Fatal(err)
 	}
 	js := string(source)
-	for _, want := range []string{`new CustomEvent("checkbox-change"`, `cancelable: true`, `data-tui-checkbox-controlled`} {
+	for _, want := range []string{`new CustomEvent("checkbox-change"`, `cancelable: true`, `attributes: ["data-checked", "data-indeterminate"]`} {
 		if !strings.Contains(js, want) {
 			t.Fatalf("client behavior is missing %q", want)
 		}

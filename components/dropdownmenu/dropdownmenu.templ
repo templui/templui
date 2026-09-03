@@ -2,7 +2,7 @@ package dropdownmenu
 
 import (
 	"context"
-	"strconv"
+	"fmt"
 
 	"github.com/axadrn/shadcn-templ/v2/components/icon"
 	"github.com/axadrn/shadcn-templ/v2/utils"
@@ -40,7 +40,6 @@ const radioStateKey ctxKey = "dropdownmenuRadioState"
 type ctxState struct {
 	id          string
 	initialOpen bool
-	controlled  bool
 }
 
 func state(ctx context.Context) ctxState {
@@ -55,10 +54,10 @@ func state(ctx context.Context) ctxState {
 // trigger composes cleanly inside ButtonGroup and friends.
 func Trigger(ctx context.Context) templ.Attributes {
 	return templ.Attributes{
-		"data-tui-dropdownmenu-trigger": true,
-		"aria-controls":                 state(ctx).id,
-		"aria-haspopup":                 "menu",
-		"aria-expanded":                 "false",
+		"data-slot":     "dropdown-menu-trigger",
+		"aria-controls": state(ctx).id,
+		"aria-haspopup": "menu",
+		"aria-expanded": "false",
 	}
 }
 
@@ -147,9 +146,8 @@ type RadioItemProps struct {
 }
 
 type radioState struct {
-	value      string
-	controlled bool
-	disabled   bool
+	value    string
+	disabled bool
 }
 
 func initialChecked(p CheckboxItemProps) bool {
@@ -242,7 +240,7 @@ templ DropdownMenu(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, initialOpen: initialOpen(p), controlled: p.Open != nil}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, initialOpen: initialOpen(p)}) }}
 	{ children... }
 }
 
@@ -259,7 +257,7 @@ templ Portal(props ...PortalProps) {
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<template data-tui-dropdownmenu-portal { p.Attributes... }>
+	<template { p.Attributes... }>
 		{ children... }
 	</template>
 }
@@ -284,28 +282,26 @@ templ Content(props ...ContentProps) {
 	@Portal() {
 		<div
 			id={ s.id }
-			data-tui-dropdownmenu-content
-			data-tui-dropdownmenu-side={ string(p.Side) }
-			data-tui-dropdownmenu-align={ string(p.Align) }
+			data-slot="dropdown-menu-positioner"
+			data-side={ string(p.Side) }
+			data-align={ string(p.Align) }
 			if p.MobileSide != "" {
-				data-tui-dropdownmenu-mobile-side={ string(p.MobileSide) }
+				data-mobile-side={ string(p.MobileSide) }
 			}
 			if p.MobileAlign != "" {
-				data-tui-dropdownmenu-mobile-align={ string(p.MobileAlign) }
+				data-mobile-align={ string(p.MobileAlign) }
 			}
-			data-tui-dropdownmenu-side-offset={ strconv.Itoa(p.SideOffset) }
-			data-tui-dropdownmenu-align-offset={ strconv.Itoa(p.AlignOffset) }
-			data-tui-dropdownmenu-initial-open={ strconv.FormatBool(s.initialOpen) }
-			data-tui-dropdownmenu-controlled?={ s.controlled }
-			data-closed
+			data-side-offset={ fmt.Sprintf("%d", p.SideOffset) }
+			data-align-offset={ fmt.Sprintf("%d", p.AlignOffset) }
+			data-open?={ s.initialOpen }
+			data-closed?={ !s.initialOpen }
 			hidden
-			data-tui-portal
 			class="pointer-events-none isolate absolute inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
 		>
 			<div
 				data-slot="dropdown-menu-content"
-				data-tui-dropdownmenu-popup
-				data-closed
+				data-open?={ s.initialOpen }
+				data-closed?={ !s.initialOpen }
 				role="menu"
 				tabindex="-1"
 				class={
@@ -384,9 +380,8 @@ templ Item(props ...ItemProps) {
 			data-slot="dropdown-menu-item"
 			data-variant={ string(p.Variant) }
 			data-inset?={ p.Inset }
-			data-tui-dropdownmenu-item
 			if p.DisableCloseOnClick {
-				data-tui-dropdownmenu-disable-close-on-click="true"
+				data-close-on-click="false"
 			}
 			if p.Disabled {
 				aria-disabled="true"
@@ -406,9 +401,8 @@ templ Item(props ...ItemProps) {
 			data-slot="dropdown-menu-item"
 			data-variant={ string(p.Variant) }
 			data-inset?={ p.Inset }
-			data-tui-dropdownmenu-item
 			if p.DisableCloseOnClick {
-				data-tui-dropdownmenu-disable-close-on-click="true"
+				data-close-on-click="false"
 			}
 			disabled?={ p.Disabled }
 			role="menuitem"
@@ -432,8 +426,6 @@ templ CheckboxItem(props ...CheckboxItemProps) {
 		}
 		type="button"
 		data-slot="dropdown-menu-checkbox-item"
-		data-tui-dropdownmenu-checkbox-item
-		data-tui-dropdownmenu-checkbox-controlled?={ p.Checked != nil }
 		role="menuitemcheckbox"
 		if checked {
 			data-checked
@@ -462,16 +454,13 @@ templ RadioGroup(props ...RadioGroupProps) {
 		{{ p = props[0] }}
 	}
 	{{ value := initialRadioValue(p) }}
-	{{ ctx = context.WithValue(ctx, radioStateKey, radioState{value: value, controlled: p.Value != nil, disabled: p.Disabled}) }}
+	{{ ctx = context.WithValue(ctx, radioStateKey, radioState{value: value, disabled: p.Disabled}) }}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
 		role="group"
 		data-slot="dropdown-menu-radio-group"
-		data-tui-dropdownmenu-radio-group
-		data-tui-dropdownmenu-radio-controlled?={ p.Value != nil }
-		data-tui-dropdownmenu-radio-value={ value }
 		data-disabled?={ p.Disabled }
 		class={ utils.CN("", p.Class) }
 		{ p.Attributes... }
@@ -494,9 +483,8 @@ templ RadioItem(props ...RadioItemProps) {
 		}
 		type="button"
 		data-slot="dropdown-menu-radio-item"
-		data-tui-dropdownmenu-radio-item
 		if p.Value != "" {
-			data-tui-dropdownmenu-radio-value={ p.Value }
+			data-value={ p.Value }
 		}
 		role="menuitemradio"
 		if checked {
@@ -563,9 +551,8 @@ templ Sub(props ...SubProps) {
 			id={ p.ID }
 		}
 		data-slot="dropdown-menu-sub"
-		data-tui-dropdownmenu-sub
-		data-tui-dropdownmenu-sub-open={ strconv.FormatBool(initialSubOpen(p)) }
-		data-tui-dropdownmenu-sub-controlled?={ p.Open != nil }
+		data-open?={ initialSubOpen(p) }
+		data-closed?={ !initialSubOpen(p) }
 		class={ utils.CN("", p.Class) }
 		{ p.Attributes... }
 	>
@@ -585,7 +572,6 @@ templ SubTrigger(props ...SubTriggerProps) {
 		type="button"
 		data-slot="dropdown-menu-sub-trigger"
 		data-inset?={ p.Inset }
-		data-tui-dropdownmenu-sub-trigger
 		role="menuitem"
 		aria-haspopup="menu"
 		aria-expanded="false"
@@ -616,7 +602,6 @@ templ SubContent(props ...SubContentProps) {
 			id={ p.ID }
 		}
 		data-slot="dropdown-menu-sub-content"
-		data-tui-dropdownmenu-sub-content
 		data-closed
 		role="menu"
 		tabindex="-1"

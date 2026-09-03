@@ -90,7 +90,7 @@ templ sliderExampleControlled() {
 			(() => {
 				const demo = document.querySelector("[data-slider-example-controlled]");
 				demo.addEventListener("slider-change", (e) => {
-					demo.querySelector("[data-value]").textContent = e.detail.values.join(", ");
+					demo.querySelector("[data-value]").textContent = e.detail.value.join(", ");
 				});
 			})();
 		</script>

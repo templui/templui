@@ -223,7 +223,7 @@ func checkItemClasses(cnClass string, disabled bool) string {
 // class list, the look comes from cn-context-menu-content (animations key on
 // Base UI's data-open/data-closed attributes). The --available-height/--transform-origin
 // variables become our JS variable names.
-const contentClasses = "cn-context-menu-content cn-context-menu-content-logical cn-menu-target cn-menu-translucent z-50 max-h-(--tui-contextmenu-available-height) origin-(--tui-contextmenu-transform-origin) overflow-x-hidden overflow-y-auto outline-none"
+const contentClasses = "cn-context-menu-content cn-context-menu-content-logical cn-menu-target cn-menu-translucent z-50 max-h-(--contextmenu-available-height) origin-(--contextmenu-transform-origin) overflow-x-hidden overflow-y-auto outline-none"
 
 // Root renders no element: it only generates the id that links Trigger and
 // Content (via ctx).
@@ -1860,7 +1860,7 @@ func SubContent(props ...SubContentProps) templ.Component {
 			// the cn classes (animations key on Base UI's state attributes). max-h
 			// drops out because our JS only sets the available-height variable on
 			// the root positioner.
-			"cn-context-menu-content cn-context-menu-content-logical cn-menu-target cn-menu-translucent cn-context-menu-subcontent z-50 origin-(--tui-contextmenu-transform-origin) overflow-x-hidden overflow-y-auto outline-none",
+			"cn-context-menu-content cn-context-menu-content-logical cn-menu-target cn-menu-translucent cn-context-menu-subcontent z-50 origin-(--contextmenu-transform-origin) overflow-x-hidden overflow-y-auto outline-none",
 			// JS wiring: floatingui positions the sub content as a fixed layer and
 			// toggles the hidden class around the exit animation.
 			"hidden fixed inset-auto left-0 top-0 data-closed:fill-mode-forwards",

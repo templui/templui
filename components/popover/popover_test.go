@@ -1,33 +1,25 @@
 package popover
 
 import (
-	"bytes"
-	"context"
 	"os"
 	"strings"
 	"testing"
 )
 
 func TestContentCarriesDeclarativeInitialOpenState(t *testing.T) {
-	ctx := context.WithValue(context.Background(), stateKey, ctxState{
-		id:          "actions",
-		initialOpen: true,
-	})
-
-	var output bytes.Buffer
-	if err := Content().Render(ctx, &output); err != nil {
+	source, err := os.ReadFile("popover.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
-
-	html := output.String()
+	templ := string(source)
 	for _, want := range []string{
-		`id="actions"`,
-		`data-tui-popover-initial-open="true"`,
-		`data-closed`,
+		`data-slot="popover-positioner"`,
+		`data-open?={ s.initialOpen }`,
+		`data-closed?={ !s.initialOpen }`,
 		`hidden`,
 	} {
-		if !strings.Contains(html, want) {
-			t.Fatalf("rendered popover is missing %q: %s", want, html)
+		if !strings.Contains(templ, want) {
+			t.Fatalf("popover template is missing %q", want)
 		}
 	}
 }
@@ -53,8 +45,8 @@ func TestClientConsumesInitialOpenAfterPortalMount(t *testing.T) {
 	js := string(source)
 	for _, want := range []string{
 		`liftTemplates();`,
-		`content.getAttribute("data-tui-popover-initial-open") === "true"`,
-		`content.removeAttribute("data-tui-popover-initial-open")`,
+		`content.hasAttribute("data-open")`,
+		`attributes: ["data-open"]`,
 		`open(content);`,
 		`FloatingUIDOM.autoUpdate(trigger, content, update`,
 		`layoutShift: typeof IntersectionObserver !== "undefined"`,

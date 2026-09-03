@@ -11,13 +11,12 @@ type ctxKey string
 const stateKey ctxKey = "radioGroupState"
 
 type ctxState struct {
-	name       string
-	value      string
-	controlled bool
-	disabled   bool
-	readOnly   bool
-	required   bool
-	form       string
+	name     string
+	value    string
+	disabled bool
+	readOnly bool
+	required bool
+	form     string
 }
 
 func state(ctx context.Context) ctxState {
@@ -48,6 +47,9 @@ type ItemProps struct {
 	ID             string
 	Class          string
 	Attributes     templ.Attributes
+	// InputAttributes are applied to the native radio beside the visual item.
+	// Put form bindings (for example data-bind) here.
+	InputAttributes templ.Attributes
 	Name           string
 	Value          string
 	Form           string
@@ -82,15 +84,12 @@ templ RadioGroup(props ...Props) {
 	if p.Name == "" {
 		{{ p.Name = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{name: p.Name, value: initialValue(p), controlled: p.Value != nil, disabled: p.Disabled, readOnly: p.ReadOnly, required: p.Required, form: p.Form}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{name: p.Name, value: initialValue(p), disabled: p.Disabled, readOnly: p.ReadOnly, required: p.Required, form: p.Form}) }}
 	<div
 		if p.ID != "" {
 			id={ p.ID }
 		}
 		data-slot="radio-group"
-		data-tui-radio-group
-		data-tui-radio-group-controlled?={ p.Value != nil }
-		data-tui-radio-group-value={ initialValue(p) }
 		role="radiogroup"
 		if p.Disabled {
 			aria-disabled="true"
@@ -131,9 +130,7 @@ templ Item(props ...ItemProps) {
 	}}
 	<span
 		data-slot="radio-group-item"
-		data-tui-radio-group-item
 		role="radio"
-		data-tui-radio-controlled?={ p.Checked != nil || s.controlled }
 		if checked {
 			aria-checked="true"
 			data-checked
@@ -185,7 +182,6 @@ templ Item(props ...ItemProps) {
 	// validation popups anchor near the control).
 	<input
 		type="radio"
-		data-tui-radio-input
 		aria-hidden="true"
 		tabindex="-1"
 		checked?={ checked }
@@ -204,6 +200,7 @@ templ Item(props ...ItemProps) {
 		if p.Form != "" {
 			form={ p.Form }
 		}
+		{ p.InputAttributes... }
 		if p.Name != "" {
 			style="clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:absolute"
 		} else {

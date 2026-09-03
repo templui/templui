@@ -14,8 +14,8 @@
 (function () {
   "use strict";
 
-  if (window.__tuiCreatePreviewInitialized) return;
-  window.__tuiCreatePreviewInitialized = true;
+  if (window.__shadcnTemplCreatePreviewInitialized) return;
+  window.__shadcnTemplCreatePreviewInitialized = true;
 
   var THEME_STYLE_ELEMENT_ID = "design-system-theme-vars";
   var MANAGED_BODY_CLASS_PREFIXES = ["style-", "base-color-"];
@@ -27,15 +27,15 @@
     "  }\n" +
     "}\n";
 
-  var preset = window.tuiPreset;
-  var cfg = window.tuiCreateConfig;
+  var preset = window.shadcnTempl.preset;
+  var cfg = window.shadcnTempl.createConfig;
 
   var lastParams = null;
   var currentMenuColor = null;
   var menuFrameId = 0;
 
   function themes() {
-    return window.tuiCreateThemes || [];
+    return window.shadcnTempl.createThemes || [];
   }
 
   function getTheme(name) {

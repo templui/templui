@@ -109,7 +109,7 @@ templ DrawerNested() {
 			const findDialog = (root, id) => {
 				const direct = root.getElementById?.(id) || root.querySelector?.("#" + CSS.escape(id));
 				if (direct) return direct;
-				for (const tpl of root.querySelectorAll("template[data-tui-drawer-portal]")) {
+				for (const tpl of root.querySelectorAll('template[data-slot="drawer-portal"]')) {
 					const found = findDialog(tpl.content, id);
 					if (found) return found;
 				}
@@ -121,7 +121,7 @@ templ DrawerNested() {
 			const apply = () => {
 				for (const id of ids) {
 					const dialog = findDialog(document, id);
-					const popup = dialog?.querySelector('[data-tui-drawer-popup]');
+					const popup = dialog?.querySelector('[data-slot="drawer-popup"]');
 					if (!popup) continue;
 					popup.setAttribute("data-swipe-direction", mq.matches ? "down" : "right");
 					popup.setAttribute("data-swipe-axis", mq.matches ? "y" : "x");

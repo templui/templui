@@ -181,7 +181,7 @@ Set `DisableModal` to allow interaction with the rest of the page while the draw
 
 Use `SnapPoints` to snap a drawer to preset heights. Numbers between `0` and `1` represent fractions of the viewport. Numbers greater than `1` are treated as pixel values. String values support `px` and `rem` units. Snap points apply to vertical drawers.
 
-Track and control the active snap point with `window.tui.drawer.getSnapPoint(id)` and `window.tui.drawer.setSnapPoint(id, value)`. At the full snap point, the drawer gets a `data-expanded` attribute you can style with the `data-expanded:` variant.
+Track and control the active snap point with `window.shadcnTempl.drawer.getSnapPoint(id)` and `window.shadcnTempl.drawer.setSnapPoint(id, value)`. At the full snap point, the drawer gets a `data-expanded` attribute you can style with the `data-expanded:` variant.
 
 <ComponentPreview styleName="base-rhea" name="drawer-snap-points" />
 

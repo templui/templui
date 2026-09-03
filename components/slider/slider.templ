@@ -18,6 +18,9 @@ type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
+	// InputAttributes are applied to each native hidden value input when Name
+	// is set. Put native form or reactive bindings here.
+	InputAttributes templ.Attributes
 	// Value is the controlled thumb value. Use DefaultValue when the browser
 	// should own the value after the initial render.
 	Value        []float64
@@ -133,17 +136,13 @@ templ Slider(props ...Props) {
 	<div
 		id={ p.ID }
 		data-slot="slider"
-		data-tui-slider
-		data-tui-slider-controlled?={ p.Value != nil }
+		data-step={ fmtF(p.Step) }
 		data-orientation={ string(p.Orientation) }
 		if vertical {
 			data-vertical
 		} else {
 			data-horizontal
 		}
-		data-min={ fmtF(p.Min) }
-		data-max={ fmtF(p.Max) }
-		data-step={ fmtF(p.Step) }
 		if p.Disabled {
 			data-disabled
 		}
@@ -152,11 +151,11 @@ templ Slider(props ...Props) {
 	>
 		if p.Name != "" {
 			for _, v := range values {
-				<input type="hidden" name={ p.Name } value={ fmtF(v) } data-tui-slider-input aria-hidden="true" tabindex="-1"/>
+				<input type="hidden" name={ p.Name } value={ fmtF(v) } data-slot="slider-input" aria-hidden="true" tabindex="-1" { p.InputAttributes... }/>
 			}
 		}
 		<div
-			data-tui-slider-control
+			data-slot="slider-control"
 			data-orientation={ string(p.Orientation) }
 			if p.Disabled {
 				data-disabled
@@ -165,13 +164,11 @@ templ Slider(props ...Props) {
 		>
 			<div
 				data-slot="slider-track"
-				data-tui-slider-track
 				data-orientation={ string(p.Orientation) }
 				class="cn-slider-track relative grow overflow-hidden select-none"
 			>
 				<div
 					data-slot="slider-range"
-					data-tui-slider-range
 					data-orientation={ string(p.Orientation) }
 					class="cn-slider-range select-none data-horizontal:h-full data-vertical:w-full"
 					style={ indicatorStyle(fs, vertical) }
@@ -182,7 +179,6 @@ templ Slider(props ...Props) {
 				// like in shadcn's thumb: only the control dims to 50%.
 				<div
 					data-slot="slider-thumb"
-					data-tui-slider-thumb
 					role="slider"
 					tabindex={ utils.IfElse(p.Disabled, "-1", "0") }
 					aria-valuemin={ fmtF(p.Min) }

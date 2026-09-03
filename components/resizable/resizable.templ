@@ -88,7 +88,6 @@ templ PanelGroup(props ...PanelGroupProps) {
 		id={ p.ID }
 		data-testid={ p.ID }
 		data-slot="resizable-panel-group"
-		data-tui-resizable-group
 		data-group
 		data-orientation={ string(p.Orientation) }
 		data-resize-target-coarse={ strconv.Itoa(p.ResizeTargetMinimumSize.Coarse) }
@@ -159,9 +158,7 @@ templ Panel(props ...PanelProps) {
 		id={ p.ID }
 		data-testid={ p.ID }
 		data-slot="resizable-panel"
-		data-tui-resizable-panel
 		data-panel
-		data-tui-resizable-group-id={ group.id }
 		if p.DefaultSize != "" {
 			data-default-size={ p.DefaultSize }
 		}
@@ -182,7 +179,7 @@ templ Panel(props ...PanelProps) {
 		}
 	>
 		<div
-			data-tui-resizable-panel-content
+			data-slot="resizable-panel-content"
 			class={ p.Class }
 			style={ "max-height:100%;max-width:100%;flex-grow:1;overflow:auto;" + p.Style + ";touch-action:" + map[bool]string{true: "pan-x", false: "pan-y"}[group.orientation == OrientationVertical] + ";" }
 		>
@@ -221,9 +218,7 @@ templ Handle(props ...HandleProps) {
 		id={ p.ID }
 		data-testid={ p.ID }
 		data-slot="resizable-handle"
-		data-tui-resizable-handle
 		data-separator={ map[bool]string{true: "disabled", false: "inactive"}[p.Disabled] }
-		data-tui-resizable-group-id={ group.id }
 		role="separator"
 		aria-orientation={ string(separatorOrientation) }
 		if p.Disabled {

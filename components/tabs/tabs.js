@@ -1,41 +1,42 @@
 (function () {
   "use strict";
 
-  // Update tab state
-  function setActiveTab(tabsId, value) {
-  const root = document.querySelector(
-    `[data-tui-tabs][data-tui-tabs-id="${tabsId}"]`,
-  );
-  if (root) root.setAttribute("data-tui-tabs-value", value || "");
-    // Update all triggers with this tabs-id
-    document
-      .querySelectorAll(`[data-tui-tabs-trigger][data-tui-tabs-id="${tabsId}"]`)
+
+  function rootOf(target) {
+    if (target instanceof Element) {
+      return target.matches('[data-slot="tabs"]')
+        ? target
+        : target.closest('[data-slot="tabs"]');
+    }
+    return typeof target === "string" ? document.getElementById(target) : null;
+  }
+
+  function setActiveTab(target, value) {
+    const root = rootOf(target);
+    if (!root || !value) return;
+    if (root.getAttribute("data-value") !== value) root.setAttribute("data-value", value);
+    root
+      .querySelectorAll('[data-slot="tabs-trigger"]')
       .forEach((trigger) => {
-        const isActive = trigger.getAttribute("data-tui-tabs-value") === value;
-        trigger.setAttribute(
-          "data-tui-tabs-state",
-          isActive ? "active" : "inactive",
-        );
-        // Base UI marks the selected tab with a bare data-active attribute;
-        // the cn-tabs-trigger styles select on it.
+        const isActive = trigger.getAttribute("data-value") === value;
         trigger.toggleAttribute("data-active", isActive);
+        trigger.toggleAttribute("data-inactive", !isActive);
+        trigger.setAttribute("aria-selected", String(isActive));
+        trigger.setAttribute("tabindex", isActive ? "0" : "-1");
       });
 
-    // Update all contents with this tabs-id
-    document
-      .querySelectorAll(`[data-tui-tabs-content][data-tui-tabs-id="${tabsId}"]`)
+    root
+      .querySelectorAll('[data-slot="tabs-content"]')
       .forEach((content) => {
-        const isActive = content.getAttribute("data-tui-tabs-value") === value;
-        content.setAttribute(
-          "data-tui-tabs-state",
-          isActive ? "active" : "inactive",
-        );
+        const isActive = content.getAttribute("data-value") === value;
+        content.toggleAttribute("data-active", isActive);
+        content.toggleAttribute("data-inactive", !isActive);
         content.classList.toggle("hidden", !isActive);
       });
   }
 
   function requestValueChange(root, value) {
-    if (!root || root.getAttribute("data-tui-tabs-value") === value) return;
+    if (!root || root.querySelector('[data-slot="tabs-trigger"][data-active]')?.getAttribute("data-value") === value) return;
     const accepted = root.dispatchEvent(
       new CustomEvent("tabs-value-change", {
         bubbles: true,
@@ -43,59 +44,75 @@
         detail: { value },
       }),
     );
-    if (!accepted || root.hasAttribute("data-tui-tabs-controlled")) return;
-    setActiveTab(root.getAttribute("data-tui-tabs-id"), value);
+    if (!accepted) return;
+    setActiveTab(root, value);
   }
 
   // Click handler
   document.addEventListener("click", (e) => {
-    const trigger = e.target.closest("[data-tui-tabs-trigger]");
+    if (!(e.target instanceof Element)) return;
+    const trigger = e.target.closest('[data-slot="tabs-trigger"]');
     if (!trigger) return;
 
-    const tabsId = trigger.getAttribute("data-tui-tabs-id");
-    const value = trigger.getAttribute("data-tui-tabs-value");
-    if (tabsId && value) {
-    const root = trigger.closest("[data-tui-tabs]");
-    requestValueChange(root, value);
-    }
+    const value = trigger.getAttribute("data-value");
+    if (value) requestValueChange(rootOf(trigger), value);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (!(event.target instanceof Element)) return;
+    const trigger = event.target.closest('[data-slot="tabs-trigger"]');
+    if (!trigger) return;
+    const root = rootOf(trigger);
+    const orientation = root?.getAttribute("data-orientation") || "horizontal";
+    const rtl = root && getComputedStyle(root).direction === "rtl";
+    const previousKey = orientation === "vertical" ? "ArrowUp" : rtl ? "ArrowRight" : "ArrowLeft";
+    const nextKey = orientation === "vertical" ? "ArrowDown" : rtl ? "ArrowLeft" : "ArrowRight";
+    if (![previousKey, nextKey, "Home", "End"].includes(event.key)) return;
+    const triggers = Array.from(root.querySelectorAll('[data-slot="tabs-trigger"]:not(:disabled)'));
+    if (!triggers.length) return;
+    event.preventDefault();
+    let index = triggers.indexOf(trigger);
+    if (event.key === "Home") index = 0;
+    else if (event.key === "End") index = triggers.length - 1;
+    else index = (index + (event.key === nextKey ? 1 : -1) + triggers.length) % triggers.length;
+    const next = triggers[index];
+    next.focus();
+    requestValueChange(root, next.getAttribute("data-value"));
   });
 
   // Initialize active states
-  function init() {
-    document.querySelectorAll("[data-tui-tabs]").forEach((container) => {
-      const tabsId = container.getAttribute("data-tui-tabs-id");
-      if (!tabsId) return;
-
-      // Find active trigger or use first
-    const authored = container.querySelector(
-    `[data-tui-tabs-trigger][data-tui-tabs-state="active"]`,
-    );
-    const activeTrigger =
-    authored ||
-    (container.hasAttribute("data-tui-tabs-controlled")
-      ? null
-      : container.querySelector(`[data-tui-tabs-trigger]:not(:disabled)`));
-
-      if (activeTrigger) {
-        setActiveTab(tabsId, activeTrigger.getAttribute("data-tui-tabs-value"));
+  function setup(root) {
+    const list = root.querySelector('[data-slot="tabs-list"]');
+    if (list) list.setAttribute("aria-orientation", root.getAttribute("data-orientation") || "horizontal");
+    const triggers = Array.from(root.querySelectorAll('[data-slot="tabs-trigger"]'));
+    const contents = Array.from(root.querySelectorAll('[data-slot="tabs-content"]'));
+    triggers.forEach((trigger, index) => {
+      if (!trigger.id) trigger.id = root.id + "-trigger-" + index;
+      const content = contents.find((candidate) => candidate.getAttribute("data-value") === trigger.getAttribute("data-value"));
+      if (content) {
+        if (!content.id) content.id = root.id + "-content-" + index;
+        trigger.setAttribute("aria-controls", content.id);
+        content.setAttribute("aria-labelledby", trigger.id);
       }
     });
+    const value = root.getAttribute("data-value");
+    const authored = root.querySelector('[data-slot="tabs-trigger"][data-active]');
+    const activeTrigger = value
+      ? root.querySelector('[data-slot="tabs-trigger"][data-value="' + CSS.escape(value) + '"]')
+      : authored;
+    if (activeTrigger) setActiveTab(root, activeTrigger.getAttribute("data-value"));
   }
 
-  // Setup on load and mutations
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
-  // does not fire in hidden tabs or throttled iframes): swapped-in markup
-  // wires itself.
-  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+  window.shadcnTempl.lifecycle.register("tabs", {
+    selector: '[data-slot="tabs"]',
+    setup,
+    attributes: ["data-value"],
+    attributeChanged(root) {
+      setActiveTab(root, root.getAttribute("data-value"));
+    },
+  });
 
-  // Expose public API
-  window.tui = window.tui || {};
-  window.tui.tabs = {
+  window.shadcnTempl.tabs = {
     setActive: setActiveTab,
   };
 })();

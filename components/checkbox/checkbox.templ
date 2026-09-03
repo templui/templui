@@ -9,6 +9,9 @@ type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
+	// InputAttributes are applied to the native checkbox beside the visual
+	// root. Put form bindings (for example data-bind) here.
+	InputAttributes templ.Attributes
 	Name       string
 	Value      string
 	Disabled   bool
@@ -46,7 +49,6 @@ templ Checkbox(props ...Props) {
 	{{ checked := initialChecked(p) }}
 	<span
 		data-slot="checkbox"
-		data-tui-checkbox
 		role="checkbox"
 		if p.Indeterminate {
 			aria-checked="mixed"
@@ -74,7 +76,6 @@ templ Checkbox(props ...Props) {
 		}
 		aria-readonly?={ p.ReadOnly }
 		aria-required?={ p.Required }
-		data-tui-checkbox-controlled?={ p.Checked != nil }
 		class={
 			utils.CN(
 				// 1:1 base/ui/checkbox.tsx: structure lives here, the look comes
@@ -113,7 +114,6 @@ templ Checkbox(props ...Props) {
 	// validation popups anchor near the control).
 	<input
 		type="checkbox"
-		data-tui-checkbox-input
 		aria-hidden="true"
 		tabindex="-1"
 		checked?={ checked }
@@ -132,6 +132,7 @@ templ Checkbox(props ...Props) {
 		if p.Form != "" {
 			form={ p.Form }
 		}
+		{ p.InputAttributes... }
 		if p.Name != "" {
 			style="clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:absolute"
 		} else {

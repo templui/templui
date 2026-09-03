@@ -1,7 +1,7 @@
 package toast
 
 import (
-	"strconv"
+	"fmt"
 
 	"github.com/axadrn/shadcn-templ/v2/utils"
 )
@@ -57,10 +57,8 @@ templ Toaster(props ...ToasterProps) {
 			id={ p.ID }
 		}
 		data-slot="toast-viewport"
-		data-tui-toaster
-		data-tui-portal
-		data-tui-toaster-timeout={ strconv.Itoa(p.Timeout) }
-		data-tui-toaster-limit={ strconv.Itoa(p.Limit) }
+		data-timeout={ fmt.Sprintf("%d", p.Timeout) }
+		data-limit={ fmt.Sprintf("%d", p.Limit) }
 		class={ utils.CN(
 			"pointer-events-none fixed inset-x-4 bottom-4 z-50 mx-auto w-auto max-w-sm outline-none sm:right-4 sm:left-auto sm:mx-0 sm:w-full",
 			p.Class,
@@ -71,31 +69,29 @@ templ Toaster(props ...ToasterProps) {
 	</div>
 }
 
-// Toast renders a toast server side (e.g. swapped into the Toaster via
-// htmx); the script adopts it, builds the markup, stacks it and starts its
-// timer.
+// Toast renders a server-side declaration that the shared DOM lifecycle
+// adopts, builds, stacks, and times.
 templ Toast(props ...Props) {
 	{{ var p Props }}
 	if len(props) > 0 {
 		{{ p = props[0] }}
 	}
-	<div
+	<template
 		if p.ID != "" {
 			id={ p.ID }
 		}
-		data-tui-toast-ssr
+		data-slot="toast-declaration"
 		if p.Type != "" {
 			data-type={ string(p.Type) }
 		}
-		if p.Timeout > 0 {
-			data-tui-toast-timeout={ strconv.Itoa(p.Timeout) }
+		if p.Timeout != 0 {
+			data-timeout={ fmt.Sprintf("%d", p.Timeout) }
 		}
-		if p.Title != "" {
-			data-tui-toast-title={ p.Title }
+		if p.Class != "" {
+			data-class={ p.Class }
 		}
-		if p.Description != "" {
-			data-tui-toast-description={ p.Description }
-		}
-		class={ p.Class }
-	></div>
+	>
+		<span data-slot="toast-title">{ p.Title }</span>
+		<span data-slot="toast-description">{ p.Description }</span>
+	</template>
 }

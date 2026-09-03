@@ -1,8 +1,6 @@
 package collapsible
 
 import (
-	"bytes"
-	"context"
 	"os"
 	"strings"
 	"testing"
@@ -10,15 +8,8 @@ import (
 
 func TestControlledOpenOverridesDefaultOpen(t *testing.T) {
 	open := false
-	var output bytes.Buffer
-	if err := Collapsible(Props{Open: &open, DefaultOpen: true}).Render(context.Background(), &output); err != nil {
-		t.Fatal(err)
-	}
-	html := output.String()
-	for _, want := range []string{`data-closed`, `data-tui-collapsible-controlled`} {
-		if !strings.Contains(html, want) {
-			t.Fatalf("rendered collapsible is missing %q: %s", want, html)
-		}
+	if initialOpen(Props{Open: &open, DefaultOpen: true}) {
+		t.Fatal("explicit false must override DefaultOpen")
 	}
 }
 
@@ -28,7 +19,7 @@ func TestClientRequestsCancelableOpenChanges(t *testing.T) {
 		t.Fatal(err)
 	}
 	js := string(source)
-	for _, want := range []string{`new CustomEvent("collapsible-open-change"`, `cancelable: true`, `data-tui-collapsible-controlled`} {
+	for _, want := range []string{`new CustomEvent("collapsible-open-change"`, `cancelable: true`, `attributes: ["data-open"]`} {
 		if !strings.Contains(js, want) {
 			t.Fatalf("client behavior is missing %q", want)
 		}

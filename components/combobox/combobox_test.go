@@ -28,8 +28,7 @@ func TestClientRequestsCancelableValueAndOpenChanges(t *testing.T) {
 		`new CustomEvent("combobox-change"`,
 		`new CustomEvent("combobox-open-change"`,
 		`cancelable: true`,
-		`data-tui-combobox-value-controlled`,
-		`data-tui-combobox-open-controlled`,
+		`attributes: ["data-selected"]`,
 		`FloatingUIDOM.autoUpdate(anchor, content, update`,
 		`layoutShift: typeof IntersectionObserver !== "undefined"`,
 	} {

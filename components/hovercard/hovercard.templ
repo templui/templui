@@ -2,7 +2,7 @@ package hovercard
 
 import (
 	"context"
-	"strconv"
+	"fmt"
 
 	"github.com/axadrn/shadcn-templ/v2/utils"
 )
@@ -31,7 +31,6 @@ const stateKey ctxKey = "hovercardState"
 type ctxState struct {
 	id          string
 	initialOpen bool
-	controlled  bool
 }
 
 type delaysKey struct{}
@@ -52,8 +51,8 @@ func cardID(ctx context.Context) string {
 // trigger — the asChild equivalent: no wrapper element.
 func Trigger(ctx context.Context) templ.Attributes {
 	return templ.Attributes{
-		"data-tui-hovercard-trigger": true,
-		"data-tui-hovercard-for":     cardID(ctx),
+		"data-slot":     "hover-card-trigger",
+		"aria-controls": cardID(ctx),
 	}
 }
 
@@ -105,7 +104,7 @@ templ HoverCard(props ...Props) {
 	if p.CloseDelay == 0 {
 		{{ p.CloseDelay = 300 }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, initialOpen: initialOpen(p), controlled: p.Open != nil}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, initialOpen: initialOpen(p)}) }}
 	{{ ctx = context.WithValue(ctx, delaysKey{}, delays{open: p.Delay, close: p.CloseDelay}) }}
 	{ children... }
 }
@@ -131,28 +130,25 @@ templ Content(props ...ContentProps) {
 	{{ s, _ := ctx.Value(stateKey).(ctxState) }}
 	// Inert until the script portals it to <body> at init, so the SSRd
 	// content never participates in layout or sibling CSS.
-	<template data-tui-hovercard-portal>
+	<template>
 		<div
 			id={ cardID(ctx) }
 			data-slot="hover-card-content"
-			data-tui-hovercard-content
-			data-tui-hovercard-initial-open={ strconv.FormatBool(s.initialOpen) }
-			data-tui-hovercard-controlled?={ s.controlled }
-			data-tui-hovercard-side={ string(p.Side) }
-			data-tui-hovercard-align={ string(p.Align) }
-			data-tui-hovercard-side-offset={ strconv.Itoa(p.SideOffset) }
-			data-tui-hovercard-align-offset={ strconv.Itoa(p.AlignOffset) }
-			data-tui-hovercard-delay={ strconv.Itoa(d.open) }
-			data-tui-hovercard-close-delay={ strconv.Itoa(d.close) }
-			data-closed
+			data-side={ string(p.Side) }
+			data-align={ string(p.Align) }
+			data-side-offset={ fmt.Sprintf("%d", p.SideOffset) }
+			data-align-offset={ fmt.Sprintf("%d", p.AlignOffset) }
+			data-open-delay={ fmt.Sprintf("%d", d.open) }
+			data-close-delay={ fmt.Sprintf("%d", d.close) }
+			data-open?={ s.initialOpen }
+			data-closed?={ !s.initialOpen }
 			hidden
-			data-tui-portal
 			class={
 				utils.CN(
 					// 1:1 base/ui/hover-card.tsx HoverCardContent, the look comes from
 					// cn-hover-card-content (animations key on Base UI's data-open/data-closed attributes).
 					// origin-(--transform-origin) becomes our JS variable name.
-					"cn-hover-card-content cn-hover-card-content-logical z-50 origin-(--tui-hovercard-transform-origin) outline-hidden",
+					"cn-hover-card-content cn-hover-card-content-logical z-50 origin-(--transform-origin) outline-hidden",
 					// Native [popover] resets plus JS wiring: the popup stays mounted
 					// after animate-out until hidePopover runs.
 					"absolute inset-auto left-0 top-0 m-0 overflow-visible data-closed:fill-mode-forwards",

@@ -29,8 +29,16 @@ func isDevelopment() bool {
 
 func buildBundle(fsys fs.FS) ([]byte, string) {
 	var buf bytes.Buffer
+	// The shared lifecycle must execute before component adapters register
+	// themselves. Keep this explicit rather than coupling runtime order to
+	// directory naming.
+	if data, err := fs.ReadFile(fsys, "runtime/runtime.js"); err == nil {
+		buf.WriteString("// components/runtime/runtime.js\n")
+		buf.Write(data)
+		buf.WriteString("\n")
+	}
 	fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil || d.IsDir() || !strings.HasSuffix(path, ".js") || strings.HasSuffix(path, ".min.js") {
+		if err != nil || d.IsDir() || path == "runtime/runtime.js" || !strings.HasSuffix(path, ".js") || strings.HasSuffix(path, ".min.js") {
 			return nil
 		}
 		data, err := fs.ReadFile(fsys, path)

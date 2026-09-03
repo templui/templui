@@ -9,12 +9,12 @@
 
   function inputOf(root) {
     const next = root.nextElementSibling;
-    return next && next.matches("[data-tui-switch-input]") ? next : null;
+    return next && next.matches('input[type="checkbox"]') ? next : null;
   }
 
   function rootOf(input) {
     const prev = input.previousElementSibling;
-    return prev && prev.matches("[data-tui-switch]") ? prev : null;
+    return prev && prev.matches('[data-slot="switch"]') ? prev : null;
   }
 
   function isDisabled(root, input) {
@@ -64,7 +64,7 @@
       detail: { checked: nextChecked },
     });
     root.dispatchEvent(change);
-    if (change.defaultPrevented || root.hasAttribute("data-tui-switch-controlled")) return;
+    if (change.defaultPrevented) return;
     forwardClick(input, sourceEvent);
   }
 
@@ -72,7 +72,7 @@
   // otherwise forward it to the input a second time) and toggle through the
   // hidden input so the native change event fires.
   document.addEventListener("click", (e) => {
-    const root = e.target.closest && e.target.closest("[data-tui-switch]");
+    const root = e.target.closest && e.target.closest('[data-slot="switch"]');
     if (!root) return;
     const input = inputOf(root);
     if (!input) return;
@@ -88,14 +88,14 @@
 
   document.addEventListener("change", (e) => {
     const input = e.target;
-    if (!input.matches || !input.matches("[data-tui-switch-input]")) return;
+    if (!input.matches || !rootOf(input)) return;
     const root = rootOf(input);
     if (root) sync(root, input);
   });
 
   document.addEventListener("keydown", (e) => {
     const root = e.target;
-    if (!root.matches || !root.matches("[data-tui-switch]")) return;
+    if (!root.matches || !root.matches('[data-slot="switch"]')) return;
     if (isDisabled(root, inputOf(root))) return;
     if (e.key === "Enter") {
       // useButton: Enter activates non-native buttons on keydown.
@@ -112,7 +112,7 @@
   // click handler above forwards to the input.
   document.addEventListener("keyup", (e) => {
     const root = e.target;
-    if (!root.matches || !root.matches("[data-tui-switch]")) return;
+    if (!root.matches || !root.matches('[data-slot="switch"]')) return;
     if (e.key !== " " || e.defaultPrevented) return;
     if (isDisabled(root, inputOf(root))) return;
     forwardClick(root, e);
@@ -122,7 +122,7 @@
   // the root (SwitchRoot's input onFocus).
   document.addEventListener("focusin", (e) => {
     const input = e.target;
-    if (!input.matches || !input.matches("[data-tui-switch-input]")) return;
+    if (!input.matches || !rootOf(input)) return;
     const root = rootOf(input);
     if (root) root.focus();
   });
@@ -130,14 +130,13 @@
   let labelId = 0;
 
   function setup(root) {
-    if (root.hasAttribute("data-tui-switch-initialized")) return;
-    root.setAttribute("data-tui-switch-initialized", "");
     const input = inputOf(root);
     if (!input) return;
     // The clicks dispatched on the hidden input are an implementation detail
     // and must not reach ancestors, which already receive the original click
     // (SwitchRoot's input onClick).
-    input.addEventListener("click", (e) => e.stopPropagation());
+    const stopClick = (e) => e.stopPropagation();
+    input.addEventListener("click", stopClick);
     // useAriaLabelledBy fallback: the span control is labelled by the native
     // label associated with the hidden input.
     if (!root.hasAttribute("aria-labelledby") && !root.hasAttribute("aria-label")) {
@@ -148,25 +147,33 @@
       if (label) {
         if (!label.id) {
           labelId += 1;
-          label.id = (input.id || "tui-switch-" + labelId) + "-label";
+          label.id = (input.id || "switch-" + labelId) + "-label";
         }
         root.setAttribute("aria-labelledby", label.id);
       }
     }
     sync(root, input);
+    const unwatch = window.shadcnTempl.lifecycle.watchProperty(
+      input,
+      "checked",
+      () => sync(root, input),
+    );
+    return () => {
+      input.removeEventListener("click", stopClick);
+      unwatch?.();
+    };
   }
 
-  function init() {
-    document.querySelectorAll("[data-tui-switch]").forEach(setup);
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
-  // does not fire in hidden tabs or throttled iframes): swapped-in markup
-  // wires itself.
-  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+  window.shadcnTempl.lifecycle.register("switch", {
+    selector: '[data-slot="switch"]',
+    setup,
+    attributes: ["data-checked"],
+    attributeChanged(root) {
+      const input = inputOf(root);
+      if (!input) return;
+      const checked = root.hasAttribute("data-checked");
+      if (input.checked !== checked) input.checked = checked;
+      sync(root, input);
+    },
+  });
 })();

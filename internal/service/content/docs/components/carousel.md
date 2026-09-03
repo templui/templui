@@ -171,7 +171,7 @@ You can configure the carousel using the `Align`, `Loop`, `Autoplay` and `Interv
 
 ## API
 
-The carousel exposes its selection state on the root element as `data-tui-carousel-selected` and `data-tui-carousel-count`.
+The carousel exposes its selection state on the root element as `data-carousel-selected` and `data-carousel-count`.
 
 <ComponentPreview name="carousel-api" previewClassName="sm:h-[32rem]" />
 

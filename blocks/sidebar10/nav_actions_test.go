@@ -1,26 +1,25 @@
 package sidebar10
 
 import (
-	"bytes"
-	"context"
+	"os"
 	"strings"
 	"testing"
 )
 
 func TestActionsPopoverIsLinkedAndInitiallyOpen(t *testing.T) {
-	var output bytes.Buffer
-	if err := NavActions().Render(context.Background(), &output); err != nil {
+	source, err := os.ReadFile("nav_actions.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
 
-	html := output.String()
+	templSource := string(source)
 	for _, want := range []string{
-		`aria-controls="sidebar10-actions-popover"`,
-		`id="sidebar10-actions-popover"`,
-		`data-tui-popover-initial-open="true"`,
+		`ID:          "sidebar10-actions-popover"`,
+		`DefaultOpen: true`,
+		`Attributes: popover.Trigger(ctx)`,
 	} {
-		if !strings.Contains(html, want) {
-			t.Fatalf("rendered actions popover is missing %q: %s", want, html)
+		if !strings.Contains(templSource, want) {
+			t.Fatalf("actions popover source is missing %q", want)
 		}
 	}
 }

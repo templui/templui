@@ -97,12 +97,12 @@ Resizable panel groups follow the document direction.
 The browser API mirrors the panel and group imperative handles used by shadcn's primitive.
 
 ```js
-window.tui.resizable.resize("panel-id", "40%")
-window.tui.resizable.collapse("panel-id")
-window.tui.resizable.expand("panel-id")
-window.tui.resizable.getSize("panel-id")
-window.tui.resizable.getLayout("group-id")
-window.tui.resizable.setLayout("group-id", {
+window.shadcnTempl.resizable.resize("panel-id", "40%")
+window.shadcnTempl.resizable.collapse("panel-id")
+window.shadcnTempl.resizable.expand("panel-id")
+window.shadcnTempl.resizable.getSize("panel-id")
+window.shadcnTempl.resizable.getLayout("group-id")
+window.shadcnTempl.resizable.setLayout("group-id", {
   "left-panel": 40,
   "right-panel": 60,
 })

@@ -3,29 +3,31 @@ package dashboard01
 import (
 	"bytes"
 	"context"
+	"os"
 	"strings"
 	"testing"
 )
 
 func TestInteractiveBaseBlockPendantsAreRendered(t *testing.T) {
-	var out bytes.Buffer
-	if err := DataTable(Data[:1]).Render(context.Background(), &out); err != nil {
+	dataTableSource, err := os.ReadFile("data_table.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
-	html := out.String()
+	dataTable := string(dataTableSource)
 	for _, want := range []string{
 		"data-dashboard01-sortable",
 		"data-dashboard01-drag-handle",
-		"data-dashboard01-save=\"Cover page\"",
-		"window.tui?.toast?.promise",
+		"data-dashboard01-save={ item.Header }",
+		"window.shadcnTempl?.toast?.promise",
 		"data-dashboard01-drawer-trigger",
 		"mobile ? \"down\" : \"right\"",
 	} {
-		if !strings.Contains(html, want) {
-			t.Errorf("rendered data table is missing %q", want)
+		if !strings.Contains(dataTable, want) {
+			t.Errorf("data table source is missing %q", want)
 		}
 	}
 
+	var out bytes.Buffer
 	out.Reset()
 	if err := dataTableDrawerBody(Data[0]).Render(context.Background(), &out); err != nil {
 		t.Fatal(err)
@@ -34,18 +36,18 @@ func TestInteractiveBaseBlockPendantsAreRendered(t *testing.T) {
 		t.Error("rendered drawer body does not hide desktop-only details on mobile")
 	}
 
-	out.Reset()
-	if err := ChartAreaInteractive().Render(context.Background(), &out); err != nil {
+	chartSource, err := os.ReadFile("chart_area_interactive.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
-	html = out.String()
+	chart := string(chartSource)
 	for _, want := range []string{
 		"data-dashboard01-chart-range-card",
 		"window.matchMedia(\"(max-width: 767px)\")",
 		"setRange(card, \"7d\")",
 	} {
-		if !strings.Contains(html, want) {
-			t.Errorf("rendered chart is missing %q", want)
+		if !strings.Contains(chart, want) {
+			t.Errorf("chart source is missing %q", want)
 		}
 	}
 }

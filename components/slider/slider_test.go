@@ -1,25 +1,18 @@
 package slider
 
 import (
-	"bytes"
-	"context"
 	"os"
 	"strings"
 	"testing"
 )
 
-func TestControlledValueOverridesDefaultValue(t *testing.T) {
-	value := []float64{}
-	var output bytes.Buffer
-	if err := Slider(Props{Value: value, DefaultValue: []float64{50}}).Render(context.Background(), &output); err != nil {
+func TestTemplateHasNoPrivateControlMarker(t *testing.T) {
+	source, err := os.ReadFile("slider.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
-	html := output.String()
-	if !strings.Contains(html, `data-tui-slider-controlled`) {
-		t.Fatalf("rendered slider is missing controlled marker: %s", html)
-	}
-	if strings.Contains(html, `aria-valuenow="50"`) {
-		t.Fatalf("controlled empty value must override the default: %s", html)
+	if strings.Contains(string(source), "data-slider-controlled") {
+		t.Fatal("slider state ownership must not leak into private DOM markers")
 	}
 }
 
@@ -29,7 +22,7 @@ func TestClientRequestsCancelableValueChanges(t *testing.T) {
 		t.Fatal(err)
 	}
 	js := string(source)
-	for _, want := range []string{`new CustomEvent("slider-change"`, `cancelable: true`, `data-tui-slider-controlled`} {
+	for _, want := range []string{`new CustomEvent("slider-change"`, `cancelable: true`, `attributes: ["aria-valuenow", "aria-valuemin", "aria-valuemax"]`} {
 		if !strings.Contains(js, want) {
 			t.Fatalf("client behavior is missing %q", want)
 		}

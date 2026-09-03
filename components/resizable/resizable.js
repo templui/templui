@@ -24,9 +24,9 @@
 (function () {
   "use strict";
 
-  const GROUP = "[data-tui-resizable-group]";
-  const PANEL = "[data-tui-resizable-panel]";
-  const HANDLE = "[data-tui-resizable-handle]";
+  const GROUP = '[data-slot="resizable-panel-group"]';
+  const PANEL = '[data-slot="resizable-panel"]';
+  const HANDLE = '[data-slot="resizable-handle"]';
   const CURSOR_FLAG_HORIZONTAL_MIN = 0b0001;
   const CURSOR_FLAG_HORIZONTAL_MAX = 0b0010;
   const CURSOR_FLAG_VERTICAL_MIN = 0b0100;
@@ -914,7 +914,6 @@
     const cursor = cursorForInteraction();
     if (!cursorStyleElement) {
       cursorStyleElement = document.createElement("style");
-      cursorStyleElement.dataset.tuiResizableCursor = "";
       document.head.appendChild(cursorStyleElement);
     }
     cursorStyleElement.textContent = cursor ? `*, *:hover { cursor: ${cursor} !important; }` : "";
@@ -1249,16 +1248,13 @@
     });
   }
 
-  window.tui = window.tui || {};
-  window.tui.resizable = api;
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => initialize());
-  else initialize();
-  new MutationObserver((records) => records.forEach((record) => {
-    record.removedNodes.forEach((node) => {
-      if (node instanceof Element) cleanup(node);
-    });
-    record.addedNodes.forEach((node) => {
-      if (node instanceof Element) initialize(node);
-    });
-  })).observe(document.documentElement, { childList: true, subtree: true });
+  window.shadcnTempl.resizable = api;
+  window.shadcnTempl.lifecycle.register("resizable", {
+    mount(root) {
+      if (root instanceof Element || root instanceof Document) initialize(root);
+    },
+    unmount(root) {
+      if (root instanceof Element) cleanup(root);
+    },
+  });
 })();

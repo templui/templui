@@ -72,7 +72,7 @@ templ progressExampleControlled() {
 			(() => {
 				const demo = document.querySelector("[data-progress-example-controlled]");
 				demo.addEventListener("slider-change", (e) => {
-					document.getElementById("progress-example-controlled").setAttribute("aria-valuenow", String(e.detail.values[0]));
+					document.getElementById("progress-example-controlled").setAttribute("aria-valuenow", String(e.detail.value[0]));
 				});
 			})();
 		</script>

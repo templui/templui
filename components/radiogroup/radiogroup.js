@@ -13,16 +13,16 @@
 
   function inputOf(item) {
     const next = item.nextElementSibling;
-    return next && next.matches("[data-tui-radio-input]") ? next : null;
+    return next && next.matches('input[type="radio"]') ? next : null;
   }
 
   function itemOf(input) {
     const prev = input.previousElementSibling;
-    return prev && prev.matches("[data-tui-radio-group-item]") ? prev : null;
+    return prev && prev.matches('[data-slot="radio-group-item"]') ? prev : null;
   }
 
   function itemsOf(group) {
-    return Array.from(group.querySelectorAll("[data-tui-radio-group-item]"));
+    return Array.from(group.querySelectorAll('[data-slot="radio-group-item"]'));
   }
 
   function isDisabled(item, input) {
@@ -34,7 +34,7 @@
   }
 
   function groupOf(input) {
-    return input.closest("[data-tui-radio-group]");
+    return input.closest('[data-slot="radio-group"]');
   }
 
   function requestValueChange(input) {
@@ -47,10 +47,7 @@
     });
     const target = group || itemOf(input);
     const accepted = target.dispatchEvent(change);
-    const controlled = group
-      ? group.hasAttribute("data-tui-radio-group-controlled")
-      : target.hasAttribute("data-tui-radio-controlled");
-    return accepted && !controlled;
+    return accepted;
   }
 
   // Port of utils/dispatchClickWithModifiers.ts: the constructed click keeps
@@ -116,7 +113,7 @@
   // otherwise forward it to the input a second time) and select through the
   // hidden input so the native change event fires.
   document.addEventListener("click", (e) => {
-    const item = e.target.closest && e.target.closest("[data-tui-radio-group-item]");
+    const item = e.target.closest && e.target.closest('[data-slot="radio-group-item"]');
     if (!item || e.defaultPrevented) return;
     const input = inputOf(item);
     if (!input) return;
@@ -132,13 +129,13 @@
 
   document.addEventListener("change", (e) => {
     const input = e.target;
-    if (!input.matches || !input.matches("[data-tui-radio-input]")) return;
+    if (!input.matches || !itemOf(input)) return;
     syncByInput(input);
   });
 
   document.addEventListener("keydown", (e) => {
     const item = e.target;
-    if (!item.matches || !item.matches("[data-tui-radio-group-item]")) return;
+    if (!item.matches || !item.matches('[data-slot="radio-group-item"]')) return;
     const input = inputOf(item);
     if (isDisabled(item, input)) return;
     if (e.key === "Enter") {
@@ -155,7 +152,7 @@
     if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) return;
     // isModifierKeySet with modifierKeys=[Shift]: any other modifier cancels.
     if (e.ctrlKey || e.altKey || e.metaKey) return;
-    const group = item.closest("[data-tui-radio-group]");
+    const group = item.closest('[data-slot="radio-group"]');
     if (!group) return;
     const rtl = getComputedStyle(group).direction === "rtl";
     const forward = e.key === "ArrowDown" || e.key === (rtl ? "ArrowLeft" : "ArrowRight");
@@ -184,7 +181,7 @@
   // the item root (RadioRoot's input onFocus).
   document.addEventListener("focusin", (e) => {
     const input = e.target;
-    if (!input.matches || !input.matches("[data-tui-radio-input]")) return;
+    if (!input.matches || !itemOf(input)) return;
     const item = itemOf(input);
     if (item) item.focus();
   });
@@ -192,17 +189,16 @@
   let labelId = 0;
 
   function setupItem(item) {
-    if (item.hasAttribute("data-tui-radio-initialized")) return;
-    item.setAttribute("data-tui-radio-initialized", "");
     const input = inputOf(item);
     if (!input) return;
     // The clicks dispatched on the hidden input are an implementation detail
     // and must not reach ancestors, which already receive the original click
     // (RadioRoot's input onClick).
-    input.addEventListener("click", (e) => {
+    const onInputClick = (e) => {
       e.stopPropagation();
       if (!requestValueChange(input)) e.preventDefault();
-    });
+    };
+    input.addEventListener("click", onInputClick);
     // useAriaLabelledBy fallback: the span control is labelled by the native
     // label associated with the hidden input.
     if (!item.hasAttribute("aria-labelledby") && !item.hasAttribute("aria-label")) {
@@ -213,29 +209,38 @@
       if (label) {
         if (!label.id) {
           labelId += 1;
-          label.id = (input.id || "tui-radio-" + labelId) + "-label";
+          label.id = (input.id || "radio-" + labelId) + "-label";
         }
         item.setAttribute("aria-labelledby", label.id);
       }
     }
+    const unwatch = window.shadcnTempl.lifecycle.watchProperty(
+      input,
+      "checked",
+      () => syncByInput(input),
+    );
+    return () => {
+      input.removeEventListener("click", onInputClick);
+      unwatch?.();
+    };
   }
 
-  function init() {
-    document.querySelectorAll("[data-tui-radio-group-item]").forEach(setupItem);
-    document.querySelectorAll("[data-tui-radio-group]").forEach((group) => {
-      if (group.hasAttribute("data-tui-radio-group-initialized")) return;
-      group.setAttribute("data-tui-radio-group-initialized", "");
+  window.shadcnTempl.lifecycle.register("radio-group-item", {
+    selector: '[data-slot="radio-group-item"]',
+    setup: setupItem,
+    attributes: ["data-checked"],
+    attributeChanged(item) {
+      const input = inputOf(item);
+      if (!input) return;
+      const checked = item.hasAttribute("data-checked");
+      if (input.checked !== checked) input.checked = checked;
+      syncByInput(input);
+    },
+  });
+  window.shadcnTempl.lifecycle.register("radio-group", {
+    selector: '[data-slot="radio-group"]',
+    setup(group) {
       syncGroup(group);
-    });
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
-  // does not fire in hidden tabs or throttled iframes): swapped-in markup
-  // wires itself.
-  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+    },
+  });
 })();

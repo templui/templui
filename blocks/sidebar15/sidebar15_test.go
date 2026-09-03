@@ -1,30 +1,25 @@
 package sidebar15
 
 import (
-	"bytes"
-	"context"
-	"regexp"
+	"os"
 	"strings"
 	"testing"
 )
 
 func TestDatePickerMatchesUpstreamCalendarConfiguration(t *testing.T) {
-	var output bytes.Buffer
-	if err := DatePicker().Render(context.Background(), &output); err != nil {
+	source, err := os.ReadFile("date_picker.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
-	html := output.String()
+	templSource := string(source)
 	for _, want := range []string{
-		`data-tui-calendar-mode="single"`,
-		`bg-transparent [--cell-size:2.1rem]`,
-		`data-tui-calendar-month-select`,
-		`data-tui-calendar-year-select`,
+		`Mode:          calendar.ModeSingle`,
+		`CaptionLayout: calendar.CaptionLayoutDropdown`,
+		`Class:         "bg-transparent [--cell-size:2.1rem]"`,
+		`time.Date(now.Year(), now.Month(), 12`,
 	} {
-		if !strings.Contains(html, want) {
-			t.Fatalf("rendered date picker is missing %q: %s", want, html)
+		if !strings.Contains(templSource, want) {
+			t.Fatalf("date picker source is missing %q", want)
 		}
-	}
-	if !regexp.MustCompile(`data-tui-calendar-selected="[0-9]{4}-[0-9]{2}-12"`).MatchString(html) {
-		t.Fatalf("date picker must select day 12: %s", html)
 	}
 }

@@ -10,14 +10,21 @@
   const TOL = 1; // scroll edge tolerance
   const ARROW_TICK_MS = 40; // hovering a scroll arrow scrolls one item per tick
   const SELECTED_DELAY = 400; // mouseup selection stays disabled this long after open
+  const scrollLockOwner = {};
+  const elementStates = new WeakMap();
+
+  function state(element) {
+    if (!elementStates.has(element)) elementStates.set(element, {});
+    return elementStates.get(element);
+  }
 
   function allContents() {
-    return document.querySelectorAll("[data-tui-select-content]");
+    return document.querySelectorAll(`[data-slot="select-positioner"]`);
   }
 
   function triggerFor(content) {
     return document.querySelector(
-      '[data-tui-select-trigger][aria-controls="' + content.id + '"]',
+      '[data-slot="select-trigger"][aria-controls="' + content.id + '"]',
     );
   }
 
@@ -28,19 +35,19 @@
   // The hidden form input sits right before the trigger button.
   function inputFor(trigger) {
     const prev = trigger.previousElementSibling;
-    return prev && prev.hasAttribute("data-tui-select-input") ? prev : null;
+    return prev && prev.matches('input[type="hidden"]') ? prev : null;
   }
 
   function valueSpanFor(trigger) {
-    return trigger.querySelector("[data-tui-select-value]");
+    return trigger.querySelector(`[data-slot="select-value"]`);
   }
 
   function popupFor(content) {
-    return content.querySelector("[data-tui-select-popup]");
+    return content.querySelector(`[data-slot="select-content"]`);
   }
 
   function viewportFor(content) {
-    return content.querySelector("[data-tui-select-viewport]");
+    return content.querySelector(`[data-slot="select-viewport"]`);
   }
 
   function clamp(value, min, max) {
@@ -52,7 +59,7 @@
   }
 
   function isAlignMode(content) {
-    return !content.hasAttribute("data-tui-select-disable-align-item-with-trigger");
+    return popupFor(content)?.getAttribute("data-align-trigger") !== "false";
   }
 
   function setState(content, state) {
@@ -106,18 +113,18 @@
 
   // Moves the content to <body> (shadcn portals it the same way).
   // The unmount half of the React portal pendant: a portaled content lives
-  // as long as its SSR declaration site (_tuiPortalOwner) stays in the
+  // as long as its SSR declaration site stays in the
   // document. Trigger-presence heuristics judged mid-swap moments wrongly -
   // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
-    document.querySelectorAll("body > [data-tui-select-content]").forEach((c) => {
-      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) {
+    document.querySelectorAll('body > [data-slot="select-positioner"]').forEach((c) => {
+      if (c !== content && state(c).portalOwner && !state(c).portalOwner.isConnected) {
         stopAutoPositioning(c);
         c.remove();
       }
     });
     if (content.parentElement !== document.body) {
-      if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
+      if (!state(content).portalOwner) state(content).portalOwner = content.parentElement;
       document.body.appendChild(content);
     }
   }
@@ -134,7 +141,7 @@
   // Regular anchored placement below/above the trigger (Base UI's positioner).
   function positionPopper(content, trigger, strategy) {
     const { computePosition, offset, flip, shift, size } = window.FloatingUIDOM;
-    const align = content.getAttribute("data-tui-select-align") || "center";
+    const align = content.getAttribute("data-align") || "center";
     const placement = align === "center" ? "bottom" : "bottom-" + align;
 
     content.style.position = strategy;
@@ -183,8 +190,8 @@
     const viewport = viewportFor(content);
     const valueEl = valueSpanFor(trigger);
     const textEl =
-      content.querySelector('[data-tui-select-item][data-selected] [data-tui-select-item-text]') ||
-      content.querySelector("[data-tui-select-item] [data-tui-select-item-text]");
+      content.querySelector('[data-slot="select-item"][data-selected] [data-slot="select-item-text"]') ||
+      content.querySelector('[data-slot="select-item"] [data-slot="select-item-text"]');
 
     const docEl = document.documentElement;
     const triggerRect = trigger.getBoundingClientRect();
@@ -243,7 +250,7 @@
       return false;
     }
 
-    content._tuiReachedMax = false;
+    state(content).reachedMax = false;
 
     if (isTopPositioned) {
       const topOffset = Math.max(0, viewportHeight - idealHeight);
@@ -269,7 +276,7 @@
 
     setSide(content, "none");
     if (height >= viewportHeight || height >= maxPopupHeight) {
-      content._tuiReachedMax = true;
+      state(content).reachedMax = true;
     }
     return true;
   }
@@ -281,16 +288,16 @@
     // Base UI uses viewport positioning while the selected item is aligned
     // with the trigger. Touch and regular popper positioning use Floating
     // UI's standard absolute positioning instead.
-    const alignMode = isAlignMode(content) && content._tuiOpenMethod !== "touch";
+    const alignMode = isAlignMode(content) && state(content).openMethod !== "touch";
     popup.setAttribute("data-align-trigger", alignMode ? "true" : "false");
     resetInlineStyles(content);
-    content._tuiAligned = false;
+    state(content).aligned = false;
 
     return positionPopper(content, trigger, alignMode ? "fixed" : "absolute")
       .then(() => {
         if (!alignMode) return undefined;
         if (positionAligned(content, trigger)) {
-          content._tuiAligned = true;
+          state(content).aligned = true;
           return undefined;
         }
         // Not enough room: redo the plain popper pass (the aligned attempt
@@ -303,13 +310,13 @@
   }
 
   function startAutoPositioning(content, trigger) {
-    if (content._tuiPositionCleanup) content._tuiPositionCleanup();
+    if (state(content).positionCleanup) state(content).positionCleanup();
     let resolveFirst;
     const firstPosition = new Promise((resolve) => {
       resolveFirst = resolve;
     });
     const update = () => position(content, trigger).then(resolveFirst, resolveFirst);
-    content._tuiPositionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
+    state(content).positionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
       elementResize: typeof ResizeObserver !== "undefined",
       layoutShift: typeof IntersectionObserver !== "undefined",
     });
@@ -317,17 +324,17 @@
   }
 
   function stopAutoPositioning(content) {
-    if (!content._tuiPositionCleanup) return;
-    content._tuiPositionCleanup();
-    content._tuiPositionCleanup = null;
+    if (!state(content).positionCleanup) return;
+    state(content).positionCleanup();
+    state(content).positionCleanup = null;
   }
 
   // ----- scroll arrows + capped grow-on-scroll (Base UI behavior) -----------
 
   function updateScrollArrows(content) {
     const viewport = viewportFor(content);
-    const up = content.querySelector("[data-tui-select-scroll-up]");
-    const down = content.querySelector("[data-tui-select-scroll-down]");
+    const up = content.querySelector(`[data-slot="select-scroll-up-button"]`);
+    const down = content.querySelector(`[data-slot="select-scroll-down-button"]`);
     if (!viewport || !up || !down) return;
     const max = maxScrollTop(viewport);
     up.classList.toggle("hidden", max <= 0 || viewport.scrollTop <= TOL);
@@ -344,7 +351,7 @@
     const isTopPositioned = content.style.top === "0px";
     const isBottomPositioned = content.style.bottom === "0px";
 
-    if (content._tuiReachedMax || !content._tuiAligned || (!isTopPositioned && !isBottomPositioned)) {
+    if (state(content).reachedMax || !state(content).aligned || (!isTopPositioned && !isBottomPositioned)) {
       updateScrollArrows(content);
       return;
     }
@@ -370,7 +377,7 @@
       }
       viewport.scrollTop = isTopPositioned ? maxScrollTop(viewport) : 0;
       if (maxAvailableHeight - (currentHeight + heightDelta) <= TOL) {
-        content._tuiReachedMax = true;
+        state(content).reachedMax = true;
       }
       updateScrollArrows(content);
       return;
@@ -396,7 +403,7 @@
     }
 
     if (nextPositionerHeight >= maxAvailableHeight - TOL) {
-      content._tuiReachedMax = true;
+      state(content).reachedMax = true;
     }
     updateScrollArrows(content);
   }
@@ -452,7 +459,7 @@
       stopArrowScroll();
       return;
     }
-    const items = [...content.querySelectorAll("[data-tui-select-item]")];
+    const items = [...content.querySelectorAll(`[data-slot="select-item"]`)];
     viewport.scrollTop = targetScrollTop(
       items,
       isUp,
@@ -466,15 +473,15 @@
 
   document.addEventListener("mouseover", (e) => {
     if (!(e.target instanceof Element)) return;
-    const arrow = e.target.closest("[data-tui-select-scroll-up], [data-tui-select-scroll-down]");
+    const arrow = e.target.closest('[data-slot="select-scroll-up-button"], [data-slot="select-scroll-down-button"]');
     if (!arrow || arrowTimer) return;
-    const content = arrow.closest("[data-tui-select-content]");
-    if (content) arrowScrollStep(content, arrow.hasAttribute("data-tui-select-scroll-up"), arrow);
+    const content = arrow.closest(`[data-slot="select-positioner"]`);
+    if (content) arrowScrollStep(content, arrow.matches('[data-slot="select-scroll-up-button"]'), arrow);
   });
 
   document.addEventListener("mouseout", (e) => {
     if (!(e.target instanceof Element)) return;
-    if (e.target.closest("[data-tui-select-scroll-up], [data-tui-select-scroll-down]")) {
+    if (e.target.closest('[data-slot="select-scroll-up-button"], [data-slot="select-scroll-down-button"]')) {
       stopArrowScroll();
     }
   });
@@ -485,39 +492,33 @@
   // while open, with the body padded by the scrollbar width so the page
   // does not shift.
   function lockScroll() {
-    if (document.body.hasAttribute("data-tui-scroll-locked")) return;
-    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
-    document.body.setAttribute("data-tui-scroll-locked", "");
-    document.body.style.overflow = "hidden";
-    if (scrollbar > 0) document.body.style.paddingRight = scrollbar + "px";
+    window.shadcnTempl.setScrollLocked(scrollLockOwner, true);
   }
   function unlockScroll() {
     if ([...allContents()].some(isOpen)) return;
-    document.body.removeAttribute("data-tui-scroll-locked");
-    document.body.style.overflow = "";
-    document.body.style.paddingRight = "";
+    window.shadcnTempl.setScrollLocked(scrollLockOwner, false);
   }
 
   function open(content, trigger, openMethod) {
     allContents().forEach((c) => {
       if (c !== content) close(c);
     });
-    clearTimeout(content._tuiHide);
-    content._tuiOpenMethod = openMethod || "programmatic";
+    clearTimeout(state(content).hideTimer);
+    state(content).openMethod = openMethod || "programmatic";
     // A press on the trigger can open the popup under the pointer (aligned
     // mode). Mouseup selection stays disabled briefly so releasing over the
     // selected item or a neighboring item doesn't commit an accidental
     // selection (Base UI's selectionRef + SELECTED_DELAY). Dragging can
     // re-arm unselected mouseup sooner, see the pointermove handler.
-    content._tuiSelection = {
+    state(content).selection = {
       allowSelectedMouseUp: false,
       allowUnselectedMouseUp: false,
       dragY: 0,
     };
-    clearTimeout(content._tuiSelectedDelay);
-    content._tuiSelectedDelay = setTimeout(() => {
-      content._tuiSelection.allowSelectedMouseUp = true;
-      content._tuiSelection.allowUnselectedMouseUp = true;
+    clearTimeout(state(content).selectedDelay);
+    state(content).selectedDelay = setTimeout(() => {
+      state(content).selection.allowSelectedMouseUp = true;
+      state(content).selection.allowUnselectedMouseUp = true;
     }, SELECTED_DELAY);
     portal(content);
     lockScroll(); // Base UI's select is modal by default: no page scroll while open
@@ -548,8 +549,8 @@
       trigger.setAttribute("data-pressed", "");
       // Base UI moves focus to the selected item when the listbox opens.
       const selected =
-        content.querySelector('[data-tui-select-item][data-selected]') ||
-        content.querySelector("[data-tui-select-item]");
+        content.querySelector('[data-slot="select-item"][data-selected]') ||
+        content.querySelector(`[data-slot="select-item"]`);
       if (selected) selected.focus({ preventScroll: true });
     };
     startAutoPositioning(content, trigger).then(finish, finish);
@@ -559,8 +560,8 @@
     if (content.hidden) return;
     stopAutoPositioning(content);
     stopArrowScroll();
-    clearTimeout(content._tuiSelectedDelay);
-    content._tuiSelection = {
+    clearTimeout(state(content).selectedDelay);
+    state(content).selection = {
       allowSelectedMouseUp: false,
       allowUnselectedMouseUp: false,
       dragY: 0,
@@ -576,7 +577,7 @@
       trigger.removeAttribute("data-popup-open");
       trigger.removeAttribute("data-pressed");
     }
-    clearTimeout(content._tuiHide);
+    clearTimeout(state(content).hideTimer);
     // Aligned mode has no exit animation (animate-none, like shadcn) — hide
     // immediately instead of waiting for one.
     const popup = popupFor(content);
@@ -585,7 +586,7 @@
       setTransitionAttribute(content, "data-ending-style", false);
       return;
     }
-    content._tuiHide = setTimeout(() => {
+    state(content).hideTimer = setTimeout(() => {
       if (content.hasAttribute("data-closed") && !content.hidden) {
         content.hidden = true;
         setTransitionAttribute(content, "data-ending-style", false);
@@ -609,7 +610,7 @@
         },
       }),
     );
-    if (!accepted || content.hasAttribute("data-tui-select-open-controlled")) return;
+    if (!accepted) return;
     const trigger = triggerFor(content);
     if (nextOpen && trigger) open(content, trigger, openMethod);
     else if (!nextOpen) close(content);
@@ -619,14 +620,43 @@
     allContents().forEach((content) => requestOpenChange(content, false));
   }
 
+  function itemLabel(item) {
+    return item.getAttribute("data-label") ||
+      (item.querySelector(`[data-slot="select-item-text"]`) || item).textContent.trim();
+  }
+
+  function applyValue(trigger, value, notify) {
+    const content = contentFor(trigger);
+    if (!content) return;
+    const item = content.querySelector(
+      '[data-slot="select-item"][data-value="' + CSS.escape(value) + '"]',
+    );
+    content.querySelectorAll(`[data-slot="select-item"]`).forEach((candidate) => {
+      const selected = candidate === item;
+      candidate.toggleAttribute("data-selected", selected);
+      candidate.setAttribute("aria-selected", String(selected));
+    });
+    const span = valueSpanFor(trigger);
+    state(trigger).placeholder ??= span?.textContent || "";
+    if (span) span.textContent = item ? itemLabel(item) : state(trigger).placeholder;
+    trigger.toggleAttribute("data-placeholder", !item);
+    if (trigger.getAttribute("data-value") !== value) trigger.setAttribute("data-value", value);
+    const input = inputFor(trigger);
+    if (input && input.value !== value) {
+      input.value = value;
+      if (notify) {
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    }
+  }
+
   function selectItem(content, item) {
     const trigger = triggerFor(content);
-    if (!trigger) return;
-  if (trigger.getAttribute("aria-readonly") === "true") return;
-    const value = item.getAttribute("data-tui-select-value") || "";
+    if (!trigger || trigger.getAttribute("aria-readonly") === "true") return;
+    const value = item.getAttribute("data-value") || "";
     const label =
-      item.getAttribute("data-tui-select-label") ||
-      (item.querySelector("[data-tui-select-item-text]") || item).textContent.trim();
+      itemLabel(item);
 
     const accepted = trigger.dispatchEvent(
       new CustomEvent("select-change", {
@@ -637,44 +667,27 @@
     );
     if (!accepted) return;
 
-    if (!trigger.hasAttribute("data-tui-select-value-controlled")) {
-      content.querySelectorAll("[data-tui-select-item]").forEach((i) => {
-      i.removeAttribute("data-selected");
-      i.setAttribute("aria-selected", "false");
-      });
-      item.setAttribute("data-selected", "");
-      item.setAttribute("aria-selected", "true");
-
-      const span = valueSpanFor(trigger);
-      if (span) span.textContent = label;
-      trigger.removeAttribute("data-placeholder");
-
-      const input = inputFor(trigger);
-      if (input && input.value !== value) {
-        input.value = value;
-        input.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-    }
+    applyValue(trigger, value, true);
     requestOpenChange(content, false);
     trigger.focus();
   }
 
   // Shows the selected item's label in the trigger (server only knows the
-  // value, the label lives in the item). Runs on load and whenever new selects
-  // appear in the DOM (e.g. content swapped in by a library like htmx) — the
-  // MutationObserver keeps this framework-agnostic.
+  // value, the label lives in the item). Runs on load and for newly inserted
+  // selects through the shared browser-DOM lifecycle.
   // Lift SSR'd contents out of their inert <template> wrappers into <body>,
-  // replacing a stale portaled copy on re-swaps (e.g. htmx).
+  // replacing a stale portaled copy after ordinary DOM replacement.
   function liftTemplates() {
-    document.querySelectorAll("template[data-tui-select-portal]").forEach((tpl) => {
-      const content = tpl.content.querySelector("[data-tui-select-content]");
-      if (content) {
+    document.querySelectorAll("template").forEach((tpl) => {
+      const content = tpl.content.querySelector('[data-slot="select-positioner"]');
+      if (!content) return;
+      {
         const stale = document.getElementById(content.id);
         if (stale) {
           stopAutoPositioning(stale);
           stale.remove();
         }
-        content._tuiPortalOwner = tpl.parentElement;
+        state(content).portalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
       tpl.remove();
@@ -683,38 +696,59 @@
 
   function init() {
     liftTemplates();
-    document.querySelectorAll("[data-tui-select-trigger]").forEach((trigger) => {
+    document.querySelectorAll(`[data-slot="select-trigger"]`).forEach((trigger) => {
       const content = contentFor(trigger);
       if (!content) return;
       portal(content); // portal up front, like React does on mount
-      const checked = content.querySelector('[data-tui-select-item][data-selected]');
-      if (checked) {
-        const label =
-          checked.getAttribute("data-tui-select-label") ||
-          (checked.querySelector("[data-tui-select-item-text]") || checked).textContent.trim();
-        const span = valueSpanFor(trigger);
-        if (span && span.textContent.trim() !== label) span.textContent = label;
-        if (trigger.hasAttribute("data-placeholder")) trigger.removeAttribute("data-placeholder");
-      }
-      if (content.getAttribute("data-tui-select-initial-open") === "true") {
-        content.removeAttribute("data-tui-select-initial-open");
-        const openMethod =
-          content.getAttribute("data-tui-select-initial-open-method") || "programmatic";
+      applyValue(trigger, trigger.getAttribute("data-value") || "", false);
+      if (content.hasAttribute("data-open")) {
+        const openMethod = content.getAttribute("data-open-method") || "programmatic";
         open(content, trigger, openMethod);
       }
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
-  // does not fire in hidden tabs or throttled iframes): swapped-in markup
-  // lifts and wires itself, removals release portaled content through the
-  // ownership sweep.
-  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+  window.shadcnTempl.lifecycle.register("select-positioner", {
+    selector: '[data-slot="select-positioner"]',
+    setup() {},
+    attributes: ["data-open"],
+    attributeChanged(content) {
+      const trigger = triggerFor(content);
+      if (content.hasAttribute("data-open") && content.hidden && trigger) {
+        open(content, trigger, content.getAttribute("data-open-method") || "programmatic");
+      } else if (!content.hasAttribute("data-open") && !content.hidden && !content.hasAttribute("data-closed")) {
+        close(content);
+      }
+    },
+  });
+  window.shadcnTempl.lifecycle.register("select-value", {
+    selector: '[data-slot="select-trigger"]',
+    setup(trigger) {
+      const input = inputFor(trigger);
+      if (!input) return;
+      return window.shadcnTempl.lifecycle.watchProperty(input, "value", () => {
+        applyValue(trigger, input.value, false);
+      });
+    },
+    attributes: ["data-value"],
+    attributeChanged(trigger) {
+      applyValue(trigger, trigger.getAttribute("data-value") || "", false);
+    },
+  });
+  window.shadcnTempl.lifecycle.register("select", {
+    mount: init,
+    unmount() {
+      init();
+      unlockScroll();
+    },
+  });
+
+  document.addEventListener("change", (event) => {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement) || input.type !== "hidden") return;
+    const trigger = input.nextElementSibling;
+    if (trigger?.matches('[data-slot="select-trigger"]')) applyValue(trigger, input.value, false);
+  });
 
   // ----- events -------------------------------------------------------------
 
@@ -766,14 +800,14 @@
 
   document.addEventListener("pointerdown", (e) => {
     if (e.button !== 0 || !(e.target instanceof Element)) return;
-    const trigger = e.target.closest("[data-tui-select-trigger]");
+    const trigger = e.target.closest(`[data-slot="select-trigger"]`);
     if (trigger) {
       // Touch opens on the click that fires at release (Base UI opens on
       // the compat mousedown, which for touch also fires post-touchend).
       // Opening at press would put the aligned popup under the still-down
       // finger, and the tap's click, hit-tested at the release point,
       // would land on the item above the trigger and instantly commit it.
-      trigger._tuiOpenMethod = e.pointerType;
+      state(trigger).openMethod = e.pointerType;
       if (e.pointerType === "touch") return;
       pressedTriggers.add(trigger);
       // Keep the browser from focusing the trigger button, focus lives on
@@ -796,58 +830,58 @@
     // only commits when its press started on the item. The stray click the
     // browser hit-tests onto the popup that just opened over the trigger
     // (touch fires its compatibility click at the tap position) never did.
-    const item = e.target.closest("[data-tui-select-item]");
+    const item = e.target.closest(`[data-slot="select-item"]`);
     if (item) {
-      item._tuiPointerType = e.pointerType;
-      item._tuiAllowMouseSelection = true;
-      const content = item.closest("[data-tui-select-content]");
-      if (content && content._tuiSelection) content._tuiSelection.dragY = 0;
+      state(item).pointerType = e.pointerType;
+      state(item).allowMouseSelection = true;
+      const content = item.closest(`[data-slot="select-positioner"]`);
+      if (content && state(content).selection) state(content).selection.dragY = 0;
     }
-    if (!e.target.closest("[data-tui-select-content]")) requestCloseAll();
+    if (!e.target.closest(`[data-slot="select-positioner"]`)) requestCloseAll();
   });
 
   document.addEventListener("pointerover", (e) => {
     if (!(e.target instanceof Element)) return;
-    const item = e.target.closest("[data-tui-select-item]");
-    if (item) item._tuiPointerType = e.pointerType;
+    const item = e.target.closest(`[data-slot="select-item"]`);
+    if (item) state(item).pointerType = e.pointerType;
   });
 
   document.addEventListener("pointercancel", (e) => {
     if (!(e.target instanceof Element)) return;
-    const trigger = e.target.closest("[data-tui-select-trigger]");
+    const trigger = e.target.closest(`[data-slot="select-trigger"]`);
     if (!trigger) return;
-    trigger._tuiOpenMethod = null;
+    state(trigger).openMethod = null;
     pressedTriggers.delete(trigger);
   });
 
   document.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
-    const trigger = e.target.closest("[data-tui-select-trigger]");
+    const trigger = e.target.closest(`[data-slot="select-trigger"]`);
     if (trigger) {
       if (pressedTriggers.has(trigger)) {
         pressedTriggers.delete(trigger);
         return;
       }
-      const openMethod = trigger._tuiOpenMethod || (e.detail === 0 ? "keyboard" : "mouse");
-      trigger._tuiOpenMethod = null;
+      const openMethod = state(trigger).openMethod || (e.detail === 0 ? "keyboard" : "mouse");
+      state(trigger).openMethod = null;
       if (!trigger.disabled) {
         toggle(trigger, openMethod);
       }
       return;
     }
 
-    const item = e.target.closest("[data-tui-select-item]");
+    const item = e.target.closest(`[data-slot="select-item"]`);
     if (item) {
-      const content = item.closest("[data-tui-select-content]");
+      const content = item.closest(`[data-slot="select-positioner"]`);
       if (!content) return;
       // Virtual clicks (detail 0: keyboard, assistive technology, .click())
       // represent explicit activation and always commit; so do touch clicks,
       // whose press necessarily started on the item.
-      const isMouseClick = (item._tuiPointerType || "mouse") !== "touch";
+      const isMouseClick = (state(item).pointerType || "mouse") !== "touch";
       const isVirtualClick = e.detail === 0;
       const isInvalidMouseClick =
-        isMouseClick && !isVirtualClick && !item._tuiAllowMouseSelection;
-      item._tuiAllowMouseSelection = false;
+        isMouseClick && !isVirtualClick && !state(item).allowMouseSelection;
+      state(item).allowMouseSelection = false;
       if (item.hasAttribute("data-disabled") || isInvalidMouseClick) return;
       selectItem(content, item);
     }
@@ -859,15 +893,15 @@
   // selects on mouseup, only on click.
   document.addEventListener("mouseup", (e) => {
     if (!(e.target instanceof Element)) return;
-    const item = e.target.closest("[data-tui-select-item]");
+    const item = e.target.closest(`[data-slot="select-item"]`);
     if (!item) return;
-    const content = item.closest("[data-tui-select-content]");
-    const selection = content && content._tuiSelection;
+    const content = item.closest(`[data-slot="select-positioner"]`);
+    const selection = content && state(content).selection;
     if (!selection) return;
     selection.dragY = 0;
-    if (item.hasAttribute("data-disabled") || item._tuiPointerType === "touch") return;
+    if (item.hasAttribute("data-disabled") || state(item).pointerType === "touch") return;
     // Regular clicks are committed by the click event.
-    if (item._tuiAllowMouseSelection) return;
+    if (state(item).allowMouseSelection) return;
     const selected = item.hasAttribute("data-selected");
     if (
       (!selection.allowSelectedMouseUp && selected) ||
@@ -875,9 +909,9 @@
     ) {
       return;
     }
-    item._tuiAllowMouseSelection = true;
+    state(item).allowMouseSelection = true;
     item.click();
-    item._tuiAllowMouseSelection = false;
+    state(item).allowMouseSelection = false;
   });
 
   let typeBuffer = "";
@@ -898,10 +932,10 @@
 
     // Closed trigger: arrow keys open the listbox (Enter/Space go through
     // the native button click path).
-    const trigger = e.target.closest("[data-tui-select-trigger]");
+    const trigger = e.target.closest(`[data-slot="select-trigger"]`);
     if (trigger && !trigger.disabled) {
       pressedTriggers.delete(trigger); // like useClick's onKeyDown reset
-      trigger._tuiOpenMethod = null;
+      state(trigger).openMethod = null;
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
         const content = contentFor(trigger);
@@ -911,11 +945,11 @@
     }
 
     // Open listbox: roving focus on the items.
-    const item = e.target.closest("[data-tui-select-item]");
+    const item = e.target.closest(`[data-slot="select-item"]`);
     if (!item) return;
-    const content = item.closest("[data-tui-select-content]");
+    const content = item.closest(`[data-slot="select-positioner"]`);
     if (!content) return;
-    const items = [...content.querySelectorAll("[data-tui-select-item]")].filter(
+    const items = [...content.querySelectorAll(`[data-slot="select-item"]`)].filter(
       (i) => !i.hasAttribute("data-disabled"),
     );
     const index = items.indexOf(item);
@@ -947,16 +981,16 @@
   // The highlight follows the pointer, one highlighted item at a time.
   document.addEventListener("pointermove", (e) => {
     if (!(e.target instanceof Element)) return;
-    const item = e.target.closest("[data-tui-select-item]");
+    const item = e.target.closest(`[data-slot="select-item"]`);
     if (!item) return;
     // Dragging with the button held re-arms unselected mouseup selection
     // before SELECTED_DELAY has elapsed, once the drag covers >= 8px.
     if (e.pointerType === "mouse" && e.buttons === 1) {
-      const content = item.closest("[data-tui-select-content]");
-      if (content && content._tuiSelection) {
-        content._tuiSelection.dragY += e.movementY;
-        if (content._tuiSelection.dragY ** 2 >= 64) {
-          content._tuiSelection.allowUnselectedMouseUp = true;
+      const content = item.closest(`[data-slot="select-positioner"]`);
+      if (content && state(content).selection) {
+        state(content).selection.dragY += e.movementY;
+        if (state(content).selection.dragY ** 2 >= 64) {
+          state(content).selection.allowUnselectedMouseUp = true;
         }
       }
     }
@@ -968,9 +1002,9 @@
   window.addEventListener(
     "scroll",
     (e) => {
-      const inMenu = e.target instanceof Element && e.target.closest("[data-tui-select-content]");
+      const inMenu = e.target instanceof Element && e.target.closest(`[data-slot="select-positioner"]`);
       if (inMenu) {
-        if (inMenu._tuiAligned) {
+        if (state(inMenu).aligned) {
           handleAlignedScroll(inMenu);
         } else {
           updateScrollArrows(inMenu);

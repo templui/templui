@@ -13,6 +13,9 @@ type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
+	// InputAttributes are applied to the native checkbox beside the visual
+	// root. Put form bindings (for example data-bind) here.
+	InputAttributes templ.Attributes
 	Name       string
 	Value      string
 	Disabled   bool
@@ -55,7 +58,6 @@ templ Switch(props ...Props) {
 	{{ checked := initialChecked(p) }}
 	<span
 		data-slot="switch"
-		data-tui-switch
 		data-size={ string(p.Size) }
 		role="switch"
 		if checked {
@@ -74,7 +76,6 @@ templ Switch(props ...Props) {
 		}
 		aria-readonly?={ p.ReadOnly }
 		aria-required?={ p.Required }
-		data-tui-switch-controlled?={ p.Checked != nil }
 		class={
 			utils.CN(
 				// 1:1 base/ui/switch.tsx: structure lives here, the look comes from
@@ -104,7 +105,6 @@ templ Switch(props ...Props) {
 	// validation popups anchor near the control).
 	<input
 		type="checkbox"
-		data-tui-switch-input
 		aria-hidden="true"
 		tabindex="-1"
 		id={ p.ID }
@@ -121,6 +121,7 @@ templ Switch(props ...Props) {
 		if p.Form != "" {
 			form={ p.Form }
 		}
+		{ p.InputAttributes... }
 		if p.Name != "" {
 			style="clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:absolute"
 		} else {

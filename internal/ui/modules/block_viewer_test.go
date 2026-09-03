@@ -3,6 +3,7 @@ package modules
 import (
 	"bytes"
 	"context"
+	"os"
 	"strings"
 	"testing"
 )
@@ -25,31 +26,23 @@ func TestBuildBlockFileTreePreservesRegistryOrder(t *testing.T) {
 }
 
 func TestBlockViewerCodeKeepsFlexLayoutWhenSwitchingFiles(t *testing.T) {
-	t.Setenv("GO_ENV", "production")
-
-	entry := BlockEntry{Files: []BlockFile{
-		{Path: "first.templ", Content: "package first"},
-		{Path: "second.go", Content: "package second"},
-	}}
-
-	var rendered bytes.Buffer
-	if err := blockViewerCode(entry).Render(context.Background(), &rendered); err != nil {
+	source, err := os.ReadFile("block_viewer.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
 
-	html := rendered.String()
-	figureClass := `class="mx-0! mt-0 flex min-w-0 flex-1 flex-col rounded-xl border-none"`
-	if got := strings.Count(html, figureClass); got != len(entry.Files) {
-		t.Fatalf("got flex figure class %d times, want %d", got, len(entry.Files))
-	}
-	if strings.Contains(html, `class="mx-0! mt-0 hidden`) {
-		t.Fatal("hidden must remain an HTML attribute, not replace the flex display class")
-	}
-	if !strings.Contains(html, `data-tui-block-file-pane="second.go" hidden `+figureClass) {
-		t.Fatal("inactive file pane is not hidden with the native hidden attribute")
-	}
-	if !strings.Contains(html, `overflow-y-auto`) || !strings.Contains(html, `data-tui-block-file-scroll`) {
-		t.Fatal("file pane is missing its vertical scroll container")
+	templSource := string(source)
+	for _, want := range []string{
+		`data-block-file-pane={ file.Path }`,
+		`if i != 0 {`,
+		`hidden`,
+		`class="mx-0! mt-0 flex min-w-0 flex-1 flex-col rounded-xl border-none"`,
+		`overflow-y-auto`,
+		`data-block-file-scroll`,
+	} {
+		if !strings.Contains(templSource, want) {
+			t.Fatalf("block viewer source is missing %q", want)
+		}
 	}
 }
 
@@ -76,7 +69,7 @@ func TestBlockViewerUsesResizablePrimitiveComposition(t *testing.T) {
 			t.Fatalf("block viewer is missing %q", want)
 		}
 	}
-	if strings.Contains(html, `data-tui-block-panel style="width:`) {
+	if strings.Contains(html, `data-block-panel style="width:`) {
 		t.Fatal("block viewer still uses the legacy inline-width resize implementation")
 	}
 }

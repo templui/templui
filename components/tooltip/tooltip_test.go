@@ -15,7 +15,7 @@ func TestClientUsesBaseUIOpenStateAndAnchorTracking(t *testing.T) {
 	for _, want := range []string{
 		`new CustomEvent("tooltip-open-change"`,
 		`cancelable: true`,
-		`data-tui-tooltip-controlled`,
+		`attributes: ["data-open"]`,
 		`FloatingUIDOM.autoUpdate(trigger, content, update`,
 		`layoutShift: typeof IntersectionObserver !== "undefined"`,
 	} {

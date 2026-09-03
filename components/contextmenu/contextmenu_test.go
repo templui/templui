@@ -62,13 +62,14 @@ func TestSubControlledOpenOverridesDefaultOpen(t *testing.T) {
 		t.Fatal("controlled false must override submenu defaultOpen true")
 	}
 
-	var output bytes.Buffer
-	if err := Sub(SubProps{Open: &open, DefaultOpen: true}).Render(context.Background(), &output); err != nil {
+	source, err := os.ReadFile("contextmenu.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
-	html := output.String()
-	if !strings.Contains(html, `data-tui-contextmenu-sub-open="false"`) ||
-		!strings.Contains(html, `data-tui-contextmenu-sub-controlled`) {
-		t.Fatalf("rendered controlled submenu is missing state markers: %s", html)
+	templ := string(source)
+	for _, want := range []string{`data-slot="context-menu-sub"`, `data-open?={ initialSubOpen(p) }`} {
+		if !strings.Contains(templ, want) {
+			t.Fatalf("context submenu template is missing %q", want)
+		}
 	}
 }

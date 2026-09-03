@@ -11,10 +11,9 @@ type ctxKey string
 const stateKey ctxKey = "collapsibleState"
 
 type ctxState struct {
-	id         string
-	open       bool
-	controlled bool
-	disabled   bool
+	id       string
+	open     bool
+	disabled bool
 }
 
 func state(ctx context.Context) ctxState {
@@ -58,14 +57,12 @@ templ Collapsible(props ...Props) {
 		{{ p.ID = utils.RandomID() }}
 	}
 	{{ open := initialOpen(p) }}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: open, controlled: p.Open != nil, disabled: p.Disabled}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, open: open, disabled: p.Disabled}) }}
 	<div
 		data-slot="collapsible"
-		data-tui-collapsible
 		data-open?={ open }
 		data-closed?={ !open }
 		data-disabled?={ p.Disabled }
-		data-tui-collapsible-controlled?={ p.Open != nil }
 		class={ utils.CN("", p.Class) }
 		{ p.Attributes... }
 	>
@@ -78,10 +75,9 @@ templ Collapsible(props ...Props) {
 func Trigger(ctx context.Context) templ.Attributes {
 	s := state(ctx)
 	attrs := templ.Attributes{
-		"data-slot":                    "collapsible-trigger",
-		"data-tui-collapsible-trigger": true,
-		"aria-controls":                s.id,
-		"aria-expanded":                utils.IfElse(s.open, "true", "false"),
+		"data-slot":     "collapsible-trigger",
+		"aria-controls": s.id,
+		"aria-expanded": utils.IfElse(s.open, "true", "false"),
 	}
 	if s.disabled {
 		attrs["data-disabled"] = true
@@ -105,7 +101,6 @@ templ Content(props ...ContentProps) {
 	<div
 		id={ s.id }
 		data-slot="collapsible-content"
-		data-tui-collapsible-content
 		data-open?={ s.open }
 		data-closed?={ !s.open }
 		hidden?={ !s.open }

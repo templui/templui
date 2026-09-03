@@ -1,5 +1,7 @@
 // Uses window.FloatingUIDOM from components/floatingui (loaded in the same bundle).
 (function () {
+  const scrollLockOwner = {};
+  const elementStates = new WeakMap();
   const EXIT_MS = 120; // exit animation (duration-100) + slack
   const COLLISION_PADDING = 5;
   // Submenu hover intent, like Base UI: open fast, close with a grace delay so
@@ -7,22 +9,27 @@
   const SUB_OPEN_DELAY = 100;
   const SUB_CLOSE_DELAY = 300;
 
+  function state(element) {
+    if (!elementStates.has(element)) elementStates.set(element, {});
+    return elementStates.get(element);
+  }
+
   function allContents() {
-    return document.querySelectorAll("[data-tui-contextmenu-content]");
+    return document.querySelectorAll(`[data-slot="context-menu-positioner"]`);
   }
 
   function contentFor(trigger) {
-    return document.getElementById(trigger.getAttribute("data-tui-contextmenu-for") || "");
+    return document.getElementById(trigger.getAttribute("aria-controls") || "");
   }
 
   function triggerFor(content) {
     return document.querySelector(
-      '[data-tui-contextmenu-trigger][data-tui-contextmenu-for="' + content.id + '"]',
+      '[data-slot="context-menu-trigger"][aria-controls="' + content.id + '"]',
     );
   }
 
   function popupFor(content) {
-    return content.querySelector("[data-tui-contextmenu-popup]");
+    return content.querySelector(`[data-slot="context-menu-content"]`);
   }
 
   function setOpenState(element, open) {
@@ -63,15 +70,15 @@
 
   // Moves the content to <body> (shadcn portals it the same way).
   // The unmount half of the React portal pendant: a portaled content lives
-  // as long as its SSR declaration site (_tuiPortalOwner) stays in the
+  // as long as its SSR declaration site stays in the
   // document. Trigger-presence heuristics judged mid-swap moments wrongly -
   // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
-    document.querySelectorAll("body > [data-tui-contextmenu-content]").forEach((c) => {
-      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) c.remove();
+    document.querySelectorAll('body > [data-slot="context-menu-positioner"]').forEach((c) => {
+      if (c !== content && state(c).portalOwner && !state(c).portalOwner.isConnected) c.remove();
     });
     if (content.parentElement !== document.body) {
-      if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
+      if (!state(content).portalOwner) state(content).portalOwner = content.parentElement;
       document.body.appendChild(content);
     }
   }
@@ -89,11 +96,9 @@
     const { computePosition, offset, flip, shift, size } = window.FloatingUIDOM;
     // Base UI context menu placement: right-start against the cursor,
     // sideOffset 0, alignOffset 4.
-    const side = content.getAttribute("data-tui-contextmenu-side") || "right";
-    const sideOffset =
-      parseInt(content.getAttribute("data-tui-contextmenu-side-offset"), 10) || 0;
-    const alignOffset =
-      parseInt(content.getAttribute("data-tui-contextmenu-align-offset"), 10) || 0;
+    const side = content.getAttribute("data-side") || "right";
+    const sideOffset = parseInt(content.getAttribute("data-side-offset"), 10) || 0;
+    const alignOffset = parseInt(content.getAttribute("data-align-offset"), 10) || 0;
     const anchor = cursorAnchor(x, y);
 
     return computePosition(anchor, content, {
@@ -107,7 +112,7 @@
           padding: COLLISION_PADDING,
           apply(args) {
             content.style.setProperty(
-              "--tui-contextmenu-available-height",
+              "--available-height",
               args.availableHeight + "px",
             );
           },
@@ -120,7 +125,7 @@
       const popup = popupFor(content);
       if (popup) {
         popup.style.setProperty(
-          "--tui-contextmenu-transform-origin",
+          "--transform-origin",
           anchorOrigin(
             result,
             anchor.getBoundingClientRect(),
@@ -137,7 +142,7 @@
   const ITEM_SELECTOR = '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]';
 
   function containerOf(el) {
-    return el.closest("[data-tui-contextmenu-sub-content], [data-tui-contextmenu-popup]");
+    return el.closest('[data-slot="context-menu-sub-content"], [data-slot="context-menu-content"]');
   }
 
   function itemsIn(container) {
@@ -170,18 +175,12 @@
   // Base UI menus are modal: the background scroll is locked while open,
   // with the body padded by the scrollbar width so the page does not shift.
   function lockScroll() {
-    if (document.body.hasAttribute("data-tui-scroll-locked")) return;
-    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
-    document.body.setAttribute("data-tui-scroll-locked", "");
-    document.body.style.overflow = "hidden";
-    if (scrollbar > 0) document.body.style.paddingRight = scrollbar + "px";
+    window.shadcnTempl.setScrollLocked(scrollLockOwner, true);
   }
 
   function unlockScroll() {
     if (anyOpen()) return;
-    document.body.removeAttribute("data-tui-scroll-locked");
-    document.body.style.overflow = "";
-    document.body.style.paddingRight = "";
+    window.shadcnTempl.setScrollLocked(scrollLockOwner, false);
   }
 
   function openAt(content, x, y) {
@@ -189,7 +188,7 @@
     allContents().forEach((c) => {
     if (c !== content) requestOpenChange(c, false);
     });
-    clearTimeout(content._tuiHide);
+    clearTimeout(state(content).hideTimer);
     portal(content);
     lockScroll();
     // z-index portal like shadcn (no native top layer); re-append
@@ -199,7 +198,7 @@
 
     if (alreadyOpen) {
       // Right-click somewhere else while open: move over to the new spot.
-      content.querySelectorAll("[data-tui-contextmenu-sub]").forEach(closeSubNow);
+      content.querySelectorAll(`[data-slot="context-menu-sub"]`).forEach(closeSubNow);
       positionMenu(content, x, y);
       return;
     }
@@ -227,9 +226,9 @@
   function close(content) {
     if (content.hidden) return;
     setState(content, "closed");
-    content.querySelectorAll("[data-tui-contextmenu-sub]").forEach(closeSubNow);
-    clearTimeout(content._tuiHide);
-    content._tuiHide = setTimeout(() => {
+    content.querySelectorAll(`[data-slot="context-menu-sub"]`).forEach(closeSubNow);
+    clearTimeout(state(content).hideTimer);
+    state(content).hideTimer = setTimeout(() => {
       if (content.hasAttribute("data-closed") && !content.hidden) {
         content.hidden = true;
       }
@@ -249,7 +248,7 @@
     detail: { open: nextOpen },
   });
   const accepted = (trigger || content).dispatchEvent(change);
-  if (!accepted || content.hasAttribute("data-tui-contextmenu-controlled")) return false;
+  if (!accepted) return false;
   if (nextOpen) openAt(content, x, y);
   else close(content);
   return true;
@@ -263,8 +262,8 @@
 
   function subParts(sub) {
     return {
-      trigger: sub.querySelector("[data-tui-contextmenu-sub-trigger]"),
-      content: sub.querySelector("[data-tui-contextmenu-sub-content]"),
+      trigger: sub.querySelector(`[data-slot="context-menu-sub-trigger"]`),
+      content: sub.querySelector(`[data-slot="context-menu-sub-content"]`),
     };
   }
 
@@ -291,7 +290,7 @@
       content.style.top = result.y + "px";
       content.setAttribute("data-side", result.placement.split("-")[0]);
       content.style.setProperty(
-        "--tui-contextmenu-transform-origin",
+        "--transform-origin",
         anchorOrigin(result, trigger.getBoundingClientRect(), content.getBoundingClientRect(), 0),
       );
       content.offsetHeight; // flush styles before re-enabling transitions
@@ -325,10 +324,10 @@
 
   // Closes immediately (used when the whole menu goes away).
   function closeSubNow(sub) {
-    clearTimeout(sub._tuiOpen);
-    clearTimeout(sub._tuiClose);
-    sub._tuiOpen = null;
-    sub._tuiClose = null;
+    clearTimeout(state(sub).openTimer);
+    clearTimeout(state(sub).closeTimer);
+    state(sub).openTimer = null;
+    state(sub).closeTimer = null;
     const { trigger, content } = subParts(sub);
     if (!trigger || !content) return;
     content.classList.add("hidden");
@@ -347,17 +346,18 @@
 		detail: { open: nextOpen },
 	  }),
 	);
-	if (!accepted || sub.hasAttribute("data-tui-contextmenu-sub-controlled")) return;
-	sub.setAttribute("data-tui-contextmenu-sub-open", String(nextOpen));
+	if (!accepted) return;
+	sub.toggleAttribute("data-open", nextOpen);
+	sub.toggleAttribute("data-closed", !nextOpen);
 	if (nextOpen) openSub(sub, focusFirst);
 	else closeSub(sub);
   }
 
   function syncSubState(menu) {
-	menu.querySelectorAll("[data-tui-contextmenu-sub]").forEach((sub) => {
+	menu.querySelectorAll(`[data-slot="context-menu-sub"]`).forEach((sub) => {
 	  const { content } = subParts(sub);
 	  if (!content) return;
-	  const shouldOpen = sub.getAttribute("data-tui-contextmenu-sub-open") === "true";
+	  const shouldOpen = sub.hasAttribute("data-open");
 	  if (shouldOpen && !content.hasAttribute("data-open")) openSub(sub, false);
 	  else if (!shouldOpen && content.hasAttribute("data-open")) closeSubNow(sub);
 	});
@@ -367,31 +367,31 @@
   // keep it open; everything else in the menu schedules its subs to close.
   document.addEventListener("mouseover", (e) => {
     if (!(e.target instanceof Element)) return;
-    const menu = e.target.closest("[data-tui-contextmenu-content]");
+    const menu = e.target.closest(`[data-slot="context-menu-positioner"]`);
     if (!menu) return;
-    const hovered = e.target.closest("[data-tui-contextmenu-sub]");
+    const hovered = e.target.closest(`[data-slot="context-menu-sub"]`);
 
-    menu.querySelectorAll("[data-tui-contextmenu-sub]").forEach((sub) => {
+    menu.querySelectorAll(`[data-slot="context-menu-sub"]`).forEach((sub) => {
       const { content } = subParts(sub);
       if (!content) return;
       const isOpen = content.hasAttribute("data-open");
       const onPath = hovered && (sub === hovered || sub.contains(hovered));
 
       if (onPath) {
-        clearTimeout(sub._tuiClose);
-        sub._tuiClose = null;
-        if (!isOpen && !sub._tuiOpen) {
-          sub._tuiOpen = setTimeout(() => {
-            sub._tuiOpen = null;
+        clearTimeout(state(sub).closeTimer);
+        state(sub).closeTimer = null;
+        if (!isOpen && !state(sub).openTimer) {
+          state(sub).openTimer = setTimeout(() => {
+            state(sub).openTimer = null;
 			requestSubOpenChange(sub, true);
           }, SUB_OPEN_DELAY);
         }
       } else {
-        clearTimeout(sub._tuiOpen);
-        sub._tuiOpen = null;
-        if (isOpen && !sub._tuiClose) {
-          sub._tuiClose = setTimeout(() => {
-            sub._tuiClose = null;
+        clearTimeout(state(sub).openTimer);
+        state(sub).openTimer = null;
+        if (isOpen && !state(sub).closeTimer) {
+          state(sub).closeTimer = setTimeout(() => {
+            state(sub).closeTimer = null;
 			requestSubOpenChange(sub, false);
           }, SUB_CLOSE_DELAY);
         }
@@ -403,7 +403,7 @@
   // the menu container when the pointer sits on empty menu space.
   document.addEventListener("pointermove", (e) => {
     if (!(e.target instanceof Element)) return;
-    const content = e.target.closest("[data-tui-contextmenu-content]");
+    const content = e.target.closest(`[data-slot="context-menu-positioner"]`);
     if (!content || !content.hasAttribute("data-open")) return;
     const item = e.target.closest(ITEM_SELECTOR);
     if (item && containerOf(item)) {
@@ -420,14 +420,15 @@
   // ----- init (portal up front, like React does on mount) --------------------
 
   // Lift SSR'd contents out of their inert <template> wrappers into <body>,
-  // replacing a stale portaled copy on re-swaps (e.g. htmx).
+  // replacing a stale portaled copy after ordinary DOM replacement.
   function liftTemplates() {
-    document.querySelectorAll("template[data-tui-contextmenu-portal]").forEach((tpl) => {
-      const content = tpl.content.querySelector("[data-tui-contextmenu-content]");
+    document.querySelectorAll("template").forEach((tpl) => {
+      const content = tpl.content.querySelector(`[data-slot="context-menu-positioner"]`);
+      if (!content) return;
       if (content) {
         const stale = document.getElementById(content.id);
         if (stale) stale.remove();
-        content._tuiPortalOwner = tpl.parentElement;
+        state(content).portalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
       tpl.remove();
@@ -436,12 +437,11 @@
 
   function init() {
     liftTemplates();
-    document.querySelectorAll("[data-tui-contextmenu-trigger]").forEach((trigger) => {
+    document.querySelectorAll(`[data-slot="context-menu-trigger"]`).forEach((trigger) => {
       const content = contentFor(trigger);
     if (content) {
     portal(content);
-    if (content.getAttribute("data-tui-contextmenu-initial-open") === "true") {
-      content.removeAttribute("data-tui-contextmenu-initial-open");
+    if (content.hasAttribute("data-open")) {
       const rect = trigger.getBoundingClientRect();
       openAt(content, rect.left + rect.width / 2, rect.top + rect.height / 2);
     }
@@ -449,22 +449,67 @@
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
-  // does not fire in hidden tabs or throttled iframes): swapped-in markup
-  // lifts and wires itself, removals release portaled content through the
-  // ownership sweep.
-  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+  window.shadcnTempl.lifecycle.register("context-menu-positioner", {
+    selector: '[data-slot="context-menu-positioner"]',
+    setup() {},
+    attributes: ["data-open"],
+    attributeChanged(content) {
+      const trigger = triggerFor(content);
+      if (content.hasAttribute("data-open") && content.hidden && trigger) {
+        const rect = trigger.getBoundingClientRect();
+        openAt(content, rect.left + rect.width / 2, rect.top + rect.height / 2);
+      } else if (!content.hasAttribute("data-open") && !content.hidden && !content.hasAttribute("data-closed")) {
+        close(content);
+      }
+    },
+  });
+  window.shadcnTempl.lifecycle.register("context-menu-sub", {
+    selector: '[data-slot="context-menu-sub"]',
+    setup() {},
+    attributes: ["data-open"],
+    attributeChanged(sub) {
+      const { content } = subParts(sub);
+      if (!content) return;
+      if (sub.hasAttribute("data-open") && !content.hasAttribute("data-open")) openSub(sub, false);
+      else if (!sub.hasAttribute("data-open") && content.hasAttribute("data-open")) closeSub(sub);
+    },
+  });
+  window.shadcnTempl.lifecycle.register("context-menu-checkbox-state", {
+    selector: '[data-slot="context-menu-checkbox-item"]',
+    setup() {},
+    attributes: ["data-checked"],
+    attributeChanged(item) {
+      setChecked(item, item.hasAttribute("data-checked"));
+    },
+  });
+  window.shadcnTempl.lifecycle.register("context-menu-radio-state", {
+    selector: '[data-slot="context-menu-radio-item"]',
+    setup() {},
+    attributes: ["data-checked"],
+    attributeChanged(item) {
+      const checked = item.hasAttribute("data-checked");
+      if (checked) {
+        const group = item.closest('[data-slot="context-menu-radio-group"]');
+        group?.querySelectorAll('[data-slot="context-menu-radio-item"][data-checked]').forEach((other) => {
+          if (other !== item) setChecked(other, false);
+        });
+      }
+      setChecked(item, checked);
+    },
+  });
+  window.shadcnTempl.lifecycle.register("context-menu", {
+    mount: init,
+    unmount() {
+      init();
+      unlockScroll();
+    },
+  });
 
   // ----- events ---------------------------------------------------------------
 
   document.addEventListener("contextmenu", (e) => {
     if (!(e.target instanceof Element)) return;
-    const trigger = e.target.closest("[data-tui-contextmenu-trigger]");
+    const trigger = e.target.closest(`[data-slot="context-menu-trigger"]`);
     if (!trigger) return;
     const content = contentFor(trigger);
     if (!content) return;
@@ -476,25 +521,25 @@
   document.addEventListener("pointerdown", (e) => {
     if (!(e.target instanceof Element)) return;
     if (e.button !== 0) return;
-    if (!e.target.closest("[data-tui-contextmenu-content]")) closeAll();
+    if (!e.target.closest(`[data-slot="context-menu-positioner"]`)) closeAll();
   });
 
   document.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
     // Clicking a submenu trigger opens it right away.
-    const subTrigger = e.target.closest("[data-tui-contextmenu-sub-trigger]");
+    const subTrigger = e.target.closest(`[data-slot="context-menu-sub-trigger"]`);
     if (subTrigger) {
-      const sub = subTrigger.closest("[data-tui-contextmenu-sub]");
+      const sub = subTrigger.closest(`[data-slot="context-menu-sub"]`);
       if (sub) {
-        clearTimeout(sub._tuiOpen);
-        sub._tuiOpen = null;
+        clearTimeout(state(sub).openTimer);
+        state(sub).openTimer = null;
 		requestSubOpenChange(sub, true, e.detail === 0);
       }
       return;
     }
 
     // Checkbox items toggle and keep the menu open.
-    const checkbox = e.target.closest("[data-tui-contextmenu-checkbox-item]");
+    const checkbox = e.target.closest(`[data-slot="context-menu-checkbox-item"]`);
     if (checkbox) {
       if (!checkbox.disabled) {
         const on = checkbox.hasAttribute("data-checked");
@@ -504,7 +549,7 @@
       detail: { checked: !on },
     });
     const accepted = checkbox.dispatchEvent(change);
-    if (accepted && !checkbox.hasAttribute("data-tui-contextmenu-checkbox-controlled")) {
+    if (accepted) {
       setChecked(checkbox, !on);
     }
       }
@@ -512,18 +557,18 @@
     }
 
     // Radio items select within their group and keep the menu open.
-    const radio = e.target.closest("[data-tui-contextmenu-radio-item]");
+    const radio = e.target.closest(`[data-slot="context-menu-radio-item"]`);
     if (radio) {
       if (!radio.disabled) {
-        const group = radio.closest("[data-tui-contextmenu-radio-group]");
+        const group = radio.closest(`[data-slot="context-menu-radio-group"]`);
     const change = new CustomEvent("contextmenu-value-change", {
       bubbles: true,
       cancelable: true,
-      detail: { value: radio.getAttribute("data-tui-contextmenu-radio-value") },
+      detail: { value: radio.getAttribute("data-value") },
     });
     const accepted = (group || radio).dispatchEvent(change);
-    if (accepted && group && !group.hasAttribute("data-tui-contextmenu-radio-controlled")) {
-          group.querySelectorAll("[data-tui-contextmenu-radio-item]").forEach((r) => {
+    if (accepted && group) {
+          group.querySelectorAll(`[data-slot="context-menu-radio-item"]`).forEach((r) => {
             setChecked(r, false);
           });
       setChecked(radio, true);
@@ -532,13 +577,13 @@
       return;
     }
 
-    const item = e.target.closest("[data-tui-contextmenu-item]");
+    const item = e.target.closest(`[data-slot="context-menu-item"]`);
     if (item) {
       if (
         item.getAttribute("aria-disabled") !== "true" &&
-        item.getAttribute("data-tui-contextmenu-disable-close-on-click") !== "true"
+        item.getAttribute("data-close-on-click") !== "false"
       ) {
-        const content = item.closest("[data-tui-contextmenu-content]");
+        const content = item.closest(`[data-slot="context-menu-positioner"]`);
     if (content) requestOpenChange(content, false);
       }
     }
@@ -580,19 +625,19 @@
         break;
       }
       case "ArrowRight": {
-        const subTrigger = active.closest("[data-tui-contextmenu-sub-trigger]");
+        const subTrigger = active.closest(`[data-slot="context-menu-sub-trigger"]`);
         if (subTrigger) {
           e.preventDefault();
-          const sub = subTrigger.closest("[data-tui-contextmenu-sub]");
+          const sub = subTrigger.closest(`[data-slot="context-menu-sub"]`);
 		  if (sub) requestSubOpenChange(sub, true, true);
         }
         break;
       }
       case "ArrowLeft": {
-        const subContent = active.closest("[data-tui-contextmenu-sub-content]");
+        const subContent = active.closest(`[data-slot="context-menu-sub-content"]`);
         if (subContent) {
           e.preventDefault();
-          const sub = subContent.closest("[data-tui-contextmenu-sub]");
+          const sub = subContent.closest(`[data-slot="context-menu-sub"]`);
           if (sub) {
             const { trigger } = subParts(sub);
 			requestSubOpenChange(sub, false);

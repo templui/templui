@@ -1,10 +1,17 @@
 // Uses window.FloatingUIDOM from components/floatingui (loaded in the same bundle).
 (function () {
+  const configs = new WeakMap();
+  const elementStates = new WeakMap();
   // Exit animations run at the tw-animate default (150ms); hide after.
   const EXIT_MS = 170;
 
+  function state(element) {
+    if (!elementStates.has(element)) elementStates.set(element, {});
+    return elementStates.get(element);
+  }
+
   function allContents() {
-    return document.querySelectorAll("[data-tui-tooltip-content]");
+    return document.querySelectorAll(`[data-slot="tooltip-content"]`);
   }
 
   function contentFor(trigger) {
@@ -13,7 +20,7 @@
 
   function triggerFor(content) {
     return document.querySelector(
-      '[data-tui-tooltip-trigger][aria-describedby="' + content.id + '"]',
+      '[data-slot="tooltip-trigger"][aria-describedby="' + content.id + '"]',
     );
   }
 
@@ -32,7 +39,7 @@
   // The arrow styles itself per side (data-side classes, like Base UI's
   // Arrow); the script only feeds it the side and the centered coordinate.
   function placeArrow(content, side, arrowData) {
-    const arrowEl = content.querySelector("[data-tui-tooltip-arrow]");
+    const arrowEl = content.querySelector(`[data-slot="tooltip-arrow"]`);
     if (!arrowEl) return;
     arrowEl.setAttribute("data-side", side);
     arrowEl.style.left = arrowData && arrowData.x != null ? arrowData.x + "px" : "";
@@ -41,28 +48,28 @@
 
   // Moves the content to <body> (shadcn portals it the same way).
   // The unmount half of the React portal pendant: a portaled content lives
-  // as long as its SSR declaration site (_tuiPortalOwner) stays in the
+  // as long as its SSR declaration site stays in the
   // document. Trigger-presence heuristics judged mid-swap moments wrongly -
   // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
-    document.querySelectorAll("body > [data-tui-tooltip-content]").forEach((c) => {
-      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) {
+    document.querySelectorAll('body > [data-slot="tooltip-content"]').forEach((c) => {
+      if (c !== content && state(c).portalOwner && !state(c).portalOwner.isConnected) {
         stopAutoPositioning(c);
         c.remove();
       }
     });
     if (content.parentElement !== document.body) {
-      if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
+      if (!state(content).portalOwner) state(content).portalOwner = content.parentElement;
       document.body.appendChild(content);
     }
   }
 
   function positionContent(content, trigger) {
     const { computePosition, offset, flip, shift, arrow } = window.FloatingUIDOM;
-    const side = content.getAttribute("data-tui-tooltip-side") || "top";
-    const sideOffset =
-      parseInt(content.getAttribute("data-tui-tooltip-side-offset"), 10) || 4;
-    const arrowEl = content.querySelector("[data-tui-tooltip-arrow]");
+    const componentConfig = configs.get(content) || {};
+    const side = componentConfig.side || "top";
+    const sideOffset = parseInt(componentConfig.sideOffset, 10) || 4;
+    const arrowEl = content.querySelector(`[data-slot="tooltip-arrow"]`);
 
     return computePosition(trigger, content, {
       placement: side,
@@ -95,13 +102,13 @@
   }
 
   function startAutoPositioning(content, trigger) {
-    if (content._tuiPositionCleanup) content._tuiPositionCleanup();
+    if (state(content).positionCleanup) state(content).positionCleanup();
     let resolveFirst;
     const firstPosition = new Promise((resolve) => {
       resolveFirst = resolve;
     });
     const update = () => positionContent(content, trigger).then(resolveFirst, resolveFirst);
-    content._tuiPositionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
+    state(content).positionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
       elementResize: typeof ResizeObserver !== "undefined",
       layoutShift: typeof IntersectionObserver !== "undefined",
     });
@@ -109,18 +116,22 @@
   }
 
   function stopAutoPositioning(content) {
-    if (!content._tuiPositionCleanup) return;
-    content._tuiPositionCleanup();
-    content._tuiPositionCleanup = null;
+    if (!state(content).positionCleanup) return;
+    state(content).positionCleanup();
+    state(content).positionCleanup = null;
   }
 
   function open(trigger) {
     // Consumers can suppress a tooltip situationally (e.g. the sidebar only
     // shows menu tooltips while collapsed to icons).
-    if (trigger.hasAttribute("data-tui-tooltip-disabled")) return;
+    if (
+      trigger.matches(":disabled") ||
+      trigger.getAttribute("aria-disabled") === "true" ||
+      trigger.hasAttribute("data-tooltip-disabled")
+    ) return;
     const content = contentFor(trigger);
     if (!content) return;
-    clearTimeout(content._tuiHide);
+    clearTimeout(state(content).hideTimer);
     portal(content);
     // z-index portal like shadcn (no native top layer); re-append
     // keeps paint order = open order.
@@ -141,7 +152,7 @@
       content.removeAttribute("data-ending-style");
       content.setAttribute("data-open", "");
       content.setAttribute("data-starting-style", "");
-      const arrowEl = content.querySelector("[data-tui-tooltip-arrow]");
+      const arrowEl = content.querySelector(`[data-slot="tooltip-arrow"]`);
       if (arrowEl) {
         arrowEl.removeAttribute("data-closed");
         arrowEl.removeAttribute("data-ending-style");
@@ -165,7 +176,7 @@
     content.removeAttribute("data-starting-style");
     content.setAttribute("data-closed", "");
     content.setAttribute("data-ending-style", "");
-    const arrowEl = content.querySelector("[data-tui-tooltip-arrow]");
+    const arrowEl = content.querySelector(`[data-slot="tooltip-arrow"]`);
     if (arrowEl) {
       arrowEl.removeAttribute("data-open");
       arrowEl.removeAttribute("data-starting-style");
@@ -174,8 +185,8 @@
     }
     const trigger = triggerFor(content);
     if (trigger) trigger.removeAttribute("data-popup-open");
-    clearTimeout(content._tuiHide);
-    content._tuiHide = setTimeout(() => {
+    clearTimeout(state(content).hideTimer);
+    state(content).hideTimer = setTimeout(() => {
       if (content.hasAttribute("data-closed") && !content.hidden) {
         content.hidden = true;
         content.removeAttribute("data-ending-style");
@@ -199,7 +210,7 @@
         detail: { open: nextOpen },
       }),
     );
-    if (!accepted || content.hasAttribute("data-tui-tooltip-controlled")) return;
+    if (!accepted) return;
     if (nextOpen) open(trigger);
     else close(content);
   }
@@ -211,12 +222,12 @@
   // ----- events -------------------------------------------------------------
 
   document.addEventListener("mouseover", (e) => {
-    const trigger = e.target.closest("[data-tui-tooltip-trigger]");
+    const trigger = e.target.closest(`[data-slot="tooltip-trigger"]`);
     if (trigger) requestOpenChange(trigger, true);
   });
 
   document.addEventListener("mouseout", (e) => {
-    const trigger = e.target.closest("[data-tui-tooltip-trigger]");
+    const trigger = e.target.closest(`[data-slot="tooltip-trigger"]`);
     if (!trigger) return;
     if (e.relatedTarget && trigger.contains(e.relatedTarget)) return; // still inside
     const content = contentFor(trigger);
@@ -227,12 +238,12 @@
   // focus opens the tooltip, so programmatic focus (e.g. a dialog's
   // autofocus) does not pop it.
   document.addEventListener("focusin", (e) => {
-    const trigger = e.target.closest("[data-tui-tooltip-trigger]");
+    const trigger = e.target.closest(`[data-slot="tooltip-trigger"]`);
     if (trigger && trigger.matches(":focus-visible")) requestOpenChange(trigger, true);
   });
 
   document.addEventListener("focusout", (e) => {
-    const trigger = e.target.closest("[data-tui-tooltip-trigger]");
+    const trigger = e.target.closest(`[data-slot="tooltip-trigger"]`);
     if (!trigger) return;
     const content = contentFor(trigger);
     if (content) requestOpenChange(trigger, false);
@@ -246,38 +257,47 @@
   // portal renders it there from the start.
   function init() {
     document
-      .querySelectorAll("template[data-tui-tooltip-portal]")
+      .querySelectorAll("template")
       .forEach((tpl) => {
-        const content = tpl.content.querySelector("[data-tui-tooltip-content]");
+        const content = tpl.content.querySelector(`[data-slot="tooltip-content"]`);
+        if (!content) return;
         if (content) {
           const stale = document.getElementById(content.id);
           if (stale) {
             stopAutoPositioning(stale);
-            stale.remove(); // htmx re-swap of the same id
+            stale.remove(); // replacement of an earlier source with the same id
           }
-          content._tuiPortalOwner = tpl.parentElement;
+          state(content).portalOwner = tpl.parentElement;
           portal(content);
         }
         tpl.remove();
       });
     allContents().forEach((content) => {
       portal(content);
-      if (content.getAttribute("data-tui-tooltip-initial-open") === "true") {
-        content.removeAttribute("data-tui-tooltip-initial-open");
+      if (content.hasAttribute("data-open")) {
         const trigger = triggerFor(content);
         if (trigger) open(trigger);
       }
     });
   }
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
-  // does not fire in hidden tabs or throttled iframes): swapped-in markup
-  // lifts and wires itself, removals release portaled content through the
-  // ownership sweep.
-  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+  window.shadcnTempl.lifecycle.register("tooltip-content", {
+    selector: '[data-slot="tooltip-content"]',
+    setup(content) {
+      configs.set(content, {
+        side: content.getAttribute("data-side"),
+        sideOffset: content.getAttribute("data-side-offset"),
+      });
+    },
+    attributes: ["data-open"],
+    attributeChanged(content) {
+      const trigger = triggerFor(content);
+      if (content.hasAttribute("data-open") && content.hidden && trigger) open(trigger);
+      else if (!content.hasAttribute("data-open") && !content.hidden && !content.hasAttribute("data-closed")) close(content);
+    },
+  });
+  window.shadcnTempl.lifecycle.register("tooltip", {
+    mount: init,
+    unmount: init,
+  });
 
 })();

@@ -13,7 +13,7 @@
   }
 
   function valueOf(item) {
-    return item.getAttribute("data-tui-accordion-value") || "";
+    return item.getAttribute("data-value") || "";
   }
 
   function valuesOf(accordion) {
@@ -34,21 +34,21 @@
   function openItem(item) {
     const panel = panelOf(item);
     triggerOf(item).setAttribute("aria-expanded", "true");
-  syncItemState(item, true);
+    syncItemState(item, true);
     if (!panel) return;
     panel.removeAttribute("data-closed");
     panel.hidden = false;
-    panel.style.setProperty("--tui-accordion-panel-height", panel.scrollHeight + "px");
+    panel.style.setProperty("--accordion-panel-height", panel.scrollHeight + "px");
     panel.setAttribute("data-open", "");
   }
 
   function closeItem(item) {
     const panel = panelOf(item);
     triggerOf(item).setAttribute("aria-expanded", "false");
-  syncItemState(item, false);
+    syncItemState(item, false);
     if (!panel) return;
     panel.removeAttribute("data-open");
-    panel.style.setProperty("--tui-accordion-panel-height", panel.scrollHeight + "px");
+    panel.style.setProperty("--accordion-panel-height", panel.scrollHeight + "px");
     panel.setAttribute("data-closed", "");
     panel.addEventListener(
       "animationend",
@@ -75,10 +75,10 @@
     const change = new CustomEvent("accordion-value-change", {
       bubbles: true,
       cancelable: true,
-      detail: { values },
+      detail: { value: values },
     });
     const accepted = accordion.dispatchEvent(change);
-    return accepted && !accordion.hasAttribute("data-tui-accordion-controlled");
+    return accepted;
   }
 
   document.addEventListener("click", (e) => {
@@ -87,19 +87,19 @@
     if (!trigger) return;
     const item = trigger.closest('[data-slot="accordion-item"]');
     const accordion = trigger.closest('[data-slot="accordion"]');
-  if (
-    !item ||
-    !accordion ||
-    item.hasAttribute("data-disabled") ||
-    accordion.hasAttribute("data-disabled") ||
-    !requestValueChange(accordion, item)
-  ) return;
+    if (
+      !item ||
+      !accordion ||
+      item.hasAttribute("data-disabled") ||
+      accordion.hasAttribute("data-disabled") ||
+      !requestValueChange(accordion, item)
+    ) return;
 
     if (trigger.getAttribute("aria-expanded") === "true") {
       closeItem(item);
       return;
     }
-  if (!accordion.hasAttribute("data-multiple")) {
+    if (!accordion.hasAttribute("data-multiple")) {
       accordion.querySelectorAll('[data-slot="accordion-item"]').forEach((other) => {
         if (other === item) return;
         if (other.closest('[data-slot="accordion"]') !== accordion) return;
@@ -130,5 +130,32 @@
       e.preventDefault();
       next.focus();
     }
+  });
+
+  window.shadcnTempl.lifecycle.register("accordion", {
+    selector: '[data-slot="accordion"]',
+    setup() {},
+  });
+
+  window.shadcnTempl.lifecycle.register("accordion-item-state", {
+    selector: '[data-slot="accordion-item"]',
+    setup() {},
+    attributes: ["data-open"],
+    attributeChanged(item) {
+      const shouldOpen = item.hasAttribute("data-open");
+      const isOpen = triggerOf(item)?.getAttribute("aria-expanded") === "true";
+      if (shouldOpen === isOpen) return;
+      if (shouldOpen) {
+        const accordion = item.closest('[data-slot="accordion"]');
+        if (accordion && !accordion.hasAttribute("data-multiple")) {
+          accordion.querySelectorAll('[data-slot="accordion-item"][data-open]').forEach((other) => {
+            if (other !== item && other.closest('[data-slot="accordion"]') === accordion) closeItem(other);
+          });
+        }
+        openItem(item);
+      } else {
+        closeItem(item);
+      }
+    },
   });
 })();

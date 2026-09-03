@@ -1,8 +1,6 @@
 package radiogroup
 
 import (
-	"bytes"
-	"context"
 	"os"
 	"strings"
 	"testing"
@@ -10,15 +8,8 @@ import (
 
 func TestControlledValueOverridesDefaultValue(t *testing.T) {
 	value := ""
-	var output bytes.Buffer
-	if err := RadioGroup(Props{Value: &value, DefaultValue: "monthly"}).Render(context.Background(), &output); err != nil {
-		t.Fatal(err)
-	}
-	html := output.String()
-	for _, want := range []string{`data-tui-radio-group-controlled`, `data-tui-radio-group-value=""`} {
-		if !strings.Contains(html, want) {
-			t.Fatalf("rendered radio group is missing %q: %s", want, html)
-		}
+	if got := initialValue(Props{Value: &value, DefaultValue: "monthly"}); got != "" {
+		t.Fatalf("explicit empty value must override DefaultValue, got %q", got)
 	}
 }
 
@@ -28,7 +19,7 @@ func TestClientRequestsCancelableValueChanges(t *testing.T) {
 		t.Fatal(err)
 	}
 	js := string(source)
-	for _, want := range []string{`"radio-group-value-change"`, `cancelable: true`, `data-tui-radio-group-controlled`} {
+	for _, want := range []string{`"radio-group-value-change"`, `cancelable: true`, `attributes: ["data-checked"]`} {
 		if !strings.Contains(js, want) {
 			t.Fatalf("client behavior is missing %q", want)
 		}

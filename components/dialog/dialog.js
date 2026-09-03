@@ -15,15 +15,23 @@
   // open time (last = topmost), like Base UI's nested dialog counts.
   const dialogs = new WeakMap();
   const openStack = [];
+  const parentPopups = new WeakMap();
+  const portalOwners = new WeakMap();
+  const CONTENT_SELECTOR = '[data-slot="dialog-content"], [data-slot="alert-dialog-content"], [data-slot="sheet-content"]';
+  const TRIGGER_SELECTOR = '[data-slot="dialog-trigger"], [data-slot="alert-dialog-trigger"], [data-slot="sheet-trigger"]';
+  const CLOSE_SELECTOR = '[data-slot="dialog-close"], [data-slot="alert-dialog-close"], [data-slot="alert-dialog-cancel"], [data-slot="sheet-close"]';
+  const OVERLAY_SELECTOR = '[data-slot="dialog-overlay"], [data-slot="alert-dialog-overlay"], [data-slot="sheet-overlay"]';
+  const TITLE_SELECTOR = '[data-slot="dialog-title"], [data-slot="alert-dialog-title"], [data-slot="sheet-title"]';
+  const DESCRIPTION_SELECTOR = '[data-slot="dialog-description"], [data-slot="alert-dialog-description"], [data-slot="sheet-description"]';
 
   function getDialog(target) {
     if (!target) return null;
     if (typeof target === "string") {
       const el = document.getElementById(target);
-      return el && el.matches("[data-tui-dialog-content]") ? el : null;
+      return el && el.matches(CONTENT_SELECTOR) ? el : null;
     }
-    if (target.matches?.("[data-tui-dialog-content]")) return target;
-    return target.closest?.("[data-tui-dialog-content]") || null;
+    if (target.matches?.(CONTENT_SELECTOR)) return target;
+    return target.closest?.(CONTENT_SELECTOR) || null;
   }
 
   function stateOf(target) {
@@ -32,21 +40,20 @@
   }
 
   function dialogFor(element) {
-    const id =
-      element.getAttribute("aria-controls") || element.getAttribute("data-tui-dialog-target");
+    const id = element.getAttribute("aria-controls");
     if (id) return getDialog(id);
     return getDialog(element);
   }
 
   function triggersFor(popup) {
     if (!popup.id) return [];
-    return document.querySelectorAll(
-      '[data-tui-dialog-trigger][aria-controls="' + popup.id + '"]',
+    return Array.from(document.querySelectorAll(TRIGGER_SELECTOR)).filter(
+      (trigger) => trigger.getAttribute("aria-controls") === popup.id,
     );
   }
 
   function isModal(state) {
-    return state.popup.getAttribute("data-tui-dialog-show-modal") !== "false";
+    return state.popup.getAttribute("aria-modal") !== "false";
   }
 
   // ----- interaction type ----------------------------------------------------
@@ -247,28 +254,20 @@
   // lands in a 0ms timeout: the click's frame paints the enter animation
   // without paying the full-page scrollbar relayout first.
   let lockTimer;
+  const scrollLockOwner = {};
 
   function anyModalOpen() {
-    // The native-dialog selector keeps the shared body lock coordinated with
-    // drawer.js until the drawer is ported to the same DOM scheme.
-    return (
-      openStack.some((state) => isModal(state)) ||
-      !!document.querySelector('dialog[open][data-tui-dialog-show-modal="true"]')
-    );
+    return openStack.some((state) => isModal(state));
   }
 
   function applyScrollLock() {
     lockTimer = undefined;
     if (!anyModalOpen()) return;
-    if (document.body.hasAttribute("data-tui-scroll-locked")) return;
-    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
-    document.body.setAttribute("data-tui-scroll-locked", "");
-    document.body.style.overflow = "hidden";
-    if (scrollbar > 0) document.body.style.paddingRight = scrollbar + "px";
+    window.shadcnTempl.setScrollLocked(scrollLockOwner, true);
   }
 
   function lockScroll() {
-    if (lockTimer !== undefined || document.body.hasAttribute("data-tui-scroll-locked")) return;
+    if (lockTimer !== undefined) return;
     lockTimer = window.setTimeout(applyScrollLock, 0);
   }
 
@@ -276,23 +275,21 @@
     if (anyModalOpen()) return;
     window.clearTimeout(lockTimer);
     lockTimer = undefined;
-    document.body.removeAttribute("data-tui-scroll-locked");
-    document.body.style.overflow = "";
-    document.body.style.paddingRight = "";
+    window.shadcnTempl.setScrollLocked(scrollLockOwner, false);
   }
 
   // ----- aria wiring (useDialogTitle/-Description registration) --------------
 
   function wireAria(state) {
     const popup = state.popup;
-    const title = popup.querySelector("[data-tui-dialog-title]");
+    const title = popup.querySelector(TITLE_SELECTOR);
     if (title) {
       if (!title.id) title.id = popup.id + "-title";
       popup.setAttribute("aria-labelledby", title.id);
     } else {
       popup.removeAttribute("aria-labelledby");
     }
-    const description = popup.querySelector("[data-tui-dialog-description]");
+    const description = popup.querySelector(DESCRIPTION_SELECTOR);
     if (description) {
       if (!description.id) description.id = popup.id + "-description";
       popup.setAttribute("aria-describedby", description.id);
@@ -342,7 +339,7 @@
   // relation is recorded at lift time (see liftTemplates); parentOf resolves
   // it to the parent's live state.
   function parentOf(state) {
-    const parentId = state.root.getAttribute("data-tui-dialog-parent");
+    const parentId = parentPopups.get(state.root);
     return parentId ? stateOf(parentId) : null;
   }
 
@@ -516,7 +513,7 @@
         detail: { open: nextOpen },
       }),
     );
-    if (!accepted || state.popup.hasAttribute("data-tui-dialog-controlled")) return;
+    if (!accepted) return;
     if (nextOpen) openDialog(state.popup, trigger);
     else closeDialog(state.popup);
   }
@@ -538,16 +535,16 @@
     (event) => {
       pressStartedInPopup =
         event.target instanceof Element
-          ? event.target.closest("[data-tui-dialog-content]")
+          ? event.target.closest(CONTENT_SELECTOR)
           : null;
     },
     true,
   );
 
   function handleBackdropClick(backdrop, event) {
-    const state = stateOf(backdrop.parentElement?.querySelector("[data-tui-dialog-content]"));
+    const state = stateOf(backdrop.parentElement?.querySelector(CONTENT_SELECTOR));
     if (!state || !state.open) return;
-    if (state.popup.hasAttribute("data-tui-dialog-disable-dismissible")) return;
+    if (state.popup.getAttribute("data-dismissible") === "false") return;
     if (!isTopmost(state)) return;
     if (event.button !== 0) return;
     if (pressStartedInPopup === state.popup) return;
@@ -605,20 +602,20 @@
     const guard = document.createElement("span");
     guard.setAttribute("tabindex", "0");
     guard.setAttribute("aria-hidden", "true");
-    guard.setAttribute("data-tui-dialog-focus-guard", "");
+    guard.setAttribute("data-floating-ui-focus-guard", "");
     guard.style.cssText =
       "clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0;";
     return guard;
   }
 
   function ensureDialog(root) {
-    const popup = root.querySelector("[data-tui-dialog-content]");
+    const popup = root.querySelector(CONTENT_SELECTOR);
     if (!popup || dialogs.has(popup)) return dialogs.get(popup) || null;
 
     const state = {
       root,
       popup,
-      backdrop: root.querySelector("[data-tui-dialog-backdrop]"),
+      backdrop: root.querySelector(OVERLAY_SELECTOR),
       open: false,
       trigger: null,
       previouslyFocused: null,
@@ -631,7 +628,7 @@
 
     // A nested dialog renders no backdrop in Base UI (DialogBackdrop's
     // enabled: !nested); the parent's backdrop keeps covering the page.
-    if (root.hasAttribute("data-tui-dialog-parent")) {
+    if (parentPopups.has(root)) {
       popup.setAttribute("data-nested", "");
       if (state.backdrop) state.backdrop.hidden = true;
     }
@@ -659,7 +656,7 @@
     });
 
     // FloatingFocusManager restoreFocus="popup": when the focused element is
-    // removed from inside the popup (e.g. an htmx swap of the dialog body),
+    // removed from inside the popup during ordinary DOM replacement,
     // focus falls back to the popup instead of escaping to <body>.
     popup.addEventListener("focusout", (event) => {
       const target = event.target;
@@ -680,13 +677,13 @@
   }
 
   // Fully retire a dialog: undo aria-hidden marking, release the scroll
-  // lock and remove the portaled DOM. Used when an htmx/datastar swap
-  // removed the dialog's source from the page or replaced it with a fresh
+  // lock and remove the portaled DOM when its source is removed from the
+  // page or replaced with a fresh
   // template.
   function destroyDialog(popup) {
     const state = dialogs.get(popup);
     if (!state) {
-      popup.closest("[data-tui-dialog-root]")?.remove();
+      popup.closest(`[data-slot="dialog-root"]`)?.remove();
       return;
     }
     state.finishToken = null;
@@ -706,21 +703,22 @@
   }
 
   // Lift SSR'd portal nodes out of their inert <template> wrappers into
-  // <body>, replacing a stale portaled copy on re-swaps (e.g. htmx). A
+  // <body>, replacing a stale portaled copy after ordinary DOM replacement. A
   // template found inside an already-lifted popup belongs to a dialog that
   // was composed inside that dialog's content: Base UI's nested dialog. The
   // relation is recorded on the root before the move to <body>.
   function liftTemplates() {
     let lifted = false;
-    document.querySelectorAll("template[data-tui-dialog-portal]").forEach((tpl) => {
-      const root = tpl.content.querySelector("[data-tui-dialog-root]");
-      const popup = root?.querySelector("[data-tui-dialog-content]");
+    document.querySelectorAll("template").forEach((tpl) => {
+      const root = tpl.content.querySelector(`[data-slot="dialog-root"]`);
+      const popup = root?.querySelector(CONTENT_SELECTOR);
+      if (!root || !popup) return;
       if (root && popup) {
-        const parentPopup = tpl.closest("[data-tui-dialog-content]");
-        if (parentPopup?.id) root.setAttribute("data-tui-dialog-parent", parentPopup.id);
+        const parentPopup = tpl.closest(CONTENT_SELECTOR);
+        if (parentPopup?.id) parentPopups.set(root, parentPopup.id);
         const stale = document.getElementById(popup.id);
         if (stale) destroyDialog(stale);
-        root._tuiPortalOwner = tpl.parentElement;
+        portalOwners.set(root, tpl.parentElement);
         document.body.appendChild(root);
         lifted = true;
       }
@@ -733,31 +731,29 @@
 
   function init() {
     liftTemplates();
-    document.querySelectorAll("body > [data-tui-dialog-root]").forEach((root) => {
-      const popup = root.querySelector("[data-tui-dialog-content]");
+    document.querySelectorAll('body > [data-slot="dialog-root"]').forEach((root) => {
+      const popup = root.querySelector(CONTENT_SELECTOR);
       if (!popup) {
         root.remove();
         return;
       }
 
       // The unmount half of the React portal pendant: the dialog lives as
-      // long as its SSR declaration site (_tuiPortalOwner) stays in the
+      // long as its server-rendered declaration site stays in the
       // document. Ownership keeps trigger-less programmatic dialogs
       // (dialog.TriggerFor, the command menu) alive and judges swaps
       // without mid-swap trigger heuristics.
       const state = dialogs.get(popup);
       if (state) {
-        if (root._tuiPortalOwner && !root._tuiPortalOwner.isConnected) destroyDialog(popup);
+        const owner = portalOwners.get(root);
+        if (owner && !owner.isConnected) destroyDialog(popup);
         return;
       }
 
       const fresh = ensureDialog(root);
       if (!fresh) return;
 
-      if (popup.getAttribute("data-tui-dialog-initial-open") === "true") {
-        // One-shot: consume the attribute so a later re-init never re-opens
-        // a closed dialog.
-        popup.removeAttribute("data-tui-dialog-initial-open");
+      if (popup.hasAttribute("data-open")) {
         openDialog(popup);
       }
     });
@@ -765,42 +761,42 @@
 
   document.addEventListener("click", (event) => {
     if (!(event.target instanceof Element)) return;
-    const trigger = event.target.closest("[data-tui-dialog-trigger]");
+    const trigger = event.target.closest(TRIGGER_SELECTOR);
     if (trigger) {
       toggleDialog(dialogFor(trigger), trigger);
       return;
     }
-    const closeButton = event.target.closest("[data-tui-dialog-close]");
+    const closeButton = event.target.closest(CLOSE_SELECTOR);
     if (closeButton) {
       requestOpenChange(dialogFor(closeButton), false);
       return;
     }
-    const backdrop = event.target.closest("[data-tui-dialog-backdrop]");
+    const backdrop = event.target.closest(OVERLAY_SELECTOR);
     if (backdrop) {
       handleBackdropClick(backdrop, event);
     }
   });
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => init());
-  } else {
-    init();
-  }
-
-  // Initialize dialogs added later (e.g. swapped in via htmx), so a
-  // server-rendered dialog with Open true still opens. Also retire dialogs
-  // whose source got swapped out of the DOM (releasing the scroll lock and
-  // the aria-hidden marking).
-  new MutationObserver(() => {
-    init();
-    unlockScroll();
-  }).observe(document.body, {
-    childList: true,
-    subtree: true,
+  window.shadcnTempl.lifecycle.register("dialog-content", {
+    selector: CONTENT_SELECTOR,
+    setup() {},
+    attributes: ["data-open"],
+    attributeChanged(popup) {
+      const state = stateOf(popup);
+      if (!state) return;
+      if (popup.hasAttribute("data-open")) openDialog(popup);
+      else closeDialog(popup);
+    },
+  });
+  window.shadcnTempl.lifecycle.register("dialog", {
+    mount: init,
+    unmount() {
+      init();
+      unlockScroll();
+    },
   });
 
-  window.tui = window.tui || {};
-  window.tui.dialog = {
+  window.shadcnTempl.dialog = {
     open: openDialog,
     close: closeDialog,
     toggle: toggleDialog,

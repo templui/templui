@@ -61,9 +61,10 @@ templ SelectAlignItem() {
 				// Toggles the component's real flag (the ContentProps
 				// DisableAlignItemWithTrigger pendant of Base UI's
 				// alignItemWithTrigger prop).
-				const content = document.getElementById("align-item-select");
+				const positioner = document.getElementById("align-item-select");
+				const content = positioner?.querySelector('[data-slot="select-content"]');
 				if (!content) return;
-				content.toggleAttribute("data-tui-select-disable-align-item-with-trigger", !sw.checked);
+				content.setAttribute("data-align-trigger", String(sw.checked));
 			});
 		})();
 	</script>

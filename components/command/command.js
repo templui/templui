@@ -3,11 +3,13 @@
   // base/ui/command.tsx: command-score fuzzy filtering with result sorting,
   // a roving selection, vim bindings and aria-activedescendant wiring.
 
-  const ITEM_SELECTOR = "[data-tui-command-item]";
+  const ITEM_SELECTOR = '[data-slot="command-item"]';
   const VALID_ITEM_SELECTOR = ITEM_SELECTOR + ':not([aria-disabled="true"]):not([hidden])';
-  const GROUP_SELECTOR = "[data-tui-command-group]";
-  const GROUP_ITEMS_SELECTOR = "[data-tui-command-group-items]";
+  const GROUP_SELECTOR = '[data-slot="command-group"]';
+  const GROUP_ITEMS_SELECTOR = "[cmdk-group-items]";
   const GROUP_HEADING_SELECTOR = "[cmdk-group-heading]";
+  const states = new WeakMap();
+  const sourceOrders = new WeakMap();
 
   // ----- command-score ------------------------------------------------------
   // 1:1 port of cmdk's command-score.ts (the default filter).
@@ -133,23 +135,23 @@
   // ----- helpers ------------------------------------------------------------
 
   function rootFor(el) {
-    return el.closest("[data-tui-command]");
+    return el.closest('[data-slot="command"]');
   }
 
   function inputOf(root) {
-    return root.querySelector("[data-tui-command-input]");
+    return root.querySelector('[data-slot="command-input"]');
   }
 
   function listOf(root) {
-    return root.querySelector("[data-tui-command-list]");
+    return root.querySelector('[data-slot="command-list"]');
   }
 
   function sizerOf(root) {
-    return root.querySelector("[data-tui-command-list-sizer]");
+    return root.querySelector("[cmdk-list-sizer]");
   }
 
   function searchOf(root) {
-    return root._tuiCommandSearch || "";
+    return states.get(root)?.search || "";
   }
 
   function valueOf(item) {
@@ -272,7 +274,8 @@
 
   function filterItems(root) {
     const search = searchOf(root);
-    const scores = (root._tuiCommandScores = new Map());
+    const scores = new Map();
+    states.get(root).scores = scores;
     const items = [...root.querySelectorAll(ITEM_SELECTOR)];
     let count = items.length;
 
@@ -296,12 +299,12 @@
     });
 
     // cmdk renders separators only while the search is empty.
-    root.querySelectorAll("[data-tui-command-separator]").forEach((sep) => {
-      sep.hidden = !!search && !sep.hasAttribute("data-tui-command-always-render");
+    root.querySelectorAll('[data-slot="command-separator"]').forEach((sep) => {
+      sep.hidden = !!search && !sep.hasAttribute("data-force-mount");
     });
 
     // Empty renders only at zero results.
-    root.querySelectorAll("[data-tui-command-empty]").forEach((empty) => {
+    root.querySelectorAll('[data-slot="command-empty"]').forEach((empty) => {
       empty.hidden = count !== 0;
     });
   }
@@ -315,12 +318,12 @@
       // cmdk unmounts filtered items and remounts them in source order once
       // the search clears; restoring the recorded order is our equivalent.
       [sizer, ...root.querySelectorAll(GROUP_ITEMS_SELECTOR)].forEach((container) => {
-        (container._tuiCommandOrder || []).forEach((child) => container.appendChild(child));
+        (sourceOrders.get(container) || []).forEach((child) => container.appendChild(child));
       });
       return;
     }
 
-    const scores = root._tuiCommandScores || new Map();
+    const scores = states.get(root)?.scores || new Map();
 
     // Sort the items within their group (or the list) by score.
     getValidItems(root)
@@ -330,7 +333,7 @@
         if (group) {
           group.appendChild(item.parentElement === group ? item : item.closest(GROUP_ITEMS_SELECTOR + " > *"));
         } else {
-          sizer.appendChild(item.parentElement === sizer ? item : item.closest("[data-tui-command-list-sizer] > *"));
+          sizer.appendChild(item.parentElement === sizer ? item : item.closest("[cmdk-list-sizer] > *"));
         }
       });
 
@@ -351,7 +354,7 @@
   }
 
   function onSearchChange(root, search) {
-    root._tuiCommandSearch = search;
+    states.get(root).search = search;
     // cmdk: filter synchronously, sort, then select the first item.
     filterItems(root);
     sort(root);
@@ -361,9 +364,7 @@
   // ----- setup ---------------------------------------------------------------
 
   function setup(root) {
-    if (root._tuiCommandInit) return;
-    root._tuiCommandInit = true;
-    root._tuiCommandSearch = "";
+    states.set(root, { search: "", scores: new Map() });
 
     // cmdk infers a missing value from the rendered textContent, and every
     // item needs an id for aria-activedescendant.
@@ -379,31 +380,26 @@
     // Record source order so clearing the search can undo result sorting.
     const sizer = sizerOf(root);
     [sizer, ...root.querySelectorAll(GROUP_ITEMS_SELECTOR)].forEach((container) => {
-      if (container) container._tuiCommandOrder = [...container.children];
+      if (container) sourceOrders.set(container, [...container.children]);
     });
 
     // cmdk selects the first item on mount and scrolls it into view.
     selectFirstItem(root);
   }
 
-  function init() {
-    document.querySelectorAll("[data-tui-command]").forEach(setup);
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
-  // does not fire in hidden tabs or throttled iframes): swapped-in markup
-  // wires itself.
-  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+  window.shadcnTempl.lifecycle.register("command", {
+    selector: '[data-slot="command"]',
+    setup,
+  });
+  window.shadcnTempl.lifecycle.register("command-separator", {
+    selector: '[data-slot="command-separator"]',
+    setup() {},
+  });
 
   // ----- events -------------------------------------------------------------
 
   document.addEventListener("input", (e) => {
-    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-command-input")) return;
+    if (!(e.target instanceof Element) || !e.target.matches('[data-slot="command-input"]')) return;
     const root = rootFor(e.target);
     if (root) onSearchChange(root, e.target.value);
   });
@@ -500,7 +496,7 @@
   // bubbling dialog-close event once the dialog finished closing.
   document.addEventListener("dialog-close", (e) => {
     if (!(e.target instanceof Element)) return;
-    e.target.querySelectorAll("[data-tui-command]").forEach((root) => {
+    e.target.querySelectorAll('[data-slot="command"]').forEach((root) => {
       const input = inputOf(root);
       if (input) input.value = "";
       onSearchChange(root, "");

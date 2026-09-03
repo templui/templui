@@ -9,12 +9,12 @@
 
   function inputOf(root) {
     const next = root.nextElementSibling;
-    return next && next.matches("[data-tui-checkbox-input]") ? next : null;
+    return next && next.matches('input[type="checkbox"]') ? next : null;
   }
 
   function rootOf(input) {
     const prev = input.previousElementSibling;
-    return prev && prev.matches("[data-tui-checkbox]") ? prev : null;
+    return prev && prev.matches('[data-slot="checkbox"]') ? prev : null;
   }
 
   function isDisabled(root, input) {
@@ -71,7 +71,7 @@
       detail: { checked: nextChecked },
     });
     root.dispatchEvent(change);
-    if (change.defaultPrevented || root.hasAttribute("data-tui-checkbox-controlled")) return;
+    if (change.defaultPrevented) return;
     forwardClick(input, sourceEvent);
   }
 
@@ -79,7 +79,7 @@
   // otherwise forward it to the input a second time) and toggle through the
   // hidden input so the native change event fires.
   document.addEventListener("click", (e) => {
-    const root = e.target.closest && e.target.closest("[data-tui-checkbox]");
+    const root = e.target.closest && e.target.closest('[data-slot="checkbox"]');
     if (!root) return;
     const input = inputOf(root);
     if (!input) return;
@@ -95,14 +95,14 @@
 
   document.addEventListener("change", (e) => {
     const input = e.target;
-    if (!input.matches || !input.matches("[data-tui-checkbox-input]")) return;
+    if (!input.matches || !rootOf(input)) return;
     const root = rootOf(input);
     if (root) sync(root, input);
   });
 
   document.addEventListener("keydown", (e) => {
     const root = e.target;
-    if (!root.matches || !root.matches("[data-tui-checkbox]")) return;
+    if (!root.matches || !root.matches('[data-slot="checkbox"]')) return;
     const input = inputOf(root);
     if (isDisabled(root, input)) return;
     if (e.key === "Enter") {
@@ -130,7 +130,7 @@
   // click handler above forwards to the input.
   document.addEventListener("keyup", (e) => {
     const root = e.target;
-    if (!root.matches || !root.matches("[data-tui-checkbox]")) return;
+    if (!root.matches || !root.matches('[data-slot="checkbox"]')) return;
     if (e.key !== " " || e.defaultPrevented) return;
     if (isDisabled(root, inputOf(root))) return;
     forwardClick(root, e);
@@ -140,7 +140,7 @@
   // the root (CheckboxRoot's input onFocus).
   document.addEventListener("focusin", (e) => {
     const input = e.target;
-    if (!input.matches || !input.matches("[data-tui-checkbox-input]")) return;
+    if (!input.matches || !rootOf(input)) return;
     const root = rootOf(input);
     if (root) root.focus();
   });
@@ -148,8 +148,6 @@
   let labelId = 0;
 
   function setup(root) {
-    if (root.hasAttribute("data-tui-checkbox-initialized")) return;
-    root.setAttribute("data-tui-checkbox-initialized", "");
     const input = inputOf(root);
     if (!input) return;
     // SSR'd mixed state: the input element has no indeterminate attribute,
@@ -160,7 +158,8 @@
     // The clicks dispatched on the hidden input are an implementation detail
     // and must not reach ancestors, which already receive the original click
     // (CheckboxRoot's input onClick).
-    input.addEventListener("click", (e) => e.stopPropagation());
+    const stopClick = (e) => e.stopPropagation();
+    input.addEventListener("click", stopClick);
     // useAriaLabelledBy fallback: the span control is labelled by the native
     // label associated with the hidden input.
     if (!root.hasAttribute("aria-labelledby") && !root.hasAttribute("aria-label")) {
@@ -171,22 +170,41 @@
       if (label) {
         if (!label.id) {
           labelId += 1;
-          label.id = (input.id || "tui-checkbox-" + labelId) + "-label";
+          label.id = (input.id || "checkbox-" + labelId) + "-label";
         }
         root.setAttribute("aria-labelledby", label.id);
       }
     }
     sync(root, input);
+    const unwatchChecked = window.shadcnTempl.lifecycle.watchProperty(
+      input,
+      "checked",
+      () => sync(root, input),
+    );
+    const unwatchIndeterminate = window.shadcnTempl.lifecycle.watchProperty(
+      input,
+      "indeterminate",
+      () => sync(root, input),
+    );
+    return () => {
+      input.removeEventListener("click", stopClick);
+      unwatchChecked?.();
+      unwatchIndeterminate?.();
+    };
   }
 
-  function init() {
-    document.querySelectorAll("[data-tui-checkbox]").forEach(setup);
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+  window.shadcnTempl.lifecycle.register("checkbox", {
+    selector: '[data-slot="checkbox"]',
+    setup,
+    attributes: ["data-checked", "data-indeterminate"],
+    attributeChanged(root) {
+      const input = inputOf(root);
+      if (!input) return;
+      const checked = root.hasAttribute("data-checked");
+      const indeterminate = root.hasAttribute("data-indeterminate");
+      if (input.checked !== checked) input.checked = checked;
+      if (input.indeterminate !== indeterminate) input.indeterminate = indeterminate;
+      sync(root, input);
+    },
+  });
 })();

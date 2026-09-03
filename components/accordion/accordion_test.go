@@ -1,24 +1,24 @@
 package accordion
 
 import (
-	"bytes"
-	"context"
 	"os"
 	"strings"
 	"testing"
 )
 
-func TestRootOwnsInitialAndControlledValues(t *testing.T) {
-	controlled := []string{}
-	var output bytes.Buffer
-	if err := Accordion(Props{Value: controlled, DefaultValue: []string{"item-1"}}).Render(context.Background(), &output); err != nil {
+func TestRootUsesPublicItemStateOnly(t *testing.T) {
+	source, err := os.ReadFile("accordion.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
-	html := output.String()
-	for _, want := range []string{`data-tui-accordion`, `data-tui-accordion-controlled`, `data-tui-accordion-value=""`} {
-		if !strings.Contains(html, want) {
-			t.Fatalf("rendered accordion is missing %q: %s", want, html)
+	templ := string(source)
+	for _, want := range []string{`data-slot="accordion"`, `data-slot="accordion-item"`, `data-open?={ open }`} {
+		if !strings.Contains(templ, want) {
+			t.Fatalf("accordion template is missing %q", want)
 		}
+	}
+	if strings.Contains(templ, "data-accordion-controlled") {
+		t.Fatal("accordion template leaks private state ownership into HTML")
 	}
 }
 
@@ -28,7 +28,7 @@ func TestClientRequestsCancelableValueChanges(t *testing.T) {
 		t.Fatal(err)
 	}
 	js := string(source)
-	for _, want := range []string{`new CustomEvent("accordion-value-change"`, `cancelable: true`, `data-tui-accordion-controlled`} {
+	for _, want := range []string{`new CustomEvent("accordion-value-change"`, `cancelable: true`, `attributes: ["data-open"]`} {
 		if !strings.Contains(js, want) {
 			t.Fatalf("client behavior is missing %q", want)
 		}

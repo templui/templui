@@ -30,8 +30,8 @@ templ FieldSlider() {
 		(() => {
 			const root = document.getElementById("field-slider");
 			root.addEventListener("slider-change", (e) => {
-				document.getElementById("field-slider-min").textContent = e.detail.values[0];
-				document.getElementById("field-slider-max").textContent = e.detail.values[1];
+				document.getElementById("field-slider-min").textContent = e.detail.value[0];
+				document.getElementById("field-slider-max").textContent = e.detail.value[1];
 			});
 		})();
 	</script>

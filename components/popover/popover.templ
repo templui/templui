@@ -2,7 +2,7 @@ package popover
 
 import (
 	"context"
-	"strconv"
+	"fmt"
 
 	"github.com/axadrn/shadcn-templ/v2/utils"
 )
@@ -31,7 +31,6 @@ const stateKey ctxKey = "popoverState"
 type ctxState struct {
 	id          string
 	initialOpen bool
-	controlled  bool
 }
 
 func state(ctx context.Context) ctxState {
@@ -45,10 +44,10 @@ func state(ctx context.Context) ctxState {
 // into the popover trigger — the asChild equivalent: no wrapper element.
 func Trigger(ctx context.Context) templ.Attributes {
 	return templ.Attributes{
-		"data-tui-popover-trigger": true,
-		"aria-controls":            state(ctx).id,
-		"aria-haspopup":            "dialog",
-		"aria-expanded":            "false",
+		"data-slot":     "popover-trigger",
+		"aria-controls": state(ctx).id,
+		"aria-haspopup": "dialog",
+		"aria-expanded": "false",
 	}
 }
 
@@ -110,7 +109,7 @@ templ Popover(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, initialOpen: initialOpen(p), controlled: p.Open != nil}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, initialOpen: initialOpen(p)}) }}
 	{ children... }
 }
 
@@ -134,27 +133,23 @@ templ Content(props ...ContentProps) {
 	}}
 	// Inert until the script portals it to <body> at init, so the SSRd
 	// content never participates in layout or sibling CSS.
-	<template data-tui-popover-portal>
+	<template>
 		<div
 			id={ s.id }
-			data-tui-popover-content
-			data-tui-popover-side={ string(p.Side) }
-			data-tui-popover-align={ string(p.Align) }
-			data-tui-popover-side-offset={ strconv.Itoa(sideOffset) }
-			data-tui-popover-initial-open={ strconv.FormatBool(s.initialOpen) }
-			data-tui-popover-controlled?={ s.controlled }
-			if p.AlignOffset != 0 {
-				data-tui-popover-align-offset={ strconv.Itoa(p.AlignOffset) }
-			}
-			data-closed
+			data-slot="popover-positioner"
+			data-side={ string(p.Side) }
+			data-align={ string(p.Align) }
+			data-side-offset={ fmt.Sprintf("%g", sideOffset) }
+			data-align-offset={ fmt.Sprintf("%g", p.AlignOffset) }
+			data-open?={ s.initialOpen }
+			data-closed?={ !s.initialOpen }
 			hidden
-			data-tui-portal
 			class="pointer-events-none isolate absolute inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
 		>
 			<div
 				data-slot="popover-content"
-				data-tui-popover-popup
-				data-closed
+				data-open?={ s.initialOpen }
+				data-closed?={ !s.initialOpen }
 				role="dialog"
 				tabindex="-1"
 				class={

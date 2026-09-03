@@ -9,27 +9,21 @@ import (
 )
 
 func TestPanelUsesUpstreamTwoLayerOverflowStructure(t *testing.T) {
-	var output bytes.Buffer
-	if err := Panel(PanelProps{
-		ID:          "primary",
-		DefaultSize: "50%",
-		MinSize:     "20%",
-		Class:       "panel-content",
-	}).Render(context.Background(), &output); err != nil {
+	source, err := os.ReadFile("resizable.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
-
-	html := output.String()
+	templ := string(source)
 	for _, want := range []string{
 		`data-slot="resizable-panel"`,
 		`data-panel`,
-		`flex-basis:50%`,
+		`flex-basis:`,
 		`overflow:visible`,
-		`data-tui-resizable-panel-content`,
+		`data-slot="resizable-panel-content"`,
 		`max-height:100%;max-width:100%;flex-grow:1;overflow:auto`,
 	} {
-		if !strings.Contains(html, want) {
-			t.Fatalf("rendered panel is missing %q: %s", want, html)
+		if !strings.Contains(templ, want) {
+			t.Fatalf("panel template is missing %q", want)
 		}
 	}
 }

@@ -198,7 +198,7 @@ in a `sidebar.Inset` component.
 
 ## useSidebar
 
-The `window.tui.sidebar` API is the `useSidebar` pendant and is used to control the sidebar.
+The `window.shadcnTempl.sidebar` API is the `useSidebar` pendant and is used to control the sidebar.
 
 ```js showLineNumbers
 const {
@@ -209,7 +209,7 @@ const {
 	setOpenMobile,
 	isMobile,
 	toggleSidebar,
-} = window.tui.sidebar
+} = window.shadcnTempl.sidebar
 ```
 
 | Property        | Type                        | Description                                   |
@@ -418,7 +418,7 @@ The `sidebar.MenuSkeleton` component is used to render a skeleton for a `sidebar
 Use the `sidebar.Trigger` component to render a button that toggles the sidebar.
 
 ```templ showLineNumbers
-<button onclick="window.tui.sidebar.toggleSidebar()">Toggle Sidebar</button>
+<button onclick="window.shadcnTempl.sidebar.toggleSidebar()">Toggle Sidebar</button>
 ```
 
 ## SidebarRail

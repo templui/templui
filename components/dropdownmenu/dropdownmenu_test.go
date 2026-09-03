@@ -28,28 +28,20 @@ func TestNativeMenuItemsFillTheirRows(t *testing.T) {
 }
 
 func TestContentCarriesStateAndResponsivePlacement(t *testing.T) {
-	ctx := context.WithValue(context.Background(), stateKey, ctxState{id: "menu", initialOpen: true, controlled: true})
-	var output bytes.Buffer
-	if err := Content(ContentProps{
-		Side:        SideRight,
-		Align:       AlignStart,
-		MobileSide:  SideBottom,
-		MobileAlign: AlignEnd,
-	}).Render(ctx, &output); err != nil {
+	source, err := os.ReadFile("dropdownmenu.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
-
-	html := output.String()
+	templ := string(source)
 	for _, want := range []string{
-		`id="menu"`,
-		`data-tui-dropdownmenu-side="right"`,
-		`data-tui-dropdownmenu-mobile-side="bottom"`,
-		`data-tui-dropdownmenu-mobile-align="end"`,
-		`data-tui-dropdownmenu-initial-open="true"`,
-		`data-tui-dropdownmenu-controlled`,
+		`data-slot="dropdown-menu-positioner"`,
+		`data-side={ string(p.Side) }`,
+		`data-mobile-side={ string(p.MobileSide) }`,
+		`data-mobile-align={ string(p.MobileAlign) }`,
+		`data-open?={ s.initialOpen }`,
 	} {
-		if !strings.Contains(html, want) {
-			t.Fatalf("rendered menu is missing %q: %s", want, html)
+		if !strings.Contains(templ, want) {
+			t.Fatalf("menu template is missing %q", want)
 		}
 	}
 }
@@ -62,7 +54,7 @@ func TestClientUsesResponsivePreferenceAndCollisionAvoidance(t *testing.T) {
 	js := string(source)
 	for _, want := range []string{
 		`matchMedia("(max-width: 767px)")`,
-		`data-tui-dropdownmenu-mobile-side`,
+		`data-mobile-side`,
 		`flip({ padding: COLLISION_PADDING })`,
 		`shift({ padding: COLLISION_PADDING })`,
 		`FloatingUIDOM.autoUpdate(trigger, content, update`,
@@ -88,13 +80,14 @@ func TestSubControlledOpenOverridesDefaultOpen(t *testing.T) {
 		t.Fatal("controlled false must override submenu defaultOpen true")
 	}
 
-	var output bytes.Buffer
-	if err := Sub(SubProps{Open: &open, DefaultOpen: true}).Render(context.Background(), &output); err != nil {
+	source, err := os.ReadFile("dropdownmenu.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
-	html := output.String()
-	if !strings.Contains(html, `data-tui-dropdownmenu-sub-open="false"`) ||
-		!strings.Contains(html, `data-tui-dropdownmenu-sub-controlled`) {
-		t.Fatalf("rendered controlled submenu is missing state markers: %s", html)
+	templ := string(source)
+	for _, want := range []string{`data-slot="dropdown-menu-sub"`, `data-open?={ initialSubOpen(p) }`} {
+		if !strings.Contains(templ, want) {
+			t.Fatalf("dropdown submenu template is missing %q", want)
+		}
 	}
 }

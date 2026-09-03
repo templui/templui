@@ -8,7 +8,7 @@
      app/(app)/(create)/lib/fonts.ts           -> FONTS order, FONT_HEADING_OPTIONS
      lib/font-definitions.ts                   -> per-font family/variables/dependency
      app/(app)/(create)/lib/randomize-biases.ts -> CHART_COLOR_PAIRINGS, RANDOMIZE_BIASES, applyBias
-   Theme variable sets live in create-themes.js (window.tuiCreateThemes). */
+   Theme variable sets live in create-themes.js (window.shadcnTempl.createThemes). */
 (function () {
   "use strict";
 
@@ -703,11 +703,11 @@
     return biasFilter(items, context);
   }
 
-  // registry/config.ts getThemesForBaseColor, over window.tuiCreateThemes.
+  // registry/config.ts getThemesForBaseColor, over window.shadcnTempl.createThemes.
   function getThemesForBaseColor(baseColorName) {
     const baseColorNames = BASE_COLORS;
 
-    return window.tuiCreateThemes.filter((theme) => {
+    return window.shadcnTempl.createThemes.filter((theme) => {
       if (theme.name === baseColorName) {
         return true;
       }
@@ -733,7 +733,7 @@
   };
 
   if (typeof window !== "undefined") {
-    window.tuiCreateConfig = api;
+    window.shadcnTempl = window.shadcnTempl || {}; window.shadcnTempl.createConfig = api;
   }
   if (typeof module !== "undefined" && module.exports) {
     module.exports = api;

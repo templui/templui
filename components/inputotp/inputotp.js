@@ -4,24 +4,16 @@
   // Pendant of the input-otp library: one invisible real input over the
   // container drives everything, the slots only display state.
 
-  function roots() {
-    return document.querySelectorAll("[data-tui-inputotp]");
-  }
-
   function inputOf(root) {
-    return root.querySelector("[data-tui-inputotp-input]");
+    return root.querySelector('[data-slot="input-otp-input"]');
   }
 
   function slotsOf(root) {
-    return Array.from(root.querySelectorAll("[data-tui-inputotp-slot]")).sort(
-      (a, b) =>
-        parseInt(a.getAttribute("data-tui-inputotp-index")) -
-        parseInt(b.getAttribute("data-tui-inputotp-index")),
-    );
+    return Array.from(root.querySelectorAll('[data-slot="input-otp-slot"]'));
   }
 
   function sanitize(root, value) {
-    const pattern = root.getAttribute("data-tui-inputotp-pattern");
+    const pattern = inputOf(root)?.pattern;
     let out = "";
     for (const ch of value) {
       if (!pattern || new RegExp(pattern).test(ch)) out += ch;
@@ -74,9 +66,9 @@
     const start = input.selectionStart;
     const end = input.selectionEnd;
     slots.forEach((slot, i) => {
-      const charEl = slot.querySelector("[data-tui-inputotp-char]");
+      const charEl = slot.querySelector(".cn-input-otp-char");
       if (charEl) charEl.textContent = value[i] || "";
-      const caretEl = slot.querySelector("[data-tui-inputotp-caret]");
+      const caretEl = slot.querySelector(".cn-input-otp-caret");
       let active = false;
       if (focused) {
         if (start === end) {
@@ -96,34 +88,36 @@
   }
 
   function initRoot(root) {
-    if (root.dataset.tuiInputotpInit === "true") return;
-    root.dataset.tuiInputotpInit = "true";
     const input = inputOf(root);
     if (!input) return;
     input.maxLength = slotsOf(root).length;
     input.value = sanitize(root, input.value);
+    root.setAttribute("data-value", input.value);
     render(root);
-  }
-
-  function init() {
-    roots().forEach(initRoot);
+    return window.shadcnTempl.lifecycle.watchProperty(input, "value", () => {
+      const value = sanitize(root, input.value);
+      if (input.value !== value) input.value = value;
+      root.setAttribute("data-value", value);
+      render(root);
+    });
   }
 
   document.addEventListener("input", (e) => {
-    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-inputotp-input")) return;
-    const root = e.target.closest("[data-tui-inputotp]");
+    if (!(e.target instanceof Element) || !e.target.matches('[data-slot="input-otp-input"]')) return;
+    const root = e.target.closest('[data-slot="input-otp"]');
     const clean = sanitize(root, e.target.value);
     if (clean !== e.target.value) {
       e.target.value = clean;
     }
+    root.setAttribute("data-value", clean);
     normalizeSelection(root);
     render(root);
   });
 
   document.addEventListener("focusin", (e) => {
-    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-inputotp-input")) return;
+    if (!(e.target instanceof Element) || !e.target.matches('[data-slot="input-otp-input"]')) return;
     const input = e.target;
-    const root = input.closest("[data-tui-inputotp]");
+    const root = input.closest('[data-slot="input-otp"]');
     forceEndSelection(root);
     render(root);
     // Chrome restores the previous caret position right after focus,
@@ -138,9 +132,9 @@
 
   // Arrow navigation moves the single-character selection like input-otp.
   document.addEventListener("keydown", (e) => {
-    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-inputotp-input")) return;
+    if (!(e.target instanceof Element) || !e.target.matches('[data-slot="input-otp-input"]')) return;
     const input = e.target;
-    const root = input.closest("[data-tui-inputotp]");
+    const root = input.closest('[data-slot="input-otp"]');
     const max = slotsOf(root).length;
     const len = input.value.length;
     const start = input.selectionStart || 0;
@@ -172,15 +166,15 @@
   });
 
   document.addEventListener("focusout", (e) => {
-    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-inputotp-input")) return;
-    render(e.target.closest("[data-tui-inputotp]"));
+    if (!(e.target instanceof Element) || !e.target.matches('[data-slot="input-otp-input"]')) return;
+    render(e.target.closest('[data-slot="input-otp"]'));
   });
 
   // Pointer presses always land on the invisible input; defer so the
   // browser's own caret placement is overridden.
   document.addEventListener("pointerup", (e) => {
-    if (!(e.target instanceof Element) || !e.target.hasAttribute("data-tui-inputotp-input")) return;
-    const root = e.target.closest("[data-tui-inputotp]");
+    if (!(e.target instanceof Element) || !e.target.matches('[data-slot="input-otp-input"]')) return;
+    const root = e.target.closest('[data-slot="input-otp"]');
     requestAnimationFrame(() => {
       forceEndSelection(root);
       render(root);
@@ -189,19 +183,23 @@
 
   document.addEventListener("selectionchange", () => {
     const el = document.activeElement;
-    if (!(el instanceof Element) || !el.hasAttribute("data-tui-inputotp-input")) return;
-    const root = el.closest("[data-tui-inputotp]");
+    if (!(el instanceof Element) || !el.matches('[data-slot="input-otp-input"]')) return;
+    const root = el.closest('[data-slot="input-otp"]');
     normalizeSelection(root);
     render(root);
   });
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
-  // does not fire in hidden tabs or throttled iframes): swapped-in markup
-  // wires itself.
-  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+  window.shadcnTempl.lifecycle.register("input-otp", {
+    selector: '[data-slot="input-otp"]',
+    setup: initRoot,
+    attributes: ["data-value"],
+    attributeChanged(root) {
+      const input = inputOf(root);
+      if (!input) return;
+      const value = sanitize(root, root.getAttribute("data-value") || "");
+      if (input.value !== value) input.value = value;
+      if (root.getAttribute("data-value") !== value) root.setAttribute("data-value", value);
+      render(root);
+    },
+  });
 })();

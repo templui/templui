@@ -36,17 +36,15 @@ type ctxKey string
 const stateKey ctxKey = "selectState"
 
 type ctxState struct {
-	id              string
-	name            string
-	value           string
-	valueControlled bool
-	initialOpen     bool
-	openMethod      OpenMethod
-	openControlled  bool
-	disabled        bool
-	readOnly        bool
-	required        bool
-	form            string
+	id          string
+	name        string
+	value       string
+	initialOpen bool
+	openMethod  OpenMethod
+	disabled    bool
+	readOnly    bool
+	required    bool
+	form        string
 }
 
 func state(ctx context.Context) ctxState {
@@ -103,6 +101,9 @@ type TriggerProps struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
+	// InputAttributes are applied to the native hidden form input when Name
+	// is set. Put native form or reactive bindings here.
+	InputAttributes templ.Attributes
 	// Size of the trigger. Options: 'default' (h-8), 'sm' (h-7).
 	Size Size
 }
@@ -164,7 +165,7 @@ templ Select(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, name: p.Name, value: initialValue(p), valueControlled: p.Value != nil, initialOpen: initialOpen(p), openMethod: initialOpenMethod(p), openControlled: p.Open != nil, disabled: p.Disabled, readOnly: p.ReadOnly, required: p.Required, form: p.Form}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, name: p.Name, value: initialValue(p), initialOpen: initialOpen(p), openMethod: initialOpenMethod(p), disabled: p.Disabled, readOnly: p.ReadOnly, required: p.Required, form: p.Form}) }}
 	{ children... }
 }
 
@@ -182,12 +183,13 @@ templ Trigger(props ...TriggerProps) {
 			type="hidden"
 			name={ s.name }
 			value={ s.value }
+			data-slot="select-input"
 			if s.form != "" {
 				form={ s.form }
 			}
-			data-tui-select-input
 			aria-hidden="true"
 			tabindex="-1"
+			{ p.InputAttributes... }
 		/>
 	}
 	<button
@@ -196,7 +198,7 @@ templ Trigger(props ...TriggerProps) {
 			id={ p.ID }
 		}
 		data-slot="select-trigger"
-		data-tui-select-trigger
+		data-value={ s.value }
 		data-size={ string(p.Size) }
 		role="combobox"
 		aria-controls={ s.id }
@@ -204,7 +206,6 @@ templ Trigger(props ...TriggerProps) {
 		aria-expanded="false"
 		aria-readonly?={ s.readOnly }
 		aria-required?={ s.required }
-		data-tui-select-value-controlled?={ s.valueControlled }
 		if s.value == "" {
 			data-placeholder
 		}
@@ -231,8 +232,6 @@ templ Value(props ...ValueProps) {
 	}
 	<span
 		data-slot="select-value"
-		data-tui-select-value
-		data-tui-select-placeholder={ p.Placeholder }
 		class={ utils.CN("cn-select-value", p.Class) }
 		{ p.Attributes... }
 	>
@@ -251,29 +250,26 @@ templ Content(props ...ContentProps) {
 	{{ s := state(ctx) }}
 	// Inert until the script portals it to <body> at init, so the SSRd
 	// content never participates in layout or sibling CSS.
-	<template data-tui-select-portal>
+	<template data-slot="select-portal">
 		<div
 			id={ s.id }
-			data-tui-select-content
-			data-tui-portal
-			data-tui-select-disable-align-item-with-trigger?={ p.DisableAlignItemWithTrigger }
-			data-tui-select-align={ string(p.Align) }
-			data-tui-select-initial-open={ utils.IfElse(s.initialOpen, "true", "false") }
-			data-tui-select-initial-open-method={ string(s.openMethod) }
-			data-tui-select-open-controlled?={ s.openControlled }
-			data-closed
+			data-slot="select-positioner"
+			data-align={ string(p.Align) }
+			data-open-method={ string(s.openMethod) }
+			data-open?={ s.initialOpen }
+			data-closed?={ !s.initialOpen }
 			hidden
 			class="pointer-events-none isolate fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent p-0"
 		>
 			<div
 				data-slot="select-content"
-				data-tui-select-popup
 				if p.DisableAlignItemWithTrigger {
 					data-align-trigger="false"
 				} else {
 					data-align-trigger="true"
 				}
-				data-closed
+				data-open?={ s.initialOpen }
+				data-closed?={ !s.initialOpen }
 				role="listbox"
 				class={
 					utils.CN(
@@ -289,13 +285,13 @@ templ Content(props ...ContentProps) {
 				}
 				{ p.Attributes... }
 			>
-				<div data-slot="select-scroll-up-button" data-tui-select-scroll-up class="cn-select-scroll-up-button top-0 w-full absolute hidden">
+				<div data-slot="select-scroll-up-button" class="cn-select-scroll-up-button top-0 w-full absolute hidden">
 					@icon.ChevronUp()
 				</div>
-				<div data-tui-select-viewport class="relative flex-1 overflow-x-hidden overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+				<div data-slot="select-viewport" class="relative flex-1 overflow-x-hidden overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 					{ children... }
 				</div>
-				<div data-slot="select-scroll-down-button" data-tui-select-scroll-down class="cn-select-scroll-down-button bottom-0 w-full absolute hidden">
+				<div data-slot="select-scroll-down-button" class="cn-select-scroll-down-button bottom-0 w-full absolute hidden">
 					@icon.ChevronDown()
 				</div>
 			</div>
@@ -352,10 +348,9 @@ templ Item(props ...ItemProps) {
 		role="option"
 		tabindex="-1"
 		data-slot="select-item"
-		data-tui-select-item
-		data-tui-select-value={ p.Value }
+		data-value={ p.Value }
 		if p.Label != "" {
-			data-tui-select-label={ p.Label }
+			data-label={ p.Label }
 		}
 		if selected {
 			data-selected
@@ -381,7 +376,7 @@ templ Item(props ...ItemProps) {
 		}
 		{ p.Attributes... }
 	>
-		<span data-tui-select-item-text class="cn-select-item-text shrink-0 whitespace-nowrap">
+		<span data-slot="select-item-text" class="cn-select-item-text shrink-0 whitespace-nowrap">
 			{ children... }
 		</span>
 		<span class="cn-select-item-indicator opacity-0 group-data-selected/select-item:opacity-100">

@@ -1,25 +1,18 @@
 package togglegroup
 
 import (
-	"bytes"
-	"context"
 	"os"
 	"strings"
 	"testing"
 )
 
-func TestControlledValueOverridesDefaultValue(t *testing.T) {
-	value := []string{}
-	var output bytes.Buffer
-	if err := ToggleGroup(Props{Value: value, DefaultValue: []string{"bold"}}).Render(context.Background(), &output); err != nil {
+func TestTemplateHasNoPrivateControlMarker(t *testing.T) {
+	source, err := os.ReadFile("togglegroup.templ")
+	if err != nil {
 		t.Fatal(err)
 	}
-	html := output.String()
-	if !strings.Contains(html, `data-tui-toggle-group-controlled`) {
-		t.Fatalf("rendered ToggleGroup is missing controlled marker: %s", html)
-	}
-	if strings.Contains(html, `data-tui-toggle-group-value="bold"`) {
-		t.Fatalf("controlled empty value must override the default: %s", html)
+	if strings.Contains(string(source), "data-toggle-group-controlled") {
+		t.Fatal("toggle group state ownership must not leak into private DOM markers")
 	}
 }
 
@@ -33,7 +26,7 @@ func TestClientRequestsCancelableGroupValueChanges(t *testing.T) {
 		`new CustomEvent("toggle-group-value-change"`,
 		`cancelable: true`,
 		`detail: { value: groupValue }`,
-		`group.hasAttribute("data-tui-toggle-group-controlled")`,
+		`attributes: ["data-pressed"]`,
 	} {
 		if !strings.Contains(js, want) {
 			t.Fatalf("client behavior is missing %q", want)

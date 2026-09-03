@@ -42,6 +42,10 @@ type Props struct {
 	ID         string
 	Class      string
 	Attributes templ.Attributes
+	// InputAttributes and EndInputAttributes are applied to the native hidden
+	// form inputs. Put native form or reactive bindings here.
+	InputAttributes    templ.Attributes
+	EndInputAttributes templ.Attributes
 	// Mode: 'single' (default) or 'range'.
 	Mode Mode
 	// CaptionLayout: 'label' (default) or 'dropdown'.
@@ -131,37 +135,36 @@ templ Calendar(props ...Props) {
 	<div
 		id={ p.ID }
 		data-slot="calendar"
-		data-tui-calendar
-		data-tui-calendar-mode={ string(p.Mode) }
-		data-tui-calendar-locale={ p.Locale }
-		data-tui-calendar-week-starts-on={ strconv.Itoa(int(p.WeekStartsOn)) }
-		data-tui-calendar-month={ view.Format("2006-01-02") }
+		data-mode={ string(p.Mode) }
+		data-locale={ p.Locale }
+		data-week-starts-on={ strconv.Itoa(int(p.WeekStartsOn)) }
+		data-month={ view.Format("2006-01-02") }
 		if selectedISO != "" {
-			data-tui-calendar-selected={ selectedISO }
+			data-selected={ selectedISO }
 		}
 		if endISO != "" {
-			data-tui-calendar-end={ endISO }
+			data-range-end={ endISO }
 		}
 		if p.HideOutsideDays {
-			data-tui-calendar-outside-days="false"
+			data-outside-days="false"
 		}
 		if p.FixedWeeks {
-			data-tui-calendar-fixed-weeks
+			data-fixed-weeks
 		}
 		if p.ShowWeekNumber {
-			data-tui-calendar-week-number
+			data-week-number
 		}
 		if !p.MinDate.IsZero() {
-			data-tui-calendar-min={ p.MinDate.Format("2006-01-02") }
+			data-min={ p.MinDate.Format("2006-01-02") }
 		}
 		if !p.MaxDate.IsZero() {
-			data-tui-calendar-max={ p.MaxDate.Format("2006-01-02") }
+			data-max={ p.MaxDate.Format("2006-01-02") }
 		}
 		if len(p.Disabled) > 0 {
-			data-tui-calendar-disabled={ isoList(p.Disabled) }
+			data-disabled-dates={ isoList(p.Disabled) }
 		}
 		if len(p.BookedDates) > 0 {
-			data-tui-calendar-booked-dates={ isoList(p.BookedDates) }
+			data-booked-dates={ isoList(p.BookedDates) }
 		}
 		class={
 			utils.CN(
@@ -176,9 +179,9 @@ templ Calendar(props ...Props) {
 		{ p.Attributes... }
 	>
 		if p.Name != "" {
-			<input type="hidden" name={ p.Name } value={ selectedISO } data-tui-calendar-hidden-input aria-hidden="true" tabindex="-1"/>
+			<input type="hidden" name={ p.Name } value={ selectedISO } data-slot="calendar-input" aria-hidden="true" tabindex="-1" { p.InputAttributes... }/>
 			if p.Mode == ModeRange {
-				<input type="hidden" name={ p.EndName } value={ endISO } data-tui-calendar-hidden-end-input aria-hidden="true" tabindex="-1"/>
+				<input type="hidden" name={ p.EndName } value={ endISO } data-slot="calendar-end-input" aria-hidden="true" tabindex="-1" { p.EndInputAttributes... }/>
 			}
 		}
 		<div class="relative flex flex-col gap-4 md:flex-row">
@@ -187,7 +190,7 @@ templ Calendar(props ...Props) {
 						Variant: button.VariantGhost,
 						Class:   "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
 						Attributes: templ.Attributes{
-							"data-tui-calendar-prev": "",
+							"data-slot": "calendar-previous",
 							"aria-label":             "Go to the previous month",
 						},
 					}) {
@@ -197,7 +200,7 @@ templ Calendar(props ...Props) {
 						Variant: button.VariantGhost,
 						Class:   "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
 						Attributes: templ.Attributes{
-							"data-tui-calendar-next": "",
+							"data-slot": "calendar-next",
 							"aria-label":             "Go to the next month",
 						},
 					}) {
@@ -205,13 +208,13 @@ templ Calendar(props ...Props) {
 					}
 			</div>
 			for m := 0; m < months; m++ {
-				<div class="flex w-full flex-col gap-4" data-tui-calendar-month-block={ strconv.Itoa(m) }>
+				<div class="flex w-full flex-col gap-4" data-slot="calendar-month" data-index={ strconv.Itoa(m) }>
 					<div class="flex h-(--cell-size) w-full items-center justify-center px-(--cell-size)">
 						if p.CaptionLayout == CaptionLayoutDropdown && months == 1 {
 						<div class="flex h-(--cell-size) w-full items-center justify-center gap-1.5 text-sm font-medium">
 							<div class="cn-calendar-dropdown-root relative rounded-(--cell-radius)">
 								<select
-									data-tui-calendar-month-select
+									data-slot="calendar-month-select"
 									class="absolute inset-0 bg-popover opacity-0"
 									aria-label="Choose the month"
 								>
@@ -220,13 +223,13 @@ templ Calendar(props ...Props) {
 									}
 								</select>
 								<span class="font-medium select-none cn-calendar-caption-label flex items-center gap-1 rounded-(--cell-radius) text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground" aria-hidden="true">
-									<span data-tui-calendar-month-label>{ monthNames[int(view.Month())-1] }</span>
+									<span data-slot="calendar-month-label">{ monthNames[int(view.Month())-1] }</span>
 									@icon.ChevronDown(icon.Props{Class: "size-4"})
 								</span>
 							</div>
 							<div class="cn-calendar-dropdown-root relative rounded-(--cell-radius)">
 								<select
-									data-tui-calendar-year-select
+									data-slot="calendar-year-select"
 									class="absolute inset-0 bg-popover opacity-0"
 									aria-label="Choose the year"
 								>
@@ -235,27 +238,27 @@ templ Calendar(props ...Props) {
 									}
 								</select>
 								<span class="font-medium select-none cn-calendar-caption-label flex items-center gap-1 rounded-(--cell-radius) text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground" aria-hidden="true">
-									<span data-tui-calendar-year-label>{ strconv.Itoa(view.Year()) }</span>
+									<span data-slot="calendar-year-label">{ strconv.Itoa(view.Year()) }</span>
 									@icon.ChevronDown(icon.Props{Class: "size-4"})
 								</span>
 							</div>
 						</div>
 					} else {
-						<span data-tui-calendar-caption class="font-medium select-none cn-calendar-caption text-sm">
+						<span data-slot="calendar-caption" class="font-medium select-none cn-calendar-caption text-sm">
 							{ view.AddDate(0, m, 0).Format("January 2006") }
 						</span>
 					}
 				</div>
 				<table class="w-full border-collapse">
 					<thead>
-						<tr data-tui-calendar-weekdays class="flex"></tr>
+						<tr data-slot="calendar-weekdays" class="flex"></tr>
 					</thead>
-					<tbody data-tui-calendar-weeks></tbody>
+					<tbody data-slot="calendar-weeks"></tbody>
 				</table>
 			</div>
 			}
 		</div>
-		<template data-tui-calendar-day-template>
+		<template data-slot="calendar-day-template">
 			@button.Button(button.Props{
 				Variant: button.VariantGhost,
 				Size:    button.SizeIcon,

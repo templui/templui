@@ -1,16 +1,23 @@
 // Uses window.FloatingUIDOM from components/floatingui (loaded in the same bundle).
 (function () {
+  const configs = new WeakMap();
+  const elementStates = new WeakMap();
   // Constants from Base UI's popover, shadcn's reference implementation.
   const EXIT_MS = 120; // exit animation (duration-100) + slack
   const COLLISION_PADDING = 5;
 
+  function state(element) {
+    if (!elementStates.has(element)) elementStates.set(element, {});
+    return elementStates.get(element);
+  }
+
   function allContents() {
-    return document.querySelectorAll("[data-tui-popover-content]");
+    return document.querySelectorAll(`[data-slot="popover-positioner"]`);
   }
 
   function triggerFor(content) {
     return document.querySelector(
-      '[data-tui-popover-trigger][aria-controls="' + content.id + '"]',
+      '[data-slot="popover-trigger"][aria-controls="' + content.id + '"]',
     );
   }
 
@@ -19,7 +26,7 @@
   }
 
   function popupFor(content) {
-    return content.querySelector("[data-tui-popover-popup]");
+    return content.querySelector(`[data-slot="popover-content"]`);
   }
 
   function setState(content, state) {
@@ -67,18 +74,18 @@
 
   // Moves the content to <body> (shadcn portals it the same way).
   // The unmount half of the React portal pendant: a portaled content lives
-  // as long as its SSR declaration site (_tuiPortalOwner) stays in the
+  // as long as its SSR declaration site stays in the
   // document. Trigger-presence heuristics judged mid-swap moments wrongly -
   // multi-phase swap layers briefly disconnect the new triggers.
   function portal(content) {
-    document.querySelectorAll("body > [data-tui-popover-content]").forEach((c) => {
-      if (c !== content && c._tuiPortalOwner && !c._tuiPortalOwner.isConnected) {
+    document.querySelectorAll('body > [data-slot="popover-positioner"]').forEach((c) => {
+      if (c !== content && state(c).portalOwner && !state(c).portalOwner.isConnected) {
         stopAutoPositioning(c);
         c.remove();
       }
     });
     if (content.parentElement !== document.body) {
-      if (!content._tuiPortalOwner) content._tuiPortalOwner = content.parentElement;
+      if (!state(content).portalOwner) state(content).portalOwner = content.parentElement;
       document.body.appendChild(content);
     }
     wireAria(content);
@@ -105,10 +112,11 @@
     const trigger = triggerFor(content);
     if (!trigger) return Promise.resolve();
     const { computePosition, offset, flip, shift } = window.FloatingUIDOM;
-    const side = content.getAttribute("data-tui-popover-side") || "bottom";
-    const align = content.getAttribute("data-tui-popover-align") || "center";
-    const sideOffset = parseFloat(content.getAttribute("data-tui-popover-side-offset")) || 0;
-    const alignOffset = parseFloat(content.getAttribute("data-tui-popover-align-offset")) || 0;
+    const componentConfig = configs.get(content) || {};
+    const side = componentConfig.side || "bottom";
+    const align = componentConfig.align || "center";
+    const sideOffset = parseFloat(componentConfig.sideOffset) || 0;
+    const alignOffset = parseFloat(componentConfig.alignOffset) || 0;
     const placement = align === "center" ? side : side + "-" + align;
 
     return computePosition(trigger, content, {
@@ -141,13 +149,13 @@
   function startAutoPositioning(content) {
     const trigger = triggerFor(content);
     if (!trigger) return Promise.resolve();
-    if (content._tuiPositionCleanup) content._tuiPositionCleanup();
+    if (state(content).positionCleanup) state(content).positionCleanup();
     let resolveFirst;
     const firstPosition = new Promise((resolve) => {
       resolveFirst = resolve;
     });
     const update = () => position(content).then(resolveFirst, resolveFirst);
-    content._tuiPositionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
+    state(content).positionCleanup = window.FloatingUIDOM.autoUpdate(trigger, content, update, {
       elementResize: typeof ResizeObserver !== "undefined",
       layoutShift: typeof IntersectionObserver !== "undefined",
     });
@@ -155,9 +163,9 @@
   }
 
   function stopAutoPositioning(content) {
-    if (!content._tuiPositionCleanup) return;
-    content._tuiPositionCleanup();
-    content._tuiPositionCleanup = null;
+    if (!state(content).positionCleanup) return;
+    state(content).positionCleanup();
+    state(content).positionCleanup = null;
   }
 
   function isOpen(content) {
@@ -173,18 +181,18 @@
         detail: { open: nextOpen },
       }),
     );
-    if (!accepted || content.hasAttribute("data-tui-popover-controlled")) return;
+    if (!accepted) return;
     if (nextOpen) open(content);
     else close(content, returnFocus);
   }
 
   function open(content) {
     if (typeof content === "string") content = document.getElementById(content);
-    if (!content || isOpen(content)) return;
+    if (!content || (!content.hidden && isOpen(content))) return;
     allContents().forEach((c) => {
       if (c !== content) close(c);
     });
-    clearTimeout(content._tuiHide);
+    clearTimeout(state(content).hideTimer);
     portal(content);
     // z-index portal like shadcn (no native top layer); re-append
     // keeps paint order = open order.
@@ -238,8 +246,8 @@
       trigger.removeAttribute("data-popup-open");
       trigger.removeAttribute("data-pressed");
     }
-    clearTimeout(content._tuiHide);
-    content._tuiHide = setTimeout(() => {
+    clearTimeout(state(content).hideTimer);
+    state(content).hideTimer = setTimeout(() => {
       if (content.hasAttribute("data-closed") && !content.hidden) {
         content.hidden = true;
         setTransitionAttribute(content, "data-ending-style", false);
@@ -258,10 +266,10 @@
   function closeNearest(element) {
     if (!element) return;
     const content =
-      element.closest?.("[data-tui-popover-content]") ||
-      (element.closest?.("[data-tui-popover-trigger]") &&
-        contentFor(element.closest("[data-tui-popover-trigger]"))) ||
-      element.querySelector?.("[data-tui-popover-content]");
+      element.closest?.(`[data-slot="popover-positioner"]`) ||
+      (element.closest?.(`[data-slot="popover-trigger"]`) &&
+        contentFor(element.closest(`[data-slot="popover-trigger"]`))) ||
+      element.querySelector?.(`[data-slot="popover-positioner"]`);
     if (content) requestOpenChange(content, false);
   }
 
@@ -276,19 +284,19 @@
   // on body when the popup ends up under the released pointer is harmless.
   document.addEventListener("pointerdown", (e) => {
     if (e.button !== 0 || !(e.target instanceof Element)) return;
-    const trigger = e.target.closest("[data-tui-popover-trigger]");
+    const trigger = e.target.closest(`[data-slot="popover-trigger"]`);
     if (trigger) {
       if (trigger.disabled) return;
       const content = contentFor(trigger);
       if (content) toggle(content);
       return;
     }
-    if (!e.target.closest("[data-tui-popover-content]")) requestCloseAll(false);
+    if (!e.target.closest(`[data-slot="popover-positioner"]`)) requestCloseAll(false);
   });
 
   document.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
-    const trigger = e.target.closest("[data-tui-popover-trigger]");
+    const trigger = e.target.closest(`[data-slot="popover-trigger"]`);
     if (trigger) {
       // Keyboard activation only (Enter/Space fire a detail-0 click without
       // a preceding pointerdown); pointer presses are handled on pointerdown.
@@ -308,17 +316,18 @@
   // not sit inside layout groups where hidden siblings break :last-child
   // rules. Runs on load and whenever new popovers appear in the DOM.
   // Lift SSR'd contents out of their inert <template> wrappers into <body>,
-  // replacing a stale portaled copy on re-swaps (e.g. htmx).
+  // replacing a stale portaled copy after ordinary DOM replacement.
   function liftTemplates() {
-    document.querySelectorAll("template[data-tui-popover-portal]").forEach((tpl) => {
-      const content = tpl.content.querySelector("[data-tui-popover-content]");
+    document.querySelectorAll("template").forEach((tpl) => {
+      const content = tpl.content.querySelector(`[data-slot="popover-positioner"]`);
+      if (!content) return;
       if (content) {
         const stale = document.getElementById(content.id);
         if (stale) {
           stopAutoPositioning(stale);
           stale.remove();
         }
-        content._tuiPortalOwner = tpl.parentElement;
+        state(content).portalOwner = tpl.parentElement;
         document.body.appendChild(content);
       }
       tpl.remove();
@@ -330,26 +339,32 @@
     allContents().forEach((content) => {
       if (!triggerFor(content)) return;
       portal(content);
-      if (content.getAttribute("data-tui-popover-initial-open") === "true") {
-        content.removeAttribute("data-tui-popover-initial-open");
-        open(content);
-      }
+      if (content.hasAttribute("data-open")) open(content);
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-  // Re-init on any childList mutation, directly (never rAF-deferred: rAF
-  // does not fire in hidden tabs or throttled iframes): swapped-in markup
-  // lifts and wires itself, removals release portaled content through the
-  // ownership sweep.
-  new MutationObserver(() => init()).observe(document.body, { childList: true, subtree: true });
+  window.shadcnTempl.lifecycle.register("popover-positioner", {
+    selector: '[data-slot="popover-positioner"]',
+    setup(content) {
+      configs.set(content, {
+        side: content.getAttribute("data-side"),
+        align: content.getAttribute("data-align"),
+        sideOffset: content.getAttribute("data-side-offset"),
+        alignOffset: content.getAttribute("data-align-offset"),
+      });
+    },
+    attributes: ["data-open"],
+    attributeChanged(content) {
+      if (content.hasAttribute("data-open")) open(content);
+      else if (!content.hidden && !content.hasAttribute("data-closed")) close(content, false);
+    },
+  });
+  window.shadcnTempl.lifecycle.register("popover", {
+    mount: init,
+    unmount: init,
+  });
 
-  window.tui = window.tui || {};
-  window.tui.popover = {
+  window.shadcnTempl.popover = {
     open,
     close,
     closeAll,

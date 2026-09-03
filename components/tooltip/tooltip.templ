@@ -2,7 +2,7 @@ package tooltip
 
 import (
 	"context"
-	"strconv"
+	"fmt"
 
 	"github.com/axadrn/shadcn-templ/v2/utils"
 )
@@ -23,7 +23,6 @@ const stateKey ctxKey = "tooltipState"
 type ctxState struct {
 	id          string
 	initialOpen bool
-	controlled  bool
 }
 
 func state(ctx context.Context) ctxState {
@@ -40,8 +39,8 @@ func state(ctx context.Context) ctxState {
 //	@button.Button(button.Props{Attributes: tooltip.Trigger(ctx)}) { ... }
 func Trigger(ctx context.Context) templ.Attributes {
 	return templ.Attributes{
-		"data-tui-tooltip-trigger": true,
-		"aria-describedby":         state(ctx).id,
+		"data-slot":        "tooltip-trigger",
+		"aria-describedby": state(ctx).id,
 	}
 }
 
@@ -78,7 +77,7 @@ templ Tooltip(props ...Props) {
 	if p.ID == "" {
 		{{ p.ID = utils.RandomID() }}
 	}
-	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, initialOpen: initialOpen(p), controlled: p.Open != nil}) }}
+	{{ ctx = context.WithValue(ctx, stateKey, ctxState{id: p.ID, initialOpen: initialOpen(p)}) }}
 	{ children... }
 }
 
@@ -96,18 +95,15 @@ templ Content(props ...ContentProps) {
 	{{ s := state(ctx) }}
 	// Inert until the script portals it to <body>: inline it would count as a
 	// layout sibling (e.g. button group's last-child rounding).
-	<template data-tui-tooltip-portal>
+	<template>
 		<div
 			id={ s.id }
 			data-slot="tooltip-content"
-			data-tui-tooltip-content
-			data-tui-tooltip-side={ string(p.Side) }
-			data-tui-tooltip-side-offset={ strconv.Itoa(p.SideOffset) }
-			data-tui-tooltip-initial-open={ strconv.FormatBool(s.initialOpen) }
-			data-tui-tooltip-controlled?={ s.controlled }
-			data-closed
+			data-side={ string(p.Side) }
+			data-side-offset={ fmt.Sprintf("%d", p.SideOffset) }
+			data-open?={ s.initialOpen }
+			data-closed?={ !s.initialOpen }
 			hidden
-			data-tui-portal
 			role="tooltip"
 			class={
 				utils.CN(
@@ -124,7 +120,7 @@ templ Content(props ...ContentProps) {
 		>
 			{ children... }
 			<span
-				data-tui-tooltip-arrow
+				data-slot="tooltip-arrow"
 				data-closed
 				class="cn-tooltip-arrow cn-tooltip-arrow-logical absolute z-50 bg-foreground fill-foreground data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1 data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1 data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5"
 			></span>
