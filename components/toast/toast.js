@@ -38,11 +38,11 @@
   // button.templ's baseClasses, the look comes from the cn-button-* classes.
   var BUTTON_BASE =
     "cn-button group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0";
-  var ACTION_CLASS =
-    BUTTON_BASE + " cn-button-variant-outline cn-button-size-sm shrink-0";
-  var CLOSE_CLASS =
-    BUTTON_BASE +
-    " cn-button-variant-ghost cn-button-size-icon-sm relative shrink-0 text-muted-foreground after:absolute after:-inset-2 after:content-[''] hover:text-foreground";
+  var ACTION_CLASS = [BUTTON_BASE, "cn-button-variant-outline cn-button-size-sm shrink-0"].join(" ");
+  var CLOSE_CLASS = [
+    BUTTON_BASE,
+    "cn-button-variant-ghost cn-button-size-icon-sm relative shrink-0 text-muted-foreground after:absolute after:-inset-2 after:content-[''] hover:text-foreground",
+  ].join(" ");
 
   var ICONS = {
     success:

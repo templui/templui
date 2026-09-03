@@ -7,6 +7,7 @@ require (
 	github.com/a-h/templ v0.3.1001
 	github.com/fogleman/gg v1.3.0
 	github.com/joho/godotenv v1.5.1
+	github.com/tdewolff/parse/v2 v2.8.16
 	github.com/yuin/goldmark v1.7.13
 	go.abhg.dev/goldmark/frontmatter v0.2.0
 	golang.org/x/image v0.44.0

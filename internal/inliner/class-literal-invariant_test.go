@@ -16,11 +16,13 @@ import (
 	"github.com/axadrn/shadcn-templ/v2/internal/registry"
 )
 
-func TestRegistryTemplClassLiteralsAreSelfContained(t *testing.T) {
+func TestRegistryClassLiteralsAreSelfContained(t *testing.T) {
 	seen := map[string]bool{}
 	for _, item := range registry.Get().Items {
 		for _, path := range item.FilePaths() {
-			if !strings.HasSuffix(path, ".templ") || seen[path] {
+			isTempl := strings.HasSuffix(path, ".templ")
+			isJavaScript := strings.HasSuffix(path, ".js")
+			if (!isTempl && !isJavaScript) || seen[path] {
 				continue
 			}
 			seen[path] = true
@@ -29,7 +31,12 @@ func TestRegistryTemplClassLiteralsAreSelfContained(t *testing.T) {
 			if err != nil {
 				t.Fatalf("read %s: %v", path, err)
 			}
-			f, err := parseSourceFile(string(source))
+			var f *sourceFile
+			if isJavaScript {
+				f, err = parseJavaScriptSourceFile(string(source))
+			} else {
+				f, err = parseSourceFile(string(source))
+			}
 			if err != nil {
 				t.Fatalf("parse %s: %v", path, err)
 			}
@@ -40,6 +47,9 @@ func TestRegistryTemplClassLiteralsAreSelfContained(t *testing.T) {
 				if len(extractCnClasses(s.text)) == 0 {
 					continue
 				}
+				if isJavaScript && s.quote != '"' && s.quote != '`' {
+					t.Errorf("%s: cn- literal %q must use double quotes or a no-substitution template literal", path, s.text)
+				}
 				if s.text != strings.TrimSpace(s.text) {
 					t.Errorf("%s: cn- literal %q starts or ends with whitespace; the style transform trims literals, so concatenation around it breaks — pass class fragments as separate utils.CN arguments instead", path, s.text)
 				}
@@ -47,6 +57,6 @@ func TestRegistryTemplClassLiteralsAreSelfContained(t *testing.T) {
 		}
 	}
 	if len(seen) == 0 {
-		t.Fatal("no .templ files found in registry.json")
+		t.Fatal("no .templ or .js files found in registry.json")
 	}
 }
