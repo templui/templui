@@ -3,7 +3,7 @@ package modules
 import (
 	"strconv"
 
-	"github.com/axadrn/shadcn-templ/v2/components/button"
+	"github.com/axadrn/shadcn-templ/v2/components/icon"
 )
 
 type TableOfContentsItem struct {
@@ -95,20 +95,29 @@ templ TableOfContentsScript() {
 	</script>
 }
 
-// TocAdCard is the pendant of shadcn's OpenInV0Cta card below the toc,
-// advertising Goilerplate. Classes are 1:1 from open-in-v0-cta.tsx.
+// TocAdCard is a compact goilerplate launch card below the toc.
 templ TocAdCard() {
-	<div class="group relative flex flex-col gap-2 rounded-2xl bg-surface p-6 text-sm text-surface-foreground">
-		<div class="text-base leading-tight font-semibold text-balance group-hover:underline">
-			Ship your shadcn-templ app with goilerplate
+	<a
+		href="https://goilerplate.com"
+		target="_blank"
+		rel="noreferrer"
+		class="relative block overflow-hidden rounded-2xl border bg-surface p-4 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+	>
+		<div class="relative flex items-start justify-between gap-3">
+			<span class="mt-1 inline-flex items-center gap-1.5 text-[10px] leading-none font-semibold tracking-[0.12em] text-muted-foreground uppercase">
+				<span class="size-1.5 rounded-full bg-foreground"></span>
+				V3 Early Access
+			</span>
+			<img src="/assets/img/goilerplate-mark.svg" alt="" width="64" height="84" class="h-11 w-auto shrink-0 dark:invert"/>
 		</div>
-		<div class="text-muted-foreground">The Go SaaS generator. Auth, payments, workspaces. Your code.</div>
-		<div class="text-muted-foreground">Early Access: $199 lifetime until October 31.</div>
-		@button.Button(button.Props{Variant: button.VariantOutline, Size: button.SizeSm, Class: "mt-2 w-fit"}) {
-			Get goilerplate
-		}
-		<a href="https://goilerplate.com" target="_blank" rel="noreferrer" class="absolute inset-0">
-			<span class="sr-only">Get goilerplate</span>
-		</a>
-	</div>
+		<div class="relative mt-4 text-base leading-tight font-semibold tracking-tight text-balance text-foreground">
+			Skip the setup.
+			<br/>
+			Ship the product.
+		</div>
+		<div class="relative mt-3 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+			Meet goilerplate
+			@icon.ArrowUpRight(icon.Props{Class: "size-3.5"})
+		</div>
+	</a>
 }
