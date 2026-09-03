@@ -402,6 +402,111 @@ func TestBuildStyleItem(t *testing.T) {
 	}
 }
 
+func TestBuildStyleItemCompilesJavaScript(t *testing.T) {
+	t.Setenv("GO_ENV", "production")
+	marker := regexp.MustCompile(`\bcn-[\w-]+`)
+
+	for _, styleName := range StyleNames() {
+		bare, ok := splitStyleName(styleName)
+		if !ok {
+			t.Fatalf("invalid style name %q", styleName)
+		}
+		styleMap, err := styleMapFor(bare)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		chart, err := BuildStyleItem(styleName, "chart", inliner.Options{})
+		if err != nil {
+			t.Fatalf("%s chart: %v", styleName, err)
+		}
+		chartJavaScript := itemFileContent(t, chart, "components/chart/chart.js")
+		if marker.MatchString(chartJavaScript) {
+			t.Errorf("%s chart JavaScript contains a cn-* marker", styleName)
+		}
+		assertContainsClasses(t, styleName+" chart", chartJavaScript, styleMap["cn-chart-tooltip"])
+
+		toast, err := BuildStyleItem(styleName, "toast", inliner.Options{})
+		if err != nil {
+			t.Fatalf("%s toast: %v", styleName, err)
+		}
+		toastJavaScript := itemFileContent(t, toast, "components/toast/toast.js")
+		if marker.MatchString(toastJavaScript) {
+			t.Errorf("%s toast JavaScript contains a cn-* marker", styleName)
+		}
+		for _, name := range []string{"cn-toast", "cn-button-variant-outline", "cn-button-size-icon-sm"} {
+			assertContainsClasses(t, styleName+" toast "+name, toastJavaScript, styleMap[name])
+		}
+		if !strings.Contains(toastJavaScript, `var ACTION_CLASS = [BUTTON_BASE, "`) {
+			t.Errorf("%s toast action does not preserve the complete-token join", styleName)
+		}
+	}
+
+	lyra, err := BuildStyleItem("base-lyra", "chart", inliner.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	content := itemFileContent(t, lyra, "components/chart/chart.js")
+	if !strings.Contains(content, "rounded-none") {
+		t.Error("Lyra chart tooltip misses rounded-none")
+	}
+
+	luma, err := BuildStyleItem("base-luma", "chart", inliner.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	lumaMap, err := styleMapFor("luma")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertContainsClasses(t, "Luma chart", itemFileContent(t, luma, "components/chart/chart.js"), lumaMap["cn-chart-tooltip"])
+}
+
+func TestBuildStyleItemPreservesMarkerFreeJavaScript(t *testing.T) {
+	t.Setenv("GO_ENV", "production")
+	accordion, err := BuildStyleItem("base-nova", "accordion", inliner.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := itemFileContent(t, accordion, "components/accordion/accordion.js")
+	source, err := componentSource("components/accordion/accordion.js")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != string(source) {
+		t.Error("marker-free accordion JavaScript changed during registry compilation")
+	}
+	if !contains(accordion.RegistryDependencies, "scripts") {
+		t.Errorf("JavaScript component dependencies = %v, want scripts", accordion.RegistryDependencies)
+	}
+}
+
+func itemFileContent(t *testing.T, item *Item, path string) string {
+	t.Helper()
+	if item == nil {
+		t.Fatalf("item containing %s is nil", path)
+	}
+	for _, file := range item.Files {
+		if file.Path == path {
+			return file.Content
+		}
+	}
+	t.Fatalf("item %s does not contain %s", item.Name, path)
+	return ""
+}
+
+func assertContainsClasses(t *testing.T, name, content, classes string) {
+	t.Helper()
+	if classes == "" {
+		t.Fatalf("%s style map classes are empty", name)
+	}
+	for _, class := range strings.Fields(classes) {
+		if !strings.Contains(content, class) {
+			t.Errorf("%s misses class %q", name, class)
+		}
+	}
+}
+
 func TestBuildStyleIndex(t *testing.T) {
 	item := BuildStyleIndex("base-nova")
 	if item == nil {

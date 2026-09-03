@@ -2,8 +2,8 @@
 // shadcn's per-style registry items (registry/base-nova/ui/button.tsx ->
 // r/styles/base-nova/button.json). A .templ source is compiled through the
 // inliner with the style's map so the served content carries the flat
-// Tailwind classes of that style and no cn-* markers; .js files ship
-// verbatim.
+// Tailwind classes of that style and no cn-* markers. Templ and JavaScript
+// sources use syntax-aware transforms and all other file types ship verbatim.
 package registryapi
 
 import (
@@ -107,8 +107,14 @@ func componentSource(filePath string) ([]byte, error) {
 
 var (
 	itemMu    sync.Mutex
-	itemCache = map[string]*Item{}
+	itemCache = map[itemKey]*Item{}
 )
+
+type itemKey struct {
+	Style string
+	Name  string
+	Opts  inliner.Options
+}
 
 // BuildStyleItem builds the registry:item JSON of one component compiled for
 // one style. Returns (nil, nil) when style or component are unknown (the 404
@@ -124,7 +130,7 @@ func BuildStyleItem(styleName, name string, opts inliner.Options) (*Item, error)
 		return nil, nil
 	}
 
-	cacheKey := fmt.Sprintf("%s/%s/%s/%t", styleName, name, opts.MenuColor, opts.RTL)
+	cacheKey := itemKey{Style: styleName, Name: name, Opts: opts}
 	if !isDevelopment() {
 		itemMu.Lock()
 		cached, ok := itemCache[cacheKey]
@@ -147,11 +153,14 @@ func BuildStyleItem(styleName, name string, opts inliner.Options) (*Item, error)
 			return nil, fmt.Errorf("registryapi: read %s: %w", file.Path, err)
 		}
 		content := string(src)
-		if strings.HasSuffix(file.Path, ".templ") {
+		switch {
+		case strings.HasSuffix(file.Path, ".templ"):
 			content, err = inliner.TransformStyle(content, styleMap, opts)
-			if err != nil {
-				return nil, fmt.Errorf("registryapi: inline %s for %s: %w", file.Path, styleName, err)
-			}
+		case strings.HasSuffix(file.Path, ".js"):
+			content, err = inliner.TransformJavaScriptStyle(content, styleMap, opts)
+		}
+		if err != nil {
+			return nil, fmt.Errorf("registryapi: inline %s for %s: %w", file.Path, styleName, err)
 		}
 		files = append(files, ItemFile{
 			Path:    file.Path,
