@@ -5,10 +5,13 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 
+	"github.com/axadrn/shadcn-templ/v2/assets"
 	"github.com/axadrn/shadcn-templ/v2/cmd/shadcn-templ/utils"
+	"github.com/axadrn/shadcn-templ/v2/internal/inliner"
 	internalregistry "github.com/axadrn/shadcn-templ/v2/internal/registry"
 	"github.com/axadrn/shadcn-templ/v2/internal/registryapi"
 )
@@ -172,5 +175,69 @@ func TestSupportsFontHeading(t *testing.T) {
 	}
 	if supportsFontHeading(filepath.Join(t.TempDir(), "missing.css")) {
 		t.Error("supportsFontHeading() = true for missing file")
+	}
+}
+
+func TestAddInstallsCompiledChartAndToastJavaScript(t *testing.T) {
+	t.Setenv("GO_ENV", "production")
+
+	mux := http.NewServeMux()
+	mux.Handle("GET /init", registryapi.InitHandler())
+	mux.Handle("GET /r/styles/{style}/{file}", registryapi.StylesHandler())
+	mux.HandleFunc("GET /r/registry.json", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write(internalregistry.JSON())
+	})
+	mux.HandleFunc("GET /assets/css/{file}", func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte("/* test stylesheet */\n"))
+	})
+	server := httptest.NewServer(mux)
+	t.Cleanup(server.Close)
+
+	cwd := t.TempDir()
+	err := os.WriteFile(filepath.Join(cwd, "go.mod"), []byte("module example.com/acme/app\n\ngo 1.25.0\n"), 0o644)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = RunInit(InitOptions{Cwd: cwd, Force: true, Silent: true, Registry: server.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = RunAdd([]string{"chart", "toast"}, AddOptions{Cwd: cwd, Overwrite: true, Silent: true, Registry: server.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	styleCSS, err := assets.Assets.ReadFile("css/styles/style-nova.css")
+	if err != nil {
+		t.Fatal(err)
+	}
+	styleMap, err := inliner.CreateStyleMap(string(styleCSS))
+	if err != nil {
+		t.Fatal(err)
+	}
+	marker := regexp.MustCompile(`\bcn-[\w-]+`)
+	for _, path := range []string{"components/chart/chart.js", "components/toast/toast.js"} {
+		content, err := os.ReadFile(filepath.Join(cwd, filepath.FromSlash(path)))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if marker.Match(content) {
+			t.Errorf("%s contains a canonical style marker", path)
+		}
+	}
+
+	chart, err := os.ReadFile(filepath.Join(cwd, "components/chart/chart.js"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	chartContent := string(chart)
+	if !strings.Contains(chartContent, "min-w-32") {
+		t.Error("installed chart JavaScript misses min-w-32")
+	}
+	for _, class := range strings.Fields(styleMap["cn-chart-tooltip"]) {
+		if !strings.Contains(chartContent, class) {
+			t.Errorf("installed chart JavaScript misses Nova tooltip class %q", class)
+		}
 	}
 }
