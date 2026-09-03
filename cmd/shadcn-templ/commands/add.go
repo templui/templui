@@ -10,6 +10,7 @@ import (
 	"flag"
 	"fmt"
 	"net/url"
+	"os"
 	"path"
 	"path/filepath"
 	"sort"
@@ -120,6 +121,9 @@ func addComponents(components []string, config *utils.Config, registryURL string
 	if config.RTL != nil && *config.RTL {
 		query.Set("rtl", "true")
 	}
+	if supportsFontHeading(config.ResolvedPaths.TailwindCSS) {
+		query.Set("fontHeading", "true")
+	}
 	tree, err := registry.ResolveTree(registryURL, config.Style, query, components)
 	if err != nil {
 		return err
@@ -173,6 +177,14 @@ func addComponents(components []string, config *utils.Config, registryURL string
 	}
 
 	return nil
+}
+
+func supportsFontHeading(path string) bool {
+	css, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+	return strings.Contains(string(css), "--font-heading:")
 }
 
 // vendorCSSImports fetches the vendored stylesheets a registry css block

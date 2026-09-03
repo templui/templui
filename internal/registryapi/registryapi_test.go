@@ -2,6 +2,8 @@ package registryapi
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"regexp"
 	"strings"
@@ -478,6 +480,81 @@ func TestBuildStyleItemPreservesMarkerFreeJavaScript(t *testing.T) {
 	}
 	if !contains(accordion.RegistryDependencies, "scripts") {
 		t.Errorf("JavaScript component dependencies = %v, want scripts", accordion.RegistryDependencies)
+	}
+}
+
+func TestBuildStyleItemCachesFontHeadingSeparately(t *testing.T) {
+	t.Setenv("GO_ENV", "production")
+	tests := []struct {
+		name  string
+		first inliner.Options
+		last  inliner.Options
+	}{
+		{name: "disabled then enabled", first: inliner.Options{}, last: inliner.Options{FontHeading: true}},
+		{name: "enabled then disabled", first: inliner.Options{FontHeading: true}, last: inliner.Options{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			itemMu.Lock()
+			itemCache = map[itemKey]*Item{}
+			itemMu.Unlock()
+
+			first, err := BuildStyleItem("base-nova", "card", tt.first)
+			if err != nil {
+				t.Fatal(err)
+			}
+			last, err := BuildStyleItem("base-nova", "card", tt.last)
+			if err != nil {
+				t.Fatal(err)
+			}
+			firstContent := itemFileContent(t, first, "components/card/card.templ")
+			lastContent := itemFileContent(t, last, "components/card/card.templ")
+			assertFontHeadingOption(t, firstContent, tt.first.FontHeading)
+			assertFontHeadingOption(t, lastContent, tt.last.FontHeading)
+			if firstContent == lastContent {
+				t.Error("font-heading options returned identical cached content")
+			}
+		})
+	}
+}
+
+func TestStylesHandlerParsesFontHeadingStrictly(t *testing.T) {
+	t.Setenv("GO_ENV", "production")
+	tests := []struct {
+		query string
+		want  bool
+	}{
+		{query: "fontHeading=true", want: true},
+		{query: "fontHeading=false", want: false},
+		{query: "fontHeading=1", want: false},
+		{query: "fontHeading=True", want: false},
+		{query: "", want: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.query, func(t *testing.T) {
+			request := httptest.NewRequest(http.MethodGet, "/r/styles/base-nova/card.json?"+tt.query, nil)
+			request.SetPathValue("style", "base-nova")
+			request.SetPathValue("file", "card.json")
+			response := httptest.NewRecorder()
+			StylesHandler().ServeHTTP(response, request)
+			if response.Code != http.StatusOK {
+				t.Fatalf("status = %d, want %d; body = %s", response.Code, http.StatusOK, response.Body.String())
+			}
+			var item Item
+			err := json.Unmarshal(response.Body.Bytes(), &item)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assertFontHeadingOption(t, itemFileContent(t, &item, "components/card/card.templ"), tt.want)
+		})
+	}
+}
+
+func assertFontHeadingOption(t *testing.T, content string, want bool) {
+	t.Helper()
+	has := strings.Contains(content, "font-heading")
+	if has != want {
+		t.Errorf("font-heading presence = %t, want %t", has, want)
 	}
 }
 

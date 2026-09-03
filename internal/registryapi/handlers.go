@@ -3,14 +3,14 @@
 package registryapi
 
 import (
-	"slices"
-
-	"github.com/axadrn/shadcn-templ/v2/internal/inliner"
 	"bytes"
 	"encoding/json"
 	"log"
 	"net/http"
+	"slices"
 	"strings"
+
+	"github.com/axadrn/shadcn-templ/v2/internal/inliner"
 )
 
 // writeJSON serializes like NextResponse.json: no HTML escaping, no
@@ -92,9 +92,12 @@ func StylesHandler() http.Handler {
 		}
 
 		// The install-config half of shadcn's CLI transformers: the CLI
-		// sends its components.json menuColor/rtl, the markers resolve here
+		// sends its project menuColor, rtl and font-heading support; the markers resolve here
 		// (shadcn-templ has no separate install step).
-		opts := inliner.Options{RTL: r.URL.Query().Get("rtl") == "true"}
+		opts := inliner.Options{
+			RTL:         r.URL.Query().Get("rtl") == "true",
+			FontHeading: r.URL.Query().Get("fontHeading") == "true",
+		}
 		if menuColor := r.URL.Query().Get("menuColor"); slices.Contains(MenuColors, menuColor) {
 			opts.MenuColor = menuColor
 		}
