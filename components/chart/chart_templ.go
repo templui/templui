@@ -245,7 +245,11 @@ type Margin struct {
 
 type CurveType string
 
-const CurveNatural CurveType = "natural"
+const (
+	CurveNatural  CurveType = "natural"
+	CurveMonotone CurveType = "monotone"
+	CurveLinear   CurveType = "linear"
+)
 
 // CartesianGridProps is the pendant of Recharts' CartesianGrid. Both
 // directions default to Recharts' true, so they are pointers: pass
@@ -307,6 +311,10 @@ type YAxisProps struct {
 	TickCount     int     // defaults to Recharts 5
 	Width         float64 // defaults to Recharts 60
 	TickFormatter func(any) string
+	// Ticks fixes the value ticks, the pendant of Recharts' ticks prop
+	// with a domain spanning them. The renderer computes nice ticks from
+	// zero when empty. TickFormatter labels them.
+	Ticks []float64
 }
 
 // TooltipProps is the pendant of ChartTooltip: the cursor flag and the
@@ -397,6 +405,8 @@ type LineProps struct {
 	Type        CurveType
 	Stroke      string
 	StrokeWidth float64
+	// StrokeDasharray dashes the curve, like Recharts' strokeDasharray.
+	StrokeDasharray string
 	// Dot draws the per point dots; nil is the demos' dot={false}.
 	Dot *DotProps
 	// ActiveDot sizes the hover dot, like Recharts' activeDot prop.
@@ -413,6 +423,9 @@ type DotProps struct {
 	DataFill    bool
 	Icon        templ.Component
 	Size        float64 // icon box, like the custom dot's width/height
+	// Indices limits the dots to those data rows, the pendant of a dot
+	// render prop that returns null elsewhere. Nil draws every row.
+	Indices []int
 }
 
 // ActiveDotProps is the pendant of Recharts' activeDot object.
@@ -1855,6 +1868,17 @@ func buildModel(ctx context.Context, st *chartState) Model {
 		if y.Hide {
 			m.YAxisWidth = 0
 		}
+		if len(y.Ticks) > 0 && st.layout != "vertical" {
+			m.YTicks = y.Ticks
+			m.YTickLabels = make([]string, len(y.Ticks))
+			for i, tick := range y.Ticks {
+				if y.TickFormatter != nil {
+					m.YTickLabels[i] = y.TickFormatter(tick)
+				} else {
+					m.YTickLabels[i] = str(tick)
+				}
+			}
+		}
 	}
 	if st.margin != nil {
 		m.MarginTop, m.MarginRight, m.MarginBottom, m.MarginLeft = st.margin.Top, st.margin.Right, st.margin.Bottom, st.margin.Left
@@ -1958,11 +1982,12 @@ func buildModel(ctx context.Context, st *chartState) Model {
 			s.Curve = string(l.props.Type)
 			s.Stroke = l.props.Stroke
 			s.StrokeWidth = l.props.StrokeWidth
+			s.StrokeDasharray = l.props.StrokeDasharray
 			if l.props.ActiveDot != nil {
 				s.ActiveDotR = l.props.ActiveDot.R
 			}
 			if d := l.props.Dot; d != nil {
-				dm := &DotModel{R: d.R, Fill: d.Fill, Size: d.Size}
+				dm := &DotModel{R: d.R, Fill: d.Fill, Size: d.Size, Indices: d.Indices}
 				if d.DataFill {
 					dm.Fills = make([]string, len(st.data))
 					for i, row := range st.data {
@@ -2240,10 +2265,19 @@ func modelSeries(config Config, key, fill string, fillOpacity float64, data []Da
 		color = seriesColor(key)
 	}
 	values := make([]float64, len(data))
+	// A row without the key is a gap, like a missing value in Recharts
+	// with connectNulls off: the curve breaks and no dot is drawn.
+	var gaps []bool
 	for i, d := range data {
 		values[i] = num(d[key])
+		if d[key] == nil {
+			if gaps == nil {
+				gaps = make([]bool, len(data))
+			}
+			gaps[i] = true
+		}
 	}
-	return ModelSeries{Key: key, Label: config.Label(key), Color: color, Values: values, FillOpacity: fillOpacity}
+	return ModelSeries{Key: key, Label: config.Label(key), Color: color, Values: values, Gaps: gaps, FillOpacity: fillOpacity}
 }
 
 // LegendItem is one rendered legend entry.
@@ -2387,7 +2421,7 @@ func legendContent(items []LegendItem, p *LegendProps) templ.Component {
 				var templ_7745c5c3_Var34 string
 				templ_7745c5c3_Var34, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + it.Color)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1625, Col: 88}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1659, Col: 88}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 				if templ_7745c5c3_Err != nil {
@@ -2401,7 +2435,7 @@ func legendContent(items []LegendItem, p *LegendProps) templ.Component {
 			var templ_7745c5c3_Var35 string
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(it.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1627, Col: 15}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/chart/chart.templ`, Line: 1661, Col: 15}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 			if templ_7745c5c3_Err != nil {
@@ -2432,28 +2466,30 @@ func legendPad(verticalAlign string) string {
 // re-renders the SVG at real container pixels (Recharts'
 // ResponsiveContainer behavior) and drives tooltip and cursor from it.
 type Model struct {
-	Kind           string  `json:"kind"` // "bar" | "area" | "pie"
-	MarginTop      float64 `json:"marginTop"`
-	MarginRight    float64 `json:"marginRight"`
-	MarginBottom   float64 `json:"marginBottom"`
-	MarginLeft     float64 `json:"marginLeft"`
-	XAxisHeight    float64 `json:"xAxisHeight,omitempty"`
-	TickMargin     float64 `json:"tickMargin,omitempty"`
-	MinTickGap     float64 `json:"minTickGap,omitempty"`
-	YAxisWidth     float64 `json:"yAxisWidth,omitempty"`
-	YAxisMargin    float64 `json:"yAxisMargin,omitempty"` // tickMargin of the y axis
-	TickCount      int     `json:"tickCount,omitempty"`   // y ticks, Recharts default 5
-	XTickLine      bool    `json:"xTickLine,omitempty"`
-	XAxisLine      bool    `json:"xAxisLine,omitempty"`
-	YTickLine      bool    `json:"yTickLine,omitempty"`
-	YAxisLine      bool    `json:"yAxisLine,omitempty"`
-	LegendHeight   float64 `json:"legendHeight,omitempty"`
-	LegendVAlign   string  `json:"legendVAlign,omitempty"` // "top" raises the legend above the plot
-	CategoryGap    float64 `json:"categoryGap,omitempty"`
-	Radius         float64 `json:"radius,omitempty"`
-	Grid           bool    `json:"grid,omitempty"`
-	GridHorizontal bool    `json:"gridHorizontal,omitempty"`
-	GridVertical   bool    `json:"gridVertical,omitempty"`
+	Kind           string    `json:"kind"` // "bar" | "area" | "pie"
+	MarginTop      float64   `json:"marginTop"`
+	MarginRight    float64   `json:"marginRight"`
+	MarginBottom   float64   `json:"marginBottom"`
+	MarginLeft     float64   `json:"marginLeft"`
+	XAxisHeight    float64   `json:"xAxisHeight,omitempty"`
+	TickMargin     float64   `json:"tickMargin,omitempty"`
+	MinTickGap     float64   `json:"minTickGap,omitempty"`
+	YAxisWidth     float64   `json:"yAxisWidth,omitempty"`
+	YAxisMargin    float64   `json:"yAxisMargin,omitempty"` // tickMargin of the y axis
+	TickCount      int       `json:"tickCount,omitempty"`   // y ticks, Recharts default 5
+	YTicks         []float64 `json:"yTicks,omitempty"`      // fixed value ticks, the domain spans them
+	YTickLabels    []string  `json:"yTickLabels,omitempty"` // the fixed ticks formatted
+	XTickLine      bool      `json:"xTickLine,omitempty"`
+	XAxisLine      bool      `json:"xAxisLine,omitempty"`
+	YTickLine      bool      `json:"yTickLine,omitempty"`
+	YAxisLine      bool      `json:"yAxisLine,omitempty"`
+	LegendHeight   float64   `json:"legendHeight,omitempty"`
+	LegendVAlign   string    `json:"legendVAlign,omitempty"` // "top" raises the legend above the plot
+	CategoryGap    float64   `json:"categoryGap,omitempty"`
+	Radius         float64   `json:"radius,omitempty"`
+	Grid           bool      `json:"grid,omitempty"`
+	GridHorizontal bool      `json:"gridHorizontal,omitempty"`
+	GridVertical   bool      `json:"gridVertical,omitempty"`
 	// Layout "vertical" swaps the axes and draws the bars horizontally.
 	Layout      string                `json:"layout,omitempty"`
 	XAxisHide   bool                  `json:"xAxisHide,omitempty"`
@@ -2563,26 +2599,28 @@ type PieLabelModel struct {
 
 // ModelSeries is one data series with its resolved color variable.
 type ModelSeries struct {
-	Key            string           `json:"key"`
-	Label          string           `json:"label"`
-	Color          string           `json:"color"`
-	Values         []float64        `json:"values"`
-	FillOpacity    float64          `json:"fillOpacity,omitempty"`    // areas: 0 uses Recharts' 0.6
-	Curve          string           `json:"curve,omitempty"`          // "natural" (default), "linear", "step", "monotone"
-	FillOpacityPtr *float64         `json:"fillOpacityPtr,omitempty"` // radar: an explicit zero stays
-	Icon           string           `json:"icon,omitempty"`           // rendered svg, replaces the tooltip indicator
-	Fill           string           `json:"fill,omitempty"`           // verbatim fill, e.g. url(#fillDesktop)
-	Stroke         string           `json:"stroke,omitempty"`         // verbatim stroke for the area line
-	Radius         []float64        `json:"radius,omitempty"`         // bars: corner radii, one or four
-	StackID        string           `json:"stackId,omitempty"`
-	Cells          []string         `json:"cells,omitempty"` // bars: fill per data row
-	ActiveIndex    *int             `json:"activeIndex,omitempty"`
-	ActiveBar      *RectangleProps  `json:"activeBar,omitempty"`
-	LabelLists     []LabelListModel `json:"labelLists,omitempty"`  // bars: one or more label lists
-	StrokeWidth    float64          `json:"strokeWidth,omitempty"` // lines: stroke width
-	Dot            *DotModel        `json:"dot,omitempty"`         // lines: per point dots
-	ActiveDotR     float64          `json:"activeDotR,omitempty"`  // lines: hover dot radius
-	LabelList      *LabelListModel  `json:"labelList,omitempty"`   // lines: value labels
+	Key             string           `json:"key"`
+	Label           string           `json:"label"`
+	Color           string           `json:"color"`
+	Values          []float64        `json:"values"`
+	Gaps            []bool           `json:"gaps,omitempty"`           // rows without a value: the curve breaks there
+	FillOpacity     float64          `json:"fillOpacity,omitempty"`    // areas: 0 uses Recharts' 0.6
+	Curve           string           `json:"curve,omitempty"`          // "natural" (default), "linear", "step", "monotone"
+	FillOpacityPtr  *float64         `json:"fillOpacityPtr,omitempty"` // radar: an explicit zero stays
+	Icon            string           `json:"icon,omitempty"`           // rendered svg, replaces the tooltip indicator
+	Fill            string           `json:"fill,omitempty"`           // verbatim fill, e.g. url(#fillDesktop)
+	Stroke          string           `json:"stroke,omitempty"`         // verbatim stroke for the area line
+	Radius          []float64        `json:"radius,omitempty"`         // bars: corner radii, one or four
+	StackID         string           `json:"stackId,omitempty"`
+	Cells           []string         `json:"cells,omitempty"` // bars: fill per data row
+	ActiveIndex     *int             `json:"activeIndex,omitempty"`
+	ActiveBar       *RectangleProps  `json:"activeBar,omitempty"`
+	LabelLists      []LabelListModel `json:"labelLists,omitempty"`      // bars: one or more label lists
+	StrokeWidth     float64          `json:"strokeWidth,omitempty"`     // lines: stroke width
+	StrokeDasharray string           `json:"strokeDasharray,omitempty"` // lines: dashed curve
+	Dot             *DotModel        `json:"dot,omitempty"`             // lines: per point dots
+	ActiveDotR      float64          `json:"activeDotR,omitempty"`      // lines: hover dot radius
+	LabelList       *LabelListModel  `json:"labelList,omitempty"`       // lines: value labels
 	// radial bars: the track behind the bar, its corner radius and the
 	// class the source puts on the sectors
 	Background   bool     `json:"background,omitempty"`
@@ -2596,9 +2634,10 @@ type DotModel struct {
 	R           float64  `json:"r,omitempty"`
 	FillOpacity float64  `json:"fillOpacity,omitempty"`
 	Fill        string   `json:"fill,omitempty"`
-	Fills       []string `json:"fills,omitempty"` // per point fills from the data rows
-	Icon        string   `json:"icon,omitempty"`  // rendered svg replacing the dot
-	Size        float64  `json:"size,omitempty"`  // icon box size
+	Fills       []string `json:"fills,omitempty"`   // per point fills from the data rows
+	Icon        string   `json:"icon,omitempty"`    // rendered svg replacing the dot
+	Size        float64  `json:"size,omitempty"`    // icon box size
+	Indices     []int    `json:"indices,omitempty"` // only these rows get a dot
 }
 
 // LabelListModel carries the precomputed labels of a LabelList.
