@@ -304,6 +304,37 @@ function monotonePath(xs, ys) {
   return d;
 }
 
+/* isGap says whether a series has no value at a row. */
+function isGap(s, i) {
+  return !!(s.gaps && s.gaps[i]);
+}
+
+/* hiddenKeys reads the series a container hides, its data-tui-chart-hidden
+ * attribute as space separated data keys: the pendant of Recharts' hide
+ * prop on a series, settable from the page. */
+function hiddenKeys(container) {
+  const attr = container && container.getAttribute("data-tui-chart-hidden");
+  return attr ? attr.split(/\s+/).filter(Boolean) : [];
+}
+
+function isHidden(m, s) {
+  return !!(m.hidden && m.hidden.includes(s.key));
+}
+
+/* gappedPath draws one subpath per run of values, the pendant of
+ * connectNulls off: the curve breaks at every gap. */
+function gappedPath(curve, xs, ys, gaps) {
+  if (!gaps) return curvePath(curve, xs, ys);
+  let d = "";
+  let start = 0;
+  for (let i = 0; i <= xs.length; i++) {
+    if (i < xs.length && !gaps[i]) continue;
+    if (i > start) d += curvePath(curve, xs.slice(start, i), ys.slice(start, i));
+    start = i + 1;
+  }
+  return d;
+}
+
 function curvePath(curve, xs, ys) {
   if (curve === "linear") return linearPath(xs, ys);
   if (curve === "step") return stepPath(xs, ys);
@@ -536,9 +567,11 @@ function renderCartesian(panel, m, state, alpha = 1) {
   // During a morph the scale is pinned to the target domain like
   // Recharts, which interpolates pixel positions on the new scale.
   const tickCount = m.tickCount || 5;
-  const ticks = m.domainMax
-    ? Array.from({ length: tickCount }, (_, i) => (m.domainMax * i) / (tickCount - 1))
-    : domainTicks(m, tickCount);
+  const ticks = m.yTicks && m.yTicks.length
+    ? m.yTicks
+    : m.domainMax
+      ? Array.from({ length: tickCount }, (_, i) => (m.domainMax * i) / (tickCount - 1))
+      : domainTicks(m, tickCount);
   const domainMin = ticks[0];
   const domainMax = ticks[ticks.length - 1];
 
@@ -594,7 +627,7 @@ function renderCartesian(panel, m, state, alpha = 1) {
       if (m.yTickLine) {
         svg += `<line orientation="left" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="${fmtF(plotX - TICK_SIZE)}" y1="${fmtF(yCoords[tk.index])}" x2="${fmtF(plotX)}" y2="${fmtF(yCoords[tk.index])}"/>`;
       }
-      svg += `<text orientation="left" width="${fmtF(yAxisW)}" x="${fmtF(labelX)}" y="${fmtF(tk.coord)}" stroke="none" fill="#666" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end"><tspan dy="0.355em">${fmtF(ticks[tk.index])}</tspan></text></g>`;
+      svg += `<text orientation="left" width="${fmtF(yAxisW)}" x="${fmtF(labelX)}" y="${fmtF(tk.coord)}" stroke="none" fill="#666" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end"><tspan dy="0.355em">${m.yTickLabels ? m.yTickLabels[tk.index] : fmtF(ticks[tk.index])}</tspan></text></g>`;
     }
     svg += "</g></g>";
   }
@@ -774,16 +807,21 @@ function renderCartesian(panel, m, state, alpha = 1) {
       // the previous point picked by prevPointsDiffFactor.
       const sx = morphPoints(state.morph, si, cats.slice(), "xs");
       const top = morphPoints(state.morph, si, vals[si].map((v) => linearY(v - domainMin, domainMax - domainMin, plotY, plotH)), "tops");
-      const d = curvePath(s.curve, sx, top);
+      if (isHidden(m, s)) {
+        state.tops.push(top);
+        state.points.xs.push(sx);
+        continue;
+      }
+      const d = gappedPath(s.curve, sx, top, s.gaps);
       // The Recharts line entrance: strokeDasharray sweeps the measured
       // curve length from 0 to totalLength.
-      let dash = "";
+      let dash = s.strokeDasharray ? ` stroke-dasharray="${s.strokeDasharray}"` : "";
       if (alpha < 1) {
         const total = pathLength(d);
         dash = ` stroke-dasharray="${fmtF(total * alpha)}px ${fmtF(total - total * alpha)}px"`;
       }
       svg +=
-        `<g class="recharts-layer recharts-line">` +
+        `<g class="recharts-layer recharts-line" data-key="${s.key}">` +
         `<path class="recharts-curve recharts-line-curve" stroke="${s.stroke || s.color}" stroke-width="${s.strokeWidth || 1}" fill="none"${dash} d="${d}"/>`;
       // Dots and labels appear when the entrance and the update morph
       // finished, like Recharts' isAnimationFinished gate on renderDots
@@ -791,6 +829,7 @@ function renderCartesian(panel, m, state, alpha = 1) {
       if (alpha >= 1 && !state.morph && s.dot) {
         svg += `<g class="recharts-layer recharts-line-dots">`;
         for (let i = 0; i < n; i++) {
+          if (isGap(s, i) || (s.dot.indices && !s.dot.indices.includes(i))) continue;
           if (s.dot.icon) {
             const size = s.dot.size || 24;
             svg += `<g transform="translate(${fmtF(sx[i] - size / 2)},${fmtF(top[i] - size / 2)})">${s.dot.icon}</g>`;
@@ -1647,6 +1686,7 @@ function tooltipHTML(m, i, pieIndex = 0) {
     return html;
   }
   m.series.forEach((s, si) => {
+    if (isGap(s, i) || isHidden(m, s)) return;
     const rowCls =
       "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground" +
       (t.indicator !== "line" && t.indicator !== "dashed" ? " items-center" : "");
@@ -1752,6 +1792,7 @@ function showActiveDots(panel, m, state, i) {
     // renderActivePoint's defaults: r 4, white stroke of 2, filled with the
     // item's main color. getLegendItemColor prefers the stroke over the fill.
     const series = m.series[s];
+    if (isGap(series, i) || isHidden(m, series)) continue;
     const r = series.activeDotR || 4;
     const mainColor = series.stroke && series.stroke !== "none" ? series.stroke : series.fill || series.color || "none";
     // A radar point carries its own x, the cartesian charts share the
@@ -1796,6 +1837,7 @@ function initPanel(script) {
   const state = { uid: "tui-chart-" + uid++ };
 
   const render = (alpha = 1) => {
+    m.hidden = hiddenKeys(container);
     if (m.kind === "pie") renderPie(panel, m, state, alpha);
     else if (m.kind === "radar") renderRadar(panel, m, state, alpha);
     else if (m.kind === "radial") renderRadial(panel, m, state, alpha);
@@ -1859,6 +1901,11 @@ function initPanel(script) {
     }
   });
   ro.observe(panel);
+  if (container) {
+    new MutationObserver(() => {
+      if (state.mounted) render(1);
+    }).observe(container, { attributes: true, attributeFilter: ["data-tui-chart-hidden"] });
+  }
 
   // Without a declared Tooltip child Recharts renders no tooltip, no
   // active dots and no cursor, so none of the hover wiring applies.
